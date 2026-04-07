@@ -18,7 +18,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |-------|---------|
 | [Technology](./topics/technology/INDEX.md) | 2 |
 | [Science](./topics/science/INDEX.md) | 0 |
-| [Business](./topics/business/INDEX.md) | 1 |
+| [Business](./topics/business/INDEX.md) | 2 |
 | [Health](./topics/health/INDEX.md) | 0 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Ideas](./topics/ideas/INDEX.md) | 3 |
@@ -33,6 +33,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-04-07 | [The Big Thing: We Are in a World War That Won't End Quickly](./topics/business/2026-04-07-ray-dalio-world-war-geopolitics.md) | Business |
 | 2026-04-07 | [Agent Team](./topics/ideas/2026-04-07-agent-team.md) | Ideas |
 | 2026-04-07 | [Sleepy](./topics/ideas/2026-04-07-sleepy.md) | Ideas |
 | 2026-04-07 | [八字 Dating App](./topics/ideas/2026-04-07-bazi-dating-app.md) | Ideas |
@@ -54,6 +55,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-04-07 | [八字 Dating App](./topics/ideas/2026-04-07-bazi-dating-app.md) | Ideas | dating, bazi, astrology, app-idea, matchmaking |
 | 2026-04-07 | [Sleepy](./topics/ideas/2026-04-07-sleepy.md) | Ideas | sleep, wellness, app-idea, health |
 | 2026-04-07 | [Agent Team](./topics/ideas/2026-04-07-agent-team.md) | Ideas | AI, agents, productivity, automation, multi-agent |
+| 2026-04-07 | [The Big Thing: We Are in a World War That Won't End Quickly](./topics/business/2026-04-07-ray-dalio-world-war-geopolitics.md) | Business | geopolitics, world-war, Ray-Dalio, macro, US-China, trade-war |
 <!-- ALL_ENTRIES_END -->
 
 ---

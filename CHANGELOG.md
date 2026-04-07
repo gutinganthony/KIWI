@@ -13,4 +13,5 @@ All updates to entries are logged here chronologically.
 | 2026-04-07 | Added | [八字 Dating App](./topics/ideas/2026-04-07-bazi-dating-app.md) | New Ideas category — 八字合婚交友 App |
 | 2026-04-07 | Added | [Sleepy](./topics/ideas/2026-04-07-sleepy.md) | New Ideas category — 睡眠 App |
 | 2026-04-07 | Added | [Agent Team](./topics/ideas/2026-04-07-agent-team.md) | New Ideas category — 多 Agent 協作系統 |
+| 2026-04-07 | Added | [The Big Thing: We Are in a World War](./topics/business/2026-04-07-ray-dalio-world-war-geopolitics.md) | Ray Dalio Substack，via Mapify 心智圖 |
 <!-- CHANGELOG_ENTRIES_END -->
