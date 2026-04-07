@@ -16,7 +16,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 
 | Topic | Entries |
 |-------|---------|
-| [Technology](./topics/technology/INDEX.md) | 1 |
+| [Technology](./topics/technology/INDEX.md) | 2 |
 | [Science](./topics/science/INDEX.md) | 0 |
 | [Business](./topics/business/INDEX.md) | 1 |
 | [Health](./topics/health/INDEX.md) | 0 |
@@ -32,6 +32,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-04-07 | [为了让AI学会交易，我搭了一个量化交易系统](./topics/technology/2026-04-07-ai-quant-trading-system-tutorial.md) | Technology |
 | 2026-04-07 | [光子学供应链投资逻辑：AI 基础设施的下一层重估](./topics/business/2026-04-07-photonics-ai-infrastructure-investment.md) | Business |
 | 2026-04-07 | [最能帮助你赚钱的40个GitHub仓库](./topics/technology/2026-04-07-40-github-repos-to-make-money.md) | Technology |
 <!-- RECENT_ENTRIES_END -->
@@ -43,6 +44,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- ALL_ENTRIES_START -->
 | Date | Title | Topic | Tags |
 |------|-------|-------|------|
+| 2026-04-07 | [为了让AI学会交易，我搭了一个量化交易系统](./topics/technology/2026-04-07-ai-quant-trading-system-tutorial.md) | Technology | AI, quant-trading, crypto, OKX, tutorial, LLM |
 | 2026-04-07 | [光子学供应链投资逻辑：AI 基础设施的下一层重估](./topics/business/2026-04-07-photonics-ai-infrastructure-investment.md) | Business | investment, photonics, AI-infrastructure, semiconductor |
 | 2026-04-07 | [最能帮助你赚钱的40个GitHub仓库](./topics/technology/2026-04-07-40-github-repos-to-make-money.md) | Technology | indie-hacker, monetization, quant-trading, crypto, content-automation |
 <!-- ALL_ENTRIES_END -->
