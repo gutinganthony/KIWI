@@ -16,7 +16,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 
 | Topic | Entries |
 |-------|---------|
-| [Technology](./topics/technology/INDEX.md) | 0 |
+| [Technology](./topics/technology/INDEX.md) | 1 |
 | [Science](./topics/science/INDEX.md) | 0 |
 | [Business](./topics/business/INDEX.md) | 0 |
 | [Health](./topics/health/INDEX.md) | 0 |
@@ -30,7 +30,9 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 ## Recent Entries
 
 <!-- RECENT_ENTRIES_START -->
-*No entries yet.*
+| Date | Title | Topic |
+|------|-------|-------|
+| 2026-04-07 | [最能帮助你赚钱的40个GitHub仓库](./topics/technology/2026-04-07-40-github-repos-to-make-money.md) | Technology |
 <!-- RECENT_ENTRIES_END -->
 
 ---
@@ -38,7 +40,9 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 ## All Entries (Chronological)
 
 <!-- ALL_ENTRIES_START -->
-*No entries yet.*
+| Date | Title | Topic | Tags |
+|------|-------|-------|------|
+| 2026-04-07 | [最能帮助你赚钱的40个GitHub仓库](./topics/technology/2026-04-07-40-github-repos-to-make-money.md) | Technology | indie-hacker, monetization, quant-trading, crypto, content-automation |
 <!-- ALL_ENTRIES_END -->
 
 ---
