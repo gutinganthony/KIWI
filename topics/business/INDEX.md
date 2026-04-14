@@ -6,3 +6,6 @@
 | 2026-04-14 | [如何獲得創業想法 (How to Get Startup Ideas)](./2026-04-14-how-to-get-startup-ideas.md) | startup, ideation, Paul-Graham, YC, entrepreneurship |
 | 2026-04-14 | [AI 時代建立新創的新方法 (The New Way To Build A Startup)](./2026-04-14-the-new-way-to-build-a-startup.md) | startup, AI, YC, Garry-Tan, vibe-coding, small-team |
 | 2026-04-14 | [為什麼創辦人應該比想像中更早推出公司](./2026-04-14-why-founders-should-launch-sooner.md) | startup, launch, MVP, YC, founder-advice |
+| 2026-04-14 | [地緣政治與軍事戰略 — 學者資料庫](./2026-04-14-geopolitics-war-scholars.md) | geopolitics, war, military-strategy, scholars |
+| 2026-04-14 | [原物料、能源與貨幣體系 — 學者資料庫](./2026-04-14-commodities-energy-scholars.md) | commodities, energy, monetary-system, gold |
+| 2026-04-14 | [政治經濟與世界秩序 — 學者資料庫](./2026-04-14-political-economy-world-order-scholars.md) | political-economy, world-order, US-China, multipolarity |

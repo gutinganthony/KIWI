@@ -32,9 +32,11 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
-| 2026-04-14 | [如何獲得創業想法 (How to Get Startup Ideas)](./topics/business/2026-04-14-how-to-get-startup-ideas.md) | Business |
-| 2026-04-14 | [AI 時代建立新創的新方法 (The New Way To Build A Startup)](./topics/business/2026-04-14-the-new-way-to-build-a-startup.md) | Business |
-| 2026-04-14 | [為什麼創辦人應該比想像中更早推出公司](./topics/business/2026-04-14-why-founders-should-launch-sooner.md) | Business |
+| 2026-04-14 | [地緣政治與軍事戰略 — 學者資料庫](./topics/business/2026-04-14-geopolitics-war-scholars.md) | Business |
+| 2026-04-14 | [原物料、能源與貨幣體系 — 學者資料庫](./topics/business/2026-04-14-commodities-energy-scholars.md) | Business |
+| 2026-04-14 | [政治經濟與世界秩序 — 學者資料庫](./topics/business/2026-04-14-political-economy-world-order-scholars.md) | Business |
+| 2026-04-14 | [如何獲得創業想法](./topics/business/2026-04-14-how-to-get-startup-ideas.md) | Business |
+| 2026-04-14 | [AI 時代建立新創的新方法](./topics/business/2026-04-14-the-new-way-to-build-a-startup.md) | Business |
 <!-- RECENT_ENTRIES_END -->
 
 ---
