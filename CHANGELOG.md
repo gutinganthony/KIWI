@@ -5,6 +5,7 @@ All updates to entries are logged here chronologically.
 ---
 
 <!-- CHANGELOG_ENTRIES_START -->
+| 2026-04-15 | Added | [如何用 Claude Code 自動化重複性商業任務](./topics/technology/2026-04-15-automate-business-tasks-with-claude-code.md) | Geeky Gadgets 報導 + Simon Scrapes 分析：Claude.md、Skills、商業自動化 |
 | 2026-04-14 | Added | [地緣政治與軍事戰略學者資料庫](./topics/business/2026-04-14-geopolitics-war-scholars.md) | 6 位學者，含 Mearsheimer, Posen, Walt 等 |
 | 2026-04-14 | Added | [原物料能源學者資料庫](./topics/business/2026-04-14-commodities-energy-scholars.md) | 8 位分析師，含 Pozsar, Napier, Currie 等 |
 | 2026-04-14 | Added | [政治經濟世界秩序學者資料庫](./topics/business/2026-04-14-political-economy-world-order-scholars.md) | 10 位學者，含 Dalio, Pettis, Ferguson 等 |
