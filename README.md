@@ -16,7 +16,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 
 | Topic | Entries |
 |-------|---------|
-| [Technology](./topics/technology/INDEX.md) | 2 |
+| [Technology](./topics/technology/INDEX.md) | 3 |
 | [Science](./topics/science/INDEX.md) | 0 |
 | [Business](./topics/business/INDEX.md) | 13 |
 | [Health](./topics/health/INDEX.md) | 0 |
@@ -32,11 +32,11 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-04-20 | [Claude Code 股票分析 Skills 安裝筆記 (TradingView 生態)](./topics/technology/2026-04-20-claude-code-stock-analysis-skills.md) | Technology |
 | 2026-04-20 | [AVI V4 — IG + Threads 社群發文素材庫](./topics/business/2026-04-20-avi-v4-social-posts.md) | Business |
 | 2026-04-20 | [AVI V4 — 12 個月走勢 + 五次崩盤 + 部落格文](./topics/business/2026-04-20-avi-v4-analysis-with-charts.md) | Business |
 | 2026-04-20 | [AVI V4 — 完整介紹指南 (Deep Dive)](./topics/business/2026-04-20-avi-v4-introduction-guide.md) | Business |
 | 2026-04-20 | [AVI V4 — 美股市場風險指標](./topics/business/2026-04-20-avi-v4-market-risk-index.md) | Business |
-| 2026-04-17 | [芋泥 Yuni — 行銷執行素材庫](./topics/business/2026-04-17-yuni-marketing-execution.md) | Business |
 <!-- RECENT_ENTRIES_END -->
 
 ---
@@ -56,6 +56,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-04-14 | [芋泥 Yuni — 行銷啟動計畫](./topics/business/2026-04-14-yuni-launch-campaign.md) | Business |
 | 2026-04-17 | [芋泥 Yuni — 行銷執行素材庫](./topics/business/2026-04-17-yuni-marketing-execution.md) | Business |
 | 2026-04-20 | [AVI V4 — 美股市場風險指標](./topics/business/2026-04-20-avi-v4-market-risk-index.md) | Business |
+| 2026-04-20 | [Claude Code 股票分析 Skills 安裝筆記 (TradingView 生態)](./topics/technology/2026-04-20-claude-code-stock-analysis-skills.md) | Technology |
 <!-- ALL_ENTRIES_END -->
 
 ---
