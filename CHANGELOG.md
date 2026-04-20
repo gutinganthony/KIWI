@@ -5,6 +5,8 @@ All updates to entries are logged here chronologically.
 ---
 
 <!-- CHANGELOG_ENTRIES_START -->
+| 2026-04-20 | Added | [AVI V4 — IG + Threads 社群發文素材庫](./topics/business/2026-04-20-avi-v4-social-posts.md) | IG Carousel 6 slides 設計、主 caption、Threads 10 則串文、發文時程 |
+| 2026-04-20 | Updated | [AVI V4 — 12 個月走勢 + 五次崩盤 + 部落格文](./topics/business/2026-04-20-avi-v4-analysis-with-charts.md) | v1.2：新增六維度雷達圖（含歷史崩盤對照）|
 | 2026-04-20 | Updated | [AVI V4 — 12 個月走勢 + 五次崩盤 + 部落格文](./topics/business/2026-04-20-avi-v4-analysis-with-charts.md) | v1.1：新增 3 張視覺化圖（三情境 fan chart、事件維度影響、成分拆解），共 5 張圖 |
 | 2026-04-20 | Added | [AVI V4 — 12 個月走勢 + 五次崩盤 + 部落格文](./topics/business/2026-04-20-avi-v4-analysis-with-charts.md) | 含 AVI/S&P 對照圖、5 次崩盤網格圖、Iran/Fed 情境分析、1500 字示範介紹文 |
 | 2026-04-20 | Added | [AVI V4 — 完整介紹指南 (Deep Dive)](./topics/business/2026-04-20-avi-v4-introduction-guide.md) | 13 章節完整設計文件：V3 問題、三大升級、14 指標、回測、使用場景 |

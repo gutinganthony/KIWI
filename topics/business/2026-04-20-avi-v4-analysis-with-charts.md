@@ -5,7 +5,7 @@ date_added: 2026-04-20
 last_updated: 2026-04-20
 topic: business
 tags: [market-risk, AVI, analysis, S&P500, Iran-war, Fed, blog, scenarios, personal-project]
-version: 1.1
+version: 1.2
 related: [./2026-04-20-avi-v4-market-risk-index.md, ./2026-04-20-avi-v4-introduction-guide.md]
 ---
 
@@ -327,6 +327,24 @@ AVI 不給你答案。它只給你一個數字，和一個提醒。
 
 ---
 
+
+
+### 📊 六維度使用率雷達圖
+
+![六維度風險雷達圖（含歷史對照）](./assets/avi-v4-analysis/blog_dim_radar_detailed.png)
+
+這張雷達圖把目前 6 個維度的使用率（占滿分百分比）和 **2000 / 2007 / 2022** 三次歷史崩盤高峰疊在一起：
+
+- **紅色實心粗線** = 2026-04 目前讀數
+- **三條虛線** = 歷史崩盤高峰形狀
+
+**最重要的觀察**：目前的「形狀」和 **2022 升息修正**高度相似（估值高 + 利率壓力 + 動量過熱 + 信用低），也和 **2000 Dot-com** 相似但**信用維度（目前 10%）比 2000 當時（77%）更低** — 這代表泡沫分化比歷史更極端，信用市場還完全沒有警覺。
+
+歷史上這種「估值-信用背離」形態，最後都是信用先破，把 AVI 從 7.0 拉到 8.0+。
+
+
+---
+
 ## 本文附圖清單
 
 1. **[12 個月 AVI vs S&P 500 對照圖](./assets/avi-v4-analysis/blog_12m_avi_vs_sp500.png)** — 顯示 AVI 7.0 突破與 S&P 新高的雙頂結構
@@ -334,6 +352,7 @@ AVI 不給你答案。它只給你一個數字，和一個提醒。
 3. **[三情境 AVI + S&P 展望圖](./assets/avi-v4-analysis/blog_scenarios_fan.png)** — 樂觀/基本/風險情境 12 個月前瞻
 4. **[情境事件對 AVI 六維度的影響](./assets/avi-v4-analysis/blog_event_impact.png)** — 伊朗/Fed 各情境的量化衝擊拆解
 5. **[2026-04 當前 AVI 成分拆解](./assets/avi-v4-analysis/blog_current_breakdown.png)** — 14 指標對總分 7.00 的個別貢獻
+6. **[六維度雷達圖（含歷史對照）](./assets/avi-v4-analysis/blog_dim_radar_detailed.png)** — 目前形狀 vs 2000/2007/2022 三次崩盤高峰
 
 ## 相關文件
 
@@ -346,3 +365,4 @@ AVI 不給你答案。它只給你一個數字，和一個提醒。
 
 - 2026-04-20 v1.0: Initial entry
 - 2026-04-20 v1.1: 新增三張視覺化圖（三情境 fan chart、事件對維度影響、2026-04 成分拆解）
+- 2026-04-20 v1.2: 新增六維度雷達圖（含歷史崩盤對照），共 6 張視覺化
