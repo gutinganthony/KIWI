@@ -12,3 +12,4 @@
 | 2026-04-14 | [芋泥 Yuni — 行銷啟動計畫](./2026-04-14-yuni-launch-campaign.md) | yuni, marketing, launch, personal-project |
 | 2026-04-17 | [芋泥 Yuni — 行銷執行素材庫](./2026-04-17-yuni-marketing-execution.md) | yuni, marketing, threads, instagram, content, seeding, templates |
 | 2026-04-20 | [AVI V4 — 美股市場風險指標（個人專案）](./2026-04-20-avi-v4-market-risk-index.md) | market-risk, valuation, AVI, quant, financial-indicators, CAPE, personal-project |
+| 2026-04-20 | [AVI V4 — 完整介紹指南 (Deep Dive)](./2026-04-20-avi-v4-introduction-guide.md) | market-risk, AVI, valuation, CAPE, quant, deep-dive |
