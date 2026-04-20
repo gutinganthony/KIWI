@@ -4,17 +4,17 @@ url: local
 date_added: 2026-04-20
 last_updated: 2026-04-20
 topic: business
-tags: [market-risk, AVI, analysis, S&P500, Iran-war, Fed, blog, personal-project]
-version: 1.0
+tags: [market-risk, AVI, analysis, S&P500, Iran-war, Fed, blog, scenarios, personal-project]
+version: 1.1
 related: [./2026-04-20-avi-v4-market-risk-index.md, ./2026-04-20-avi-v4-introduction-guide.md]
 ---
 
-> **此為 AVI V4 的綜合分析文**。內含三部分：
-> 1. 過去 12 個月 AVI vs S&P 500 走勢分析（含伊朗戰爭 + Fed 主席換人的風險展望）
+> **AVI V4 綜合分析文**。三部分：
+> 1. 過去 12 個月 AVI vs S&P 500 走勢分析（含伊朗戰爭 + Fed 主席議題情境分析、5 張視覺化圖表）
 > 2. 用 AVI V4 檢視五次歷史崩盤的走勢圖
-> 3. 一篇部落格視角的介紹文章
+> 3. 部落格視角的 1500 字介紹文
 >
-> 設計說明請參考：[摘要版](./2026-04-20-avi-v4-market-risk-index.md) ｜ [完整指南](./2026-04-20-avi-v4-introduction-guide.md)
+> 設計說明請看：[摘要版](./2026-04-20-avi-v4-market-risk-index.md) ｜ [完整指南](./2026-04-20-avi-v4-introduction-guide.md)
 
 ---
 
@@ -114,6 +114,45 @@ AVI 在 2025-11（6.88）與 2026-04（7.00）形成**更高高點**（higher hi
 | 🟢 樂觀情境 | 鴿派 | 衝突降溫 | 6.8-7.2 | 2027 Q3+ |
 
 **我的估計**：機率分配大概是 **基本情境 50% / 風險情境 30% / 樂觀情境 20%**，對應**加權平均預估市場見頂時點是 2027 年上半年，但若鷹派上任 + 伊朗升溫，可能提前到 2026 年 Q4**。
+
+### 三情境可視化
+
+![三情境 AVI + S&P 展望圖](./assets/avi-v4-analysis/blog_scenarios_fan.png)
+
+上圖上半部是 AVI V4 的 12 個月歷史（實心黑線）+ 未來 12 個月三個情境（虛線）。下半部是對應的 S&P 500 推估路徑。**關鍵觀察**：
+- 樂觀情境下 AVI 回落到 6.5-6.8，S&P 繼續緩漲至 7,500+
+- 基本情境下 AVI 緩升到 7.3 區間，S&P 在 2026 末到 2027 初見頂
+- 風險情境下 AVI 在 6 個月內衝到 7.65，S&P 於 Q3 2026 見頂後修正 20%+
+
+### 特定事件的量化影響
+
+每個事件對 AVI 六個維度的影響不同 — 有的只打利率維度（伊朗戰爭主要衝擊 CPI），有的會牽動多個維度（Fed 鷹派會同時拉動信用 + 宏觀 + 動量）：
+
+![情境事件對 AVI 影響](./assets/avi-v4-analysis/blog_event_impact.png)
+
+**解讀重點**：
+- **伊朗戰爭升溫**（+0.33 AVI）— 幾乎全部衝擊集中在利率維度（CPI 反彈）
+- **Fed 鷹派**（+0.60 AVI）— 最廣泛的衝擊，6 個維度中有 5 個被推動
+- **Fed 鴿派**（-0.40 AVI）— 能短期紓解利率 + 信用，但估值和動量會繼續發熱
+- **伊朗衝突降溫 + Fed 鴿派組合**是唯一可能讓 AVI 明顯回落的路徑（合計 -0.55）
+
+### 2026-04 AVI = 7.00 的成分拆解
+
+![AVI 成分拆解](./assets/avi-v4-analysis/blog_current_breakdown.png)
+
+**誰在推升目前的 7.00？** 前五大貢獻指標：
+
+| 排名 | 指標 | 百分位 | 評分 | 加權貢獻 |
+|------|------|--------|------|----------|
+| 1 | CAPE (Shiller P/E) | 97% | 9.7 | 1.164 |
+| 2 | Buffett Indicator | 97% | 9.7 | 0.873 |
+| 3 | FCF Yield (反向) | 4% | 9.6 | 0.864 |
+| 4 | P/S Ratio | 98% | 9.8 | 0.784 |
+| 5 | S&P Drawdown (反向) | 0% | 10.0 | 0.700 |
+
+**白話**：估值維度四個指標集體在 97-98 百分位 + 市場完全沒有 drawdown，這五個指標就貢獻了 **4.39 分**（總分 7.00 的 63%）。
+
+**誰還在安全位置？** 信用維度（BAA 系列）百分位僅 1-19%，這意味著「債券市場目前完全沒有擔心」。歷史上，**當股市估值已極端但信用仍樂觀時，是最典型的「泡沫末期」形態** — 2000 年初和 2021 年下半都是這種分化。一旦信用利差開始擴大，AVI 會很快從 7.0 衝到 8.0。
 
 ---
 
@@ -292,14 +331,18 @@ AVI 不給你答案。它只給你一個數字，和一個提醒。
 
 1. **[12 個月 AVI vs S&P 500 對照圖](./assets/avi-v4-analysis/blog_12m_avi_vs_sp500.png)** — 顯示 AVI 7.0 突破與 S&P 新高的雙頂結構
 2. **[五次歷史崩盤 V4 走勢匯整](./assets/avi-v4-analysis/blog_5_crises_v4_grid.png)** — 2×3 網格展示每次危機前 AVI 軌跡
+3. **[三情境 AVI + S&P 展望圖](./assets/avi-v4-analysis/blog_scenarios_fan.png)** — 樂觀/基本/風險情境 12 個月前瞻
+4. **[情境事件對 AVI 六維度的影響](./assets/avi-v4-analysis/blog_event_impact.png)** — 伊朗/Fed 各情境的量化衝擊拆解
+5. **[2026-04 當前 AVI 成分拆解](./assets/avi-v4-analysis/blog_current_breakdown.png)** — 14 指標對總分 7.00 的個別貢獻
 
 ## 相關文件
 
 - [AVI V4 完整介紹指南](./2026-04-20-avi-v4-introduction-guide.md) — 14 指標完整說明、計算邏輯
-- *AVI V4 回測報告（本地檔：reports_v4/avi_backtest_v4_report.md）* — 每次危機的詳細指標貢獻分析
-- *V3/V4/V4.1 三方比較（本地檔：reports_comparison/avi_comparison_report.md）* — 版本差異與權衡
+- *AVI V4 回測報告（本地檔）* — 每次危機的詳細指標貢獻分析
+- *V3/V4/V4.1 三方比較（本地檔）* — 版本差異與權衡
 
 
 ## Update Log
 
-- 2026-04-20 v1.0: Initial entry — 12 個月 AVI/S&P 對照分析、5 次崩盤走勢圖、部落格示範文章（含伊朗戰爭 + Fed 主席議題的情境分析）
+- 2026-04-20 v1.0: Initial entry
+- 2026-04-20 v1.1: 新增三張視覺化圖（三情境 fan chart、事件對維度影響、2026-04 成分拆解）
