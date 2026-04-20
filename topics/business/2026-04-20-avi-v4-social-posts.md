@@ -5,7 +5,7 @@ date_added: 2026-04-20
 last_updated: 2026-04-20
 topic: business
 tags: [AVI, social-media, IG, Threads, X, Twitter, stories, content-marketing, personal-project]
-version: 2.0
+version: 2.1
 related: [./2026-04-20-avi-v4-analysis-with-charts.md, ./2026-04-20-avi-v4-introduction-guide.md]
 ---
 
@@ -13,6 +13,15 @@ related: [./2026-04-20-avi-v4-analysis-with-charts.md, ./2026-04-20-avi-v4-intro
 
 ---
 
+## 📦 一鍵下載素材包
+
+- **[📥 下載 ZIP 完整素材包（2.8 MB）](./assets/avi-v4-analysis/AVI_V4_Social_Kit.zip)** — 14 張素材圖 + 4 份 MD 文件 + 總覽縮圖 + 排程 XLSX
+- **[📅 發文行事曆 XLSX](./assets/avi-v4-analysis/AVI_V4_Posting_Schedule.xlsx)** — 7 天排程 + KPI 目標
+- **[🖼️ 素材總覽縮圖](./assets/avi-v4-analysis/AVI_V4_Asset_Overview.png)** — 14 張素材一覽（4×4 網格）
+
+![AVI V4 素材總覽](./assets/avi-v4-analysis/AVI_V4_Asset_Overview.png)
+
+---
 # AVI V4 社群發文素材庫
 
 *2026-04-20 ｜ 依 IG + Threads 優化格式設計*
@@ -706,3 +715,4 @@ IG Stories 是一次性 24 小時內容，目標是**「鉤上去 → 跳到 blo
 
 - 2026-04-20 v1.0: Initial entry — IG Carousel 6 slides、主 caption、Threads 10 則串文
 - 2026-04-20 v2.0: 擴充 X/Twitter 12 則 Thread（+ Premium 單則長文版）、IG Stories 4 張（9:16）、多平台素材對照表
+- 2026-04-20 v2.1: 新增 ZIP 打包 + 素材總覽縮圖 + 發文行事曆 XLSX（可下載）
