@@ -2,6 +2,8 @@
 
 | Date | Title | Tags |
 |------|-------|------|
+| 2026-04-21 | [我的兩億美元創業錯誤 — Peter Thiel 問了，我說不](./2026-04-21-my-200-million-startup-mistake.md) | startup, equity, opportunity-cost, palantir, peter-thiel, garry-tan |
+| 2026-04-21 | [如何獲得創業想法 (How to Get Startup Ideas)](./2026-04-21-how-to-get-startup-ideas.md) | startup, paul-graham, yc, ideation, problem-solving, classic |
 | 2026-04-07 | [光子学供应链投资逻辑：AI 基础设施的下一层重估](./2026-04-07-photonics-ai-infrastructure-investment.md) | investment, photonics, silicon-photonics, AI-infrastructure, semiconductor |
 | 2026-04-14 | [如何獲得創業想法 (How to Get Startup Ideas)](./2026-04-14-how-to-get-startup-ideas.md) | startup, ideation, Paul-Graham, YC, entrepreneurship |
 | 2026-04-14 | [AI 時代建立新創的新方法 (The New Way To Build A Startup)](./2026-04-14-the-new-way-to-build-a-startup.md) | startup, AI, YC, Garry-Tan, vibe-coding, small-team |
