@@ -15,3 +15,4 @@
 | 2026-04-20 | [AVI V4 — 完整介紹指南 (Deep Dive)](./2026-04-20-avi-v4-introduction-guide.md) | market-risk, AVI, valuation, CAPE, quant, deep-dive |
 | 2026-04-20 | [AVI V4 — 12 個月走勢分析 + 五次崩盤回顧 + 部落格介紹文](./2026-04-20-avi-v4-analysis-with-charts.md) | market-risk, AVI, analysis, S&P500, Iran-war, Fed, blog |
 | 2026-04-20 | [AVI V4 — IG + Threads 社群發文素材庫](./2026-04-20-avi-v4-social-posts.md) | AVI, social-media, IG, Threads, content-marketing |
+| 2026-05-04 | [AVI 股票風險指標網站 — 商業化獲利模式評估與策略規劃](./2026-05-04-avi-monetization-strategy.md) | AVI, monetization, SaaS, business-strategy, subscription, fintech |
