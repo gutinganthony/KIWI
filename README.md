@@ -19,7 +19,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | [Technology](./topics/technology/INDEX.md) | 5 |
 | [Science](./topics/science/INDEX.md) | 0 |
 | [Business](./topics/business/INDEX.md) | 3 |
-| [Health](./topics/health/INDEX.md) | 0 |
+| [Health](./topics/health/INDEX.md) | 1 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Other](./topics/other/INDEX.md) | 0 |
 
@@ -32,11 +32,11 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-05-05 | [減內臟脂肪，光靠少吃多動沒用！科學證實這 3 招效果更驚人](./topics/health/2026-05-05-reduce-visceral-fat-3-proven-methods.md) | Health |
 | 2026-04-22 | [四個量化交易入門專案](./topics/technology/2026-04-22-4-quant-projects-to-get-started.md) | Technology |
 | 2026-04-21 | [我的兩億美元創業錯誤 — Peter Thiel 問了，我說不](./topics/business/2026-04-21-my-200-million-startup-mistake.md) | Business |
 | 2026-04-21 | [如何獲得創業想法 (Paul Graham)](./topics/business/2026-04-21-how-to-get-startup-ideas.md) | Business |
 | 2026-04-21 | [垂直 AI Agent 的規模可能是 SaaS 的 10 倍](./topics/technology/2026-04-21-vertical-ai-agents-10x-bigger-than-saas.md) | Technology |
-| 2026-04-15 | [如何用 Claude Code 自動化重複性商業任務](./topics/technology/2026-04-15-automate-business-tasks-with-claude-code.md) | Technology |
 <!-- RECENT_ENTRIES_END -->
 
 ---
@@ -46,6 +46,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- ALL_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-05-05 | [減內臟脂肪，光靠少吃多動沒用！科學證實這 3 招效果更驚人](./topics/health/2026-05-05-reduce-visceral-fat-3-proven-methods.md) | Health |
 | 2026-04-22 | [四個量化交易入門專案 (4 Quant Projects to Get You Started)](./topics/technology/2026-04-22-4-quant-projects-to-get-started.md) | Technology |
 | 2026-04-21 | [我的兩億美元創業錯誤 (My $200 Million Startup Mistake)](./topics/business/2026-04-21-my-200-million-startup-mistake.md) | Business |
 | 2026-04-21 | [如何獲得創業想法 (How to Get Startup Ideas — Paul Graham)](./topics/business/2026-04-21-how-to-get-startup-ideas.md) | Business |

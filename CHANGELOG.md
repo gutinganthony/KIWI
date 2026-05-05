@@ -5,6 +5,7 @@ All updates to entries are logged here chronologically.
 ---
 
 <!-- CHANGELOG_ENTRIES_START -->
+| 2026-05-05 | Added | [減內臟脂肪 3 招](./topics/health/2026-05-05-reduce-visceral-fat-3-proven-methods.md) | 有氧運動（6% 內臟脂肪↓）、間歇性斷食（12%↓）、壓力管理+睡眠，附研究文獻 |
 | 2026-04-22 | Added | [四個量化交易入門專案](./topics/technology/2026-04-22-4-quant-projects-to-get-started.md) | @chrispathway：Regime Clustering、IV Surface、CVaR Optimization、Event Backtester |
 | 2026-04-21 | Added | [我的兩億美元創業錯誤](./topics/business/2026-04-21-my-200-million-startup-mistake.md) | Garry Tan 拒絕 Peter Thiel 加入 Palantir，錯失 $200M 股權 |
 | 2026-04-21 | Added | [如何獲得創業想法](./topics/business/2026-04-21-how-to-get-startup-ideas.md) | Paul Graham 經典文章：注意問題、Schlep Filter、活在前沿 |
