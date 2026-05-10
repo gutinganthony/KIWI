@@ -21,7 +21,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | [Business](./topics/business/INDEX.md) | 13 |
 | [Health](./topics/health/INDEX.md) | 0 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
-| [Other](./topics/other/INDEX.md) | 0 |
+| [Other](./topics/other/INDEX.md) | 1 |
 
 > New topics are added as needed.
 

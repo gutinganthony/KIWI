@@ -5,6 +5,7 @@ All updates to entries are logged here chronologically.
 ---
 
 <!-- CHANGELOG_ENTRIES_START -->
+| 2026-05-10 | Added | [Instagram 珍藏整理 2026H1](./topics/other/2026-05-10-ig-saved-posts-2026h1-digest.md) | 209 篇 IG 珍藏自動分類：Tech 65, Animals 55, Finance 42, Startup 24 等 10 類 |
 | 2026-04-20 | Updated | [AVI V4 — IG + Threads 社群發文素材庫](./topics/business/2026-04-20-avi-v4-social-posts.md) | v2.1：新增 ZIP 打包（14 圖 + 4 MD + 2 OVERVIEW）、素材總覽縮圖、發文行事曆 XLSX |
 | 2026-04-20 | Updated | [AVI V4 — IG + Threads 社群發文素材庫](./topics/business/2026-04-20-avi-v4-social-posts.md) | v2.0：擴充 X/Twitter Thread（12 則 + Premium 單則長文）+ IG Stories 4 張（9:16），共 14 張社群素材圖 |
 | 2026-04-20 | Added | [AVI V4 — IG + Threads 社群發文素材庫](./topics/business/2026-04-20-avi-v4-social-posts.md) | IG Carousel 6 slides 設計、主 caption、Threads 10 則串文、發文時程 |
