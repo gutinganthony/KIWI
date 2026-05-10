@@ -5,12 +5,14 @@ All updates to entries are logged here chronologically.
 ---
 
 <!-- CHANGELOG_ENTRIES_START -->
-| 2026-05-05 | Added | [減內臟脂肪 3 招](./topics/health/2026-05-05-reduce-visceral-fat-3-proven-methods.md) | 有氧運動（6% 內臟脂肪↓）、間歇性斷食（12%↓）、壓力管理+睡眠，附研究文獻 |
-| 2026-04-22 | Added | [四個量化交易入門專案](./topics/technology/2026-04-22-4-quant-projects-to-get-started.md) | @chrispathway：Regime Clustering、IV Surface、CVaR Optimization、Event Backtester |
-| 2026-04-21 | Added | [我的兩億美元創業錯誤](./topics/business/2026-04-21-my-200-million-startup-mistake.md) | Garry Tan 拒絕 Peter Thiel 加入 Palantir，錯失 $200M 股權 |
-| 2026-04-21 | Added | [如何獲得創業想法](./topics/business/2026-04-21-how-to-get-startup-ideas.md) | Paul Graham 經典文章：注意問題、Schlep Filter、活在前沿 |
-| 2026-04-21 | Added | [垂直 AI Agent 的規模可能是 SaaS 的 10 倍](./topics/technology/2026-04-21-vertical-ai-agents-10x-bigger-than-saas.md) | YC Lightcone Podcast：AI Agent 吃薪資不只是軟體，300+ 獨角獸預測 |
-| 2026-04-15 | Added | [如何用 Claude Code 自動化重複性商業任務](./topics/technology/2026-04-15-automate-business-tasks-with-claude-code.md) | Geeky Gadgets 報導 + Simon Scrapes 分析：Claude.md、Skills、商業自動化 |
+| 2026-04-20 | Updated | [AVI V4 — IG + Threads 社群發文素材庫](./topics/business/2026-04-20-avi-v4-social-posts.md) | v2.1：新增 ZIP 打包（14 圖 + 4 MD + 2 OVERVIEW）、素材總覽縮圖、發文行事曆 XLSX |
+| 2026-04-20 | Updated | [AVI V4 — IG + Threads 社群發文素材庫](./topics/business/2026-04-20-avi-v4-social-posts.md) | v2.0：擴充 X/Twitter Thread（12 則 + Premium 單則長文）+ IG Stories 4 張（9:16），共 14 張社群素材圖 |
+| 2026-04-20 | Added | [AVI V4 — IG + Threads 社群發文素材庫](./topics/business/2026-04-20-avi-v4-social-posts.md) | IG Carousel 6 slides 設計、主 caption、Threads 10 則串文、發文時程 |
+| 2026-04-20 | Updated | [AVI V4 — 12 個月走勢 + 五次崩盤 + 部落格文](./topics/business/2026-04-20-avi-v4-analysis-with-charts.md) | v1.2：新增六維度雷達圖（含歷史崩盤對照）|
+| 2026-04-20 | Updated | [AVI V4 — 12 個月走勢 + 五次崩盤 + 部落格文](./topics/business/2026-04-20-avi-v4-analysis-with-charts.md) | v1.1：新增 3 張視覺化圖（三情境 fan chart、事件維度影響、成分拆解），共 5 張圖 |
+| 2026-04-20 | Added | [AVI V4 — 12 個月走勢 + 五次崩盤 + 部落格文](./topics/business/2026-04-20-avi-v4-analysis-with-charts.md) | 含 AVI/S&P 對照圖、5 次崩盤網格圖、Iran/Fed 情境分析、1500 字示範介紹文 |
+| 2026-04-20 | Added | [AVI V4 — 完整介紹指南 (Deep Dive)](./topics/business/2026-04-20-avi-v4-introduction-guide.md) | 13 章節完整設計文件：V3 問題、三大升級、14 指標、回測、使用場景 |
+| 2026-04-20 | Added | [AVI V4 — 美股市場風險指標](./topics/business/2026-04-20-avi-v4-market-risk-index.md) | 14 指標 × 6 維度、20Y 滾動百分位、5/5 危機預警 100%、當前 AVI 6.73 |
 | 2026-04-14 | Added | [地緣政治與軍事戰略學者資料庫](./topics/business/2026-04-14-geopolitics-war-scholars.md) | 6 位學者，含 Mearsheimer, Posen, Walt 等 |
 | 2026-04-14 | Added | [原物料能源學者資料庫](./topics/business/2026-04-14-commodities-energy-scholars.md) | 8 位分析師，含 Pozsar, Napier, Currie 等 |
 | 2026-04-14 | Added | [政治經濟世界秩序學者資料庫](./topics/business/2026-04-14-political-economy-world-order-scholars.md) | 10 位學者，含 Dalio, Pettis, Ferguson 等 |
