@@ -1,0 +1,145 @@
+# AVI V5 Indicator Configuration
+# 14 indicators across 6 dimensions
+
+indicators:
+  # --- Valuation Dimension ---
+  cape:
+    name: "Shiller CAPE Ratio"
+    source: multpl
+    multpl_slug: shiller-pe
+    direction: up_is_risk  # ↑=↑risk
+    dimension: valuation
+    weight: 0.12
+
+  ps_ratio:
+    name: "S&P 500 P/S Ratio"
+    source: multpl
+    multpl_slug: s-p-500-price-to-sales
+    direction: up_is_risk  # ↑=↑risk
+    dimension: valuation
+    weight: 0.08
+
+  fcf_yield:
+    name: "S&P 500 Earnings Yield (FCF proxy)"
+    source: multpl
+    multpl_slug: s-p-500-earnings-yield
+    direction: up_is_safe  # ↑=↓risk (higher yield = cheaper = safer)
+    dimension: valuation
+    weight: 0.09
+
+  buffett_indicator:
+    name: "Buffett Indicator (Market Cap / GDP)"
+    source: fred
+    fred_ids:
+      - WILL5000PRFC
+      - GDP
+    computation: ratio  # WILL5000PRFC / GDP
+    direction: up_is_risk  # ↑=↑risk
+    dimension: valuation
+    weight: 0.09
+
+  # --- Profitability Dimension ---
+  roic:
+    name: "Corporate ROIC (Profits / Net Worth)"
+    source: fred
+    fred_ids:
+      - A446RC1Q027SBEA
+      - TNWMVBSNNCB
+    computation: ratio  # profits / net_worth
+    direction: up_is_safe  # ↑=↓risk (higher profitability = safer)
+    dimension: profitability
+    weight: 0.08
+
+  # --- Macro Dimension ---
+  yield_spread_10y2y:
+    name: "10Y-2Y Treasury Yield Spread"
+    source: fred
+    fred_ids:
+      - T10Y2Y
+    computation: direct
+    direction: up_is_risk  # ↑=↑risk (inverted curve signals trouble)
+    dimension: macro
+    weight: 0.04
+
+  vix:
+    name: "CBOE Volatility Index (VIX)"
+    source: fred
+    fred_ids:
+      - VIXCLS
+    computation: direct
+    direction: up_is_risk  # ↑=↑risk
+    dimension: macro
+    weight: 0.05
+
+  stlfsi:
+    name: "St. Louis Fed Financial Stress Index"
+    source: fred
+    fred_ids:
+      - STLFSI4
+    computation: direct
+    direction: up_is_risk  # ↑=↑risk
+    dimension: macro
+    weight: 0.05
+
+  # --- Rates Dimension ---
+  cpi_yoy:
+    name: "CPI Year-over-Year Change"
+    source: fred
+    fred_ids:
+      - CPIAUCSL
+    computation: pct_change_12  # 12-month percent change
+    direction: up_is_risk  # ↑=↑risk
+    dimension: rates
+    weight: 0.07
+
+  real_yield_10y:
+    name: "10Y Real Yield (DGS10 - CPI YoY)"
+    source: fred
+    fred_ids:
+      - DGS10
+      - CPIAUCSL
+    computation: real_yield  # DGS10 - CPI_YoY
+    direction: up_is_risk  # ↑=↑risk (higher real rates = tighter)
+    dimension: rates
+    weight: 0.07
+
+  # --- Credit Dimension ---
+  baa_10y_spread:
+    name: "BAA-10Y Corporate Bond Spread"
+    source: fred
+    fred_ids:
+      - BAA10YM
+    computation: direct
+    direction: up_is_risk  # ↑=↑risk
+    dimension: credit
+    weight: 0.06
+
+  baa_aaa_diff:
+    name: "BAA-AAA Credit Spread Differential"
+    source: fred
+    fred_ids:
+      - BAA
+      - AAA
+    computation: difference  # BAA - AAA
+    direction: up_is_risk  # ↑=↑risk
+    dimension: credit
+    weight: 0.06
+
+  # --- Momentum Dimension ---
+  sp500_200ma_ratio:
+    name: "S&P 500 / 200-Day Moving Average Ratio"
+    source: yfinance
+    ticker: "^GSPC"
+    computation: price_over_200ma
+    direction: up_is_risk  # ↑=↑risk (overextended above MA)
+    dimension: momentum
+    weight: 0.07
+
+  sp500_drawdown:
+    name: "S&P 500 Drawdown from Peak"
+    source: yfinance
+    ticker: "^GSPC"
+    computation: drawdown
+    direction: up_is_safe  # ↑=↓risk (drawdown value is negative; larger magnitude = more risk, but here stored as positive magnitude so direction inverted)
+    dimension: momentum
+    weight: 0.07

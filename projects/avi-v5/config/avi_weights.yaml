@@ -1,0 +1,65 @@
+# AVI V5 Dimension Weights
+# Total weight across all 6 dimensions = 100%
+
+dimensions:
+  valuation:
+    name: "Valuation"
+    description: "Market valuation metrics (CAPE, P/S, FCF Yield, Buffett)"
+    total_weight: 0.38  # 12 + 8 + 9 + 9 = 38%
+    indicators:
+      - cape
+      - ps_ratio
+      - fcf_yield
+      - buffett_indicator
+
+  profitability:
+    name: "Profitability"
+    description: "Corporate profitability and return on capital"
+    total_weight: 0.08  # 8%
+    indicators:
+      - roic
+
+  macro:
+    name: "Macro"
+    description: "Macroeconomic stress signals"
+    total_weight: 0.14  # 4 + 5 + 5 = 14%
+    indicators:
+      - yield_spread_10y2y
+      - vix
+      - stlfsi
+
+  rates:
+    name: "Rates"
+    description: "Interest rate and inflation environment"
+    total_weight: 0.14  # 7 + 7 = 14%
+    indicators:
+      - cpi_yoy
+      - real_yield_10y
+
+  credit:
+    name: "Credit"
+    description: "Credit market stress indicators"
+    total_weight: 0.12  # 6 + 6 = 12%
+    indicators:
+      - baa_10y_spread
+      - baa_aaa_diff
+
+  momentum:
+    name: "Momentum"
+    description: "Market trend and price action"
+    total_weight: 0.14  # 7 + 7 = 14%
+    indicators:
+      - sp500_200ma_ratio
+      - sp500_drawdown
+
+# Scoring parameters
+scoring:
+  percentile_window_months: 240  # 20 years
+  score_range:
+    min: 0.0
+    max: 10.0
+  # AVI score interpretation:
+  #   0-3: Market is cheap / low risk
+  #   3-5: Fair value / neutral
+  #   5-7: Elevated valuation / caution
+  #   7-10: Extreme overvaluation / high risk
