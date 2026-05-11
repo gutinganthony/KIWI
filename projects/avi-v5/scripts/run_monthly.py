@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""AVI V4 Monthly Update Script.
+"""AVI Monthly Update Script.
 
 Usage:
     python scripts/run_monthly.py [--date YYYY-MM-DD] [--verbose]
+    python scripts/run_monthly.py --v5 [--date YYYY-MM-DD] [--verbose]
 
 Requires:
     FRED_API_KEY environment variable (or .env file in project root)
@@ -57,19 +58,16 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Enable verbose/debug logging.",
     )
+    parser.add_argument(
+        "--v5",
+        action="store_true",
+        help="Run full V5 pipeline (regime + GARCH) instead of V4-only.",
+    )
     return parser.parse_args()
 
 
-def main() -> int:
-    """Run the monthly AVI computation pipeline."""
-    args = parse_args()
-    setup_logging(args.verbose)
-
-    logger = logging.getLogger("avi_monthly")
-    logger.info("=" * 60)
-    logger.info("  AVI V4 Monthly Update")
-    logger.info("=" * 60)
-
+def run_v4(args: argparse.Namespace, logger: logging.Logger) -> int:
+    """Run the V4-only pipeline."""
     # Step 1: Collect indicator data
     logger.info("Step 1: Collecting indicator data...")
     try:
@@ -107,6 +105,64 @@ def main() -> int:
     print("\n")
 
     return 0
+
+
+def run_v5(args: argparse.Namespace, logger: logging.Logger) -> int:
+    """Run the full V5 pipeline (V4 + regime + GARCH)."""
+    try:
+        from src.pipeline.avi_v5_pipeline import AVIV5Pipeline
+    except ImportError as e:
+        logger.error(
+            f"V5 pipeline import failed: {e}. "
+            "Ensure hmmlearn, arch, and scikit-learn are installed."
+        )
+        return 1
+
+    logger.info("Running full V5 pipeline...")
+    try:
+        pipeline = AVIV5Pipeline()
+        result = pipeline.run(
+            as_of_date=args.date,
+            start_date=args.start_date,
+            verbose=args.verbose,
+        )
+    except Exception as e:
+        logger.error(f"V5 pipeline failed: {e}")
+        if args.verbose:
+            import traceback
+            traceback.print_exc()
+        return 1
+
+    # Print composite summary
+    print("\n")
+    print(result.summary())
+    print("\n")
+
+    # Print V4 detail underneath
+    print("--- Detailed V4 Breakdown ---")
+    print(result.v4_result.summary())
+    print("\n")
+
+    return 0
+
+
+def main() -> int:
+    """Run the monthly AVI computation pipeline."""
+    args = parse_args()
+    setup_logging(args.verbose)
+
+    logger = logging.getLogger("avi_monthly")
+
+    if args.v5:
+        logger.info("=" * 64)
+        logger.info("  AVI V5 Monthly Update (Regime + GARCH)")
+        logger.info("=" * 64)
+        return run_v5(args, logger)
+    else:
+        logger.info("=" * 60)
+        logger.info("  AVI V4 Monthly Update")
+        logger.info("=" * 60)
+        return run_v4(args, logger)
 
 
 if __name__ == "__main__":

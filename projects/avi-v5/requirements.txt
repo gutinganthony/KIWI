@@ -1,4 +1,4 @@
-# AVI V5 - Phase 1 Dependencies
+# AVI V5 Dependencies
 # Core
 numpy>=1.24.0
 pandas>=2.0.0
@@ -19,11 +19,15 @@ pydantic>=2.0.0
 # Testing
 pytest>=7.0.0
 
+# Phase 2: Regime Engine (HMM)
+hmmlearn>=0.3.0
+scikit-learn>=1.2.0
+scipy>=1.10.0
+
+# Phase 3: GARCH Volatility
+arch>=6.0.0
+
 # Future phases (uncomment when needed):
-# hmmlearn>=0.3.0
-# scikit-learn>=1.2.0
-# arch>=6.0.0
-# scipy>=1.10.0
 # matplotlib>=3.7.0
 # jinja2>=3.1.0
 # mcp>=1.0.0
