@@ -90,7 +90,7 @@ class IndicatorCollector:
             Series that failed to fetch are omitted with a warning.
         """
         if start_date is None:
-            start_date = "2000-01-01"
+            start_date = "1970-01-01"
 
         results: dict[str, pd.Series] = {}
 

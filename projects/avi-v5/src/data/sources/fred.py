@@ -51,7 +51,7 @@ class FREDSource:
             RuntimeError: If the FRED API call fails.
         """
         if start_date is None:
-            start_date = "2000-01-01"
+            start_date = "1970-01-01"
 
         try:
             data = self._fred.get_series(
@@ -73,30 +73,20 @@ class FREDSource:
     ) -> pd.Series:
         """Compute Buffett Indicator: Wilshire 5000 / GDP.
 
-        Both series are quarterly; we align and divide.
-
         Returns:
             Monthly-interpolated ratio series.
         """
         wilshire = self.fetch_series("WILL5000PRFC", start_date, end_date)
         gdp = self.fetch_series("GDP", start_date, end_date)
 
-        # Align to quarterly frequency, then compute ratio
-        # GDP is quarterly, Wilshire is daily — resample Wilshire to quarterly
-        wilshire_q = wilshire.resample("QE").last()
+        wilshire_m = wilshire.resample("ME").last().dropna()
+        gdp_m = gdp.resample("ME").last().ffill().dropna()
 
-        # Align indexes
-        common_idx = wilshire_q.index.intersection(gdp.index)
-        if common_idx.empty:
-            # Try aligning by quarter period
-            wilshire_q.index = wilshire_q.index.to_period("Q").to_timestamp("QE")
-            gdp.index = gdp.index.to_period("Q").to_timestamp("QE")
-            common_idx = wilshire_q.index.intersection(gdp.index)
+        combined = pd.DataFrame({"wilshire": wilshire_m, "gdp": gdp_m}).dropna()
+        if combined.empty:
+            raise RuntimeError("No overlapping data for Buffett Indicator")
 
-        ratio = wilshire_q.loc[common_idx] / gdp.loc[common_idx]
-
-        # Resample to monthly for consistent frequency
-        result = ratio.resample("ME").ffill()
+        result = (combined["wilshire"] / combined["gdp"]) * 100
         result.name = "buffett_indicator"
         logger.info(f"Computed Buffett Indicator: {len(result)} monthly observations")
         return result
@@ -117,20 +107,14 @@ class FREDSource:
         profits = self.fetch_series("A446RC1Q027SBEA", start_date, end_date)
         net_worth = self.fetch_series("TNWMVBSNNCB", start_date, end_date)
 
-        # Both are quarterly — align
-        profits_q = profits.resample("QE").last()
-        net_worth_q = net_worth.resample("QE").last()
+        profits_m = profits.resample("ME").last().ffill().dropna()
+        nw_m = net_worth.resample("ME").last().ffill().dropna()
 
-        common_idx = profits_q.index.intersection(net_worth_q.index)
-        if common_idx.empty:
-            profits_q.index = profits_q.index.to_period("Q").to_timestamp("QE")
-            net_worth_q.index = net_worth_q.index.to_period("Q").to_timestamp("QE")
-            common_idx = profits_q.index.intersection(net_worth_q.index)
+        combined = pd.DataFrame({"profits": profits_m, "nw": nw_m}).dropna()
+        if combined.empty:
+            raise RuntimeError("No overlapping data for ROIC")
 
-        # Annualize profits (multiply quarterly by 4) then divide by net worth
-        ratio = (profits_q.loc[common_idx] * 4) / net_worth_q.loc[common_idx]
-
-        result = ratio.resample("ME").ffill()
+        result = (combined["profits"] * 4) / combined["nw"]
         result.name = "roic"
         logger.info(f"Computed ROIC: {len(result)} monthly observations")
         return result
@@ -165,15 +149,17 @@ class FREDSource:
         dgs10 = self.fetch_series("DGS10", start_date, end_date)
         cpi_yoy = self.fetch_cpi_yoy(start_date, end_date)
 
-        # DGS10 is daily, resample to monthly
-        dgs10_m = dgs10.resample("ME").last()
+        dgs10_m = dgs10.resample("ME").last().dropna()
+        cpi_m = cpi_yoy.resample("ME").last().dropna()
 
-        # Align indexes
-        common_idx = dgs10_m.index.intersection(cpi_yoy.index)
-        real_yield = dgs10_m.loc[common_idx] - cpi_yoy.loc[common_idx]
-        real_yield.name = "real_yield_10y"
-        logger.info(f"Computed Real Yield: {len(real_yield)} observations")
-        return real_yield
+        combined = pd.DataFrame({"dgs10": dgs10_m, "cpi": cpi_m}).dropna()
+        if combined.empty:
+            raise RuntimeError("No overlapping data for Real Yield")
+
+        result = combined["dgs10"] - combined["cpi"]
+        result.name = "real_yield_10y"
+        logger.info(f"Computed Real Yield: {len(result)} observations")
+        return result
 
     def fetch_baa_aaa_diff(
         self,
