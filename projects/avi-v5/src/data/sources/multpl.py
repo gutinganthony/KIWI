@@ -16,6 +16,10 @@ MULTPL_URLS = {
     "s-p-500-earnings-yield": "https://www.multpl.com/s-p-500-earnings-yield/table/by-month",
 }
 
+MULTPL_FALLBACK_URLS = {
+    "s-p-500-price-to-sales": "https://www.multpl.com/s-p-500-price-to-sales/table/by-year",
+}
+
 
 class MultplSource:
     """Scrapes multpl.com for valuation indicators (CAPE, P/S, Earnings Yield).
@@ -77,7 +81,26 @@ class MultplSource:
                 f"Failed to fetch {indicator_slug} from multpl.com: {e}"
             ) from e
 
-        return self._parse_table(response.text, indicator_slug, start_date)
+        series = self._parse_table(response.text, indicator_slug, start_date)
+
+        if len(series) < 50 and indicator_slug in MULTPL_FALLBACK_URLS:
+            logger.warning(
+                f"{indicator_slug}: only {len(series)} observations from monthly URL, "
+                f"trying yearly fallback and interpolating..."
+            )
+            fallback_url = MULTPL_FALLBACK_URLS[indicator_slug]
+            try:
+                resp2 = self._session.get(fallback_url, timeout=self._timeout)
+                resp2.raise_for_status()
+                yearly = self._parse_table(resp2.text, indicator_slug, start_date)
+                if len(yearly) > len(series):
+                    series = yearly.resample("ME").interpolate(method="linear")
+                    series = series.dropna()
+                    logger.info(f"{indicator_slug}: interpolated to {len(series)} monthly from yearly")
+            except Exception as e:
+                logger.warning(f"Fallback for {indicator_slug} failed: {e}")
+
+        return series
 
     def _parse_table(
         self,

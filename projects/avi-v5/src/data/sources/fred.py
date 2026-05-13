@@ -76,7 +76,7 @@ class FREDSource:
         Returns:
             Monthly-interpolated ratio series.
         """
-        wilshire = self.fetch_series("WILL5000PRFC", start_date, end_date)
+        wilshire = self.fetch_series("WILL5000INDFC", start_date, end_date)
         gdp = self.fetch_series("GDP", start_date, end_date)
 
         wilshire_m = wilshire.resample("ME").last().dropna()
