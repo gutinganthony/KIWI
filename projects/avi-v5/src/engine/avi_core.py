@@ -192,15 +192,18 @@ class AVIEngine:
 
             # Ensure we have data up to target date
             series_to_date = series[series.index <= target_date]
-            if len(series_to_date) < self._window_months:
+            min_periods = 60  # 5 years minimum for expanding window
+            if len(series_to_date) < min_periods:
                 logger.debug(
                     f"  Skipping {key}: insufficient history "
-                    f"({len(series_to_date)} < {self._window_months})"
+                    f"({len(series_to_date)} < {min_periods})"
                 )
                 continue
 
-            # Compute rolling percentile
-            pctile_series = rolling_percentile(series_to_date, self._window_months)
+            # Compute rolling percentile (expanding window for early periods)
+            pctile_series = rolling_percentile(
+                series_to_date, self._window_months, min_periods=min_periods
+            )
 
             # Get the percentile at target date (or closest prior)
             valid_pctiles = pctile_series.dropna()
