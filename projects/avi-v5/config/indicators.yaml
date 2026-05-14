@@ -31,7 +31,7 @@ indicators:
     name: "Buffett Indicator (Market Cap / GDP)"
     source: fred
     fred_ids:
-      - WILL5000INDFC
+      - WILL5000IND  # Active series (WILL5000PRFC and WILL5000INDFC are discontinued)
       - GDP
     computation: ratio  # WILL5000PRFC / GDP
     direction: up_is_risk  # ↑=↑risk
