@@ -99,7 +99,14 @@ class CPIResult:
 
 
 class CrashProbabilityIndex:
-    """Daily crash probability scorer using 8 short-term indicators."""
+    """Daily crash probability scorer using 10 short-term indicators.
+
+    Score boosting mechanisms (applied after weighted sum):
+      - AVI boost: CPI * 1.2 when AVI > 6 and CPI > 40
+      - Consensus boost: CPI * 1.15-1.3 when 3-5+ indicators elevated
+      - Short-term stress boost: CPI * 1.25-1.3 when momentum_collapse
+        and/or vix_spike fire, to improve 7-day detection window
+    """
 
     # Indicator weights (sum to 1.0) — 10 indicators
     WEIGHTS = {
@@ -234,6 +241,31 @@ class CrashProbabilityIndex:
         if elevated_count >= 5:
             cpi_score = min(100.0, cpi_score * 1.3)
         elif elevated_count >= 3:
+            cpi_score = min(100.0, cpi_score * 1.15)
+
+        # Short-term stress boost: compensate for slow indicators fading
+        # in the final 7 days before a crash. When fast-moving indicators
+        # (momentum_collapse, vix_spike, vix_term_structure) fire together,
+        # it strongly suggests imminent price dislocation — boost CPI to
+        # prevent false negatives in the critical 7-day window.
+        mc_signal = sig_mc    # momentum_collapse signal
+        vs_signal = sig_vs    # vix_spike signal
+        vts_signal = sig_vts  # vix_term_structure signal
+
+        # Tier 1: strong momentum collapse alone (>2.5% drop in 3-5 days)
+        if mc_signal > 50:
+            cpi_score = min(100.0, cpi_score * 1.3)
+
+        # Tier 2: VIX surging + momentum weakening together = flash crash setup
+        if vs_signal > 60 and mc_signal > 30:
+            cpi_score = min(100.0, cpi_score * 1.25)
+
+        # Tier 3: extreme VIX regime — backwardation + elevated VIX level
+        # Even without momentum collapse, this pattern reliably precedes
+        # crashes (e.g., VIX term structure inverted + VIX spiking above 20).
+        # This catches the scenario where CPI peaks 2-4 weeks out but the
+        # VIX stress is still present/intensifying in the final week.
+        if vts_signal > 80 and vs_signal > 50:
             cpi_score = min(100.0, cpi_score * 1.15)
 
         # Flash Alert

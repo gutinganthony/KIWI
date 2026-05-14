@@ -392,73 +392,73 @@ def generate_2018_q4_data():
     idx = make_daily_index("2018-02-01", 252)
     n = len(idx)
 
+    # Price peaks near Oct 3 (index ~174), then crashes to Dec 24 trough
     prices = _pad_to_len(np.concatenate([
-        np.linspace(2800, 2700, 20),
-        np.linspace(2700, 2900, 60),
-        np.linspace(2900, 2940, 40),
-        np.linspace(2940, 2930, 20),
-        np.linspace(2930, 2800, 10),
-        np.linspace(2800, 2600, 15),
-        np.linspace(2600, 2700, 10),
-        np.linspace(2700, 2500, 15),
-        np.linspace(2500, 2351, 10),
-        np.linspace(2351, 2600, 60),
+        np.linspace(2800, 2700, 20),      # Feb: Volmageddon dip
+        np.linspace(2700, 2800, 40),      # Mar-May: recovery
+        np.linspace(2800, 2870, 40),      # Jun-Jul: grind higher
+        np.linspace(2870, 2920, 40),      # Aug-Sep: new highs
+        np.linspace(2920, 2940, 34),      # Sep 20 - Oct 3: final push to peak
+        np.linspace(2940, 2800, 10),      # Oct: initial selloff
+        np.linspace(2800, 2600, 15),      # Nov: continued selling
+        np.linspace(2600, 2500, 10),      # Dec: accelerating
+        np.linspace(2500, 2351, 8),       # Dec 24: trough
+        np.linspace(2351, 2600, 40),      # Recovery
     ]), n)
 
     vol = _pad_to_len(np.abs(np.concatenate([
-        np.random.normal(3.8e9, 4e8, 120),
-        np.random.normal(3.5e9, 3e8, 20),
-        np.random.normal(4.5e9, 6e8, 25),
-        np.random.normal(4e9, 5e8, 10),
-        np.random.normal(4.8e9, 7e8, 25),
-        np.random.normal(4e9, 4e8, 60),
+        np.random.normal(3.8e9, 4e8, 20),     # Feb: elevated (Volmageddon)
+        np.random.normal(3.2e9, 3e8, 100),    # Mar-Aug: normal volume
+        np.random.normal(3.5e9, 3e8, 34),     # Sep: slightly elevated
+        np.random.normal(4e9, 5e8, 20),       # Early Oct: rising pre-peak
+        np.random.normal(4.8e9, 7e8, 25),     # Oct-Nov: high vol selloff
+        np.random.normal(5e9, 8e8, 8),        # Dec: peak vol
+        np.random.normal(4e9, 4e8, 50),       # Recovery
     ])), n)
 
     sp500 = make_sp500(idx, prices, vol)
 
-    # VIX: creeping up in Sep, then spike in Oct — pre-peak stress
+    # VIX: calm through Aug, creeping up Sep, spike in early Oct pre-peak
     vix = pd.Series(_pad_to_len(np.concatenate([
-        np.random.normal(20, 3, 20),
-        np.random.normal(13, 1.5, 80),      # Mar-Aug: very calm
-        np.linspace(13, 16, 20),             # Sep: starting to rise
-        np.linspace(16, 21, 10),             # Late Sep: accelerating
-        np.linspace(21, 24, 10),             # Oct 1-3: spike before peak
-        np.linspace(24, 28, 15),             # Oct: crash VIX
-        np.linspace(28, 20, 10),
-        np.linspace(20, 30, 15),
-        np.linspace(30, 36, 10),
-        np.linspace(36, 18, 70),
+        np.random.normal(20, 3, 20),          # Feb: Volmageddon aftermath
+        np.random.normal(13, 1.5, 100),       # Mar-Aug: very calm
+        np.linspace(13, 16, 20),              # Sep: starting to rise
+        np.linspace(16, 22, 15),              # Late Sep: accelerating
+        np.linspace(22, 25, 19),              # Oct 1-3: spike pre-peak
+        np.linspace(25, 28, 10),              # Oct: crash VIX
+        np.linspace(28, 30, 15),              # Nov: still elevated
+        np.linspace(30, 36, 8),               # Dec: peak VIX
+        np.linspace(36, 18, 50),              # Recovery
     ]), n), index=idx)
 
     vix3m = pd.Series(_pad_to_len(np.concatenate([
         np.random.normal(18, 2, 20),
-        np.random.normal(15, 1, 80),
-        np.linspace(15, 16, 20),
-        np.linspace(16, 18, 10),             # VIX approaching VIX3M
-        np.linspace(18, 20, 10),             # Backwardation starting
-        np.linspace(20, 24, 15),
-        np.linspace(24, 19, 10),
-        np.linspace(19, 25, 15),
-        np.linspace(25, 30, 10),
-        np.linspace(30, 17, 70),
+        np.random.normal(15, 1, 100),         # Mar-Aug: calm
+        np.linspace(15, 16, 20),              # Sep
+        np.linspace(16, 19, 15),              # Late Sep
+        np.linspace(19, 21, 19),              # Oct 1-3: VIX approaching VIX3M
+        np.linspace(21, 24, 10),              # Oct post-peak
+        np.linspace(24, 25, 15),
+        np.linspace(25, 30, 8),
+        np.linspace(30, 17, 50),
     ]), n), index=idx)
 
     baa = pd.Series(_pad_to_len(np.concatenate([
-        np.random.normal(4.2, 0.05, 120),
-        np.linspace(4.2, 4.3, 20),
-        np.linspace(4.3, 4.6, 25),
-        np.linspace(4.6, 4.5, 10),
-        np.linspace(4.5, 5.0, 25),
-        np.linspace(5.0, 4.3, 60),
+        np.random.normal(4.2, 0.05, 120),     # Feb-Aug: stable
+        np.linspace(4.2, 4.4, 30),            # Sep: starting to widen
+        np.linspace(4.4, 4.7, 24),            # Oct: widening into peak
+        np.linspace(4.7, 5.0, 25),            # Nov: continued stress
+        np.linspace(5.0, 5.3, 8),             # Dec: peak stress
+        np.linspace(5.3, 4.3, 50),            # Recovery
     ]), n), index=idx)
 
     aaa = pd.Series(_pad_to_len(np.concatenate([
         np.random.normal(3.5, 0.05, 120),
-        np.linspace(3.5, 3.55, 20),
-        np.linspace(3.55, 3.65, 25),
-        np.linspace(3.65, 3.6, 10),
-        np.linspace(3.6, 3.8, 25),
-        np.linspace(3.8, 3.5, 60),
+        np.linspace(3.5, 3.55, 30),
+        np.linspace(3.55, 3.65, 24),
+        np.linspace(3.65, 3.75, 25),
+        np.linspace(3.75, 3.85, 8),
+        np.linspace(3.85, 3.5, 50),
     ]), n), index=idx)
 
     t10y = pd.Series(np.random.normal(2.9, 0.15, n), index=idx)
