@@ -56,17 +56,18 @@ def collect_data(start: str = "2020-01-01") -> Dict:
 
 def compute_cpi(data: Dict, date: Optional[str] = None):
     """Compute CPI score and return the CPIResult."""
+    import pandas as pd
     from src.cpi import CrashProbabilityIndex
 
     cpi = CrashProbabilityIndex()
     return cpi.compute(
         sp500_daily=data["sp500"],
-        vix_daily=data["vix"],
+        vix_daily=data.get("vix", pd.Series(dtype=float)),
         vix3m_daily=data.get("vix3m"),
-        baa_daily=data["baa"],
-        aaa_daily=data["aaa"],
-        treasury_10y=data["t10y"],
-        treasury_2y=data["t2y"],
+        baa_daily=data.get("baa", pd.Series(dtype=float)),
+        aaa_daily=data.get("aaa", pd.Series(dtype=float)),
+        treasury_10y=data.get("t10y", pd.Series(dtype=float)),
+        treasury_2y=data.get("t2y", pd.Series(dtype=float)),
         as_of=date,
     )
 
