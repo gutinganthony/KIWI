@@ -101,16 +101,18 @@ class CPIResult:
 class CrashProbabilityIndex:
     """Daily crash probability scorer using 8 short-term indicators."""
 
-    # Indicator weights (sum to 1.0)
+    # Indicator weights (sum to 1.0) — 10 indicators
     WEIGHTS = {
-        "vix_term_structure": 0.18,
-        "garch_vix_gap": 0.12,
-        "credit_acceleration": 0.15,
-        "breadth_divergence": 0.13,
-        "distribution_days": 0.12,
-        "rsi_divergence": 0.10,
-        "ma_distance_reversal": 0.10,
-        "yield_curve_steepening": 0.10,
+        "vix_term_structure": 0.14,
+        "vix_spike": 0.10,           # NEW: absolute VIX level surge
+        "garch_vix_gap": 0.10,
+        "credit_acceleration": 0.12,
+        "breadth_divergence": 0.10,
+        "distribution_days": 0.10,
+        "rsi_divergence": 0.08,
+        "ma_distance_reversal": 0.08,
+        "yield_curve_steepening": 0.08,
+        "momentum_collapse": 0.10,    # NEW: 5-day price momentum breakdown
     }
 
     def compute(
@@ -204,6 +206,18 @@ class CrashProbabilityIndex:
         # --- 8. Yield Curve Steepening ---
         sig_yc, ind_yc, flash = self._yield_curve_steepening(treasury_10y, treasury_2y)
         indicators.append(ind_yc)
+        if flash:
+            flash_triggers.append(flash)
+
+        # --- 9. VIX Spike (absolute level surge) ---
+        sig_vs, ind_vs, flash = self._vix_spike(vix_daily)
+        indicators.append(ind_vs)
+        if flash:
+            flash_triggers.append(flash)
+
+        # --- 10. Momentum Collapse (5-day price breakdown) ---
+        sig_mc, ind_mc, flash = self._momentum_collapse(sp500_daily)
+        indicators.append(ind_mc)
         if flash:
             flash_triggers.append(flash)
 
@@ -490,4 +504,61 @@ class CrashProbabilityIndex:
 
         ind = self._make_indicator("yield_curve_steepening", change_20d * 100, signal)
         flash = "Yield curve rapid steepening after inversion" if signal > 70 else None
+        return signal, ind, flash
+
+    def _vix_spike(
+        self, vix: pd.Series
+    ) -> tuple[float, CPIIndicator, Optional[str]]:
+        """VIX absolute level and rate of change. High VIX + rising = imminent risk."""
+        if len(vix) < 20:
+            ind = self._make_indicator("vix_spike", 0, 0)
+            return 0.0, ind, None
+
+        current = vix.iloc[-1]
+        vix_5d_ago = vix.iloc[-5]
+        vix_change_5d = current - vix_5d_ago
+
+        # VIX percentile over last 252 days
+        if len(vix) >= 252:
+            pctile = (vix.tail(252) < current).sum() / 252
+        else:
+            pctile = (vix < current).sum() / len(vix)
+
+        # Signal: combination of level and speed
+        # High VIX (>20) AND rising fast = danger
+        level_signal = np.clip((current - 15) / 15 * 60, 0, 60)  # VIX 15→0, 30→60
+        speed_signal = np.clip(vix_change_5d / 8 * 40, 0, 40)    # +8pts in 5d → 40
+        signal = min(100, level_signal + speed_signal)
+
+        ind = self._make_indicator("vix_spike", current, signal)
+        flash = f"VIX surge: {current:.0f} (+{vix_change_5d:.1f} in 5d)" if current > 22 and vix_change_5d > 3 else None
+        return signal, ind, flash
+
+    def _momentum_collapse(
+        self, sp500: pd.DataFrame
+    ) -> tuple[float, CPIIndicator, Optional[str]]:
+        """Rapid 5-day price decline — direct crash signal for 3-5 day prediction."""
+        close = sp500["close"] if "close" in sp500.columns else sp500.iloc[:, 0]
+
+        if len(close) < 20:
+            ind = self._make_indicator("momentum_collapse", 0, 0)
+            return 0.0, ind, None
+
+        # 5-day return
+        ret_5d = (close.iloc[-1] / close.iloc[-5] - 1) * 100
+
+        # 3-day return (even shorter for flash crashes)
+        ret_3d = (close.iloc[-1] / close.iloc[-3] - 1) * 100
+
+        # Use the worse of the two
+        worst_ret = min(ret_5d, ret_3d)
+
+        # Map: 0% → 0, -2% → 40, -4% → 70, -6%+ → 100
+        if worst_ret < 0:
+            signal = np.clip(abs(worst_ret) / 6 * 100, 0, 100)
+        else:
+            signal = 0.0
+
+        ind = self._make_indicator("momentum_collapse", worst_ret, signal)
+        flash = f"Sharp decline: {worst_ret:.1f}% in {3 if ret_3d < ret_5d else 5}d" if worst_ret < -2.5 else None
         return signal, ind, flash

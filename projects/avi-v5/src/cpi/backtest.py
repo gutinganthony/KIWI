@@ -11,41 +11,17 @@ from . import CrashProbabilityIndex
 logger = logging.getLogger(__name__)
 
 CRASH_EVENTS = [
-    {
-        "name": "2018 Feb Volmageddon",
-        "peak": "2018-01-26",
-        "trough": "2018-02-08",
-        "drawdown": -0.10,
-        "type": "flash_crash",
-    },
-    {
-        "name": "2018 Q4 Selloff",
-        "peak": "2018-10-03",
-        "trough": "2018-12-24",
-        "drawdown": -0.20,
-        "type": "major",
-    },
-    {
-        "name": "COVID Crash 2020",
-        "peak": "2020-02-19",
-        "trough": "2020-03-23",
-        "drawdown": -0.34,
-        "type": "major",
-    },
-    {
-        "name": "2022 Rate Hike",
-        "peak": "2022-01-03",
-        "trough": "2022-10-12",
-        "drawdown": -0.25,
-        "type": "major",
-    },
-    {
-        "name": "2025 Q1 Tariff Selloff",
-        "peak": "2025-02-19",
-        "trough": "2025-04-08",
-        "drawdown": -0.19,
-        "type": "major",
-    },
+    {"name": "Dot-com Crash 2000", "peak": "2000-03-24", "trough": "2002-10-09", "drawdown": -0.49, "type": "major"},
+    {"name": "GFC 2007-09", "peak": "2007-10-09", "trough": "2009-03-09", "drawdown": -0.57, "type": "major"},
+    {"name": "2018 Feb Volmageddon", "peak": "2018-01-26", "trough": "2018-02-08", "drawdown": -0.10, "type": "flash_crash"},
+    {"name": "2018 Q4 Selloff", "peak": "2018-10-03", "trough": "2018-12-24", "drawdown": -0.20, "type": "major"},
+    {"name": "2019 May Selloff", "peak": "2019-05-01", "trough": "2019-06-03", "drawdown": -0.07, "type": "correction"},
+    {"name": "COVID Crash 2020", "peak": "2020-02-19", "trough": "2020-03-23", "drawdown": -0.34, "type": "major"},
+    {"name": "2020 Sep Tech Corr", "peak": "2020-09-02", "trough": "2020-09-23", "drawdown": -0.10, "type": "correction"},
+    {"name": "2022 Rate Hike", "peak": "2022-01-03", "trough": "2022-10-12", "drawdown": -0.25, "type": "major"},
+    {"name": "2023 Jul-Oct Pullback", "peak": "2023-07-31", "trough": "2023-10-27", "drawdown": -0.10, "type": "correction"},
+    {"name": "2024 Aug Japan Carry", "peak": "2024-07-16", "trough": "2024-08-05", "drawdown": -0.08, "type": "correction"},
+    {"name": "2025 Q1 Tariff", "peak": "2025-02-19", "trough": "2025-04-08", "drawdown": -0.19, "type": "major"},
 ]
 
 

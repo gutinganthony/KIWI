@@ -80,7 +80,7 @@ def run_backtest(verbose: bool = False):
     start_time = time.time()
 
     collector = CPIDataCollector()
-    data = collector.collect_all(start="2016-01-01")
+    data = collector.collect_all(start="1998-01-01")
 
     result = run_cpi_backtest(data)
     print(result)
