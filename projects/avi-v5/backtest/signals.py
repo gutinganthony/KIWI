@@ -108,30 +108,10 @@ def _compute_avi_at_date(
     """
     ind_cfg, dim_cfg = _get_config()
 
-    # First, try the standard engine (fast path).
-    # Check if we have at least one indicator with a full 240-month window.
-    has_full = False
-    for key, series in indicator_data.items():
-        s = series[series.index <= as_of]
-        if len(s) >= _FULL_WINDOW:
-            has_full = True
-            break
-
-    if has_full:
-        # The engine can handle this date for indicators with enough data.
-        truncated: dict[str, pd.Series] = {}
-        for key, series in indicator_data.items():
-            s = series[series.index <= as_of]
-            if len(s) >= _FULL_WINDOW:
-                truncated[key] = s
-        if truncated:
-            try:
-                result = engine.compute(truncated, as_of_date=as_of.strftime("%Y-%m-%d"))
-                return result.total_score
-            except Exception as exc:
-                logger.debug(f"Engine compute failed at {as_of.date()}: {exc}")
-
-    # Expanding-window fallback for early dates (or if engine failed).
+    # Use unified expanding/rolling window approach for ALL dates.
+    # This correctly handles mixed-history indicators (e.g., FRED from 1970
+    # + multpl from 1996) by using rolling window when enough data exists
+    # and expanding window otherwise, per indicator.
     total_score = 0.0
     total_weight_available = 0.0
 
