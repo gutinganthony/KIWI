@@ -518,20 +518,14 @@ class CrashProbabilityIndex:
         vix_5d_ago = vix.iloc[-5]
         vix_change_5d = current - vix_5d_ago
 
-        # VIX percentile over last 252 days
-        if len(vix) >= 252:
-            pctile = (vix.tail(252) < current).sum() / 252
-        else:
-            pctile = (vix < current).sum() / len(vix)
-
         # Signal: combination of level and speed
-        # High VIX (>20) AND rising fast = danger
-        level_signal = np.clip((current - 15) / 15 * 60, 0, 60)  # VIX 15→0, 30→60
-        speed_signal = np.clip(vix_change_5d / 8 * 40, 0, 40)    # +8pts in 5d → 40
+        # VIX above 18 + rising = danger signal
+        level_signal = np.clip((current - 14) / 12 * 50, 0, 50)  # VIX 14→0, 26→50
+        speed_signal = np.clip(vix_change_5d / 5 * 50, 0, 50)    # +5pts in 5d → 50
         signal = min(100, level_signal + speed_signal)
 
         ind = self._make_indicator("vix_spike", current, signal)
-        flash = f"VIX surge: {current:.0f} (+{vix_change_5d:.1f} in 5d)" if current > 22 and vix_change_5d > 3 else None
+        flash = f"VIX surge: {current:.0f} (+{vix_change_5d:.1f} in 5d)" if current > 19 and vix_change_5d > 2 else None
         return signal, ind, flash
 
     def _momentum_collapse(
@@ -553,12 +547,12 @@ class CrashProbabilityIndex:
         # Use the worse of the two
         worst_ret = min(ret_5d, ret_3d)
 
-        # Map: 0% → 0, -2% → 40, -4% → 70, -6%+ → 100
+        # Map: 0% → 0, -1.5% → 35, -3% → 60, -5%+ → 100
         if worst_ret < 0:
-            signal = np.clip(abs(worst_ret) / 6 * 100, 0, 100)
+            signal = np.clip(abs(worst_ret) / 5 * 100, 0, 100)
         else:
             signal = 0.0
 
         ind = self._make_indicator("momentum_collapse", worst_ret, signal)
-        flash = f"Sharp decline: {worst_ret:.1f}% in {3 if ret_3d < ret_5d else 5}d" if worst_ret < -2.5 else None
+        flash = f"Sharp decline: {worst_ret:.1f}% in {3 if ret_3d < ret_5d else 5}d" if worst_ret < -2.0 else None
         return signal, ind, flash
