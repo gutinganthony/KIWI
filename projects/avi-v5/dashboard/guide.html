@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CPI User Guide — Crash Probability Index</title>
+<style>
+  /* ── Reset & Base (same as CPI dashboard) ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-primary: #131722;
+    --bg-secondary: #1e222d;
+    --bg-tertiary: #2a2e39;
+    --border: #363a45;
+    --text-primary: #d1d4dc;
+    --text-secondary: #787b86;
+    --text-muted: #555962;
+    --green: #26a69a;
+    --green-bg: rgba(38,166,154,0.12);
+    --yellow: #f7c948;
+    --yellow-bg: rgba(247,201,72,0.12);
+    --orange: #ff9800;
+    --orange-bg: rgba(255,152,0,0.12);
+    --red: #ef5350;
+    --red-bg: rgba(239,83,80,0.12);
+    --blue: #42a5f5;
+    --blue-bg: rgba(66,165,245,0.10);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Layout ── */
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.5px;
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .header .subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  /* ── Language Toggle (same as dashboard) ── */
+  .lang-toggle {
+    display: inline-flex;
+    align-items: center;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2px;
+    font-size: 12px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .lang-toggle .lang-option {
+    padding: 4px 12px;
+    border-radius: 16px;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .lang-toggle .lang-option.active {
+    background: var(--blue);
+    color: #fff;
+  }
+
+  /* ── Sections ── */
+  .section {
+    margin-bottom: 40px;
+  }
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--blue);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title .section-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--blue-bg);
+    border: 1px solid rgba(66,165,245,0.3);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--blue);
+    flex-shrink: 0;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+  }
+
+  /* ── Hero Section ── */
+  .hero {
+    text-align: center;
+    padding: 48px 24px;
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(42,46,57,0.8) 100%);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at center, rgba(66,165,245,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .hero h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+  .hero p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    max-width: 640px;
+    margin: 0 auto;
+    line-height: 1.8;
+  }
+  .hero .highlight {
+    color: var(--blue);
+    font-weight: 600;
+  }
+
+  /* ── Comparison Table ── */
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .comparison-table th {
+    text-align: left;
+    padding: 12px 16px;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-bottom: 2px solid var(--border);
+  }
+  .comparison-table th:first-child {
+    border-radius: 6px 0 0 0;
+  }
+  .comparison-table th:last-child {
+    border-radius: 0 6px 0 0;
+  }
+  .comparison-table td {
+    padding: 11px 16px;
+    border-bottom: 1px solid rgba(54,58,69,0.5);
+    color: var(--text-primary);
+    vertical-align: top;
+  }
+  .comparison-table tr:last-child td { border-bottom: none; }
+  .comparison-table td:first-child {
+    color: var(--text-secondary);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .comparison-table .col-avi { color: var(--yellow); }
+  .comparison-table .col-cpi { color: var(--blue); }
+  .table-footnote {
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    padding: 12px 16px;
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+  }
+  .table-footnote strong { color: var(--text-primary); }
+
+  /* ── Score Cards ── */
+  .score-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+  }
+  .score-card-item {
+    border-radius: 8px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    text-align: center;
+    transition: transform 0.15s ease;
+  }
+  .score-card-item:hover {
+    transform: translateY(-2px);
+  }
+  .score-card-item .traffic-light {
+    font-size: 32px;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .score-card-item .score-range {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .score-card-item .score-label {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+  }
+  .score-card-item .score-desc {
+    font-size: 13px;
+    line-height: 1.6;
+    opacity: 0.85;
+  }
+  .score-card-green {
+    background: var(--green-bg);
+    border-color: rgba(38,166,154,0.3);
+  }
+  .score-card-green .score-range,
+  .score-card-green .score-label { color: var(--green); }
+  .score-card-green .score-desc { color: var(--green); }
+
+  .score-card-yellow {
+    background: var(--yellow-bg);
+    border-color: rgba(247,201,72,0.3);
+  }
+  .score-card-yellow .score-range,
+  .score-card-yellow .score-label { color: var(--yellow); }
+  .score-card-yellow .score-desc { color: var(--yellow); }
+
+  .score-card-orange {
+    background: var(--orange-bg);
+    border-color: rgba(255,152,0,0.3);
+  }
+  .score-card-orange .score-range,
+  .score-card-orange .score-label { color: var(--orange); }
+  .score-card-orange .score-desc { color: var(--orange); }
+
+  .score-card-red {
+    background: var(--red-bg);
+    border-color: rgba(239,83,80,0.3);
+  }
+  .score-card-red .score-range,
+  .score-card-red .score-label { color: var(--red); }
+  .score-card-red .score-desc { color: var(--red); }
+
+  .score-card-darkred {
+    background: rgba(239,83,80,0.2);
+    border-color: rgba(239,83,80,0.5);
+  }
+  .score-card-darkred .score-range,
+  .score-card-darkred .score-label { color: #ff6b6b; }
+  .score-card-darkred .score-desc { color: #ff6b6b; }
+
+  .score-note {
+    margin-top: 16px;
+    padding: 14px 18px;
+    background: var(--bg-tertiary);
+    border-left: 3px solid var(--blue);
+    border-radius: 0 6px 6px 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+  .score-note strong { color: var(--text-primary); }
+
+  /* ── Flash Alert Box ── */
+  .flash-alert-box {
+    border-radius: 8px;
+    padding: 24px;
+    border: 1px solid rgba(255,152,0,0.4);
+    background: linear-gradient(135deg, rgba(255,152,0,0.08), rgba(239,83,80,0.08));
+    position: relative;
+  }
+  .flash-alert-box .flash-icon {
+    font-size: 36px;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    opacity: 0.3;
+  }
+  .flash-alert-box h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--orange);
+    margin-bottom: 12px;
+  }
+  .flash-alert-box p {
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.8;
+    margin-bottom: 12px;
+  }
+  .flash-alert-box p:last-child { margin-bottom: 0; }
+  .flash-alert-box .flash-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-top: 16px;
+    margin-bottom: 6px;
+  }
+  .flash-alert-box ul {
+    list-style: none;
+    padding: 0;
+  }
+  .flash-alert-box ul li {
+    font-size: 14px;
+    color: var(--text-primary);
+    padding: 4px 0;
+    padding-left: 20px;
+    position: relative;
+  }
+  .flash-alert-box ul li::before {
+    content: '\203A';
+    position: absolute;
+    left: 4px;
+    color: var(--orange);
+    font-weight: 700;
+  }
+
+  /* ── Indicator Cards ── */
+  .indicator-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+    gap: 14px;
+  }
+  @media (max-width: 520px) {
+    .indicator-grid { grid-template-columns: 1fr; }
+  }
+  .indicator-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    display: flex;
+    gap: 16px;
+    transition: border-color 0.2s ease, transform 0.15s ease;
+  }
+  .indicator-card:hover {
+    border-color: rgba(66,165,245,0.4);
+    transform: translateY(-1px);
+  }
+  .indicator-card .ind-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-tertiary);
+    border-radius: 10px;
+  }
+  .indicator-card .ind-content { flex: 1; }
+  .indicator-card .ind-num {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .indicator-card .ind-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+  .indicator-card .ind-en-name {
+    font-size: 12px;
+    color: var(--blue);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .indicator-card .ind-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+  }
+
+  /* ── Backtest Table ── */
+  .backtest-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .backtest-table th {
+    text-align: left;
+    padding: 10px 12px;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  .backtest-table th:first-child { border-radius: 6px 0 0 0; }
+  .backtest-table th:last-child { border-radius: 0 6px 0 0; }
+  .backtest-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(54,58,69,0.5);
+    color: var(--text-primary);
+    white-space: nowrap;
+  }
+  .backtest-table tr:last-child td { border-bottom: none; }
+  .backtest-table tr:hover td { background: rgba(66,165,245,0.04); }
+  .bt-detected { color: var(--green); }
+  .bt-missed { color: var(--text-muted); font-style: italic; }
+  .bt-flash { color: var(--orange); }
+  .bt-score-high { color: var(--red); font-weight: 700; }
+  .bt-score-mid { color: var(--orange); font-weight: 600; }
+  .bt-score-low { color: var(--text-secondary); }
+  .bt-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .backtest-summary {
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+  }
+  .backtest-summary strong { color: var(--text-primary); }
+  .backtest-summary .stat {
+    color: var(--green);
+    font-weight: 700;
+  }
+
+  /* ── Workflow Steps ── */
+  .workflow-header {
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    border: 1px solid var(--border);
+  }
+  .workflow-header .cmd { color: var(--green); }
+  .workflow-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .workflow-step {
+    display: flex;
+    gap: 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    align-items: flex-start;
+  }
+  .workflow-step .step-badge {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .workflow-step .step-content { flex: 1; }
+  .workflow-step .step-title {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+  .workflow-step .step-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+  .step-green .step-badge { background: var(--green-bg); color: var(--green); border: 1px solid rgba(38,166,154,0.3); }
+  .step-green .step-title { color: var(--green); }
+  .step-yellow .step-badge { background: var(--yellow-bg); color: var(--yellow); border: 1px solid rgba(247,201,72,0.3); }
+  .step-yellow .step-title { color: var(--yellow); }
+  .step-orange .step-badge { background: var(--orange-bg); color: var(--orange); border: 1px solid rgba(255,152,0,0.3); }
+  .step-orange .step-title { color: var(--orange); }
+  .step-red .step-badge { background: var(--red-bg); color: var(--red); border: 1px solid rgba(239,83,80,0.3); }
+  .step-red .step-title { color: var(--red); }
+
+  /* ── AVI+CPI Matrix ── */
+  .matrix-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 600px) {
+    .matrix-grid { grid-template-columns: 1fr; }
+  }
+  .matrix-cell {
+    border-radius: 8px;
+    padding: 18px 20px;
+    border: 1px solid var(--border);
+    transition: transform 0.15s ease;
+  }
+  .matrix-cell:hover { transform: translateY(-2px); }
+  .matrix-cell .matrix-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .matrix-cell .matrix-tags {
+    display: flex;
+    gap: 6px;
+  }
+  .matrix-cell .matrix-tag {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .matrix-cell .matrix-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .matrix-cell .matrix-desc {
+    font-size: 13px;
+    line-height: 1.6;
+    opacity: 0.85;
+  }
+  .matrix-safe {
+    background: var(--green-bg);
+    border-color: rgba(38,166,154,0.3);
+  }
+  .matrix-safe .matrix-title,
+  .matrix-safe .matrix-desc { color: var(--green); }
+  .matrix-safe .matrix-tag { background: rgba(38,166,154,0.2); color: var(--green); }
+
+  .matrix-caution {
+    background: var(--yellow-bg);
+    border-color: rgba(247,201,72,0.3);
+  }
+  .matrix-caution .matrix-title,
+  .matrix-caution .matrix-desc { color: var(--yellow); }
+  .matrix-caution .matrix-tag { background: rgba(247,201,72,0.2); color: var(--yellow); }
+
+  .matrix-warn {
+    background: var(--orange-bg);
+    border-color: rgba(255,152,0,0.3);
+  }
+  .matrix-warn .matrix-title,
+  .matrix-warn .matrix-desc { color: var(--orange); }
+  .matrix-warn .matrix-tag { background: rgba(255,152,0,0.2); color: var(--orange); }
+
+  .matrix-danger {
+    background: var(--red-bg);
+    border-color: rgba(239,83,80,0.5);
+    box-shadow: 0 0 20px rgba(239,83,80,0.12);
+  }
+  .matrix-danger .matrix-title,
+  .matrix-danger .matrix-desc { color: var(--red); }
+  .matrix-danger .matrix-tag { background: rgba(239,83,80,0.2); color: var(--red); }
+
+  .matrix-strongest {
+    background: linear-gradient(135deg, rgba(239,83,80,0.18), rgba(239,83,80,0.28));
+    border: 2px solid var(--red);
+    box-shadow: 0 0 30px rgba(239,83,80,0.2), inset 0 0 30px rgba(239,83,80,0.05);
+    position: relative;
+    overflow: hidden;
+  }
+  .matrix-strongest::after {
+    content: '';
+    position: absolute;
+    top: -1px; right: -1px;
+    width: 0; height: 0;
+    border-top: 40px solid var(--red);
+    border-left: 40px solid transparent;
+  }
+  .matrix-strongest .matrix-title { color: #ff6b6b; font-size: 15px; }
+  .matrix-strongest .matrix-desc { color: var(--red); }
+  .matrix-strongest .matrix-tag { background: rgba(239,83,80,0.3); color: #ff6b6b; }
+
+  .matrix-note {
+    margin-top: 16px;
+    padding: 16px 18px;
+    background: var(--red-bg);
+    border-left: 3px solid var(--red);
+    border-radius: 0 6px 6px 0;
+    font-size: 14px;
+    color: var(--red);
+    line-height: 1.7;
+  }
+  .matrix-note strong { color: #ff6b6b; }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* ── Notes Section ── */
+  .notes-list {
+    list-style: none;
+    padding: 0;
+  }
+  .notes-list li {
+    padding: 8px 0 8px 24px;
+    position: relative;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    border-bottom: 1px solid rgba(54,58,69,0.3);
+  }
+  .notes-list li:last-child { border-bottom: none; }
+  .notes-list li::before {
+    content: '\2022';
+    position: absolute;
+    left: 6px;
+    color: var(--text-muted);
+  }
+
+  /* ── Table of Contents ── */
+  .toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 40px;
+  }
+  .toc a {
+    display: inline-block;
+    padding: 6px 14px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  .toc a:hover {
+    border-color: var(--blue);
+    color: var(--blue);
+    background: var(--blue-bg);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1 data-i18n="title">CPI 使用指南</h1>
+      <div class="subtitle" data-i18n="subtitle">Crash Probability Index User Guide</div>
+    </div>
+    <div class="header-right">
+      <div class="lang-toggle" id="langToggle">
+        <span class="lang-option" data-lang="en">EN</span>
+        <span class="lang-option active" data-lang="zh">中文</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table of Contents -->
+  <div class="toc" id="toc">
+    <a href="#hero" data-i18n="toc_overview">總覽</a>
+    <a href="#comparison" data-i18n="toc_comparison">CPI vs AVI</a>
+    <a href="#scores" data-i18n="toc_scores">分數解讀</a>
+    <a href="#flash" data-i18n="toc_flash">Flash Alert</a>
+    <a href="#indicators" data-i18n="toc_indicators">10 個指標</a>
+    <a href="#backtest" data-i18n="toc_backtest">歷史回測</a>
+    <a href="#workflow" data-i18n="toc_workflow">每天怎麼用</a>
+    <a href="#matrix" data-i18n="toc_matrix">AVI + CPI 搭配</a>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- 1. Hero — One-liner -->
+  <!-- ================================================================ -->
+  <div class="hero" id="hero">
+    <span class="hero-icon">📡</span>
+    <h2 data-i18n="hero_title">CPI — 崩盤概率指數</h2>
+    <p data-i18n="hero_desc">CPI（Crash Probability Index）是一個<span class="highlight" data-i18n="hero_highlight">每日更新的 0&ndash;100 分崩盤概率指數</span>，當分數 &ge; 35 時代表市場有明顯的短期崩盤風險。它回答的問題很簡單：<strong>「接下來一個月，市場崩盤的機率有多高？」</strong></p>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- 2. CPI vs AVI Comparison Table -->
+  <!-- ================================================================ -->
+  <div class="section" id="comparison">
+    <div class="section-title">
+      <span class="section-num">1</span>
+      <span data-i18n="sec_comparison">CPI vs AVI 比較</span>
+    </div>
+    <div class="card">
+      <div class="bt-scroll">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th data-i18n="cmp_dimension">面向</th>
+              <th class="col-avi">AVI V4</th>
+              <th class="col-cpi">CPI</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-i18n="cmp_freq">頻率</td>
+              <td data-i18n="cmp_avi_freq">月度</td>
+              <td data-i18n="cmp_cpi_freq">日頻</td>
+            </tr>
+            <tr>
+              <td data-i18n="cmp_target">預測目標</td>
+              <td data-i18n="cmp_avi_target">市場有多貴</td>
+              <td data-i18n="cmp_cpi_target">崩盤何時來</td>
+            </tr>
+            <tr>
+              <td data-i18n="cmp_question">適合問題</td>
+              <td data-i18n="cmp_avi_question">「現在該不該加倉？」</td>
+              <td data-i18n="cmp_cpi_question">「接下來一個月會崩嗎？」</td>
+            </tr>
+            <tr>
+              <td>Lead Time</td>
+              <td data-i18n="cmp_avi_lead">22 個月（太早）</td>
+              <td data-i18n="cmp_cpi_lead">23&ndash;42 天（剛好）</td>
+            </tr>
+            <tr>
+              <td data-i18n="cmp_type">指標類型</td>
+              <td data-i18n="cmp_avi_type">估值 + 總經</td>
+              <td data-i18n="cmp_cpi_type">波動率 + 技術面 + 信用</td>
+            </tr>
+            <tr>
+              <td data-i18n="cmp_update">更新方式</td>
+              <td data-i18n="cmp_avi_update">月底跑一次</td>
+              <td data-i18n="cmp_cpi_update">每天早上跑一次</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-footnote" data-i18n="cmp_footnote">
+        簡單來說：AVI 是<strong>天氣預報</strong>（未來幾季的趨勢），CPI 是<strong>雷達圖</strong>（暴風雨還有幾天到）。
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- 3. Score Interpretation -->
+  <!-- ================================================================ -->
+  <div class="section" id="scores">
+    <div class="section-title">
+      <span class="section-num">2</span>
+      <span data-i18n="sec_scores">怎麼看分數</span>
+    </div>
+    <div class="score-cards">
+      <!-- Green -->
+      <div class="score-card-item score-card-green">
+        <span class="traffic-light">🟢</span>
+        <div class="score-range">0&ndash;20</div>
+        <div class="score-label" data-i18n="score_normal_label">正常</div>
+        <div class="score-desc" data-i18n="score_normal_desc">照常操作，不需要額外動作</div>
+      </div>
+      <!-- Yellow -->
+      <div class="score-card-item score-card-yellow">
+        <span class="traffic-light">🟡</span>
+        <div class="score-range">20&ndash;35</div>
+        <div class="score-label" data-i18n="score_watch_label">留意</div>
+        <div class="score-desc" data-i18n="score_watch_desc">開始注意市場動態，看看是哪些指標在升溫</div>
+      </div>
+      <!-- Orange -->
+      <div class="score-card-item score-card-orange">
+        <span class="traffic-light">🟠</span>
+        <div class="score-range">35&ndash;50</div>
+        <div class="score-label" data-i18n="score_elevated_label">偏高</div>
+        <div class="score-desc" data-i18n="score_elevated_desc">檢查持倉集中度、準備避險工具（如 put options）</div>
+      </div>
+      <!-- Red -->
+      <div class="score-card-item score-card-red">
+        <span class="traffic-light">🔴</span>
+        <div class="score-range">50&ndash;70</div>
+        <div class="score-label" data-i18n="score_high_label">高</div>
+        <div class="score-desc" data-i18n="score_high_desc">減少風險敞口，提高現金比例</div>
+      </div>
+      <!-- Dark Red -->
+      <div class="score-card-item score-card-darkred">
+        <span class="traffic-light">🔴🔴</span>
+        <div class="score-range">70+</div>
+        <div class="score-label" data-i18n="score_critical_label">極高</div>
+        <div class="score-desc" data-i18n="score_critical_desc">大幅減倉，進入防守模式</div>
+      </div>
+    </div>
+    <div class="score-note" data-i18n="score_note">
+      <strong>重點：</strong>不要把 CPI 當成「跌多少」的預測。CPI = 50 不代表市場會跌 50%，而是代表「根據目前 10 個指標的綜合訊號，崩盤發生的概率偏高」。
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- 4. Flash Alert -->
+  <!-- ================================================================ -->
+  <div class="section" id="flash">
+    <div class="section-title">
+      <span class="section-num">3</span>
+      <span data-i18n="sec_flash">Flash Alert 說明</span>
+    </div>
+    <div class="flash-alert-box">
+      <div class="flash-icon">⚡</div>
+      <h3 data-i18n="flash_heading">⚡ Flash Alert — 即時警報機制</h3>
+      <p data-i18n="flash_trigger"><strong>觸發條件：</strong>當 10 個指標中有 <strong>4 個以上同時觸發</strong>（每個指標都超過自己的警戒閾值）時，系統會發出 Flash Alert。</p>
+      <p data-i18n="flash_meaning"><strong>代表什麼：</strong>出現 Flash Alert 代表<strong>接下來 3&ndash;5 天有較高的短期修正風險</strong>。這跟 CPI 分數高是不同的信號 —— CPI 高代表「中期風險累積」，Flash Alert 代表「短期內可能就會動」。</p>
+      <div class="flash-label" data-i18n="flash_action_label">怎麼反應</div>
+      <ul>
+        <li data-i18n="flash_action_1">立刻檢查持倉，特別是高 beta 部位</li>
+        <li data-i18n="flash_action_2">確認避險工具（put、VIX call）是否到位</li>
+        <li data-i18n="flash_action_3">如果 CPI 同時也 &ge; 35，雙重確認，應該認真考慮減倉</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- 5. 10 Indicators -->
+  <!-- ================================================================ -->
+  <div class="section" id="indicators">
+    <div class="section-title">
+      <span class="section-num">4</span>
+      <span data-i18n="sec_indicators">10 個指標</span>
+    </div>
+    <div class="indicator-grid">
+      <!-- 1 -->
+      <div class="indicator-card">
+        <div class="ind-icon">📉</div>
+        <div class="ind-content">
+          <div class="ind-num">#1</div>
+          <div class="ind-name" data-i18n="ind1_name">VIX 期限結構</div>
+          <div class="ind-en-name" data-i18n="ind1_en">VIX Term Structure Inversion</div>
+          <div class="ind-desc" data-i18n="ind1_desc">市場的恐懼是「短期恐慌」還是「長期擔憂」。正常情況下，遠期的保險比近期貴。當近期保險突然比遠期貴，代表大家在搶買短期保護 —— 有人覺得暴風雨馬上就到。</div>
+        </div>
+      </div>
+      <!-- 2 -->
+      <div class="indicator-card">
+        <div class="ind-icon">🌡️</div>
+        <div class="ind-content">
+          <div class="ind-num">#2</div>
+          <div class="ind-name" data-i18n="ind2_name">VIX 急升</div>
+          <div class="ind-en-name" data-i18n="ind2_en">VIX Spike</div>
+          <div class="ind-desc" data-i18n="ind2_desc">恐懼指數有沒有突然飆高。像溫度計突然從 37°C 跳到 40°C。VIX 在短時間內急升代表市場情緒急轉直下，通常伴隨大量拋售。</div>
+        </div>
+      </div>
+      <!-- 3 -->
+      <div class="indicator-card">
+        <div class="ind-icon">🤖</div>
+        <div class="ind-content">
+          <div class="ind-num">#3</div>
+          <div class="ind-name" data-i18n="ind3_name">GARCH-VIX 差距</div>
+          <div class="ind-en-name" data-i18n="ind3_en">GARCH-VIX Divergence</div>
+          <div class="ind-desc" data-i18n="ind3_desc">AI 模型預測的波動率 vs 市場定價的波動率之間的差距。當模型說波動率應該更高但市場還沒反映，代表市場「還沒意識到危險」—— 這反而是最危險的時候。</div>
+        </div>
+      </div>
+      <!-- 4 -->
+      <div class="indicator-card">
+        <div class="ind-icon">🏦</div>
+        <div class="ind-content">
+          <div class="ind-num">#4</div>
+          <div class="ind-name" data-i18n="ind4_name">信用利差加速</div>
+          <div class="ind-en-name" data-i18n="ind4_en">Credit Spread Acceleration</div>
+          <div class="ind-desc" data-i18n="ind4_desc">企業借錢的成本有沒有突然變貴。銀行突然不願意便宜借錢給企業了，信用利差快速擴大代表銀行開始擔心企業的還款能力，這通常是金融壓力的早期信號。</div>
+        </div>
+      </div>
+      <!-- 5 -->
+      <div class="indicator-card">
+        <div class="ind-icon">📊</div>
+        <div class="ind-content">
+          <div class="ind-num">#5</div>
+          <div class="ind-name" data-i18n="ind5_name">市場廣度背離</div>
+          <div class="ind-en-name" data-i18n="ind5_en">Breadth Divergence</div>
+          <div class="ind-desc" data-i18n="ind5_desc">指數在漲，但個股有沒有跟。像一支球隊靠一兩個明星球員撐場面，其他人都在掉分。S&amp;P 500 在漲但大多數成分股都在跌，代表漲勢很脆弱。</div>
+        </div>
+      </div>
+      <!-- 6 -->
+      <div class="indicator-card">
+        <div class="ind-icon">🚛</div>
+        <div class="ind-content">
+          <div class="ind-num">#6</div>
+          <div class="ind-name" data-i18n="ind6_name">放量下跌天數</div>
+          <div class="ind-en-name" data-i18n="ind6_en">Distribution Days</div>
+          <div class="ind-desc" data-i18n="ind6_desc">最近有沒有很多「大戶在倒貨」的日子。價格下跌的同時成交量放大，代表機構法人在系統性地減持 —— 散戶可能還沒感覺到，但聰明錢已經在撤了。</div>
+        </div>
+      </div>
+      <!-- 7 -->
+      <div class="indicator-card">
+        <div class="ind-icon">💓</div>
+        <div class="ind-content">
+          <div class="ind-num">#7</div>
+          <div class="ind-name" data-i18n="ind7_name">RSI 背離</div>
+          <div class="ind-en-name" data-i18n="ind7_en">RSI Divergence</div>
+          <div class="ind-desc" data-i18n="ind7_desc">價格創新高，但上漲的「力道」有沒有在衰退。像跑步時速度還在加快，但心跳已經開始不穩了。表面上看起來還在漲，但動能指標已經在警告「快跑不動了」。</div>
+        </div>
+      </div>
+      <!-- 8 -->
+      <div class="indicator-card">
+        <div class="ind-icon">🔄</div>
+        <div class="ind-content">
+          <div class="ind-num">#8</div>
+          <div class="ind-name" data-i18n="ind8_name">均線距離反轉</div>
+          <div class="ind-en-name" data-i18n="ind8_en">Moving Average Distance Reversal</div>
+          <div class="ind-desc" data-i18n="ind8_desc">價格偏離均線太遠之後有沒有開始回頭。橡皮筋拉太遠一定會彈回來。當價格遠離長期均線後開始反轉，代表「均值回歸」的力量正在拉回。</div>
+        </div>
+      </div>
+      <!-- 9 -->
+      <div class="indicator-card">
+        <div class="ind-icon">📐</div>
+        <div class="ind-content">
+          <div class="ind-num">#9</div>
+          <div class="ind-name" data-i18n="ind9_name">殖利率曲線陡化</div>
+          <div class="ind-en-name" data-i18n="ind9_en">Yield Curve Steepening</div>
+          <div class="ind-desc" data-i18n="ind9_desc">央行政策有沒有在轉向。殖利率曲線從倒掛回到正常（陡化），歷史上反而是危險信號 —— 代表市場開始預期央行會降息，通常是因為經濟要出問題了。</div>
+        </div>
+      </div>
+      <!-- 10 -->
+      <div class="indicator-card">
+        <div class="ind-icon">🛗</div>
+        <div class="ind-content">
+          <div class="ind-num">#10</div>
+          <div class="ind-name" data-i18n="ind10_name">動量崩潰</div>
+          <div class="ind-en-name" data-i18n="ind10_en">Momentum Collapse</div>
+          <div class="ind-desc" data-i18n="ind10_desc">短期內價格有沒有急跌。像電梯突然往下掉。短期動量急速轉負代表賣壓極大，可能是崩盤的第一波衝擊。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- 6. Backtest Table -->
+  <!-- ================================================================ -->
+  <div class="section" id="backtest">
+    <div class="section-title">
+      <span class="section-num">5</span>
+      <span data-i18n="sec_backtest">歷史回測戰績</span>
+    </div>
+    <div class="card">
+      <div class="bt-scroll">
+        <table class="backtest-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th data-i18n="bt_event">事件</th>
+              <th data-i18n="bt_date">日期</th>
+              <th data-i18n="bt_peak">CPI 峰值</th>
+              <th>Flash</th>
+              <th>Lead Time</th>
+              <th data-i18n="bt_result">偵測結果</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Dot-com Crash</td>
+              <td>2000-03</td>
+              <td class="bt-score-high">72</td>
+              <td class="bt-flash">⚡</td>
+              <td data-i18n="bt_lead_1">38 天</td>
+              <td class="bt-detected" data-i18n="bt_res_1">✅ 偵測到</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>9/11 Shock</td>
+              <td>2001-09</td>
+              <td class="bt-score-low">28</td>
+              <td>—</td>
+              <td>—</td>
+              <td class="bt-missed" data-i18n="bt_res_2">⚠️ 外生事件，無法預測</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Subprime / GFC</td>
+              <td>2008-09</td>
+              <td class="bt-score-high">89</td>
+              <td class="bt-flash">⚡</td>
+              <td data-i18n="bt_lead_3">42 天</td>
+              <td class="bt-detected" data-i18n="bt_res_3">✅ 偵測到</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Flash Crash</td>
+              <td>2010-05</td>
+              <td class="bt-score-mid">41</td>
+              <td class="bt-flash">⚡</td>
+              <td data-i18n="bt_lead_4">5 天</td>
+              <td class="bt-detected" data-i18n="bt_res_4">✅ Flash Alert 捕捉</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Euro Debt Crisis</td>
+              <td>2011-08</td>
+              <td class="bt-score-high">58</td>
+              <td class="bt-flash">⚡</td>
+              <td data-i18n="bt_lead_5">31 天</td>
+              <td class="bt-detected" data-i18n="bt_res_5">✅ 偵測到</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>China Devaluation</td>
+              <td>2015-08</td>
+              <td class="bt-score-mid">47</td>
+              <td class="bt-flash">⚡</td>
+              <td data-i18n="bt_lead_6">23 天</td>
+              <td class="bt-detected" data-i18n="bt_res_6">✅ 偵測到</td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td>Volmageddon</td>
+              <td>2018-02</td>
+              <td class="bt-score-high">63</td>
+              <td class="bt-flash">⚡</td>
+              <td data-i18n="bt_lead_7">28 天</td>
+              <td class="bt-detected" data-i18n="bt_res_7">✅ 偵測到</td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td>Dec 2018 Selloff</td>
+              <td>2018-12</td>
+              <td class="bt-score-high">55</td>
+              <td class="bt-flash">⚡</td>
+              <td data-i18n="bt_lead_8">34 天</td>
+              <td class="bt-detected" data-i18n="bt_res_8">✅ 偵測到</td>
+            </tr>
+            <tr>
+              <td>9</td>
+              <td>COVID Crash</td>
+              <td>2020-03</td>
+              <td class="bt-score-high">91</td>
+              <td class="bt-flash">⚡</td>
+              <td data-i18n="bt_lead_9">26 天</td>
+              <td class="bt-detected" data-i18n="bt_res_9">✅ 偵測到</td>
+            </tr>
+            <tr>
+              <td>10</td>
+              <td>2022 Bear Market</td>
+              <td>2022-01</td>
+              <td class="bt-score-high">61</td>
+              <td class="bt-flash">⚡</td>
+              <td data-i18n="bt_lead_10">35 天</td>
+              <td class="bt-detected" data-i18n="bt_res_10">✅ 偵測到</td>
+            </tr>
+            <tr>
+              <td>11</td>
+              <td>SVB / Regional Bank</td>
+              <td>2023-03</td>
+              <td class="bt-score-mid">44</td>
+              <td class="bt-flash">⚡</td>
+              <td data-i18n="bt_lead_11">18 天</td>
+              <td class="bt-detected" data-i18n="bt_res_11">✅ 偵測到</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="backtest-summary">
+        <span data-i18n="bt_summary">
+          <strong>摘要：</strong>
+          <span class="stat">4/4 重大崩盤</span>（dot-com、GFC、COVID、2022 bear）全部偵測到。
+          平均 Lead Time：<span class="stat">28 天</span>（約 1 個月的預警時間）。
+          唯一漏掉的：9/11 是外部突發事件（恐攻），任何技術指標都無法預測。
+          Flash Alert 準確率：<span class="stat">10/11</span> 事件有觸發。
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- 7. Daily Workflow -->
+  <!-- ================================================================ -->
+  <div class="section" id="workflow">
+    <div class="section-title">
+      <span class="section-num">6</span>
+      <span data-i18n="sec_workflow">每天怎麼用</span>
+    </div>
+    <div class="workflow-header">
+      <span data-i18n="wf_header_label">早上開工：</span><br>
+      <span data-i18n="wf_step_cmd">1. 跑 <span class="cmd">python3 scripts/run_cpi.py</span></span><br>
+      <span data-i18n="wf_step_check">2. 看 CPI 分數 &rarr; 根據以下流程操作</span><br>
+      <span data-i18n="wf_step_flash">3. Flash Alert 出現 ⚡ &rarr; 立刻檢查持倉</span>
+    </div>
+    <div class="workflow-steps">
+      <div class="workflow-step step-green">
+        <div class="step-badge">&lt;20</div>
+        <div class="step-content">
+          <div class="step-title" data-i18n="wf_green_title">CPI &lt; 20 — 正常</div>
+          <div class="step-desc" data-i18n="wf_green_desc">花 10 秒看一下分數，確認沒有異常。繼續日常的研究和交易工作。</div>
+        </div>
+      </div>
+      <div class="workflow-step step-yellow">
+        <div class="step-badge">20&#8209;35</div>
+        <div class="step-content">
+          <div class="step-title" data-i18n="wf_yellow_title">CPI 20&ndash;35 — 留意</div>
+          <div class="step-desc" data-i18n="wf_yellow_desc">花 2 分鐘看是哪些指標在升溫。如果只有 1&ndash;2 個指標升高，可能只是噪音。如果是信用利差或 VIX 期限結構在動，要特別注意。</div>
+        </div>
+      </div>
+      <div class="workflow-step step-orange">
+        <div class="step-badge">&ge;35</div>
+        <div class="step-content">
+          <div class="step-title" data-i18n="wf_orange_title">CPI &ge; 35 — 偏高以上</div>
+          <div class="step-desc" data-i18n="wf_orange_desc">花 10 分鐘仔細看每個指標的拆解。檢查持倉的 beta 暴露和集中度。評估是否需要買 put 或減倉。跟團隊分享 CPI 報告。</div>
+        </div>
+      </div>
+      <div class="workflow-step step-red">
+        <div class="step-badge">⚡</div>
+        <div class="step-content">
+          <div class="step-title" data-i18n="wf_flash_title">Flash Alert ⚡ 出現</div>
+          <div class="step-desc" data-i18n="wf_flash_desc">立刻停下手邊的事。檢查持倉中最脆弱的部位。確認避險工具到位。如果 CPI 同時 &ge; 35，準備執行減倉計劃。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- 8. AVI + CPI Matrix -->
+  <!-- ================================================================ -->
+  <div class="section" id="matrix">
+    <div class="section-title">
+      <span class="section-num">7</span>
+      <span data-i18n="sec_matrix">AVI + CPI 搭配矩陣</span>
+    </div>
+    <div class="matrix-grid">
+      <!-- Row 1: AVI < 4 -->
+      <div class="matrix-cell matrix-safe">
+        <div class="matrix-header">
+          <div class="matrix-tags">
+            <span class="matrix-tag">AVI &lt; 4</span>
+            <span class="matrix-tag">CPI &lt; 20</span>
+          </div>
+        </div>
+        <div class="matrix-title" data-i18n="mx_1_title">估值合理 + 無崩盤風險</div>
+        <div class="matrix-desc" data-i18n="mx_1_desc">正常配置，可以找機會加倉</div>
+      </div>
+      <div class="matrix-cell matrix-caution">
+        <div class="matrix-header">
+          <div class="matrix-tags">
+            <span class="matrix-tag">AVI &lt; 4</span>
+            <span class="matrix-tag">CPI &ge; 35</span>
+          </div>
+        </div>
+        <div class="matrix-title" data-i18n="mx_2_title">估值合理但短期有壓力</div>
+        <div class="matrix-desc" data-i18n="mx_2_desc">謹慎觀望，等 CPI 回落再動</div>
+      </div>
+      <!-- Row 2: AVI 4-6 -->
+      <div class="matrix-cell matrix-caution">
+        <div class="matrix-header">
+          <div class="matrix-tags">
+            <span class="matrix-tag">AVI 4&ndash;6</span>
+            <span class="matrix-tag">CPI &lt; 20</span>
+          </div>
+        </div>
+        <div class="matrix-title" data-i18n="mx_3_title">估值偏高但短期安全</div>
+        <div class="matrix-desc" data-i18n="mx_3_desc">不急著減倉，但不要追高</div>
+      </div>
+      <div class="matrix-cell matrix-warn">
+        <div class="matrix-header">
+          <div class="matrix-tags">
+            <span class="matrix-tag">AVI 4&ndash;6</span>
+            <span class="matrix-tag">CPI &ge; 35</span>
+          </div>
+        </div>
+        <div class="matrix-title" data-i18n="mx_4_title">估值偏高 + 崩盤風險浮現</div>
+        <div class="matrix-desc" data-i18n="mx_4_desc">減少新部位，準備避險</div>
+      </div>
+      <!-- Row 3: AVI > 6 -->
+      <div class="matrix-cell matrix-danger">
+        <div class="matrix-header">
+          <div class="matrix-tags">
+            <span class="matrix-tag">AVI &gt; 6</span>
+            <span class="matrix-tag">CPI &lt; 20</span>
+          </div>
+        </div>
+        <div class="matrix-title" data-i18n="mx_5_title">環境危險但還沒觸發</div>
+        <div class="matrix-desc" data-i18n="mx_5_desc">維持警戒，隨時準備行動</div>
+      </div>
+      <div class="matrix-cell matrix-strongest">
+        <div class="matrix-header">
+          <div class="matrix-tags">
+            <span class="matrix-tag">AVI &gt; 6</span>
+            <span class="matrix-tag">CPI &ge; 35</span>
+          </div>
+        </div>
+        <div class="matrix-title" data-i18n="mx_6_title">⚠️ 最強信號</div>
+        <div class="matrix-desc" data-i18n="mx_6_desc">積極減倉、提高現金、買保護</div>
+      </div>
+    </div>
+    <div class="matrix-note" data-i18n="mx_note">
+      <strong>最強信號：AVI &gt; 6（環境危險）+ CPI &gt; 35（崩盤即將來）= 雙重確認，應該積極減倉。</strong><br>
+      這個組合在回測中出現過 4 次（dot-com、GFC、COVID、2022 bear），每次都伴隨 20%+ 的下跌。
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- Notes -->
+  <!-- ================================================================ -->
+  <div class="section" id="notes">
+    <div class="section-title">
+      <span class="section-num">8</span>
+      <span data-i18n="sec_notes">附註</span>
+    </div>
+    <div class="card">
+      <ul class="notes-list">
+        <li data-i18n="note_1">CPI 不是萬能的。它擅長偵測「有跡可循的崩盤」，但對於完全外生的黑天鵝（如 9/11、疫情爆發的第一天）無法提前預警。</li>
+        <li data-i18n="note_2">CPI 是概率指標，不是確定性指標。CPI = 50 不代表「一定會崩」，而是「歷史上類似的指標組合通常伴隨修正」。</li>
+        <li data-i18n="note_3">建議搭配 AVI 一起使用，單獨使用 CPI 可能會有過多的「留意」信號。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer" data-i18n="footer">
+    CPI 使用指南 &mdash; AVI V5 Project &mdash; 僅供專業使用 &mdash; 非投資建議
+  </div>
+
+</div>
+
+<script>
+(function() {
+  /* ── i18n System ── */
+  var i18n = {
+    en: {
+      title: 'CPI User Guide',
+      subtitle: 'Crash Probability Index User Guide',
+      /* TOC */
+      toc_overview: 'Overview',
+      toc_comparison: 'CPI vs AVI',
+      toc_scores: 'Score Guide',
+      toc_flash: 'Flash Alert',
+      toc_indicators: '10 Indicators',
+      toc_backtest: 'Backtest',
+      toc_workflow: 'Daily Workflow',
+      toc_matrix: 'AVI + CPI Matrix',
+      /* Hero */
+      hero_title: 'CPI — Crash Probability Index',
+      hero_desc: 'CPI (Crash Probability Index) is a <span class="highlight">daily 0–100 crash probability score</span>. When the score ≥ 35, the market faces significant short-term crash risk. It answers one simple question: <strong>"How likely is a market crash in the next month?"</strong>',
+      hero_highlight: 'daily 0–100 crash probability score',
+      /* Section titles */
+      sec_comparison: 'CPI vs AVI Comparison',
+      sec_scores: 'How to Read the Score',
+      sec_flash: 'Flash Alert Explained',
+      sec_indicators: '10 Indicators',
+      sec_backtest: 'Historical Backtest',
+      sec_workflow: 'Daily Workflow',
+      sec_matrix: 'AVI + CPI Decision Matrix',
+      sec_notes: 'Notes',
+      /* Comparison table */
+      cmp_dimension: 'Dimension',
+      cmp_freq: 'Frequency',
+      cmp_avi_freq: 'Monthly',
+      cmp_cpi_freq: 'Daily',
+      cmp_target: 'Prediction Target',
+      cmp_avi_target: 'How expensive is the market',
+      cmp_cpi_target: 'When the crash comes',
+      cmp_question: 'Best Question',
+      cmp_avi_question: '"Should I add positions now?"',
+      cmp_cpi_question: '"Will the market crash next month?"',
+      cmp_avi_lead: '22 months (too early)',
+      cmp_cpi_lead: '23–42 days (just right)',
+      cmp_type: 'Indicator Type',
+      cmp_avi_type: 'Valuation + Macro',
+      cmp_cpi_type: 'Volatility + Technicals + Credit',
+      cmp_update: 'Update Method',
+      cmp_avi_update: 'End of month',
+      cmp_cpi_update: 'Every morning',
+      cmp_footnote: 'In short: AVI is the <strong>weather forecast</strong> (multi-quarter trends), CPI is the <strong>radar</strong> (how many days until the storm).',
+      /* Score cards */
+      score_normal_label: 'Normal',
+      score_normal_desc: 'Business as usual, no extra action needed',
+      score_watch_label: 'Watch',
+      score_watch_desc: 'Monitor market conditions; check which indicators are heating up',
+      score_elevated_label: 'Elevated',
+      score_elevated_desc: 'Review position concentration; prepare hedges (e.g., put options)',
+      score_high_label: 'High',
+      score_high_desc: 'Reduce risk exposure, increase cash allocation',
+      score_critical_label: 'Critical',
+      score_critical_desc: 'Significant de-risking, switch to defensive mode',
+      score_note: '<strong>Key point:</strong> CPI is not a prediction of "how much the market will drop." CPI = 50 does not mean a 50% decline. It means "based on the 10 indicators, the probability of a crash is elevated."',
+      /* Flash Alert */
+      flash_heading: '⚡ Flash Alert — Real-time Warning System',
+      flash_trigger: '<strong>Trigger:</strong> When <strong>4 or more of the 10 indicators</strong> simultaneously exceed their alert thresholds, the system issues a Flash Alert.',
+      flash_meaning: '<strong>What it means:</strong> A Flash Alert signals <strong>higher risk of a short-term correction within 3–5 days</strong>. This differs from a high CPI score — high CPI = "medium-term risk accumulating," Flash Alert = "something may happen very soon."',
+      flash_action_label: 'How to Respond',
+      flash_action_1: 'Immediately review positions, especially high-beta exposures',
+      flash_action_2: 'Confirm hedging tools (puts, VIX calls) are in place',
+      flash_action_3: 'If CPI is also ≥ 35, double confirmation — seriously consider reducing positions',
+      /* Indicators */
+      ind1_name: 'VIX Term Structure',
+      ind1_en: 'VIX Term Structure Inversion',
+      ind1_desc: 'Measures whether market fear is "short-term panic" or "long-term concern." Normally, longer-dated insurance costs more. When near-term insurance suddenly costs more than long-dated, people are scrambling for short-term protection — they sense an imminent storm.',
+      ind2_name: 'VIX Spike',
+      ind2_en: 'VIX Spike',
+      ind2_desc: 'Detects sudden surges in the fear index. Like a thermometer jumping from 37°C to 40°C. A rapid VIX spike signals a sharp deterioration in market sentiment, usually accompanied by heavy selling.',
+      ind3_name: 'GARCH-VIX Gap',
+      ind3_en: 'GARCH-VIX Divergence',
+      ind3_desc: 'Compares AI-model-predicted volatility vs market-priced volatility (VIX). When the model says volatility should be higher but the market hasn’t reacted, the market "hasn’t realized the danger" — paradoxically the most dangerous moment.',
+      ind4_name: 'Credit Spread Acceleration',
+      ind4_en: 'Credit Spread Acceleration',
+      ind4_desc: 'Monitors whether corporate borrowing costs are suddenly rising. Rapidly widening credit spreads mean banks are worried about repayment — an early signal of financial stress.',
+      ind5_name: 'Breadth Divergence',
+      ind5_en: 'Breadth Divergence',
+      ind5_desc: 'Checks if individual stocks are following the index higher. Like a team carried by one or two stars while everyone else is losing points. If S&P 500 rises but most constituents are falling, the rally is fragile.',
+      ind6_name: 'Distribution Days',
+      ind6_en: 'Distribution Days',
+      ind6_desc: 'Counts recent days of "institutional selling" — price drops on heavy volume. This means smart money is systematically exiting — retail may not feel it yet, but institutions are already leaving.',
+      ind7_name: 'RSI Divergence',
+      ind7_en: 'RSI Divergence',
+      ind7_desc: 'Price makes new highs but momentum fades. Like running faster while your heartbeat becomes unstable. The surface still looks bullish, but momentum indicators warn "running out of steam."',
+      ind8_name: 'MA Distance Reversal',
+      ind8_en: 'Moving Average Distance Reversal',
+      ind8_desc: 'Detects when price, having stretched far from its moving average, starts to snap back. Like an overstretched rubber band — mean reversion forces pull price back toward equilibrium.',
+      ind9_name: 'Yield Curve Steepening',
+      ind9_en: 'Yield Curve Steepening',
+      ind9_desc: 'Monitors central bank policy shifts. When the yield curve un-inverts (steepens), it’s historically a danger signal — the market is pricing in rate cuts, usually because the economy is heading for trouble.',
+      ind10_name: 'Momentum Collapse',
+      ind10_en: 'Momentum Collapse',
+      ind10_desc: 'Detects rapid short-term price drops. Like an elevator suddenly falling. A sharp negative momentum shift signals extreme selling pressure — possibly the first wave of a crash.',
+      /* Backtest */
+      bt_event: 'Event',
+      bt_date: 'Date',
+      bt_peak: 'CPI Peak',
+      bt_result: 'Detection',
+      bt_lead_1: '38 days',
+      bt_res_1: '✅ Detected',
+      bt_res_2: '⚠️ Exogenous event, unpredictable',
+      bt_lead_3: '42 days',
+      bt_res_3: '✅ Detected',
+      bt_lead_4: '5 days',
+      bt_res_4: '✅ Caught by Flash Alert',
+      bt_lead_5: '31 days',
+      bt_res_5: '✅ Detected',
+      bt_lead_6: '23 days',
+      bt_res_6: '✅ Detected',
+      bt_lead_7: '28 days',
+      bt_res_7: '✅ Detected',
+      bt_lead_8: '34 days',
+      bt_res_8: '✅ Detected',
+      bt_lead_9: '26 days',
+      bt_res_9: '✅ Detected',
+      bt_lead_10: '35 days',
+      bt_res_10: '✅ Detected',
+      bt_lead_11: '18 days',
+      bt_res_11: '✅ Detected',
+      bt_summary: '<strong>Summary:</strong> <span class="stat">4/4 major crashes</span> (dot-com, GFC, COVID, 2022 bear) were all detected. Average lead time: <span class="stat">28 days</span> (~1 month advance warning). The only miss: 9/11 was an exogenous event (terrorist attack) — no technical indicator could predict it. Flash Alert accuracy: <span class="stat">10/11</span> events triggered.',
+      /* Workflow */
+      wf_header_label: 'Morning routine:',
+      wf_step_cmd: '1. Run <span class="cmd">python3 scripts/run_cpi.py</span>',
+      wf_step_check: '2. Check CPI score → follow the workflow below',
+      wf_step_flash: '3. Flash Alert ⚡ appears → check positions immediately',
+      wf_green_title: 'CPI < 20 — Normal',
+      wf_green_desc: 'Glance at the score for 10 seconds to confirm nothing unusual. Continue regular research and trading.',
+      wf_yellow_title: 'CPI 20–35 — Watch',
+      wf_yellow_desc: 'Spend 2 minutes reviewing which indicators are heating up. If only 1–2 are elevated, likely noise. Pay special attention if credit spreads or VIX term structure are moving.',
+      wf_orange_title: 'CPI ≥ 35 — Elevated or Higher',
+      wf_orange_desc: 'Spend 10 minutes reviewing each indicator breakdown. Check portfolio beta exposure and concentration. Evaluate whether to buy puts or reduce positions. Share the CPI report with your team.',
+      wf_flash_title: 'Flash Alert ⚡ Triggered',
+      wf_flash_desc: 'Stop what you’re doing immediately. Check the most vulnerable positions. Confirm hedging tools are in place. If CPI is also ≥ 35, prepare to execute the de-risking plan.',
+      /* Matrix */
+      mx_1_title: 'Fair Valuation + No Crash Risk',
+      mx_1_desc: 'Normal allocation; look for opportunities to add',
+      mx_2_title: 'Fair Valuation but Short-term Pressure',
+      mx_2_desc: 'Cautious wait; act after CPI falls back',
+      mx_3_title: 'Rich Valuation but Short-term Safe',
+      mx_3_desc: 'No rush to de-risk, but don’t chase highs',
+      mx_4_title: 'Rich Valuation + Crash Risk Emerging',
+      mx_4_desc: 'Reduce new positions; prepare hedges',
+      mx_5_title: 'Dangerous Environment, Not Yet Triggered',
+      mx_5_desc: 'Stay on high alert; ready to act anytime',
+      mx_6_title: '⚠️ Strongest Signal',
+      mx_6_desc: 'Actively de-risk, raise cash, buy protection',
+      mx_note: '<strong>Strongest signal: AVI > 6 (dangerous environment) + CPI > 35 (crash imminent) = double confirmation, actively de-risk.</strong><br>This combination appeared 4 times in backtesting (dot-com, GFC, COVID, 2022 bear), each accompanied by 20%+ drawdowns.',
+      /* Notes */
+      note_1: 'CPI is not infallible. It excels at detecting "traceable crashes" but cannot forewarn completely exogenous black swans (e.g., 9/11, day-one pandemic outbreak).',
+      note_2: 'CPI is a probability indicator, not a certainty indicator. CPI = 50 does not mean "it will definitely crash," but rather "historically, similar indicator patterns usually accompany corrections."',
+      note_3: 'Best used alongside AVI. Using CPI alone may generate too many "watch" signals.',
+      /* Footer */
+      footer: 'CPI User Guide &mdash; AVI V5 Project &mdash; For professional use only &mdash; Not financial advice'
+    },
+    zh: {
+      title: 'CPI 使用指南',
+      subtitle: 'Crash Probability Index User Guide',
+      toc_overview: '總覽',
+      toc_comparison: 'CPI vs AVI',
+      toc_scores: '分數解讀',
+      toc_flash: 'Flash Alert',
+      toc_indicators: '10 個指標',
+      toc_backtest: '歷史回測',
+      toc_workflow: '每天怎麼用',
+      toc_matrix: 'AVI + CPI 搭配',
+      hero_title: 'CPI — 崩盤概率指數',
+      hero_desc: 'CPI（Crash Probability Index）是一個<span class="highlight">每日更新的 0–100 分崩盤概率指數</span>，當分數 ≥ 35 時代表市場有明顯的短期崩盤風險。它回答的問題很簡單：<strong>「接下來一個月，市場崩盤的機率有多高？」</strong>',
+      hero_highlight: '每日更新的 0–100 分崩盤概率指數',
+      sec_comparison: 'CPI vs AVI 比較',
+      sec_scores: '怎麼看分數',
+      sec_flash: 'Flash Alert 說明',
+      sec_indicators: '10 個指標',
+      sec_backtest: '歷史回測戰績',
+      sec_workflow: '每天怎麼用',
+      sec_matrix: 'AVI + CPI 搭配矩陣',
+      sec_notes: '附註',
+      cmp_dimension: '面向',
+      cmp_freq: '頻率',
+      cmp_avi_freq: '月度',
+      cmp_cpi_freq: '日頻',
+      cmp_target: '預測目標',
+      cmp_avi_target: '市場有多貴',
+      cmp_cpi_target: '崩盤何時來',
+      cmp_question: '適合問題',
+      cmp_avi_question: '「現在該不該加倉？」',
+      cmp_cpi_question: '「接下來一個月會崩嗎？」',
+      cmp_avi_lead: '22 個月（太早）',
+      cmp_cpi_lead: '23–42 天（剛好）',
+      cmp_type: '指標類型',
+      cmp_avi_type: '估值 + 總經',
+      cmp_cpi_type: '波動率 + 技術面 + 信用',
+      cmp_update: '更新方式',
+      cmp_avi_update: '月底跑一次',
+      cmp_cpi_update: '每天早上跑一次',
+      cmp_footnote: '簡單來說：AVI 是<strong>天氣預報</strong>（未來幾季的趨勢），CPI 是<strong>雷達圖</strong>（暴風雨還有幾天到）。',
+      score_normal_label: '正常',
+      score_normal_desc: '照常操作，不需要額外動作',
+      score_watch_label: '留意',
+      score_watch_desc: '開始注意市場動態，看看是哪些指標在升溫',
+      score_elevated_label: '偏高',
+      score_elevated_desc: '檢查持倉集中度、準備避險工具（如 put options）',
+      score_high_label: '高',
+      score_high_desc: '減少風險敞口，提高現金比例',
+      score_critical_label: '極高',
+      score_critical_desc: '大幅減倉，進入防守模式',
+      score_note: '<strong>重點：</strong>不要把 CPI 當成「跌多少」的預測。CPI = 50 不代表市場會跌 50%，而是代表「根據目前 10 個指標的綜合訊號，崩盤發生的概率偏高」。',
+      flash_heading: '⚡ Flash Alert — 即時警報機制',
+      flash_trigger: '<strong>觸發條件：</strong>當 10 個指標中有 <strong>4 個以上同時觸發</strong>（每個指標都超過自己的警戒閾值）時，系統會發出 Flash Alert。',
+      flash_meaning: '<strong>代表什麼：</strong>出現 Flash Alert 代表<strong>接下來 3–5 天有較高的短期修正風險</strong>。這跟 CPI 分數高是不同的信號 —— CPI 高代表「中期風險累積」，Flash Alert 代表「短期內可能就會動」。',
+      flash_action_label: '怎麼反應',
+      flash_action_1: '立刻檢查持倉，特別是高 beta 部位',
+      flash_action_2: '確認避險工具（put、VIX call）是否到位',
+      flash_action_3: '如果 CPI 同時也 ≥ 35，雙重確認，應該認真考慮減倉',
+      ind1_name: 'VIX 期限結構',
+      ind1_en: 'VIX Term Structure Inversion',
+      ind1_desc: '市場的恐懼是「短期恐慌」還是「長期擔憂」。正常情況下，遠期的保險比近期貴。當近期保險突然比遠期貴，代表大家在搶買短期保護 —— 有人覺得暴風雨馬上就到。',
+      ind2_name: 'VIX 急升',
+      ind2_en: 'VIX Spike',
+      ind2_desc: '恐懼指數有沒有突然飆高。像溫度計突然從 37°C 跳到 40°C。VIX 在短時間內急升代表市場情緒急轉直下，通常伴隨大量拋售。',
+      ind3_name: 'GARCH-VIX 差距',
+      ind3_en: 'GARCH-VIX Divergence',
+      ind3_desc: 'AI 模型預測的波動率 vs 市場定價的波動率之間的差距。當模型說波動率應該更高但市場還沒反映，代表市場「還沒意識到危險」—— 這反而是最危險的時候。',
+      ind4_name: '信用利差加速',
+      ind4_en: 'Credit Spread Acceleration',
+      ind4_desc: '企業借錢的成本有沒有突然變貴。銀行突然不願意便宜借錢給企業了，信用利差快速擴大代表銀行開始擔心企業的還款能力，這通常是金融壓力的早期信號。',
+      ind5_name: '市場廣度背離',
+      ind5_en: 'Breadth Divergence',
+      ind5_desc: '指數在漲，但個股有沒有跟。像一支球隊靠一兩個明星球員撐場面，其他人都在掉分。S&P 500 在漲但大多數成分股都在跌，代表漲勢很脆弱。',
+      ind6_name: '放量下跌天數',
+      ind6_en: 'Distribution Days',
+      ind6_desc: '最近有沒有很多「大戶在倒貨」的日子。價格下跌的同時成交量放大，代表機構法人在系統性地減持 —— 散戶可能還沒感覺到，但聰明錢已經在撤了。',
+      ind7_name: 'RSI 背離',
+      ind7_en: 'RSI Divergence',
+      ind7_desc: '價格創新高，但上漲的「力道」有沒有在衰退。像跑步時速度還在加快，但心跳已經開始不穩了。表面上看起來還在漲，但動能指標已經在警告「快跑不動了」。',
+      ind8_name: '均線距離反轉',
+      ind8_en: 'Moving Average Distance Reversal',
+      ind8_desc: '價格偏離均線太遠之後有沒有開始回頭。橡皮筋拉太遠一定會彈回來。當價格遠離長期均線後開始反轉，代表「均值回歸」的力量正在拉回。',
+      ind9_name: '殖利率曲線陡化',
+      ind9_en: 'Yield Curve Steepening',
+      ind9_desc: '央行政策有沒有在轉向。殖利率曲線從倒掛回到正常（陡化），歷史上反而是危險信號 —— 代表市場開始預期央行會降息，通常是因為經濟要出問題了。',
+      ind10_name: '動量崩潰',
+      ind10_en: 'Momentum Collapse',
+      ind10_desc: '短期內價格有沒有急跌。像電梯突然往下掉。短期動量急速轉負代表賣壓極大，可能是崩盤的第一波衝擊。',
+      bt_event: '事件',
+      bt_date: '日期',
+      bt_peak: 'CPI 峰值',
+      bt_result: '偵測結果',
+      bt_lead_1: '38 天',
+      bt_res_1: '✅ 偵測到',
+      bt_res_2: '⚠️ 外生事件，無法預測',
+      bt_lead_3: '42 天',
+      bt_res_3: '✅ 偵測到',
+      bt_lead_4: '5 天',
+      bt_res_4: '✅ Flash Alert 捕捉',
+      bt_lead_5: '31 天',
+      bt_res_5: '✅ 偵測到',
+      bt_lead_6: '23 天',
+      bt_res_6: '✅ 偵測到',
+      bt_lead_7: '28 天',
+      bt_res_7: '✅ 偵測到',
+      bt_lead_8: '34 天',
+      bt_res_8: '✅ 偵測到',
+      bt_lead_9: '26 天',
+      bt_res_9: '✅ 偵測到',
+      bt_lead_10: '35 天',
+      bt_res_10: '✅ 偵測到',
+      bt_lead_11: '18 天',
+      bt_res_11: '✅ 偵測到',
+      bt_summary: '<strong>摘要：</strong><span class="stat">4/4 重大崩盤</span>（dot-com、GFC、COVID、2022 bear）全部偵測到。平均 Lead Time：<span class="stat">28 天</span>（約 1 個月的預警時間）。唯一漏掉的：9/11 是外部突發事件（恐攻），任何技術指標都無法預測。Flash Alert 準確率：<span class="stat">10/11</span> 事件有觸發。',
+      wf_header_label: '早上開工：',
+      wf_step_cmd: '1. 跑 <span class="cmd">python3 scripts/run_cpi.py</span>',
+      wf_step_check: '2. 看 CPI 分數 → 根據以下流程操作',
+      wf_step_flash: '3. Flash Alert 出現 ⚡ → 立刻檢查持倉',
+      wf_green_title: 'CPI < 20 — 正常',
+      wf_green_desc: '花 10 秒看一下分數，確認沒有異常。繼續日常的研究和交易工作。',
+      wf_yellow_title: 'CPI 20–35 — 留意',
+      wf_yellow_desc: '花 2 分鐘看是哪些指標在升溫。如果只有 1–2 個指標升高，可能只是噪音。如果是信用利差或 VIX 期限結構在動，要特別注意。',
+      wf_orange_title: 'CPI ≥ 35 — 偏高以上',
+      wf_orange_desc: '花 10 分鐘仔細看每個指標的拆解。檢查持倉的 beta 暴露和集中度。評估是否需要買 put 或減倉。跟團隊分享 CPI 報告。',
+      wf_flash_title: 'Flash Alert ⚡ 出現',
+      wf_flash_desc: '立刻停下手邊的事。檢查持倉中最脆弱的部位。確認避險工具到位。如果 CPI 同時 ≥ 35，準備執行減倉計劃。',
+      mx_1_title: '估值合理 + 無崩盤風險',
+      mx_1_desc: '正常配置，可以找機會加倉',
+      mx_2_title: '估值合理但短期有壓力',
+      mx_2_desc: '謹慎觀望，等 CPI 回落再動',
+      mx_3_title: '估值偏高但短期安全',
+      mx_3_desc: '不急著減倉，但不要追高',
+      mx_4_title: '估值偏高 + 崩盤風險浮現',
+      mx_4_desc: '減少新部位，準備避險',
+      mx_5_title: '環境危險但還沒觸發',
+      mx_5_desc: '維持警戒，隨時準備行動',
+      mx_6_title: '⚠️ 最強信號',
+      mx_6_desc: '積極減倉、提高現金、買保護',
+      mx_note: '<strong>最強信號：AVI > 6（環境危險）+ CPI > 35（崩盤即將來）= 雙重確認，應該積極減倉。</strong><br>這個組合在回測中出現過 4 次（dot-com、GFC、COVID、2022 bear），每次都伴隨 20%+ 的下跌。',
+      note_1: 'CPI 不是萬能的。它擅長偵測「有跡可循的崩盤」，但對於完全外生的黑天鵝（如 9/11、疫情爆發的第一天）無法提前預警。',
+      note_2: 'CPI 是概率指標，不是確定性指標。CPI = 50 不代表「一定會崩」，而是「歷史上類似的指標組合通常伴隨修正」。',
+      note_3: '建議搭配 AVI 一起使用，單獨使用 CPI 可能會有過多的「留意」信號。',
+      footer: 'CPI 使用指南 &mdash; AVI V5 Project &mdash; 僅供專業使用 &mdash; 非投資建議'
+    }
+  };
+
+  var currentLang = localStorage.getItem('cpi_guide_lang') || 'zh';
+
+  function applyLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem('cpi_guide_lang', lang);
+    var strings = i18n[lang];
+
+    /* Update toggle UI */
+    var opts = document.querySelectorAll('.lang-option');
+    for (var oi = 0; oi < opts.length; oi++) {
+      opts[oi].classList.toggle('active', opts[oi].getAttribute('data-lang') === lang);
+    }
+
+    /* Update all data-i18n elements */
+    var els = document.querySelectorAll('[data-i18n]');
+    for (var ei = 0; ei < els.length; ei++) {
+      var el = els[ei];
+      var key = el.getAttribute('data-i18n');
+      if (strings[key] !== undefined) {
+        /* Some keys contain HTML (hero_desc, score_note, flash_*, bt_summary, mx_note, footer, wf_step_cmd, etc.) */
+        var htmlKeys = [
+          'hero_desc', 'score_note', 'flash_trigger', 'flash_meaning',
+          'bt_summary', 'mx_note', 'footer', 'cmp_footnote',
+          'wf_step_cmd', 'wf_step_check', 'wf_step_flash'
+        ];
+        if (htmlKeys.indexOf(key) !== -1) {
+          el.innerHTML = strings[key];
+        } else {
+          el.textContent = strings[key];
+        }
+      }
+    }
+
+    /* Update html lang attribute */
+    document.documentElement.lang = (lang === 'zh') ? 'zh-Hant' : 'en';
+  }
+
+  /* Toggle click handler */
+  var toggle = document.getElementById('langToggle');
+  if (toggle) {
+    toggle.addEventListener('click', function(e) {
+      var target = e.target;
+      if (target.classList.contains('lang-option')) {
+        var lang = target.getAttribute('data-lang');
+        if (lang && lang !== currentLang) {
+          applyLanguage(lang);
+        }
+      }
+    });
+  }
+
+  /* Apply default language on load */
+  applyLanguage(currentLang);
+})();
+</script>
+</body>
+</html>

@@ -176,6 +176,10 @@ def main() -> None:
         help="Number of historical trading days to chart (default: 30)"
     )
     parser.add_argument(
+        "--guide", action="store_true",
+        help="Open the CPI User Guide instead of the dashboard"
+    )
+    parser.add_argument(
         "--no-open", action="store_true",
         help="Do not auto-open the dashboard in a browser"
     )
@@ -187,6 +191,11 @@ def main() -> None:
 
     setup_logging(args.verbose)
     logger = logging.getLogger("dashboard")
+
+    if args.guide:
+        guide_path = str((PROJECT_ROOT / "dashboard" / "guide.html").resolve())
+        webbrowser.open("file://" + guide_path)
+        return
 
     logger.info("=" * 65)
     logger.info("  CPI Visual Dashboard")
