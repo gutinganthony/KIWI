@@ -50,11 +50,11 @@ class CPIResult:
 
     @property
     def level(self) -> str:
-        if self.score >= 80:
+        if self.score >= 70:
             return "CRITICAL"
-        elif self.score >= 60:
+        elif self.score >= 50:
             return "HIGH"
-        elif self.score >= 40:
+        elif self.score >= 35:
             return "ELEVATED"
         elif self.score >= 20:
             return "MODERATE"
@@ -85,11 +85,11 @@ class CPIResult:
             )
 
         lines.append(f"\n  Action Guidance:")
-        if self.score >= 80:
+        if self.score >= 70:
             lines.append(f"  🔴 Immediate risk reduction. Consider hedging or raising cash.")
-        elif self.score >= 60:
+        elif self.score >= 50:
             lines.append(f"  🟠 Tighten stops. No new long positions. Reduce leverage.")
-        elif self.score >= 40:
+        elif self.score >= 35:
             lines.append(f"  🟡 Stay alert. Review stop-losses. Monitor daily.")
         else:
             lines.append(f"  🟢 Normal conditions. Standard risk management.")
@@ -215,6 +215,13 @@ class CrashProbabilityIndex:
         if avi_score is not None and avi_score > 6.0 and cpi_score > 40:
             cpi_score = min(100.0, cpi_score * 1.2)
 
+        # Consensus boost: when 3+ indicators are elevated, amplify
+        elevated_count = sum(1 for ind in indicators if ind.signal >= 40)
+        if elevated_count >= 5:
+            cpi_score = min(100.0, cpi_score * 1.3)
+        elif elevated_count >= 3:
+            cpi_score = min(100.0, cpi_score * 1.15)
+
         # Flash Alert
         flash_alert = FlashAlert(
             triggered=len(flash_triggers) >= 2,
@@ -256,8 +263,8 @@ class CrashProbabilityIndex:
             ratio = vix.iloc[-1] / max(vix_ma63.iloc[-1], 1)
 
         # ratio > 1.0 = backwardation (stress)
-        # Map: 0.85 → 0, 1.0 → 50, 1.15 → 100
-        signal = np.clip((ratio - 0.85) / 0.30 * 100, 0, 100)
+        # Map: 0.92 → 0, 1.0 → 60, 1.10 → 100
+        signal = np.clip((ratio - 0.92) / 0.18 * 100, 0, 100)
 
         ind = self._make_indicator("vix_term_structure", ratio, signal)
         flash = "VIX in backwardation (spot > 3M)" if ratio > 1.05 else None
@@ -309,8 +316,8 @@ class CrashProbabilityIndex:
         # Use the worse of 10d and 20d
         change = max(spread_change_10d, spread_change_20d / 2)
 
-        # Map: 0 bps → 0, 15 bps → 50, 30+ bps → 100
-        signal = np.clip(change / 30 * 100, 0, 100)
+        # Map: 0 bps → 0, 8 bps → 50, 20+ bps → 100
+        signal = np.clip(change / 20 * 100, 0, 100)
 
         ind = self._make_indicator("credit_acceleration", spread_change_10d, signal)
         flash = f"Credit spread widening fast (+{spread_change_10d:.0f}bps in 10d)" if spread_change_10d > 20 else None
@@ -378,8 +385,8 @@ class CrashProbabilityIndex:
             if price_change < -0.002 and vol_change:  # Down >0.2% on higher volume
                 dist_count += 1
 
-        # Map: 0-1 → 0, 3 → 40, 5 → 70, 7+ → 100
-        signal = np.clip((dist_count - 1) / 6 * 100, 0, 100)
+        # Map: 0-1 → 0, 3 → 50, 5 → 80, 6+ → 100
+        signal = np.clip((dist_count - 1) / 5 * 100, 0, 100)
 
         ind = self._make_indicator("distribution_days", dist_count, signal)
         flash = f"{dist_count} distribution days in 25 sessions" if dist_count >= 5 else None
