@@ -1,96 +1,248 @@
 #!/usr/bin/env python3
-"""CPI Dashboard — visual HTML dashboard + browser auto-open."""
+"""CPI Visual Dashboard — generate and open an HTML dashboard for CPI results.
 
-import json
-import os
+Usage:
+    # Generate dashboard and open in browser
+    python3 scripts/run_dashboard.py
+
+    # Also generate updated Pine Script for TradingView
+    python3 scripts/run_dashboard.py --pine
+
+    # Compute for a specific date
+    python3 scripts/run_dashboard.py --date 2024-12-15
+
+    # Custom output path
+    python3 scripts/run_dashboard.py --output /tmp/cpi.html
+"""
+
+import argparse
+import logging
 import sys
-import time
 import webbrowser
-from datetime import datetime
 from pathlib import Path
+from typing import Dict, List, Optional, Tuple
 
+# Add project root to path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from dotenv import load_dotenv
+
 load_dotenv(PROJECT_ROOT / ".env")
 
 
-def run_dashboard(date=None, verbose=False):
+def setup_logging(verbose: bool = False) -> None:
+    """Configure logging."""
+    level = logging.DEBUG if verbose else logging.INFO
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    if not verbose:
+        logging.getLogger("yfinance").setLevel(logging.WARNING)
+        logging.getLogger("urllib3").setLevel(logging.WARNING)
+        logging.getLogger("peewee").setLevel(logging.WARNING)
+        logging.getLogger("src.garch").setLevel(logging.WARNING)
+
+
+def collect_data(start: str = "2020-01-01") -> Dict:
+    """Collect all CPI data sources."""
     from src.cpi.data import CPIDataCollector
+
+    collector = CPIDataCollector()
+    return collector.collect_all(start=start)
+
+
+def compute_cpi(data: Dict, date: Optional[str] = None):
+    """Compute CPI score and return the CPIResult."""
     from src.cpi import CrashProbabilityIndex
 
-    print("Collecting market data...")
-    collector = CPIDataCollector()
-    data = collector.collect_all(start="2024-01-01")
-
-    print("Computing CPI...")
     cpi = CrashProbabilityIndex()
-    result = cpi.compute(
+    return cpi.compute(
         sp500_daily=data["sp500"],
         vix_daily=data["vix"],
         vix3m_daily=data.get("vix3m"),
         baa_daily=data["baa"],
         aaa_daily=data["aaa"],
-        treasury_10y=data["treasury_10y"],
-        treasury_2y=data["treasury_2y"],
+        treasury_10y=data["t10y"],
+        treasury_2y=data["t2y"],
         as_of=date,
     )
 
-    # Build indicator data for template
-    indicators_json = json.dumps([
-        {"name": ind.name.replace("_", " ").title(), "signal": round(ind.signal), "status": ind.status}
-        for ind in sorted(result.indicators, key=lambda x: -x.weighted_signal)
-    ])
 
-    flash_triggers = result.flash_alert.triggers if result.flash_alert.triggered else []
+def build_history(
+    data: Dict, days: int = 30
+) -> List[Tuple[str, float]]:
+    """Compute CPI for last N trading days to build a history chart.
 
-    # Read template
-    template_path = PROJECT_ROOT / "dashboard" / "template.html"
-    html = template_path.read_text()
+    Returns list of (date_str, score) tuples.
+    """
+    from src.cpi import CrashProbabilityIndex
 
-    # Inject data
-    html = html.replace("{{CPI_SCORE}}", f"{result.score:.0f}")
-    html = html.replace("{{CPI_LEVEL}}", result.level)
-    html = html.replace("{{CPI_DATE}}", result.date.strftime("%Y-%m-%d"))
-    html = html.replace("{{INDICATORS_JSON}}", indicators_json)
-    html = html.replace("{{FLASH_TRIGGERED}}", "true" if result.flash_alert.triggered else "false")
-    html = html.replace("{{FLASH_TRIGGERS}}", json.dumps(flash_triggers))
+    logger = logging.getLogger("dashboard.history")
+    cpi = CrashProbabilityIndex()
 
-    # Color mapping
-    colors = {"LOW": "#00c853", "MODERATE": "#ffd600", "ELEVATED": "#ff9100", "HIGH": "#ff3d00", "CRITICAL": "#d50000"}
-    html = html.replace("{{CPI_COLOR}}", colors.get(result.level, "#00c853"))
+    # Get the last N trading dates from sp500
+    sp500 = data["sp500"]
+    dates = sp500.index[-days:]
 
-    # Action guidance
-    actions = {
-        "LOW": "Normal conditions. Standard risk management.",
-        "MODERATE": "Stay aware. Monitor market dynamics.",
-        "ELEVATED": "Review positions. Prepare hedging strategies.",
-        "HIGH": "Reduce risk exposure. Tighten stop-losses.",
-        "CRITICAL": "Immediate risk reduction. Raise cash levels.",
+    history = []  # type: List[Tuple[str, float]]
+    for dt in dates:
+        try:
+            result = cpi.compute(
+                sp500_daily=sp500,
+                vix_daily=data["vix"],
+                vix3m_daily=data.get("vix3m"),
+                baa_daily=data["baa"],
+                aaa_daily=data["aaa"],
+                treasury_10y=data["t10y"],
+                treasury_2y=data["t2y"],
+                as_of=dt.strftime("%Y-%m-%d"),
+            )
+            history.append((dt.strftime("%m/%d"), round(result.score, 1)))
+        except Exception as e:
+            logger.debug("Skipping %s: %s", dt.strftime("%Y-%m-%d"), e)
+            continue
+
+    return history
+
+
+def generate_pine_script(result) -> str:
+    """Generate an updated Pine Script with current CPI values filled in.
+
+    Reads the template pine file and replaces placeholder values between
+    the PINE_VALUES_START and PINE_VALUES_END markers.
+
+    Returns the path to the generated Pine Script.
+    """
+    template_path = PROJECT_ROOT / "pine" / "cpi_indicator.pine"
+    output_path = PROJECT_ROOT / "pine" / "cpi_indicator_current.pine"
+
+    template = template_path.read_text(encoding="utf-8")
+
+    # Build indicator signal lookup
+    sig_map = {}  # type: Dict[str, float]
+    for ind in result.indicators:
+        sig_map[ind.name] = round(ind.signal, 1)
+
+    # Values to substitute
+    avi_ctx = result.avi_context
+    replacements = {
+        "{{CPI_SCORE}}": "{:.1f}".format(result.score),
+        "{{CPI_DATE}}": result.date.strftime("%Y-%m-%d"),
+        "{{FLASH_ALERT}}": "true" if result.flash_alert.triggered else "false",
+        "{{FLASH_SEVERITY}}": result.flash_alert.severity,
+        "{{AVI_CONTEXT}}": "{:.1f}".format(avi_ctx) if avi_ctx is not None else "0.0",
+        "{{SIG_VIX_TERM}}": str(sig_map.get("vix_term_structure", 0.0)),
+        "{{SIG_VIX_SPIKE}}": str(sig_map.get("vix_spike", 0.0)),
+        "{{SIG_GARCH}}": str(sig_map.get("garch_vix_gap", 0.0)),
+        "{{SIG_CREDIT}}": str(sig_map.get("credit_acceleration", 0.0)),
+        "{{SIG_BREADTH}}": str(sig_map.get("breadth_divergence", 0.0)),
+        "{{SIG_DISTRIB}}": str(sig_map.get("distribution_days", 0.0)),
+        "{{SIG_RSI}}": str(sig_map.get("rsi_divergence", 0.0)),
+        "{{SIG_MA_DIST}}": str(sig_map.get("ma_distance_reversal", 0.0)),
+        "{{SIG_YIELD}}": str(sig_map.get("yield_curve_steepening", 0.0)),
+        "{{SIG_MOMENTUM}}": str(sig_map.get("momentum_collapse", 0.0)),
     }
-    html = html.replace("{{ACTION_TEXT}}", actions.get(result.level, ""))
 
-    # Write output
-    output_path = PROJECT_ROOT / "dashboard" / "cpi_report.html"
-    output_path.write_text(html)
+    output = template
+    for placeholder, value in replacements.items():
+        output = output.replace(placeholder, value)
 
-    print(f"\nCPI Score: {result.score:.0f}/100 ({result.level})")
-    if result.flash_alert.triggered:
-        print(f"⚡ FLASH ALERT: {', '.join(flash_triggers)}")
-    print(f"\nDashboard saved: {output_path}")
-    print("Opening in browser...")
-
-    webbrowser.open(f"file://{output_path}")
+    output_path.write_text(output, encoding="utf-8")
+    return str(output_path.resolve())
 
 
-def main():
-    import argparse
-    parser = argparse.ArgumentParser(description="CPI Visual Dashboard")
-    parser.add_argument("--date", help="Date to compute (YYYY-MM-DD)")
-    parser.add_argument("--verbose", action="store_true")
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="CPI Visual Dashboard — generate HTML + optional Pine Script"
+    )
+    parser.add_argument(
+        "--date", type=str, default=None,
+        help="Compute CPI for a specific date (YYYY-MM-DD)"
+    )
+    parser.add_argument(
+        "--pine", action="store_true",
+        help="Also generate updated Pine Script for TradingView"
+    )
+    parser.add_argument(
+        "--output", type=str, default=None,
+        help="Custom output path for the HTML dashboard"
+    )
+    parser.add_argument(
+        "--history", type=int, default=30,
+        help="Number of historical trading days to chart (default: 30)"
+    )
+    parser.add_argument(
+        "--no-open", action="store_true",
+        help="Do not auto-open the dashboard in a browser"
+    )
+    parser.add_argument(
+        "--verbose", "-v", action="store_true",
+        help="Enable verbose logging"
+    )
     args = parser.parse_args()
-    run_dashboard(args.date, args.verbose)
+
+    setup_logging(args.verbose)
+    logger = logging.getLogger("dashboard")
+
+    logger.info("=" * 65)
+    logger.info("  CPI Visual Dashboard")
+    logger.info("=" * 65)
+
+    # Step 1: Collect data
+    logger.info("Collecting market data...")
+    data = collect_data()
+
+    # Step 2: Compute current CPI
+    logger.info("Computing CPI score...")
+    result = compute_cpi(data, date=args.date)
+    logger.info(
+        "CPI Score: %.0f/100 (%s)", result.score, result.level
+    )
+
+    # Step 3: Build history (for chart)
+    history = None  # type: Optional[List[Tuple[str, float]]]
+    if args.history > 0:
+        logger.info("Computing %d-day history for chart...", args.history)
+        history = build_history(data, days=args.history)
+        logger.info("  History: %d data points", len(history) if history else 0)
+
+    # Step 4: Generate HTML dashboard
+    from dashboard.cpi_dashboard import generate_dashboard
+
+    html_path = generate_dashboard(
+        result=result,
+        history=history,
+        output_path=args.output,
+    )
+    logger.info("Dashboard generated: %s", html_path)
+
+    # Step 5: Open in browser
+    if not args.no_open:
+        url = "file://" + html_path
+        logger.info("Opening in browser...")
+        webbrowser.open(url)
+
+    # Step 6: Generate Pine Script (optional)
+    pine_path = None
+    if args.pine:
+        logger.info("Generating Pine Script with current values...")
+        pine_path = generate_pine_script(result)
+        logger.info("Pine Script generated: %s", pine_path)
+        logger.info(
+            "  Copy contents of %s into TradingView Pine Editor",
+            pine_path,
+        )
+
+    # Print summary to terminal as well
+    print()
+    print(result.summary())
+    print()
+    print("Dashboard: file://" + html_path)
+    if pine_path:
+        print("Pine Script: " + pine_path)
 
 
 if __name__ == "__main__":
