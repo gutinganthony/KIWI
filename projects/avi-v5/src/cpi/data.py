@@ -22,7 +22,7 @@ class CPIDataCollector:
 
     def collect_all(
         self, start: str = "2000-01-01", end: Optional[str] = None
-    ) -> dict[str, pd.DataFrame | pd.Series]:
+    ) -> dict:
         """Collect all daily data sources for CPI computation.
 
         Returns dict with keys: sp500, vix, vix3m, baa, aaa, t10y, t2y
