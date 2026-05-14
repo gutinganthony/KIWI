@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CPI Dashboard — Crash Probability Index</title>
+<style>
+  /* ── Reset & Base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-primary: #131722;
+    --bg-secondary: #1e222d;
+    --bg-tertiary: #2a2e39;
+    --border: #363a45;
+    --text-primary: #d1d4dc;
+    --text-secondary: #787b86;
+    --text-muted: #555962;
+    --green: #26a69a;
+    --green-bg: rgba(38,166,154,0.12);
+    --yellow: #f7c948;
+    --yellow-bg: rgba(247,201,72,0.12);
+    --orange: #ff9800;
+    --orange-bg: rgba(255,152,0,0.12);
+    --red: #ef5350;
+    --red-bg: rgba(239,83,80,0.12);
+    --blue: #42a5f5;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── Layout ── */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 20px;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.5px;
+  }
+  .header .date {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  /* ── Flash Alert Banner ── */
+  .flash-alert {
+    display: none;
+    border-radius: 6px;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+    border-left: 4px solid;
+  }
+  .flash-alert.visible { display: block; }
+  .flash-alert.warning {
+    background: var(--orange-bg);
+    border-color: var(--orange);
+    color: var(--orange);
+  }
+  .flash-alert.critical {
+    background: var(--red-bg);
+    border-color: var(--red);
+    color: var(--red);
+  }
+  .flash-alert .flash-title {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+  .flash-alert .flash-triggers {
+    font-size: 13px;
+    opacity: 0.9;
+    line-height: 1.7;
+  }
+
+  /* ── Top Row: Score + AVI + Action ── */
+  .top-row {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 700px) {
+    .top-row { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  /* ── Score Card ── */
+  .score-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .score-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+  .score-value {
+    font-size: 72px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .score-max {
+    font-size: 20px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+  .score-level {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-top: 8px;
+    padding: 4px 16px;
+    border-radius: 4px;
+  }
+  .score-level.LOW { color: var(--green); background: var(--green-bg); }
+  .score-level.MODERATE { color: var(--yellow); background: var(--yellow-bg); }
+  .score-level.ELEVATED { color: var(--orange); background: var(--orange-bg); }
+  .score-level.HIGH { color: var(--red); background: var(--red-bg); }
+  .score-level.CRITICAL { color: #fff; background: var(--red); }
+
+  /* ── Gauge Ring ── */
+  .gauge-wrapper {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    margin: 0 auto 12px;
+  }
+  .gauge-bg, .gauge-fill {
+    position: absolute;
+    top: 0; left: 0;
+    width: 180px;
+    height: 180px;
+  }
+  .gauge-bg circle, .gauge-fill circle {
+    fill: none;
+    stroke-width: 10;
+    cx: 90;
+    cy: 90;
+    r: 80;
+  }
+  .gauge-bg circle { stroke: var(--bg-tertiary); }
+  .gauge-fill circle {
+    stroke-dasharray: 502.65;
+    stroke-dashoffset: 502.65;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: center;
+    transition: stroke-dashoffset 1.2s ease;
+  }
+  .gauge-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+
+  /* ── Right Panel ── */
+  .right-panel { display: flex; flex-direction: column; gap: 16px; }
+
+  .avi-context {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .avi-context .avi-badge {
+    font-size: 28px;
+    font-weight: 700;
+    min-width: 60px;
+    text-align: center;
+  }
+  .avi-context .avi-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  .avi-context .avi-desc strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .action-guidance {
+    padding: 14px 18px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .action-guidance.LOW { background: var(--green-bg); color: var(--green); }
+  .action-guidance.MODERATE { background: var(--yellow-bg); color: var(--yellow); }
+  .action-guidance.ELEVATED { background: var(--orange-bg); color: var(--orange); }
+  .action-guidance.HIGH { background: var(--red-bg); color: var(--red); }
+  .action-guidance.CRITICAL { background: var(--red-bg); color: var(--red); }
+  .action-guidance .action-title {
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  /* ── Indicator Bars ── */
+  .indicators-card h2 {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+  .indicator-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 60px 70px;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(54,58,69,0.5);
+    font-size: 13px;
+  }
+  @media (max-width: 600px) {
+    .indicator-row { grid-template-columns: 140px 1fr 50px 60px; }
+  }
+  .indicator-row:last-child { border-bottom: none; }
+  .indicator-name {
+    color: var(--text-primary);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .bar-track {
+    height: 8px;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.8s ease;
+  }
+  .indicator-signal {
+    text-align: right;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .indicator-status {
+    text-align: right;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+  .status-normal { color: var(--text-muted); }
+  .status-elevated { color: var(--orange); }
+  .status-critical { color: var(--red); }
+
+  /* ── History Chart ── */
+  .chart-card { margin-top: 20px; }
+  .chart-card h2 {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+  .chart-container {
+    position: relative;
+    height: 220px;
+    width: 100%;
+  }
+  canvas { display: block; }
+  .chart-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>Crash Probability Index (CPI)</h1>
+    <div class="date">{{DATE}}</div>
+  </div>
+
+  <!-- Flash Alert -->
+  <div id="flashAlert" class="flash-alert {{FLASH_CLASS}}">
+    <div class="flash-title">{{FLASH_TITLE}}</div>
+    <div class="flash-triggers">{{FLASH_TRIGGERS}}</div>
+  </div>
+
+  <!-- Top Row -->
+  <div class="top-row">
+    <!-- Score Gauge -->
+    <div class="card score-card">
+      <div class="score-label">Crash Probability</div>
+      <div class="gauge-wrapper">
+        <svg class="gauge-bg" viewBox="0 0 180 180"><circle/></svg>
+        <svg class="gauge-fill" viewBox="0 0 180 180">
+          <circle id="gaugeCircle" style="stroke: {{SCORE_COLOR}};" />
+        </svg>
+        <div class="gauge-center">
+          <div class="score-value" style="color: {{SCORE_COLOR}};">{{SCORE}}</div>
+          <div class="score-max">/ 100</div>
+        </div>
+      </div>
+      <div class="score-level {{LEVEL}}">{{LEVEL}}</div>
+    </div>
+
+    <!-- Right Panel: AVI Context + Action -->
+    <div class="card right-panel">
+      <div class="avi-context">
+        <div class="avi-badge" style="color: {{AVI_COLOR}};">{{AVI_SCORE}}</div>
+        <div class="avi-desc">
+          <strong>AVI V5 Context Score</strong><br>
+          {{AVI_DESCRIPTION}}
+        </div>
+      </div>
+      <div class="action-guidance {{LEVEL}}">
+        <div class="action-title">Action Guidance</div>
+        {{ACTION_TEXT}}
+      </div>
+    </div>
+  </div>
+
+  <!-- Indicator Breakdown -->
+  <div class="card indicators-card">
+    <h2>10-Indicator Breakdown</h2>
+    {{INDICATOR_ROWS}}
+  </div>
+
+  <!-- Historical Chart -->
+  <div class="card chart-card">
+    <h2>CPI History (Last 30 Days)</h2>
+    <div class="chart-container" id="chartContainer">
+      {{CHART_CONTENT}}
+    </div>
+  </div>
+
+  <div class="footer">
+    Generated by AVI V5 CPI Dashboard &mdash; For professional use only &mdash; Not financial advice
+  </div>
+
+</div>
+
+<script>
+(function() {
+  // Animate gauge
+  var score = {{SCORE_RAW}};
+  var circumference = 2 * Math.PI * 80;  // 502.65
+  var offset = circumference - (score / 100) * circumference;
+  var circle = document.getElementById('gaugeCircle');
+  if (circle) {
+    setTimeout(function() {
+      circle.style.strokeDashoffset = offset;
+    }, 100);
+  }
+
+  // Draw chart if data available
+  var chartData = {{CHART_DATA}};
+  if (chartData && chartData.length > 1) {
+    drawChart(chartData);
+  }
+
+  function drawChart(data) {
+    var container = document.getElementById('chartContainer');
+    container.innerHTML = '';
+    var canvas = document.createElement('canvas');
+    var W = container.clientWidth || 800;
+    var H = 220;
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    container.appendChild(canvas);
+
+    var ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    var padL = 50, padR = 20, padT = 20, padB = 40;
+    var chartW = W - padL - padR;
+    var chartH = H - padT - padB;
+
+    var scores = data.map(function(d) { return d[1]; });
+    var maxY = Math.max(100, Math.max.apply(null, scores) + 5);
+    var minY = 0;
+
+    // Grid lines and labels
+    ctx.strokeStyle = '#2a2e39';
+    ctx.lineWidth = 1;
+    ctx.fillStyle = '#787b86';
+    ctx.font = '11px -apple-system, sans-serif';
+    ctx.textAlign = 'right';
+
+    var levels = [0, 20, 35, 50, 70, 100];
+    for (var li = 0; li < levels.length; li++) {
+      var yPos = padT + chartH - (levels[li] / maxY * chartH);
+      ctx.beginPath();
+      ctx.moveTo(padL, yPos);
+      ctx.lineTo(padL + chartW, yPos);
+      ctx.stroke();
+      ctx.fillText(levels[li].toString(), padL - 8, yPos + 4);
+    }
+
+    // Colored zones (very subtle fills)
+    var zones = [
+      {from: 0,  to: 20, color: 'rgba(38,166,154,0.06)'},
+      {from: 20, to: 35, color: 'rgba(247,201,72,0.06)'},
+      {from: 35, to: 50, color: 'rgba(255,152,0,0.06)'},
+      {from: 50, to: 100, color: 'rgba(239,83,80,0.06)'}
+    ];
+    for (var zi = 0; zi < zones.length; zi++) {
+      var z = zones[zi];
+      var y1 = padT + chartH - (z.to / maxY * chartH);
+      var y2 = padT + chartH - (z.from / maxY * chartH);
+      ctx.fillStyle = z.color;
+      ctx.fillRect(padL, y1, chartW, y2 - y1);
+    }
+
+    // Threshold line at 35
+    ctx.strokeStyle = 'rgba(255,152,0,0.5)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([6, 4]);
+    var threshY = padT + chartH - (35 / maxY * chartH);
+    ctx.beginPath();
+    ctx.moveTo(padL, threshY);
+    ctx.lineTo(padL + chartW, threshY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Data line
+    var n = data.length;
+    ctx.strokeStyle = '#42a5f5';
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    for (var i = 0; i < n; i++) {
+      var x = padL + (i / (n - 1)) * chartW;
+      var y = padT + chartH - (data[i][1] / maxY * chartH);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // Area fill under line
+    ctx.lineTo(padL + chartW, padT + chartH);
+    ctx.lineTo(padL, padT + chartH);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(66,165,245,0.08)';
+    ctx.fill();
+
+    // Dots on data points (only if < 40 points)
+    if (n < 40) {
+      for (var di = 0; di < n; di++) {
+        var dx = padL + (di / (n - 1)) * chartW;
+        var dy = padT + chartH - (data[di][1] / maxY * chartH);
+        var sc = data[di][1];
+        ctx.fillStyle = sc >= 50 ? '#ef5350' : sc >= 35 ? '#ff9800' : sc >= 20 ? '#f7c948' : '#26a69a';
+        ctx.beginPath();
+        ctx.arc(dx, dy, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // X-axis date labels
+    ctx.fillStyle = '#787b86';
+    ctx.font = '10px -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    var step = Math.max(1, Math.floor(n / 6));
+    for (var xi = 0; xi < n; xi += step) {
+      var lx = padL + (xi / (n - 1)) * chartW;
+      ctx.fillText(data[xi][0], lx, H - 8);
+    }
+    // Always show last date
+    if ((n - 1) % step !== 0) {
+      var lastX = padL + chartW;
+      ctx.fillText(data[n - 1][0], lastX, H - 8);
+    }
+  }
+})();
+</script>
+</body>
+</html>
