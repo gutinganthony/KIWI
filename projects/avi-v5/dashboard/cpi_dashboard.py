@@ -94,6 +94,46 @@ def _action_text(level: str) -> str:
     return actions.get(level, actions["LOW"])
 
 
+# ── Bilingual support ──
+
+_ACTION_TEXTS_EN = {
+    "LOW": "Normal market conditions. Standard risk management applies. "
+           "Follow regular rebalancing schedule.",
+    "MODERATE": "Mild caution warranted. Maintain normal position sizing but be aware "
+                "of developing stress signals. Review weekly.",
+    "ELEVATED": "Stay alert and review stop-loss levels. Avoid adding risk in extended "
+                "sectors. Monitor CPI and flash alerts daily.",
+    "HIGH": "Tighten stop-losses across all positions. Avoid initiating new long exposure. "
+            "Reduce leverage if applicable. Monitor CPI daily for escalation.",
+    "CRITICAL": "Immediate risk reduction recommended. Consider hedging via puts, "
+                "raising cash allocation, and tightening all stops. Review portfolio "
+                "for concentrated positions.",
+}
+
+_ACTION_TEXTS_ZH = {
+    "LOW": "正常狀態，維持標準風險管理。",
+    "MODERATE": "保持警覺，檢查停損設定，每日監控。",
+    "ELEVATED": "收緊停損，不開新多頭，降低槓桿。",
+    "HIGH": "立即降低風險，考慮避險或提高現金部位。",
+    "CRITICAL": "立即降低風險，考慮避險或提高現金部位。",
+}
+
+
+def _avi_description_zh(avi_score: Optional[float]) -> str:
+    """Chinese AVI interpretation."""
+    if avi_score is None:
+        return "AVI V5 分數不可用。請執行月度管線以納入估值環境。"
+    if avi_score >= 8.0:
+        return "極度高估。市場定價追求完美，任何衝擊都可能引發超額修正。"
+    elif avi_score >= 6.0:
+        return "高估值。長期風險升高，放大 CPI 信號的重要性。"
+    elif avi_score >= 4.0:
+        return "中性估值。標準風險水準，CPI 信號可獨立判斷。"
+    elif avi_score >= 2.0:
+        return "估值合理至低估。長期風險低，修正往往較淺。"
+    return "深度低估。安全邊際充足，崩盤可能是買入機會。"
+
+
 def _indicator_display_name(name: str) -> str:
     """Convert snake_case indicator name to display name."""
     replacements = {
@@ -125,12 +165,12 @@ def _build_indicator_rows(result: CPIResult) -> str:
 
         row = (
             '<div class="indicator-row">'
-            '  <div class="indicator-name">{name}</div>'
+            '  <div class="indicator-name" data-i18n-indicator="{name}">{name}</div>'
             '  <div class="bar-track">'
             '    <div class="bar-fill" style="width:{width}%;background:{color};"></div>'
             '  </div>'
             '  <div class="indicator-signal" style="color:{color};">{signal:.0f}</div>'
-            '  <div class="indicator-status {status_cls}">{status}</div>'
+            '  <div class="indicator-status {status_cls}" data-i18n-status="{status}">{status}</div>'
             '</div>'
         ).format(
             name=html.escape(display_name),
@@ -195,6 +235,9 @@ def generate_dashboard(
     # Action guidance
     action_text = _action_text(level)
 
+    # Chinese AVI description
+    avi_desc_zh = _avi_description_zh(avi_score)
+
     # Indicator rows
     indicator_rows = _build_indicator_rows(result)
 
@@ -225,6 +268,14 @@ def generate_dashboard(
     output = output.replace("{{AVI_COLOR}}", avi_color)
     output = output.replace("{{AVI_DESCRIPTION}}", avi_desc)
     output = output.replace("{{ACTION_TEXT}}", action_text)
+    # Bilingual action texts (EN)
+    for lv_key, lv_text in _ACTION_TEXTS_EN.items():
+        output = output.replace("{{ACTION_TEXT_EN_" + lv_key + "}}", lv_text)
+    # Bilingual action texts (ZH)
+    for lv_key, lv_text in _ACTION_TEXTS_ZH.items():
+        output = output.replace("{{ACTION_TEXT_ZH_" + lv_key + "}}", lv_text)
+    # Chinese AVI description
+    output = output.replace("{{AVI_DESCRIPTION_ZH}}", avi_desc_zh)
     output = output.replace("{{INDICATOR_ROWS}}", indicator_rows)
     output = output.replace("{{CHART_DATA}}", chart_data_str)
     output = output.replace("{{CHART_CONTENT}}", chart_content)
