@@ -34,6 +34,187 @@ def _pad_to_len(arr, n):
     return np.concatenate([arr, np.full(n - len(arr), arr[-1])])
 
 
+def generate_dotcom_2000_data():
+    """Dot-com crash: Mar 24, 2000 peak. VIX 24→28, massive overextension."""
+    idx = make_daily_index("1999-06-01", 252)
+    n = len(idx)
+
+    # Massive rally then sharp reversal
+    prices = _pad_to_len(np.concatenate([
+        np.linspace(1300, 1400, 40),
+        np.linspace(1400, 1450, 30),
+        np.linspace(1450, 1520, 50),   # Push to new highs
+        np.linspace(1520, 1553, 20),   # Final push to peak (Mar 24)
+        np.linspace(1553, 1400, 15),   # Initial drop
+        np.linspace(1400, 1300, 20),   # Continued selling
+        np.linspace(1300, 1250, 80),   # Grinding lower
+    ]), n)
+
+    vol = _pad_to_len(np.abs(np.concatenate([
+        np.random.normal(1e9, 1e8, 120),    # Normal volume
+        np.random.normal(1.2e9, 2e8, 20),   # Rising pre-peak
+        np.random.normal(1.5e9, 3e8, 35),   # Spike during selloff
+        np.random.normal(1.2e9, 2e8, 80),
+    ])), n)
+
+    sp500 = make_sp500(idx, prices, vol)
+
+    # VIX: elevated and rising pre-crash (24→28)
+    vix = pd.Series(_pad_to_len(np.concatenate([
+        np.random.normal(22, 2, 100),
+        np.linspace(22, 26, 20),     # Rising into peak
+        np.linspace(26, 28, 10),     # Spike at peak
+        np.linspace(28, 34, 15),     # Crash VIX
+        np.linspace(34, 30, 20),
+        np.random.normal(28, 3, 90),
+    ]), n), index=idx)
+
+    vix3m = pd.Series(_pad_to_len(np.concatenate([
+        np.random.normal(24, 1.5, 100),
+        np.linspace(24, 25, 20),
+        np.linspace(25, 26, 10),     # Backwardation starting
+        np.linspace(26, 30, 15),
+        np.linspace(30, 28, 20),
+        np.random.normal(27, 2, 90),
+    ]), n), index=idx)
+
+    baa = pd.Series(_pad_to_len(np.concatenate([
+        np.random.normal(7.5, 0.1, 100),
+        np.linspace(7.5, 7.8, 20),   # Widening
+        np.linspace(7.8, 8.2, 25),
+        np.linspace(8.2, 8.5, 20),
+        np.random.normal(8.3, 0.2, 90),
+    ]), n), index=idx)
+
+    aaa = pd.Series(_pad_to_len(np.concatenate([
+        np.random.normal(6.5, 0.1, 100),
+        np.linspace(6.5, 6.6, 20),
+        np.linspace(6.6, 6.7, 25),
+        np.linspace(6.7, 6.8, 20),
+        np.random.normal(6.7, 0.1, 90),
+    ]), n), index=idx)
+
+    t10y = pd.Series(_pad_to_len(np.concatenate([
+        np.random.normal(6.0, 0.1, 100),
+        np.linspace(6.0, 6.2, 40),
+        np.linspace(6.2, 5.8, 30),
+        np.random.normal(5.5, 0.2, 85),
+    ]), n), index=idx)
+
+    t2y = pd.Series(_pad_to_len(np.concatenate([
+        np.random.normal(5.8, 0.1, 100),
+        np.linspace(5.8, 6.3, 40),    # 2Y > 10Y = inversion
+        np.linspace(6.3, 5.5, 30),
+        np.random.normal(5.2, 0.2, 85),
+    ]), n), index=idx)
+
+    return {
+        "sp500": sp500, "vix": vix, "vix3m": vix3m,
+        "baa": baa, "aaa": aaa, "t10y": t10y, "t2y": t2y,
+        "peak_date": "2000-03-24", "name": "Dot-com Crash 2000",
+    }
+
+
+def generate_gfc_2007_data():
+    """GFC 2007: Oct 9, 2007 peak. Credit stress, VIX jump Aug 2007."""
+    idx = make_daily_index("2007-01-02", 252)
+    n = len(idx)
+
+    prices = _pad_to_len(np.concatenate([
+        np.linspace(1420, 1500, 60),   # Jan-Mar: rally
+        np.linspace(1500, 1530, 40),   # Apr-Jun: push higher
+        np.linspace(1530, 1455, 15),   # Jul: Aug subprime dip
+        np.linspace(1455, 1520, 25),   # Sep: recovery to near highs
+        np.linspace(1520, 1565, 15),   # Oct 1-9: final push to peak
+        np.linspace(1565, 1450, 20),   # Oct-Nov: rollover
+        np.linspace(1450, 1380, 20),   # Dec: continued weakness
+        np.linspace(1380, 1200, 60),   # 2008: accelerating decline
+    ]), n)
+
+    vol = _pad_to_len(np.abs(np.concatenate([
+        np.random.normal(2.5e9, 3e8, 100),
+        np.random.normal(3.5e9, 5e8, 15),   # Aug spike
+        np.random.normal(2.8e9, 3e8, 25),
+        np.random.normal(3e9, 4e8, 35),      # Rising into crash
+        np.random.normal(4e9, 5e8, 80),
+    ])), n)
+
+    sp500 = make_sp500(idx, prices, vol)
+
+    # VIX: calm then Aug 2007 spike (15→30), settle, then rise again
+    vix = pd.Series(_pad_to_len(np.concatenate([
+        np.random.normal(12, 1, 80),      # Jan-Jun: very low vol
+        np.linspace(12, 15, 20),          # Jul: starting to rise
+        np.linspace(15, 30, 10),          # Aug: subprime spike!
+        np.linspace(30, 20, 15),          # Sep: settle
+        np.linspace(20, 18, 15),          # Early Oct: calm
+        np.linspace(18, 24, 15),          # Oct 9→: rising again
+        np.linspace(24, 28, 20),          # Nov: elevated
+        np.linspace(28, 35, 20),          # Dec-Jan: crisis mode
+        np.random.normal(30, 5, 60),
+    ]), n), index=idx)
+
+    vix3m = pd.Series(_pad_to_len(np.concatenate([
+        np.random.normal(14, 1, 80),
+        np.linspace(14, 16, 20),
+        np.linspace(16, 25, 10),          # Aug: backwardation
+        np.linspace(25, 20, 15),
+        np.linspace(20, 19, 15),
+        np.linspace(19, 22, 15),
+        np.linspace(22, 25, 20),
+        np.linspace(25, 30, 20),
+        np.random.normal(28, 3, 60),
+    ]), n), index=idx)
+
+    # Credit spreads: dramatic widening starting Aug 2007
+    baa = pd.Series(_pad_to_len(np.concatenate([
+        np.random.normal(6.2, 0.05, 80),
+        np.linspace(6.2, 6.4, 20),
+        np.linspace(6.4, 6.8, 10),        # Aug: credit stress
+        np.linspace(6.8, 6.6, 15),        # Partial settle
+        np.linspace(6.6, 6.5, 15),
+        np.linspace(6.5, 6.9, 15),        # Oct: widening again
+        np.linspace(6.9, 7.3, 20),
+        np.linspace(7.3, 8.0, 20),
+        np.random.normal(8.5, 0.5, 60),
+    ]), n), index=idx)
+
+    aaa = pd.Series(_pad_to_len(np.concatenate([
+        np.random.normal(5.2, 0.05, 80),
+        np.linspace(5.2, 5.3, 20),
+        np.linspace(5.3, 5.4, 10),
+        np.linspace(5.4, 5.3, 15),
+        np.linspace(5.3, 5.3, 15),
+        np.linspace(5.3, 5.4, 15),
+        np.linspace(5.4, 5.5, 20),
+        np.linspace(5.5, 5.6, 20),
+        np.random.normal(5.5, 0.1, 60),
+    ]), n), index=idx)
+
+    # Yield curve: was inverted in 2006, steepening in 2007
+    t10y = pd.Series(_pad_to_len(np.concatenate([
+        np.random.normal(4.7, 0.1, 100),
+        np.linspace(4.7, 4.5, 30),
+        np.linspace(4.5, 4.2, 30),        # Dropping
+        np.linspace(4.2, 3.8, 30),
+        np.random.normal(3.5, 0.2, 65),
+    ]), n), index=idx)
+
+    t2y = pd.Series(_pad_to_len(np.concatenate([
+        np.random.normal(4.9, 0.1, 100),   # 2Y > 10Y = inverted
+        np.linspace(4.9, 4.5, 30),
+        np.linspace(4.5, 3.8, 30),         # Rapid drop = steepening
+        np.linspace(3.8, 3.2, 30),
+        np.random.normal(2.8, 0.3, 65),
+    ]), n), index=idx)
+
+    return {
+        "sp500": sp500, "vix": vix, "vix3m": vix3m,
+        "baa": baa, "aaa": aaa, "t10y": t10y, "t2y": t2y,
+        "peak_date": "2007-10-09", "name": "GFC 2007-09",
+    }
+
+
 def generate_covid_crash_data():
     """COVID crash: Feb 19, 2020 peak → Mar 23, 2020 trough (-34%)."""
     idx = make_daily_index("2019-06-01", 252)
@@ -235,12 +416,14 @@ def generate_2018_q4_data():
 
     sp500 = make_sp500(idx, prices, vol)
 
+    # VIX: creeping up in Sep, then spike in Oct — pre-peak stress
     vix = pd.Series(_pad_to_len(np.concatenate([
         np.random.normal(20, 3, 20),
-        np.random.normal(14, 2, 100),
-        np.linspace(14, 16, 10),
-        np.linspace(16, 22, 10),
-        np.linspace(22, 28, 15),
+        np.random.normal(13, 1.5, 80),      # Mar-Aug: very calm
+        np.linspace(13, 16, 20),             # Sep: starting to rise
+        np.linspace(16, 21, 10),             # Late Sep: accelerating
+        np.linspace(21, 24, 10),             # Oct 1-3: spike before peak
+        np.linspace(24, 28, 15),             # Oct: crash VIX
         np.linspace(28, 20, 10),
         np.linspace(20, 30, 15),
         np.linspace(30, 36, 10),
@@ -249,9 +432,10 @@ def generate_2018_q4_data():
 
     vix3m = pd.Series(_pad_to_len(np.concatenate([
         np.random.normal(18, 2, 20),
-        np.random.normal(16, 1.5, 100),
-        np.linspace(16, 17, 10),
-        np.linspace(17, 20, 10),
+        np.random.normal(15, 1, 80),
+        np.linspace(15, 16, 20),
+        np.linspace(16, 18, 10),             # VIX approaching VIX3M
+        np.linspace(18, 20, 10),             # Backwardation starting
         np.linspace(20, 24, 15),
         np.linspace(24, 19, 10),
         np.linspace(19, 25, 15),
@@ -384,6 +568,8 @@ def main():
     print()
 
     events = [
+        generate_dotcom_2000_data(),
+        generate_gfc_2007_data(),
         generate_covid_crash_data(),
         generate_2022_rate_hike_data(),
         generate_2018_q4_data(),
