@@ -58,8 +58,8 @@ class CrashDetectionResult:
     cpi_at_peak: float
     flash_alert_before: bool
     days_first_alert: int  # Days before peak that CPI first exceeded 60
-    detected_30d: bool  # CPI >= 60 within 30 days before peak
-    detected_7d: bool  # CPI >= 60 within 7 days before peak
+    detected_30d: bool  # CPI >= 35 within 30 days before peak
+    detected_7d: bool  # CPI >= 35 within 7 days before peak
 
 
 def run_cpi_backtest(
@@ -146,8 +146,8 @@ def run_cpi_backtest(
         max_7d = scores_7d.max() if not scores_7d.empty else 0
         at_peak = cpi_series.get(peak, scores_30d.iloc[-1])
 
-        # First day CPI >= 60
-        alerts_60 = scores_30d[scores_30d >= 60]
+        # First day CPI >= 35
+        alerts_60 = scores_30d[scores_30d >= 35]
         if not alerts_60.empty:
             first_alert = alerts_60.index[0]
             days_before = (peak - first_alert).days
@@ -162,21 +162,21 @@ def run_cpi_backtest(
             cpi_at_peak=at_peak,
             flash_alert_before=flash_30d.any() if not flash_30d.empty else False,
             days_first_alert=days_before,
-            detected_30d=max_30d >= 60,
-            detected_7d=max_7d >= 60,
+            detected_30d=max_30d >= 35,
+            detected_7d=max_7d >= 35,
         ))
 
     # Also compute false positive rate
-    # Define: CPI >= 60 on a day NOT within 30 days before any crash peak
+    # Define: CPI >= 35 on a day NOT within 30 days before any crash peak
     crash_windows = set()
     for event in events:
         peak = pd.Timestamp(event["peak"])
         for d in range(45):
             crash_windows.add(peak - pd.Timedelta(days=d))
 
-    total_alert_days = (cpi_series >= 60).sum()
+    total_alert_days = (cpi_series >= 35).sum()
     true_positive_days = sum(
-        1 for d in cpi_series.index if cpi_series[d] >= 60 and d in crash_windows
+        1 for d in cpi_series.index if cpi_series[d] >= 35 and d in crash_windows
     )
     false_positive_days = total_alert_days - true_positive_days
     total_non_crash_days = len(cpi_series) - len(crash_windows.intersection(set(cpi_series.index)))
@@ -188,7 +188,7 @@ def run_cpi_backtest(
         "  CPI BACKTEST: Crash Probability Index vs Historical Events",
         "=" * 70,
         "",
-        "  CRASH DETECTION (threshold: CPI >= 60)",
+        "  CRASH DETECTION (threshold: CPI >= 35)",
         "  " + "-" * 66,
     ]
 
@@ -219,7 +219,7 @@ def run_cpi_backtest(
     lines.append("")
     lines.append(f"  ALERT STATISTICS")
     lines.append("  " + "-" * 66)
-    lines.append(f"  Total days CPI >= 60:         {total_alert_days}")
+    lines.append(f"  Total days CPI >= 35:         {total_alert_days}")
     lines.append(f"  True positive days:           {true_positive_days}")
     lines.append(f"  False positive days:          {false_positive_days}")
     lines.append(f"  False positive rate:          {fp_rate:.1%}")
