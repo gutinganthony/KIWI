@@ -46,7 +46,7 @@ def setup_logging(verbose: bool = False) -> None:
         logging.getLogger("src.garch").setLevel(logging.WARNING)
 
 
-def collect_data(start: str = "2020-01-01") -> Dict:
+def collect_data(start: str = "2024-01-01") -> Dict:
     """Collect all CPI data sources."""
     from src.cpi.data import CPIDataCollector
 
@@ -172,8 +172,8 @@ def main() -> None:
         help="Custom output path for the HTML dashboard"
     )
     parser.add_argument(
-        "--history", type=int, default=30,
-        help="Number of historical trading days to chart (default: 30)"
+        "--history", type=int, default=252,
+        help="Number of historical trading days to chart (default: 252 = ~1 year)"
     )
     parser.add_argument(
         "--guide", action="store_true",
