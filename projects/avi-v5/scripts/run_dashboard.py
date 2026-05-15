@@ -205,9 +205,27 @@ def main() -> None:
     logger.info("Collecting market data...")
     data = collect_data()
 
-    # Step 2: Compute current CPI
+    # Step 2: Compute AVI V5 score
+    avi_score = None
+    try:
+        logger.info("Computing AVI V5 score...")
+        from src.pipeline.avi_v5_pipeline import AVIV5Pipeline
+        import os
+        fred_key = os.environ.get("FRED_API_KEY", "")
+        if fred_key:
+            pipeline = AVIV5Pipeline(fred_api_key=fred_key)
+            v5_result = pipeline.run(verbose=False)
+            avi_score = v5_result.avi_v4_score
+            logger.info("AVI V5: %.2f/10", avi_score)
+        else:
+            logger.warning("No FRED_API_KEY, skipping AVI")
+    except Exception as e:
+        logger.warning("AVI computation failed (non-fatal): %s", e)
+
+    # Step 3: Compute current CPI
     logger.info("Computing CPI score...")
     result = compute_cpi(data, date=args.date)
+    result.avi_context = avi_score
     logger.info(
         "CPI Score: %.0f/100 (%s)", result.score, result.level
     )
