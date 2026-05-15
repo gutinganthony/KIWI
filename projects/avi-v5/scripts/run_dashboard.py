@@ -101,7 +101,7 @@ def build_history(
                 treasury_2y=data["t2y"],
                 as_of=dt.strftime("%Y-%m-%d"),
             )
-            history.append((dt.strftime("%m/%d"), round(result.score, 1)))
+            history.append((dt.strftime("%Y-%m-%d"), round(result.score, 1)))
         except Exception as e:
             logger.debug("Skipping %s: %s", dt.strftime("%Y-%m-%d"), e)
             continue

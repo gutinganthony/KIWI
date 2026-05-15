@@ -406,9 +406,14 @@
 
   <!-- Historical Chart -->
   <div class="card chart-card">
-    <h2 data-i18n="historical_trend">CPI History (Last 30 Days)</h2>
-    <div class="chart-container" id="chartContainer">
+    <h2 data-i18n="historical_trend">CPI History (Past Year)</h2>
+    <div class="chart-container" id="chartContainer" style="position:relative;cursor:crosshair;">
       {{CHART_CONTENT}}
+      <div id="tooltip" style="display:none;position:absolute;background:rgba(30,34,45,0.95);border:1px solid #42a5f5;border-radius:6px;padding:8px 12px;color:#d1d4dc;font-size:13px;pointer-events:none;z-index:10;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.4);">
+        <div id="ttDate" style="font-weight:600;margin-bottom:2px;"></div>
+        <div>CPI: <span id="ttScore" style="font-weight:700;"></span></div>
+      </div>
+      <div id="crosshair" style="display:none;position:absolute;top:0;width:1px;height:100%;background:rgba(66,165,245,0.4);pointer-events:none;"></div>
     </div>
   </div>
 
@@ -427,7 +432,7 @@
       crash_probability: 'Crash Probability',
       flash_title: '{{FLASH_TITLE}}',
       indicator_breakdown: '10-Indicator Breakdown',
-      historical_trend: 'CPI History (Last 30 Days)',
+      historical_trend: 'CPI History (Past Year)',
       action_guidance: 'Action Guidance',
       avi_context: 'AVI V5 Context Score',
       avi_description: '{{AVI_DESCRIPTION}}',
@@ -460,7 +465,7 @@
       crash_probability: '崩盤概率',
       flash_title: '即時警報',
       indicator_breakdown: '指標拆解',
-      historical_trend: 'CPI 歷史走勢（近 30 天）',
+      historical_trend: 'CPI 歷史走勢（過去一年）',
       action_guidance: '行動建議',
       avi_context: 'AVI 環境分數',
       avi_description: '{{AVI_DESCRIPTION_ZH}}',
@@ -682,20 +687,70 @@
       }
     }
 
-    // X-axis date labels
+    // X-axis: show monthly labels (1st of each month)
     ctx.fillStyle = '#787b86';
-    ctx.font = '10px -apple-system, sans-serif';
+    ctx.font = '11px -apple-system, sans-serif';
     ctx.textAlign = 'center';
-    var step = Math.max(1, Math.floor(n / 6));
-    for (var xi = 0; xi < n; xi += step) {
-      var lx = padL + (xi / (n - 1)) * chartW;
-      ctx.fillText(data[xi][0], lx, H - 8);
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var lastMonth = -1;
+    for (var xi = 0; xi < n; xi++) {
+      var dateStr = data[xi][0]; // YYYY-MM-DD
+      var parts = dateStr.split('-');
+      var mo = parseInt(parts[1], 10);
+      if (mo !== lastMonth) {
+        lastMonth = mo;
+        var lx = padL + (xi / (n - 1)) * chartW;
+        var yr = parts[0].substring(2); // "25" or "26"
+        ctx.fillText(months[mo - 1] + " '" + yr, lx, H - 8);
+        // Draw tick
+        ctx.strokeStyle = '#363a45';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(lx, padT + chartH);
+        ctx.lineTo(lx, padT + chartH + 5);
+        ctx.stroke();
+      }
     }
-    // Always show last date
-    if ((n - 1) % step !== 0) {
-      var lastX = padL + chartW;
-      ctx.fillText(data[n - 1][0], lastX, H - 8);
-    }
+
+    // Store chart geometry for tooltip
+    window._chartMeta = { padL: padL, padR: padR, padT: padT, chartW: chartW, chartH: chartH, maxY: maxY, data: data, n: n, H: H };
+  }
+
+  // Tooltip interaction
+  var chartCont = document.getElementById('chartContainer');
+  var tooltip = document.getElementById('tooltip');
+  var crosshair = document.getElementById('crosshair');
+  var ttDate = document.getElementById('ttDate');
+  var ttScore = document.getElementById('ttScore');
+
+  if (chartCont) {
+    chartCont.addEventListener('mousemove', function(e) {
+      var meta = window._chartMeta;
+      if (!meta) return;
+      var rect = chartCont.getBoundingClientRect();
+      var mx = e.clientX - rect.left;
+      var relX = mx - meta.padL;
+      if (relX < 0 || relX > meta.chartW) { tooltip.style.display = 'none'; crosshair.style.display = 'none'; return; }
+      var idx = Math.round((relX / meta.chartW) * (meta.n - 1));
+      idx = Math.max(0, Math.min(meta.n - 1, idx));
+      var pt = meta.data[idx];
+      var dateStr = pt[0];
+      var score = pt[1];
+      ttDate.textContent = dateStr;
+      ttScore.textContent = score.toFixed(1);
+      ttScore.style.color = score >= 50 ? '#ef5350' : score >= 35 ? '#ff9800' : score >= 20 ? '#f7c948' : '#26a69a';
+      var px = meta.padL + (idx / (meta.n - 1)) * meta.chartW;
+      tooltip.style.display = 'block';
+      tooltip.style.left = (px + 12) + 'px';
+      tooltip.style.top = '10px';
+      if (px + 150 > rect.width) tooltip.style.left = (px - 130) + 'px';
+      crosshair.style.display = 'block';
+      crosshair.style.left = px + 'px';
+    });
+    chartCont.addEventListener('mouseleave', function() {
+      tooltip.style.display = 'none';
+      crosshair.style.display = 'none';
+    });
   }
 })();
 </script>
