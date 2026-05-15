@@ -108,18 +108,21 @@ class CrashProbabilityIndex:
         and/or vix_spike fire, to improve 7-day detection window
     """
 
-    # Indicator weights (sum to 1.0) — 10 indicators
+    # Indicator weights (sum to 1.0) — 12 indicators
     WEIGHTS = {
-        "vix_term_structure": 0.14,
-        "vix_spike": 0.10,           # NEW: absolute VIX level surge
-        "garch_vix_gap": 0.10,
-        "credit_acceleration": 0.12,
-        "breadth_divergence": 0.10,
-        "distribution_days": 0.10,
-        "rsi_divergence": 0.08,
-        "ma_distance_reversal": 0.08,
-        "yield_curve_steepening": 0.08,
-        "momentum_collapse": 0.10,    # NEW: 5-day price momentum breakdown
+        "vix_term_structure": 0.12,
+        "vix_spike": 0.09,
+        "garch_vix_gap": 0.08,
+        "credit_acceleration": 0.10,
+        "breadth_divergence": 0.08,
+        "distribution_days": 0.08,
+        "rsi_divergence": 0.07,
+        "ma_distance_reversal": 0.07,
+        "yield_curve_steepening": 0.06,
+        "momentum_collapse": 0.09,
+        "yield_surge": 0.08,          # NEW: rapid Treasury yield spike
+        "intraday_selloff": 0.08,     # NEW: same-day broad market decline
+    }
     }
 
     def compute(
@@ -225,6 +228,18 @@ class CrashProbabilityIndex:
         # --- 10. Momentum Collapse (5-day price breakdown) ---
         sig_mc, ind_mc, flash = self._momentum_collapse(sp500_daily)
         indicators.append(ind_mc)
+        if flash:
+            flash_triggers.append(flash)
+
+        # --- 11. Yield Surge (Treasury yield rapid spike) ---
+        sig_ys, ind_ys, flash = self._yield_surge(treasury_10y)
+        indicators.append(ind_ys)
+        if flash:
+            flash_triggers.append(flash)
+
+        # --- 12. Intraday Selloff (broad market same-day decline) ---
+        sig_is, ind_is, flash = self._intraday_selloff(sp500_daily, vix_daily)
+        indicators.append(ind_is)
         if flash:
             flash_triggers.append(flash)
 
@@ -587,4 +602,89 @@ class CrashProbabilityIndex:
 
         ind = self._make_indicator("momentum_collapse", worst_ret, signal)
         flash = f"Sharp decline: {worst_ret:.1f}% in {3 if ret_3d < ret_5d else 5}d" if worst_ret < -2.0 else None
+        return signal, ind, flash
+
+    def _yield_surge(
+        self, treasury_10y: pd.Series
+    ) -> tuple:
+        """Rapid Treasury yield spike — rate shock signal.
+
+        Today's scenario: 10Y jumped 9bps to 4.55% (year high),
+        30Y hit 5.12% (highest since 2007). This creates equity risk
+        via higher discount rates + tighter financial conditions.
+        """
+        if len(treasury_10y) < 20:
+            ind = self._make_indicator("yield_surge", 0, 0)
+            return 0.0, ind, None
+
+        current = treasury_10y.iloc[-1]
+        prev_5d = treasury_10y.iloc[-5] if len(treasury_10y) >= 5 else current
+        prev_20d = treasury_10y.iloc[-20]
+
+        # 5-day yield change (in bps)
+        change_5d = (current - prev_5d) * 100
+        # 20-day yield change
+        change_20d = (current - prev_20d) * 100
+
+        # Percentile of current yield in last 252 days
+        if len(treasury_10y) >= 252:
+            pctile = (treasury_10y.tail(252) < current).sum() / 252
+        else:
+            pctile = (treasury_10y < current).sum() / len(treasury_10y)
+
+        # Signal: high yield level + rapid rise = equity risk
+        # 5d change > 10bps is notable, > 20bps is alarming
+        speed_signal = np.clip(change_5d / 20 * 50, 0, 50)
+        # Yield at 1-year high = additional stress
+        level_signal = np.clip(pctile * 50, 0, 50)
+        signal = min(100, speed_signal + level_signal)
+
+        ind = self._make_indicator("yield_surge", change_5d, signal)
+        flash = f"Yield spike: 10Y +{change_5d:.0f}bps in 5d (now {current:.2f}%)" if change_5d > 12 else None
+        return signal, ind, flash
+
+    def _intraday_selloff(
+        self, sp500: pd.DataFrame, vix: pd.Series
+    ) -> tuple:
+        """Same-day broad market decline detection.
+
+        Catches scenarios like today: S&P -1%, Nasdaq -1.1%, VIX +10%.
+        When stocks drop AND VIX rises simultaneously = real stress.
+        """
+        close = sp500["close"] if "close" in sp500.columns else sp500.iloc[:, 0]
+
+        if len(close) < 5 or len(vix) < 5:
+            ind = self._make_indicator("intraday_selloff", 0, 0)
+            return 0.0, ind, None
+
+        # Today's return
+        ret_1d = (close.iloc[-1] / close.iloc[-2] - 1) * 100
+
+        # VIX change today
+        vix_change_1d = vix.iloc[-1] - vix.iloc[-2]
+        vix_pct_change = (vix_change_1d / vix.iloc[-2]) * 100
+
+        # Signal: stock decline + VIX rise = confirmed stress
+        stock_signal = 0.0
+        if ret_1d < 0:
+            # -0.5% → 20, -1% → 40, -2% → 70, -3%+ → 100
+            stock_signal = np.clip(abs(ret_1d) / 3 * 100, 0, 100)
+
+        vix_signal = 0.0
+        if vix_pct_change > 0:
+            # VIX +5% → 25, +10% → 50, +20%+ → 100
+            vix_signal = np.clip(vix_pct_change / 20 * 100, 0, 100)
+
+        # Combined: both need to fire for high signal
+        if ret_1d < -0.3 and vix_pct_change > 3:
+            signal = min(100, (stock_signal * 0.6 + vix_signal * 0.4))
+        else:
+            signal = min(100, max(stock_signal, vix_signal) * 0.5)
+
+        combined_value = ret_1d
+        ind = self._make_indicator("intraday_selloff", combined_value, signal)
+
+        flash = None
+        if ret_1d < -0.8 and vix_pct_change > 8:
+            flash = f"Market stress: S&P {ret_1d:.1f}%, VIX +{vix_pct_change:.0f}%"
         return signal, ind, flash
