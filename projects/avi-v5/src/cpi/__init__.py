@@ -123,7 +123,6 @@ class CrashProbabilityIndex:
         "yield_surge": 0.08,          # NEW: rapid Treasury yield spike
         "intraday_selloff": 0.08,     # NEW: same-day broad market decline
     }
-    }
 
     def compute(
         self,
