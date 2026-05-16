@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>皮皮 體檢對照報告 (2026/4/16 vs 2026/5/15)</title>
+<style>
+  @page { size: A4; margin: 18mm 14mm; }
+  body {
+    font-family: "WenQuanYi Zen Hei", "Microsoft JhengHei", "PingFang TC", "Heiti TC", sans-serif;
+    color: #222;
+    line-height: 1.55;
+    font-size: 11pt;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+    color: #2c5f8d;
+    border-bottom: 3px solid #2c5f8d;
+    padding-bottom: 10px;
+    margin-bottom: 6px;
+    font-size: 22pt;
+  }
+  .subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 24px;
+    font-size: 11pt;
+  }
+  h2 {
+    color: #2c5f8d;
+    border-left: 6px solid #2c5f8d;
+    padding-left: 12px;
+    margin-top: 30px;
+    font-size: 15pt;
+    page-break-after: avoid;
+  }
+  h3 {
+    color: #444;
+    margin-top: 18px;
+    font-size: 12pt;
+    page-break-after: avoid;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 18px 0;
+    font-size: 10pt;
+    page-break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid #bbb;
+    padding: 6px 9px;
+    text-align: left;
+    vertical-align: middle;
+  }
+  th {
+    background-color: #e8f1f8;
+    font-weight: bold;
+    color: #2c5f8d;
+  }
+  td.num {
+    text-align: center;
+    font-family: "Courier New", monospace;
+  }
+  .high { color: #c0392b; font-weight: bold; }
+  .low  { color: #2980b9; font-weight: bold; }
+  .ok   { color: #27ae60; }
+  .improve  { background-color: #e8f8e8; }
+  .worsen   { background-color: #fbeaea; }
+  .neutral  { background-color: #fdf6e3; }
+  .keyfind  { background-color: #fef9e7; padding: 14px 18px; border-left: 5px solid #f39c12; margin: 14px 0; border-radius: 4px; }
+  .alert    { background-color: #fbeaea; padding: 14px 18px; border-left: 5px solid #c0392b; margin: 14px 0; border-radius: 4px; }
+  .good     { background-color: #eaf7ea; padding: 14px 18px; border-left: 5px solid #27ae60; margin: 14px 0; border-radius: 4px; }
+  .info     { background-color: #e8f1f8; padding: 14px 18px; border-left: 5px solid #2c5f8d; margin: 14px 0; border-radius: 4px; }
+  ul, ol { padding-left: 22px; }
+  li { margin: 4px 0; }
+  .footer {
+    text-align: center;
+    color: #888;
+    font-size: 9pt;
+    border-top: 1px solid #ccc;
+    padding-top: 12px;
+    margin-top: 30px;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 9pt;
+    font-weight: bold;
+    margin-left: 4px;
+  }
+  .badge-up   { background-color: #c0392b; color: white; }
+  .badge-down { background-color: #2980b9; color: white; }
+  .badge-ok   { background-color: #27ae60; color: white; }
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .summary-box {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 12px 16px;
+  }
+  .summary-box h4 { margin: 0 0 8px 0; color: #2c5f8d; font-size: 11pt; }
+</style>
+</head>
+<body>
+
+<h1>皮皮 體檢對照報告</h1>
+<div class="subtitle">
+  13 歲 紅貴賓（公）｜主治醫師：程醫師<br>
+  比對日期：2026/4/16 vs 2026/5/15（間隔 29 天）
+</div>
+
+<div class="info">
+  <strong>📋 病史摘要：</strong>膽囊黏液囊腫（GBM）等待手術中、確診庫欣氏症（已開始 Trilostane）、嚴重肝膽功能異常、慢性皮膚過敏、預計 6 月中於小花動物醫院進行膽囊切除手術。
+</div>
+
+<h2>📐 基本資料</h2>
+<table>
+  <tr><th>項目</th><th>4/16</th><th>5/15</th><th>變化</th></tr>
+  <tr class="neutral">
+    <td>體重</td>
+    <td class="num">7.20 kg</td>
+    <td class="num">6.90 kg</td>
+    <td>↓ 0.30 kg（-4.2%）⚠️ 需留意</td>
+  </tr>
+</table>
+
+<h2>🩸 全血計數 (CBC)</h2>
+<table>
+  <tr><th>項目</th><th>參考值</th><th>4/16</th><th>5/15</th><th>變化解讀</th></tr>
+  <tr class="improve"><td>紅血球 RBC</td><td class="num">5.65-8.87 M/μL</td><td class="num low">5.21 ↓</td><td class="num ok">6.43</td><td>✅ 改善</td></tr>
+  <tr class="improve"><td>血球容積比 HCT</td><td class="num">37.3-61.7%</td><td class="num low">35.9 ↓</td><td class="num ok">44.3</td><td>✅ 貧血明顯改善</td></tr>
+  <tr class="improve"><td>血紅素 HGB</td><td class="num">13.1-20.5 g/dL</td><td class="num">13.5</td><td class="num ok">15.3</td><td>✅ 改善</td></tr>
+  <tr><td>MCV</td><td class="num">61.6-73.5 fL</td><td class="num ok">69.0</td><td class="num ok">68.8</td><td>持平</td></tr>
+  <tr><td>MCH</td><td class="num">21.2-25.9 pg</td><td class="num">25.9</td><td class="num ok">23.7</td><td>改善</td></tr>
+  <tr><td>MCHC</td><td class="num">32.0-37.9 g/dL</td><td class="num">37.6</td><td class="num ok">34.5</td><td>改善</td></tr>
+  <tr class="improve"><td>網織球 RETIC</td><td class="num">10-110 K/μL</td><td class="num">21.5</td><td class="num ok">56.5</td><td>✅ 造血反應提升</td></tr>
+  <tr><td>白血球 WBC</td><td class="num">5.05-16.76 K/μL</td><td class="num ok">7.42</td><td class="num ok">10.34</td><td>↑ 仍在正常範圍</td></tr>
+  <tr><td>嗜中性球 NEU</td><td class="num">2.95-11.64 K/μL</td><td class="num ok">5.11</td><td class="num ok">7.45</td><td>↑ 正常</td></tr>
+  <tr><td>淋巴球 LYM</td><td class="num">1.05-5.10 K/μL</td><td class="num">1.20（低邊）</td><td class="num ok">1.70</td><td>改善</td></tr>
+  <tr><td>單核球 MONO</td><td class="num">0.16-1.12 K/μL</td><td class="num ok">0.94</td><td class="num">1.02</td><td>略升</td></tr>
+  <tr><td>嗜酸性球 EOS</td><td class="num">0.06-1.23 K/μL</td><td class="num ok">0.16</td><td class="num ok">0.16</td><td>持平</td></tr>
+  <tr><td>血小板 PLT</td><td class="num">148-484 K/μL</td><td class="num ok">386</td><td class="num">480（上緣）</td><td>↑ 邊緣偏高</td></tr>
+  <tr><td>MPV</td><td class="num">8.7-13.2 fL</td><td class="num ok">11.7</td><td class="num ok">11.2</td><td>持平</td></tr>
+  <tr class="worsen"><td><strong>PCT 血小板容積比</strong></td><td class="num">0.14-0.46%</td><td class="num">未測</td><td class="num high">0.54 ↑</td><td>⚠️ 新增異常（輕度）</td></tr>
+</table>
+
+<h2>🧪 生化檢驗 — 肝膽功能</h2>
+<table>
+  <tr><th>項目</th><th>參考值</th><th>4/16</th><th>5/15</th><th>變化解讀</th></tr>
+  <tr class="improve"><td><strong>ALT 丙胺酸轉氨酶</strong></td><td class="num">10-125 U/L</td><td class="num high">644 ↑</td><td class="num high">532 ↑</td><td>✅ ↓ 17% 改善中</td></tr>
+  <tr class="improve"><td><strong>ALKP 鹼性磷酸酶</strong></td><td class="num">23-212 U/L</td><td class="num high">1828 ↑</td><td class="num high">1690 ↑</td><td>↓ 7.5% 微幅改善</td></tr>
+  <tr class="worsen"><td><strong>GGT</strong></td><td class="num">0-11 U/L</td><td class="num">未測</td><td class="num high">125 ↑</td><td>⚠️ 新測，顯示嚴重膽汁鬱積</td></tr>
+  <tr class="improve"><td><strong>T-Bil 總膽紅素</strong></td><td class="num">0-0.9 mg/dL</td><td class="num">未列</td><td class="num ok">0.5</td><td>🌟 仍在擇期手術窗口</td></tr>
+  <tr><td>ALB 白蛋白</td><td class="num">2.2-3.9 g/dL</td><td class="num">3.0</td><td class="num">3.0</td><td>持平（偏低邊）</td></tr>
+</table>
+
+<h2>🧪 生化檢驗 — 腎臟功能（4/16）</h2>
+<table>
+  <tr><th>項目</th><th>參考值</th><th>4/16</th><th>5/15</th><th>備註</th></tr>
+  <tr><td>BUN 血中尿素氮</td><td class="num">7-27 mg/dL</td><td class="num high">28 ↑</td><td class="num">未測</td><td>邊緣偏高</td></tr>
+  <tr><td>CREA 肌酸酐</td><td class="num">0.5-1.8 mg/dL</td><td class="num ok">1.2</td><td class="num">未測</td><td>正常</td></tr>
+  <tr><td>BUN/CREA</td><td class="num">—</td><td class="num">23</td><td class="num">—</td><td>—</td></tr>
+</table>
+
+<h2>⚡ 電解質 — <span style="color:#c0392b;">重點觀察</span></h2>
+<table>
+  <tr><th>項目</th><th>參考值</th><th>4/16</th><th>5/15</th><th>變化解讀</th></tr>
+  <tr><td>鈉 Na</td><td class="num">144-160 mmol/L</td><td class="num ok">148</td><td class="num ok">150</td><td>微升</td></tr>
+  <tr class="worsen"><td><strong>鉀 K</strong></td><td class="num">3.5-5.8 mmol/L</td><td class="num ok">5.0</td><td class="num high">6.0 ↑</td><td>⚠️ 升高超標</td></tr>
+  <tr class="worsen"><td><strong>Na/K 比值</strong></td><td class="num">&gt;27 為安全</td><td class="num ok">30</td><td class="num high">25 ↓</td><td>⚠️ 跨入警戒區</td></tr>
+  <tr><td>氯 Cl</td><td class="num">109-122 mmol/L</td><td class="num">109（下緣）</td><td class="num low">108 ↓</td><td>微降</td></tr>
+</table>
+
+<div class="alert">
+  <strong>⚠️ 重要警示：</strong>K=6.0 + Na/K=25 + 先前的肌肉抽動症狀，呼應 <strong>Trilostane 早期過度抑制（醫源性低皮質醇症）</strong>。醫師已將劑量減半處理，建議減量後 7-14 天重驗電解質與 ACTH 刺激試驗，確認穩定。
+</div>
+
+<h2>🧪 生化檢驗 — 蛋白、代謝、其他（4/16）</h2>
+<table>
+  <tr><th>項目</th><th>參考值</th><th>4/16</th><th>5/15</th><th>備註</th></tr>
+  <tr><td>TP 總蛋白</td><td class="num">5.2-8.2 g/dL</td><td class="num ok">7.7</td><td class="num">未測</td><td>正常</td></tr>
+  <tr><td>GLOB 球蛋白</td><td class="num">2.5-4.5 g/dL</td><td class="num high">4.7 ↑</td><td class="num">未測</td><td>慢性發炎指標</td></tr>
+  <tr><td>ALB/GLOB 比值</td><td class="num">—</td><td class="num">0.6</td><td class="num">—</td><td>偏低</td></tr>
+  <tr><td>GLU 血糖</td><td class="num">70-143 mg/dL</td><td class="num ok">110</td><td class="num">未測</td><td>正常</td></tr>
+  <tr><td>CHOL 膽固醇</td><td class="num">110-320 mg/dL</td><td class="num">305</td><td class="num">未測</td><td>上緣</td></tr>
+  <tr class="worsen"><td><strong>TRIG 三酸甘油脂</strong></td><td class="num">10-100 mg/dL</td><td class="num high">&gt;375 ↑↑</td><td class="num">未測</td><td>🔴 重度高血脂</td></tr>
+  <tr><td>CRP 反應蛋白</td><td class="num">0.0-1.0 mg/dL</td><td class="num ok">0.1</td><td class="num">未測</td><td>無急性發炎</td></tr>
+  <tr><td>胰脂酶</td><td class="num">0-200 U/L</td><td class="num ok">118</td><td class="num">未測</td><td>無胰臟炎</td></tr>
+  <tr><td>TT4 總甲狀腺素</td><td class="num">1.0-4.0 μg/dL</td><td class="num low">&lt;0.5 ↓</td><td class="num">未測</td><td>庫欣常見假性低下</td></tr>
+  <tr><td>滲透壓 Osm</td><td class="num">—</td><td class="num">301 mmol/kg</td><td class="num">—</td><td>—</td></tr>
+</table>
+
+<h2>🦠 傳染病篩檢（4/16 SNAP Pro）</h2>
+<table>
+  <tr><th>項目</th><th>結果</th></tr>
+  <tr><td>無漿體病 (AP_spp)</td><td class="ok">陰性 ✅</td></tr>
+  <tr><td>艾利希體病 (EH_spp)</td><td class="ok">陰性 ✅</td></tr>
+  <tr><td>心絲蟲</td><td class="ok">陰性 ✅</td></tr>
+  <tr><td>萊姆病</td><td class="ok">陰性 ✅</td></tr>
+</table>
+
+<h2>🎯 整體變化重點解讀</h2>
+
+<div class="good">
+  <h3 style="margin-top:0;">🟢 好消息（改善方向）</h3>
+  <ol>
+    <li><strong>貧血明顯改善</strong> — HCT 35.9 → 44.3，網織球從 21.5 → 56.5K，骨髓造血反應正常啟動。</li>
+    <li><strong>肝指數下降</strong> — ALT ↓17%，ALKP ↓7.5%，方向正確。</li>
+    <li><strong>T-Bil 維持 0.5</strong> — 🌟 最關鍵指標，膽道無阻塞，<strong>擇期手術窗口維持中</strong>。</li>
+    <li><strong>WBC、CRP 正常</strong> — 無全身性感染。</li>
+    <li><strong>傳染病全陰性</strong>。</li>
+  </ol>
+</div>
+
+<div class="keyfind">
+  <h3 style="margin-top:0;">🟡 中性觀察</h3>
+  <ol>
+    <li><strong>體重下降 300g (-4.2%)</strong> — 一個月內掉 4% 對 7 公斤老犬需追蹤，可能與食量、Trilostane 影響、或低脂飲食有關。</li>
+    <li><strong>PCT 血小板容積輕微偏高</strong> — 配合 PLT 480K 上緣，可能反映輕微發炎或脫水，<strong>對手術反而非壞事</strong>（血小板足夠）。</li>
+  </ol>
+</div>
+
+<div class="alert">
+  <h3 style="margin-top:0;">🔴 需要警覺的點</h3>
+  <ol>
+    <li><strong>電解質失衡 — Trilostane 副作用一致</strong>
+      <ul>
+        <li>K 從 5.0 → 6.0（超標）</li>
+        <li>Na/K 比值從 30 → 25（&lt;27 是醫源性低皮質醇症警訊）</li>
+        <li>呼應先前的「抽動」副作用</li>
+        <li>✅ 醫師已減半 Trilostane 劑量處理</li>
+      </ul>
+    </li>
+    <li><strong>GGT 125（&gt;11 倍上限）</strong> — 嚴重膽汁鬱積，再次驗證膽囊切除手術的必要性。</li>
+    <li><strong>三酸甘油脂 &gt;375（重度高血脂）</strong> — 庫欣 + 紅貴賓品種 + GBM 的危險組合，飲食控制非常重要。</li>
+    <li><strong>GLOB 4.7（球蛋白偏高）</strong> — 慢性發炎刺激，搭配 CRP 正常代表非急性。</li>
+  </ol>
+</div>
+
+<h2>📋 給醫師的討論清單</h2>
+<div class="info">
+  <ol>
+    <li><strong>電解質：</strong>K=6.0、Na/K=25
+      <ul>
+        <li>是否需減量 Trilostane 後 1-2 週重驗？</li>
+        <li>是否需考慮暫停 Trilostane？</li>
+        <li>是否需電解質補充？</li>
+      </ul>
+    </li>
+    <li><strong>重度高血脂 (TRIG &gt;375)：</strong>
+      <ul>
+        <li>是否加 Omega-3 魚油？</li>
+        <li>飼料是否該換成低脂處方（如 RC GI Low Fat）？</li>
+      </ul>
+    </li>
+    <li><strong>GGT 125：</strong>跟小花術前評估時務必提供此數據。</li>
+    <li><strong>體重下降 4%：</strong>是否需調整熱量攝取或飲食頻次？</li>
+    <li><strong>下次抽血建議加驗：</strong>
+      <ul>
+        <li>凝血功能 PT/aPTT/血小板功能</li>
+        <li>完整電解質 + 血氣分析</li>
+        <li>cPL（術前胰臟最後確認）</li>
+        <li>重複 T-Bil 確認手術窗口</li>
+        <li>ACTH 刺激試驗（劑量調整後）</li>
+      </ul>
+    </li>
+  </ol>
+</div>
+
+<h2>📌 整體結論</h2>
+<div class="summary-grid">
+  <div class="summary-box" style="border-color:#27ae60; background:#f4fbf4;">
+    <h4>✅ 好的方向</h4>
+    貧血改善、肝指數下降、T-Bil 維持安全、無感染、無傳染病。
+  </div>
+  <div class="summary-box" style="border-color:#c0392b; background:#fcf4f4;">
+    <h4>⚠️ 要警覺的</h4>
+    Trilostane 引起的電解質失衡（醫師已減量處理）、重度高血脂、體重微降。
+  </div>
+</div>
+
+<div class="good">
+  <strong>🎯 手術風險評估：</strong>整體仍在「擇期手術窗口」內，<strong>5/25 抽膽汁 + 6 月中手術的計畫，目前是合理且安全的</strong>。但這段期間請特別注意：抽動有無復發、食慾、活動力。如電解質減量後仍不穩，可能需要更早回診調整。
+</div>
+
+<div class="footer">
+  本報告為個人化健康數據整合，僅供討論參考，所有醫療決策請以執業獸醫師臨床判斷為準。<br>
+  製作日期：2026/5/16
+</div>
+
+</body>
+</html>
