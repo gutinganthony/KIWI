@@ -163,6 +163,19 @@ class TechStressIndex:
         elif elevated >= 3:
             score = min(100, score * 1.1)
 
+        # Spike detection: when ANY indicator > 70, it's meaningful even if
+        # trend indicators haven't caught up yet. Boost proportionally.
+        max_signal = max(ind.signal for ind in indicators)
+        high_signals = [ind.signal for ind in indicators if ind.signal >= 50]
+        if len(high_signals) >= 2:
+            # Two+ strong signals = minimum score should reflect urgency
+            avg_high = sum(high_signals) / len(high_signals)
+            min_score = avg_high * 0.6  # e.g., avg 68 → min 41
+            score = max(score, min_score)
+        elif max_signal >= 70:
+            # Single very strong signal = at least moderate alert
+            score = max(score, max_signal * 0.45)  # e.g., 77 → min 35
+
         if score >= 65:
             bias = "BEARISH"
         elif score >= 45:
@@ -291,12 +304,14 @@ class TechStressIndex:
         qqq_ret = (qqq.iloc[-1] / qqq.iloc[-3] - 1) * 100
 
         # VIX up + QQQ down = stress
-        if vix_change > 3 and qqq_ret < -0.5:
-            vix_signal = np.clip(vix_change / 15 * 50, 0, 50)
-            qqq_signal = np.clip(abs(qqq_ret) / 3 * 50, 0, 50)
+        if vix_change > 2 and qqq_ret < -0.3:
+            vix_signal = np.clip(vix_change / 10 * 50, 0, 50)
+            qqq_signal = np.clip(abs(qqq_ret) / 2 * 50, 0, 50)
             signal = min(100, vix_signal + qqq_signal)
-        elif vix_change > 5:
-            signal = np.clip(vix_change / 20 * 60, 0, 60)
+        elif vix_change > 3:
+            signal = np.clip(vix_change / 12 * 50, 0, 50)
+        elif qqq_ret < -0.8:
+            signal = np.clip(abs(qqq_ret) / 2.5 * 40, 0, 40)
         else:
             signal = 0
 
