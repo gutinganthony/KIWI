@@ -185,17 +185,24 @@ class TechStressIndex:
         if len(high_signals) >= 2:
             # Two+ strong signals = minimum score should reflect urgency
             avg_high = sum(high_signals) / len(high_signals)
-            min_score = avg_high * 0.6  # e.g., avg 68 → min 41
+            min_score = avg_high * 0.65  # e.g., avg 68 → min 44
             score = max(score, min_score)
         elif max_signal >= 70:
             # Single very strong signal = at least moderate alert
-            score = max(score, max_signal * 0.45)  # e.g., 77 → min 35
+            score = max(score, max_signal * 0.5)  # e.g., 77 → min 38.5
 
-        if score >= 65:
+        # Multi-indicator breadth: when 3+ indicators > 25, stress is real
+        mild_elevated = sum(1 for ind in indicators if ind.signal >= 25)
+        if mild_elevated >= 4:
+            score = max(score, 45)  # Force CAUTIOUS when broad stress
+        elif mild_elevated >= 3:
+            score = min(100, score * 1.15)
+
+        if score >= 60:
             bias = "BEARISH"
-        elif score >= 45:
+        elif score >= 40:
             bias = "CAUTIOUS"
-        elif score >= 25:
+        elif score >= 22:
             bias = "NEUTRAL"
         else:
             bias = "BULLISH"
