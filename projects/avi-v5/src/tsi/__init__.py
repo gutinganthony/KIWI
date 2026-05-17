@@ -78,15 +78,17 @@ class TSIResult:
 
 
 class TechStressIndex:
-    """Daily tech sector stress scorer using 7 market-based proxies."""
+    """Daily tech sector stress scorer using 9 market-based proxies."""
 
     WEIGHTS = {
-        "sox_qqq_divergence": 0.18,
-        "memory_momentum": 0.15,
-        "yield_shock": 0.15,
-        "ai_infra_rs": 0.12,
-        "tech_breadth": 0.12,
-        "cloud_rs": 0.10,
+        "sox_qqq_divergence": 0.14,
+        "memory_momentum": 0.12,
+        "yield_shock": 0.12,
+        "yield_30y_stress": 0.08,    # NEW: 30Y absolute level + speed
+        "yield_curve_bear_steep": 0.08,  # NEW: 30Y-10Y steepening under rising rates
+        "ai_infra_rs": 0.10,
+        "tech_breadth": 0.10,
+        "cloud_rs": 0.08,
         "vix_tech_correlation": 0.18,
     }
 
@@ -99,6 +101,7 @@ class TechStressIndex:
         spy_daily: pd.Series,
         treasury_10y: pd.Series,
         vix_daily: pd.Series,
+        treasury_30y: Optional[pd.Series] = None,
         tech_stocks: Optional[pd.DataFrame] = None,
         as_of: Optional[str] = None,
     ) -> TSIResult:
@@ -111,6 +114,8 @@ class TechStressIndex:
             spy_daily = spy_daily[spy_daily.index <= cutoff]
             treasury_10y = treasury_10y[treasury_10y.index <= cutoff]
             vix_daily = vix_daily[vix_daily.index <= cutoff]
+            if treasury_30y is not None:
+                treasury_30y = treasury_30y[treasury_30y.index <= cutoff]
 
         date = sox_daily.index[-1].to_pydatetime()
         indicators = []
@@ -134,7 +139,17 @@ class TechStressIndex:
         if ind.signal > 70:
             flash_triggers.append(f"Yield spike: +{ind.value:.0f}bps in 5d")
 
-        # 4. AI Infra Relative Strength (SMH vs SPY)
+        # 4. 30Y Yield Stress
+        ind = self._yield_30y_stress(treasury_30y if treasury_30y is not None else treasury_10y)
+        indicators.append(ind)
+        if ind.signal > 70:
+            flash_triggers.append(f"30Y yield at extreme: {ind.value:.2f}%")
+
+        # 5. Yield Curve Bear Steepening (30Y-10Y spread rising under rising rates)
+        ind = self._yield_curve_bear_steep(treasury_10y, treasury_30y)
+        indicators.append(ind)
+
+        # 6. AI Infra Relative Strength (SMH vs SPY)
         ind = self._ai_infra_rs(smh_daily, spy_daily)
         indicators.append(ind)
 
@@ -316,3 +331,61 @@ class TechStressIndex:
             signal = 0
 
         return TSIIndicator("vix_tech_correlation", vix_change, signal, 0.18, "bearish" if signal > 30 else "neutral")
+
+    def _yield_30y_stress(self, t30y: pd.Series) -> TSIIndicator:
+        """30Y Treasury at extreme levels = long-duration tech gets crushed.
+
+        May 15, 2026: 30Y hit 5.12% (highest since 2007). This directly
+        impacts growth/tech via DCF discount rate.
+        """
+        if len(t30y) < 20:
+            return TSIIndicator("yield_30y_stress", 0, 0, 0.08, "neutral")
+
+        current = t30y.iloc[-1]
+        change_5d = (current - t30y.iloc[-5]) * 100  # bps
+        change_20d = (current - t30y.iloc[-20]) * 100
+
+        # Level signal: 30Y above 4.5% is elevated, above 5% is extreme
+        level_signal = np.clip((current - 4.0) / 1.5 * 50, 0, 50)
+        # Speed signal: rapid rise
+        speed_signal = np.clip(change_5d / 15 * 50, 0, 50)
+        signal = min(100, level_signal + speed_signal)
+
+        return TSIIndicator("yield_30y_stress", current, signal, 0.08, "bearish" if signal > 30 else "neutral")
+
+    def _yield_curve_bear_steep(self, t10y: pd.Series, t30y: Optional[pd.Series]) -> TSIIndicator:
+        """Bear steepening: 30Y-10Y spread WIDENING while BOTH yields rise.
+
+        This is the most toxic scenario for tech:
+        - Rising rates = lower valuations
+        - Steepening = market pricing in higher long-term inflation/rates
+        - Means rate cuts are NOT coming to save tech
+
+        May 15: 10Y 4.55%, 30Y 5.12% → spread 57bps and widening
+        """
+        if t30y is None or len(t10y) < 10 or len(t30y) < 10:
+            return TSIIndicator("yield_curve_bear_steep", 0, 0, 0.08, "neutral")
+
+        # Current spread
+        spread = t30y.iloc[-1] - t10y.iloc[-1]
+        spread_5d_ago = t30y.iloc[-5] - t10y.iloc[-5]
+        spread_change = (spread - spread_5d_ago) * 100  # bps
+
+        # Both yields rising?
+        t10y_rising = t10y.iloc[-1] > t10y.iloc[-5]
+        t30y_rising = t30y.iloc[-1] > t30y.iloc[-5]
+        both_rising = t10y_rising and t30y_rising
+
+        # Bear steepening = spread widening + both rising
+        if both_rising and spread_change > 0:
+            signal = np.clip(spread_change / 10 * 70, 0, 70)
+            # Extra penalty if 30Y is above 5%
+            if t30y.iloc[-1] > 5.0:
+                signal = min(100, signal + 30)
+        elif spread_change > 5:
+            # Spread widening even if not both rising
+            signal = np.clip(spread_change / 15 * 50, 0, 50)
+        else:
+            signal = 0
+
+        return TSIIndicator("yield_curve_bear_steep", spread_change, signal, 0.08, "bearish" if signal > 30 else "neutral")

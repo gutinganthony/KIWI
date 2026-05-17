@@ -63,7 +63,8 @@ def main():
                     sox_daily=data["sox"], qqq_daily=data["qqq"],
                     mu_daily=data["mu"], smh_daily=data["smh"],
                     spy_daily=data["spy"], treasury_10y=data["t10y"],
-                    vix_daily=data["vix"], as_of=dt.strftime("%Y-%m-%d"),
+                    vix_daily=data["vix"], treasury_30y=data.get("t30y"),
+                    as_of=dt.strftime("%Y-%m-%d"),
                 )
                 bar = "█" * int(result.score / 5)
                 flash = " ⚡" if result.flash_alert else ""
@@ -76,7 +77,8 @@ def main():
             sox_daily=data["sox"], qqq_daily=data["qqq"],
             mu_daily=data["mu"], smh_daily=data["smh"],
             spy_daily=data["spy"], treasury_10y=data["t10y"],
-            vix_daily=data["vix"], as_of=args.date,
+            vix_daily=data["vix"], treasury_30y=data.get("t30y"),
+            as_of=args.date,
         )
         print(result.summary())
 
