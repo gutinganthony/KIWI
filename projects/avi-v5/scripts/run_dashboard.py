@@ -110,49 +110,11 @@ def build_history(
 
 
 def generate_pine_script(result) -> str:
-    """Generate an updated Pine Script with current CPI values filled in.
+    """Generate updated CPI Pine Script with current values. Delegates to src.pine_export."""
+    from src.pine_export import generate_cpi_pine
+    return generate_cpi_pine(result)
 
-    Reads the template pine file and replaces placeholder values between
-    the PINE_VALUES_START and PINE_VALUES_END markers.
 
-    Returns the path to the generated Pine Script.
-    """
-    template_path = PROJECT_ROOT / "pine" / "cpi_indicator.pine"
-    output_path = PROJECT_ROOT / "pine" / "cpi_indicator_current.pine"
-
-    template = template_path.read_text(encoding="utf-8")
-
-    # Build indicator signal lookup
-    sig_map = {}  # type: Dict[str, float]
-    for ind in result.indicators:
-        sig_map[ind.name] = round(ind.signal, 1)
-
-    # Values to substitute
-    avi_ctx = result.avi_context
-    replacements = {
-        "{{CPI_SCORE}}": "{:.1f}".format(result.score),
-        "{{CPI_DATE}}": result.date.strftime("%Y-%m-%d"),
-        "{{FLASH_ALERT}}": "true" if result.flash_alert.triggered else "false",
-        "{{FLASH_SEVERITY}}": result.flash_alert.severity,
-        "{{AVI_CONTEXT}}": "{:.1f}".format(avi_ctx) if avi_ctx is not None else "0.0",
-        "{{SIG_VIX_TERM}}": str(sig_map.get("vix_term_structure", 0.0)),
-        "{{SIG_VIX_SPIKE}}": str(sig_map.get("vix_spike", 0.0)),
-        "{{SIG_GARCH}}": str(sig_map.get("garch_vix_gap", 0.0)),
-        "{{SIG_CREDIT}}": str(sig_map.get("credit_acceleration", 0.0)),
-        "{{SIG_BREADTH}}": str(sig_map.get("breadth_divergence", 0.0)),
-        "{{SIG_DISTRIB}}": str(sig_map.get("distribution_days", 0.0)),
-        "{{SIG_RSI}}": str(sig_map.get("rsi_divergence", 0.0)),
-        "{{SIG_MA_DIST}}": str(sig_map.get("ma_distance_reversal", 0.0)),
-        "{{SIG_YIELD}}": str(sig_map.get("yield_curve_steepening", 0.0)),
-        "{{SIG_MOMENTUM}}": str(sig_map.get("momentum_collapse", 0.0)),
-    }
-
-    output = template
-    for placeholder, value in replacements.items():
-        output = output.replace(placeholder, value)
-
-    output_path.write_text(output, encoding="utf-8")
-    return str(output_path.resolve())
 
 
 def main() -> None:
@@ -253,24 +215,58 @@ def main() -> None:
         logger.info("Opening in browser...")
         webbrowser.open(url)
 
-    # Step 6: Generate Pine Script (optional)
-    pine_path = None
+    # Step 6: Generate Pine Scripts (optional)
+    pine_paths = []
     if args.pine:
-        logger.info("Generating Pine Script with current values...")
-        pine_path = generate_pine_script(result)
-        logger.info("Pine Script generated: %s", pine_path)
-        logger.info(
-            "  Copy contents of %s into TradingView Pine Editor",
-            pine_path,
-        )
+        logger.info("Generating Pine Scripts with current values...")
+
+        # CPI Pine
+        cpi_pine_path = generate_pine_script(result)
+        pine_paths.append(("CPI", cpi_pine_path))
+        logger.info("CPI Pine generated: %s", cpi_pine_path)
+
+        # TSI Pine
+        try:
+            from src.tsi.data import TSIDataCollector
+            from src.tsi import TechStressIndex
+            from src.pine_export import generate_tsi_pine, generate_composite_pine
+
+            logger.info("Computing TSI for Pine Script...")
+            tsi_data = TSIDataCollector().collect_all()
+            tsi_result = TechStressIndex().compute(
+                sox_daily=tsi_data["sox"], qqq_daily=tsi_data["qqq"],
+                mu_daily=tsi_data["mu"], smh_daily=tsi_data["smh"],
+                spy_daily=tsi_data["spy"], treasury_10y=tsi_data["t10y"],
+                vix_daily=tsi_data["vix"], treasury_30y=tsi_data.get("t30y"),
+                as_of=args.date,
+            )
+            tsi_pine_path = generate_tsi_pine(tsi_result)
+            pine_paths.append(("TSI", tsi_pine_path))
+            logger.info("TSI Pine generated: %s", tsi_pine_path)
+            logger.info("TSI Score: %.0f/100 (%s)", tsi_result.score, tsi_result.bias)
+
+            # Composite (CPI + TSI + AVI)
+            composite_path = generate_composite_pine(result, tsi_result, avi_score)
+            pine_paths.append(("Composite", composite_path))
+            logger.info("Composite Pine generated: %s", composite_path)
+
+        except ImportError:
+            logger.warning("mcp-tradingview not available for TSI Pine — skipping")
+        except Exception as e:
+            logger.warning("TSI Pine generation failed (non-fatal): %s", e)
 
     # Print summary to terminal as well
     print()
     print(result.summary())
     print()
     print("Dashboard: file://" + html_path)
-    if pine_path:
-        print("Pine Script: " + pine_path)
+    if pine_paths:
+        print()
+        print("Pine Scripts generated:")
+        for name, path in pine_paths:
+            print(f"  [{name}] {path}")
+        print()
+        print("→ Paste each file into TradingView Pine Editor and click 'Add to chart'")
 
 
 if __name__ == "__main__":
