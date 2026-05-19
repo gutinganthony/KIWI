@@ -5,6 +5,7 @@ All updates to entries are logged here chronologically.
 ---
 
 <!-- CHANGELOG_ENTRIES_START -->
+| 2026-05-18 | Added | [Situational Awareness LP — Q1 2026 13F 持股拆解](./topics/business/2026-05-18-situational-awareness-lp-q1-2026-13f.md) | Aschenbrenner 基金 Q1 2026 申報：42 檔、$13.67B notional；新增 $8.7B 半導體 puts；出清 LITE/COHR/INTC calls |
 | 2026-04-20 | Updated | [AVI V4 — IG + Threads 社群發文素材庫](./topics/business/2026-04-20-avi-v4-social-posts.md) | v2.1：新增 ZIP 打包（14 圖 + 4 MD + 2 OVERVIEW）、素材總覽縮圖、發文行事曆 XLSX |
 | 2026-04-20 | Updated | [AVI V4 — IG + Threads 社群發文素材庫](./topics/business/2026-04-20-avi-v4-social-posts.md) | v2.0：擴充 X/Twitter Thread（12 則 + Premium 單則長文）+ IG Stories 4 張（9:16），共 14 張社群素材圖 |
 | 2026-04-20 | Added | [AVI V4 — IG + Threads 社群發文素材庫](./topics/business/2026-04-20-avi-v4-social-posts.md) | IG Carousel 6 slides 設計、主 caption、Threads 10 則串文、發文時程 |
