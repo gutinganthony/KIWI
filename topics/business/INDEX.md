@@ -15,3 +15,4 @@
 | 2026-04-20 | [AVI V4 — 完整介紹指南 (Deep Dive)](./2026-04-20-avi-v4-introduction-guide.md) | market-risk, AVI, valuation, CAPE, quant, deep-dive |
 | 2026-04-20 | [AVI V4 — 12 個月走勢分析 + 五次崩盤回顧 + 部落格介紹文](./2026-04-20-avi-v4-analysis-with-charts.md) | market-risk, AVI, analysis, S&P500, Iran-war, Fed, blog |
 | 2026-04-20 | [AVI V4 — IG + Threads 社群發文素材庫](./2026-04-20-avi-v4-social-posts.md) | AVI, social-media, IG, Threads, content-marketing |
+| 2026-05-18 | [Situational Awareness LP — Q1 2026 13F 持股拆解（Aschenbrenner）](./2026-05-18-situational-awareness-lp-q1-2026-13f.md) | investment, hedge-fund, 13F, AI-infrastructure, semiconductor, bitcoin-miner, Aschenbrenner, options, puts |
