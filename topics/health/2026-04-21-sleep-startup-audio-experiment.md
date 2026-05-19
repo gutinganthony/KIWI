@@ -1,10 +1,10 @@
 ---
 title: 睡眠修復音頻實驗 — 科學依據 + 製作過程
 date_added: 2026-04-21
-last_updated: 2026-04-21
+last_updated: 2026-04-22
 topic: health
-tags: [sleep, pink-noise, brown-noise, audio, CBT-I, 4-7-8-breathing, body-scan, ElevenLabs, experiment]
-version: 1.0
+tags: [sleep, pink-noise, brown-noise, audio, CBT-I, 4-7-8-breathing, body-scan, ElevenLabs, ear-seeds, auricular-acupressure, experiment]
+version: 1.2
 ---
 
 ## 背景
@@ -100,3 +100,52 @@ version: 1.0
 - Python 純 stdlib 混音（`wave`、`struct`、`math`）
 - Voss-McCartney 16-row 演算法生成粉紅噪音
 - 棕色噪音：積分白噪音（leak=0.998）+ 三層移動平均平滑
+
+---
+
+## 用戶測試回饋（v1 → v2）
+
+### 第一輪測試問題
+
+| 問題 | 根本原因 | 修正方向 |
+|------|----------|----------|
+| 呼吸引導讓人窒息 | 轉換詞佔 2-3 秒，4-7-8 呼吸比例失真 | 改 4-4-6，拿掉計數和轉換詞 |
+| 沒有流程說明 | 未知事件觸發邊緣系統警覺 | 開頭加 30 秒 agenda 說明 |
+| 棕噪音幾乎聽不到 | NOISE_VOL 1.8 遠不夠 | 調至 5.0 |
+| 整體不舒服 / 女友自己關掉 | 問題 1+2 疊加 | 腳本全面重寫（v4）|
+
+### 科學依據（修正方向）
+
+- **4-4-6 呼吸**：Perciavalle et al. (2017) — 吐氣 > 吸氣的比例是副交感啟動的關鍵，非精確 4-7-8
+- **Agenda 說明**：CBT-I 標準協議 + Bolles (1972) — 可預測性直接降低焦慮與超警覺
+- **移除計數**：MBSR 標準：認知負荷（數數）與放鬆相競爭
+
+### 腳本 v4 改動（待 ElevenLabs 重新生成）
+
+- 開頭新增：「接下來四分鐘，先三次呼吸，再身體掃描，全程躺著跟著做就好」
+- 呼吸：吸氣 → 4s 靜默 → 憋住 → 4s 靜默 → 呼氣 → 6s 靜默
+- 腳本位置：`~/Desktop/sleep_script_v4_女生版.txt` / `男生版.txt`
+
+---
+
+## 耳穴貼豆（Line B 升級版）
+
+Sea-Band 測試後女友反映手腕不舒服 → 改用**耳穴貼豆（王不留行）**
+
+### 助眠耳穴（推薦優先順序）
+
+| 穴位 | 位置 | 功效 | 貼豆推薦 |
+|------|------|------|----------|
+| ① 耳神門 | 三角窩外上 1/3 | 安神鎮靜，失眠首選 | ★★★★★ |
+| ② 心點 | 耳甲腔正中央 | 寧心安神 | ★★★★ |
+| ③ 交感穴 | 對耳輪前端 | 抑制交感興奮 | ★★★★ |
+| ④ 內分泌區 | 耳甲腔下方 | 調節皮質醇 | ★★★ |
+| ⑤ 耳垂神門 | 耳垂正面中央 | 存在感最低，最舒適 | ★★★★★ |
+
+**研究依據**：Chen et al. (2019) *J Altern Complement Med* — 耳穴貼壓顯著改善 PSQI 睡眠品質指數（p<0.05）
+
+**使用方式**：每天輕壓 3-5 次，每次 1-2 分鐘，可連續貼 3-5 天不取下
+
+**優勢 vs Sea-Band**：無腕部壓迫感，側睡翻身不受影響，存在感幾乎為零
+
+穴位圖：`~/Desktop/ear_sleep_points.png`
