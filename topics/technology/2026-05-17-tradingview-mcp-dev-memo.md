@@ -1,12 +1,12 @@
 ---
-title: TradingView MCP 開發備忘 — Phase 5 接續指南
+title: TradingView MCP 開發備忘 — Phase 5 完成版
 url: local
 source: AVI V5 ARCHITECTURE.md + session progress
 date_added: 2026-05-17
-last_updated: 2026-05-17
+last_updated: 2026-05-19
 topic: technology
 tags: [tradingview, mcp, pine-script, automation, avi-v5, phase-5, dev-memo]
-version: 1.0
+version: 2.0
 ---
 
 ## 開新 Session 時的指令
@@ -15,82 +15,126 @@ version: 1.0
 
 ---
 
-## 一、已完成的部分
+## 一、所有已完成的部分
 
 | 項目 | 狀態 | 檔案位置 |
 |------|------|---------|
 | HTML Dashboard | ✅ | `projects/avi-v5/dashboard/template.html` + `cpi_dashboard.py` |
 | CPI 使用手冊 HTML | ✅ | `projects/avi-v5/dashboard/guide.html` |
-| Pine Script 模板 | ✅ | `projects/avi-v5/pine/cpi_indicator.pine` |
-| Dashboard CLI | ✅ | `scripts/run_dashboard.py` (支援 `--guide`, `--pine`) |
+| CPI Pine Script 模板 | ✅ | `projects/avi-v5/pine/cpi_indicator.pine` |
+| **TSI Pine Script 模板** | ✅ **Phase 5 新** | `projects/avi-v5/pine/tsi_indicator.pine` |
+| **AVI 三合一 Composite** | ✅ **Phase 5 新** | `projects/avi-v5/pine/avi_composite.pine` |
+| **Pine 生成共用模組** | ✅ **Phase 5 新** | `projects/avi-v5/src/pine_export.py` |
+| Dashboard CLI（升級版） | ✅ **Phase 5 升級** | `scripts/run_dashboard.py --pine` 現在生成 3 個 Pine 檔 |
 | CPI 引擎 (12 指標) | ✅ | `src/cpi/__init__.py` |
 | TSI 引擎 (9 指標) | ✅ | `src/tsi/__init__.py` |
 | AVI V5 Pipeline | ✅ | `src/pipeline/avi_v5_pipeline.py` |
+| **TradingView MCP Server** | ✅ **Phase 5 新** | `mcp_tradingview/server.py` |
+| **Playwright Bridge** | ✅ **Phase 5 新** | `mcp_tradingview/tradingview_bridge.py` |
+| **MCP 工具：圖表操作** | ✅ **Phase 5 新** | `mcp_tradingview/tools/chart_tools.py` |
+| **MCP 工具：Pine 上傳** | ✅ **Phase 5 新** | `mcp_tradingview/tools/pine_tools.py` |
+| **MCP 工具：市場資料** | ✅ **Phase 5 新** | `mcp_tradingview/tools/data_tools.py` |
+| **MCP 工具：回測** | ✅ **Phase 5 新** | `mcp_tradingview/tools/backtest_tools.py` |
 
-## 二、Phase 5 尚未做的
+---
 
-### 方案 A：輕量版（建議先做）
+## 二、「推送到 TradingView」教學（小學生版）
 
-**自動生成 Pine Script + 每日更新**
+### 方法 A：手動貼上（簡單，5 分鐘）
 
-不需要 Playwright，只需要：
-1. `run_dashboard.py --pine` 已經能生成 `pine/cpi_indicator_current.pine`
-2. 需要擴展：同時生成 TSI Pine Script
-3. 需要新增：一鍵複製到剪貼簿的功能
-4. 需要新增：Pine Script 中同時顯示 CPI + TSI + AVI 三個分數
-
-**Pine Script 模板已存在：** `projects/avi-v5/pine/cpi_indicator.pine`
-
-模板使用 `{{placeholder}}` 語法，Python 腳本替換後輸出到 `pine/cpi_indicator_current.pine`。
-
-### 方案 B：完整 MCP（進階）
-
-**Playwright 瀏覽器自動化**
-
-架構設計在 `projects/avi-v5/ARCHITECTURE.md` 的 Part A，包含：
+不需要 MCP，不需要 session cookie，**推薦先用這個**。
 
 ```
-mcp-tradingview/
-├── server.py                   # MCP protocol handler (stdio)
-├── tradingview_bridge.py       # Playwright automation
-└── tools/
-    ├── chart_tools.py          # switch_symbol, draw_level
-    ├── pine_tools.py           # create/modify Pine Script
-    ├── data_tools.py           # get_ohlcv, market_state
-    └── backtest_tools.py       # run_backtest
+第 1 步：在你的電腦上執行
+  cd ~/KIWI/projects/avi-v5
+  python3 scripts/run_dashboard.py --pine
+
+  → 執行完成後會顯示 3 個 Pine 檔的路徑，例如：
+      [CPI]       /Users/你/KIWI/projects/avi-v5/pine/cpi_indicator_current.pine
+      [TSI]       /Users/你/KIWI/projects/avi-v5/pine/tsi_indicator_current.pine
+      [Composite] /Users/你/KIWI/projects/avi-v5/pine/avi_composite_current.pine
+
+第 2 步：打開 TradingView（瀏覽器）
+  → 進入任何一個圖表，例如 SPY 日線圖
+
+第 3 步：打開 Pine 編輯器
+  → 點下方「Pine Editor」分頁（或按 Alt+P）
+
+第 4 步：貼上程式碼
+  → 用文字編輯器打開上面的 .pine 檔（記事本也行）
+  → 全選（Ctrl+A）→ 複製（Ctrl+C）
+  → 回到 TradingView Pine 編輯器，全選後貼上
+
+第 5 步：加到圖表
+  → 點右上角「Add to chart」按鈕
+  → 指標就出現在圖表下方了！
+
+重複第 2-5 步，把 3 個 Pine 檔都加上去
+（CPI 崩盤概率、TSI 科技壓力、Composite 三合一）
 ```
 
-**MCP 設定（settings.json）：**
+---
+
+### 方法 B：MCP 自動化（進階，一次設定後每次一句話搞定）
+
+設定一次後，以後只要跟 Claude 說「更新 TradingView 指標」，Claude 就會自動幫你做完所有事。
+
+#### B-1：安裝 Playwright
+
+```bash
+cd ~/KIWI/projects/avi-v5
+pip3 install mcp playwright
+playwright install chromium
+```
+
+#### B-2：取得 TradingView Session Cookie
+
+```
+1. 用 Chrome 打開 tradingview.com 並登入
+2. 按 F12 打開開發者工具
+3. 點上方「Application」分頁
+4. 左側找到「Cookies」→「https://www.tradingview.com」
+5. 找到名為「sessionid」的那行
+6. 複製它的「Value」欄位（一長串英文數字）
+```
+
+#### B-3：設定 Claude Code
+
+打開（或新建）`~/.claude/settings.json`，加入：
+
 ```json
 {
   "mcpServers": {
     "tradingview": {
       "command": "python",
-      "args": ["-m", "projects.avi-v5.mcp-tradingview.server"],
+      "args": ["mcp_tradingview/server.py"],
+      "cwd": "/Users/你的名字/KIWI/projects/avi-v5",
       "env": {
-        "TV_SESSION_COOKIE": "${TV_SESSION_COOKIE}"
+        "TV_SESSION_COOKIE": "貼上剛才複製的 sessionid",
+        "TV_HEADLESS": "1",
+        "FRED_API_KEY": "8181079f96c8210790797e299aca965a"
       }
     }
   }
 }
 ```
 
-**MCP Tools 規格：**
+> ⚠️ 把 `cwd` 路徑改成你電腦上實際的路徑
 
-| Tool | 參數 | 功能 |
-|------|------|------|
-| `tv_switch_symbol` | symbol, timeframe | 切換標的 |
-| `tv_draw_level` | price, label, color | 畫水平線 |
-| `tv_get_ohlcv` | symbol, timeframe, bars | 讀 K 線 |
-| `tv_get_market_state` | symbol | 即時價格 |
-| `tv_create_pine_indicator` | name, source_code | 上傳 Pine |
-| `tv_run_backtest` | strategy_code, symbol | 執行回測 |
-| `tv_screenshot` | filepath | 截圖 |
+#### B-4：使用方式
 
-**技術需求：**
-- Playwright（`pip install playwright && playwright install chromium`）
-- TradingView Pro 帳號（用戶已有）
-- Session Cookie 認證（比帳密登入穩定）
+重新啟動 Claude Code，然後直接說：
+
+```
+「幫我更新 TradingView 的 AVI 指標」
+```
+
+Claude 就會自動：
+1. 抓最新市場數據
+2. 計算 CPI / TSI / AVI 分數
+3. 把 3 個指標更新並推送到你的 TradingView 圖表
+
+---
 
 ## 三、所有系統的指令備忘
 
@@ -106,7 +150,9 @@ python3 scripts/run_cpi.py                 # 當日 CPI 分數（終端機）
 python3 scripts/run_cpi.py --backtest      # CPI 回測（11 事件）
 python3 scripts/run_dashboard.py           # CPI 視覺面板（瀏覽器）
 python3 scripts/run_dashboard.py --guide   # CPI 使用手冊（瀏覽器）
-python3 scripts/run_dashboard.py --pine    # 同時生成 Pine Script
+
+# === Pine Script（三合一）===
+python3 scripts/run_dashboard.py --pine    # 生成 CPI + TSI + Composite 三個 Pine 檔
 
 # === TSI ===
 python3 scripts/run_tsi.py                 # 當日 TSI 分數
@@ -117,61 +163,42 @@ python3 scripts/run_tsi.py --history 252   # 一年趨勢
 python3 scripts/run_backtest.py            # V4 vs V4.1 vs V4.2 比較
 ```
 
+---
+
 ## 四、環境設定（換電腦時）
 
 ```bash
 # 1. Clone repo
 git clone https://github.com/gutinganthony/KIWI.git
 cd KIWI
-git checkout claude/add-kiwi-integration-VwVzs
+git checkout claude/tradingview-mcp-phase-5-wOPl8
 
 # 2. 安裝套件
 cd projects/avi-v5
 pip3 install -r requirements.txt
+playwright install chromium   # Phase 5 MCP 需要
 
 # 3. 設定 API Key
 echo "FRED_API_KEY=8181079f96c8210790797e299aca965a" > .env
 
-# 4. 測試
+# 4. 測試（不需要 MCP）
 python3 scripts/run_tsi.py
-python3 scripts/run_dashboard.py
+python3 scripts/run_dashboard.py --pine
 ```
 
-## 五、檔案結構速查
+---
 
-```
-projects/avi-v5/
-├── ARCHITECTURE.md              # 完整架構設計
-├── CPI_ARCHITECTURE.md          # CPI 技術文件
-├── .env                         # FRED API Key（不上傳 git）
-├── config/
-│   ├── indicators.yaml          # 14 個 AVI 指標定義
-│   ├── avi_weights.yaml         # 6 維度權重
-│   └── regime_params.yaml       # Regime + GARCH 參數
-├── src/
-│   ├── data/sources/            # FRED, multpl, yfinance 資料源
-│   ├── engine/                  # AVI V4 核心 + percentile
-│   ├── regime/                  # 4-state HMM
-│   ├── garch/                   # GARCH(1,1) + VIX comparison
-│   ├── pipeline/                # V5 整合 pipeline
-│   ├── cpi/                     # CPI 崩盤概率（12 指標）
-│   └── tsi/                     # TSI 科技壓力（9 指標）
-├── backtest/                    # AVI 回測框架
-├── dashboard/                   # HTML Dashboard + Guide
-│   ├── template.html            # Dashboard 模板
-│   ├── guide.html               # 使用手冊
-│   └── cpi_dashboard.py         # 生成器
-├── pine/                        # TradingView Pine Script
-│   └── cpi_indicator.pine       # Pine 模板
-├── scripts/
-│   ├── run_monthly.py           # AVI V5
-│   ├── run_cpi.py               # CPI
-│   ├── run_tsi.py               # TSI
-│   ├── run_dashboard.py         # 視覺面板
-│   └── run_backtest.py          # AVI 回測
-└── tests/
-    └── test_cpi_validation.py   # CPI 嵌入式驗證
-```
+## 五、3 個 Pine Script 各自的用途
+
+| 檔案 | 指標 | 顯示什麼 | 何時使用 |
+|------|------|---------|---------|
+| `cpi_indicator_current.pine` | CPI 12 指標 | 大盤崩盤概率（0-100） | 看整體市場風險 |
+| `tsi_indicator_current.pine` | TSI 9 指標 | 科技股壓力（0-100） | 看 QQQ/科技股 |
+| `avi_composite_current.pine` | CPI+TSI+AVI | 三線同一圖，右上角摘要表 | **日常主要用這個** |
+
+> 💡 **建議**：平常只加 `avi_composite_current.pine` 就夠了，三個指標都看得到。
+
+---
 
 ## 六、當前系統能力總結
 
@@ -185,4 +212,5 @@ projects/avi-v5/
 
 ## Update Log
 
-- 2026-05-17 v1.0: Phase 5 開發備忘，含方案 A/B、指令備忘、環境設定、檔案結構。
+- 2026-05-17 v1.0: Phase 5 開發備忘，含方案 A/B、指令備忘、環境設定、檔案結構
+- 2026-05-19 v2.0: Phase 5 **完成**。新增 TSI Pine、Composite Pine、MCP Server（8 個工具）、小學生版 TradingView 推送教學
