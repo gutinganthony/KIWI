@@ -67,12 +67,12 @@ def main():
     # ── 3. Playwright Chromium ──
     print("\n【3】Playwright Chromium 瀏覽器")
     try:
-        result = subprocess.run(
-            ["playwright", "show-browsers"],
-            capture_output=True, text=True, timeout=10
-        )
-        chromium_ok = "chromium" in result.stdout.lower() or result.returncode == 0
-    except (FileNotFoundError, subprocess.TimeoutExpired):
+        from playwright.sync_api import sync_playwright
+        _p = sync_playwright().start()
+        exe = Path(_p.chromium.executable_path)
+        chromium_ok = exe.exists()
+        _p.stop()
+    except Exception:
         chromium_ok = False
 
     check(
