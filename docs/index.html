@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>AVI Dashboard — CPI · TSI · AVI</title>
+<style>
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #131722;
+  --bg2: #1e222d;
+  --bg3: #2a2e39;
+  --border: #363a45;
+  --text: #d1d4dc;
+  --text2: #787b86;
+  --text3: #555962;
+  --green: #26a69a;
+  --green-bg: rgba(38,166,154,0.12);
+  --yellow: #f7c948;
+  --yellow-bg: rgba(247,201,72,0.12);
+  --orange: #ff9800;
+  --orange-bg: rgba(255,152,0,0.12);
+  --red: #ef5350;
+  --red-bg: rgba(239,83,80,0.12);
+  --blue: #42a5f5;
+  --blue-bg: rgba(66,165,245,0.1);
+  --purple: #7c4dff;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Ubuntu, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+.container { max-width: 1100px; margin: 0 auto; padding: 16px; }
+
+/* ── Header ── */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.header-left { display: flex; align-items: center; gap: 10px; }
+.header-logo {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: #fff;
+}
+.header h1 { font-size: 17px; font-weight: 600; }
+.header-right { display: flex; align-items: center; gap: 10px; }
+.updated { font-size: 12px; color: var(--text3); white-space: nowrap; }
+
+/* ── Lang Toggle ── */
+.lang-toggle {
+  display: inline-flex;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2px;
+  cursor: pointer;
+  user-select: none;
+}
+.lang-opt {
+  padding: 3px 10px;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+  transition: all 0.15s;
+}
+.lang-opt.active { background: var(--blue); color: #fff; }
+
+/* ── Alert Banner ── */
+.alert-bar {
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  border-left: 4px solid;
+  display: none;
+}
+.alert-bar.show { display: flex; align-items: flex-start; gap: 10px; }
+.alert-bar.caution { background: var(--yellow-bg); border-color: var(--yellow); color: var(--yellow); }
+.alert-bar.danger { background: var(--red-bg); border-color: var(--red); color: var(--red); }
+.alert-bar .alert-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.alert-bar .alert-body { flex: 1; }
+.alert-bar .alert-title { font-weight: 700; font-size: 14px; margin-bottom: 3px; }
+.alert-bar .alert-desc { font-size: 13px; opacity: 0.9; line-height: 1.5; }
+
+/* ── Three Gauges Row ── */
+.gauges-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+@media (max-width: 620px) {
+  .gauges-row { grid-template-columns: 1fr; gap: 10px; }
+}
+
+.gauge-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+.gauge-card:hover { border-color: #4a4f5e; }
+.gc-tag {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text3);
+}
+.gc-tag-freq {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 10px;
+  color: var(--text3);
+  background: var(--bg3);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* SVG Gauge Ring */
+.ring-wrap { position: relative; width: 120px; height: 120px; margin: 8px auto 10px; }
+.ring-wrap svg { position: absolute; top: 0; left: 0; width: 120px; height: 120px; }
+.ring-center {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+.ring-score { font-size: 28px; font-weight: 700; line-height: 1; }
+.ring-max { font-size: 12px; color: var(--text2); }
+.gc-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.gc-level {
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px;
+  padding: 3px 10px; border-radius: 4px;
+}
+.lvl-low, .lvl-bullish { color: var(--green); background: var(--green-bg); }
+.lvl-moderate, .lvl-neutral { color: var(--yellow); background: var(--yellow-bg); }
+.lvl-elevated, .lvl-cautious { color: var(--orange); background: var(--orange-bg); }
+.lvl-high, .lvl-bearish { color: var(--red); background: var(--red-bg); }
+.lvl-critical { color: #fff; background: var(--red); }
+
+.gc-desc { font-size: 11px; color: var(--text2); margin-top: 8px; line-height: 1.4; max-width: 160px; }
+
+/* ── Signal Matrix ── */
+.section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text2);
+  margin-bottom: 12px;
+}
+
+.signal-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.signal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.signal-overall {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.signal-light {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.signal-light.green { background: var(--green); box-shadow: 0 0 8px var(--green); }
+.signal-light.yellow { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
+.signal-light.orange { background: var(--orange); box-shadow: 0 0 8px var(--orange); }
+.signal-light.red { background: var(--red); box-shadow: 0 0 8px var(--red); }
+.signal-label { font-size: 15px; font-weight: 700; }
+.signal-sublabel { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+.signal-matrix {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+@media (max-width: 480px) { .signal-matrix { grid-template-columns: 1fr; } }
+
+.matrix-cell {
+  background: var(--bg3);
+  border-radius: 8px;
+  padding: 10px 12px;
+  border-left: 3px solid;
+}
+.matrix-cell.green-cell { border-color: var(--green); }
+.matrix-cell.yellow-cell { border-color: var(--yellow); }
+.matrix-cell.orange-cell { border-color: var(--orange); }
+.matrix-cell.red-cell { border-color: var(--red); }
+.matrix-cell .mc-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 4px;
+}
+.matrix-cell.green-cell .mc-label { color: var(--green); }
+.matrix-cell.yellow-cell .mc-label { color: var(--yellow); }
+.matrix-cell.orange-cell .mc-label { color: var(--orange); }
+.matrix-cell.red-cell .mc-label { color: var(--red); }
+.matrix-cell .mc-text { font-size: 12px; color: var(--text2); line-height: 1.4; }
+
+/* ── Breakdown Cards ── */
+.breakdown-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+@media (max-width: 700px) { .breakdown-grid { grid-template-columns: 1fr; } }
+
+.breakdown-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+.breakdown-card.full-width { grid-column: 1 / -1; }
+
+.breakdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.breakdown-title { font-size: 14px; font-weight: 600; }
+.breakdown-score-badge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* Indicator rows */
+.ind-row {
+  display: grid;
+  grid-template-columns: 1fr 70px 60px;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(54,58,69,0.4);
+  font-size: 12px;
+}
+.ind-row:last-child { border-bottom: none; }
+.ind-name { color: var(--text); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ind-bar-track { height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+.ind-bar-fill { height: 100%; border-radius: 3px; }
+.ind-val { text-align: right; font-size: 11px; color: var(--text2); font-variant-numeric: tabular-nums; }
+.ind-status {
+  text-align: right;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.s-normal { color: var(--text3); }
+.s-watch { color: var(--yellow); }
+.s-elevated { color: var(--orange); }
+.s-critical { color: var(--red); }
+
+/* AVI Dimension rows (bigger, 6 items) */
+.dim-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 50px 28px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(54,58,69,0.4);
+  font-size: 12px;
+}
+.dim-row:last-child { border-bottom: none; }
+.dim-name { font-weight: 600; color: var(--text); font-size: 12px; }
+.dim-weight { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.dim-pct { text-align: right; font-variant-numeric: tabular-nums; font-size: 13px; font-weight: 600; }
+.dim-emoji { text-align: center; font-size: 14px; }
+
+/* ── Event Calendar ── */
+.event-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.event-row {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(54,58,69,0.4);
+  align-items: flex-start;
+  font-size: 12px;
+}
+.event-row:last-child { border-bottom: none; }
+.event-date { color: var(--text2); white-space: nowrap; min-width: 48px; font-variant-numeric: tabular-nums; }
+.event-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.event-dot.red { background: var(--red); }
+.event-dot.orange { background: var(--orange); }
+.event-dot.yellow { background: var(--yellow); }
+.event-name { font-weight: 600; color: var(--text); }
+.event-note { color: var(--text2); margin-top: 2px; }
+
+/* ── Footer ── */
+.footer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text3);
+  line-height: 1.6;
+  text-align: center;
+}
+.footer a { color: var(--blue); text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+
+/* ── Responsive tweaks ── */
+@media (max-width: 400px) {
+  .container { padding: 12px; }
+  .header h1 { font-size: 15px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ── Header ── -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-logo">AVI</div>
+      <div>
+        <h1 data-i18n="title">Market Risk Dashboard</h1>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="updated" id="updatedLabel">Updated: 2026-05-20</span>
+      <div class="lang-toggle" id="langToggle">
+        <span class="lang-opt active" data-lang="en">EN</span>
+        <span class="lang-opt" data-lang="zh">中文</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Alert Banner ── -->
+  <div class="alert-bar caution show" id="alertBar">
+    <div class="alert-icon">⚡</div>
+    <div class="alert-body">
+      <div class="alert-title" data-i18n="alert_title">Tech Sector Caution — TSI Elevated</div>
+      <div class="alert-desc" data-i18n="alert_desc">TSI = 45 (CAUTIOUS): 10Y Treasury spiked +9bps to 4.55%; 30Y hit 5.12% (highest since 2007). Tech valuations under pressure from bear steepening yield curve. Capital Context 4-week +20% signal (100-year 3rd occurrence) active.</div>
+    </div>
+  </div>
+
+  <!-- ── Three Gauges ── -->
+  <div class="gauges-row">
+
+    <!-- AVI V5 -->
+    <div class="gauge-card">
+      <span class="gc-tag">AVI V5</span>
+      <span class="gc-tag-freq" data-i18n="monthly">Monthly</span>
+      <div class="ring-wrap">
+        <svg viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#2a2e39" stroke-width="9"/>
+          <circle id="avi-ring" cx="60" cy="60" r="50" fill="none"
+            stroke="#f7c948" stroke-width="9" stroke-linecap="round"
+            stroke-dasharray="314.16" stroke-dashoffset="314.16"
+            transform="rotate(-90 60 60)"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-score" id="avi-score" style="color:#f7c948">4.5</div>
+          <div class="ring-max">/ 10</div>
+        </div>
+      </div>
+      <div class="gc-name" data-i18n="avi_name">Adjusted Valuation Index</div>
+      <div class="gc-level lvl-elevated" data-i18n="avi_level">ELEVATED</div>
+      <div class="gc-desc" data-i18n="avi_desc">Valuation environment. High = market is expensive vs history. CAPE 41.5, 2nd highest ever.</div>
+    </div>
+
+    <!-- CPI -->
+    <div class="gauge-card">
+      <span class="gc-tag">CPI</span>
+      <span class="gc-tag-freq" data-i18n="daily">Daily</span>
+      <div class="ring-wrap">
+        <svg viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#2a2e39" stroke-width="9"/>
+          <circle id="cpi-ring" cx="60" cy="60" r="50" fill="none"
+            stroke="#26a69a" stroke-width="9" stroke-linecap="round"
+            stroke-dasharray="314.16" stroke-dashoffset="314.16"
+            transform="rotate(-90 60 60)"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-score" id="cpi-score" style="color:#26a69a">23</div>
+          <div class="ring-max">/ 100</div>
+        </div>
+      </div>
+      <div class="gc-name" data-i18n="cpi_name">Crash Probability Index</div>
+      <div class="gc-level lvl-low" data-i18n="cpi_level">LOW</div>
+      <div class="gc-desc" data-i18n="cpi_desc">Short-term crash risk (30-day window). 4/4 major crashes detected. Current: no imminent crash signal.</div>
+    </div>
+
+    <!-- TSI -->
+    <div class="gauge-card">
+      <span class="gc-tag">TSI</span>
+      <span class="gc-tag-freq" data-i18n="daily">Daily</span>
+      <div class="ring-wrap">
+        <svg viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#2a2e39" stroke-width="9"/>
+          <circle id="tsi-ring" cx="60" cy="60" r="50" fill="none"
+            stroke="#ff9800" stroke-width="9" stroke-linecap="round"
+            stroke-dasharray="314.16" stroke-dashoffset="314.16"
+            transform="rotate(-90 60 60)"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-score" id="tsi-score" style="color:#ff9800">45</div>
+          <div class="ring-max">/ 100</div>
+        </div>
+      </div>
+      <div class="gc-name" data-i18n="tsi_name">Tech Stress Index</div>
+      <div class="gc-level lvl-cautious" data-i18n="tsi_level">CAUTIOUS</div>
+      <div class="gc-desc" data-i18n="tsi_desc">Tech sector stress. 7/7 events detected. Yield shock + 30Y at 5.12% driving current signal.</div>
+    </div>
+
+  </div><!-- /gauges-row -->
+
+  <!-- ── Combined Signal ── -->
+  <div class="signal-card">
+    <div class="signal-header">
+      <div class="section-title" data-i18n="combined_signal">Combined Signal</div>
+      <div class="signal-overall">
+        <div class="signal-light yellow"></div>
+        <div>
+          <div class="signal-label" data-i18n="signal_label">Cautious Hold</div>
+          <div class="signal-sublabel" data-i18n="signal_sub">AVI 偏高 × CPI 低 × TSI 謹慎</div>
+        </div>
+      </div>
+    </div>
+    <div class="signal-matrix">
+      <div class="matrix-cell green-cell">
+        <div class="mc-label" data-i18n="m1_label">CPI — Normal</div>
+        <div class="mc-text" data-i18n="m1_text">No imminent crash signal. Short-term risk low. Do not panic sell.</div>
+      </div>
+      <div class="matrix-cell orange-cell">
+        <div class="mc-label" data-i18n="m2_label">TSI — Caution</div>
+        <div class="mc-text" data-i18n="m2_text">Tech under yield pressure. Avoid adding tech. Tighten stops on growth names.</div>
+      </div>
+      <div class="matrix-cell orange-cell">
+        <div class="mc-label" data-i18n="m3_label">AVI — Elevated</div>
+        <div class="mc-text" data-i18n="m3_text">CAPE 41.5 (2nd highest ever). No new long positions. Raise cash on bounces.</div>
+      </div>
+      <div class="matrix-cell yellow-cell">
+        <div class="mc-label" data-i18n="m4_label">Watch Trigger</div>
+        <div class="mc-text" data-i18n="m4_text">NVIDIA earnings 5/20. If TSI &gt; 55 OR CPI &gt; 35, activate reduce-risk protocol.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── AVI V5 Breakdown ── -->
+  <div class="breakdown-grid">
+    <div class="breakdown-card full-width">
+      <div class="breakdown-header">
+        <div>
+          <div class="section-title" style="margin-bottom:2px" data-i18n="avi_breakdown">AVI V5 — 6-Dimension Breakdown</div>
+          <div style="font-size:12px;color:var(--text2)" data-i18n="avi_breakdown_sub">14 indicators · 20-year rolling percentile · Monthly update</div>
+        </div>
+        <div class="breakdown-score-badge" style="color:#f7c948;background:var(--yellow-bg)">4.5 / 10</div>
+      </div>
+      <!-- Dimensions -->
+      <div class="dim-row">
+        <div><div class="dim-name" data-i18n="d_valuation">Valuation</div><div class="dim-weight">38% · CAPE, P/S, FCF, Buffett</div></div>
+        <div class="ind-bar-track"><div class="ind-bar-fill" style="width:72%;background:var(--orange)"></div></div>
+        <div class="dim-pct" style="color:var(--orange)">72%</div>
+        <div class="dim-emoji">🟠</div>
+      </div>
+      <div class="dim-row">
+        <div><div class="dim-name" data-i18n="d_profit">Profitability</div><div class="dim-weight">8% · ROIC</div></div>
+        <div class="ind-bar-track"><div class="ind-bar-fill" style="width:34%;background:var(--green)"></div></div>
+        <div class="dim-pct" style="color:var(--green)">34%</div>
+        <div class="dim-emoji">🟢</div>
+      </div>
+      <div class="dim-row">
+        <div><div class="dim-name" data-i18n="d_macro">Macro</div><div class="dim-weight">14% · VIX, STLFSI4, Yield Spread</div></div>
+        <div class="ind-bar-track"><div class="ind-bar-fill" style="width:52%;background:var(--yellow)"></div></div>
+        <div class="dim-pct" style="color:var(--yellow)">52%</div>
+        <div class="dim-emoji">🟡</div>
+      </div>
+      <div class="dim-row">
+        <div><div class="dim-name" data-i18n="d_rate">Rate / Inflation</div><div class="dim-weight">14% · CPI YoY, 10Y Real Yield</div></div>
+        <div class="ind-bar-track"><div class="ind-bar-fill" style="width:65%;background:var(--orange)"></div></div>
+        <div class="dim-pct" style="color:var(--orange)">65%</div>
+        <div class="dim-emoji">🟠</div>
+      </div>
+      <div class="dim-row">
+        <div><div class="dim-name" data-i18n="d_credit">Credit</div><div class="dim-weight">12% · BAA-10Y, BAA-AAA</div></div>
+        <div class="ind-bar-track"><div class="ind-bar-fill" style="width:12%;background:var(--green)"></div></div>
+        <div class="dim-pct" style="color:var(--green)">12%</div>
+        <div class="dim-emoji">🟢</div>
+      </div>
+      <div class="dim-row">
+        <div><div class="dim-name" data-i18n="d_momentum">Momentum</div><div class="dim-weight">14% · S&amp;P/200MA, Drawdown</div></div>
+        <div class="ind-bar-track"><div class="ind-bar-fill" style="width:58%;background:var(--yellow)"></div></div>
+        <div class="dim-pct" style="color:var(--yellow)">58%</div>
+        <div class="dim-emoji">🟡</div>
+      </div>
+      <div style="margin-top:10px;padding:8px 10px;background:var(--bg3);border-radius:6px;font-size:11px;color:var(--text2);line-height:1.5" data-i18n="avi_note">
+        Note: AVI V5 uses improved rolling percentile vs V4. Credit spreads remain historically low (12%) — the last defense before acceleration to 8.0+. Valuation at 72% is the primary risk driver.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CPI + TSI Breakdown ── -->
+  <div class="breakdown-grid">
+
+    <!-- CPI -->
+    <div class="breakdown-card">
+      <div class="breakdown-header">
+        <div>
+          <div class="section-title" style="margin-bottom:2px" data-i18n="cpi_breakdown">CPI — 12-Indicator Breakdown</div>
+          <div style="font-size:11px;color:var(--text2)" data-i18n="cpi_breakdown_sub">Daily · Crash prediction 23–42 day lead</div>
+        </div>
+        <div class="breakdown-score-badge" style="color:var(--green);background:var(--green-bg)">23 / 100</div>
+      </div>
+      <div id="cpi-indicators">
+        <!-- VIX Term Structure -->
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ci_vts">VIX Term Structure</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:22%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ci_vs">VIX Spike</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:38%;background:var(--yellow)"></div></div>
+          <div class="ind-status s-watch">WATCH</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ci_garch">GARCH-VIX Gap</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:15%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ci_credit">Credit Acceleration</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:10%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ci_breadth">Breadth Divergence</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:35%;background:var(--yellow)"></div></div>
+          <div class="ind-status s-watch">WATCH</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ci_dist">Distribution Days</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:20%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ci_rsi">RSI Divergence</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:28%;background:var(--yellow)"></div></div>
+          <div class="ind-status s-watch">WATCH</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ci_ma">MA Distance Reversal</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:12%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ci_yc">Yield Curve Steep.</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:18%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ci_mc">Momentum Collapse</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:8%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ci_ys">Yield Surge</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:52%;background:var(--orange)"></div></div>
+          <div class="ind-status s-elevated">ELEVATED</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ci_is">Intraday Selloff</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:14%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TSI -->
+    <div class="breakdown-card">
+      <div class="breakdown-header">
+        <div>
+          <div class="section-title" style="margin-bottom:2px" data-i18n="tsi_breakdown">TSI — 9-Indicator Breakdown</div>
+          <div style="font-size:11px;color:var(--text2)" data-i18n="tsi_breakdown_sub">Daily · Tech sector · 7/7 events detected</div>
+        </div>
+        <div class="breakdown-score-badge" style="color:var(--orange);background:var(--orange-bg)">45 / 100</div>
+      </div>
+      <div id="tsi-indicators">
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ti_sox">SOX/QQQ Divergence</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:30%;background:var(--yellow)"></div></div>
+          <div class="ind-status s-watch">WATCH</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ti_mem">Memory Momentum</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:25%;background:var(--yellow)"></div></div>
+          <div class="ind-status s-watch">WATCH</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ti_ys">Yield Shock (10Y)</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:72%;background:var(--orange)"></div></div>
+          <div class="ind-status s-elevated">ELEVATED</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ti_30y">30Y Yield Stress</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:78%;background:var(--red)"></div></div>
+          <div class="ind-status s-critical">HIGH</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ti_bear">Bear Steep. (30Y-10Y)</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:58%;background:var(--orange)"></div></div>
+          <div class="ind-status s-elevated">ELEVATED</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ti_ai">AI Infra RS (SMH/SPY)</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:22%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ti_breadth">Tech Breadth (QQQ)</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:35%;background:var(--yellow)"></div></div>
+          <div class="ind-status s-watch">WATCH</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ti_cloud">Cloud RS (QQQ/SPY)</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:18%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ti_vix">VIX-Tech Corr.</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:48%;background:var(--yellow)"></div></div>
+          <div class="ind-status s-watch">WATCH</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /breakdown-grid -->
+
+  <!-- ── Key Metrics Strip ── -->
+  <div class="signal-card" style="margin-bottom:12px">
+    <div class="section-title" data-i18n="market_snapshot">Market Snapshot — 2026-05-17</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:4px">
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:10px;color:var(--text2);margin-bottom:4px">S&amp;P 500</div>
+        <div style="font-size:18px;font-weight:700;color:var(--green)">7,300+</div>
+        <div style="font-size:10px;color:var(--text3)">4-week +20% signal</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:10px;color:var(--text2);margin-bottom:4px">CAPE</div>
+        <div style="font-size:18px;font-weight:700;color:var(--orange)">41.5</div>
+        <div style="font-size:10px;color:var(--text3)">2nd highest ever</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:10px;color:var(--text2);margin-bottom:4px">VIX</div>
+        <div style="font-size:18px;font-weight:700;color:var(--yellow)">~19</div>
+        <div style="font-size:10px;color:var(--text3)">Near 20 threshold</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:10px;color:var(--text2);margin-bottom:4px">10Y Yield</div>
+        <div style="font-size:18px;font-weight:700;color:var(--orange)">4.55%</div>
+        <div style="font-size:10px;color:var(--text3)">+9bps · Year high</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:10px;color:var(--text2);margin-bottom:4px">30Y Yield</div>
+        <div style="font-size:18px;font-weight:700;color:var(--red)">5.12%</div>
+        <div style="font-size:10px;color:var(--text3)">2007 since highest</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:10px;color:var(--text2);margin-bottom:4px">Oil (Brent)</div>
+        <div style="font-size:18px;font-weight:700;color:var(--orange)">$108</div>
+        <div style="font-size:10px;color:var(--text3)">Iran risk premium</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Event Calendar ── -->
+  <div class="event-card">
+    <div class="section-title" data-i18n="event_calendar">Key Events — 2026 H2 Watch Calendar</div>
+    <div class="event-row">
+      <div class="event-date">5/20</div>
+      <div class="event-dot red"></div>
+      <div>
+        <div class="event-name" data-i18n="ev1_name">NVIDIA Earnings (After Close)</div>
+        <div class="event-note" data-i18n="ev1_note">Tech direction pivot. Watch: guidance cut? HBM order visibility? TSI will spike if miss.</div>
+      </div>
+    </div>
+    <div class="event-row">
+      <div class="event-date">6/10</div>
+      <div class="event-dot orange"></div>
+      <div>
+        <div class="event-name" data-i18n="ev2_name">CPI Data (May)</div>
+        <div class="event-note" data-i18n="ev2_note">&gt;3.3% → rate hike pressure returns, AVI rate dimension spikes. CPI indicator: Yield Surge.</div>
+      </div>
+    </div>
+    <div class="event-row">
+      <div class="event-date">6/16</div>
+      <div class="event-dot red"></div>
+      <div>
+        <div class="event-name" data-i18n="ev3_name">FOMC (Warsh era debut + dot plot)</div>
+        <div class="event-note" data-i18n="ev3_note">Kevin Warsh's first meeting. Hawkish dot plot → TSI bear steepening accelerates.</div>
+      </div>
+    </div>
+    <div class="event-row">
+      <div class="event-date">Jul–Aug</div>
+      <div class="event-dot orange"></div>
+      <div>
+        <div class="event-name" data-i18n="ev4_name">Big Tech Q2 Earnings + Seasonal Weakness</div>
+        <div class="event-note" data-i18n="ev4_note">Any capex guidance cut = memory cycle first shot. Aug historically weakest month (55% up rate).</div>
+      </div>
+    </div>
+    <div class="event-row">
+      <div class="event-date">Sep</div>
+      <div class="event-dot red"></div>
+      <div>
+        <div class="event-name" data-i18n="ev5_name">Historically Weakest Month</div>
+        <div class="event-note" data-i18n="ev5_note">Only 32% up probability historically. AVI + TSI both elevated = highest risk window 2026 Q3.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Action Playbook ── -->
+  <div class="signal-card" style="margin-bottom:12px">
+    <div class="section-title" data-i18n="playbook">Action Playbook — Current State</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px">
+      <div style="background:var(--bg3);border-radius:8px;padding:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px" data-i18n="do_label">DO</div>
+        <ul style="font-size:12px;color:var(--text2);line-height:1.6;padding-left:14px" data-i18n="do_list">
+          <li>Hold existing positions</li>
+          <li>Raise cash 20–25%</li>
+          <li>Own QQQ puts (2-3mo)</li>
+          <li>Watch TSI daily</li>
+        </ul>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px" data-i18n="dont_label">DON'T</div>
+        <ul style="font-size:12px;color:var(--text2);line-height:1.6;padding-left:14px" data-i18n="dont_list">
+          <li>Add tech exposure</li>
+          <li>Chase AI momentum</li>
+          <li>Ignore yield signals</li>
+          <li>Use leverage</li>
+        </ul>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px" data-i18n="trigger_label">TRIGGER</div>
+        <ul style="font-size:12px;color:var(--text2);line-height:1.6;padding-left:14px" data-i18n="trigger_list">
+          <li>TSI &gt; 55 → reduce</li>
+          <li>CPI &gt; 35 → hedge</li>
+          <li>CPI+TSI both high → act</li>
+          <li>Flash ⚡ → immediate</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── AVI Score Reference ── -->
+  <div class="breakdown-card full-width" style="margin-bottom:12px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px">
+    <div class="section-title" data-i18n="avi_reference">AVI Score Reference</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;margin-top:8px">
+      <div style="background:var(--bg3);border-radius:6px;padding:8px 10px;display:flex;align-items:center;gap:8px">
+        <span style="color:var(--red);font-weight:700;font-size:13px">8.0+</span>
+        <span style="font-size:11px;color:var(--text2)" data-i18n="ref_extreme">🔴 Extreme — Slash exposure</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:6px;padding:8px 10px;display:flex;align-items:center;gap:8px">
+        <span style="color:var(--orange);font-weight:700;font-size:13px">7.0–8.0</span>
+        <span style="font-size:11px;color:var(--text2)" data-i18n="ref_high">🟠 High risk — Reduce</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:6px;padding:8px 10px;display:flex;align-items:center;gap:8px">
+        <span style="color:var(--yellow);font-weight:700;font-size:13px">6.0–7.0</span>
+        <span style="font-size:11px;color:var(--text2)" data-i18n="ref_elevated">🟡 Elevated — No adds</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:6px;padding:8px 10px;display:flex;align-items:center;gap:8px">
+        <span style="color:var(--yellow);font-weight:700;font-size:13px">5.0–6.0</span>
+        <span style="font-size:11px;color:var(--text2)" data-i18n="ref_mod">🟡 Mod-High — Cautious</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:6px;padding:8px 10px;display:flex;align-items:center;gap:8px">
+        <span style="color:var(--green);font-weight:700;font-size:13px">4.0–5.0</span>
+        <span style="font-size:11px;color:var(--text2)" data-i18n="ref_neutral">🟢 Neutral — Normal</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:6px;padding:8px 10px;display:flex;align-items:center;gap:8px">
+        <span style="color:var(--green);font-weight:700;font-size:13px">&lt;4.0</span>
+        <span style="font-size:11px;color:var(--text2)" data-i18n="ref_low">🟢 Low — Deploy capital</span>
+      </div>
+    </div>
+    <div style="margin-top:10px;font-size:11px;color:var(--text3);padding:8px 10px;background:var(--bg3);border-radius:6px" data-i18n="avi_current_note">
+      Current: AVI V5 = 4.5 (Neutral-to-Elevated). Note: V5 uses improved methodology vs V4. V4 equivalent was 7.00 in Apr 2026.
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="footer">
+    <div data-i18n="footer_main">AVI Dashboard · CPI + TSI + AVI V5 · Personal research project — not financial advice</div>
+    <div style="margin-top:6px">
+      <span data-i18n="footer_update">To update: run </span>
+      <code style="background:var(--bg3);padding:1px 6px;border-radius:3px;font-size:10px">python3 scripts/run_dashboard.py --pine</code>
+      <span> · </span>
+      <a href="https://github.com/gutinganthony/KIWI" data-i18n="footer_source">Source</a>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+(function() {
+  /* ── i18n ── */
+  var zh = {
+    title: '市場風險儀表板',
+    monthly: '月度',
+    daily: '日頻',
+    avi_name: 'AVI 估值指數',
+    avi_level: '偏高',
+    avi_desc: '市場估值環境評分。CAPE 41.5（史上第二高），估值已偏貴。',
+    cpi_name: 'CPI 崩盤概率指數',
+    cpi_level: '低',
+    cpi_desc: '短期崩盤風險（30天窗口）。4/4 重大崩盤偵測成功。當前：無即時崩盤信號。',
+    tsi_name: 'TSI 科技壓力指數',
+    tsi_level: '謹慎',
+    tsi_desc: '科技板塊壓力。7/7 事件全數偵測。殖利率衝擊 + 30Y 至 5.12% 是當前主要驅動。',
+    alert_title: '科技板塊謹慎 — TSI 升高',
+    alert_desc: 'TSI = 45（謹慎）：10Y 殖利率急升 9bps 至 4.55%；30Y 達 5.12%（2007 年以來最高）。科技估值面臨殖利率曲線熊市陡化壓力。Capital Context 4 週 +20% 信號（百年第 3 次）已觸發。',
+    combined_signal: '三系統綜合信號',
+    signal_label: '謹慎持有',
+    signal_sub: 'AVI 偏高 × CPI 低 × TSI 謹慎',
+    m1_label: 'CPI — 正常',
+    m1_text: '無即時崩盤信號，短期風險低。不要恐慌減倉。',
+    m2_label: 'TSI — 謹慎',
+    m2_text: '科技承受殖利率壓力。避免加碼科技，收緊成長股停損。',
+    m3_label: 'AVI — 偏高',
+    m3_text: 'CAPE 41.5（史上第二高）。不新建多頭部位。在反彈時提高現金。',
+    m4_label: '監控觸發條件',
+    m4_text: 'NVIDIA 財報 5/20。若 TSI > 55 或 CPI > 35，啟動減倉程序。',
+    avi_breakdown: 'AVI V5 — 六維度拆解',
+    avi_breakdown_sub: '14 個指標 · 20 年滾動百分位 · 月度更新',
+    d_valuation: '估值',
+    d_profit: '獲利能力',
+    d_macro: '宏觀環境',
+    d_rate: '利率/通膨',
+    d_credit: '信用市場',
+    d_momentum: '動量',
+    avi_note: '注意：AVI V5 使用改進的滾動百分位，方法不同於 V4。信用利差仍在歷史低位（12%）——這是目前市場最後的防線。估值維度 72% 是主要風險驅動因素。',
+    cpi_breakdown: 'CPI — 12 個指標拆解',
+    cpi_breakdown_sub: '日頻 · 崩盤預警 23-42 天提前',
+    tsi_breakdown: 'TSI — 9 個指標拆解',
+    tsi_breakdown_sub: '日頻 · 科技板塊 · 7/7 事件偵測',
+    ci_vts: 'VIX 期限結構',
+    ci_vs: 'VIX 急升',
+    ci_garch: 'GARCH-VIX 差距',
+    ci_credit: '信用利差加速',
+    ci_breadth: '市場廣度背離',
+    ci_dist: '放量下跌天數',
+    ci_rsi: 'RSI 背離',
+    ci_ma: '均線距離反轉',
+    ci_yc: '殖利率曲線陡化',
+    ci_mc: '動量崩潰',
+    ci_ys: '殖利率急升',
+    ci_is: '盤中大幅下跌',
+    ti_sox: 'SOX/QQQ 背離',
+    ti_mem: '記憶體股動能',
+    ti_ys: '殖利率衝擊 (10Y)',
+    ti_30y: '30Y 殖利率壓力',
+    ti_bear: '熊市陡化 (30Y-10Y)',
+    ti_ai: 'AI 基建相對強度',
+    ti_breadth: '科技廣度 (QQQ)',
+    ti_cloud: '雲端相對強度',
+    ti_vix: 'VIX-科技相關性',
+    market_snapshot: '市場快照 — 2026-05-17',
+    event_calendar: '關鍵事件日曆 — 2026 H2 監控',
+    ev1_name: 'NVIDIA 財報（盤後）',
+    ev1_note: '科技股方向定調。若指引下修，TSI 會急升。',
+    ev2_name: 'CPI 數據公布（5月）',
+    ev2_note: '>3.3% → 升息壓力回來，AVI 利率維度衝高。',
+    ev3_name: 'FOMC（Warsh 時代首次 + dot plot）',
+    ev3_note: 'Kevin Warsh 首次主導。鷹派 dot plot → TSI 熊市陡化加速。',
+    ev4_name: '大型科技 Q2 財報 + 季節性弱勢',
+    ev4_note: '任何 capex 指引下修 = 記憶體週期第一槍。8 月歷史上最弱。',
+    ev5_name: '歷史最弱月份',
+    ev5_note: '歷史上只有 32% 上漲概率。AVI+TSI 雙高 = 2026 Q3 最高風險窗口。',
+    playbook: '行動手冊 — 當前狀態',
+    do_label: '應該做',
+    do_list: '<li>持有現有部位</li><li>提高現金至 20-25%</li><li>持有 QQQ put（2-3 個月）</li><li>每日追蹤 TSI</li>',
+    dont_label: '不要做',
+    dont_list: '<li>加碼科技部位</li><li>追高 AI 動能股</li><li>忽略殖利率信號</li><li>使用槓桿</li>',
+    trigger_label: '觸發條件',
+    trigger_list: '<li>TSI > 55 → 開始減倉</li><li>CPI > 35 → 建立避險</li><li>CPI+TSI 雙高 → 立即行動</li><li>Flash ⚡ → 立刻檢查持倉</li>',
+    avi_reference: 'AVI 分數對照表',
+    ref_extreme: '🔴 極度危險 — 大幅減倉',
+    ref_high: '🟠 高風險 — 減倉',
+    ref_elevated: '🟡 偏高 — 不追高',
+    ref_mod: '🟡 中等偏高 — 謹慎',
+    ref_neutral: '🟢 中性 — 正常配置',
+    ref_low: '🟢 低 — 積極佈局',
+    avi_current_note: '當前：AVI V5 = 4.5（中性偏高）。注意：V5 使用改進方法。V4 等效值在 2026 年 4 月為 7.00。',
+    footer_main: 'AVI 儀表板 · CPI + TSI + AVI V5 · 個人研究專案 — 非投資建議',
+    footer_update: '更新方式：執行 ',
+    footer_source: 'GitHub 原始碼',
+    updated: '更新於'
+  };
+
+  var currentLang = localStorage.getItem('avi_lang') || 'en';
+
+  function applyLang(lang) {
+    currentLang = lang;
+    localStorage.setItem('avi_lang', lang);
+    var opts = document.querySelectorAll('.lang-opt');
+    for (var i = 0; i < opts.length; i++) {
+      opts[i].classList.toggle('active', opts[i].getAttribute('data-lang') === lang);
+    }
+    if (lang === 'zh') {
+      var els = document.querySelectorAll('[data-i18n]');
+      for (var j = 0; j < els.length; j++) {
+        var key = els[j].getAttribute('data-i18n');
+        if (zh[key] !== undefined) {
+          if (key === 'do_list' || key === 'dont_list' || key === 'trigger_list') {
+            els[j].innerHTML = zh[key];
+          } else {
+            els[j].textContent = zh[key];
+          }
+        }
+      }
+      document.getElementById('updatedLabel').textContent = '更新於：2026-05-20';
+    } else {
+      // Reset to English defaults
+      location.reload();
+    }
+  }
+
+  var toggle = document.getElementById('langToggle');
+  if (toggle) {
+    toggle.addEventListener('click', function(e) {
+      var t = e.target;
+      if (t.classList.contains('lang-opt')) {
+        var l = t.getAttribute('data-lang');
+        if (l && l !== currentLang) applyLang(l);
+      }
+    });
+  }
+  if (currentLang === 'zh') applyLang('zh');
+
+  /* ── Animate Rings ── */
+  var rings = [
+    { id: 'avi-ring', score: 4.5, max: 10 },
+    { id: 'cpi-ring', score: 23,  max: 100 },
+    { id: 'tsi-ring', score: 45,  max: 100 },
+  ];
+  var circ = 2 * Math.PI * 50; // r=50 → 314.16
+
+  setTimeout(function() {
+    rings.forEach(function(r) {
+      var el = document.getElementById(r.id);
+      if (!el) return;
+      var pct = r.score / r.max;
+      var offset = circ - pct * circ;
+      el.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.34,1.56,0.64,1)';
+      el.style.strokeDashoffset = offset;
+    });
+  }, 150);
+
+})();
+</script>
+</body>
+</html>

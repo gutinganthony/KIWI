@@ -1,0 +1,37 @@
+# AVI V5 Dependencies
+# Core
+numpy>=1.24.0
+pandas>=2.0.0
+pyyaml>=6.0
+
+# Data Sources
+fredapi>=0.5.0
+yfinance>=0.2.18
+requests>=2.28.0
+beautifulsoup4>=4.12.0
+
+# Environment
+python-dotenv>=1.0.0
+
+# Type checking / models (optional but recommended)
+pydantic>=2.0.0
+
+# Testing
+pytest>=7.0.0
+
+# Phase 2: Regime Engine (HMM)
+hmmlearn>=0.3.0
+scikit-learn>=1.2.0
+scipy>=1.10.0
+
+# Phase 3: GARCH Volatility
+arch>=6.0.0
+
+# Phase 4: Dashboard
+matplotlib>=3.7.0
+jinja2>=3.1.0
+
+# Phase 5: TradingView MCP
+mcp>=1.0.0
+playwright>=1.40.0
+# After installing: playwright install chromium

@@ -1,0 +1,15 @@
+{
+  "_comment": "Add this block to ~/.claude/settings.json (global) or .claude/settings.json (project)",
+  "mcpServers": {
+    "tradingview": {
+      "command": "python",
+      "args": ["mcp_tradingview/server.py"],
+      "cwd": "/ABSOLUTE/PATH/TO/KIWI/projects/avi-v5",
+      "env": {
+        "TV_SESSION_COOKIE": "your_sessionid_cookie_value_here",
+        "TV_HEADLESS": "1",
+        "FRED_API_KEY": "your_fred_api_key_here"
+      }
+    }
+  }
+}
