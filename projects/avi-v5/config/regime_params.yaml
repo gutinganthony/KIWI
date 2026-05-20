@@ -1,0 +1,18 @@
+regime:
+  n_regimes: 4
+  labels: [calm_trend, volatile_trend, chop, risk_off]
+  multipliers:
+    calm_trend: 1.00
+    volatile_trend: 1.08
+    chop: 1.04
+    risk_off: 1.15
+  transition_risk_weight: 0.5
+  feature_window: 21
+
+garch:
+  p: 1
+  q: 1
+  distribution: studentst
+  forecast_horizon: 21
+  vol_gap_scale: 0.3
+  max_adjustment: 0.5
