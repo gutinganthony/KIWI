@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-"""Daily market alert — compute CPI + TSI + AVI and send via Telegram.
+"""Daily market alert — reads pre-computed data from docs/index.html and sends via Telegram.
+
+Data source: KIWI_DATA JSON embedded in docs/index.html (written by update_dashboard.py).
+This guarantees Telegram and Dashboard always show the same numbers.
 
 Setup:
   1. Telegram: message @BotFather → /newbot → get TOKEN
   2. Telegram: message @userinfobot → get your CHAT_ID
-  3. Set env vars: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, FRED_API_KEY
+  3. Set env vars: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
 
 Usage:
   python3 scripts/notify.py              # Send alert now
@@ -15,13 +18,14 @@ import argparse
 import json
 import logging
 import os
+import re
 import sys
 import urllib.request
 from datetime import datetime
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
+DOCS_INDEX = PROJECT_ROOT.parent.parent / "docs" / "index.html"
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("notify")
@@ -40,67 +44,21 @@ def send_telegram(token, chat_id, message):
         return json.loads(resp.read())
 
 
-def compute_tsi():
-    """Compute today's TSI score."""
-    try:
-        from src.tsi.data import TSIDataCollector
-        from src.tsi import TechStressIndex
-        collector = TSIDataCollector()
-        data = collector.collect_all()
-        tsi = TechStressIndex()
-        result = tsi.compute(
-            sox_daily=data["sox"], qqq_daily=data["qqq"],
-            mu_daily=data["mu"], smh_daily=data["smh"],
-            spy_daily=data["spy"], treasury_10y=data["t10y"],
-            vix_daily=data["vix"], treasury_30y=data.get("t30y"),
-        )
-        return result.score, result.bias, result.flash_alert, result.flash_reason
-    except Exception as e:
-        logger.error(f"TSI failed: {e}")
-        return None, None, False, ""
-
-
-def compute_cpi():
-    """Compute today's CPI score."""
-    try:
-        import pandas as pd
-        from src.cpi.data import CPIDataCollector
-        from src.cpi import CrashProbabilityIndex
-        collector = CPIDataCollector()
-        data = collector.collect_all()
-        cpi = CrashProbabilityIndex()
-        result = cpi.compute(
-            sp500_daily=data["sp500"],
-            vix_daily=data.get("vix", pd.Series(dtype=float)),
-            vix3m_daily=data.get("vix3m"),
-            baa_daily=data.get("baa", pd.Series(dtype=float)),
-            aaa_daily=data.get("aaa", pd.Series(dtype=float)),
-            treasury_10y=data.get("t10y", pd.Series(dtype=float)),
-            treasury_2y=data.get("t2y", pd.Series(dtype=float)),
-        )
-        return result.score, result.level, result.flash_alert.triggered
-    except Exception as e:
-        logger.error(f"CPI failed: {e}")
-        return None, None, False
-
-
-def compute_avi():
-    """Compute current AVI V5 score."""
-    try:
-        from src.pipeline.avi_v5_pipeline import AVIV5Pipeline
-        fred_key = os.environ.get("FRED_API_KEY", "")
-        if not fred_key:
-            return None
-        pipeline = AVIV5Pipeline(fred_api_key=fred_key)
-        result = pipeline.run(verbose=False)
-        return result.avi_v4_score
-    except Exception as e:
-        logger.error(f"AVI failed: {e}")
-        return None
+def load_dashboard_data():
+    """Extract KIWI_DATA JSON from docs/index.html."""
+    if not DOCS_INDEX.exists():
+        raise FileNotFoundError(f"Dashboard not found: {DOCS_INDEX}")
+    html = DOCS_INDEX.read_text(encoding="utf-8")
+    match = re.search(
+        r"//\s*\[KIWI-DATA-START\].*?const KIWI_DATA\s*=\s*(\{.*?\});\s*//\s*\[KIWI-DATA-END\]",
+        html, re.DOTALL
+    )
+    if not match:
+        raise ValueError("KIWI_DATA block not found in index.html")
+    return json.loads(match.group(1))
 
 
 def level_emoji(score, system):
-    """Get emoji for score level."""
     if score is None:
         return "⚪"
     if system == "cpi":
@@ -121,58 +79,38 @@ def level_emoji(score, system):
     return "⚪"
 
 
-def _yf_last_close(ticker):
-    """Fetch last close for a single ticker, return float or None."""
-    try:
-        import yfinance as yf
-        df = yf.download(ticker, period="2d", auto_adjust=True, progress=False)
-        if df.empty:
-            return None
-        val = float(df["Close"].iloc[-1])
-        return val if val == val else None  # NaN check
-    except Exception:
-        return None
-
-
-def fetch_market_snapshot():
-    """Fetch quick market snapshot from yfinance (no API key needed)."""
-    snap = {
-        "sp500": _yf_last_close("^GSPC"),
-        "vix":   _yf_last_close("^VIX"),
-        "t10y":  _yf_last_close("^TNX"),
-        "t30y":  _yf_last_close("^TYX"),
-    }
-    return snap
-
-
-def build_message():
-    """Build the daily alert message aligned with the Dashboard layout."""
+def build_message(data):
+    """Build the daily alert message from dashboard data."""
     today = datetime.now().strftime("%Y-%m-%d %a")
 
-    logger.info("Computing TSI...")
-    tsi_score, tsi_bias, tsi_flash, tsi_flash_reason = compute_tsi()
+    cpi_score = data.get("cpi", {}).get("score")
+    cpi_level = data.get("cpi", {}).get("level", "──")
+    cpi_flash = data.get("cpi", {}).get("flash", False)
 
-    logger.info("Computing CPI...")
-    cpi_score, cpi_level, cpi_flash = compute_cpi()
+    tsi_score = data.get("tsi", {}).get("score")
+    tsi_bias  = data.get("tsi", {}).get("bias", "──")
+    tsi_flash = data.get("tsi", {}).get("flash", False)
 
-    logger.info("Computing AVI...")
-    avi_score = compute_avi()
+    avi_score = data.get("avi", {}).get("score")
 
-    logger.info("Fetching market snapshot...")
-    snap = fetch_market_snapshot()
+    snap_sp500 = data.get("market", {}).get("sp500")
+    snap_vix   = data.get("market", {}).get("vix")
+    snap_t10y  = data.get("market", {}).get("t10y")
+    snap_t30y  = data.get("market", {}).get("t30y")
 
     cpi_val = cpi_score or 0
     tsi_val = tsi_score or 0
     avi_val = avi_score or 0
 
-    # ── Flash alerts ──
+    # Flash alerts
     alerts = []
     if cpi_flash:
         alerts.append("CPI Flash Alert ⚡")
-    if tsi_flash and tsi_flash_reason:
-        alerts.append(f"TSI Flash: {tsi_flash_reason}")
+    if tsi_flash:
+        tsi_flash_reason = data.get("tsi", {}).get("flash_reason", "")
+        alerts.append(f"TSI Flash: {tsi_flash_reason}" if tsi_flash_reason else "TSI Flash Alert ⚡")
 
-    # ── Combined signal ──
+    # Combined signal
     if cpi_val >= 35 and tsi_val >= 55:
         signal_line = "🔴 <b>雙重壓力</b>：積極減倉 + 建立避險"
     elif cpi_val >= 35:
@@ -186,52 +124,41 @@ def build_message():
     else:
         signal_line = "🟢 <b>正常</b>：照常操作"
 
-    # ── Build message ──
     lines = [
         f"<b>📊 每日市場體溫</b>  <i>{today}</i>",
         "─────────────────",
     ]
 
-    # Scores
     cpi_d = f"{cpi_val:.0f}" if cpi_score is not None else "──"
     tsi_d = f"{tsi_val:.0f}" if tsi_score is not None else "──"
     avi_d = f"{avi_val:.1f}" if avi_score is not None else "──"
-    cpi_l = cpi_level or "──"
-    tsi_b = tsi_bias or "──"
 
-    lines.append(f"{level_emoji(cpi_score, 'cpi')} <b>CPI</b>  {cpi_d}/100  <i>{cpi_l}</i>")
-    lines.append(f"{level_emoji(tsi_score, 'tsi')} <b>TSI</b>  {tsi_d}/100  <i>{tsi_b}</i>")
+    lines.append(f"{level_emoji(cpi_score, 'cpi')} <b>CPI</b>  {cpi_d}/100  <i>{cpi_level}</i>")
+    lines.append(f"{level_emoji(tsi_score, 'tsi')} <b>TSI</b>  {tsi_d}/100  <i>{tsi_bias}</i>")
     lines.append(f"{level_emoji(avi_score, 'avi')} <b>AVI</b>  {avi_d}/10")
 
-    # Flash alerts
     if alerts:
         lines.append("")
         for a in alerts:
             lines.append(f"⚡ {a}")
 
-    # Market snapshot
     snap_parts = []
-    if snap["sp500"]:
-        snap_parts.append(f"S&amp;P {snap['sp500']:,.0f}")
-    if snap["vix"]:
-        snap_parts.append(f"VIX {snap['vix']:.1f}")
-    if snap["t10y"]:
-        snap_parts.append(f"10Y {snap['t10y']:.2f}%")
-    if snap["t30y"]:
-        snap_parts.append(f"30Y {snap['t30y']:.2f}%")
+    if snap_sp500:
+        snap_parts.append(f"S&amp;P {snap_sp500:,.0f}")
+    if snap_vix:
+        snap_parts.append(f"VIX {snap_vix:.1f}")
+    if snap_t10y:
+        snap_parts.append(f"10Y {snap_t10y:.2f}%")
+    if snap_t30y:
+        snap_parts.append(f"30Y {snap_t30y:.2f}%")
     if snap_parts:
         lines.append("")
         lines.append("  ".join(snap_parts))
 
-    # Combined signal
     lines.append("")
     lines.append(signal_line)
-
-    # Trigger reminders
     lines.append("")
     lines.append("<i>觸發條件：TSI&gt;55 減倉 · CPI&gt;35 避險 · 雙高立即行動</i>")
-
-    # Dashboard link
     lines.append("")
     lines.append("🌐 <a href=\"https://gutinganthony.github.io/KIWI/\">查看完整 Dashboard</a>")
 
@@ -245,7 +172,6 @@ def main():
 
     os.chdir(PROJECT_ROOT)
 
-    # Load .env manually (no dotenv dependency needed)
     env_path = PROJECT_ROOT / ".env"
     if env_path.exists():
         for line in env_path.read_text().splitlines():
@@ -254,13 +180,14 @@ def main():
                 key, val = line.split("=", 1)
                 os.environ.setdefault(key.strip(), val.strip())
 
-    message = build_message()
+    logger.info(f"Loading dashboard data from {DOCS_INDEX}...")
+    data = load_dashboard_data()
+    logger.info(f"  CPI={data.get('cpi',{}).get('score')}  TSI={data.get('tsi',{}).get('score')}  AVI={data.get('avi',{}).get('score')}")
+
+    message = build_message(data)
 
     if args.dry_run:
-        # Convert HTML to plain text for terminal display
-        import re
-        plain = re.sub(r"<[^>]+>", "", message)
-        print(plain)
+        print(re.sub(r"<[^>]+>", "", message))
         return
 
     token = os.environ.get("TELEGRAM_BOT_TOKEN")
@@ -268,9 +195,7 @@ def main():
 
     if not token or not chat_id:
         print("Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID")
-        print("Set them in .env or environment variables")
         print("\nMessage preview:")
-        import re
         print(re.sub(r"<[^>]+>", "", message))
         return
 
