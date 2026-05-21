@@ -360,6 +360,11 @@ body {
 </style>
 </head>
 <body>
+<script>
+// [KIWI-DATA-START]
+var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","dimensions":{"valuation":{"pct":72,"emoji":"🟠"},"profitability":{"pct":34,"emoji":"🟢"},"macro":{"pct":52,"emoji":"🟡"},"rate":{"pct":65,"emoji":"🟠"},"credit":{"pct":12,"emoji":"🟢"},"momentum":{"pct":58,"emoji":"🟡"}}},"cpi":{"score":23.0,"level":"LOW","flash":false,"indicators":{"vix_term_structure":{"signal":22,"status":"normal"},"vix_spike":{"signal":38,"status":"watch"},"garch_vix_gap":{"signal":15,"status":"normal"},"credit_acceleration":{"signal":10,"status":"normal"},"breadth_divergence":{"signal":35,"status":"watch"},"distribution_days":{"signal":20,"status":"normal"},"rsi_divergence":{"signal":28,"status":"watch"},"ma_distance_reversal":{"signal":12,"status":"normal"},"yield_curve_steepening":{"signal":18,"status":"normal"},"momentum_collapse":{"signal":8,"status":"normal"},"yield_surge":{"signal":52,"status":"elevated"},"intraday_selloff":{"signal":14,"status":"normal"}}},"tsi":{"score":45.0,"bias":"CAUTIOUS","flash":false,"indicators":{"sox_qqq_divergence":{"signal":30,"status":"watch"},"memory_momentum":{"signal":25,"status":"watch"},"yield_shock":{"signal":72,"status":"elevated"},"yield_30y_stress":{"signal":78,"status":"critical"},"yield_curve_bear_steep":{"signal":58,"status":"elevated"},"ai_infra_rs":{"signal":22,"status":"normal"},"tech_breadth":{"signal":35,"status":"watch"},"cloud_rs":{"signal":18,"status":"normal"},"vix_tech_correlation":{"signal":48,"status":"watch"}}},"market":{"sp500":5300.0,"vix":19.0,"t10y":4.55,"t30y":5.12,"cape":41.5,"oil":0.0},"alert":{"show":true,"level":"caution","title_en":"Tech Sector Caution — TSI CAUTIOUS","title_zh":"科技板塊謹慎 — TSI CAUTIOUS","desc_en":"TSI = 45 (CAUTIOUS), CPI = 23. Elevated stress indicators. Monitor daily.","desc_zh":"TSI = 45（CAUTIOUS），CPI = 23。壓力指標升高，請每日追蹤。"}};
+// [KIWI-DATA-END]
+</script>
 <div class="container">
 
   <!-- ── Header ── -->
@@ -980,24 +985,213 @@ body {
   }
   if (currentLang === 'zh') applyLang('zh');
 
-  /* ── Animate Rings ── */
-  var rings = [
-    { id: 'avi-ring', score: 4.5, max: 10 },
-    { id: 'cpi-ring', score: 23,  max: 100 },
-    { id: 'tsi-ring', score: 45,  max: 100 },
-  ];
-  var circ = 2 * Math.PI * 50; // r=50 → 314.16
+  /* ── renderDashboard: populate everything from KIWI_DATA ── */
+  function renderDashboard(data) {
+    if (!data) return;
+    var circ = 2 * Math.PI * 50; // r=50 → 314.16
 
-  setTimeout(function() {
-    rings.forEach(function(r) {
-      var el = document.getElementById(r.id);
-      if (!el) return;
-      var pct = r.score / r.max;
-      var offset = circ - pct * circ;
-      el.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.34,1.56,0.64,1)';
-      el.style.strokeDashoffset = offset;
-    });
-  }, 150);
+    // ── Updated date ──────────────────────────────────────────────────────
+    var upd = document.getElementById('updatedLabel');
+    if (upd && data.updated) {
+      upd.textContent = 'Updated: ' + data.updated;
+    }
+
+    // ── Alert bar ─────────────────────────────────────────────────────────
+    var alertBar = document.getElementById('alertBar');
+    if (alertBar && data.alert) {
+      var a = data.alert;
+      alertBar.className = 'alert-bar' + (a.show ? ' show ' + a.level : '');
+      var titleEl = alertBar.querySelector('.alert-title');
+      var descEl  = alertBar.querySelector('.alert-desc');
+      if (titleEl) titleEl.textContent = a.title_en || '';
+      if (descEl)  descEl.textContent  = a.desc_en  || '';
+    }
+
+    // ── Ring gauges ───────────────────────────────────────────────────────
+    var rings = [
+      { ringId: 'avi-ring', scoreId: 'avi-score', score: data.avi && data.avi.score, max: 10  },
+      { ringId: 'cpi-ring', scoreId: 'cpi-score', score: data.cpi && data.cpi.score, max: 100 },
+      { ringId: 'tsi-ring', scoreId: 'tsi-score', score: data.tsi && data.tsi.score, max: 100 },
+    ];
+
+    // Score → ring color
+    function ringColor(score, max) {
+      var pct = score / max;
+      if (pct >= 0.7) return '#ef5350';
+      if (pct >= 0.5) return '#ff9800';
+      if (pct >= 0.35) return '#f7c948';
+      return '#26a69a';
+    }
+
+    setTimeout(function() {
+      rings.forEach(function(r) {
+        if (r.score === undefined || r.score === null) return;
+        var ringEl  = document.getElementById(r.ringId);
+        var scoreEl = document.getElementById(r.scoreId);
+        var pct = r.score / r.max;
+        var offset = circ - pct * circ;
+        if (ringEl) {
+          var col = ringColor(r.score, r.max);
+          ringEl.style.stroke = col;
+          ringEl.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.34,1.56,0.64,1)';
+          ringEl.style.strokeDashoffset = offset;
+        }
+        if (scoreEl) {
+          scoreEl.textContent = r.max === 10
+            ? r.score.toFixed(1)
+            : Math.round(r.score);
+        }
+      });
+    }, 150);
+
+    // ── AVI level badge ───────────────────────────────────────────────────
+    if (data.avi) {
+      var aviLvlEl = document.querySelector('.gauge-card .gc-level[data-i18n="avi_level"]');
+      if (aviLvlEl) {
+        var lvl = data.avi.level || '';
+        aviLvlEl.textContent = lvl;
+        aviLvlEl.className = 'gc-level lvl-' + lvl.toLowerCase();
+      }
+      // AVI breakdown score badge
+      var aviBadge = document.querySelector('.breakdown-score-badge[style*="f7c948"]');
+      if (aviBadge) aviBadge.textContent = (data.avi.score || 0).toFixed(1) + ' / 10';
+    }
+
+    // ── CPI level badge ───────────────────────────────────────────────────
+    if (data.cpi) {
+      var cpiLvlEl = document.querySelector('.gauge-card .gc-level[data-i18n="cpi_level"]');
+      if (cpiLvlEl) {
+        var cl = data.cpi.level || 'LOW';
+        cpiLvlEl.textContent = cl;
+        cpiLvlEl.className = 'gc-level lvl-' + cl.toLowerCase();
+      }
+      // CPI score badge in breakdown header
+      var cpiBadge = document.querySelector('.breakdown-score-badge[style*="green"]');
+      if (cpiBadge) cpiBadge.textContent = Math.round(data.cpi.score) + ' / 100';
+    }
+
+    // ── TSI level badge ───────────────────────────────────────────────────
+    if (data.tsi) {
+      var tsiLvlEl = document.querySelector('.gauge-card .gc-level[data-i18n="tsi_level"]');
+      if (tsiLvlEl) {
+        var tl = data.tsi.bias || 'NEUTRAL';
+        var tlLower = tl.toLowerCase();
+        tsiLvlEl.textContent = tl;
+        tsiLvlEl.className = 'gc-level lvl-' + (tlLower === 'bearish' ? 'critical'
+          : tlLower === 'cautious' ? 'cautious'
+          : tlLower === 'bullish' ? 'low' : 'elevated');
+      }
+      // TSI score badge in breakdown header
+      var tsiBadge = document.querySelector('.breakdown-score-badge[style*="orange"]');
+      if (tsiBadge) tsiBadge.textContent = Math.round(data.tsi.score) + ' / 100';
+    }
+
+    // ── AVI dimension bars ────────────────────────────────────────────────
+    if (data.avi && data.avi.dimensions) {
+      var dimOrder = ['valuation','profitability','macro','rate','credit','momentum'];
+      var dimRows  = document.querySelectorAll('.dim-row');
+      dimOrder.forEach(function(key, idx) {
+        var row = dimRows[idx];
+        if (!row) return;
+        var d = data.avi.dimensions[key];
+        if (!d) return;
+        var bar    = row.querySelector('.ind-bar-fill');
+        var pctEl  = row.querySelector('.dim-pct');
+        var emojiEl= row.querySelector('.dim-emoji');
+        var col    = d.pct >= 75 ? 'var(--red)' : d.pct >= 60 ? 'var(--orange)' : d.pct >= 40 ? 'var(--yellow)' : 'var(--green)';
+        if (bar)    { bar.style.width = d.pct + '%'; bar.style.background = col; }
+        if (pctEl)  { pctEl.textContent = d.pct + '%'; pctEl.style.color = col; }
+        if (emojiEl){ emojiEl.textContent = d.emoji || ''; }
+      });
+    }
+
+    // ── CPI indicator bars ────────────────────────────────────────────────
+    var STATUS_COLOR = {
+      normal:   'var(--green)',
+      watch:    'var(--yellow)',
+      elevated: 'var(--orange)',
+      critical: 'var(--red)',
+    };
+    var STATUS_CLASS = {
+      normal:   's-normal',
+      watch:    's-watch',
+      elevated: 's-elevated',
+      critical: 's-critical',
+    };
+    function updateIndicatorRows(containerId, indicators, keyOrder) {
+      var container = document.getElementById(containerId);
+      if (!container) return;
+      var rows = container.querySelectorAll('.ind-row');
+      keyOrder.forEach(function(key, idx) {
+        var row = rows[idx];
+        if (!row) return;
+        var ind = indicators[key];
+        if (!ind) return;
+        var bar    = row.querySelector('.ind-bar-fill');
+        var statusEl = row.querySelector('[class^="ind-status"]');
+        var sig = Math.round(ind.signal);
+        var col = STATUS_COLOR[ind.status] || 'var(--green)';
+        if (bar) { bar.style.width = sig + '%'; bar.style.background = col; }
+        if (statusEl) {
+          statusEl.className = 'ind-status ' + (STATUS_CLASS[ind.status] || 's-normal');
+          statusEl.textContent = ind.status.toUpperCase();
+        }
+      });
+    }
+
+    if (data.cpi && data.cpi.indicators) {
+      updateIndicatorRows('cpi-indicators', data.cpi.indicators, [
+        'vix_term_structure','vix_spike','garch_vix_gap','credit_acceleration',
+        'breadth_divergence','distribution_days','rsi_divergence','ma_distance_reversal',
+        'yield_curve_steepening','momentum_collapse','yield_surge','intraday_selloff',
+      ]);
+    }
+
+    if (data.tsi && data.tsi.indicators) {
+      updateIndicatorRows('tsi-indicators', data.tsi.indicators, [
+        'sox_qqq_divergence','memory_momentum','yield_shock','yield_30y_stress',
+        'yield_curve_bear_steep','ai_infra_rs','tech_breadth','cloud_rs',
+        'vix_tech_correlation',
+      ]);
+    }
+
+    // ── Market snapshot values ────────────────────────────────────────────
+    if (data.market) {
+      var m = data.market;
+      var mktGrid = document.querySelector('.signal-card .signal-card, .signal-card');
+      // Find the market snapshot card by section title text
+      var cards = document.querySelectorAll('.signal-card');
+      var snapCard = null;
+      for (var i = 0; i < cards.length; i++) {
+        var titleEl2 = cards[i].querySelector('[data-i18n="market_snapshot"]');
+        if (titleEl2) { snapCard = cards[i]; break; }
+      }
+      if (snapCard) {
+        var vals = snapCard.querySelectorAll('[style*="font-size:18px"]');
+        var snapValues = [
+          m.sp500   ? (m.sp500 >= 1000 ? Math.round(m.sp500).toLocaleString() : m.sp500) : null,
+          m.cape    ? m.cape.toFixed(1) : null,
+          m.vix     ? '~' + m.vix.toFixed(0) : null,
+          m.t10y    ? m.t10y.toFixed(2) + '%' : null,
+          m.t30y    ? m.t30y.toFixed(2) + '%' : null,
+          m.oil > 0 ? '$' + Math.round(m.oil)  : null,
+        ];
+        vals.forEach(function(el, idx) {
+          if (snapValues[idx] !== null) el.textContent = snapValues[idx];
+        });
+        // Also update the section title date
+        var snapTitle = snapCard.querySelector('[data-i18n="market_snapshot"]');
+        if (snapTitle && data.updated) {
+          snapTitle.textContent = 'Market Snapshot — ' + data.updated;
+        }
+      }
+    }
+  }
+
+  // Run renderDashboard on load
+  if (typeof KIWI_DATA !== 'undefined') {
+    renderDashboard(KIWI_DATA);
+  }
 
 })();
 </script>
