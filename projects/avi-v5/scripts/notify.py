@@ -121,22 +121,27 @@ def level_emoji(score, system):
     return "⚪"
 
 
-def fetch_market_snapshot():
-    """Fetch quick market snapshot from yfinance (no API key needed)."""
-    snap = {"sp500": None, "vix": None, "t10y": None, "t30y": None}
+def _yf_last_close(ticker):
+    """Fetch last close for a single ticker, return float or None."""
     try:
         import yfinance as yf
-        tickers = yf.download(
-            ["^GSPC", "^VIX", "^TNX", "^TYX"],
-            period="2d", auto_adjust=True, progress=False
-        )
-        closes = tickers["Close"].iloc[-1]
-        snap["sp500"] = float(closes.get("^GSPC", 0) or 0) or None
-        snap["vix"]   = float(closes.get("^VIX",  0) or 0) or None
-        snap["t10y"]  = float(closes.get("^TNX",  0) or 0) or None  # ^TNX is in %
-        snap["t30y"]  = float(closes.get("^TYX",  0) or 0) or None  # ^TYX is in %
-    except Exception as e:
-        logger.warning(f"Market snapshot failed: {e}")
+        df = yf.download(ticker, period="2d", auto_adjust=True, progress=False)
+        if df.empty:
+            return None
+        val = float(df["Close"].iloc[-1])
+        return val if val == val else None  # NaN check
+    except Exception:
+        return None
+
+
+def fetch_market_snapshot():
+    """Fetch quick market snapshot from yfinance (no API key needed)."""
+    snap = {
+        "sp500": _yf_last_close("^GSPC"),
+        "vix":   _yf_last_close("^VIX"),
+        "t10y":  _yf_last_close("^TNX"),
+        "t30y":  _yf_last_close("^TYX"),
+    }
     return snap
 
 
