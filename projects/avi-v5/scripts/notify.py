@@ -50,7 +50,7 @@ def load_dashboard_data():
         raise FileNotFoundError(f"Dashboard not found: {DOCS_INDEX}")
     html = DOCS_INDEX.read_text(encoding="utf-8")
     match = re.search(
-        r"//\s*\[KIWI-DATA-START\].*?const KIWI_DATA\s*=\s*(\{.*?\});\s*//\s*\[KIWI-DATA-END\]",
+        r"//\s*\[KIWI-DATA-START\].*?(?:var|const|let)\s+KIWI_DATA\s*=\s*(\{.*?\});\s*//\s*\[KIWI-DATA-END\]",
         html, re.DOTALL
     )
     if not match:
