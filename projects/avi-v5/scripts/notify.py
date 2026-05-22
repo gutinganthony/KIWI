@@ -61,9 +61,13 @@ def send_line_broadcast(token, message):
         "Content-Type": "application/json",
         "Authorization": f"Bearer {token}",
     })
-    with urllib.request.urlopen(req) as resp:
-        body = resp.read()
-        return json.loads(body) if body else {"ok": True}
+    try:
+        with urllib.request.urlopen(req) as resp:
+            body = resp.read()
+            return json.loads(body) if body else {"ok": True}
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"LINE HTTP {e.code}: {error_body}") from e
 
 
 def load_dashboard_data():
