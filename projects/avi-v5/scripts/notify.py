@@ -1,16 +1,23 @@
 #!/usr/bin/env python3
-"""Daily market alert — reads pre-computed data from docs/index.html and sends via Telegram.
+"""Daily market alert — reads pre-computed data from docs/index.html and sends via Telegram + LINE.
 
 Data source: KIWI_DATA JSON embedded in docs/index.html (written by update_dashboard.py).
-This guarantees Telegram and Dashboard always show the same numbers.
+This guarantees both channels always show the same numbers.
 
 Setup:
-  1. Telegram: message @BotFather → /newbot → get TOKEN
-  2. Telegram: message @userinfobot → get your CHAT_ID
-  3. Set env vars: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
+  Telegram:
+    1. message @BotFather → /newbot → get TOKEN
+    2. message @userinfobot → get your CHAT_ID
+    3. Set env vars: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
+
+  LINE:
+    1. https://developers.line.biz/ → Create provider → Create Messaging API channel
+    2. Channel settings → Messaging API → Issue Channel access token
+    3. Set env var: LINE_CHANNEL_ACCESS_TOKEN
+    4. Friends add your LINE Official Account → they receive broadcasts automatically
 
 Usage:
-  python3 scripts/notify.py              # Send alert now
+  python3 scripts/notify.py              # Send to all configured channels
   python3 scripts/notify.py --dry-run    # Print without sending
 """
 
@@ -32,7 +39,7 @@ logger = logging.getLogger("notify")
 
 
 def send_telegram(token, chat_id, message):
-    """Send message via Telegram Bot API (no external library needed)."""
+    """Send HTML-formatted message via Telegram Bot API."""
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     payload = json.dumps({
         "chat_id": chat_id,
@@ -42,6 +49,21 @@ def send_telegram(token, chat_id, message):
     req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
     with urllib.request.urlopen(req) as resp:
         return json.loads(resp.read())
+
+
+def send_line_broadcast(token, message):
+    """Broadcast plain-text message to all LINE Official Account followers."""
+    url = "https://api.line.me/v2/bot/message/broadcast"
+    payload = json.dumps({
+        "messages": [{"type": "text", "text": message}]
+    }).encode("utf-8")
+    req = urllib.request.Request(url, data=payload, headers={
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
+    })
+    with urllib.request.urlopen(req) as resp:
+        body = resp.read()
+        return json.loads(body) if body else {"ok": True}
 
 
 def load_dashboard_data():
@@ -80,7 +102,7 @@ def level_emoji(score, system):
 
 
 def build_message(data):
-    """Build the daily alert message from dashboard data."""
+    """Build daily alert. Returns (html_message, plain_message)."""
     today = datetime.now().strftime("%Y-%m-%d %a")
 
     cpi_score = data.get("cpi", {}).get("score")
@@ -102,7 +124,6 @@ def build_message(data):
     tsi_val = tsi_score or 0
     avi_val = avi_score or 0
 
-    # Flash alerts
     alerts = []
     if cpi_flash:
         alerts.append("CPI Flash Alert ⚡")
@@ -110,63 +131,79 @@ def build_message(data):
         tsi_flash_reason = data.get("tsi", {}).get("flash_reason", "")
         alerts.append(f"TSI Flash: {tsi_flash_reason}" if tsi_flash_reason else "TSI Flash Alert ⚡")
 
-    # Combined signal
     if cpi_val >= 35 and tsi_val >= 55:
-        signal_line = "🔴 <b>雙重壓力</b>：積極減倉 + 建立避險"
+        signal_html  = "🔴 <b>雙重壓力</b>：積極減倉 + 建立避險"
+        signal_plain = "🔴 雙重壓力：積極減倉 + 建立避險"
     elif cpi_val >= 35:
-        signal_line = "🟠 <b>崩盤概率升高</b>：檢查持倉，準備避險"
+        signal_html  = "🟠 <b>崩盤概率升高</b>：檢查持倉，準備避險"
+        signal_plain = "🟠 崩盤概率升高：檢查持倉，準備避險"
     elif tsi_val >= 60:
-        signal_line = "🔴 <b>科技壓力高</b>：減科技曝險"
+        signal_html  = "🔴 <b>科技壓力高</b>：減科技曝險"
+        signal_plain = "🔴 科技壓力高：減科技曝險"
     elif tsi_val >= 45 or avi_val >= 6:
-        signal_line = "🟡 <b>謹慎持有</b>：不追高，留意觸發條件"
+        signal_html  = "🟡 <b>謹慎持有</b>：不追高，留意觸發條件"
+        signal_plain = "🟡 謹慎持有：不追高，留意觸發條件"
     elif cpi_val >= 20:
-        signal_line = "🟡 <b>留意</b>：掃一眼哪個指標在升溫"
+        signal_html  = "🟡 <b>留意</b>：掃一眼哪個指標在升溫"
+        signal_plain = "🟡 留意：掃一眼哪個指標在升溫"
     else:
-        signal_line = "🟢 <b>正常</b>：照常操作"
-
-    lines = [
-        f"<b>📊 每日市場體溫</b>  <i>{today}</i>",
-        "─────────────────",
-    ]
+        signal_html  = "🟢 <b>正常</b>：照常操作"
+        signal_plain = "🟢 正常：照常操作"
 
     cpi_d = f"{cpi_val:.0f}" if cpi_score is not None else "──"
     tsi_d = f"{tsi_val:.0f}" if tsi_score is not None else "──"
     avi_d = f"{avi_val:.1f}" if avi_score is not None else "──"
 
-    lines.append(f"{level_emoji(cpi_score, 'cpi')} <b>CPI</b>  {cpi_d}/100  <i>{cpi_level}</i>")
-    lines.append(f"{level_emoji(tsi_score, 'tsi')} <b>TSI</b>  {tsi_d}/100  <i>{tsi_bias}</i>")
-    lines.append(f"{level_emoji(avi_score, 'avi')} <b>AVI</b>  {avi_d}/10")
-
-    if alerts:
-        lines.append("")
-        for a in alerts:
-            lines.append(f"⚡ {a}")
-
     snap_parts = []
-    if snap_sp500:
-        snap_parts.append(f"S&amp;P {snap_sp500:,.0f}")
-    if snap_vix:
-        snap_parts.append(f"VIX {snap_vix:.1f}")
-    if snap_t10y:
-        snap_parts.append(f"10Y {snap_t10y:.2f}%")
-    if snap_t30y:
-        snap_parts.append(f"30Y {snap_t30y:.2f}%")
-    if snap_parts:
-        lines.append("")
-        lines.append("  ".join(snap_parts))
+    if snap_sp500: snap_parts.append(f"S&P {snap_sp500:,.0f}")
+    if snap_vix:   snap_parts.append(f"VIX {snap_vix:.1f}")
+    if snap_t10y:  snap_parts.append(f"10Y {snap_t10y:.2f}%")
+    if snap_t30y:  snap_parts.append(f"30Y {snap_t30y:.2f}%")
+    snap_line = "  ".join(snap_parts)
 
-    lines.append("")
-    lines.append(signal_line)
-    lines.append("")
-    lines.append("<i>觸發條件：TSI&gt;55 減倉 · CPI&gt;35 避險 · 雙高立即行動</i>")
-    lines.append("")
-    lines.append("🌐 <a href=\"https://gutinganthony.github.io/KIWI/\">查看完整 Dashboard</a>")
+    # ── Telegram (HTML) ──
+    html_lines = [
+        f"<b>📊 每日市場體溫</b>  <i>{today}</i>",
+        "─────────────────",
+        f"{level_emoji(cpi_score,'cpi')} <b>CPI</b>  {cpi_d}/100  <i>{cpi_level}</i>",
+        f"{level_emoji(tsi_score,'tsi')} <b>TSI</b>  {tsi_d}/100  <i>{tsi_bias}</i>",
+        f"{level_emoji(avi_score,'avi')} <b>AVI</b>  {avi_d}/10",
+    ]
+    if alerts:
+        html_lines.append("")
+        for a in alerts:
+            html_lines.append(f"⚡ {a}")
+    if snap_line:
+        html_lines += ["", snap_line.replace("S&P", "S&amp;P")]
+    html_lines += ["", signal_html, "",
+                   "<i>觸發條件：TSI&gt;55 減倉 · CPI&gt;35 避險 · 雙高立即行動</i>",
+                   "",
+                   '🌐 <a href="https://gutinganthony.github.io/KIWI/">查看完整 Dashboard</a>']
 
-    return "\n".join(lines)
+    # ── LINE (plain text) ──
+    plain_lines = [
+        f"📊 每日市場體溫  {today}",
+        "─────────────────",
+        f"{level_emoji(cpi_score,'cpi')} CPI  {cpi_d}/100  {cpi_level}",
+        f"{level_emoji(tsi_score,'tsi')} TSI  {tsi_d}/100  {tsi_bias}",
+        f"{level_emoji(avi_score,'avi')} AVI  {avi_d}/10",
+    ]
+    if alerts:
+        plain_lines.append("")
+        for a in alerts:
+            plain_lines.append(f"⚡ {a}")
+    if snap_line:
+        plain_lines += ["", snap_line]
+    plain_lines += ["", signal_plain, "",
+                    "觸發條件：TSI>55 減倉 · CPI>35 避險 · 雙高立即行動",
+                    "",
+                    "🌐 查看完整 Dashboard：https://gutinganthony.github.io/KIWI/"]
+
+    return "\n".join(html_lines), "\n".join(plain_lines)
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Daily market alert via Telegram")
+    parser = argparse.ArgumentParser(description="Daily market alert via Telegram + LINE")
     parser.add_argument("--dry-run", action="store_true", help="Print message without sending")
     args = parser.parse_args()
 
@@ -184,27 +221,40 @@ def main():
     data = load_dashboard_data()
     logger.info(f"  CPI={data.get('cpi',{}).get('score')}  TSI={data.get('tsi',{}).get('score')}  AVI={data.get('avi',{}).get('score')}")
 
-    message = build_message(data)
+    html_msg, plain_msg = build_message(data)
 
     if args.dry_run:
-        print(re.sub(r"<[^>]+>", "", message))
+        print("── Telegram ──")
+        print(re.sub(r"<[^>]+>", "", html_msg))
+        print("\n── LINE ──")
+        print(plain_msg)
         return
 
-    token = os.environ.get("TELEGRAM_BOT_TOKEN")
-    chat_id = os.environ.get("TELEGRAM_CHAT_ID")
-
-    if not token or not chat_id:
-        print("Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID")
-        print("\nMessage preview:")
-        print(re.sub(r"<[^>]+>", "", message))
-        return
-
-    logger.info("Sending Telegram alert...")
-    result = send_telegram(token, chat_id, message)
-    if result.get("ok"):
-        logger.info("✅ Alert sent successfully!")
+    # ── Telegram ──
+    tg_token  = os.environ.get("TELEGRAM_BOT_TOKEN")
+    tg_chatid = os.environ.get("TELEGRAM_CHAT_ID")
+    if tg_token and tg_chatid:
+        try:
+            result = send_telegram(tg_token, tg_chatid, html_msg)
+            if result.get("ok"):
+                logger.info("✅ Telegram sent")
+            else:
+                logger.error(f"Telegram failed: {result}")
+        except Exception as e:
+            logger.error(f"Telegram error: {e}")
     else:
-        logger.error(f"Failed: {result}")
+        logger.warning("Telegram skipped (no token/chat_id)")
+
+    # ── LINE ──
+    line_token = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN")
+    if line_token:
+        try:
+            send_line_broadcast(line_token, plain_msg)
+            logger.info("✅ LINE broadcast sent")
+        except Exception as e:
+            logger.error(f"LINE error: {e}")
+    else:
+        logger.warning("LINE skipped (no LINE_CHANNEL_ACCESS_TOKEN)")
 
 
 if __name__ == "__main__":
