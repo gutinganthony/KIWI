@@ -41,7 +41,7 @@ DOCS_HTML = os.path.abspath(
 FALLBACK = {
     "avi_score": 4.5,
     "avi_level": "ELEVATED",
-    "cpi_score": 23.0,
+    "cri_score": 23.0,
     "tsi_score": 45.0,
     "sp500": 5300.0,
     "vix": 19.0,
@@ -393,14 +393,14 @@ def build_alert(tsi_score, cpi_score, tsi_bias, avi_level_str):
     if tsi_score >= 65 or cpi_score >= 50:
         level = "danger"
         show = True
-        title_en = f"High Risk Alert — TSI {tsi_bias} / CPI Elevated"
-        title_zh = f"高風險警告 — TSI {tsi_bias} / CPI 升高"
+        title_en = f"High Risk Alert — TSI {tsi_bias} / CRI Elevated"
+        title_zh = f"高風險警告 — TSI {tsi_bias} / CRI 升高"
         desc_en = (
-            f"TSI = {tsi_score:.0f} ({tsi_bias}), CPI = {cpi_score:.0f}. "
+            f"TSI = {tsi_score:.0f} ({tsi_bias}), CRI = {cpi_score:.0f}. "
             "Multiple stress signals elevated. Consider risk reduction."
         )
         desc_zh = (
-            f"TSI = {tsi_score:.0f}（{tsi_bias}），CPI = {cpi_score:.0f}。"
+            f"TSI = {tsi_score:.0f}（{tsi_bias}），CRI = {cpi_score:.0f}。"
             "多項壓力指標升高，考慮降低風險敞口。"
         )
     elif tsi_score >= 45 or cpi_score >= 35:
@@ -409,11 +409,11 @@ def build_alert(tsi_score, cpi_score, tsi_bias, avi_level_str):
         title_en = f"Tech Sector Caution — TSI {tsi_bias}"
         title_zh = f"科技板塊謹慎 — TSI {tsi_bias}"
         desc_en = (
-            f"TSI = {tsi_score:.0f} ({tsi_bias}), CPI = {cpi_score:.0f}. "
+            f"TSI = {tsi_score:.0f} ({tsi_bias}), CRI = {cpi_score:.0f}. "
             "Elevated stress indicators. Monitor daily."
         )
         desc_zh = (
-            f"TSI = {tsi_score:.0f}（{tsi_bias}），CPI = {cpi_score:.0f}。"
+            f"TSI = {tsi_score:.0f}（{tsi_bias}），CRI = {cpi_score:.0f}。"
             "壓力指標升高，請每日追蹤。"
         )
     else:
@@ -512,11 +512,11 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
     avi_score = compute_avi_score(dims)
     avi_lvl   = avi_level(avi_score)
 
-    # ── CPI ──────────────────────────────────────────────────────────────────
-    cpi_score = cpi_result.score if cpi_result else FALLBACK["cpi_score"]
-    cpi_lvl   = cpi_result.level if cpi_result else "LOW"
-    cpi_flash = cpi_result.flash_alert.triggered if cpi_result else False
-    cpi_inds  = build_cpi_indicators(cpi_result)
+    # ── CRI ──────────────────────────────────────────────────────────────────
+    cri_score = cpi_result.score if cpi_result else FALLBACK["cri_score"]
+    cri_lvl   = cpi_result.level if cpi_result else "LOW"
+    cri_flash = cpi_result.flash_alert.triggered if cpi_result else False
+    cri_inds  = build_cpi_indicators(cpi_result)
 
     # ── TSI ──────────────────────────────────────────────────────────────────
     tsi_score = tsi_result.score if tsi_result else FALLBACK["tsi_score"]
@@ -546,7 +546,7 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
     cape  = cape_val if cape_val else FALLBACK["cape"]
 
     # ── Alert ─────────────────────────────────────────────────────────────────
-    alert = build_alert(tsi_score, cpi_score, tsi_bias, avi_lvl)
+    alert = build_alert(tsi_score, cri_score, tsi_bias, avi_lvl)
 
     payload = {
         "updated": today,
@@ -555,11 +555,11 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
             "level":      avi_lvl,
             "dimensions": dims,
         },
-        "cpi": {
-            "score":      round(cpi_score, 1),
-            "level":      cpi_lvl,
-            "flash":      cpi_flash,
-            "indicators": cpi_inds,
+        "cri": {
+            "score":      round(cri_score, 1),
+            "level":      cri_lvl,
+            "flash":      cri_flash,
+            "indicators": cri_inds,
         },
         "tsi": {
             "score":      round(tsi_score, 1),
@@ -644,7 +644,7 @@ def main():
 
     log.info("=== Computed Payload ===")
     log.info(f"  AVI  : {payload['avi']['score']:.2f} / {payload['avi']['level']}")
-    log.info(f"  CPI  : {payload['cpi']['score']:.1f} / {payload['cpi']['level']}")
+    log.info(f"  CRI  : {payload['cri']['score']:.1f} / {payload['cri']['level']}")
     log.info(f"  TSI  : {payload['tsi']['score']:.1f} / {payload['tsi']['bias']}")
     log.info(f"  SPX  : {payload['market']['sp500']}")
     log.info(f"  VIX  : {payload['market']['vix']}")

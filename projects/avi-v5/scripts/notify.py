@@ -87,7 +87,7 @@ def load_dashboard_data():
 def level_emoji(score, system):
     if score is None:
         return "⚪"
-    if system == "cpi":
+    if system == "cri":
         if score >= 50: return "🔴"
         if score >= 35: return "🟠"
         if score >= 20: return "🟡"
@@ -109,9 +109,9 @@ def build_message(data):
     """Build daily alert. Returns (html_message, plain_message)."""
     today = datetime.now().strftime("%Y-%m-%d %a")
 
-    cpi_score = data.get("cpi", {}).get("score")
-    cpi_level = data.get("cpi", {}).get("level", "──")
-    cpi_flash = data.get("cpi", {}).get("flash", False)
+    cri_score = data.get("cri", {}).get("score")
+    cri_level = data.get("cri", {}).get("level", "──")
+    cri_flash = data.get("cri", {}).get("flash", False)
 
     tsi_score = data.get("tsi", {}).get("score")
     tsi_bias  = data.get("tsi", {}).get("bias", "──")
@@ -124,21 +124,21 @@ def build_message(data):
     snap_t10y  = data.get("market", {}).get("t10y")
     snap_t30y  = data.get("market", {}).get("t30y")
 
-    cpi_val = cpi_score or 0
+    cri_val = cri_score or 0
     tsi_val = tsi_score or 0
     avi_val = avi_score or 0
 
     alerts = []
-    if cpi_flash:
-        alerts.append("CPI Flash Alert ⚡")
+    if cri_flash:
+        alerts.append("CRI Flash Alert ⚡")
     if tsi_flash:
         tsi_flash_reason = data.get("tsi", {}).get("flash_reason", "")
         alerts.append(f"TSI Flash: {tsi_flash_reason}" if tsi_flash_reason else "TSI Flash Alert ⚡")
 
-    if cpi_val >= 35 and tsi_val >= 55:
+    if cri_val >= 35 and tsi_val >= 55:
         signal_html  = "🔴 <b>雙重壓力</b>：積極減倉 + 建立避險"
         signal_plain = "🔴 雙重壓力：積極減倉 + 建立避險"
-    elif cpi_val >= 35:
+    elif cri_val >= 35:
         signal_html  = "🟠 <b>崩盤概率升高</b>：檢查持倉，準備避險"
         signal_plain = "🟠 崩盤概率升高：檢查持倉，準備避險"
     elif tsi_val >= 60:
@@ -147,14 +147,14 @@ def build_message(data):
     elif tsi_val >= 45 or avi_val >= 6:
         signal_html  = "🟡 <b>謹慎持有</b>：不追高，留意觸發條件"
         signal_plain = "🟡 謹慎持有：不追高，留意觸發條件"
-    elif cpi_val >= 20:
+    elif cri_val >= 20:
         signal_html  = "🟡 <b>留意</b>：掃一眼哪個指標在升溫"
         signal_plain = "🟡 留意：掃一眼哪個指標在升溫"
     else:
         signal_html  = "🟢 <b>正常</b>：照常操作"
         signal_plain = "🟢 正常：照常操作"
 
-    cpi_d = f"{cpi_val:.0f}" if cpi_score is not None else "──"
+    cri_d = f"{cri_val:.0f}" if cri_score is not None else "──"
     tsi_d = f"{tsi_val:.0f}" if tsi_score is not None else "──"
     avi_d = f"{avi_val:.1f}" if avi_score is not None else "──"
 
@@ -169,7 +169,7 @@ def build_message(data):
     html_lines = [
         f"<b>📊 每日市場體溫</b>  <i>{today}</i>",
         "─────────────────",
-        f"{level_emoji(cpi_score,'cpi')} <b>CPI</b>  {cpi_d}/100  <i>{cpi_level}</i>",
+        f"{level_emoji(cri_score,'cri')} <b>CRI</b>  {cri_d}/100  <i>{cri_level}</i>",
         f"{level_emoji(tsi_score,'tsi')} <b>TSI</b>  {tsi_d}/100  <i>{tsi_bias}</i>",
         f"{level_emoji(avi_score,'avi')} <b>AVI</b>  {avi_d}/10",
     ]
@@ -180,7 +180,7 @@ def build_message(data):
     if snap_line:
         html_lines += ["", snap_line.replace("S&P", "S&amp;P")]
     html_lines += ["", signal_html, "",
-                   "<i>觸發條件：TSI&gt;55 減倉 · CPI&gt;35 避險 · 雙高立即行動</i>",
+                   "<i>觸發條件：TSI&gt;55 減倉 · CRI&gt;35 避險 · 雙高立即行動</i>",
                    "",
                    '🌐 <a href="https://gutinganthony.github.io/KIWI/">查看完整 Dashboard</a>']
 
@@ -188,7 +188,7 @@ def build_message(data):
     plain_lines = [
         f"📊 每日市場體溫  {today}",
         "─────────────────",
-        f"{level_emoji(cpi_score,'cpi')} CPI  {cpi_d}/100  {cpi_level}",
+        f"{level_emoji(cri_score,'cri')} CRI  {cri_d}/100  {cri_level}",
         f"{level_emoji(tsi_score,'tsi')} TSI  {tsi_d}/100  {tsi_bias}",
         f"{level_emoji(avi_score,'avi')} AVI  {avi_d}/10",
     ]
@@ -199,7 +199,7 @@ def build_message(data):
     if snap_line:
         plain_lines += ["", snap_line]
     plain_lines += ["", signal_plain, "",
-                    "觸發條件：TSI>55 減倉 · CPI>35 避險 · 雙高立即行動",
+                    "觸發條件：TSI>55 減倉 · CRI>35 避險 · 雙高立即行動",
                     "",
                     "🌐 查看完整 Dashboard：https://gutinganthony.github.io/KIWI/"]
 
@@ -223,7 +223,7 @@ def main():
 
     logger.info(f"Loading dashboard data from {DOCS_INDEX}...")
     data = load_dashboard_data()
-    logger.info(f"  CPI={data.get('cpi',{}).get('score')}  TSI={data.get('tsi',{}).get('score')}  AVI={data.get('avi',{}).get('score')}")
+    logger.info(f"  CRI={data.get('cri',{}).get('score')}  TSI={data.get('tsi',{}).get('score')}  AVI={data.get('avi',{}).get('score')}")
 
     html_msg, plain_msg = build_message(data)
 
