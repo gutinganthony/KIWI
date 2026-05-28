@@ -38,16 +38,28 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger("notify")
 
 
-def send_telegram(token, chat_id, message):
-    """Send HTML-formatted message via Telegram Bot API."""
+def send_telegram(token, chat_id, message, retries=3):
+    """Send HTML-formatted message via Telegram Bot API, with retry."""
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     payload = json.dumps({
         "chat_id": chat_id,
         "text": message,
         "parse_mode": "HTML",
     }).encode("utf-8")
-    req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(req) as resp:
+    import time
+    for attempt in range(1, retries + 1):
+        try:
+            req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                return json.loads(resp.read())
+        except urllib.error.HTTPError as e:
+            body = e.read().decode("utf-8", errors="replace")
+            raise RuntimeError(f"Telegram HTTP {e.code}: {body}") from e
+        except Exception as e:
+            if attempt == retries:
+                raise
+            logger.warning(f"Telegram attempt {attempt} failed: {e}, retrying...")
+            time.sleep(2 ** attempt)
         return json.loads(resp.read())
 
 
@@ -234,6 +246,8 @@ def main():
         print(plain_msg)
         return
 
+    failures = []
+
     # ── Telegram ──
     tg_token  = os.environ.get("TELEGRAM_BOT_TOKEN")
     tg_chatid = os.environ.get("TELEGRAM_CHAT_ID")
@@ -243,22 +257,32 @@ def main():
             if result.get("ok"):
                 logger.info("✅ Telegram sent")
             else:
-                logger.error(f"Telegram failed: {result}")
+                logger.error(f"❌ Telegram API returned not-ok: {result}")
+                failures.append("telegram")
         except Exception as e:
-            logger.error(f"Telegram error: {e}")
+            logger.error(f"❌ Telegram failed: {e}")
+            failures.append("telegram")
     else:
-        logger.warning("Telegram skipped (no token/chat_id)")
+        logger.warning("Telegram skipped (TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not set)")
+        failures.append("telegram")
 
     # ── LINE ──
     line_token = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN")
     if line_token:
+        logger.info(f"LINE token (first 20 chars): {line_token[:20]}...")
         try:
             send_line_broadcast(line_token, plain_msg)
             logger.info("✅ LINE broadcast sent")
         except Exception as e:
-            logger.error(f"LINE error: {e}")
+            logger.error(f"❌ LINE failed: {e}")
+            failures.append("line")
     else:
-        logger.warning("LINE skipped (no LINE_CHANNEL_ACCESS_TOKEN)")
+        logger.warning("LINE skipped (LINE_CHANNEL_ACCESS_TOKEN not set)")
+        failures.append("line")
+
+    if failures:
+        logger.error(f"Failed channels: {', '.join(failures)}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
