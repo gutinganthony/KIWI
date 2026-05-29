@@ -357,7 +357,29 @@ body {
   .container { padding: 12px; }
   .header h1 { font-size: 15px; }
 }
+
+/* ── Taiwan Indicators ── */
+.tw-cards { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.tw-card { flex: 1; min-width: 200px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+.tw-card-label { font-size: 11px; color: var(--text2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.tw-card-value { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 6px; font-variant-numeric: tabular-nums; }
+.tw-card-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-bottom: 6px; }
+.tw-card-note { font-size: 10px; color: var(--text3); }
+.tw-badge-bullish { background: var(--green-bg); color: var(--green); }
+.tw-badge-bearish { background: var(--red-bg); color: var(--red); }
+.tw-badge-neutral { background: var(--bg3); color: var(--text2); }
+.tw-badge-high { background: var(--red-bg); color: var(--red); }
+.tw-badge-elevated { background: var(--orange-bg); color: var(--orange); }
+.tw-badge-normal { background: var(--green-bg); color: var(--green); }
+.tw-charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px; }
+@media (max-width: 680px) { .tw-charts-grid { grid-template-columns: 1fr; } }
+.tw-chart-block { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+.tw-chart-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.tw-chart-sub { font-size: 10px; color: var(--text3); margin-bottom: 10px; }
+.tw-chart-container { position: relative; height: 160px; }
+.tw-note { font-size: 10px; color: var(--text3); text-align: center; padding-top: 4px; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 <script>
@@ -836,6 +858,46 @@ var KIWI_DATA = {"updated":"2026-05-29","avi":{"score":5.58,"level":"ELEVATED","
     </div>
   </div>
 
+  <!-- ── Taiwan Indicators ── -->
+  <div class="section" id="tw-section" style="margin-top:24px">
+    <div class="section-head">
+      <div class="section-title" data-i18n="tw_title">🇹🇼 台股法人指標</div>
+      <div class="section-sub" data-i18n="tw_sub">外資期貨多空 · 融資餘額 · 近90日走勢</div>
+    </div>
+
+    <div class="tw-cards">
+      <div class="tw-card">
+        <div class="tw-card-label">外資台指期淨多空口數</div>
+        <div class="tw-card-value" id="tw-futures-val">—</div>
+        <div class="tw-card-badge tw-badge-neutral" id="tw-futures-badge">載入中</div>
+        <div class="tw-card-note">&gt;+10,000 = 偏多；&lt;−10,000 = 偏空</div>
+      </div>
+      <div class="tw-card">
+        <div class="tw-card-label">全市場融資餘額</div>
+        <div class="tw-card-value" id="tw-margin-val">—</div>
+        <div class="tw-card-badge tw-badge-neutral" id="tw-margin-badge">載入中</div>
+        <div class="tw-card-note">90日百分位 · 85%+ = 逆向過熱警訊</div>
+      </div>
+    </div>
+
+    <div class="tw-charts-grid">
+      <div class="tw-chart-block">
+        <div class="tw-chart-title">外資台指期淨多空口數 (口)</div>
+        <div class="tw-chart-sub">正值 = 淨多單；負值 = 淨空單 · 萬口以上為明確方向訊號</div>
+        <div class="tw-chart-container"><canvas id="futuresChart"></canvas></div>
+      </div>
+      <div class="tw-chart-block">
+        <div class="tw-chart-title">全市場融資餘額 (億元)</div>
+        <div class="tw-chart-sub">逆向指標：持續走高且達90日85%分位 = 過熱警訊</div>
+        <div class="tw-chart-container"><canvas id="marginChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="tw-note">
+      資料來源：台灣期貨交易所（TAIFEX）· 台灣證券交易所（TWSE）· 每交易日 08:00 自動更新
+    </div>
+  </div>
+
   <!-- ── Footer ── -->
   <div class="footer">
     <div data-i18n="footer_main">AVI Dashboard · CRI + TSI + AVI V5 · Personal research project — not financial advice</div>
@@ -1194,6 +1256,119 @@ var KIWI_DATA = {"updated":"2026-05-29","avi":{"score":5.58,"level":"ELEVATED","
   }
 
 })();
+
+  // ── Taiwan Indicators ──────────────────────────────────────────────────────
+  function fmtFutures(n) {
+    if (n === null || n === undefined) return '—';
+    return (n >= 0 ? '+' : '') + n.toLocaleString() + ' 口';
+  }
+  function fmtMargin(n) {
+    if (n === null || n === undefined) return '—';
+    return Math.round(n / 100000).toLocaleString() + ' 億';
+  }
+
+  function renderTaiwanCharts(data) {
+    document.getElementById('tw-futures-val').textContent = fmtFutures(data.futures_latest);
+    document.getElementById('tw-margin-val').textContent = fmtMargin(data.margin_latest);
+
+    var fBadge = document.getElementById('tw-futures-badge');
+    var sig = (data.futures_signal || 'NEUTRAL').toUpperCase();
+    var sigLabels = { BULLISH: '偏多 ▲', BEARISH: '偏空 ▼', NEUTRAL: '中性 —' };
+    fBadge.textContent = sigLabels[sig] || sig;
+    fBadge.className = 'tw-card-badge tw-badge-' + sig.toLowerCase();
+
+    var mBadge = document.getElementById('tw-margin-badge');
+    var lvl = (data.margin_level || 'NORMAL').toUpperCase();
+    var lvlLabels = { HIGH: '⚠ 過高 ' + data.margin_pct + '%', ELEVATED: '偏高 ' + data.margin_pct + '%', NORMAL: '正常 ' + data.margin_pct + '%' };
+    mBadge.textContent = lvlLabels[lvl] || lvl;
+    mBadge.className = 'tw-card-badge tw-badge-' + lvl.toLowerCase();
+
+    var chartOpts = {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: { backgroundColor: '#2a2e39', borderColor: '#363a45', borderWidth: 1,
+                   titleColor: '#d1d4dc', bodyColor: '#787b86' }
+      },
+      scales: {
+        x: { ticks: { color: '#787b86', maxTicksLimit: 8, font: { size: 10 }, maxRotation: 0 },
+             grid: { color: 'rgba(54,58,69,0.5)' } },
+        y: { ticks: { color: '#787b86', font: { size: 10 } },
+             grid: { color: 'rgba(54,58,69,0.5)' } }
+      }
+    };
+
+    var labels = (data.dates || []).map(function(d) { return d.slice(5); });
+    var fData = data.futures_net || [];
+    var mData = data.margin_balance || [];
+
+    if (typeof Chart !== 'undefined') {
+      // Futures bar chart
+      var fCtx = document.getElementById('futuresChart');
+      if (fCtx && fData.length > 0) {
+        new Chart(fCtx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{ data: fData,
+              backgroundColor: fData.map(function(v) { return (v||0) >= 0 ? 'rgba(38,166,154,0.75)' : 'rgba(239,83,80,0.75)'; }),
+              borderColor: fData.map(function(v) { return (v||0) >= 0 ? '#26a69a' : '#ef5350'; }),
+              borderWidth: 1 }]
+          },
+          options: Object.assign({}, chartOpts, {
+            scales: Object.assign({}, chartOpts.scales, {
+              y: Object.assign({}, chartOpts.scales.y, {
+                ticks: Object.assign({}, chartOpts.scales.y.ticks, {
+                  callback: function(v) { return (v/1000).toFixed(0) + 'k'; }
+                })
+              })
+            })
+          })
+        });
+      }
+
+      // Margin line chart
+      var mCtx = document.getElementById('marginChart');
+      if (mCtx && mData.length > 0) {
+        new Chart(mCtx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{ data: mData.map(function(v) { return v || null; }),
+              borderColor: '#42a5f5', backgroundColor: 'rgba(66,165,245,0.1)',
+              borderWidth: 2, pointRadius: 0, fill: true, tension: 0.3, spanGaps: true }]
+          },
+          options: Object.assign({}, chartOpts, {
+            scales: Object.assign({}, chartOpts.scales, {
+              y: Object.assign({}, chartOpts.scales.y, {
+                ticks: Object.assign({}, chartOpts.scales.y.ticks, {
+                  callback: function(v) { return Math.round(v/100000) + '億'; }
+                })
+              })
+            })
+          })
+        });
+      }
+    }
+  }
+
+  (function loadTaiwan() {
+    fetch('./taiwan_data.json?v=' + Date.now())
+      .then(function(r) { return r.ok ? r.json() : Promise.reject('not found'); })
+      .then(renderTaiwanCharts)
+      .catch(function() {
+        ['tw-futures-val','tw-margin-val'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.textContent = '資料更新中';
+        });
+        ['tw-futures-badge','tw-margin-badge'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) { el.textContent = '每日自動更新'; el.className = 'tw-card-badge tw-badge-neutral'; }
+        });
+      });
+  })();
+
 </script>
 </body>
 </html>
