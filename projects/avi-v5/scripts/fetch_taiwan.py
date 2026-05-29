@@ -2,126 +2,111 @@
 """
 fetch_taiwan.py — Fetch Taiwan market indicators for KIWI Dashboard.
 
-Fetches daily:
-  • 外資台指期貨淨多空口數  (TAIFEX 三大法人未平倉)
-  • 融資餘額              (TWSE 全市場融資餘額合計)
+Data sources:
+  • 外資台指期貨淨多空口數  → FinMind API (TaiwanFuturesInstitutionalInvestors, TX)
+  • 融資餘額              → TWSE exchangeReport/MI_MARGN (MS)
 
 Writes docs/taiwan_data.json with rolling 90-day history.
-
-Run from projects/avi-v5/:
-    python scripts/fetch_taiwan.py
+Run from projects/avi-v5/: python scripts/fetch_taiwan.py
 """
 
 import json
 import logging
 import os
 import re
-import time
 from datetime import date, timedelta
 
 import requests
-from bs4 import BeautifulSoup
 
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-_PROJECT_DIR = os.path.dirname(_SCRIPT_DIR)
-_REPO_ROOT = os.path.abspath(os.path.join(_PROJECT_DIR, "..", ".."))
+_REPO_ROOT = os.path.abspath(os.path.join(_SCRIPT_DIR, "..", "..", ".."))
 TAIWAN_DATA_PATH = os.path.join(_REPO_ROOT, "docs", "taiwan_data.json")
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger(__name__)
 
-HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; KIWI-Dashboard/1.0)"}
+
+
+# ── FinMind: 外資台指期未平倉淨多空 ────────────────────────────────────────────
+
+def fetch_futures_net_range(start: date, end: date) -> dict[str, int]:
+    """
+    Fetch 外資 TX futures net open interest for a date range via FinMind.
+    Returns {date_str: net_long_contracts}.
+    TX = 臺股期貨 (TAIEX Large Futures); net = long - short 未平倉口數.
+    """
+    url = (
+        "https://api.finmindtrade.com/api/v4/data"
+        "?dataset=TaiwanFuturesInstitutionalInvestors"
+        f"&data_id=TX&start_date={start}&end_date={end}"
     )
-}
-
-
-# ── TAIFEX: 外資期貨淨多空 ──────────────────────────────────────────────────────
-
-def fetch_taifex_net(target: date) -> int | None:
-    """Fetch 外資及陸資 net TAIEX futures open interest (all contract types summed)."""
-    date_str = target.strftime("%Y/%m/%d")
-    url = "https://www.taifex.com.tw/cht/3/totalTableDate"
     try:
-        resp = requests.post(
-            url,
-            data={"queryDate": date_str},
-            headers={**HEADERS, "Content-Type": "application/x-www-form-urlencoded",
-                     "Referer": url},
-            timeout=25,
-        )
+        resp = requests.get(url, headers=HEADERS, timeout=20)
         resp.raise_for_status()
-        soup = BeautifulSoup(resp.text, "html.parser")
+        payload = resp.json()
+        if payload.get("status") != 200:
+            log.warning(f"FinMind TX: status={payload.get('status')} msg={payload.get('msg')}")
+            return {}
 
-        net_positions = []
-        for td in soup.find_all("td"):
-            if "外資及陸資" not in td.get_text(strip=True):
+        result = {}
+        for rec in payload.get("data", []):
+            if rec.get("institutional_investors") != "外資":
                 continue
-            cells = td.parent.find_all("td")
-            nums = []
-            for c in cells:
-                raw = c.get_text(strip=True).replace(",", "").replace("\xa0", "")
-                if re.fullmatch(r"-?\d+", raw):
-                    nums.append(int(raw))
-            # Row format: [long_qty, long_notional, short_qty, short_notional, net_qty, net_notional]
-            if len(nums) >= 5:
-                net_positions.append(nums[4])  # 多空淨額口數
+            d = rec["date"]
+            net = rec["long_open_interest_balance_volume"] - rec["short_open_interest_balance_volume"]
+            result[d] = net
 
-        if not net_positions:
-            log.warning(f"TAIFEX: no 外資 rows found for {date_str}")
-            return None
-
-        total = sum(net_positions)
-        log.info(f"TAIFEX 外資期貨淨多空: {total:+,} 口 ({date_str}, {len(net_positions)} contract types)")
-        return total
+        log.info(f"FinMind TX 外資: fetched {len(result)} dates ({start} → {end})")
+        return result
 
     except Exception as e:
-        log.warning(f"TAIFEX fetch failed {date_str}: {e}")
-        return None
+        log.warning(f"FinMind TX fetch failed: {e}")
+        return {}
 
 
 # ── TWSE: 融資餘額 ─────────────────────────────────────────────────────────────
 
-def fetch_twse_margin(target: date) -> int | None:
-    """Fetch total market margin balance (融資餘額合計) in thousand TWD."""
+def fetch_margin_balance(target: date) -> int | None:
+    """
+    Fetch total market 融資金額餘額 (仟元) from TWSE MI_MARGN.
+    Returns an integer (千元), or None on failure.
+    """
     date_str = target.strftime("%Y%m%d")
-    urls = [
-        f"https://www.twse.com.tw/rwd/zh/marginShortSelling/MI_MARGN?date={date_str}&selectType=MS&response=json",
-        f"https://www.twse.com.tw/fund/MI_MARGN?date={date_str}&selectType=MS&response=json",
-        f"https://www.twse.com.tw/exchangeReport/MI_MARGN?date={date_str}&selectType=MS&response=json",
-    ]
-    for url in urls:
-        try:
-            resp = requests.get(url, headers=HEADERS, timeout=20)
-            if resp.status_code != 200:
-                continue
-            payload = resp.json()
-            if payload.get("stat") not in ("OK", "ok"):
-                continue
-            rows = payload.get("data", [])
-            if not rows:
-                continue
-            # Last row is 合計; find largest numeric field
-            total_row = rows[-1]
-            candidates = []
-            for col in total_row:
-                raw = str(col).replace(",", "")
-                try:
-                    v = int(raw)
-                    if v > 100_000:
-                        candidates.append(v)
-                except ValueError:
-                    pass
-            if candidates:
-                total = max(candidates)
-                log.info(f"TWSE 融資餘額: {total:,} 千元 ({date_str})")
-                return total
-        except Exception as e:
-            log.warning(f"TWSE margin fetch failed ({url[:60]}...): {e}")
-    log.warning(f"All TWSE attempts failed for {date_str}")
-    return None
+    url = (
+        f"https://www.twse.com.tw/exchangeReport/MI_MARGN"
+        f"?date={date_str}&selectType=MS&response=json"
+    )
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=20)
+        resp.raise_for_status()
+        payload = resp.json()
+
+        if payload.get("stat") not in ("OK", "ok"):
+            return None
+
+        for table in payload.get("tables", []):
+            fields = table.get("fields", [])
+            # Find index of 今日餘額
+            try:
+                bal_idx = fields.index("今日餘額")
+            except ValueError:
+                bal_idx = -1
+
+            for row in table.get("data", []):
+                item = row[0] if row else ""
+                if "融資金額" in item:
+                    raw = row[bal_idx].replace(",", "") if bal_idx >= 0 else row[-1].replace(",", "")
+                    val = int(raw)
+                    log.info(f"TWSE 融資金額餘額: {val:,} 千元 ({date_str})")
+                    return val
+
+        log.warning(f"TWSE: 融資金額 row not found for {date_str}")
+        return None
+
+    except Exception as e:
+        log.warning(f"TWSE margin fetch failed ({date_str}): {e}")
+        return None
 
 
 # ── Data Store ──────────────────────────────────────────────────────────────────
@@ -152,7 +137,7 @@ def trading_days(start: date, end: date) -> list[date]:
     return days
 
 
-def compute_signals(dates, futures, margin) -> dict:
+def compute_signals(dates: list, futures: list, margin: list) -> dict:
     vf = [(d, v) for d, v in zip(dates, futures) if v is not None]
     vm = [(d, v) for d, v in zip(dates, margin) if v is not None]
 
@@ -162,7 +147,8 @@ def compute_signals(dates, futures, margin) -> dict:
     f_signal = "BULLISH" if f_latest > 10000 else ("BEARISH" if f_latest < -10000 else "NEUTRAL")
 
     m_vals = [v for _, v in vm]
-    m_pct = int(sum(1 for v in m_vals if v < m_latest) / len(m_vals) * 100) if len(m_vals) > 10 else 50
+    m_pct = (int(sum(1 for v in m_vals if v < m_latest) / len(m_vals) * 100)
+             if len(m_vals) > 10 else 50)
     m_level = "HIGH" if m_pct >= 85 else ("ELEVATED" if m_pct >= 65 else "NORMAL")
 
     return {
@@ -180,9 +166,8 @@ def main():
     log.info("=== Taiwan Data Fetch Starting ===")
     today = date.today()
     existing = load_data()
-    existing_dates = set(existing.get("dates", []))
 
-    # Rebuild record map from existing data
+    # Rebuild record map
     records: dict = {}
     for i, d in enumerate(existing.get("dates", [])):
         records[d] = {
@@ -190,39 +175,49 @@ def main():
             "margin_balance": existing["margin_balance"][i],
         }
 
-    # Find missing dates (rolling 90-day window)
-    all_days = trading_days(today - timedelta(days=130), today)
+    # Determine missing dates in rolling 90-day window
+    window_start = today - timedelta(days=130)
+    all_days = trading_days(window_start, today)
+    existing_dates = set(records.keys())
     missing = [d for d in all_days if d.strftime("%Y-%m-%d") not in existing_dates]
-    log.info(f"Missing dates: {len(missing)}, will fetch last 10")
+    log.info(f"Missing dates: {len(missing)}, fetching all at once via FinMind range query")
 
-    for d in missing[-10:]:
-        dstr = d.strftime("%Y-%m-%d")
-        futures = fetch_taifex_net(d)
-        time.sleep(1)
-        margin = fetch_twse_margin(d)
-        if futures is not None or margin is not None:
-            records[dstr] = {"futures_net": futures, "margin_balance": margin}
-        time.sleep(1)
+    # ── Futures: bulk range fetch via FinMind ──────────────────────────────────
+    if missing:
+        fetch_start = missing[0]
+        fetch_end = missing[-1]
+        futures_batch = fetch_futures_net_range(fetch_start, fetch_end)
 
-    # Sort and keep last 90 days
+        for d in missing:
+            dstr = d.strftime("%Y-%m-%d")
+            futures_val = futures_batch.get(dstr)  # None if non-trading day
+            # Margin: fetch only if futures data was returned (confirms it's a trading day)
+            margin_val = None
+            if futures_val is not None:
+                margin_val = fetch_margin_balance(d)
+
+            if futures_val is not None or margin_val is not None:
+                records[dstr] = {"futures_net": futures_val, "margin_balance": margin_val}
+
+    # Sort and keep last 90 records
     sorted_dates = sorted(records.keys())[-90:]
     futures_series = [records[d]["futures_net"] for d in sorted_dates]
     margin_series = [records[d]["margin_balance"] for d in sorted_dates]
 
     signals = compute_signals(sorted_dates, futures_series, margin_series)
-
-    output = {"updated": today.strftime("%Y-%m-%d"),
-              "dates": sorted_dates,
-              "futures_net": futures_series,
-              "margin_balance": margin_series,
-              **signals}
+    output = {
+        "updated": today.strftime("%Y-%m-%d"),
+        "dates": sorted_dates,
+        "futures_net": futures_series,
+        "margin_balance": margin_series,
+        **signals,
+    }
 
     save_data(output)
     log.info(
-        f"=== Done: futures={signals['futures_latest']:+,}  "
-        f"signal={signals['futures_signal']}  "
-        f"margin_pct={signals['margin_pct']}%  "
-        f"level={signals['margin_level']} ==="
+        f"=== Done: {len(sorted_dates)} records, "
+        f"futures={signals['futures_latest']:+,} ({signals['futures_signal']}), "
+        f"margin={signals['margin_latest']:,} 千元 ({signals['margin_level']}) ==="
     )
 
 
