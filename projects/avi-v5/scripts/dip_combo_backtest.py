@@ -181,11 +181,63 @@ def fmt(rows, horizon, topn=18):
               f"{r['avg']:>6.1f}%{r['dd_avg']:>6.1f}%{r['p']:>7.3f}")
         if len(seen)>=topn: break
 
+# ── 統計嚴謹度：Wilson 下界 / BH-FDR 多重比較 / 樣本外 ─────────────────────────
+def wilson_lb(k, n, z=1.96):
+    if n == 0: return 0.0
+    p = k/n; d = 1 + z*z/n
+    centre = p + z*z/(2*n)
+    margin = z*((p*(1-p)/n + z*z/(4*n*n))**0.5)
+    return (centre - margin)/d * 100
+
+def bh_survive(pvals, q=0.05):
+    m = len(pvals)
+    order = sorted(range(m), key=lambda i: pvals[i])
+    kmax = -1
+    for rank, i in enumerate(order):
+        if pvals[i] <= (rank+1)/m*q: kmax = rank
+    keep = set(order[r] for r in range(kmax+1)) if kmax >= 0 else set()
+    return [i in keep for i in range(m)]
+
+def oos(df, cond, h, split):
+    cond = cond.reindex(df.index).fillna(False); c = df["close"].values; idx = df.index
+    def wr(mask):
+        pos = decluster(mask, 21); r = [c[p+h]/c[p]-1 for p in pos if p+h < len(c)]
+        return (len(r), (np.mean(np.array(r) > 0)*100 if r else float("nan")))
+    return wr(cond & (idx < split)), wr(cond & (idx >= split))
+
+def robust_report(df, trig, horizon, min_n, split, hn):
+    rows = search(df, trig, horizon, min_n)
+    if not rows:
+        print("  無組合達樣本門檻"); return
+    pvals = [r["p"] for _,_,r in rows]
+    keep = bh_survive(pvals, 0.05)
+    surv = [(c,f,r) for (c,f,r),k in zip(rows,keep) if k]
+    surv.sort(key=lambda x:(-x[2]["win"], x[2]["p"]))
+    print(f"\n  === 統計嚴謹版（{hn}）：共測 {len(rows)} 組合 → BH-FDR(q<0.05) 存活 {len(surv)} 組 ===")
+    print(f"  樣本外切點 {split}（train=之前 / test=之後，test 含近期崩盤）")
+    print(f"  {'組合':<40}{'n':>4}{'勝率':>6}{'Wilson下界':>10}{'train':>11}{'test':>11}")
+    print("  "+"-"*84)
+    seen=set()
+    for cond,filt,r in surv[:14]:
+        name=" + ".join(sorted(cond))+(f" [{filt}]" if filt else "")
+        if name in seen: continue
+        seen.add(name)
+        # rebuild boolean for OOS
+        b=None
+        for k in cond: b=trig[k] if b is None else b&trig[k]
+        if filt: b=b&FILTERS[filt](df)
+        (ntr,wtr),(nte,wte)=oos(df,b,horizon,split)
+        wlb=wilson_lb(round(r["win"]/100*r["n"]), r["n"])
+        print(f"  {name:<40}{r['n']:>4}{r['win']:>5.0f}%{wlb:>9.0f}%"
+              f"{f'{ntr}/{wtr:.0f}%':>11}{f'{nte}/{wte:.0f}%':>11}")
+    print("  註：Wilson 下界=保守真實勝率(95%CI下緣)；train/test 都高=非過度配適。")
+
 def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("--market",default="US",choices=["US","TW"])
     ap.add_argument("--horizon",type=int,default=63)
     ap.add_argument("--min-n",type=int,default=12)
+    ap.add_argument("--robust",action="store_true",help="輸出 FDR+Wilson+樣本外 嚴謹版")
     a=ap.parse_args()
     if a.market=="US":
         close=load_spx(); df=build_panel(close,load_vix(),load_fng())
@@ -197,9 +249,13 @@ def main():
         trig=triggers_TW(df)
         print(f"== 台股 TAIEX 抄底組合回測 ==  區間 {df.index.min().date()}~{df.index.max().date()}"
               f"  ({len(df)} 日)  指標:RSI/回檔/距50DMA/波動分位/200DMA")
+    hn=[k for k,v in HOR.items() if v==a.horizon][0]
     rows=search(df,trig,a.horizon,a.min_n)
     fmt(rows,a.horizon)
     print("\n  註：勝率為『之後 N 日正報酬』比例；續跌avg=訊號後 12 月內平均最大續跌(買太早的痛)。")
+    if a.robust:
+        split = "2008-01-01" if a.market=="US" else "2017-01-01"
+        robust_report(df,trig,a.horizon,a.min_n,split,hn)
 
 if __name__=="__main__":
     main()
