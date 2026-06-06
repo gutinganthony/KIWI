@@ -3,10 +3,10 @@ title: KIWI 專案總備忘 — 新 Session 快速上手指南
 url: local
 source: Session 2026-05-10 ~ 2026-05-17 完整紀錄
 date_added: 2026-05-17
-last_updated: 2026-05-17
+last_updated: 2026-06-06
 topic: technology
 tags: [session-handoff, guide, avi-v5, cpi, tsi, dashboard, fund-management, master-doc]
-version: 1.0
+version: 1.1
 ---
 
 ## 給新 Session 的 Claude：讀這份文件就夠了
@@ -126,7 +126,22 @@ KIWI/
 
 ---
 
-## 五、下一步待辦事項（優先序）
+## 五、2026-06-06 Session 新增
+
+### IBKR 建議（香港/北京投資人）
+- 投資人在香港或北京、資金在香港 → 建議用 **IBKR（盈透證券）**
+- 投資人各自開 IBKR Individual Account
+- 你申請 IBKR **Friends & Family Advisor** 帳戶（免費，最多管 15 帳戶）
+- 好處：你不碰錢、不碰帳密、合規透明、支持港股美股多幣種
+- Firstrade 不適合（只支援美國居民、不支援 Advisor 架構）
+
+### 新增 KIWI 文章
+- `topics/other/2026-05-17-ikigai-life-purpose.md` — Ikigai 人生意義框架 + 個人四圈分析
+- `projects/skills/investment-research-SKILL.md` — 投資研究驗證 Skill（6 步驟流程）
+
+---
+
+## 六、下一步待辦事項（優先序）
 
 ### P0：統合 Dashboard + 部署到 GitHub Pages
 - 把 CPI + TSI + AVI 合成一個網頁
@@ -151,7 +166,7 @@ KIWI/
 
 ---
 
-## 六、環境設定（換電腦時）
+## 七、環境設定（換電腦時）
 
 ```bash
 # 1. Clone
@@ -174,7 +189,7 @@ python3 scripts/run_monthly.py --v5     # AVI V5
 
 ---
 
-## 七、新 Session 開場白範本
+## 八、新 Session 開場白範本
 
 視你要做什麼，複製以下其中一個：
 
@@ -194,4 +209,5 @@ python3 scripts/run_monthly.py --v5     # AVI V5
 
 ## Update Log
 
+- 2026-06-06 v1.1: 新增 IBKR 建議（香港投資人）、Ikigai 文章、投資研究 Skill、KIWI 知識庫新文章清單更新。
 - 2026-05-17 v1.0: 完整 session handoff 文件，涵蓋所有系統、檔案結構、待辦、環境設定、開場白範本。
