@@ -24,16 +24,25 @@ DATA = __import__("pathlib").Path(__file__).resolve().parent.parent / "data"
 HOR = {"1M": 21, "3M": 63, "6M": 126, "12M": 252}
 
 # ── 資料載入 ──────────────────────────────────────────────────────────────────
+def _close(path):
+    """從任意 OHLC CSV 取出收盤價 Series（自動找日期欄與 Close 欄）。"""
+    df = pd.read_csv(path)
+    dcol = next(c for c in df.columns if str(c).lower() in ("date","datetime"))
+    try:    ccol = next(c for c in df.columns if str(c).lower()=="close")
+    except StopIteration: ccol = next(c for c in df.columns if "close" in str(c).lower())
+    df[dcol] = pd.to_datetime(df[dcol], errors="coerce")
+    return df.dropna(subset=[dcol]).set_index(dcol)[ccol].astype(float).sort_index().rename("close")
+
 def load_spx():
-    a = pd.read_csv(DATA/"spx.csv", parse_dates=["Date"]).set_index("Date")["Close"].sort_index()
-    a = a[a.index <= "2019-12-23"]
-    b = pd.read_csv(DATA/"spx_investpy.csv", parse_dates=["Date"]).set_index("Date")["Close"].sort_index()
-    b = b[(b.index > "2019-12-23") & (b.index <= "2020-12-31")]
-    v = pd.read_csv(DATA/"voo.csv", parse_dates=["Date"]).set_index("Date")["Close"].sort_index()
-    scale = b.loc[:"2020-12-31"].iloc[-1] / v.asof(b.loc[:"2020-12-31"].index[-1])
-    v = v[v.index > "2020-12-31"] * scale
-    s = pd.concat([a, b, v]); s = s[~s.index.duplicated()].sort_index()
-    return s.rename("close")
+    s = _close(DATA/"spx.csv")
+    s = s[~s.index.duplicated()]
+    # Mac 抓的完整資料(到~2026)直接用；否則走雲端三檔接合(fja05680→investpy→VOO)
+    if s.index.max().year >= 2023 or not (DATA/"spx_investpy.csv").exists():
+        return s
+    a = s[s.index <= "2019-12-23"]
+    b = _close(DATA/"spx_investpy.csv"); b = b[(b.index > "2019-12-23") & (b.index <= "2020-12-31")]
+    v = _close(DATA/"voo.csv"); scale = b.iloc[-1] / v.asof(b.index[-1]); v = v[v.index > "2020-12-31"] * scale
+    return pd.concat([a, b, v]).pipe(lambda x: x[~x.index.duplicated()].sort_index())
 
 def load_vix():
     return pd.read_csv(DATA/"vix.csv", parse_dates=["DATE"]).set_index("DATE")["CLOSE"].sort_index().rename("vix")
@@ -42,13 +51,16 @@ def load_fng():
     return pd.read_csv(DATA/"fng.csv", parse_dates=["Date"]).set_index("Date")["Fear Greed"].sort_index().rename("fng")
 
 def load_taiex():
+    cols = [str(c).lower() for c in pd.read_csv(DATA/"taiex.csv", nrows=0).columns]
+    # Mac yfinance 標準格式：有 Date + Close 欄 → 直接用
+    if any(c in ("date","datetime") for c in cols) and any(c=="close" for c in cols):
+        return _close(DATA/"taiex.csv")
+    # 否則 = investing.com 中文匯出格式（雲端鏡像）
     df = pd.read_csv(DATA/"taiex.csv")
-    df.columns = ["date","close","open","high","low","vol","chg"]
-    def pdate(s):
-        s=str(s).replace("年","-").replace("月","-").replace("日","")
-        return pd.to_datetime(s, errors="coerce")
-    df["date"]=df["date"].map(pdate)
-    df["close"]=df["close"].astype(str).str.replace(",","").astype(float)
+    df.columns = ["date","close","open","high","low","vol","chg"][:len(df.columns)]
+    df["date"] = df["date"].map(lambda s: pd.to_datetime(
+        str(s).replace("年","-").replace("月","-").replace("日",""), errors="coerce"))
+    df["close"] = df["close"].astype(str).str.replace(",","").astype(float)
     return df.dropna(subset=["date"]).set_index("date")["close"].sort_index().rename("close")
 
 # ── 指標 ──────────────────────────────────────────────────────────────────────
