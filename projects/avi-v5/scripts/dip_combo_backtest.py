@@ -217,27 +217,36 @@ def oos(df, cond, h, split):
         return (len(r), (np.mean(np.array(r) > 0)*100 if r else float("nan")))
     return wr(cond & (idx < split)), wr(cond & (idx >= split))
 
+def _cond_bool(df, trig, cond, filt):
+    b=None
+    for k in cond: b=trig[k] if b is None else b&trig[k]
+    if filt: b=b&FILTERS[filt](df)
+    return b
+
 def robust_report(df, trig, horizon, min_n, split, hn):
     rows = search(df, trig, horizon, min_n)
     if not rows:
         print("  無組合達樣本門檻"); return
-    pvals = [r["p"] for _,_,r in rows]
-    keep = bh_survive(pvals, 0.05)
-    surv = [(c,f,r) for (c,f,r),k in zip(rows,keep) if k]
+    # 去重複：把「事件完全相同」的組合(如 VIX>=25+VIX>=30 == VIX>=30)收斂成一個，
+    # 否則多重比較母數被灌水、BH-FDR 過嚴。保留條件數最少(最簡潔)的那個名字。
+    uniq={}
+    for cond,filt,r in rows:
+        b=_cond_bool(df,trig,cond,filt)
+        sig=tuple(decluster(b.reindex(df.index).fillna(False),21))
+        if sig not in uniq or len(cond)+ (1 if filt else 0) < len(uniq[sig][0])+(1 if uniq[sig][1] else 0):
+            uniq[sig]=(cond,filt,r)
+    rows=list(uniq.values())
+    pvals=[r["p"] for _,_,r in rows]
+    keep=bh_survive(pvals,0.05)
+    surv=[(c,f,r) for (c,f,r),k in zip(rows,keep) if k]
     surv.sort(key=lambda x:(-x[2]["win"], x[2]["p"]))
-    print(f"\n  === 統計嚴謹版（{hn}）：共測 {len(rows)} 組合 → BH-FDR(q<0.05) 存活 {len(surv)} 組 ===")
+    print(f"\n  === 統計嚴謹版（{hn}）：去重後 {len(rows)} 個獨立組合 → BH-FDR(q<0.05) 存活 {len(surv)} 組 ===")
     print(f"  樣本外切點 {split}（train=之前 / test=之後，test 含近期崩盤）")
     print(f"  {'組合':<40}{'n':>4}{'勝率':>6}{'Wilson下界':>10}{'train':>11}{'test':>11}")
     print("  "+"-"*84)
-    seen=set()
     for cond,filt,r in surv[:14]:
         name=" + ".join(sorted(cond))+(f" [{filt}]" if filt else "")
-        if name in seen: continue
-        seen.add(name)
-        # rebuild boolean for OOS
-        b=None
-        for k in cond: b=trig[k] if b is None else b&trig[k]
-        if filt: b=b&FILTERS[filt](df)
+        b=_cond_bool(df,trig,cond,filt)
         (ntr,wtr),(nte,wte)=oos(df,b,horizon,split)
         wlb=wilson_lb(round(r["win"]/100*r["n"]), r["n"])
         print(f"  {name:<40}{r['n']:>4}{r['win']:>5.0f}%{wlb:>9.0f}%"
