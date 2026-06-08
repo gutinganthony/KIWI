@@ -233,8 +233,10 @@ def compute_tsi(yf_data, fred_data):
             log.warning(f"TSI: {name} has no 'Close' column, columns={cols}, using iloc[:,0]")
             return df.iloc[:, 0]
 
-        # Required series
-        soxx_df = yf_data.get("SOXX") or yf_data.get("^SOX")
+        # Required series (must not use `or` on DataFrames — pandas raises ambiguous truth value)
+        soxx_df = yf_data.get("SOXX")
+        if soxx_df is None:
+            soxx_df = yf_data.get("^SOX")
         qqq_df  = yf_data.get("QQQ")
         mu_df   = yf_data.get("MU")
         smh_df  = yf_data.get("SMH")
