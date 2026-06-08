@@ -147,39 +147,70 @@ CRI_base = Σ (indicator_signal × weight)
 TSI（Tech Stress Index）聚焦半導體 + 科技板塊，捕捉主力指數（SPY）
 還未反映、但科技板塊已在惡化的早期訊號。
 
-歷史回測：7/7 科技重大回調事件偵測成功（含 2000 年網路泡沫、
-2022 年科技熊市、2024 年 AI 泡沫修正）。
+### v4 真實數據回測驗證（2026-06）
 
-### 9 個指標與權重
+TSI v4 的權重**不是憑感覺設定，而是用 27 年真實歷史數據實證最佳化**：
+
+- **資料**：jacksoncrow Kaggle（SPY/QQQ/SOXX/SMH/MU/HYG 1993-2020）
+  + CBOE 官方 VIX/VVIX（1990-2025），存於 `projects/avi-v5/data/backtest/`
+- **方法**：逐日計算 TSI，以「未來 N 日 SPY 跌幅 >5%」為崩盤標籤，
+  用 ROC-AUC 評估各指標預測力，再以邏輯回歸找最佳權重（5-fold 交叉驗證）
+- **結果**：
+  - TSI v4 整體分數 **D1 AUC = 0.905、D5 AUC = 0.722**（v3 為 0.809 / 0.700）
+  - 邏輯回歸最佳模型 **交叉驗證 AUC = 0.747 ± 0.064**（樣本外）
+  - 高信心訊號 **TSI ≥ 55 命中率 57%**（只在 1% 時間觸發，vs 隨機基準 4%）
+- **重現**：`python scripts/real_backtest.py` + `python scripts/tsi_optimize.py`
+
+**各指標實證預測力排名（D1 ROC-AUC）**：
+
+| 指標 | D1 AUC | 評價 |
+|------|:------:|------|
+| tech_breadth | 0.93 | 最強 — QQQ 跌破均線是最快訊號 |
+| vvix_lead | 0.82 | 強 — VVIX（波動率的波動率）真領先 |
+| vix_tech_correlation | 0.78 | 強 — VIX 升 + 科技跌 |
+| tech_crash_day | 0.76 | 強 — 單日暴跌偵測 |
+| sox_qqq_divergence | 0.71 | 中上 |
+| memory_momentum | 0.71 | 中上 |
+| sox_momentum_decel | 0.53 | 弱（保留但低配重）|
+| credit_divergence | 0.50→0.57 | 短窗弱、長窗較佳，但提供獨立資訊 |
+
+**誠實限制**：純粹「無預兆突發 1 日崩盤」的預測上限約 AUC 0.55–0.6
+（市場本質如此）；但「發展中的崩盤」可達 AUC 0.75，提前 1–3 天降低
+曝險有實際價值。TSI 的定位是「降風險訊號」，不是「精準擇時器」。
+
+### 12 個指標與權重（v4，實證最佳化）
 
 ```
-vix_tech_correlation    18%  ── VIX 上漲同時科技跌 = 真正的壓力
-sox_qqq_divergence      14%  ── 半導體（SOX）落後大盤科技（QQQ）
-memory_momentum         12%  ── 記憶體股（MU）動能崩潰（需求先行指標）
-yield_shock             12%  ── 10Y 殖利率 5 日快速上升（科技估值殺手）
-ai_infra_rs             10%  ── SMH（AI 基礎設施）vs SPY 相對強度
-tech_breadth            10%  ── QQQ 內部動能（vs 20/50MA）
-cloud_rs                 8%  ── QQQ vs SPY 相對強度（科技 vs 大盤）
-yield_30y_stress         8%  ── 30Y 殖利率絕對水位（DCF 折現率直接衝擊）
-yield_curve_bear_steep   8%  ── 30Y-10Y 利差擴大 + 兩端同步上升（最毒場景）
+# 股票/波動指標（已用真實回測驗證，依預測重要性配權）
+tech_breadth            18%  ── #1 預測指標：QQQ vs 20/50MA
+vvix_lead               14%  ── VVIX 急升 → VIX 爆發 1-2 日前（真領先）
+credit_divergence       12%  ── HYG vs SPY 信用乖離（提供獨立資訊）
+tech_crash_day          10%  ── 單日 QQQ/SOX 暴跌 + VIX 放大
+vix_tech_correlation     8%  ── VIX 上漲同時科技跌
+sox_qqq_divergence       7%  ── 半導體（SOX）落後大盤科技（QQQ）
+memory_momentum          5%  ── 記憶體股（MU）動能崩潰
+sox_momentum_decel       5%  ── SOX 動能二次微分衰減
+
+# 殖利率/總體指標（未在此回測，為升息型崩盤如 2022 保留）
+yield_shock              9%  ── 10Y 殖利率 5 日快速上升
+yield_30y_stress         5%  ── 30Y 殖利率絕對水位
+ai_infra_rs              4%  ── SMH vs SPY 相對強度
+yield_curve_bear_steep   3%  ── 30Y-10Y 利差擴大
 ```
 
-### 計算方式
+### 計算方式（v4，已移除分數膨脹邏輯）
 
 ```
-TSI_base = Σ (indicator_signal × weight)
+TSI = Σ (indicator_signal × weight)    # 權重已正規化至總和 1.0
 
-# 共振增幅：
-若 ≥5 個指標 signal ≥50  → × 1.25
-若 ≥3 個指標 signal ≥50  → × 1.10
-
-# 單一強信號保底：
-若 ≥2 個指標 signal ≥50  → TSI ≥ avg(high_signals) × 0.65
-若最高單一信號 ≥70       → TSI ≥ max_signal × 0.5
-
-# 廣泛壓力保底：
-若 ≥4 個指標 signal ≥25  → TSI ≥ 45（強制進入 CAUTIOUS）
+# 單一極端訊號保底（輕量）：
+若最高單一信號 ≥75  → TSI ≥ max_signal × 0.45
 ```
+
+> **v3 → v4 重要改變**：移除了舊版的共振增幅（×1.25/×1.1）與
+> 「強制進入 45」的廣泛壓力保底。這些膨脹邏輯讓 TSI 在 **53% 的時間**
+> 都在警示，反而把樣本外 AUC 從 0.747 拉低到 0.700。移除後 TSI ≥ 55
+> 的命中率從 22% 跳升到 **57%**。
 
 | 分數 | 等級 | 含義 |
 |------|------|------|

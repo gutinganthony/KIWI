@@ -93,20 +93,22 @@ class TechStressIndex:
 
     WEIGHTS = {
         # ── Leading (1-3 day advance warning) ─────────────────────────────
-        "vvix_lead":             0.12,   # VVIX spike → VIX explosion 1-2d later
-        "credit_divergence":     0.10,   # HYG lagging SPY → equity selloff 1-3d
-        "sox_momentum_decel":    0.08,   # SOX 2nd-derivative decay → breakdown 1-2d
-        # ── Semi-reactive (same-day to 3-day) ─────────────────────────────
-        "tech_crash_day":        0.12,   # 1-day QQQ/SOX drop + VIX amplification
-        "vix_tech_correlation":  0.12,   # 3-day VIX+tech co-movement
-        "sox_qqq_divergence":    0.08,   # 10-day semi vs tech divergence
-        "memory_momentum":       0.08,   # 5+20-day MU trend
-        # ── Macro/structural (slow-moving context) ────────────────────────
-        "yield_shock":           0.10,   # 5-day 10Y spike
-        "yield_30y_stress":      0.06,   # 30Y absolute level + speed
-        "yield_curve_bear_steep": 0.05,  # 30Y-10Y bear steepening
-        "ai_infra_rs":           0.05,   # 20-day SMH vs SPY
-        "tech_breadth":          0.04,   # QQQ vs 20/50MA
+        # ── v4 weights: empirically optimized on 27y real data (2006-2020) ──
+        #    via logistic regression, cross-validated AUC = 0.747 (vs 0.700 prior).
+        #    See scripts/tsi_optimize.py. Ordered by predictive importance.
+        "tech_breadth":          0.18,   # #1 predictor (D1 AUC 0.93) — QQQ vs 20/50MA
+        "vvix_lead":             0.14,   # vol-of-vol spike (D1 AUC 0.82, true leading)
+        "credit_divergence":     0.12,   # HYG vs SPY — adds independent signal
+        "tech_crash_day":        0.10,   # 1-day QQQ/SOX drop + VIX (D1 AUC 0.76)
+        "vix_tech_correlation":  0.08,   # 3-day VIX+tech co-move (D1 AUC 0.78)
+        "sox_qqq_divergence":    0.07,   # 10-day semi vs tech (D1 AUC 0.71)
+        "memory_momentum":       0.05,   # 5+20-day MU trend (D1 AUC 0.71)
+        "sox_momentum_decel":    0.05,   # SOX 2nd-derivative (weak alone, kept light)
+        # ── Macro/rate indicators (not in equity backtest; for rate-driven crashes) ──
+        "yield_shock":           0.09,   # 5-day 10Y spike (e.g. 2022 selloff)
+        "yield_30y_stress":      0.05,   # 30Y absolute level + speed
+        "ai_infra_rs":           0.04,   # 20-day SMH vs SPY
+        "yield_curve_bear_steep": 0.03,  # 30Y-10Y bear steepening
     }
 
     def compute(
@@ -213,35 +215,18 @@ class TechStressIndex:
             flash_triggers.append(f"VIX surge + tech selloff")
 
         # Composite
-        total = sum(ind.signal * self.WEIGHTS.get(ind.name, 0.1) for ind in indicators)
+        # v4: clean weighted sum. The previous consensus/breadth "boost" logic
+        # inflated the score (fired 53% of days) and DROPPED out-of-sample AUC
+        # from 0.747 to 0.700. Removed per scripts/tsi_optimize.py findings.
+        # Weights are pre-normalized to sum ~1.0, so total is already 0-100.
+        total = sum(ind.signal * self.WEIGHTS.get(ind.name, 0.0) for ind in indicators)
         score = min(100, max(0, total))
 
-        # Consensus boost
-        elevated = sum(1 for ind in indicators if ind.signal >= 50)
-        if elevated >= 5:
-            score = min(100, score * 1.25)
-        elif elevated >= 3:
-            score = min(100, score * 1.1)
-
-        # Spike detection: when ANY indicator > 70, it's meaningful even if
-        # trend indicators haven't caught up yet. Boost proportionally.
+        # Single light spike floor: one genuinely extreme signal (>75) shouldn't be
+        # fully diluted by calm trend indicators. Mild, not the old aggressive floor.
         max_signal = max(ind.signal for ind in indicators)
-        high_signals = [ind.signal for ind in indicators if ind.signal >= 50]
-        if len(high_signals) >= 2:
-            # Two+ strong signals = minimum score should reflect urgency
-            avg_high = sum(high_signals) / len(high_signals)
-            min_score = avg_high * 0.65  # e.g., avg 68 → min 44
-            score = max(score, min_score)
-        elif max_signal >= 70:
-            # Single very strong signal = at least moderate alert
-            score = max(score, max_signal * 0.5)  # e.g., 77 → min 38.5
-
-        # Multi-indicator breadth: when 3+ indicators > 25, stress is real
-        mild_elevated = sum(1 for ind in indicators if ind.signal >= 25)
-        if mild_elevated >= 4:
-            score = max(score, 45)  # Force CAUTIOUS when broad stress
-        elif mild_elevated >= 3:
-            score = min(100, score * 1.15)
+        if max_signal >= 75:
+            score = max(score, max_signal * 0.45)  # e.g., 80 → floor 36
 
         if score >= 60:
             bias = "BEARISH"
