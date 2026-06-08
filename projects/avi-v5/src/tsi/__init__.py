@@ -78,18 +78,19 @@ class TSIResult:
 
 
 class TechStressIndex:
-    """Daily tech sector stress scorer using 9 market-based proxies."""
+    """Daily tech sector stress scorer using 10 market-based proxies."""
 
     WEIGHTS = {
-        "sox_qqq_divergence": 0.14,
-        "memory_momentum": 0.12,
-        "yield_shock": 0.12,
-        "yield_30y_stress": 0.08,    # NEW: 30Y absolute level + speed
-        "yield_curve_bear_steep": 0.08,  # NEW: 30Y-10Y steepening under rising rates
-        "ai_infra_rs": 0.10,
-        "tech_breadth": 0.10,
-        "cloud_rs": 0.08,
-        "vix_tech_correlation": 0.18,
+        "tech_crash_day":        0.14,   # NEW: 1-day shock detector (fastest)
+        "vix_tech_correlation":  0.16,   # 3-day VIX+tech co-movement
+        "sox_qqq_divergence":    0.10,   # 10-day semi vs tech divergence
+        "memory_momentum":       0.10,   # 5+20-day MU trend
+        "yield_shock":           0.12,   # 5-day 10Y spike
+        "yield_30y_stress":      0.08,   # 30Y absolute level + speed
+        "yield_curve_bear_steep": 0.06,  # 30Y-10Y steepening
+        "ai_infra_rs":           0.08,   # 20-day SMH vs SPY
+        "tech_breadth":          0.10,   # QQQ vs 20/50MA
+        "cloud_rs":              0.06,   # 10-day QQQ vs SPY
     }
 
     def compute(
@@ -120,6 +121,12 @@ class TechStressIndex:
         date = sox_daily.index[-1].to_pydatetime()
         indicators = []
         flash_triggers = []
+
+        # 0. Single-day tech crash detector (fastest — must be first)
+        ind = self._tech_crash_day(qqq_daily, sox_daily, vix_daily)
+        indicators.append(ind)
+        if ind.signal > 60:  # ~2%+ single-day drop — flash on its own
+            flash_triggers.append(f"Tech crash: {ind.value:.1f}% single-day drop")
 
         # 1. SOX/QQQ Divergence
         ind = self._sox_qqq_divergence(sox_daily, qqq_daily)
@@ -207,13 +214,48 @@ class TechStressIndex:
         else:
             bias = "BULLISH"
 
-        flash = len(flash_triggers) >= 2
-        flash_reason = " + ".join(flash_triggers) if flash else ""
+        # Flash: 2+ triggers，或 tech_crash_day 單獨超過 75（單日暴跌 >2.5%）
+        crash_day_ind = next((i for i in indicators if i.name == "tech_crash_day"), None)
+        single_crash = crash_day_ind is not None and crash_day_ind.signal > 75
+        flash = len(flash_triggers) >= 2 or single_crash
+        flash_reason = " + ".join(flash_triggers) if flash_triggers else ""
 
         return TSIResult(
             score=score, date=date, indicators=indicators,
             bias=bias, flash_alert=flash, flash_reason=flash_reason,
         )
+
+    def _tech_crash_day(self, qqq: pd.Series, sox: pd.Series, vix: pd.Series) -> TSIIndicator:
+        """Single-day tech/semi crash — fastest-reacting indicator (1-day window).
+
+        Catches shocks that trend indicators miss for 3-10 days.
+        Logic: worst of QQQ/SOX 1-day return, amplified by VIX spike.
+        -1% → ~33,  -2% → ~67,  -3% → ~100
+        VIX rising same day adds up to 50% amplification.
+        Flash fires independently when signal > 75 (~2.5% single-day drop).
+        """
+        if len(qqq) < 2 or len(sox) < 2 or len(vix) < 2:
+            return TSIIndicator("tech_crash_day", 0, 0, 0.14, "neutral")
+
+        qqq_1d = (qqq.iloc[-1] / qqq.iloc[-2] - 1) * 100
+        sox_1d = (sox.iloc[-1] / sox.iloc[-2] - 1) * 100
+        vix_1d = vix.iloc[-1] - vix.iloc[-2]  # absolute VIX change
+
+        worst_1d = min(qqq_1d, sox_1d)
+
+        if worst_1d < 0:
+            base_signal = np.clip(abs(worst_1d) / 3 * 100, 0, 100)
+            # VIX rising same day confirms real selling pressure (not sector rotation)
+            if vix_1d > 0:
+                vix_amp = np.clip(vix_1d / 3, 0, 0.5)  # up to 50% amplification
+                signal = min(100, base_signal * (1 + vix_amp))
+            else:
+                signal = base_signal
+        else:
+            signal = 0.0
+
+        return TSIIndicator("tech_crash_day", worst_1d, signal, 0.14,
+                            "bearish" if signal > 30 else "neutral")
 
     def _sox_qqq_divergence(self, sox: pd.Series, qqq: pd.Series) -> TSIIndicator:
         """When SOX (semis) underperforms QQQ (tech), trouble ahead."""

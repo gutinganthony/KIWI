@@ -117,7 +117,7 @@ def level_emoji(score, system):
     return "⚪"
 
 
-def build_message(data):
+def build_message(data, weekend=False):
     """Build daily alert. Returns (html_message, plain_message)."""
     today = datetime.now().strftime("%Y-%m-%d %a")
 
@@ -178,8 +178,9 @@ def build_message(data):
     snap_line = "  ".join(snap_parts)
 
     # ── Telegram (HTML) ──
+    title = "⚠️ 週末預警" if weekend else "📊 每日市場體溫"
     html_lines = [
-        f"<b>📊 每日市場體溫</b>  <i>{today}</i>",
+        f"<b>{title}</b>  <i>{today}</i>",
         "─────────────────",
         f"{level_emoji(cri_score,'cri')} <b>CRI</b>  {cri_d}/100  <i>{cri_level}</i>",
         f"{level_emoji(tsi_score,'tsi')} <b>TSI</b>  {tsi_d}/100  <i>{tsi_bias}</i>",
@@ -198,7 +199,7 @@ def build_message(data):
 
     # ── LINE (plain text) ──
     plain_lines = [
-        f"📊 每日市場體溫  {today}",
+        f"{title}  {today}",
         "─────────────────",
         f"{level_emoji(cri_score,'cri')} CRI  {cri_d}/100  {cri_level}",
         f"{level_emoji(tsi_score,'tsi')} TSI  {tsi_d}/100  {tsi_bias}",
@@ -221,6 +222,8 @@ def build_message(data):
 def main():
     parser = argparse.ArgumentParser(description="Daily market alert via Telegram + LINE")
     parser.add_argument("--dry-run", action="store_true", help="Print message without sending")
+    parser.add_argument("--weekend", action="store_true",
+                        help="Weekend bridge mode: only send if TSI>55 or CRI>35")
     args = parser.parse_args()
 
     os.chdir(PROJECT_ROOT)
@@ -235,9 +238,18 @@ def main():
 
     logger.info(f"Loading dashboard data from {DOCS_INDEX}...")
     data = load_dashboard_data()
-    logger.info(f"  CRI={data.get('cri',{}).get('score')}  TSI={data.get('tsi',{}).get('score')}  AVI={data.get('avi',{}).get('score')}")
+    cri_score = data.get('cri', {}).get('score', 0)
+    tsi_score = data.get('tsi', {}).get('score', 0)
+    tsi_flash = data.get('tsi', {}).get('flash', False)
+    logger.info(f"  CRI={cri_score}  TSI={tsi_score}  AVI={data.get('avi',{}).get('score')}")
 
-    html_msg, plain_msg = build_message(data)
+    if args.weekend:
+        if cri_score < 35 and tsi_score < 55 and not tsi_flash:
+            logger.info(f"Weekend check: CRI={cri_score} TSI={tsi_score} — below threshold, no alert sent.")
+            return
+        logger.info(f"⚠️ Weekend bridge triggered: CRI={cri_score} TSI={tsi_score} flash={tsi_flash}")
+
+    html_msg, plain_msg = build_message(data, weekend=args.weekend)
 
     if args.dry_run:
         print("── Telegram ──")
