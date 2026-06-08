@@ -78,19 +78,35 @@ class TSIResult:
 
 
 class TechStressIndex:
-    """Daily tech sector stress scorer using 10 market-based proxies."""
+    """Daily tech sector stress scorer using 13 market-based proxies.
+
+    Leading indicators (fire 1-3 days BEFORE crash):
+      vvix_lead         — VVIX spike anticipates VIX explosion by 1-2 days
+      credit_divergence — HYG lagging SPY = credit markets see risk first
+      sox_momentum_decel— SOX 2nd-derivative decline precedes breakdown
+
+    Reactive indicators (fire same-day or 1-3 days after):
+      tech_crash_day, vix_tech_correlation, sox_qqq_divergence, memory_momentum,
+      yield_shock, yield_30y_stress, yield_curve_bear_steep, ai_infra_rs,
+      tech_breadth, cloud_rs
+    """
 
     WEIGHTS = {
-        "tech_crash_day":        0.14,   # NEW: 1-day shock detector (fastest)
-        "vix_tech_correlation":  0.16,   # 3-day VIX+tech co-movement
-        "sox_qqq_divergence":    0.10,   # 10-day semi vs tech divergence
-        "memory_momentum":       0.10,   # 5+20-day MU trend
-        "yield_shock":           0.12,   # 5-day 10Y spike
-        "yield_30y_stress":      0.08,   # 30Y absolute level + speed
-        "yield_curve_bear_steep": 0.06,  # 30Y-10Y steepening
-        "ai_infra_rs":           0.08,   # 20-day SMH vs SPY
-        "tech_breadth":          0.10,   # QQQ vs 20/50MA
-        "cloud_rs":              0.06,   # 10-day QQQ vs SPY
+        # ── Leading (1-3 day advance warning) ─────────────────────────────
+        "vvix_lead":             0.12,   # VVIX spike → VIX explosion 1-2d later
+        "credit_divergence":     0.10,   # HYG lagging SPY → equity selloff 1-3d
+        "sox_momentum_decel":    0.08,   # SOX 2nd-derivative decay → breakdown 1-2d
+        # ── Semi-reactive (same-day to 3-day) ─────────────────────────────
+        "tech_crash_day":        0.12,   # 1-day QQQ/SOX drop + VIX amplification
+        "vix_tech_correlation":  0.12,   # 3-day VIX+tech co-movement
+        "sox_qqq_divergence":    0.08,   # 10-day semi vs tech divergence
+        "memory_momentum":       0.08,   # 5+20-day MU trend
+        # ── Macro/structural (slow-moving context) ────────────────────────
+        "yield_shock":           0.10,   # 5-day 10Y spike
+        "yield_30y_stress":      0.06,   # 30Y absolute level + speed
+        "yield_curve_bear_steep": 0.05,  # 30Y-10Y bear steepening
+        "ai_infra_rs":           0.05,   # 20-day SMH vs SPY
+        "tech_breadth":          0.04,   # QQQ vs 20/50MA
     }
 
     def compute(
@@ -105,6 +121,8 @@ class TechStressIndex:
         treasury_30y: Optional[pd.Series] = None,
         tech_stocks: Optional[pd.DataFrame] = None,
         as_of: Optional[str] = None,
+        vvix_daily: Optional[pd.Series] = None,
+        hyg_daily: Optional[pd.Series] = None,
     ) -> TSIResult:
         if as_of:
             cutoff = pd.Timestamp(as_of)
@@ -122,53 +140,73 @@ class TechStressIndex:
         indicators = []
         flash_triggers = []
 
-        # 0. Single-day tech crash detector (fastest — must be first)
+        # ── LEADING INDICATORS (fire 1-3 days before crash) ─────────────────
+
+        # L1. VVIX lead — vol-of-vol spike anticipates VIX explosion by 1-2 days
+        ind = self._vvix_lead(vvix_daily if vvix_daily is not None else vix_daily, vix_daily)
+        indicators.append(ind)
+        if ind.signal > 65:
+            flash_triggers.append(f"VVIX fear spike: {ind.value:.0f} ({ind.value:.0f} vs MA20)")
+
+        # L2. Credit divergence — HYG lagging SPY = credit sees risk 1-3d before equity
+        ind = self._credit_divergence(
+            hyg_daily if hyg_daily is not None else spy_daily, spy_daily
+        )
+        indicators.append(ind)
+        if ind.signal > 65:
+            flash_triggers.append(f"Credit stress: HYG lagging SPY by {ind.value:.1f}%")
+
+        # L3. SOX momentum deceleration — 2nd-derivative decay before actual breakdown
+        ind = self._sox_momentum_decel(sox_daily, qqq_daily)
+        indicators.append(ind)
+        if ind.signal > 70:
+            flash_triggers.append(f"SOX momentum decelerating: {ind.value:.1f}%")
+
+        # ── REACTIVE INDICATORS ──────────────────────────────────────────────
+
+        # R1. Single-day tech crash detector
         ind = self._tech_crash_day(qqq_daily, sox_daily, vix_daily)
         indicators.append(ind)
-        if ind.signal > 60:  # ~2%+ single-day drop — flash on its own
+        if ind.signal > 60:
             flash_triggers.append(f"Tech crash: {ind.value:.1f}% single-day drop")
 
-        # 1. SOX/QQQ Divergence
+        # R2. SOX/QQQ Divergence
         ind = self._sox_qqq_divergence(sox_daily, qqq_daily)
         indicators.append(ind)
         if ind.signal > 70:
             flash_triggers.append(f"SOX lagging QQQ: {ind.value:.1f}%")
 
-        # 2. Memory Stock Momentum (MU as proxy)
+        # R3. Memory Stock Momentum (MU as proxy)
         ind = self._memory_momentum(mu_daily)
         indicators.append(ind)
         if ind.signal > 70:
             flash_triggers.append(f"Memory stocks breaking down")
 
-        # 3. Treasury Yield Shock
+        # R4. Treasury Yield Shock
         ind = self._yield_shock(treasury_10y)
         indicators.append(ind)
         if ind.signal > 70:
             flash_triggers.append(f"Yield spike: +{ind.value:.0f}bps in 5d")
 
-        # 4. 30Y Yield Stress
+        # R5. 30Y Yield Stress
         ind = self._yield_30y_stress(treasury_30y if treasury_30y is not None else treasury_10y)
         indicators.append(ind)
         if ind.signal > 70:
             flash_triggers.append(f"30Y yield at extreme: {ind.value:.2f}%")
 
-        # 5. Yield Curve Bear Steepening (30Y-10Y spread rising under rising rates)
+        # R6. Yield Curve Bear Steepening
         ind = self._yield_curve_bear_steep(treasury_10y, treasury_30y)
         indicators.append(ind)
 
-        # 6. AI Infra Relative Strength (SMH vs SPY)
+        # R7. AI Infra Relative Strength (SMH vs SPY)
         ind = self._ai_infra_rs(smh_daily, spy_daily)
         indicators.append(ind)
 
-        # 5. Tech Breadth (QQQ internal momentum)
+        # R8. Tech Breadth (QQQ vs 20/50MA)
         ind = self._tech_breadth(qqq_daily)
         indicators.append(ind)
 
-        # 6. Cloud RS (QQQ momentum as proxy)
-        ind = self._cloud_rs(qqq_daily, spy_daily)
-        indicators.append(ind)
-
-        # 7. VIX-Tech Correlation
+        # R9. VIX-Tech Correlation (3-day co-movement)
         ind = self._vix_tech_corr(vix_daily, qqq_daily)
         indicators.append(ind)
         if ind.signal > 75:
@@ -438,3 +476,97 @@ class TechStressIndex:
             signal = 0
 
         return TSIIndicator("yield_curve_bear_steep", spread_change, signal, 0.08, "bearish" if signal > 30 else "neutral")
+
+    # ── Leading Indicator Methods ──────────────────────────────────────────────
+
+    def _vvix_lead(self, vvix: pd.Series, vix: pd.Series) -> TSIIndicator:
+        """VVIX (vol-of-vol) spike → VIX explosion 1-2 days later → tech selloff.
+
+        VVIX measures implied volatility of VIX options. When VVIX rises above
+        its 20-day mean while VIX is still calm, it signals institutional hedgers
+        are buying VIX calls in anticipation of a shock — typically 1-2 days early.
+
+        Historical: VVIX >120 has preceded major VIX spikes in 2018, 2020, 2022.
+        """
+        if len(vvix) < 20 or len(vix) < 5:
+            return TSIIndicator("vvix_lead", 0, 0, 0.12, "neutral")
+
+        vvix_now = vvix.iloc[-1]
+        vvix_ma20 = vvix.tail(20).mean()
+        pct_above_ma = (vvix_now / vvix_ma20 - 1) * 100
+
+        vvix_3d_change = (vvix.iloc[-1] / vvix.iloc[-3] - 1) * 100
+        vix_3d_change  = (vix.iloc[-1]  / vix.iloc[-3]  - 1) * 100
+
+        # Base signal: VVIX elevated above its own 20-day mean
+        base = np.clip(pct_above_ma / 20 * 60, 0, 60)
+
+        # Leading bonus: VVIX rising FASTER than VIX (anticipatory divergence)
+        if vvix_3d_change > 5 and vvix_3d_change > vix_3d_change * 2:
+            divergence_bonus = np.clip(vvix_3d_change / 15 * 40, 0, 40)
+            signal = min(100, base + divergence_bonus)
+        else:
+            signal = base
+
+        return TSIIndicator("vvix_lead", vvix_now, signal, 0.12,
+                            "bearish" if signal > 30 else "neutral")
+
+    def _credit_divergence(self, hyg: pd.Series, spy: pd.Series) -> TSIIndicator:
+        """HYG (high yield bonds) lagging SPY → equity weakness 1-3 days ahead.
+
+        Credit markets are populated by more-informed institutional money.
+        When HY spreads widen while equities hold, it's early-warning that
+        risk appetite is deteriorating before equities catch up.
+
+        Signal: spy_5d_return - hyg_5d_return > 0 (SPY outperforming HYG = warning)
+        Extra: HYG falling while SPY flat/up = strongest warning (divergence peak)
+        """
+        if len(hyg) < 10 or len(spy) < 10:
+            return TSIIndicator("credit_divergence", 0, 0, 0.10, "neutral")
+
+        hyg_5d = (hyg.iloc[-1] / hyg.iloc[-5] - 1) * 100
+        spy_5d = (spy.iloc[-1] / spy.iloc[-5] - 1) * 100
+        divergence = spy_5d - hyg_5d  # positive = SPY outperforming HYG
+
+        if divergence > 0:
+            signal = np.clip(divergence / 3 * 80, 0, 80)
+            # Extra if HYG actually falling while SPY flat/up (strongest divergence)
+            if hyg_5d < -0.3 and spy_5d > -0.3:
+                signal = min(100, signal + 20)
+        else:
+            signal = 0
+
+        return TSIIndicator("credit_divergence", divergence, signal, 0.10,
+                            "bearish" if signal > 30 else "neutral")
+
+    def _sox_momentum_decel(self, sox: pd.Series, qqq: pd.Series) -> TSIIndicator:
+        """SOX momentum deceleration (2nd derivative) → breakdown 1-2 days ahead.
+
+        When SOX's rate-of-gain SLOWS while still positive, sellers are absorbing
+        buyers without moving the price down yet. Actual breakdown follows 1-2d.
+
+        Logic: compare 3-day vs 7-day momentum. If 7d was strong but 3d collapsed →
+        momentum lost steam → high probability of reversal or gap-down tomorrow.
+        Extra: if QQQ still strong while SOX decelerates → SOX-specific weakness.
+        """
+        if len(sox) < 15 or len(qqq) < 10:
+            return TSIIndicator("sox_momentum_decel", 0, 0, 0.08, "neutral")
+
+        sox_3d = (sox.iloc[-1] / sox.iloc[-3] - 1) * 100
+        sox_7d = (sox.iloc[-1] / sox.iloc[-7] - 1) * 100
+        qqq_3d = (qqq.iloc[-1] / qqq.iloc[-3] - 1) * 100
+
+        if sox_7d > 1.5 and sox_3d < sox_7d * 0.35:
+            # Strong 7d momentum collapsed in last 3d — deceleration
+            decel = sox_7d - sox_3d
+            signal = np.clip(decel / 3 * 70, 0, 70)
+            if qqq_3d > sox_3d + 1.0:  # QQQ still strong, SOX specifically weakening
+                signal = min(100, signal + 20)
+        elif sox_3d < -1.0 and sox_7d > 0:
+            # Recently turned negative from positive — momentum flip
+            signal = np.clip(abs(sox_3d) / 2 * 60, 0, 60)
+        else:
+            signal = 0
+
+        return TSIIndicator("sox_momentum_decel", sox_3d - sox_7d, signal, 0.08,
+                            "bearish" if signal > 30 else "neutral")

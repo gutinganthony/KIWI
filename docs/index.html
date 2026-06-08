@@ -652,36 +652,63 @@ var KIWI_DATA = {"updated":"2026-06-08","avi":{"score":6.7,"level":"ELEVATED","d
     <div class="breakdown-card">
       <div class="breakdown-header">
         <div>
-          <div class="section-title" style="margin-bottom:2px" data-i18n="tsi_breakdown">TSI — 9-Indicator Breakdown</div>
-          <div style="font-size:11px;color:var(--text2)" data-i18n="tsi_breakdown_sub">Daily · Tech sector · 7/7 events detected</div>
+          <div class="section-title" style="margin-bottom:2px" data-i18n="tsi_breakdown">TSI — 12-Indicator Breakdown</div>
+          <div style="font-size:11px;color:var(--text2)" data-i18n="tsi_breakdown_sub">Daily · Tech sector · Leading (1-3d) + Reactive</div>
         </div>
         <div class="breakdown-score-badge" style="color:var(--orange);background:var(--orange-bg)">45 / 100</div>
       </div>
       <div id="tsi-indicators">
+        <!-- Leading indicators (fire 1-3 days BEFORE crash) -->
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ti_vvix">⏩ VVIX Lead (vol-of-vol)</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:0%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ti_credit">⏩ Credit Diverg. (HYG/SPY)</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:0%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ti_decel">⏩ SOX Momentum Decel.</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:0%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <!-- Reactive indicators -->
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ti_crash">Tech Crash Day</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:0%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ti_vix">VIX-Tech Corr.</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:30%;background:var(--yellow)"></div></div>
+          <div class="ind-status s-watch">WATCH</div>
+        </div>
         <div class="ind-row">
           <div class="ind-name" data-i18n="ti_sox">SOX/QQQ Divergence</div>
           <div class="ind-bar-track"><div class="ind-bar-fill" style="width:30%;background:var(--yellow)"></div></div>
           <div class="ind-status s-watch">WATCH</div>
         </div>
         <div class="ind-row">
-          <div class="ind-name" data-i18n="ti_mem">Memory Momentum</div>
+          <div class="ind-name" data-i18n="ti_mem">Memory Momentum (MU)</div>
           <div class="ind-bar-track"><div class="ind-bar-fill" style="width:25%;background:var(--yellow)"></div></div>
           <div class="ind-status s-watch">WATCH</div>
         </div>
         <div class="ind-row">
           <div class="ind-name" data-i18n="ti_ys">Yield Shock (10Y)</div>
-          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:72%;background:var(--orange)"></div></div>
-          <div class="ind-status s-elevated">ELEVATED</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:45%;background:var(--yellow)"></div></div>
+          <div class="ind-status s-watch">WATCH</div>
         </div>
         <div class="ind-row">
           <div class="ind-name" data-i18n="ti_30y">30Y Yield Stress</div>
-          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:78%;background:var(--red)"></div></div>
-          <div class="ind-status s-critical">HIGH</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:50%;background:var(--orange)"></div></div>
+          <div class="ind-status s-elevated">ELEVATED</div>
         </div>
         <div class="ind-row">
           <div class="ind-name" data-i18n="ti_bear">Bear Steep. (30Y-10Y)</div>
-          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:58%;background:var(--orange)"></div></div>
-          <div class="ind-status s-elevated">ELEVATED</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:35%;background:var(--yellow)"></div></div>
+          <div class="ind-status s-watch">WATCH</div>
         </div>
         <div class="ind-row">
           <div class="ind-name" data-i18n="ti_ai">AI Infra RS (SMH/SPY)</div>
@@ -691,16 +718,6 @@ var KIWI_DATA = {"updated":"2026-06-08","avi":{"score":6.7,"level":"ELEVATED","d
         <div class="ind-row">
           <div class="ind-name" data-i18n="ti_breadth">Tech Breadth (QQQ)</div>
           <div class="ind-bar-track"><div class="ind-bar-fill" style="width:35%;background:var(--yellow)"></div></div>
-          <div class="ind-status s-watch">WATCH</div>
-        </div>
-        <div class="ind-row">
-          <div class="ind-name" data-i18n="ti_cloud">Cloud RS (QQQ/SPY)</div>
-          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:18%;background:var(--green)"></div></div>
-          <div class="ind-status s-normal">NORMAL</div>
-        </div>
-        <div class="ind-row">
-          <div class="ind-name" data-i18n="ti_vix">VIX-Tech Corr.</div>
-          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:48%;background:var(--yellow)"></div></div>
           <div class="ind-status s-watch">WATCH</div>
         </div>
       </div>
@@ -1211,9 +1228,10 @@ var KIWI_DATA = {"updated":"2026-06-08","avi":{"score":6.7,"level":"ELEVATED","d
 
     if (data.tsi && data.tsi.indicators) {
       updateIndicatorRows('tsi-indicators', data.tsi.indicators, [
-        'sox_qqq_divergence','memory_momentum','yield_shock','yield_30y_stress',
-        'yield_curve_bear_steep','ai_infra_rs','tech_breadth','cloud_rs',
-        'vix_tech_correlation',
+        'vvix_lead','credit_divergence','sox_momentum_decel',
+        'tech_crash_day','vix_tech_correlation','sox_qqq_divergence',
+        'memory_momentum','yield_shock','yield_30y_stress',
+        'yield_curve_bear_steep','ai_infra_rs','tech_breadth',
       ]);
     }
 
