@@ -81,43 +81,73 @@ AVI = Σ (dimension_percentile / 100 × weight × 10)
 
 ### 設計理念
 
-CRI（Crash Risk Index）回答的問題是：**未來 23–42 天內，市場出現 20%+ 崩盤的機率有多高？**
+CRI（Crash Risk Index）回答的問題是：**未來數日至數週內，S&P 500 大盤出現急跌的機率有多高？**
 
-歷史回測：4 次主要崩盤（2000、2008、2020、2022）全部提前偵測，
-領先時間 23–42 個交易日，沒有漏報。
+### v2 真實數據回測驗證（2026-06）
 
-### 12 個指標與權重
+CRI v2 的權重**用 24 年真實數據（SPY 1993- + CBOE VIX 1990-）實證最佳化**，
+方法與 TSI v4 一致：逐日計算 CRI，以「未來 N 日 SPY 跌幅 >5%」為崩盤標籤，
+ROC-AUC 評估各指標 + 邏輯回歸找權重（5-fold 交叉驗證）。
+
+- **資料**：`projects/avi-v5/data/backtest/`（SPY + VIX，涵蓋 2000/2008/2010/2015/2018/2020）
+- **結果**：
+  - CRI v2 整體分數 **D1 AUC = 0.904、D5 AUC = 0.787**（舊版含 boost 為 0.888 / 0.772）
+  - 邏輯回歸最佳模型 **交叉驗證 AUC = 0.805 ± 0.022**（樣本外）
+- **重現**：`python scripts/cri_backtest.py`
+
+**各指標實證預測力（D1 ROC-AUC）**：
+
+| 指標 | D1 AUC | 評價 |
+|------|:------:|------|
+| vix_spike | 0.89 | 最強 |
+| vix_term_structure | 0.85 | **最早的領先訊號**（backwardation 先反轉）|
+| momentum_collapse | 0.77 | 強 |
+| intraday_selloff | 0.70 | 中上 |
+| distribution_days | 0.69 | 中上 |
+| garch_vix_gap | 0.55 | 弱 |
+| breadth_divergence | 0.26 | ❌ 無預測力（反向）→ 大幅降配 |
+| rsi_divergence | 0.21 | ❌ 無預測力（反向）→ 大幅降配 |
+| ma_distance_reversal | 0.28 | ❌ 無預測力（反向）→ 大幅降配 |
+
+**關鍵發現**：原本設計來「提早預警」的三個技術指標（breadth_divergence、
+rsi_divergence、ma_distance_reversal）AUC 都 < 0.5，**實證上完全沒有
+預測力**（它們在平靜的高檔市場也常亮燈，無法區分崩盤）。已降到最低配重。
+
+### 12 個指標與權重（v2，實證最佳化）
 
 ```
-vix_term_structure   12%  ── VIX 期限結構（spot vs 3M）反轉 = 壓力
-vix_spike             9%  ── VIX 絕對水位 + 5 日上升速度
-garch_vix_gap         8%  ── GARCH 預測波動率 vs VIX 隱含波動率差距
-credit_acceleration  10%  ── BAA-AAA 利差 10 日加速擴大
-breadth_divergence    8%  ── 指數新高但市場廣度下降
-distribution_days     8%  ── 25 日內放量下跌天數（主力出貨訊號）
-rsi_divergence        7%  ── 價格創高但 RSI 下降（背離）
-ma_distance_reversal  7%  ── 嚴重超漲後開始反轉
-yield_curve_steepen   6%  ── 殖利率曲線在倒掛後快速陡化（衰退訊號）
-momentum_collapse     9%  ── 5 日急跌（最直接的短期崩盤前兆）
-yield_surge           8%  ── 10Y 殖利率 5 日快速跳升（折現率衝擊）
-intraday_selloff      8%  ── 同日股票跌 + VIX 漲（即時確認壓力）
+# VIX/價格指標（已用真實回測驗證，依預測 AUC 配權）
+vix_spike             22%  ── #1：VIX 絕對水位 + 5 日上升速度
+vix_term_structure    20%  ── 最早領先：VIX 期限結構反轉（backwardation）
+momentum_collapse     13%  ── 3-5 日急跌
+distribution_days     10%  ── 放量下跌天數（主力出貨）
+intraday_selloff       8%  ── 同日股票跌 + VIX 漲
+garch_vix_gap          3%  ── GARCH vol vs VIX（弱）
+breadth_divergence     2%  ── 已降配（AUC 0.26 無預測力）
+rsi_divergence         1%  ── 已降配（AUC 0.21 無預測力）
+ma_distance_reversal   1%  ── 已降配（AUC 0.28 無預測力）
+
+# 利率/信用指標（未在此回測，為升息/信用型崩盤保留）
+credit_acceleration   10%  ── BAA-AAA 利差加速（如 2008）
+yield_surge            6%  ── 10Y 殖利率快速跳升（如 2022）
+yield_curve_steepen    4%  ── 10Y-2Y 陡化
 ```
 
-### 計算方式
+### 計算方式（v2，已移除 boost 疊加）
 
 ```
-CRI_base = Σ (indicator_signal × weight)
-
-# 增幅機制（依序疊加）：
-若 AVI > 6 且 CRI > 40  → × 1.2
-若 ≥5 個指標 signal ≥40  → × 1.3
-若 ≥3 個指標 signal ≥40  → × 1.15
-若 momentum_collapse > 50 → × 1.3
-若 vix_spike > 60 且 momentum_collapse > 30 → × 1.25
+CRI = Σ (indicator_signal × weight)    # 權重已正規化至總和 1.0，無增幅、無保底
 ```
 
-增幅機制的設計邏輯：崩盤前夕通常有「多指標同時亮燈」的現象，
-單純加權容易低估，所以當多指標共振時主動放大信號。
+> **v1 → v2 重要改變**：移除了舊版的 5 段 boost 疊加
+> （AVI×1.2 · 共振×1.3 · tier1×1.3 · tier2×1.25 · tier3×1.15 連乘）。
+> 這些 boost 只在 vix_spike + momentum_collapse **同時亮燈時**才放大——
+> 而那正是崩盤**當下**，所以舊 CRI 才會「崩了才跑出 76」。移除後，
+> 最早的訊號（vix_term_structure 反轉）能**立即**把分數推高，提前預警。
+>
+> **實例**：COVID 2020 崩盤（2/24 主跌），CRI v2 在 2/18 進 MODERATE、
+> **2/21（崩盤前一個交易日）進 ELEVATED(45)**、2/24 進 CRITICAL(70)。
+> 2008 雷曼（9/15 倒）前，CRI v2 從 9/4 起就維持 HIGH(50-65)。
 
 | 分數 | 等級 | 含義 |
 |------|------|------|

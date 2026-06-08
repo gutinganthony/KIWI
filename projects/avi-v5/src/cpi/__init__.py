@@ -109,19 +109,25 @@ class CrashProbabilityIndex:
     """
 
     # Indicator weights (sum to 1.0) — 12 indicators
+    # ── v2 weights: empirically optimized on 24y real data (1996-2020) ──
+    #    SPY+VIX backtest, ROC-AUC per indicator + logistic CV (AUC 0.805).
+    #    See scripts/cri_backtest.py. The old technical "early warning" trio
+    #    (breadth/rsi/ma_distance) had AUC < 0.5 (no predictive power) → floored.
     WEIGHTS = {
-        "vix_term_structure": 0.12,
-        "vix_spike": 0.09,
-        "garch_vix_gap": 0.08,
-        "credit_acceleration": 0.10,
-        "breadth_divergence": 0.08,
-        "distribution_days": 0.08,
-        "rsi_divergence": 0.07,
-        "ma_distance_reversal": 0.07,
-        "yield_curve_steepening": 0.06,
-        "momentum_collapse": 0.09,
-        "yield_surge": 0.08,          # NEW: rapid Treasury yield spike
-        "intraday_selloff": 0.08,     # NEW: same-day broad market decline
+        # ── VIX/price indicators (validated; ordered by predictive AUC) ──
+        "vix_spike":            0.22,   # #1: D1 AUC 0.89, D5 0.80
+        "vix_term_structure":   0.20,   # earliest signal: backwardation (D1 0.85)
+        "momentum_collapse":    0.13,   # 3-5d price breakdown (D1 0.77)
+        "distribution_days":    0.10,   # institutional selling (D1 0.69)
+        "intraday_selloff":     0.08,   # same-day broad decline (D1 0.70)
+        "garch_vix_gap":        0.03,   # hidden vol (weak, D1 0.55)
+        "breadth_divergence":   0.02,   # FLOORED — AUC 0.26 (no power)
+        "rsi_divergence":       0.01,   # FLOORED — AUC 0.21 (no power)
+        "ma_distance_reversal": 0.01,   # FLOORED — AUC 0.28 (no power)
+        # ── Rate/credit indicators (not in this backtest; for rate-driven crashes) ──
+        "credit_acceleration":  0.10,   # BAA-AAA spread accel (e.g. 2008)
+        "yield_surge":          0.06,   # rapid 10Y spike (e.g. 2022)
+        "yield_curve_steepening": 0.04, # 10Y-2Y bear steepening
     }
 
     def compute(
@@ -242,45 +248,20 @@ class CrashProbabilityIndex:
         if flash:
             flash_triggers.append(flash)
 
-        # Composite CPI score
+        # v2: clean weighted sum. The previous AVI/consensus/tier boost-stacking
+        # (×1.2 × 1.3 × 1.3 × 1.25 × 1.15 compounding) only fired once vix_spike
+        # AND momentum_collapse were both high — i.e. DURING the crash — which is
+        # exactly why CRI spiked to 76 only after the drop. Backtest showed the
+        # boosts DROPPED out-of-sample AUC from 0.805 to 0.772. Removed so the
+        # earliest signals (vix_term_structure backwardation, vix_spike) raise
+        # the score immediately instead of waiting for multi-indicator confirmation.
+        # Weights are pre-normalized to sum 1.0, so total is already 0-100.
+        # Pure weighted sum — no spike floor. Backtest showed a max-signal floor
+        # HURT AUC (0.79 → 0.74): an isolated vix_spike in a calm-market vol blip
+        # would floor the score and create false positives. vix_spike already
+        # carries weight 0.22, so a genuine spike lifts the score on its own.
         total = sum(ind.weighted_signal for ind in indicators)
         cpi_score = min(100.0, max(0.0, total))
-
-        # AVI boost: if AVI > 6 and CPI > 40, multiply CPI by 1.2
-        if avi_score is not None and avi_score > 6.0 and cpi_score > 40:
-            cpi_score = min(100.0, cpi_score * 1.2)
-
-        # Consensus boost: when 3+ indicators are elevated, amplify
-        elevated_count = sum(1 for ind in indicators if ind.signal >= 40)
-        if elevated_count >= 5:
-            cpi_score = min(100.0, cpi_score * 1.3)
-        elif elevated_count >= 3:
-            cpi_score = min(100.0, cpi_score * 1.15)
-
-        # Short-term stress boost: compensate for slow indicators fading
-        # in the final 7 days before a crash. When fast-moving indicators
-        # (momentum_collapse, vix_spike, vix_term_structure) fire together,
-        # it strongly suggests imminent price dislocation — boost CPI to
-        # prevent false negatives in the critical 7-day window.
-        mc_signal = sig_mc    # momentum_collapse signal
-        vs_signal = sig_vs    # vix_spike signal
-        vts_signal = sig_vts  # vix_term_structure signal
-
-        # Tier 1: strong momentum collapse alone (>2.5% drop in 3-5 days)
-        if mc_signal > 50:
-            cpi_score = min(100.0, cpi_score * 1.3)
-
-        # Tier 2: VIX surging + momentum weakening together = flash crash setup
-        if vs_signal > 60 and mc_signal > 30:
-            cpi_score = min(100.0, cpi_score * 1.25)
-
-        # Tier 3: extreme VIX regime — backwardation + elevated VIX level
-        # Even without momentum collapse, this pattern reliably precedes
-        # crashes (e.g., VIX term structure inverted + VIX spiking above 20).
-        # This catches the scenario where CPI peaks 2-4 weeks out but the
-        # VIX stress is still present/intensifying in the final week.
-        if vts_signal > 80 and vs_signal > 50:
-            cpi_score = min(100.0, cpi_score * 1.15)
 
         # Flash Alert
         flash_alert = FlashAlert(
