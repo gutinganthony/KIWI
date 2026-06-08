@@ -41,7 +41,7 @@ DOCS_HTML = os.path.abspath(
 FALLBACK = {
     "avi_score": 4.5,
     "avi_level": "ELEVATED",
-    "cpi_score": 23.0,
+    "cri_score": 23.0,
     "tsi_score": 45.0,
     "sp500": 5300.0,
     "vix": 19.0,
@@ -61,7 +61,9 @@ def fetch_yfinance_data():
         log.warning("yfinance not installed — skipping market data fetch")
         return {}
 
-    tickers = ["^GSPC", "^VIX", "QQQ", "SOXX", "SMH", "SPY", "MU", "BZ=F"]
+    # ^VVIX = vol-of-vol (1-2 day lead before VIX explosion)
+    # HYG = high yield bonds (credit divergence, 2-3 day lead before equity selloff)
+    tickers = ["^GSPC", "^VIX", "^VVIX", "QQQ", "SOXX", "SMH", "SPY", "MU", "HYG", "BZ=F"]
     end = datetime.today()
     start = end - timedelta(days=730)
 
@@ -73,13 +75,20 @@ def fetch_yfinance_data():
             if df.empty:
                 log.warning(f"No data for {ticker}")
                 continue
-            # Flatten MultiIndex columns if present
+            # Flatten MultiIndex columns if present (yfinance returns MultiIndex for single ticker)
             if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
+                # Level 0 should be field names (Close, High, ...) not ticker names
+                level0 = df.columns.get_level_values(0).tolist()
+                if "Close" in level0:
+                    df.columns = level0
+                else:
+                    # Fallback: level 1 might be field names
+                    level1 = df.columns.get_level_values(1).tolist()
+                    df.columns = level1
             result[ticker] = df
             log.info(f"Fetched {ticker}: {len(df)} rows, last={df.index[-1].date()}")
         except Exception as e:
-            log.warning(f"Failed to fetch {ticker}: {e}")
+            log.warning(f"Failed to fetch {ticker}: {e}", exc_info=True)
 
     return result
 
@@ -212,42 +221,69 @@ def compute_tsi(yf_data, fred_data):
     """Compute TSI score using TechStressIndex engine."""
     try:
         from src.tsi import TechStressIndex
+        log.info("TSI: imported TechStressIndex OK")
 
-        # Required series
-        soxx_df = yf_data.get("SOXX") or yf_data.get("^SOX")
+        def get_close(df, name="?"):
+            if df is None:
+                log.warning(f"TSI: {name} DataFrame is None")
+                return None
+            cols = list(df.columns)
+            if "Close" in cols:
+                return df["Close"]
+            log.warning(f"TSI: {name} has no 'Close' column, columns={cols}, using iloc[:,0]")
+            return df.iloc[:, 0]
+
+        # Required series (must not use `or` on DataFrames — pandas raises ambiguous truth value)
+        soxx_df = yf_data.get("SOXX")
+        if soxx_df is None:
+            soxx_df = yf_data.get("^SOX")
         qqq_df  = yf_data.get("QQQ")
         mu_df   = yf_data.get("MU")
         smh_df  = yf_data.get("SMH")
         spy_df  = yf_data.get("SPY")
         vix_df  = yf_data.get("^VIX")
+        vvix_df = yf_data.get("^VVIX")
+        hyg_df  = yf_data.get("HYG")
 
-        if any(x is None for x in [qqq_df, mu_df, smh_df, spy_df, vix_df]):
-            raise ValueError("Missing required QQQ/MU/SMH/SPY/VIX data")
+        missing = [k for k, v in {"QQQ": qqq_df, "MU": mu_df, "SMH": smh_df,
+                                   "SPY": spy_df, "^VIX": vix_df}.items() if v is None]
+        if missing:
+            raise ValueError(f"Missing required data: {missing}")
 
-        def get_close(df):
-            if df is None:
-                return None
-            return df["Close"] if "Close" in df.columns else df.iloc[:, 0]
+        qqq  = get_close(qqq_df, "QQQ")
+        mu   = get_close(mu_df,  "MU")
+        smh  = get_close(smh_df, "SMH")
+        spy  = get_close(spy_df, "SPY")
+        vix  = get_close(vix_df, "^VIX")
+        sox  = get_close(soxx_df, "SOXX") if soxx_df is not None else qqq
+        vvix = get_close(vvix_df, "^VVIX") if vvix_df is not None else None
+        hyg  = get_close(hyg_df, "HYG")   if hyg_df  is not None else None
 
-        qqq  = get_close(qqq_df)
-        mu   = get_close(mu_df)
-        smh  = get_close(smh_df)
-        spy  = get_close(spy_df)
-        vix  = get_close(vix_df)
-        sox  = get_close(soxx_df) if soxx_df is not None else qqq  # fallback to QQQ
+        log.info(f"TSI data lengths: qqq={len(qqq)}, mu={len(mu)}, smh={len(smh)}, "
+                 f"spy={len(spy)}, vix={len(vix)}, sox={len(sox)}, "
+                 f"vvix={len(vvix) if vvix is not None else 'N/A'}, "
+                 f"hyg={len(hyg) if hyg is not None else 'N/A'}")
 
         treasury_10y = fred_data.get("treasury_10y")
         treasury_30y = fred_data.get("treasury_30y")
 
-        if treasury_10y is None or treasury_10y.empty:
+        if treasury_10y is None or (hasattr(treasury_10y, 'empty') and treasury_10y.empty):
+            log.info("TSI: treasury_10y not from FRED, using constant 4.5%")
             treasury_10y = pd.Series(0.045, index=vix.index)
         else:
-            treasury_10y = treasury_10y.reindex(vix.index, method="ffill").fillna(0.045)
+            # Align index: convert both to tz-naive date-only before reindex
+            treasury_10y.index = pd.to_datetime(treasury_10y.index).normalize()
+            vix_idx_naive = pd.DatetimeIndex([d.normalize() if hasattr(d, 'normalize') else d for d in vix.index])
+            treasury_10y = treasury_10y.reindex(vix_idx_naive, method="ffill").fillna(0.045)
+            treasury_10y.index = vix.index  # restore original index
 
-        if treasury_30y is None or treasury_30y.empty:
+        if treasury_30y is None or (hasattr(treasury_30y, 'empty') and treasury_30y.empty):
             treasury_30y = None
         else:
-            treasury_30y = treasury_30y.reindex(vix.index, method="ffill").fillna(0.05)
+            treasury_30y.index = pd.to_datetime(treasury_30y.index).normalize()
+            vix_idx_naive = pd.DatetimeIndex([d.normalize() if hasattr(d, 'normalize') else d for d in vix.index])
+            treasury_30y = treasury_30y.reindex(vix_idx_naive, method="ffill").fillna(0.05)
+            treasury_30y.index = vix.index
 
         tsi = TechStressIndex()
         result = tsi.compute(
@@ -259,12 +295,14 @@ def compute_tsi(yf_data, fred_data):
             treasury_10y=treasury_10y,
             vix_daily=vix,
             treasury_30y=treasury_30y,
+            vvix_daily=vvix,
+            hyg_daily=hyg,
         )
         log.info(f"TSI computed: {result.score:.1f} / {result.bias}")
         return result
 
     except Exception as e:
-        log.warning(f"TSI computation failed: {e}")
+        log.warning(f"TSI computation failed: {e}", exc_info=True)
         return None
 
 
@@ -393,14 +431,14 @@ def build_alert(tsi_score, cpi_score, tsi_bias, avi_level_str):
     if tsi_score >= 65 or cpi_score >= 50:
         level = "danger"
         show = True
-        title_en = f"High Risk Alert — TSI {tsi_bias} / CPI Elevated"
-        title_zh = f"高風險警告 — TSI {tsi_bias} / CPI 升高"
+        title_en = f"High Risk Alert — TSI {tsi_bias} / CRI Elevated"
+        title_zh = f"高風險警告 — TSI {tsi_bias} / CRI 升高"
         desc_en = (
-            f"TSI = {tsi_score:.0f} ({tsi_bias}), CPI = {cpi_score:.0f}. "
+            f"TSI = {tsi_score:.0f} ({tsi_bias}), CRI = {cpi_score:.0f}. "
             "Multiple stress signals elevated. Consider risk reduction."
         )
         desc_zh = (
-            f"TSI = {tsi_score:.0f}（{tsi_bias}），CPI = {cpi_score:.0f}。"
+            f"TSI = {tsi_score:.0f}（{tsi_bias}），CRI = {cpi_score:.0f}。"
             "多項壓力指標升高，考慮降低風險敞口。"
         )
     elif tsi_score >= 45 or cpi_score >= 35:
@@ -409,11 +447,11 @@ def build_alert(tsi_score, cpi_score, tsi_bias, avi_level_str):
         title_en = f"Tech Sector Caution — TSI {tsi_bias}"
         title_zh = f"科技板塊謹慎 — TSI {tsi_bias}"
         desc_en = (
-            f"TSI = {tsi_score:.0f} ({tsi_bias}), CPI = {cpi_score:.0f}. "
+            f"TSI = {tsi_score:.0f} ({tsi_bias}), CRI = {cpi_score:.0f}. "
             "Elevated stress indicators. Monitor daily."
         )
         desc_zh = (
-            f"TSI = {tsi_score:.0f}（{tsi_bias}），CPI = {cpi_score:.0f}。"
+            f"TSI = {tsi_score:.0f}（{tsi_bias}），CRI = {cpi_score:.0f}。"
             "壓力指標升高，請每日追蹤。"
         )
     else:
@@ -472,16 +510,21 @@ def build_cpi_indicators(cpi_result):
 def build_tsi_indicators(tsi_result):
     """Convert TSIResult indicators to dict keyed by indicator name."""
     if tsi_result is None:
+        # Static fallback — shown only when TSI computation fails in GitHub Actions.
+        # If you see these numbers every day, check Actions logs for TSI error.
         fallback = {
+            "vvix_lead":              {"signal": 0,  "status": "normal"},
+            "credit_divergence":      {"signal": 0,  "status": "normal"},
+            "sox_momentum_decel":     {"signal": 0,  "status": "normal"},
+            "tech_crash_day":         {"signal": 0,  "status": "normal"},
             "sox_qqq_divergence":     {"signal": 30, "status": "watch"},
             "memory_momentum":        {"signal": 25, "status": "watch"},
-            "yield_shock":            {"signal": 72, "status": "elevated"},
-            "yield_30y_stress":       {"signal": 78, "status": "critical"},
-            "yield_curve_bear_steep": {"signal": 58, "status": "elevated"},
+            "yield_shock":            {"signal": 45, "status": "watch"},
+            "yield_30y_stress":       {"signal": 50, "status": "elevated"},
+            "yield_curve_bear_steep": {"signal": 35, "status": "watch"},
             "ai_infra_rs":            {"signal": 22, "status": "normal"},
             "tech_breadth":           {"signal": 35, "status": "watch"},
-            "cloud_rs":               {"signal": 18, "status": "normal"},
-            "vix_tech_correlation":   {"signal": 48, "status": "watch"},
+            "vix_tech_correlation":   {"signal": 30, "status": "watch"},
         }
         return fallback
 
@@ -512,11 +555,11 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
     avi_score = compute_avi_score(dims)
     avi_lvl   = avi_level(avi_score)
 
-    # ── CPI ──────────────────────────────────────────────────────────────────
-    cpi_score = cpi_result.score if cpi_result else FALLBACK["cpi_score"]
-    cpi_lvl   = cpi_result.level if cpi_result else "LOW"
-    cpi_flash = cpi_result.flash_alert.triggered if cpi_result else False
-    cpi_inds  = build_cpi_indicators(cpi_result)
+    # ── CRI ──────────────────────────────────────────────────────────────────
+    cri_score = cpi_result.score if cpi_result else FALLBACK["cri_score"]
+    cri_lvl   = cpi_result.level if cpi_result else "LOW"
+    cri_flash = cpi_result.flash_alert.triggered if cpi_result else False
+    cri_inds  = build_cpi_indicators(cpi_result)
 
     # ── TSI ──────────────────────────────────────────────────────────────────
     tsi_score = tsi_result.score if tsi_result else FALLBACK["tsi_score"]
@@ -546,7 +589,7 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
     cape  = cape_val if cape_val else FALLBACK["cape"]
 
     # ── Alert ─────────────────────────────────────────────────────────────────
-    alert = build_alert(tsi_score, cpi_score, tsi_bias, avi_lvl)
+    alert = build_alert(tsi_score, cri_score, tsi_bias, avi_lvl)
 
     payload = {
         "updated": today,
@@ -555,11 +598,11 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
             "level":      avi_lvl,
             "dimensions": dims,
         },
-        "cpi": {
-            "score":      round(cpi_score, 1),
-            "level":      cpi_lvl,
-            "flash":      cpi_flash,
-            "indicators": cpi_inds,
+        "cri": {
+            "score":      round(cri_score, 1),
+            "level":      cri_lvl,
+            "flash":      cri_flash,
+            "indicators": cri_inds,
         },
         "tsi": {
             "score":      round(tsi_score, 1),
@@ -644,7 +687,7 @@ def main():
 
     log.info("=== Computed Payload ===")
     log.info(f"  AVI  : {payload['avi']['score']:.2f} / {payload['avi']['level']}")
-    log.info(f"  CPI  : {payload['cpi']['score']:.1f} / {payload['cpi']['level']}")
+    log.info(f"  CRI  : {payload['cri']['score']:.1f} / {payload['cri']['level']}")
     log.info(f"  TSI  : {payload['tsi']['score']:.1f} / {payload['tsi']['bias']}")
     log.info(f"  SPX  : {payload['market']['sp500']}")
     log.info(f"  VIX  : {payload['market']['vix']}")

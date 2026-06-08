@@ -5,6 +5,8 @@ All updates to entries are logged here chronologically.
 ---
 
 <!-- CHANGELOG_ENTRIES_START -->
+| 2026-06-03 | Added | [Redefine Fund — Jake × Vince 共同基金專案](./topics/business/2026-06-03-redefine-fund-project.md) | 與前 ASML PM Vince 共組半導體/AI 基金：整合點、風險、在職+海外合規地圖、結構選項比較、Action Plan、合夥對齊書 + 策略 1-pager 模板 |
+| 2026-06-02 | Added | [AI 投資研究副駕駛 — 可測試假設 + 客戶訪談訪綱](./topics/business/2026-06-02-ai-investment-copilot-hypothesis.md) | 依 Founder's Playbook Idea 階段：可測試問題陳述、對抗性壓力測試、競品地圖、客戶訪談訪綱（可複製）、退出條件 checklist |
 | 2026-04-20 | Updated | [AVI V4 — IG + Threads 社群發文素材庫](./topics/business/2026-04-20-avi-v4-social-posts.md) | v2.1：新增 ZIP 打包（14 圖 + 4 MD + 2 OVERVIEW）、素材總覽縮圖、發文行事曆 XLSX |
 | 2026-04-20 | Updated | [AVI V4 — IG + Threads 社群發文素材庫](./topics/business/2026-04-20-avi-v4-social-posts.md) | v2.0：擴充 X/Twitter Thread（12 則 + Premium 單則長文）+ IG Stories 4 張（9:16），共 14 張社群素材圖 |
 | 2026-04-20 | Added | [AVI V4 — IG + Threads 社群發文素材庫](./topics/business/2026-04-20-avi-v4-social-posts.md) | IG Carousel 6 slides 設計、主 caption、Threads 10 則串文、發文時程 |

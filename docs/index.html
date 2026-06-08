@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>AVI Dashboard — CPI · TSI · AVI</title>
+<title>AVI Dashboard — CRI · TSI · AVI</title>
 <style>
 /* ── Reset & Base ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -357,12 +357,34 @@ body {
   .container { padding: 12px; }
   .header h1 { font-size: 15px; }
 }
+
+/* ── Taiwan Indicators ── */
+.tw-cards { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.tw-card { flex: 1; min-width: 200px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+.tw-card-label { font-size: 11px; color: var(--text2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.tw-card-value { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 6px; font-variant-numeric: tabular-nums; }
+.tw-card-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-bottom: 6px; }
+.tw-card-note { font-size: 10px; color: var(--text3); }
+.tw-badge-bullish { background: var(--green-bg); color: var(--green); }
+.tw-badge-bearish { background: var(--red-bg); color: var(--red); }
+.tw-badge-neutral { background: var(--bg3); color: var(--text2); }
+.tw-badge-high { background: var(--red-bg); color: var(--red); }
+.tw-badge-elevated { background: var(--orange-bg); color: var(--orange); }
+.tw-badge-normal { background: var(--green-bg); color: var(--green); }
+.tw-charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px; }
+@media (max-width: 680px) { .tw-charts-grid { grid-template-columns: 1fr; } }
+.tw-chart-block { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+.tw-chart-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.tw-chart-sub { font-size: 10px; color: var(--text3); margin-bottom: 10px; }
+.tw-chart-container { position: relative; height: 160px; }
+.tw-note { font-size: 10px; color: var(--text3); text-align: center; padding-top: 4px; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 <script>
 // [KIWI-DATA-START]
-var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","dimensions":{"valuation":{"pct":72,"emoji":"🟠"},"profitability":{"pct":34,"emoji":"🟢"},"macro":{"pct":52,"emoji":"🟡"},"rate":{"pct":65,"emoji":"🟠"},"credit":{"pct":12,"emoji":"🟢"},"momentum":{"pct":58,"emoji":"🟡"}}},"cpi":{"score":23.0,"level":"LOW","flash":false,"indicators":{"vix_term_structure":{"signal":22,"status":"normal"},"vix_spike":{"signal":38,"status":"watch"},"garch_vix_gap":{"signal":15,"status":"normal"},"credit_acceleration":{"signal":10,"status":"normal"},"breadth_divergence":{"signal":35,"status":"watch"},"distribution_days":{"signal":20,"status":"normal"},"rsi_divergence":{"signal":28,"status":"watch"},"ma_distance_reversal":{"signal":12,"status":"normal"},"yield_curve_steepening":{"signal":18,"status":"normal"},"momentum_collapse":{"signal":8,"status":"normal"},"yield_surge":{"signal":52,"status":"elevated"},"intraday_selloff":{"signal":14,"status":"normal"}}},"tsi":{"score":45.0,"bias":"CAUTIOUS","flash":false,"indicators":{"sox_qqq_divergence":{"signal":30,"status":"watch"},"memory_momentum":{"signal":25,"status":"watch"},"yield_shock":{"signal":72,"status":"elevated"},"yield_30y_stress":{"signal":78,"status":"critical"},"yield_curve_bear_steep":{"signal":58,"status":"elevated"},"ai_infra_rs":{"signal":22,"status":"normal"},"tech_breadth":{"signal":35,"status":"watch"},"cloud_rs":{"signal":18,"status":"normal"},"vix_tech_correlation":{"signal":48,"status":"watch"}}},"market":{"sp500":5300.0,"vix":19.0,"t10y":4.55,"t30y":5.12,"cape":41.5,"oil":0.0},"alert":{"show":true,"level":"caution","title_en":"Tech Sector Caution — TSI CAUTIOUS","title_zh":"科技板塊謹慎 — TSI CAUTIOUS","desc_en":"TSI = 45 (CAUTIOUS), CPI = 23. Elevated stress indicators. Monitor daily.","desc_zh":"TSI = 45（CAUTIOUS），CPI = 23。壓力指標升高，請每日追蹤。"}};
+var KIWI_DATA = {"updated":"2026-06-08","avi":{"score":6.7,"level":"ELEVATED","dimensions":{"valuation":{"pct":88,"emoji":"🔴"},"profitability":{"pct":34,"emoji":"🟢"},"macro":{"pct":86,"emoji":"🔴"},"rate":{"pct":65,"emoji":"🟠"},"credit":{"pct":33,"emoji":"🟢"},"momentum":{"pct":41,"emoji":"🟡"}}},"cri":{"score":76.0,"level":"CRITICAL","flash":true,"indicators":{"vix_term_structure":{"signal":76.6,"status":"elevated"},"garch_vix_gap":{"signal":0.0,"status":"normal"},"credit_acceleration":{"signal":0.0,"status":"normal"},"breadth_divergence":{"signal":0.0,"status":"normal"},"distribution_days":{"signal":40.0,"status":"watch"},"rsi_divergence":{"signal":0.0,"status":"normal"},"ma_distance_reversal":{"signal":0.0,"status":"normal"},"yield_curve_steepening":{"signal":0.0,"status":"normal"},"vix_spike":{"signal":81.3,"status":"critical"},"momentum_collapse":{"signal":56.9,"status":"elevated"},"yield_surge":{"signal":46.2,"status":"watch"},"intraday_selloff":{"signal":92.9,"status":"critical"}}},"tsi":{"score":45.0,"bias":"CAUTIOUS","flash":false,"indicators":{"sox_qqq_divergence":{"signal":30,"status":"watch"},"memory_momentum":{"signal":25,"status":"watch"},"yield_shock":{"signal":72,"status":"elevated"},"yield_30y_stress":{"signal":78,"status":"critical"},"yield_curve_bear_steep":{"signal":58,"status":"elevated"},"ai_infra_rs":{"signal":22,"status":"normal"},"tech_breadth":{"signal":35,"status":"watch"},"cloud_rs":{"signal":18,"status":"normal"},"vix_tech_correlation":{"signal":48,"status":"watch"}}},"market":{"sp500":7383.74,"vix":21.51,"t10y":4.47,"t30y":4.97,"cape":41.57,"oil":96.4},"alert":{"show":true,"level":"danger","title_en":"High Risk Alert — TSI CAUTIOUS / CRI Elevated","title_zh":"高風險警告 — TSI CAUTIOUS / CRI 升高","desc_en":"TSI = 45 (CAUTIOUS), CRI = 76. Multiple stress signals elevated. Consider risk reduction.","desc_zh":"TSI = 45（CAUTIOUS），CRI = 76。多項壓力指標升高，考慮降低風險敞口。"}};
 // [KIWI-DATA-END]
 </script>
 <div class="container">
@@ -418,9 +440,9 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
       <div class="gc-desc" data-i18n="avi_desc">Valuation environment. High = market is expensive vs history. CAPE 41.5, 2nd highest ever.</div>
     </div>
 
-    <!-- CPI -->
+    <!-- CRI -->
     <div class="gauge-card">
-      <span class="gc-tag">CPI</span>
+      <span class="gc-tag">CRI</span>
       <span class="gc-tag-freq" data-i18n="daily">Daily</span>
       <div class="ring-wrap">
         <svg viewBox="0 0 120 120">
@@ -472,13 +494,13 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
         <div class="signal-light yellow"></div>
         <div>
           <div class="signal-label" data-i18n="signal_label">Cautious Hold</div>
-          <div class="signal-sublabel" data-i18n="signal_sub">AVI 偏高 × CPI 低 × TSI 謹慎</div>
+          <div class="signal-sublabel" data-i18n="signal_sub">AVI 偏高 × CRI 低 × TSI 謹慎</div>
         </div>
       </div>
     </div>
     <div class="signal-matrix">
       <div class="matrix-cell green-cell">
-        <div class="mc-label" data-i18n="m1_label">CPI — Normal</div>
+        <div class="mc-label" data-i18n="m1_label">CRI — Normal</div>
         <div class="mc-text" data-i18n="m1_text">No imminent crash signal. Short-term risk low. Do not panic sell.</div>
       </div>
       <div class="matrix-cell orange-cell">
@@ -491,7 +513,7 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
       </div>
       <div class="matrix-cell yellow-cell">
         <div class="mc-label" data-i18n="m4_label">Watch Trigger</div>
-        <div class="mc-text" data-i18n="m4_text">NVIDIA earnings 5/20. If TSI &gt; 55 OR CPI &gt; 35, activate reduce-risk protocol.</div>
+        <div class="mc-text" data-i18n="m4_text">NVIDIA earnings 5/20. If TSI &gt; 55 OR CRI &gt; 35, activate reduce-risk protocol.</div>
       </div>
     </div>
   </div>
@@ -526,7 +548,7 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
         <div class="dim-emoji">🟡</div>
       </div>
       <div class="dim-row">
-        <div><div class="dim-name" data-i18n="d_rate">Rate / Inflation</div><div class="dim-weight">14% · CPI YoY, 10Y Real Yield</div></div>
+        <div><div class="dim-name" data-i18n="d_rate">Rate / Inflation</div><div class="dim-weight">14% · CRI YoY, 10Y Real Yield</div></div>
         <div class="ind-bar-track"><div class="ind-bar-fill" style="width:65%;background:var(--orange)"></div></div>
         <div class="dim-pct" style="color:var(--orange)">65%</div>
         <div class="dim-emoji">🟠</div>
@@ -549,29 +571,44 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
     </div>
   </div>
 
-  <!-- ── CPI + TSI Breakdown ── -->
+  <!-- ── CRI + TSI Breakdown ── -->
   <div class="breakdown-grid">
 
-    <!-- CPI -->
+    <!-- CRI -->
     <div class="breakdown-card">
       <div class="breakdown-header">
         <div>
-          <div class="section-title" style="margin-bottom:2px" data-i18n="cpi_breakdown">CPI — 12-Indicator Breakdown</div>
-          <div style="font-size:11px;color:var(--text2)" data-i18n="cpi_breakdown_sub">Daily · Crash prediction 23–42 day lead</div>
+          <div class="section-title" style="margin-bottom:2px" data-i18n="cpi_breakdown">CRI — 12-Indicator Breakdown (v2)</div>
+          <div style="font-size:11px;color:var(--text2)" data-i18n="cpi_breakdown_sub">Daily · Weights optimized on 24y real data (CV-AUC 0.81)</div>
         </div>
         <div class="breakdown-score-badge" style="color:var(--green);background:var(--green-bg)">23 / 100</div>
       </div>
       <div id="cpi-indicators">
-        <!-- VIX Term Structure -->
+        <!-- Ordered by empirical predictive power (D1 ROC-AUC, 24y real data). -->
         <div class="ind-row">
-          <div class="ind-name" data-i18n="ci_vts">VIX Term Structure</div>
-          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:22%;background:var(--green)"></div></div>
+          <div class="ind-name" data-i18n="ci_vs">VIX Spike · AUC .89</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:0%;background:var(--green)"></div></div>
           <div class="ind-status s-normal">NORMAL</div>
         </div>
         <div class="ind-row">
-          <div class="ind-name" data-i18n="ci_vs">VIX Spike</div>
-          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:38%;background:var(--yellow)"></div></div>
-          <div class="ind-status s-watch">WATCH</div>
+          <div class="ind-name" data-i18n="ci_vts">VIX Term Struct. · AUC .85</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:0%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ci_mc">Momentum Collapse · AUC .77</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:0%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ci_is">Intraday Selloff · AUC .70</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:0%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ci_dist">Distribution Days · AUC .69</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:20%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
         </div>
         <div class="ind-row">
           <div class="ind-name" data-i18n="ci_garch">GARCH-VIX Gap</div>
@@ -584,23 +621,8 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
           <div class="ind-status s-normal">NORMAL</div>
         </div>
         <div class="ind-row">
-          <div class="ind-name" data-i18n="ci_breadth">Breadth Divergence</div>
-          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:35%;background:var(--yellow)"></div></div>
-          <div class="ind-status s-watch">WATCH</div>
-        </div>
-        <div class="ind-row">
-          <div class="ind-name" data-i18n="ci_dist">Distribution Days</div>
-          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:20%;background:var(--green)"></div></div>
-          <div class="ind-status s-normal">NORMAL</div>
-        </div>
-        <div class="ind-row">
-          <div class="ind-name" data-i18n="ci_rsi">RSI Divergence</div>
-          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:28%;background:var(--yellow)"></div></div>
-          <div class="ind-status s-watch">WATCH</div>
-        </div>
-        <div class="ind-row">
-          <div class="ind-name" data-i18n="ci_ma">MA Distance Reversal</div>
-          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:12%;background:var(--green)"></div></div>
+          <div class="ind-name" data-i18n="ci_ys">Yield Surge (10Y)</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:0%;background:var(--green)"></div></div>
           <div class="ind-status s-normal">NORMAL</div>
         </div>
         <div class="ind-row">
@@ -609,18 +631,18 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
           <div class="ind-status s-normal">NORMAL</div>
         </div>
         <div class="ind-row">
-          <div class="ind-name" data-i18n="ci_mc">Momentum Collapse</div>
-          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:8%;background:var(--green)"></div></div>
+          <div class="ind-name" data-i18n="ci_breadth">Breadth Diverg. · low wt</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:0%;background:var(--green)"></div></div>
           <div class="ind-status s-normal">NORMAL</div>
         </div>
         <div class="ind-row">
-          <div class="ind-name" data-i18n="ci_ys">Yield Surge</div>
-          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:52%;background:var(--orange)"></div></div>
-          <div class="ind-status s-elevated">ELEVATED</div>
+          <div class="ind-name" data-i18n="ci_rsi">RSI Diverg. · low wt</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:0%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
         </div>
         <div class="ind-row">
-          <div class="ind-name" data-i18n="ci_is">Intraday Selloff</div>
-          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:14%;background:var(--green)"></div></div>
+          <div class="ind-name" data-i18n="ci_ma">MA Dist. Reversal · low wt</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:0%;background:var(--green)"></div></div>
           <div class="ind-status s-normal">NORMAL</div>
         </div>
       </div>
@@ -630,35 +652,61 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
     <div class="breakdown-card">
       <div class="breakdown-header">
         <div>
-          <div class="section-title" style="margin-bottom:2px" data-i18n="tsi_breakdown">TSI — 9-Indicator Breakdown</div>
-          <div style="font-size:11px;color:var(--text2)" data-i18n="tsi_breakdown_sub">Daily · Tech sector · 7/7 events detected</div>
+          <div class="section-title" style="margin-bottom:2px" data-i18n="tsi_breakdown">TSI — 12-Indicator Breakdown (v4)</div>
+          <div style="font-size:11px;color:var(--text2)" data-i18n="tsi_breakdown_sub">Daily · Weights optimized on 27y real data (CV-AUC 0.75)</div>
         </div>
         <div class="breakdown-score-badge" style="color:var(--orange);background:var(--orange-bg)">45 / 100</div>
       </div>
       <div id="tsi-indicators">
+        <!-- Ordered by empirical predictive power (D1 ROC-AUC). ⏩ = true leading -->
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ti_breadth">Tech Breadth (QQQ) · AUC .93</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:0%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ti_vvix">⏩ VVIX Lead · AUC .82</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:0%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ti_credit">⏩ Credit Diverg. (HYG/SPY)</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:0%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ti_crash">Tech Crash Day · AUC .76</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:0%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <div class="ind-row">
+          <div class="ind-name" data-i18n="ti_vix">VIX-Tech Corr. · AUC .78</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:30%;background:var(--yellow)"></div></div>
+          <div class="ind-status s-watch">WATCH</div>
+        </div>
         <div class="ind-row">
           <div class="ind-name" data-i18n="ti_sox">SOX/QQQ Divergence</div>
           <div class="ind-bar-track"><div class="ind-bar-fill" style="width:30%;background:var(--yellow)"></div></div>
           <div class="ind-status s-watch">WATCH</div>
         </div>
         <div class="ind-row">
-          <div class="ind-name" data-i18n="ti_mem">Memory Momentum</div>
+          <div class="ind-name" data-i18n="ti_mem">Memory Momentum (MU)</div>
           <div class="ind-bar-track"><div class="ind-bar-fill" style="width:25%;background:var(--yellow)"></div></div>
           <div class="ind-status s-watch">WATCH</div>
         </div>
         <div class="ind-row">
+          <div class="ind-name" data-i18n="ti_decel">⏩ SOX Momentum Decel.</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:0%;background:var(--green)"></div></div>
+          <div class="ind-status s-normal">NORMAL</div>
+        </div>
+        <div class="ind-row">
           <div class="ind-name" data-i18n="ti_ys">Yield Shock (10Y)</div>
-          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:72%;background:var(--orange)"></div></div>
-          <div class="ind-status s-elevated">ELEVATED</div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:45%;background:var(--yellow)"></div></div>
+          <div class="ind-status s-watch">WATCH</div>
         </div>
         <div class="ind-row">
           <div class="ind-name" data-i18n="ti_30y">30Y Yield Stress</div>
-          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:78%;background:var(--red)"></div></div>
-          <div class="ind-status s-critical">HIGH</div>
-        </div>
-        <div class="ind-row">
-          <div class="ind-name" data-i18n="ti_bear">Bear Steep. (30Y-10Y)</div>
-          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:58%;background:var(--orange)"></div></div>
+          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:50%;background:var(--orange)"></div></div>
           <div class="ind-status s-elevated">ELEVATED</div>
         </div>
         <div class="ind-row">
@@ -667,18 +715,8 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
           <div class="ind-status s-normal">NORMAL</div>
         </div>
         <div class="ind-row">
-          <div class="ind-name" data-i18n="ti_breadth">Tech Breadth (QQQ)</div>
+          <div class="ind-name" data-i18n="ti_bear">Bear Steep. (30Y-10Y)</div>
           <div class="ind-bar-track"><div class="ind-bar-fill" style="width:35%;background:var(--yellow)"></div></div>
-          <div class="ind-status s-watch">WATCH</div>
-        </div>
-        <div class="ind-row">
-          <div class="ind-name" data-i18n="ti_cloud">Cloud RS (QQQ/SPY)</div>
-          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:18%;background:var(--green)"></div></div>
-          <div class="ind-status s-normal">NORMAL</div>
-        </div>
-        <div class="ind-row">
-          <div class="ind-name" data-i18n="ti_vix">VIX-Tech Corr.</div>
-          <div class="ind-bar-track"><div class="ind-bar-fill" style="width:48%;background:var(--yellow)"></div></div>
           <div class="ind-status s-watch">WATCH</div>
         </div>
       </div>
@@ -738,8 +776,8 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
       <div class="event-date">6/10</div>
       <div class="event-dot orange"></div>
       <div>
-        <div class="event-name" data-i18n="ev2_name">CPI Data (May)</div>
-        <div class="event-note" data-i18n="ev2_note">&gt;3.3% → rate hike pressure returns, AVI rate dimension spikes. CPI indicator: Yield Surge.</div>
+        <div class="event-name" data-i18n="ev2_name">CRI Data (May)</div>
+        <div class="event-note" data-i18n="ev2_note">&gt;3.3% → rate hike pressure returns, AVI rate dimension spikes. CRI indicator: Yield Surge.</div>
       </div>
     </div>
     <div class="event-row">
@@ -794,8 +832,8 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
         <div style="font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px" data-i18n="trigger_label">TRIGGER</div>
         <ul style="font-size:12px;color:var(--text2);line-height:1.6;padding-left:14px" data-i18n="trigger_list">
           <li>TSI &gt; 55 → reduce</li>
-          <li>CPI &gt; 35 → hedge</li>
-          <li>CPI+TSI both high → act</li>
+          <li>CRI &gt; 35 → hedge</li>
+          <li>CRI+TSI both high → act</li>
           <li>Flash ⚡ → immediate</li>
         </ul>
       </div>
@@ -836,9 +874,49 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
     </div>
   </div>
 
+  <!-- ── Taiwan Indicators ── -->
+  <div class="section" id="tw-section" style="margin-top:24px">
+    <div class="section-head">
+      <div class="section-title" data-i18n="tw_title">🇹🇼 台股法人指標</div>
+      <div class="section-sub" data-i18n="tw_sub">外資期貨多空 · 融資餘額 · 近90日走勢</div>
+    </div>
+
+    <div class="tw-cards">
+      <div class="tw-card">
+        <div class="tw-card-label">外資台指期淨多空口數</div>
+        <div class="tw-card-value" id="tw-futures-val">—</div>
+        <div class="tw-card-badge tw-badge-neutral" id="tw-futures-badge">載入中</div>
+        <div class="tw-card-note">&gt;+10,000 = 偏多；&lt;−10,000 = 偏空</div>
+      </div>
+      <div class="tw-card">
+        <div class="tw-card-label">全市場融資餘額</div>
+        <div class="tw-card-value" id="tw-margin-val">—</div>
+        <div class="tw-card-badge tw-badge-neutral" id="tw-margin-badge">載入中</div>
+        <div class="tw-card-note">90日百分位 · 85%+ = 逆向過熱警訊</div>
+      </div>
+    </div>
+
+    <div class="tw-charts-grid">
+      <div class="tw-chart-block">
+        <div class="tw-chart-title">外資台指期淨多空口數 (口)</div>
+        <div class="tw-chart-sub">正值 = 淨多單；負值 = 淨空單 · 萬口以上為明確方向訊號</div>
+        <div class="tw-chart-container"><canvas id="futuresChart"></canvas></div>
+      </div>
+      <div class="tw-chart-block">
+        <div class="tw-chart-title">全市場融資餘額 (億元)</div>
+        <div class="tw-chart-sub">逆向指標：持續走高且達90日85%分位 = 過熱警訊</div>
+        <div class="tw-chart-container"><canvas id="marginChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="tw-note">
+      資料來源：台灣期貨交易所（TAIFEX）· 台灣證券交易所（TWSE）· 每交易日 08:00 自動更新
+    </div>
+  </div>
+
   <!-- ── Footer ── -->
   <div class="footer">
-    <div data-i18n="footer_main">AVI Dashboard · CPI + TSI + AVI V5 · Personal research project — not financial advice</div>
+    <div data-i18n="footer_main">AVI Dashboard · CRI + TSI + AVI V5 · Personal research project — not financial advice</div>
     <div style="margin-top:6px">
       <span data-i18n="footer_update">To update: run </span>
       <code style="background:var(--bg3);padding:1px 6px;border-radius:3px;font-size:10px">python3 scripts/run_dashboard.py --pine</code>
@@ -859,7 +937,7 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
     avi_name: 'AVI 估值指數',
     avi_level: '偏高',
     avi_desc: '市場估值環境評分。CAPE 41.5（史上第二高），估值已偏貴。',
-    cpi_name: 'CPI 崩盤概率指數',
+    cpi_name: 'CRI 崩盤概率指數',
     cpi_level: '低',
     cpi_desc: '短期崩盤風險（30天窗口）。4/4 重大崩盤偵測成功。當前：無即時崩盤信號。',
     tsi_name: 'TSI 科技壓力指數',
@@ -869,15 +947,15 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
     alert_desc: 'TSI = 45（謹慎）：10Y 殖利率急升 9bps 至 4.55%；30Y 達 5.12%（2007 年以來最高）。科技估值面臨殖利率曲線熊市陡化壓力。Capital Context 4 週 +20% 信號（百年第 3 次）已觸發。',
     combined_signal: '三系統綜合信號',
     signal_label: '謹慎持有',
-    signal_sub: 'AVI 偏高 × CPI 低 × TSI 謹慎',
-    m1_label: 'CPI — 正常',
+    signal_sub: 'AVI 偏高 × CRI 低 × TSI 謹慎',
+    m1_label: 'CRI — 正常',
     m1_text: '無即時崩盤信號，短期風險低。不要恐慌減倉。',
     m2_label: 'TSI — 謹慎',
     m2_text: '科技承受殖利率壓力。避免加碼科技，收緊成長股停損。',
     m3_label: 'AVI — 偏高',
     m3_text: 'CAPE 41.5（史上第二高）。不新建多頭部位。在反彈時提高現金。',
     m4_label: '監控觸發條件',
-    m4_text: 'NVIDIA 財報 5/20。若 TSI > 55 或 CPI > 35，啟動減倉程序。',
+    m4_text: 'NVIDIA 財報 5/20。若 TSI > 55 或 CRI > 35，啟動減倉程序。',
     avi_breakdown: 'AVI V5 — 六維度拆解',
     avi_breakdown_sub: '14 個指標 · 20 年滾動百分位 · 月度更新',
     d_valuation: '估值',
@@ -887,8 +965,8 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
     d_credit: '信用市場',
     d_momentum: '動量',
     avi_note: '注意：AVI V5 使用改進的滾動百分位，方法不同於 V4。信用利差仍在歷史低位（12%）——這是目前市場最後的防線。估值維度 72% 是主要風險驅動因素。',
-    cpi_breakdown: 'CPI — 12 個指標拆解',
-    cpi_breakdown_sub: '日頻 · 崩盤預警 23-42 天提前',
+    cpi_breakdown: 'CRI — 12 個指標拆解 (v2)',
+    cpi_breakdown_sub: '日頻 · 24年真實數據實證最佳化 (CV-AUC 0.81)',
     tsi_breakdown: 'TSI — 9 個指標拆解',
     tsi_breakdown_sub: '日頻 · 科技板塊 · 7/7 事件偵測',
     ci_vts: 'VIX 期限結構',
@@ -916,7 +994,7 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
     event_calendar: '關鍵事件日曆 — 2026 H2 監控',
     ev1_name: 'NVIDIA 財報（盤後）',
     ev1_note: '科技股方向定調。若指引下修，TSI 會急升。',
-    ev2_name: 'CPI 數據公布（5月）',
+    ev2_name: 'CRI 數據公布（5月）',
     ev2_note: '>3.3% → 升息壓力回來，AVI 利率維度衝高。',
     ev3_name: 'FOMC（Warsh 時代首次 + dot plot）',
     ev3_note: 'Kevin Warsh 首次主導。鷹派 dot plot → TSI 熊市陡化加速。',
@@ -930,7 +1008,7 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
     dont_label: '不要做',
     dont_list: '<li>加碼科技部位</li><li>追高 AI 動能股</li><li>忽略殖利率信號</li><li>使用槓桿</li>',
     trigger_label: '觸發條件',
-    trigger_list: '<li>TSI > 55 → 開始減倉</li><li>CPI > 35 → 建立避險</li><li>CPI+TSI 雙高 → 立即行動</li><li>Flash ⚡ → 立刻檢查持倉</li>',
+    trigger_list: '<li>TSI > 55 → 開始減倉</li><li>CRI > 35 → 建立避險</li><li>CRI+TSI 雙高 → 立即行動</li><li>Flash ⚡ → 立刻檢查持倉</li>',
     avi_reference: 'AVI 分數對照表',
     ref_extreme: '🔴 極度危險 — 大幅減倉',
     ref_high: '🟠 高風險 — 減倉',
@@ -939,7 +1017,7 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
     ref_neutral: '🟢 中性 — 正常配置',
     ref_low: '🟢 低 — 積極佈局',
     avi_current_note: '當前：AVI V5 = 4.5（中性偏高）。注意：V5 使用改進方法。V4 等效值在 2026 年 4 月為 7.00。',
-    footer_main: 'AVI 儀表板 · CPI + TSI + AVI V5 · 個人研究專案 — 非投資建議',
+    footer_main: 'AVI 儀表板 · CRI + TSI + AVI V5 · 個人研究專案 — 非投資建議',
     footer_update: '更新方式：執行 ',
     footer_source: 'GitHub 原始碼',
     updated: '更新於'
@@ -1010,7 +1088,7 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
     // ── Ring gauges ───────────────────────────────────────────────────────
     var rings = [
       { ringId: 'avi-ring', scoreId: 'avi-score', score: data.avi && data.avi.score, max: 10  },
-      { ringId: 'cpi-ring', scoreId: 'cpi-score', score: data.cpi && data.cpi.score, max: 100 },
+      { ringId: 'cpi-ring', scoreId: 'cpi-score', score: data.cri && data.cri.score, max: 100 },
       { ringId: 'tsi-ring', scoreId: 'tsi-score', score: data.tsi && data.tsi.score, max: 100 },
     ];
 
@@ -1057,17 +1135,17 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
       if (aviBadge) aviBadge.textContent = (data.avi.score || 0).toFixed(1) + ' / 10';
     }
 
-    // ── CPI level badge ───────────────────────────────────────────────────
-    if (data.cpi) {
+    // ── CRI level badge ───────────────────────────────────────────────────
+    if (data.cri) {
       var cpiLvlEl = document.querySelector('.gauge-card .gc-level[data-i18n="cpi_level"]');
       if (cpiLvlEl) {
-        var cl = data.cpi.level || 'LOW';
+        var cl = data.cri.level || 'LOW';
         cpiLvlEl.textContent = cl;
         cpiLvlEl.className = 'gc-level lvl-' + cl.toLowerCase();
       }
-      // CPI score badge in breakdown header
+      // CRI score badge in breakdown header
       var cpiBadge = document.querySelector('.breakdown-score-badge[style*="green"]');
-      if (cpiBadge) cpiBadge.textContent = Math.round(data.cpi.score) + ' / 100';
+      if (cpiBadge) cpiBadge.textContent = Math.round(data.cri.score) + ' / 100';
     }
 
     // ── TSI level badge ───────────────────────────────────────────────────
@@ -1105,7 +1183,7 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
       });
     }
 
-    // ── CPI indicator bars ────────────────────────────────────────────────
+    // ── CRI indicator bars ────────────────────────────────────────────────
     var STATUS_COLOR = {
       normal:   'var(--green)',
       watch:    'var(--yellow)',
@@ -1139,19 +1217,19 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
       });
     }
 
-    if (data.cpi && data.cpi.indicators) {
-      updateIndicatorRows('cpi-indicators', data.cpi.indicators, [
-        'vix_term_structure','vix_spike','garch_vix_gap','credit_acceleration',
-        'breadth_divergence','distribution_days','rsi_divergence','ma_distance_reversal',
-        'yield_curve_steepening','momentum_collapse','yield_surge','intraday_selloff',
+    if (data.cri && data.cri.indicators) {
+      updateIndicatorRows('cpi-indicators', data.cri.indicators, [
+        'vix_spike','vix_term_structure','momentum_collapse','intraday_selloff',
+        'distribution_days','garch_vix_gap','credit_acceleration','yield_surge',
+        'yield_curve_steepening','breadth_divergence','rsi_divergence','ma_distance_reversal',
       ]);
     }
 
     if (data.tsi && data.tsi.indicators) {
       updateIndicatorRows('tsi-indicators', data.tsi.indicators, [
-        'sox_qqq_divergence','memory_momentum','yield_shock','yield_30y_stress',
-        'yield_curve_bear_steep','ai_infra_rs','tech_breadth','cloud_rs',
-        'vix_tech_correlation',
+        'tech_breadth','vvix_lead','credit_divergence','tech_crash_day',
+        'vix_tech_correlation','sox_qqq_divergence','memory_momentum','sox_momentum_decel',
+        'yield_shock','yield_30y_stress','ai_infra_rs','yield_curve_bear_steep',
       ]);
     }
 
@@ -1194,6 +1272,119 @@ var KIWI_DATA = {"updated":"2026-05-21","avi":{"score":5.6,"level":"ELEVATED","d
   }
 
 })();
+
+  // ── Taiwan Indicators ──────────────────────────────────────────────────────
+  function fmtFutures(n) {
+    if (n === null || n === undefined) return '—';
+    return (n >= 0 ? '+' : '') + n.toLocaleString() + ' 口';
+  }
+  function fmtMargin(n) {
+    if (n === null || n === undefined) return '—';
+    return Math.round(n / 100000).toLocaleString() + ' 億';
+  }
+
+  function renderTaiwanCharts(data) {
+    document.getElementById('tw-futures-val').textContent = fmtFutures(data.futures_latest);
+    document.getElementById('tw-margin-val').textContent = fmtMargin(data.margin_latest);
+
+    var fBadge = document.getElementById('tw-futures-badge');
+    var sig = (data.futures_signal || 'NEUTRAL').toUpperCase();
+    var sigLabels = { BULLISH: '偏多 ▲', BEARISH: '偏空 ▼', NEUTRAL: '中性 —' };
+    fBadge.textContent = sigLabels[sig] || sig;
+    fBadge.className = 'tw-card-badge tw-badge-' + sig.toLowerCase();
+
+    var mBadge = document.getElementById('tw-margin-badge');
+    var lvl = (data.margin_level || 'NORMAL').toUpperCase();
+    var lvlLabels = { HIGH: '⚠ 過高 ' + data.margin_pct + '%', ELEVATED: '偏高 ' + data.margin_pct + '%', NORMAL: '正常 ' + data.margin_pct + '%' };
+    mBadge.textContent = lvlLabels[lvl] || lvl;
+    mBadge.className = 'tw-card-badge tw-badge-' + lvl.toLowerCase();
+
+    var chartOpts = {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: { backgroundColor: '#2a2e39', borderColor: '#363a45', borderWidth: 1,
+                   titleColor: '#d1d4dc', bodyColor: '#787b86' }
+      },
+      scales: {
+        x: { ticks: { color: '#787b86', maxTicksLimit: 8, font: { size: 10 }, maxRotation: 0 },
+             grid: { color: 'rgba(54,58,69,0.5)' } },
+        y: { ticks: { color: '#787b86', font: { size: 10 } },
+             grid: { color: 'rgba(54,58,69,0.5)' } }
+      }
+    };
+
+    var labels = (data.dates || []).map(function(d) { return d.slice(5); });
+    var fData = data.futures_net || [];
+    var mData = data.margin_balance || [];
+
+    if (typeof Chart !== 'undefined') {
+      // Futures bar chart
+      var fCtx = document.getElementById('futuresChart');
+      if (fCtx && fData.length > 0) {
+        new Chart(fCtx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{ data: fData,
+              backgroundColor: fData.map(function(v) { return (v||0) >= 0 ? 'rgba(38,166,154,0.75)' : 'rgba(239,83,80,0.75)'; }),
+              borderColor: fData.map(function(v) { return (v||0) >= 0 ? '#26a69a' : '#ef5350'; }),
+              borderWidth: 1 }]
+          },
+          options: Object.assign({}, chartOpts, {
+            scales: Object.assign({}, chartOpts.scales, {
+              y: Object.assign({}, chartOpts.scales.y, {
+                ticks: Object.assign({}, chartOpts.scales.y.ticks, {
+                  callback: function(v) { return (v/1000).toFixed(0) + 'k'; }
+                })
+              })
+            })
+          })
+        });
+      }
+
+      // Margin line chart
+      var mCtx = document.getElementById('marginChart');
+      if (mCtx && mData.length > 0) {
+        new Chart(mCtx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{ data: mData.map(function(v) { return v || null; }),
+              borderColor: '#42a5f5', backgroundColor: 'rgba(66,165,245,0.1)',
+              borderWidth: 2, pointRadius: 0, fill: true, tension: 0.3, spanGaps: true }]
+          },
+          options: Object.assign({}, chartOpts, {
+            scales: Object.assign({}, chartOpts.scales, {
+              y: Object.assign({}, chartOpts.scales.y, {
+                ticks: Object.assign({}, chartOpts.scales.y.ticks, {
+                  callback: function(v) { return Math.round(v/100000) + '億'; }
+                })
+              })
+            })
+          })
+        });
+      }
+    }
+  }
+
+  (function loadTaiwan() {
+    fetch('./taiwan_data.json?v=' + Date.now())
+      .then(function(r) { return r.ok ? r.json() : Promise.reject('not found'); })
+      .then(renderTaiwanCharts)
+      .catch(function() {
+        ['tw-futures-val','tw-margin-val'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.textContent = '資料更新中';
+        });
+        ['tw-futures-badge','tw-margin-badge'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) { el.textContent = '每日自動更新'; el.className = 'tw-card-badge tw-badge-neutral'; }
+        });
+      });
+  })();
+
 </script>
 </body>
 </html>

@@ -1,15 +1,14 @@
-name: Auto-update Dashboard Data
+name: Weekend Bridge Alert
 
 on:
   schedule:
-    - cron: '0 2 * * *'   # 02:00 UTC = 10:00 Taiwan time (daily)
-  workflow_dispatch:        # allow manual trigger
+    # 週六 08:00 TST (00:00 UTC Sat) — 週五美股收盤後隔日檢查
+    - cron: '0 0 * * 6'
+  workflow_dispatch:
 
 jobs:
-  update:
+  weekend-check:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -23,24 +22,27 @@ jobs:
       - name: Install dependencies
         run: pip install -r projects/avi-v5/requirements.txt
 
-      - name: Run dashboard update
+      - name: Update dashboard with Friday close data
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         working-directory: projects/avi-v5
         run: python scripts/update_dashboard.py
 
-      - name: Fetch Taiwan market data
-        working-directory: projects/avi-v5
-        run: python scripts/fetch_taiwan.py
-
-      - name: Commit and push if changed
+      - name: Commit updated dashboard
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/index.html docs/taiwan_data.json
+          git add docs/index.html
           if git diff --staged --quiet; then
-            echo "No changes to commit"
+            echo "No changes"
           else
-            git commit -m "auto: update dashboard data $(date -u +%Y-%m-%d)"
+            git commit -m "auto: weekend bridge update $(date -u +%Y-%m-%d)"
             git push
           fi
+
+      - name: Send weekend alert if stress detected
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: python projects/avi-v5/scripts/notify.py --weekend

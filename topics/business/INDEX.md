@@ -16,3 +16,6 @@
 | 2026-04-20 | [AVI V4 — 12 個月走勢分析 + 五次崩盤回顧 + 部落格介紹文](./2026-04-20-avi-v4-analysis-with-charts.md) | market-risk, AVI, analysis, S&P500, Iran-war, Fed, blog |
 | 2026-04-20 | [AVI V4 — IG + Threads 社群發文素材庫](./2026-04-20-avi-v4-social-posts.md) | AVI, social-media, IG, Threads, content-marketing |
 | 2026-04-21 | [KIWI Sleep — 睡眠修復創業策略（YC Office Hours 筆記）](./2026-04-21-sleep-startup-strategy.md) | startup, sleep, YC, product-strategy, TCM, acupressure, audio, personal-project |
+| 2026-05-29 | [Serenity Chokepoint 三市場隱藏壟斷供應商掃描 — 美日台 45 支待發現標的](./2026-05-29-serenity-chokepoint-three-market-scan.md) | investment, serenity-chokepoint, supply-chain, semiconductor, silicon-photonics, AI-infrastructure |
+| 2026-06-02 | [AI 投資研究副駕駛 — 可測試假設 + 客戶訪談訪綱（Idea 階段）](./2026-06-02-ai-investment-copilot-hypothesis.md) | startup, investment, AI-copilot, AVI, hypothesis, customer-discovery, founders-playbook, idea-stage |
+| 2026-06-03 | [Redefine Fund — Jake × Vince 共同基金專案（策略 + 結構 + Action Plan + 模板）](./2026-06-03-redefine-fund-project.md) | startup, fund, EAM, semiconductor, AI, redefine, fundraising, partnership, action-plan |
