@@ -102,7 +102,7 @@ class MultplSource:
 
             # ── 數值：regex 抓第一個數字，忽略 † * 估計註腳與 % , $ 等符號 ──
             # （修正 bug：multpl 當期列常帶 dagger †，舊版 float() 直接報錯→整列被
-            #   silently drop，導致最新 2025/2026 資料消失、AVI 被鎖在 2024-12-31）
+            #   silently drop，導致最新 2025/2026 資料消失、AVI V5 被鎖在 2024-12-31）
             m = re.search(r"-?\d+(?:\.\d+)?", value_text.replace(",", ""))
             if not m:
                 continue
