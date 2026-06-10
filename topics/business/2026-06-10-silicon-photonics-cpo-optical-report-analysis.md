@@ -108,6 +108,25 @@ AI 傳輸需求 ↑↑（800G→1.6T→CPO）
 - **Serenity 排序**：COHR(21) > LITE(20) > AAOI(19) > 汎銓(16–17，現價不合格)。
 - **可投資性 ≠ 題材熱度**：題材最熱的汎銓，反而是 Serenity 分數最低（虧損+狂熱+紅旗）。**真正的卡脖子在封裝/雷射/檢測/連接器，不是追漲停。**
 
+## 7. 補充：已定位 MoneyDJ 原文身分 + 逐條合理性 + 新增公司（2026-06-10 pt.2）
+
+**原文身分（高信心定位，三 moneydj 子網域皆被沙箱擋無法逐字取）**：MoneyDJ 焦點專題 **「AI傳輸救星來 2026迎CPO元年」** 系列（newsviewer 為其子文）。多來源交叉確認其核心主張並逐條檢驗：
+
+| 原文主張 | 合理性 | 檢驗 |
+|---|---|---|
+| 2026＝CPO 商轉元年 | ✅ 合理 | Nvidia Spectrum-X CPO 5/31 量產、TSMC COUPE 2026 量產 |
+| 機構估 CPO 市場 2026–2036 **CAGR 66%** | 🟡 偏樂觀但可能 | 極小基期起算、10 年 66% 很猛；需可插拔/NPO 不搶太多 + CPO 良率/可靠度如期突破才成立。**當「最佳情境」看，別當基準** |
+| LITE＝Nvidia 高階 AI 雷射「**獨家**」供應商，股價 $504 ATH | 🟡 部分誇大 | 雷射地位強+Nvidia $2B 屬實；但「獨家」過頭(COHR 也供雷射/SiPh)。估值極端(PB~76x、ATH) |
+| COHR 垂直整合(InP/GaAs/SiC)、Spectrum-X 主力 | ✅ 合理 | 屬實，最完整 |
+| AAOI 2026 營收「翻倍」、自製雷射優勢 | ✅ 大致合理 | 指引 >$11億、訂單到 2027 中；毛利/中國競爭/波動風險仍在 |
+| 台廠 汎銓/智茂/閎康 受惠 CPO 檢測；聯亞為核心股 | ✅ 合理(但已飆) | CPO 報廢貴→檢測剛需屬實；族群連續漲停＝晚期籌碼 |
+
+**新增兩家（原文有提、上一版未納入）：**
+- **聯亞 3081（LandMark，InP/GaAs 磊晶片）**：雷射的上游磊晶基礎＝真上游卡脖子。Q1'26 +99% YoY、GM 54.8%(8年高)、外資目標 NT$4,738。Serenity ~21/30，**但⑤估值已飆/④已被發現** → 上游 picks-and-shovels，現價已反映、等回檔。
+- **閎康 3587（材料/故障分析，汎銓的「大哥」）**：同吃 CPO 檢測財，但**規模更大且有獲利**（汎銓虧損）。**就「檢測卡脖子」這條，閎康＝基本面更紮實的載具、汎銓＝高彈性高風險版。**
+
+**對結論的影響（不變、反而強化）**：原文主軸(CPO元年)合理，但①66% CAGR 是最佳情境、②LITE「獨家」誇大、③台廠檢測/磊晶族群已漲停狂熱。**選載具排序**：檢測 **閎康>汎銓**；上游磊晶 **聯亞已飆等回檔**；下游 **COHR(穩)>LITE(貴)>AAOI(控部位)**。
+
 ## 來源
 - [Nvidia $4B 投 Lumentum+Coherent (SiliconANGLE)](https://siliconangle.com/2026/03/02/nvidia-invests-4b-co-packaged-optics-suppliers-lumentum-coherent/)
 - [Coherent Q3 FY26 $1.81B +21% (Futurum)](https://futurumgroup.com/insights/coherent-q2-fy-2026-ai-datacenter-demand-lifts-revenue-and-margins/)
