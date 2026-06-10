@@ -66,7 +66,8 @@ pts = [
     (2023.0,  8.3),
     (2024.0,  7.7),
     (2025.0,  6.9),
-    (2026.42, 6.7),   # now
+    (2025.92, 6.6),   # QT2 ends Dec 1, 2025
+    (2026.42, 6.65),  # transition: reinvesting, roughly flat
 ]
 yrs = np.array([p[0] for p in pts])
 val = np.array([p[1] for p in pts])
@@ -84,7 +85,8 @@ annot = [
     (2015.0,  4.5,  "QE 高原\n$4.5兆",   0.0,  0.9, GOLD),
     (2019.7,  3.76, "QT1 低點\n$3.8兆",  0.0, -1.1, BLUE),
     (2022.27, 8.965,"歷史峰值\n$8.9兆",  0.0,  0.7, LRED),
-    (2026.42, 6.7,  "現在\n$6.7兆",     -1.1,  1.0, WHITE),
+    (2025.92, 6.6,  "QT 結束\n2025/12", -1.8, -1.6, AMBER),
+    (2026.42, 6.65, "現在\n約$6.6兆",   -0.5,  1.3, WHITE),
 ]
 for xp, yp, label, dx, dy, color in annot:
     ax1.annotate(label,
@@ -100,15 +102,20 @@ for xp, yp, label, dx, dy, color in annot:
 ax1.text(2019.6, 6.3, "COVID QE\n3個月+$3兆", color=GREEN, fontsize=8,
          fontweight='bold', ha='right')
 
-# Warsh direction arrow at right edge
-ax1.annotate('', xy=(2027.0, 5.4), xytext=(2027.0, 6.55),
-             arrowprops=dict(arrowstyle='->', color=RED, lw=2.5))
-ax1.text(2027.15, 5.95, "Warsh\n方向", color=RED, fontsize=8.5,
+# Warsh direction arrow at right edge — restart QT?
+ax1.annotate('', xy=(2027.0, 5.4), xytext=(2027.0, 6.5),
+             arrowprops=dict(arrowstyle='->', color=RED, lw=2.5,
+                             linestyle='--'))
+ax1.text(2027.15, 5.95, "Warsh\n重啟\n縮表？", color=RED, fontsize=8.5,
          fontweight='bold', va='center', ha='left')
 
-# QT2 shading band 2022-now
-ax1.axvspan(2022.27, 2026.5, alpha=0.06, color=RED)
-ax1.text(2024.4, 0.35, "QT2 進行中", color=RED, fontsize=8.5,
+# QT2 shading band: Jun 2022 – Dec 2025 (runoff ended Dec 1, 2025)
+ax1.axvspan(2022.45, 2025.92, alpha=0.06, color=RED)
+# Transition band: Dec 2025 – now (reinvesting, neither QT nor QE)
+ax1.axvspan(2025.92, 2026.5, alpha=0.08, color=LGREY)
+ax1.text(2024.2, 0.35, "QT2\n(2022/6–2025/12)", color=RED, fontsize=7.5,
+         ha='center', alpha=0.95, fontweight='bold')
+ax1.text(2026.2, 0.55, "過渡期\n不縮不擴", color=WHITE, fontsize=7,
          ha='center', alpha=0.95, fontweight='bold')
 ax1.text(2011.5, 0.35, "QE 時代", color=LGREY, fontsize=8.5,
          ha='center', alpha=0.85)
@@ -122,7 +129,7 @@ ax1.set_yticks([0, 2, 4, 6, 8, 10])
 ax1.set_yticklabels(['$0', '$2兆', '$4兆', '$6兆', '$8兆', '$10兆'],
                     color=LGREY, fontsize=9)
 ax1.set_ylabel('Fed 總資產（兆美元）', color=LGREY, fontsize=9)
-ax1.set_title('Fed 資產負債表 2008–2026\n$0.9兆 → 峰值$8.9兆 → 現在$6.7兆，Warsh 要繼續縮',
+ax1.set_title('Fed 資產負債表 2008–2026\n\\$0.9兆 → 峰值 \\$8.9兆 → QT 已於 2025/12 結束，Warsh 會重啟嗎？',
               color=WHITE, fontsize=11, fontweight='bold', pad=10)
 for sp in ax1.spines.values():
     sp.set_color(DGREY)
@@ -203,7 +210,7 @@ ax2.text(0.5, -0.13,
 
 # ── Master title
 fig.text(0.5, 0.94,
-         '華許的兩張牌：那張 6.7 兆的表，和一個四十年沒見過的背離',
+         '華許的兩張牌：那張 6.6 兆的表，和一個四十年沒見過的背離',
          ha='center', color=WHITE, fontsize=14, fontweight='bold')
 fig.text(0.5, 0.922,
          '摸魚記  ·  2026年6月  ·  數據來源：FRED / J.P. Morgan / CNBC',
