@@ -21,3 +21,4 @@
 | 2026-06-03 | [Redefine Fund — Jake × Vince 共同基金專案（策略 + 結構 + Action Plan + 模板）](./2026-06-03-redefine-fund-project.md) | startup, fund, EAM, semiconductor, AI, redefine, fundraising, partnership, action-plan |
 | 2026-06-06 | [2026-06-05 美股大跌後市場路徑研判 — ACT 系統 + 歷史對標 + 底部加倉劇本（美/台）](./2026-06-06-post-selloff-market-roadmap.md) | market-analysis, act-system, avi, cpi, tsi, selloff, fed-warsh, taiex, midterm, spacex-ipo, position-sizing, scenario-analysis |
 | 2026-06-06 | [抄底「最高勝率」指標組合回測 — 美股+台股（真實數據、統計顯著、逐事件驗證）](./2026-06-06-dip-buying-best-indicator-combos-backtest.md) | backtest, dip-buying, vix, fear-greed-index, 200dma, taiex, sp500, win-rate, statistical-significance |
+| 2026-06-10 | [矽光子/CPO 光通訊報告分析 — LITE/COHR/AAOI/汎銓6830（Serenity評分+估值）](./2026-06-10-silicon-photonics-cpo-optical-report-analysis.md) | silicon-photonics, CPO, optical, lumentum, coherent, aaoi, fanci-6830, serenity-chokepoint, valuation, nvidia |
