@@ -114,8 +114,9 @@ def compute_cri_series(raw, eval_dates):
                 treasury_10y=empty, treasury_2y=empty,
             )
             scores[d.strftime("%Y-%m-%d")] = round(r.score, 1)
-        except Exception:
-            pass
+        except Exception as e:
+            if i < 3:
+                log.warning(f"  CRI date {d.date()} failed: {e}")
     return scores
 
 # ─── 計算 TSI（每日）────────────────────────────────────────────────────────
@@ -161,23 +162,27 @@ def compute_tsi_series(raw, eval_dates):
             if len(sp_w) < 60 or len(qqq_w) < 60:
                 continue
             r = tsi_engine.compute(
-                sp500_daily=sp_w, qqq_daily=qqq_w,
-                vix_daily=vix_w, vvix_daily=vvix_w,
-                soxx_daily=soxx_w, smh_daily=empty,
-                hyg_daily=hyg_w, mu_daily=mu_w,
-                treasury_10y=empty, treasury_30y=empty,
-                treasury_2y=empty,
+                sox_daily=soxx_w, qqq_daily=qqq_w,
+                mu_daily=mu_w, smh_daily=empty,
+                spy_daily=win(spy_close, d),
+                treasury_10y=empty, vix_daily=vix_w,
+                treasury_30y=empty,
+                vvix_daily=vvix_w if len(vvix_w) else None,
+                hyg_daily=hyg_w if len(hyg_w) else None,
             )
             scores[d.strftime("%Y-%m-%d")] = round(r.score, 1)
-        except Exception:
-            pass
+        except Exception as e:
+            if i < 3:
+                log.warning(f"  TSI date {d.date()} failed: {e}")
     return scores
 
 # ─── 計算 AVI（月度，用可用數據近似）────────────────────────────────────────
 
 def compute_avi_series(raw, fred, eval_dates):
     import numpy as np
-    gspc = raw.get("gspc") or raw.get("spy")
+    gspc = raw.get("gspc")
+    if gspc is None:
+        gspc = raw.get("spy")
     vix  = raw.get("vix")
     if gspc is None:
         return {}
