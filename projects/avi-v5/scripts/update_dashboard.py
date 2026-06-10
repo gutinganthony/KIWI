@@ -125,7 +125,23 @@ def fetch_fred_data():
 
 
 def scrape_cape():
-    """Scrape current CAPE ratio from multpl.com. Returns None on failure."""
+    """Get current CAPE (Shiller PE) from multpl.com. Returns None on failure.
+
+    修正：① 先用已修好 dagger bug 的 MultplSource 表格解析取最新值（最穩）；
+          ② 後備才用頁面 div#current（multpl 改版會壞）+ 寬鬆 regex。
+    """
+    # ① 表格解析（reuse 已修正的 parser）
+    try:
+        from src.data.sources.multpl import MultplSource
+        s = MultplSource().fetch_indicator("shiller-pe")
+        if len(s) > 0:
+            val = float(s.iloc[-1])
+            log.info(f"Scraped CAPE (table): {val} @ {s.index[-1].date()}")
+            return val
+    except Exception as e:
+        log.warning(f"CAPE table parse failed: {e}")
+
+    # ② 後備：抓頁面當前值
     try:
         import requests
         from bs4 import BeautifulSoup
@@ -135,12 +151,12 @@ def scrape_cape():
         resp = requests.get(url, headers=headers, timeout=10)
         resp.raise_for_status()
         soup = BeautifulSoup(resp.text, "html.parser")
-        # multpl.com has a large number in the page
-        el = soup.find("div", id="current")
-        if el:
-            text = el.get_text(strip=True).replace(",", "")
-            val = float(re.search(r"[\d.]+", text).group())
-            log.info(f"Scraped CAPE: {val}")
+        el = soup.find(id="current") or soup.find("div", {"class": "current"})
+        text = el.get_text(strip=True) if el else resp.text
+        m = re.search(r"\b(\d{2}\.\d{1,2})\b", text.replace(",", ""))
+        if m:
+            val = float(m.group(1))
+            log.info(f"Scraped CAPE (page): {val}")
             return val
     except Exception as e:
         log.warning(f"CAPE scrape failed: {e}")
@@ -214,7 +230,11 @@ def compute_tsi(yf_data, fred_data):
         from src.tsi import TechStressIndex
 
         # Required series
-        soxx_df = yf_data.get("SOXX") or yf_data.get("^SOX")
+        # 修正 bug：`df_a or df_b` 在 DataFrame 上會丟 ValueError(truth value ambiguous)
+        # → compute_tsi 每天崩潰 → TSI 一直 fallback 45.0。改用 None-safe。
+        soxx_df = yf_data.get("SOXX")
+        if soxx_df is None:
+            soxx_df = yf_data.get("^SOX")
         qqq_df  = yf_data.get("QQQ")
         mu_df   = yf_data.get("MU")
         smh_df  = yf_data.get("SMH")
@@ -550,6 +570,14 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
 
     payload = {
         "updated": today,
+        # data_health：標記各引擎是真算還是 fallback，避免 silent-failure 再把舊值
+        # 當成最新（TSI 一直 45.0 就是被這種無聲 fallback 蓋住）。
+        "data_health": {
+            "avi_cape_live": cape_val is not None,
+            "cri_live":      cpi_result is not None,
+            "tsi_live":      tsi_result is not None,
+            "market_live":   bool(yf_data.get("^GSPC") is not None),
+        },
         "avi": {
             "score":      avi_score,
             "level":      avi_lvl,

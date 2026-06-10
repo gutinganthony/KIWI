@@ -2,7 +2,8 @@ name: Auto-update Dashboard Data
 
 on:
   schedule:
-    - cron: '0 0 * * 1-5'   # 00:00 UTC = 08:00 Taiwan time (weekdays)
+    - cron: '0 0 * * *'     # 00:00 UTC = 08:00 台北（每天，含週末刷新日期）
+    - cron: '0 22 * * 1-5'  # 22:00 UTC = 06:00 台北（美股收盤後，抓最新收盤）
   workflow_dispatch:        # allow manual trigger
 
 jobs:

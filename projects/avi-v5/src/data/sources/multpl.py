@@ -1,6 +1,7 @@
 """Multpl.com data source for AVI V5 valuation indicators."""
 
 import logging
+import re
 from typing import Optional
 
 import numpy as np
@@ -93,23 +94,34 @@ class MultplSource:
         rows = table.find_all("tr")
         for row in rows[1:]:
             cells = row.find_all("td")
-            if len(cells) >= 2:
-                date_text = cells[0].get_text(strip=True)
-                value_text = cells[1].get_text(strip=True)
+            if len(cells) < 2:
+                continue
 
-                try:
-                    date = pd.to_datetime(date_text)
-                    value_clean = (
-                        value_text.replace("%", "")
-                        .replace(",", "")
-                        .replace("$", "")
-                        .strip()
-                    )
-                    value = float(value_clean)
-                    dates.append(date)
-                    values.append(value)
-                except (ValueError, TypeError):
+            date_text = cells[0].get_text(strip=True)
+            value_text = cells[1].get_text(strip=True)
+
+            # ── 數值：regex 抓第一個數字，忽略 † * 估計註腳與 % , $ 等符號 ──
+            # （修正 bug：multpl 當期列常帶 dagger †，舊版 float() 直接報錯→整列被
+            #   silently drop，導致最新 2025/2026 資料消失、AVI 被鎖在 2024-12-31）
+            m = re.search(r"-?\d+(?:\.\d+)?", value_text.replace(",", ""))
+            if not m:
+                continue
+            try:
+                value = float(m.group())
+            except ValueError:
+                continue
+
+            # ── 日期：multpl 的「Current / Estimate」當期列 → 用今天 ──
+            dl = date_text.lower()
+            if any(k in dl for k in ("current", "estimate", "today", "now")):
+                date = pd.Timestamp.today().normalize()
+            else:
+                date = pd.to_datetime(date_text, errors="coerce")
+                if pd.isna(date):
                     continue
+
+            dates.append(date)
+            values.append(value)
 
         if not dates:
             raise RuntimeError(
