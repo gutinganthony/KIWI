@@ -152,6 +152,74 @@ AI 傳輸需求 ↑↑（800G→1.6T→CPO）
 2. **對 AAOI**：SemiAnalysis 等於幫你的「控部位」決定背書——它是近期動能、中長期被結構挑戰的標的。
 3. **時間點變數 = 論點 C（Nvidia 延遲與否）**：若 Nvidia H2 2026 如期量產(其官方說法) → CPO 取代加速、可插拔承壓更早；若真延遲 → 可插拔(AAOI)多賺一段 runway。**盯 H2 2026 Spectrum-X CPO 實際出貨**＝這條供應鏈的最大近期催化/證偽點。
 
+## 9. Serenity 全面 Re-Review（疊加 SemiAnalysis 供應鏈拆解，2026-06-10 pt.3）
+
+> 使用者要求：用 SemiAnalysis《Scaling with Light》的供應鏈框架，重新檢視 2026-05-29 三市場掃描的卡脖子排名（特別是 PLAB / AAOI / 汎銓）。工商時報(ctee 20260610700638)為引用該報告之報導，沙箱擋無法逐字取，已以多來源重建。
+
+### 9.1 SemiAnalysis 供應鏈拆解 → 哪些「層」被驗證為真卡脖子
+
+```
+CPO 價值鏈（SemiAnalysis 框架 × Serenity 視角）：
+[平台/代工]   TSMC COUPE ＝事實標準（Nvidia Vera Rubin 採用、Broadcom/Ayar Labs 跟進）→ 真壟斷但巨型股
+[光引擎 OE]   Nvidia/Broadcom 自研 + COUPE 代工 → 看 TSMC
+[外部光源ELS] CPO 仍需外部雷射 → LITE/COHR/Sumitomo ＝報告點名層 ✅
+[光纖接合]    FAU/edge coupling＝報告強調「最難的部分」✅ → 上詮(3363,與台積電直接共研)、波若威(3163)、ACON 禾昌(6820 MT ferrule)
+[微透鏡]      采鈺 VisEra(6789, COUPE metalens)
+[封裝]        ASE 日月光（ctee 點名「真定價權」）
+[測試/檢測]   旺矽 MPI(6223 探針卡)、Advantest；故障分析 閎康/汎銓
+[磊晶上游]    InP：聯亞(3081, GM 54.8%)、IntelliEPI
+[被取代壓力]  可插拔模組廠 ← scale-up CPO 結構威脅 ⚠️ AAOI 在此
+```
+
+### 9.2 重點三檔 re-review（使用者指定）
+
+**PLAB（原 24/30 立即建倉）→ 維持 24/30，論點不受影響 ✅**
+- CPO 辯論與光罩無關；SiPh/CPO 放量反而增加光罩需求（65nm SiPh 製程 + 先進封裝皆需罩）。美國唯一高端光罩 + multi-beam 剛裝機的稀缺性不變。
+- 風險仍是自身執行：**Q3 財報＝確認點**（IC 光罩若連兩季下滑需重評）。2.5x P/S 仍是全清單最便宜的卡脖子。**結論：續抱/回檔加碼級。**
+
+**AAOI（原列 Phase 2、前文 19/30）→ 降至 17/30，結構性降級 ⚠️**
+- SemiAnalysis 三刀：①scale-up 才是大餅而 AAOI 缺席 ②CPO 比可插拔更可靠(Meta) ③若 Spectrum-X CPO 如期 H2'26 量產→可插拔承壓提前。
+- 近期訂單 runway 真實(到 2027 中)，但「卡脖子」屬性被證偽：**AAOI 是產能/客戶關係故事，不是壟斷故事**（中國 Innolight/Eoptolink 可替代）。
+- **結論：從「持有的卡脖子」改列「動能部位」管理——趁強砍回(20%→10%)的決定被雙重確認（macro 高 beta + 結構威脅）。轉進訊號：若其 pump laser 真切進 CPO ELS 供應鏈再重評。**
+
+**汎銓 6830（前文 16–17/30）→ 維持 16/30，現價不可投資 ❌**
+- 「CPO 更可靠」直接削弱「報廢貴→檢測爆發」敘事的一半；ramp 期驗證需求是真,但**虧損(Q1 EPS −0.61)+本夢比 162+漲停狂熱+財報遲交遭罰**，Serenity ⑤⑥兩維不及格。
+- **同層更好的載具：閎康(有獲利、規模大)；設備端 旺矽(6223,但 16x P/S 貴)。結論：觀察名單,等獲利轉正+狂熱退潮。**
+
+### 9.3 受報告「升級」的標的
+
+| 標的 | 原評 | 新評 | 理由 |
+|---|---|---|---|
+| **ACON 禾昌 6820** | 22/30 積極 | **23/30** | 報告把「光纖接合」定調為最難環節→ferrule 層驗證 ✅。⚠️ 新風險：MT ferrule 採購走**客戶指定 Vendor List**，須確認 ACON 進入 Nvidia/Broadcom 名單；對手 Senko 已在 Nvidia 供應鏈 |
+| **上詮 3363**(新增) | — | **23/30 但 Phase 3 已過** | 與台積電**直接共研 COUPE 光纖對準/接合**＝最純卡脖子位；但年漲 ~3 倍、漲停慣性＝已被發現,⑤估值扣分。**等深回檔** |
+| **COHR** | 21/30 | **22/30** | ELS 層被報告點名 + scale-up 放大光源需求；仍是「穩」載具 |
+| **波若威 3163**(新增) | — | **20/30** | FAU/MPO,Q3 pilot→Q4 千顆→Q1'27 萬顆,時程清楚;但已隨族群飆,等回檔 |
+| **采鈺 6789**(新增) | — | **20/30 觀察** | COUPE metalens 獨特位置,台積電體系;機構覆蓋少,值得深挖 |
+| **聯亞 3081** | (前文~21) | 21/30 | ELS→InP 磊晶上游受惠鏈確認;GM 54.8% 證實定價權;**但已飆(外資目標 4738)等回檔** |
+
+### 9.4 不受影響、論點完整的原核心持倉級標的
+**ITEQ 6213（23/30,CCL）、M31 6643（22/30,IP）、Fujimi 5384.T（26/30,CMP）、MTRN（22/30,鈹）、Stella 4109.T（22/30,BF3）、COHU（21/30,測試 handler）、LEU（24/30,HALEU）**——皆與 CPO 辯論正交,排名不動。
+
+### 9.5 更新後跨市場 Top 10（取代 05-29 版）
+
+| 排名 | 標的 | 市場 | 一句話 | 行動 |
+|---|---|---|---|---|
+| 1 | **PLAB** | 🇺🇸 | 美國唯一高端光罩,2.5x P/S,論點未受任何影響 | **回檔加碼** |
+| 2 | **ITEQ 6213** | 🇹🇼 | AI 伺服器 M7+ CCL 唯一,1.4x P/S | **回檔加碼** |
+| 3 | **Fujimi 5384.T** | 🇯🇵 | CMP 漿料 84-92%,AI 製程乘數 | 積極 |
+| 4 | **ACON 6820** | 🇹🇼 | MT ferrule,「光纖接合最難」被 SemiAnalysis 驗證 | 積極(先查 Vendor List) |
+| 5 | **COHR** | 🇺🇸 | ELS+垂直整合,Nvidia $2B,最穩 CPO 鏟子 | 分批 |
+| 6 | **MTRN** | 🇺🇸 | 美國唯一鈹礦,DoD | 積極 |
+| 7 | **M31 6643** | 🇹🇼 | 3nm SerDes IP 版稅 | 分批 |
+| 8 | **Stella 4109.T** | 🇯🇵 | 日本唯一 BF3 | 分批 |
+| 9 | **上詮 3363** | 🇹🇼 | 台積電 COUPE 光纖接合共研＝最純新卡脖子 | **等深回檔才進** |
+| 10 | **COHU** | 🇺🇸 | 3kW AI handler | 分批 |
+| ↓出榜 | **AAOI** | 🇺🇸 | scale-up CPO 缺席+可替代性→降為動能部位 | **趁強減碼 20→10%** |
+| ↓不入榜 | 汎銓/LITE/聯亞/波若威 | — | 題材真但估值/狂熱不合格 | 觀察等回檔 |
+
+### 9.6 與宏觀紀律的銜接（重要）
+以上全是**高 beta 名字**。6/5 已示警(SOX 史詩級單日)、6/11–18 是事件密集區。**「買什麼」用這張表,「何時買」用已驗證的抄底紀律**：美股等「自高點 −10% 且仍站 200DMA」(95% 勝率訊號)分批;台股 CPO 族群在漲停狂熱中,**用回檔 ≥15–20% + 抱一年的台股紀律**,不追紅燈。
+
 ## 來源
 - [Nvidia $4B 投 Lumentum+Coherent (SiliconANGLE)](https://siliconangle.com/2026/03/02/nvidia-invests-4b-co-packaged-optics-suppliers-lumentum-coherent/)
 - [Coherent Q3 FY26 $1.81B +21% (Futurum)](https://futurumgroup.com/insights/coherent-q2-fy-2026-ai-datacenter-demand-lifts-revenue-and-margins/)
