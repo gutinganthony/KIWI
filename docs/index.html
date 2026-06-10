@@ -378,6 +378,32 @@ body {
 .tw-chart-sub { font-size: 10px; color: var(--text3); margin-bottom: 10px; }
 .tw-chart-container { position: relative; height: 160px; }
 .tw-note { font-size: 10px; color: var(--text3); text-align: center; padding-top: 4px; }
+
+/* ── History Charts ── */
+.hist-section { margin-bottom: 24px; }
+.hist-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+.hist-range-btns { display: flex; gap: 4px; }
+.hist-range-btn {
+  font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 4px; border: 1px solid var(--border);
+  background: transparent; color: var(--text2); cursor: pointer; transition: all .15s;
+}
+.hist-range-btn.active, .hist-range-btn:hover { background: var(--bg3); color: var(--text); border-color: var(--text3); }
+.hist-charts-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.hist-chart-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px 16px 10px;
+}
+.hist-chart-top { display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; }
+.hist-chart-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.hist-chart-badge {
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+  padding: 1px 7px; border-radius: 3px;
+}
+.hist-chart-sub { font-size: 10px; color: var(--text3); margin-bottom: 10px; }
+.hist-canvas-wrap { position: relative; height: 140px; }
+@media (min-width: 900px) { .hist-charts-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 460px) { .hist-range-btn { padding: 3px 7px; } }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
@@ -386,6 +412,9 @@ body {
 // [KIWI-DATA-START]
 var KIWI_DATA = {"updated":"2026-06-10","avi":{"score":5.74,"level":"ELEVATED","dimensions":{"valuation":{"pct":88,"emoji":"🔴"},"profitability":{"pct":34,"emoji":"🟢"},"macro":{"pct":71,"emoji":"🟠"},"rate":{"pct":65,"emoji":"🟠"},"credit":{"pct":18,"emoji":"🟢"},"momentum":{"pct":0,"emoji":"🟢"}}},"cri":{"score":19.5,"level":"LOW","flash":false,"indicators":{"vix_term_structure":{"signal":8.2,"status":"normal"},"garch_vix_gap":{"signal":0.0,"status":"normal"},"credit_acceleration":{"signal":0.0,"status":"normal"},"breadth_divergence":{"signal":0.0,"status":"normal"},"distribution_days":{"signal":20.0,"status":"normal"},"rsi_divergence":{"signal":0.0,"status":"normal"},"ma_distance_reversal":{"signal":0.0,"status":"normal"},"yield_curve_steepening":{"signal":0.0,"status":"normal"},"vix_spike":{"signal":52.0,"status":"elevated"},"momentum_collapse":{"signal":0.0,"status":"normal"},"yield_surge":{"signal":73.4,"status":"elevated"},"intraday_selloff":{"signal":0.0,"status":"normal"}}},"tsi":{"score":45.0,"bias":"CAUTIOUS","flash":true,"indicators":{"vvix_lead":{"signal":0.0,"status":"normal"},"credit_divergence":{"signal":0.0,"status":"normal"},"sox_momentum_decel":{"signal":0.0,"status":"normal"},"tech_crash_day":{"signal":0.0,"status":"normal"},"sox_qqq_divergence":{"signal":0.0,"status":"normal"},"memory_momentum":{"signal":100.0,"status":"critical"},"yield_shock":{"signal":81.7,"status":"critical"},"yield_30y_stress":{"signal":54.3,"status":"elevated"},"yield_curve_bear_steep":{"signal":0.0,"status":"normal"},"ai_infra_rs":{"signal":0.0,"status":"normal"},"tech_breadth":{"signal":72.0,"status":"critical"},"vix_tech_correlation":{"signal":50.0,"status":"elevated"}}},"market":{"sp500":NaN,"vix":18.92,"t10y":4.56,"t30y":5.03,"cape":41.54,"oil":91.45},"alert":{"show":true,"level":"caution","title_en":"Tech Sector Caution — TSI CAUTIOUS","title_zh":"科技板塊謹慎 — TSI CAUTIOUS","desc_en":"TSI = 45 (CAUTIOUS), CRI = 19. Elevated stress indicators. Monitor daily.","desc_zh":"TSI = 45（CAUTIOUS），CRI = 19。壓力指標升高，請每日追蹤。"}};
 // [KIWI-DATA-END]
+// [KIWI-HISTORY-START]
+var KIWI_HISTORY = {"d":["2026-06-09"],"a":[6.32],"c":[28.3],"t":[45.0]};
+// [KIWI-HISTORY-END]
 </script>
 <div class="container">
 
@@ -914,6 +943,53 @@ var KIWI_DATA = {"updated":"2026-06-10","avi":{"score":5.74,"level":"ELEVATED","
     </div>
   </div>
 
+  <!-- ── History Charts ── -->
+  <div class="hist-section">
+    <div class="hist-header">
+      <div class="section-title" data-i18n="hist_title">Historical Trend</div>
+      <div class="hist-range-btns" id="histRangeBtns">
+        <button class="hist-range-btn" data-range="30">1M</button>
+        <button class="hist-range-btn" data-range="90">3M</button>
+        <button class="hist-range-btn" data-range="180">6M</button>
+        <button class="hist-range-btn active" data-range="365">1Y</button>
+        <button class="hist-range-btn" data-range="1095">3Y</button>
+        <button class="hist-range-btn" data-range="1825">5Y</button>
+      </div>
+    </div>
+
+    <div class="hist-charts-grid">
+      <!-- CRI -->
+      <div class="hist-chart-card">
+        <div class="hist-chart-top">
+          <div class="hist-chart-title" data-i18n="hist_cri_title">CRI 崩盤風險</div>
+          <span class="hist-chart-badge" id="histCriBadge" style="background:var(--yellow-bg);color:var(--yellow)"></span>
+        </div>
+        <div class="hist-chart-sub" data-i18n="hist_cri_sub">LOW &lt;20 · MODERATE &lt;35 · ELEVATED &lt;50 · HIGH &lt;70 · CRITICAL ≥70</div>
+        <div class="hist-canvas-wrap"><canvas id="histCriChart"></canvas></div>
+      </div>
+
+      <!-- TSI -->
+      <div class="hist-chart-card">
+        <div class="hist-chart-top">
+          <div class="hist-chart-title" data-i18n="hist_tsi_title">TSI 科技壓力</div>
+          <span class="hist-chart-badge" id="histTsiBadge" style="background:var(--yellow-bg);color:var(--yellow)"></span>
+        </div>
+        <div class="hist-chart-sub" data-i18n="hist_tsi_sub">BULLISH &lt;22 · NEUTRAL &lt;40 · CAUTIOUS &lt;60 · BEARISH ≥60</div>
+        <div class="hist-canvas-wrap"><canvas id="histTsiChart"></canvas></div>
+      </div>
+
+      <!-- AVI -->
+      <div class="hist-chart-card" style="grid-column:1/-1">
+        <div class="hist-chart-top">
+          <div class="hist-chart-title" data-i18n="hist_avi_title">AVI 估值指數</div>
+          <span class="hist-chart-badge" id="histAviBadge" style="background:var(--orange-bg);color:var(--orange)"></span>
+        </div>
+        <div class="hist-chart-sub" data-i18n="hist_avi_sub">LOW &lt;4 · NEUTRAL &lt;5.5 · ELEVATED &lt;7 · HIGH &lt;8 · CRITICAL ≥8</div>
+        <div class="hist-canvas-wrap" style="height:120px"><canvas id="histAviChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ── Footer ── -->
   <div class="footer">
     <div data-i18n="footer_main">AVI Dashboard · CRI + TSI + AVI V5 · Personal research project — not financial advice</div>
@@ -1020,7 +1096,14 @@ var KIWI_DATA = {"updated":"2026-06-10","avi":{"score":5.74,"level":"ELEVATED","
     footer_main: 'AVI 儀表板 · CRI + TSI + AVI V5 · 個人研究專案 — 非投資建議',
     footer_update: '更新方式：執行 ',
     footer_source: 'GitHub 原始碼',
-    updated: '更新於'
+    updated: '更新於',
+    hist_title: '三指標歷史走勢',
+    hist_cri_title: 'CRI 崩盤風險',
+    hist_cri_sub: 'LOW <20 · MODERATE <35 · ELEVATED <50 · HIGH <70 · CRITICAL ≥70',
+    hist_tsi_title: 'TSI 科技壓力',
+    hist_tsi_sub: 'BULLISH <22 · NEUTRAL <40 · CAUTIOUS <60 · BEARISH ≥60',
+    hist_avi_title: 'AVI 估值指數',
+    hist_avi_sub: 'LOW <4 · NEUTRAL <5.5 · ELEVATED <7 · HIGH <8 · CRITICAL ≥8',
   };
 
   var currentLang = localStorage.getItem('avi_lang') || 'en';
@@ -1383,6 +1466,221 @@ var KIWI_DATA = {"updated":"2026-06-10","avi":{"score":5.74,"level":"ELEVATED","
           if (el) { el.textContent = '每日自動更新'; el.className = 'tw-card-badge tw-badge-neutral'; }
         });
       });
+  })();
+
+  // ── History Charts ─────────────────────────────────────────────────────────
+  (function initHistoryCharts() {
+    if (typeof KIWI_HISTORY === 'undefined' || !KIWI_HISTORY.d || KIWI_HISTORY.d.length < 2) return;
+
+    var COLOR = {
+      cri:  { line: '#26a69a', fill: 'rgba(38,166,154,0.10)' },
+      tsi:  { line: '#f7c948', fill: 'rgba(247,201,72,0.10)' },
+      avi:  { line: '#ff9800', fill: 'rgba(255,152,0,0.10)'  },
+    };
+
+    var activeRange = 365;
+    var charts = {};
+
+    function levelColor(v, type) {
+      if (type === 'avi') {
+        if (v >= 8) return '#ef5350';
+        if (v >= 7) return '#ef5350';
+        if (v >= 5.5) return '#ff9800';
+        if (v >= 4) return '#f7c948';
+        return '#26a69a';
+      }
+      if (type === 'cri') {
+        if (v >= 70) return '#ef5350';
+        if (v >= 50) return '#ef5350';
+        if (v >= 35) return '#ff9800';
+        if (v >= 20) return '#f7c948';
+        return '#26a69a';
+      }
+      // tsi
+      if (v >= 60) return '#ef5350';
+      if (v >= 40) return '#ff9800';
+      if (v >= 22) return '#f7c948';
+      return '#26a69a';
+    }
+
+    function levelName(v, type) {
+      if (type === 'avi') {
+        if (v >= 8) return 'CRITICAL';
+        if (v >= 7) return 'HIGH';
+        if (v >= 5.5) return 'ELEVATED';
+        if (v >= 4) return 'NEUTRAL';
+        return 'LOW';
+      }
+      if (type === 'cri') {
+        if (v >= 70) return 'CRITICAL';
+        if (v >= 50) return 'HIGH';
+        if (v >= 35) return 'ELEVATED';
+        if (v >= 20) return 'MODERATE';
+        return 'LOW';
+      }
+      if (v >= 60) return 'BEARISH';
+      if (v >= 40) return 'CAUTIOUS';
+      if (v >= 22) return 'NEUTRAL';
+      return 'BULLISH';
+    }
+
+    function sliceByDays(days) {
+      var all = KIWI_HISTORY.d;
+      if (!days || days >= all.length) return { dates: all, a: KIWI_HISTORY.a, c: KIWI_HISTORY.c, t: KIWI_HISTORY.t };
+      var n = all.length;
+      return {
+        dates: all.slice(n - days),
+        a:     KIWI_HISTORY.a.slice(n - days),
+        c:     KIWI_HISTORY.c.slice(n - days),
+        t:     KIWI_HISTORY.t.slice(n - days),
+      };
+    }
+
+    // Threshold band plugin (horizontal filled zone)
+    function thresholdPlugin(zones) {
+      return {
+        id: 'thresholdBands',
+        beforeDraw: function(chart) {
+          var ctx   = chart.ctx;
+          var yAxis = chart.scales.y;
+          var xAxis = chart.scales.x;
+          var left  = xAxis.left;
+          var right = xAxis.right;
+          zones.forEach(function(z) {
+            var y1 = yAxis.getPixelForValue(z.from);
+            var y2 = yAxis.getPixelForValue(z.to);
+            ctx.save();
+            ctx.fillStyle = z.color;
+            ctx.fillRect(left, Math.min(y1,y2), right - left, Math.abs(y2 - y1));
+            ctx.restore();
+          });
+        }
+      };
+    }
+
+    var CRI_ZONES = [
+      { from: 0,  to: 20, color: 'rgba(38,166,154,0.06)' },
+      { from: 20, to: 35, color: 'rgba(247,201,72,0.06)' },
+      { from: 35, to: 50, color: 'rgba(255,152,0,0.06)'  },
+      { from: 50, to: 70, color: 'rgba(239,83,80,0.06)'  },
+      { from: 70, to:100, color: 'rgba(239,83,80,0.12)'  },
+    ];
+    var TSI_ZONES = [
+      { from: 0,  to: 22, color: 'rgba(38,166,154,0.06)' },
+      { from: 22, to: 40, color: 'rgba(247,201,72,0.06)' },
+      { from: 40, to: 60, color: 'rgba(255,152,0,0.06)'  },
+      { from: 60, to:100, color: 'rgba(239,83,80,0.08)'  },
+    ];
+    var AVI_ZONES = [
+      { from: 0,   to: 4,   color: 'rgba(38,166,154,0.06)' },
+      { from: 4,   to: 5.5, color: 'rgba(247,201,72,0.06)' },
+      { from: 5.5, to: 7,   color: 'rgba(255,152,0,0.06)'  },
+      { from: 7,   to: 8,   color: 'rgba(239,83,80,0.06)'  },
+      { from: 8,   to: 10,  color: 'rgba(239,83,80,0.12)'  },
+    ];
+
+    var CHART_CFG = {
+      cri: { canvasId: 'histCriChart', badgeId: 'histCriBadge', dataKey: 'c', zones: CRI_ZONES, yMax: 100, color: COLOR.cri },
+      tsi: { canvasId: 'histTsiChart', badgeId: 'histTsiBadge', dataKey: 't', zones: TSI_ZONES, yMax: 100, color: COLOR.tsi },
+      avi: { canvasId: 'histAviChart', badgeId: 'histAviBadge', dataKey: 'a', zones: AVI_ZONES, yMax: 10,  color: COLOR.avi },
+    };
+
+    function buildChart(type, data) {
+      var cfg  = CHART_CFG[type];
+      var el   = document.getElementById(cfg.canvasId);
+      if (!el) return null;
+
+      var vals = data[cfg.dataKey];
+      var last = vals.length ? vals[vals.length - 1] : 0;
+      var badge = document.getElementById(cfg.badgeId);
+      if (badge) {
+        badge.textContent = type === 'avi' ? last.toFixed(1) : Math.round(last) + ' ' + levelName(last, type);
+        badge.style.background = levelColor(last, type) + '22';
+        badge.style.color = levelColor(last, type);
+      }
+
+      return new Chart(el, {
+        type: 'line',
+        data: {
+          labels: data.dates,
+          datasets: [{
+            data:            vals,
+            borderColor:     cfg.color.line,
+            backgroundColor: cfg.color.fill,
+            borderWidth:     1.5,
+            fill:            true,
+            pointRadius:     0,
+            tension:         0.3,
+          }]
+        },
+        options: {
+          animation: false,
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                title: function(items) { return items[0].label; },
+                label: function(item) {
+                  var v = item.parsed.y;
+                  return ' ' + (type === 'avi' ? v.toFixed(2) : v.toFixed(1)) + ' — ' + levelName(v, type);
+                }
+              },
+              backgroundColor: 'rgba(30,34,45,0.95)',
+              titleColor: '#d1d4dc',
+              bodyColor: cfg.color.line,
+              borderColor: '#363a45',
+              borderWidth: 1,
+              padding: 8,
+            },
+          },
+          scales: {
+            x: {
+              ticks: {
+                color: '#555962', font: { size: 9 }, maxRotation: 0,
+                maxTicksLimit: 8,
+                callback: function(val, idx) {
+                  var d = this.getLabelForValue(val);
+                  return d ? d.slice(0, 7) : '';
+                }
+              },
+              grid: { color: 'rgba(54,58,69,0.4)' },
+              border: { color: 'transparent' },
+            },
+            y: {
+              min: 0, max: cfg.yMax,
+              ticks: { color: '#555962', font: { size: 9 }, maxTicksLimit: 5 },
+              grid: { color: 'rgba(54,58,69,0.4)' },
+              border: { color: 'transparent' },
+            }
+          }
+        },
+        plugins: [thresholdPlugin(cfg.zones)],
+      });
+    }
+
+    function renderAll(days) {
+      var data = sliceByDays(days);
+      Object.keys(charts).forEach(function(k) { if (charts[k]) charts[k].destroy(); });
+      charts = {};
+      Object.keys(CHART_CFG).forEach(function(type) {
+        charts[type] = buildChart(type, data);
+      });
+    }
+
+    // Range button click
+    document.getElementById('histRangeBtns').addEventListener('click', function(e) {
+      var btn = e.target.closest('.hist-range-btn');
+      if (!btn) return;
+      document.querySelectorAll('.hist-range-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      activeRange = parseInt(btn.dataset.range, 10);
+      renderAll(activeRange);
+    });
+
+    renderAll(activeRange);
   })();
 
 </script>

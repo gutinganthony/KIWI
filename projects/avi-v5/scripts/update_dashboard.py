@@ -36,6 +36,10 @@ FRED_KEY = os.environ.get("FRED_API_KEY", "")
 DOCS_HTML = os.path.abspath(
     os.path.join(_SCRIPT_DIR, "..", "..", "..", "docs", "index.html")
 )
+DOCS_HISTORY = os.path.abspath(
+    os.path.join(_SCRIPT_DIR, "..", "..", "..", "docs", "history.json")
+)
+HISTORY_MAX_DAYS = 1826  # keep 5 years rolling
 
 # Fallback constants (used when live fetch fails)
 FALLBACK = {
@@ -627,6 +631,68 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
 
 MARKER_START = "// [KIWI-DATA-START]"
 MARKER_END   = "// [KIWI-DATA-END]"
+HISTORY_START = "// [KIWI-HISTORY-START]"
+HISTORY_END   = "// [KIWI-HISTORY-END]"
+
+
+def append_to_history(payload, html_path):
+    """Append today's AVI/CRI/TSI scores to history.json and update HTML markers."""
+    today   = payload["updated"]
+    avi_v   = round(payload["avi"]["score"], 2)
+    cri_v   = round(payload["cri"]["score"], 1)
+    tsi_v   = round(payload["tsi"]["score"], 1)
+
+    # Load existing history
+    if os.path.exists(DOCS_HISTORY):
+        try:
+            hist = json.loads(open(DOCS_HISTORY, encoding="utf-8").read())
+        except Exception:
+            hist = {"d": [], "a": [], "c": [], "t": []}
+    else:
+        hist = {"d": [], "a": [], "c": [], "t": []}
+
+    # Upsert today's entry
+    if today in hist["d"]:
+        idx = hist["d"].index(today)
+        hist["a"][idx] = avi_v
+        hist["c"][idx] = cri_v
+        hist["t"][idx] = tsi_v
+    else:
+        hist["d"].append(today)
+        hist["a"].append(avi_v)
+        hist["c"].append(cri_v)
+        hist["t"].append(tsi_v)
+
+    # Keep rolling 5-year window
+    if len(hist["d"]) > HISTORY_MAX_DAYS:
+        for k in ("d", "a", "c", "t"):
+            hist[k] = hist[k][-HISTORY_MAX_DAYS:]
+
+    # Write history.json
+    try:
+        with open(DOCS_HISTORY, "w", encoding="utf-8") as f:
+            json.dump(hist, f, separators=(",", ":"))
+        log.info(f"history.json updated ({len(hist['d'])} entries)")
+    except Exception as e:
+        log.warning(f"Failed to write history.json: {e}")
+
+    # Inject into HTML between KIWI-HISTORY markers
+    if not os.path.exists(html_path):
+        return
+    try:
+        content = open(html_path, encoding="utf-8").read()
+        json_str  = json.dumps(hist, separators=(",", ":"))
+        new_block = f"{HISTORY_START}\nvar KIWI_HISTORY = {json_str};\n{HISTORY_END}"
+        pattern   = re.compile(
+            re.escape(HISTORY_START) + r".*?" + re.escape(HISTORY_END), re.DOTALL
+        )
+        if pattern.search(content):
+            content = pattern.sub(new_block, content)
+            with open(html_path, "w", encoding="utf-8") as f:
+                f.write(content)
+            log.info("KIWI-HISTORY block updated in HTML")
+    except Exception as e:
+        log.warning(f"Failed to update KIWI-HISTORY in HTML: {e}")
 
 
 def inject_into_html(payload, html_path):
@@ -699,6 +765,9 @@ def main():
         log.info("=== Dashboard update complete ===")
     else:
         log.error("=== Dashboard update failed (HTML injection) ===")
+
+    # 5. Append to history rolling store
+    append_to_history(payload, DOCS_HTML)
 
 
 if __name__ == "__main__":
