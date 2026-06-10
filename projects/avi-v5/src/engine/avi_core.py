@@ -169,11 +169,14 @@ class AVIEngine:
         if as_of_date:
             target_date = pd.to_datetime(as_of_date)
         else:
-            # Use the latest common date across available indicators
+            # 用「最新有資料的月份」(符合 docstring 本意)。
+            # 修正：原本用 min(latest_dates) = 最落後指標的最後日期 → 把整體 as-of
+            # 鎖在好幾個月前(慢指標如季度 Buffett/ROIC 拖累)。下方對每個指標已取
+            # 「≤ target_date 的最近值」，所以慢指標會自動沿用其最後值，不會 NaN。
             latest_dates = [s.index[-1] for s in indicator_data.values() if len(s) > 0]
             if not latest_dates:
                 raise ValueError("No indicator data available")
-            target_date = min(latest_dates)  # Conservative: use earliest "latest"
+            target_date = max(latest_dates)  # 最新月份(各指標各取其 ≤target 的最近值)
 
         logger.info(f"Computing AVI as of {target_date.date()}")
 
