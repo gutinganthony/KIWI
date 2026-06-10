@@ -80,15 +80,24 @@ class FREDSource:
         gdp = self.fetch_series("GDP", start_date, end_date)
 
         wilshire_m = wilshire.resample("ME").last().dropna()
-        gdp_m = gdp.resample("ME").last().ffill().dropna()
+        gdp_q = gdp.resample("ME").last().dropna()  # 季度 GDP（季末月才有值）
 
-        combined = pd.DataFrame({"wilshire": wilshire_m, "gdp": gdp_m}).dropna()
+        # 修正 bug：GDP 是季度資料、最新一季通常落後約 1 季才發布。舊版用
+        # combined.dropna() 會把「GDP 還沒出」的最近幾個月整列丟掉 → Buffett 指標
+        # 卡在上一季、跟不上最新 Wilshire（與 multpl P/S 的 dagger 是同類「資料被
+        # 無聲截斷」問題，回測偵測率因此下降）。改成把最近一筆 GDP 前填(ffill)到
+        # Wilshire 的每個月份（含最新、GDP 尚未發布的月份）。
+        gdp_aligned = gdp_q.reindex(wilshire_m.index, method="ffill")
+        combined = pd.DataFrame({"wilshire": wilshire_m, "gdp": gdp_aligned}).dropna()
         if combined.empty:
             raise RuntimeError("No overlapping data for Buffett Indicator")
 
         result = (combined["wilshire"] / combined["gdp"]) * 100
         result.name = "buffett_indicator"
-        logger.info(f"Computed Buffett Indicator: {len(result)} monthly observations")
+        logger.info(
+            f"Computed Buffett Indicator: {len(result)} monthly obs, "
+            f"latest={result.index[-1].date()} = {result.iloc[-1]:.1f}%"
+        )
         return result
 
     def fetch_roic(

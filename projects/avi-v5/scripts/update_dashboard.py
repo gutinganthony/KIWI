@@ -550,14 +550,56 @@ def build_tsi_indicators(tsi_result):
     return ind_map
 
 
+def compute_avi_from_v5():
+    """跑「真」AVI V5 管線（14 指標 × 6 維度 + Regime(HMM) + GARCH）。
+
+    回傳 (score, level, dims) — 與 run_monthly.py --v5 同一套、同一個數字。
+    跑失敗回 None → 上層自動退回舊的簡化代理(compute_avi_dimensions)，網頁絕不開天窗。
+    """
+    try:
+        from src.pipeline.avi_v5_pipeline import AVIV5Pipeline
+
+        res = AVIV5Pipeline().run()
+        score = round(float(res.avi_v5_score), 2)
+
+        # 維度分數(0-10) → 百分位顯示(0-100)；V5 的 'rates' 對應網頁鍵 'rate'
+        keymap = {"rates": "rate"}
+        dims = {}
+        for k, ds in res.v4_result.dimension_scores.items():
+            dk = keymap.get(k, k)
+            pct = int(min(100, max(0, round(ds.score * 10))))
+            dims[dk] = {"pct": pct, "emoji": _pct_emoji(pct)}
+        # 確保網頁需要的 6 維都存在（缺的補中性，避免前端讀不到鍵）
+        for dk in ("valuation", "profitability", "macro", "rate", "credit", "momentum"):
+            dims.setdefault(dk, {"pct": 50, "emoji": _pct_emoji(50)})
+
+        log.info(
+            f"AVI V5 pipeline OK: score={score} "
+            f"(V4={res.avi_v4_score:.2f}, regime={res.regime_label}, "
+            f"garch_adj={res.garch_adjustment:+.2f}) "
+            f"dims={ {k: v['pct'] for k, v in dims.items()} }"
+        )
+        return score, avi_level(score), dims
+    except Exception as e:
+        log.warning(f"AVI V5 pipeline failed -> fallback to proxy: {e}", exc_info=True)
+        return None
+
+
 def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
     """Assemble the full JSON payload."""
     today = datetime.today().strftime("%Y-%m-%d")
 
     # ── AVI ──────────────────────────────────────────────────────────────────
-    dims = compute_avi_dimensions(yf_data, fred_data, cape_val)
-    avi_score = compute_avi_score(dims)
-    avi_lvl   = avi_level(avi_score)
+    # 優先用「真」AVI V5 管線（與 run_monthly --v5 同一個數字）；跑失敗才退回簡化代理
+    avi_source = "v5"
+    _v5 = compute_avi_from_v5()
+    if _v5 is not None:
+        avi_score, avi_lvl, dims = _v5
+    else:
+        avi_source = "proxy"
+        dims = compute_avi_dimensions(yf_data, fred_data, cape_val)
+        avi_score = compute_avi_score(dims)
+        avi_lvl   = avi_level(avi_score)
 
     # ── CRI ──────────────────────────────────────────────────────────────────
     cri_score = cpi_result.score if cpi_result else FALLBACK["cri_score"]
@@ -601,6 +643,7 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
             "score":      avi_score,
             "level":      avi_lvl,
             "dimensions": dims,
+            "source":     avi_source,
         },
         "cri": {
             "score":      round(cri_score, 1),
