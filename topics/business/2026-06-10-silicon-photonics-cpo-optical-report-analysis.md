@@ -127,6 +127,31 @@ AI 傳輸需求 ↑↑（800G→1.6T→CPO）
 
 **對結論的影響（不變、反而強化）**：原文主軸(CPO元年)合理，但①66% CAGR 是最佳情境、②LITE「獨家」誇大、③台廠檢測/磊晶族群已漲停狂熱。**選載具排序**：檢測 **閎康>汎銓**；上游磊晶 **聯亞已飆等回檔**；下游 **COHR(穩)>LITE(貴)>AAOI(控部位)**。
 
+## 8. 核心：SemiAnalysis《Scaling with Light》CPO 報告（最具攻擊性的部分）
+
+使用者點明：MoneyDJ 引用的真正重點是 **SemiAnalysis（Dylan Patel 團隊）Computex 後的 CPO 報告**。SemiAnalysis 是高可信度深度技術研究，這份的「攻擊性」在三個大膽論點：
+
+### 三個攻擊性論點 + 合理性
+| # | 攻擊性論點 | 合理性 | 說明 |
+|---|---|---|---|
+| **A** | **CPO 真正的大餅是 scale-up（GPU 對 GPU 織網），不是 scale-out（交換器）**。scale-up TAM 已遠大於 scale-out，CPO TAM 將由 scale-up 主導 | ✅ **8/10 犀利且可能對** | 重新框定整張地圖：大家在追的「交換器 CPO」是小池；真正錢在 scale-up(NVLink 域)。**這把投資焦點從模組廠移到光引擎/光源/平台** |
+| **B** | **CPO 比可插拔「更可靠」**（Meta OFC 2026 數據）+ 省電 65%（Broadcom Bailly 5.4W/800G vs 可插拔 15W） | ✅ **7/10** | 若成立，**直接摧毀「CPO 不可靠」這個最大空方論點** → 加速 CPO 取代可插拔。但「Meta 評估的那一款」樣本有限 |
+| **C** | **Nvidia Spectrum-X CPO 交換器將延遲** | ⚠️ **爭議中** | **Nvidia 6/9 由 Gilad Shainer 公開反駁**：無延遲、H2 2026 量產出貨。SemiAnalysis vs Nvidia 公開對槓 |
+
+### 為什麼這份報告對「可插拔陣營」是攻擊性利空
+報告的核心殺傷力：**可插拔(pluggable)現在仍是 default（便宜、相容、熟悉），但 AI 頻寬/距離/密度/可靠度需求「很快會超出可插拔能提供的」**；CPO 對 scale-out 只是「有幫助」，但對 **scale-up 是核心**，而 scale-up 才是大餅。→ **這是對純可插拔模組廠（AAOI）中長期最強的結構性空方論述。**
+
+### 重估四家公司（疊加 SemiAnalysis 觀點）
+- **AAOI（你持 20%）→ 中長期結構利空加重**：AAOI 是可插拔模組 + 自製雷射，**不是 scale-up CPO 光引擎玩家**。SemiAnalysis 的 scale-up TAM 論點 = AAOI 在「更大那塊餅」缺席。**近期仍有 runway**（可插拔 default + 800G/1.6T 需求 > 產能到 2027 中），但**終端價值要看它能否把「400mW pump laser for CPO」真的切進 CPO 光源**。→ **強化前面「控部位、趁強砍回、別追價」的結論。**
+- **LITE / COHR → 相對受惠**：CPO 仍需外部雷射光源(ELS)，雷射在可插拔與 CPO 都要。scale-up CPO 是更大餅 → **光源/光引擎(LITE/COHR)比模組組裝廠更站對邊**。Nvidia $4B 入股是同向佐證。
+- **汎銓 / 閎康 → 論點 B 是雙面刃**：「CPO 比可插拔更可靠」**反而稍微削弱**「CPO 不可靠→檢測剛需」的台股敘事；但新技術 ramp 期仍需大量驗證。**檢測財是真的、但別用『CPO 很不可靠』當理由——SemiAnalysis 說相反。** 載具仍 閎康(有獲利) > 汎銓(虧損)。
+- **TSMC COUPE → 確認 central**（scale-up CPO 平台贏家）。
+
+### 投資結論（疊加後）
+1. **最大攻擊性 = 「scale-up 才是 CPO 主戰場」**：投資焦點該往 **光源(LITE/COHR)、CPO 平台(TSMC)、scale-up 光引擎** 移，**而非追可插拔或台股檢測飆股**。
+2. **對 AAOI**：SemiAnalysis 等於幫你的「控部位」決定背書——它是近期動能、中長期被結構挑戰的標的。
+3. **時間點變數 = 論點 C（Nvidia 延遲與否）**：若 Nvidia H2 2026 如期量產(其官方說法) → CPO 取代加速、可插拔承壓更早；若真延遲 → 可插拔(AAOI)多賺一段 runway。**盯 H2 2026 Spectrum-X CPO 實際出貨**＝這條供應鏈的最大近期催化/證偽點。
+
 ## 來源
 - [Nvidia $4B 投 Lumentum+Coherent (SiliconANGLE)](https://siliconangle.com/2026/03/02/nvidia-invests-4b-co-packaged-optics-suppliers-lumentum-coherent/)
 - [Coherent Q3 FY26 $1.81B +21% (Futurum)](https://futurumgroup.com/insights/coherent-q2-fy-2026-ai-datacenter-demand-lifts-revenue-and-margins/)
