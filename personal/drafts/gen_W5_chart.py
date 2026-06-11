@@ -42,7 +42,7 @@ ax.axis('off')
 # ── Title
 fig.text(0.5, 0.945, '台股抄底儀表板：四個訊號，亮三個才算數',
          ha='center', color=WHITE, fontsize=17, fontweight='bold')
-fig.text(0.5, 0.905, '摸魚記  ·  2026年6月  ·  共振框架：A 級訊號 ≥3 個同時成立，分批進場',
+fig.text(0.5, 0.905, '摸魚記  ·  數據截至 2026-06-11 收盤  ·  共振框架：A 級訊號 ≥3 個同時成立，分批進場',
          ha='center', color=GOLD, fontsize=10, alpha=0.9)
 
 # ── Signal cards
@@ -50,25 +50,25 @@ fig.text(0.5, 0.905, '摸魚記  ·  2026年6月  ·  共振框架：A 級訊號
 signals = [
     ('① 恐慌指數 VIXTWN',
      '觸發：> 30（破 40 更強）',
-     '目前：約 2X（未破 30）',
-     False,
+     '目前：已破 40（極端區）',
+     True,
      '歷史：破 30 後進場\n3 個月平均 +12.4%\n6 個月平均 +20%',
      '期交所（2006 年起）'),
     ('② 外資賣超',
-     '觸發：當月大幅淨賣超',
-     '目前：有賣超，未達極端',
-     False,
+     '觸發：單日進史上前15大\n或單月賣超 ≥ 2,000 億',
+     '目前：6 月已賣逾 4,300 億',
+     True,
      '歷史：賣超月底進場\n12 個月勝率 81.25%\n平均報酬 +16.27%',
      '野村投信統計'),
     ('③ 指數跌幅',
      '觸發：自高點回落 ≥ 20%',
-     '目前：回檔 < 20%',
+     '目前：自 46,552 回檔 7~9%',
      False,
      '歷史：1990 年來出現 6 次\n事後 100% 收復失土\n並創歷史新高',
      '加權指數歷史'),
     ('④ 融資維持率',
      '觸發：跌入 130–140%',
-     '目前：約 160%（正常區間）',
+     '目前：追繳啟動，未入區間',
      False,
      '歷史：維持率低點與\n加權指數短中期低點\n高度重合',
      '集保中心 / MacroMicro'),
@@ -117,13 +117,14 @@ for i, (name, trig, curr, lamp_on, stat, src) in enumerate(signals):
             fontsize=11.5, fontweight='bold')
 
     # Trigger / current
-    ax.text(cx, y0 + card_h - 22, trig, ha='center', color=GOLD,
-            fontsize=9, fontweight='bold')
-    ax.text(cx, y0 + card_h - 27, curr, ha='center', color=LGREY,
-            fontsize=9)
+    ax.text(cx, y0 + card_h - 21, trig, ha='center', va='top', color=GOLD,
+            fontsize=8.5, fontweight='bold', linespacing=1.5)
+    ax.text(cx, y0 + card_h - 28.5, curr, ha='center', va='top',
+            color=WHITE if lamp_on else LGREY, fontsize=9,
+            fontweight='bold' if lamp_on else 'normal')
 
     # Divider
-    ax.plot([x0+2.5, x0+card_w-2.5], [y0 + card_h - 31]*2,
+    ax.plot([x0+2.5, x0+card_w-2.5], [y0 + card_h - 32]*2,
             color=OFF, lw=0.8, alpha=0.8)
 
     # Historical stat
@@ -141,7 +142,7 @@ bar = FancyBboxPatch((gap, 6), 100 - 2*gap, 10,
                      facecolor=NAVY, edgecolor=AMBER, linewidth=1.8)
 ax.add_patch(bar)
 ax.text(50, 11,
-        f'目前亮燈數：{n_on} / 4　→　未達共振門檻（≥3），歷史統計還沒站到買方這邊',
+        f'目前亮燈數：{n_on} / 4　→　未達共振門檻（≥3）：恐慌到位了，跌幅與斷頭出清還沒到',
         ha='center', va='center', color=AMBER,
         fontsize=11.5, fontweight='bold')
 
