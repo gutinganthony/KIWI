@@ -28,7 +28,8 @@ Use ~/.claude/skills/gstack/... for gstack file paths (the global path).
 
 1. `docs/KIWI_INDEX_FRAMEWORK.md` — ACT index（AVI/CRI/TSI）完整定義
 2. `skills/serenity/SKILL.md` — Serenity 供應鏈瓶頸選股框架
-3. `skills/wavetrend/SKILL.md` — WaveTrend Oscillator 技術分析框架
+3. `skills/serenity/watchlist.md` — Serenity 現役觀察名單（7 檔觸發條件 + 否證條件）
+4. `skills/wavetrend/SKILL.md` — WaveTrend Oscillator 技術分析框架
 
 載入後，使用者可以直接說：
 - 「用 Serenity 框架分析 $TICKER」→ 依照 skills/serenity/SKILL.md 執行完整分析
