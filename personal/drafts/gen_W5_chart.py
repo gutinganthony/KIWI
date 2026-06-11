@@ -90,28 +90,36 @@ for i, (name, trig, curr, lamp_on, stat, src) in enumerate(signals):
 
     cx = x0 + card_w/2
 
-    # Lamp (Ellipse compensates for axis aspect so it renders circular)
-    lamp_color = GREEN if lamp_on else OFF
-    lamp = mpatches.Ellipse((cx, y0 + card_h - 6), width=6.8, height=11.3,
-                            facecolor=lamp_color, edgecolor=WHITE,
-                            linewidth=1.5, alpha=0.95 if lamp_on else 0.5)
-    ax.add_patch(lamp)
+    # Lamp: clean indicator light, no text inside.
+    # ON  = glowing green dot; OFF = recessed dark dot with dim ring.
+    # (Ellipse compensates for axis aspect so it renders circular)
+    lamp_y = y0 + card_h - 4.5
     if lamp_on:
-        glow = mpatches.Ellipse((cx, y0 + card_h - 6), width=10.4, height=17.3,
-                                facecolor=GREEN, alpha=0.25)
+        glow = mpatches.Ellipse((cx, lamp_y), width=8.4, height=14.0,
+                                facecolor=GREEN, alpha=0.22)
         ax.add_patch(glow)
-    ax.text(cx, y0 + card_h - 6, '亮' if lamp_on else '暗',
-            ha='center', va='center', color=WHITE,
-            fontsize=10, fontweight='bold')
+        lamp = mpatches.Ellipse((cx, lamp_y), width=4.6, height=7.7,
+                                facecolor=GREEN, edgecolor='#7fe0a8',
+                                linewidth=1.6)
+    else:
+        lamp = mpatches.Ellipse((cx, lamp_y), width=4.6, height=7.7,
+                                facecolor='#141f38', edgecolor=OFF,
+                                linewidth=1.4)
+    ax.add_patch(lamp)
+
+    # Status label under the lamp
+    ax.text(cx, y0 + card_h - 11, '已觸發' if lamp_on else '未觸發',
+            ha='center', color=GREEN if lamp_on else LGREY,
+            fontsize=8.5, fontweight='bold', alpha=1.0 if lamp_on else 0.75)
 
     # Signal name
-    ax.text(cx, y0 + card_h - 14.5, name, ha='center', color=WHITE,
+    ax.text(cx, y0 + card_h - 16.5, name, ha='center', color=WHITE,
             fontsize=11.5, fontweight='bold')
 
     # Trigger / current
-    ax.text(cx, y0 + card_h - 21, trig, ha='center', color=GOLD,
+    ax.text(cx, y0 + card_h - 22, trig, ha='center', color=GOLD,
             fontsize=9, fontweight='bold')
-    ax.text(cx, y0 + card_h - 26.5, curr, ha='center', color=LGREY,
+    ax.text(cx, y0 + card_h - 27, curr, ha='center', color=LGREY,
             fontsize=9)
 
     # Divider
