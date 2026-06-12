@@ -921,7 +921,7 @@ var KIWI_HISTORY = {"d":["2021-06-14","2021-06-15","2021-06-16","2021-06-17","20
         <div class="tw-card-label">全市場融資餘額</div>
         <div class="tw-card-value" id="tw-margin-val">—</div>
         <div class="tw-card-badge tw-badge-neutral" id="tw-margin-badge">載入中</div>
-        <div class="tw-card-note">90日百分位 · 85%+ = 逆向過熱警訊</div>
+        <div class="tw-card-note" id="tw-margin-note">融資÷指數正規化 90日百分位 · 85%+ = 過熱警訊</div>
       </div>
     </div>
 
@@ -932,8 +932,8 @@ var KIWI_HISTORY = {"d":["2021-06-14","2021-06-15","2021-06-16","2021-06-17","20
         <div class="tw-chart-container"><canvas id="futuresChart"></canvas></div>
       </div>
       <div class="tw-chart-block">
-        <div class="tw-chart-title">全市場融資餘額 (億元)</div>
-        <div class="tw-chart-sub">逆向指標：持續走高且達90日85%分位 = 過熱警訊</div>
+        <div class="tw-chart-title" id="tw-margin-chart-title">融資強度 %（融資餘額 ÷ 加權指數，期初 = 100%）</div>
+        <div class="tw-chart-sub" id="tw-margin-chart-sub">已消除大盤水位影響：&gt;100% = 融資增速超過大盤（槓桿堆積）· 持續走高且達90日85%分位 = 過熱警訊</div>
         <div class="tw-chart-container"><canvas id="marginChart"></canvas></div>
       </div>
     </div>
@@ -1127,7 +1127,15 @@ var KIWI_HISTORY = {"d":["2021-06-14","2021-06-15","2021-06-16","2021-06-17","20
           }
         }
       }
-      document.getElementById('updatedLabel').textContent = '更新於：2026-05-20';
+      // 動態帶入最新日期（切中文時不可寫死，否則永遠顯示舊日期）
+      var updEl = document.getElementById('updatedLabel');
+      if (updEl && typeof KIWI_DATA !== 'undefined' && KIWI_DATA.updated) {
+        var zhLbl = '更新於：' + KIWI_DATA.updated;
+        if (KIWI_DATA.market && KIWI_DATA.market.data_date && KIWI_DATA.market.data_date !== KIWI_DATA.updated) {
+          zhLbl += ' · 美股收盤 ' + KIWI_DATA.market.data_date.slice(5);
+        }
+        updEl.textContent = zhLbl;
+      }
     } else {
       // Reset to English defaults
       location.reload();
@@ -1151,10 +1159,14 @@ var KIWI_HISTORY = {"d":["2021-06-14","2021-06-15","2021-06-16","2021-06-17","20
     if (!data) return;
     var circ = 2 * Math.PI * 50; // r=50 → 314.16
 
-    // ── Updated date ──────────────────────────────────────────────────────
+    // ── Updated date（含美股實際收盤日，避免「資料是不是舊的」疑慮）──────
     var upd = document.getElementById('updatedLabel');
     if (upd && data.updated) {
-      upd.textContent = 'Updated: ' + data.updated;
+      var lbl = 'Updated: ' + data.updated;
+      if (data.market && data.market.data_date && data.market.data_date !== data.updated) {
+        lbl += ' · US close ' + data.market.data_date.slice(5);
+      }
+      upd.textContent = lbl;
     }
 
     // ── Alert bar ─────────────────────────────────────────────────────────
@@ -1381,6 +1393,11 @@ var KIWI_HISTORY = {"d":["2021-06-14","2021-06-15","2021-06-16","2021-06-17","20
     var lvlLabels = { HIGH: '⚠ 過高 ' + data.margin_pct + '%', ELEVATED: '偏高 ' + data.margin_pct + '%', NORMAL: '正常 ' + data.margin_pct + '%' };
     mBadge.textContent = lvlLabels[lvl] || lvl;
     mBadge.className = 'tw-card-badge tw-badge-' + lvl.toLowerCase();
+    // 百分位的計算基礎（ratio = 已用指數正規化；raw = 原始金額）
+    var mNote = document.getElementById('tw-margin-note');
+    if (mNote && data.margin_pct_basis === 'raw') {
+      mNote.textContent = '90日百分位 · 85%+ = 逆向過熱警訊';
+    }
 
     var chartOpts = {
       responsive: true, maintainAspectRatio: false,
@@ -1427,22 +1444,50 @@ var KIWI_HISTORY = {"d":["2021-06-14","2021-06-15","2021-06-16","2021-06-17","20
         });
       }
 
-      // Margin line chart
+      // Margin line chart：優先畫「融資÷加權指數」正規化序列（期初=100%），
+      // 消除大盤水位影響；無 TAIEX 數據時退回絕對金額（億元）。
       var mCtx = document.getElementById('marginChart');
-      if (mCtx && mData.length > 0) {
+      var rData = data.margin_ratio_pct || [];
+      var hasRatio = rData.some(function(v) { return v !== null && v !== undefined; });
+      if (mCtx && (hasRatio || mData.length > 0)) {
+        var series = hasRatio ? rData : mData;
+        var yTick = hasRatio
+          ? function(v) { return v.toFixed(0) + '%'; }
+          : function(v) { return Math.round(v/100000) + '億'; };
+        if (!hasRatio) {
+          // 後端還沒提供 TAIEX：把標題退回絕對金額版本
+          var tEl = document.getElementById('tw-margin-chart-title');
+          var sEl = document.getElementById('tw-margin-chart-sub');
+          if (tEl) tEl.textContent = '全市場融資餘額 (億元)';
+          if (sEl) sEl.textContent = '逆向指標：持續走高且達90日85%分位 = 過熱警訊';
+        }
         new Chart(mCtx, {
           type: 'line',
           data: {
             labels: labels,
-            datasets: [{ data: mData.map(function(v) { return v || null; }),
+            datasets: [{ data: series.map(function(v) { return (v === undefined ? null : v); }),
               borderColor: '#42a5f5', backgroundColor: 'rgba(66,165,245,0.1)',
               borderWidth: 2, pointRadius: 0, fill: true, tension: 0.3, spanGaps: true }]
           },
           options: Object.assign({}, chartOpts, {
+            plugins: Object.assign({}, chartOpts.plugins, {
+              tooltip: Object.assign({}, chartOpts.plugins.tooltip, {
+                callbacks: {
+                  label: function(item) {
+                    if (!hasRatio) return ' ' + Math.round(item.parsed.y/100000) + ' 億';
+                    var i = item.dataIndex;
+                    var parts = [' 融資強度 ' + item.parsed.y.toFixed(1) + '%'];
+                    if (mData[i] != null) parts.push('融資 ' + Math.round(mData[i]/100000) + ' 億');
+                    if (data.taiex && data.taiex[i] != null) parts.push('指數 ' + Math.round(data.taiex[i]).toLocaleString());
+                    return parts.join(' · ');
+                  }
+                }
+              })
+            }),
             scales: Object.assign({}, chartOpts.scales, {
               y: Object.assign({}, chartOpts.scales.y, {
                 ticks: Object.assign({}, chartOpts.scales.y.ticks, {
-                  callback: function(v) { return Math.round(v/100000) + '億'; }
+                  callback: yTick
                 })
               })
             })

@@ -2,8 +2,10 @@ name: Auto-update Dashboard Data
 
 on:
   schedule:
-    - cron: '0 2 * * *'    # 02:00 UTC = 10:00 台北（每天）
-    - cron: '0 21 * * 1-5' # 21:00 UTC = 05:00 台北次日（美股收盤後，抓「當日」美股收盤，不再永遠落後一天）
+    # 注意：GitHub cron 經常延遲 30 分鐘～數小時，所以排 3 班互為備援。
+    - cron: '0 21 * * 1-5'  # 21:00 UTC = 台北 05:00 次日（美股剛收盤，最早抓到當日收盤）
+    - cron: '0 23 * * 1-5'  # 23:00 UTC = 台北 07:00 次日（備援：確保台灣早晨開盤前已更新）
+    - cron: '0 2 * * *'     # 02:00 UTC = 台北 10:00（每天，含週末，刷新日期戳）
   workflow_dispatch:        # allow manual trigger
 
 jobs:

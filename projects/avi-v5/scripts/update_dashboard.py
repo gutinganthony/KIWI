@@ -68,8 +68,10 @@ def fetch_yfinance_data():
     # ^VVIX = vol-of-vol (1-2 day lead before VIX explosion)
     # HYG = high yield bonds (credit divergence, 2-3 day lead before equity selloff)
     tickers = ["^GSPC", "^VIX", "^VVIX", "QQQ", "SOXX", "SMH", "SPY", "MU", "HYG", "BZ=F"]
-    end = datetime.today()
-    start = end - timedelta(days=730)
+    # yfinance 的 end 是「排他」邊界：end=今天 會漏掉當天剛收盤的數據。
+    # 加 1 天確保 21:00 UTC（美股收盤後）的排程能抓到當日收盤。
+    end = datetime.today() + timedelta(days=1)
+    start = end - timedelta(days=731)
 
     result = {}
     for ticker in tickers:
@@ -587,7 +589,10 @@ def compute_avi_from_v5():
 
 def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
     """Assemble the full JSON payload."""
-    today = datetime.today().strftime("%Y-%m-%d")
+    # 日期戳用台北時區：GitHub runner 是 UTC，21:00 UTC 跑的時候台北已是隔天早上。
+    # 用 UTC 日期會讓台灣使用者覺得「資料是昨天的」。
+    from zoneinfo import ZoneInfo
+    today = datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y-%m-%d")
 
     # ── AVI ──────────────────────────────────────────────────────────────────
     # 優先用「真」AVI V5 管線（與 run_monthly --v5 同一個數字）；跑失敗才退回簡化代理
@@ -634,6 +639,12 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
     t30y  = latest_fred("treasury_30y", FALLBACK["t30y"])
     cape  = cape_val if cape_val else FALLBACK["cape"]
 
+    # 美股實際數據日期（^GSPC 最後一根 K 棒），供前端顯示與 history 對齊
+    data_date = ""
+    gspc_df = yf_data.get("^GSPC")
+    if gspc_df is not None and not gspc_df.empty:
+        data_date = gspc_df.index[-1].strftime("%Y-%m-%d")
+
     # ── Alert ─────────────────────────────────────────────────────────────────
     alert = build_alert(tsi_score, cri_score, tsi_bias, avi_lvl)
 
@@ -664,6 +675,7 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
             "t30y":  t30y,
             "cape":  cape,
             "oil":   oil,
+            "data_date": data_date,
         },
         "alert": alert,
     }
@@ -679,8 +691,12 @@ HISTORY_END   = "// [KIWI-HISTORY-END]"
 
 
 def append_to_history(payload, html_path):
-    """Append today's AVI/CRI/TSI scores to history.json and update HTML markers."""
-    today   = payload["updated"]
+    """Append today's AVI/CRI/TSI scores to history.json and update HTML markers.
+
+    歷史序列的 key 用「美股實際數據日期」（^GSPC 最後一根 K 棒），
+    與回填產生的歷史對齊：每個美股交易日恰好一筆，週末/重跑只會 upsert 不會重複。
+    """
+    entry_date = payload.get("market", {}).get("data_date") or payload["updated"]
     avi_v   = round(payload["avi"]["score"], 2)
     cri_v   = round(payload["cri"]["score"], 1)
     tsi_v   = round(payload["tsi"]["score"], 1)
@@ -694,17 +710,21 @@ def append_to_history(payload, html_path):
     else:
         hist = {"d": [], "a": [], "c": [], "t": []}
 
-    # Upsert today's entry
-    if today in hist["d"]:
-        idx = hist["d"].index(today)
+    # Upsert this market-date's entry (keep series sorted by date)
+    if entry_date in hist["d"]:
+        idx = hist["d"].index(entry_date)
         hist["a"][idx] = avi_v
         hist["c"][idx] = cri_v
         hist["t"][idx] = tsi_v
     else:
-        hist["d"].append(today)
+        hist["d"].append(entry_date)
         hist["a"].append(avi_v)
         hist["c"].append(cri_v)
         hist["t"].append(tsi_v)
+        if len(hist["d"]) >= 2 and hist["d"][-1] < hist["d"][-2]:
+            order = sorted(range(len(hist["d"])), key=lambda i: hist["d"][i])
+            for k in ("d", "a", "c", "t"):
+                hist[k] = [hist[k][i] for i in order]
 
     # Keep rolling 5-year window
     if len(hist["d"]) > HISTORY_MAX_DAYS:
