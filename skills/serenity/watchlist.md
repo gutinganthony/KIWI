@@ -1,7 +1,7 @@
 # Serenity 觀察名單（持續更新）
 
-**上次深掘**：2026-06-10  
-**完整報告**：`topics/business/2026-06-10-serenity-deep-dive-seven-stocks.md`  
+**上次深掘**：2026-06-10（七檔 Step 1–9）｜**上次獵殺**：2026-06-12（三鏈上游）  
+**完整報告**：`topics/business/2026-06-10-serenity-deep-dive-seven-stocks.md`、`topics/business/2026-06-12-serenity-nine-ticker-triage-upstream-hunt.md`  
 **框架**：`skills/serenity/SKILL.md`
 
 ---
@@ -65,6 +65,7 @@
 
 ### 4. PLAB（Photronics）
 **當前方向**：觀察名單（凍結），窗口 1–2 季
+**2026-06-12 更新**：律所增至 7 家（6/11 Pomerantz 加入）、公司仍零回應、無 SEC 介入跡象；股價反彈至 $30.51（$1.81B）；管理層稱 5 月起 tape-out 回升早期跡象（真偽待驗）。三項解凍條件零達成 → 維持凍結。
 
 | 類型 | 條件 |
 |---|---|
@@ -73,7 +74,7 @@
 | 解凍條件 C | Allen TX 廠拿到具名在岸合約（不再是「2027 後貢獻」模糊說法）|
 | **升買進** | 三項全部達成 → 重新跑 Step 7 估值 |
 | 否證 | 財報重述或 SEC 正式介入 → 永久移出 Serenity 名單 |
-| 持續紅旗 | 中國 27% 營收 + DNP 廈門 JV；Q2 capex 壓 FCF 為負 |
+| 持續紅旗 | 中國 27% 營收 + DNP 廈門 JV；Q2 capex 壓 FCF 為負；記憶體超循環短期反成逆風（design release 延遲）|
 
 ### 5. PPIH（Perma-Pipe）
 **當前方向**：觀察（降評），窗口 2 季
@@ -85,6 +86,24 @@
 | 否證 | Q2 重演 Q1 劇本（MENA 延遲 + ramp 成本 + DC award 停滯）|
 | 降為不適用 | 若 DC 佔 backlog 確認 <15%——敘事大於數字，移出框架 |
 | 殘留優點 | EV/EBITDA ~6×（便宜），backlog $136.5M (+12% QoQ），首次法說會 IR 升級 |
+
+---
+
+## 待深掘候選池（2026-06-12 三鏈獵殺產出）
+
+完整數據見 `topics/business/2026-06-12-serenity-nine-ticker-triage-upstream-hunt.md`。
+
+| 優先序 | 標的 | 市值 | 一句話 | 深掘前必查 |
+|---|---|---|---|---|
+| 1 | **Yamaichi Electronics**（6941.T） | ~$0.94B | burn-in/test socket 寡占，P/E ~16.6×，純益 +73%——兩組 agent 獨立首選 | FY3/27 指引驟降是保守還是見頂；高階 niche 實際市占 |
+| 2 | **Mersen**（EPA:MRN） | ~$1.2B | 800VDC 保險絲 + busbar 雙層卡位，forward P/E 9–11× 完全未重評 | DC 銷售逐季翻倍軌跡（全年 <€50M 即降級）|
+| 3 | **Tamura**（6768.T） | ~$480M | 美國 DC PDU/UPS 變壓器，表面赤字掩蓋 OP 創新高指引 | 6 月有報書客戶集中度（>50% 否決）|
+| 4 | **JEM**（6855.T） | ~$0.7B | 記憶體探針卡純度最高，Q3 +71%——⚠️ 正在增資 | 增資條款（折價 >15% 或 >15% 股本即降級）|
+| 5 | **Towa**（6315.T） | ~$1.3B | HBM 壓縮模封 80–90% 份額，財報落後訂單 setup | 中國占比（>40% 否決）；hybrid bonding 斷點年限 |
+
+**觸發價觀察池**：Enplas（P/E 回 20×）、IntelliEPI（P/S <8×）、VPEC（壓線 $2B）、Tri Chemical（中國 <40% 確認）、Shizuki（僅小倉位）、Aichi Electric（查中部電力依存）、Techwing（P/S 回落）、Rogers（DC 轉量產）、**Nittobo（再跌 ~50% 重新撿起——T-glass 壟斷全鏈最強）**、Baotek（治理折價）。
+
+**整層否決**（重工禁止）：SiC 基板/磊晶、燃料電池備援、美國變壓器（全重評）、液冷快接頭（無壟斷層）。個股否決名單見報告。
 
 ---
 

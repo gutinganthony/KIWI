@@ -20,3 +20,4 @@
 | 2026-06-02 | [AI 投資研究副駕駛 — 可測試假設 + 客戶訪談訪綱（Idea 階段）](./2026-06-02-ai-investment-copilot-hypothesis.md) | startup, investment, AI-copilot, AVI, hypothesis, customer-discovery, founders-playbook, idea-stage |
 | 2026-06-03 | [Redefine Fund — Jake × Vince 共同基金專案（策略 + 結構 + Action Plan + 模板）](./2026-06-03-redefine-fund-project.md) | startup, fund, EAM, semiconductor, AI, redefine, fundraising, partnership, action-plan |
 | 2026-06-10 | [Serenity 深度報告：七檔 Step 1–9 完整分析（Seikoh/santec/IQE/PLAB/PPIH/AAOI/GHM）](./2026-06-10-serenity-deep-dive-seven-stocks.md) | investment, serenity-chokepoint, supply-chain, semiconductor, silicon-photonics, AI-infrastructure, deep-dive, watchlist |
+| 2026-06-12 | [Serenity 報告：九檔美股快篩 + 三鏈上游獵殺（記憶體/電源/ASIC・光學）](./2026-06-12-serenity-nine-ticker-triage-upstream-hunt.md) | investment, serenity-chokepoint, supply-chain, HBM, AI-power, test-socket, Japan-stocks, upstream-hunt |
