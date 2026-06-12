@@ -1,20 +1,13 @@
 {
-  "date": "2026-06-11",
-  "note": "由 update.py 產生，在本機跑後 commit 進 repo",
-  "tw_market": {
-    "taiex_close": 43149.46,
-    "taiex_high_ytd": 46552.0,
-    "taiex_drawdown_pct": -7.31,
-    "vixtwn": 43.58,
-    "foreign_net_buy_today": null,
-    "foreign_net_buy_mtd": -4300.0,
-    "margin_maintenance_ratio": 163.09,
-    "margin_balance": null
+  "fetched_at": "2026-06-12T02:59:03.404127+00:00",
+  "date": "2026-06-12",
+  "taiex": {
+    "date_roc": "1150611",
+    "close": 43149.46
   },
-  "sources": {
-    "vixtwn": "https://mis.taifex.com.tw/futures/VolatilityQuotes/",
-    "margin": "https://www.macromicro.me/charts/53117/taiwan-taiex-maintenance-margin",
-    "foreign": "https://www.twse.com.tw/zh/trading/foreign/bfi82u.html",
-    "taiex": "https://tw.stock.yahoo.com/quote/%5ETWII"
-  }
+  "vixtwn": null,
+  "margin_maintenance_ratio": null,
+  "institutional_net_buy_yi": null,
+  "foreign_net_buy_today_yi": null,
+  "sources": "TWSE OpenAPI / TAIFEX / wantgoo / histock via GitHub Actions"
 }
