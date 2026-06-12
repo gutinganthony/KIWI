@@ -15,6 +15,7 @@ import re
 import sys
 import datetime
 import urllib.request
+import urllib.parse
 
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/126.0 Safari/537.36")
@@ -29,7 +30,6 @@ def fetch(url, timeout=20, headers=None, post_json=None, post_form=None):
         data = json.dumps(post_json).encode()
         h["Content-Type"] = "application/json"
     elif post_form is not None:
-        import urllib.parse
         data = urllib.parse.urlencode(post_form).encode()
         h["Content-Type"] = "application/x-www-form-urlencoded"
     req = urllib.request.Request(url, headers=h, data=data)
