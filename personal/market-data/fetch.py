@@ -20,11 +20,19 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/126.0 Safari/537.36")
 
 
-def fetch(url, timeout=20, headers=None):
+def fetch(url, timeout=20, headers=None, post_json=None, post_form=None):
     h = {"User-Agent": UA, "Accept": "application/json,text/html,*/*"}
     if headers:
         h.update(headers)
-    req = urllib.request.Request(url, headers=h)
+    data = None
+    if post_json is not None:
+        data = json.dumps(post_json).encode()
+        h["Content-Type"] = "application/json"
+    elif post_form is not None:
+        import urllib.parse
+        data = urllib.parse.urlencode(post_form).encode()
+        h["Content-Type"] = "application/x-www-form-urlencoded"
+    req = urllib.request.Request(url, headers=h, data=data)
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return r.read().decode("utf-8", errors="replace")
 
@@ -146,50 +154,96 @@ def main():
         "三大法人(openapi)", "https://openapi.twse.com.tw/v1/fund/BFI82U",
         parse_bfi82u_openapi, debug=True))
 
+    # VIXTWN：TAIFEX 主站可達（上一輪 data_gov 回 'no such data' 證實），
+    # 從 vixMinNew 頁面本體或其 ajax 端點挖數值
     vixtwn = None
-    vix_candidates = [
-        ("TAIFEX OpenData VIX CSV",
-         "https://www.taifex.com.tw/data_gov/taifex_open_data.asp?data_name=TaiwanVIX",
-         parse_vix_csv),
-        ("TAIFEX OpenAPI VIXTWN",
-         "https://openapi.taifex.com.tw/v1/VIXTWN", parse_taifex_openapi_vix),
-        ("TAIFEX MIS 指數報價",
-         "https://mis.taifex.com.tw/futures/api/getCmdyDDLItemByKind?kind=4",
-         parse_mis_volatility),
-    ]
-    for name, url, parser in vix_candidates:
-        vixtwn = try_fetch(name, url, parser, debug=True)
+
+    def parse_vix_page(raw):
+        # 頁面上的 VIX 數值通常是 2 位數.2 位小數，先撈合理區間的數字
+        ctx = []
+        for m in re.finditer(r'(\d{1,3}\.\d{2})', raw):
+            v = float(m.group(1))
+            if 5 < v < 150:
+                s = max(0, m.start() - 60)
+                ctx.append((v, raw[s:m.end() + 30]))
+        if ctx:
+            print(f"       candidates: {[c[0] for c in ctx[:12]]}")
+            for v, c in ctx[:6]:
+                print(f"       ctx {v}: {c!r}")
+        return None  # 偵察模式：先看頁面結構，下一輪鎖定
+
+    try_fetch("TAIFEX vixMinNew 頁面",
+              "https://www.taifex.com.tw/cht/7/vixMinNew", parse_vix_page)
+
+    # 列出 data_gov 開放資料的可用 data_name
+    try:
+        raw = fetch("https://www.taifex.com.tw/data_gov/taifex_open_data.asp")
+        names = re.findall(r'data_name=([A-Za-z0-9_]+)', raw)
+        vixish = [n for n in set(names) if 'vix' in n.lower() or 'VIX' in n]
+        print(f"[INFO] data_gov names total={len(set(names))}, "
+              f"vix-related={vixish}, sample={sorted(set(names))[:30]}")
+    except Exception as e:
+        print(f"[INFO] data_gov listing failed: {type(e).__name__}: {e}")
+
+    # MIS API：模仿瀏覽器 POST
+    for path, body in [
+        ("getQuoteListVolatility", {}),
+        ("getQuoteList",
+         {"MarketType": "0", "SymbolType": "I", "KindID": "1",
+          "CID": "VIXTWN", "ExpireMonth": "", "RowSize": "全部",
+          "PageNo": "", "SortColumn": "", "AscDesc": "A"}),
+    ]:
+        try:
+            raw = fetch(f"https://mis.taifex.com.tw/futures/api/{path}",
+                        post_json=body,
+                        headers={"Referer":
+                                 "https://mis.taifex.com.tw/futures/VolatilityQuotes/"})
+            print(f"[INFO] MIS {path}: {raw[:400]!r}")
+            data = json.loads(raw)
+            q = (data.get("RtData") or {}).get("QuoteList") or []
+            for item in q:
+                ident = str(item.get("SymbolID", "")) + str(item.get("DispCName", ""))
+                if "VIX" in ident.upper() or "波動" in ident:
+                    for k in ("CLastPrice", "LastPrice", "CRefPrice"):
+                        if item.get(k):
+                            vixtwn = {"value": float(item[k]), "symbol": ident}
+                            print(f"[OK]   VIXTWN(MIS): {vixtwn}")
+                            break
+                if vixtwn:
+                    break
+        except Exception as e:
+            print(f"[INFO] MIS {path} failed: {type(e).__name__}: {e}")
         if vixtwn:
             break
 
-    # 探測 TAIFEX OpenAPI 可用端點（多個 swagger 候選路徑）
-    if not vixtwn:
-        for sw in ("https://openapi.taifex.com.tw/swagger/v1/swagger.json",
-                   "https://openapi.taifex.com.tw/v1/swagger.json",
-                   "https://openapi.taifex.com.tw/swagger.json"):
-            try:
-                raw = fetch(sw)
-                paths = list(json.loads(raw).get("paths", {}))
-                vix_paths = [p for p in paths
-                             if "vix" in p.lower() or "volat" in p.lower()]
-                print(f"[INFO] swagger {sw}: VIX paths={vix_paths}, "
-                      f"total={len(paths)}, sample={paths[:25]}")
-                break
-            except Exception as e:
-                print(f"[INFO] swagger {sw} failed: {type(e).__name__}")
-
-    margin = try_fetch(
-        "HiStock資券", "https://histock.tw/stock/three.aspx?m=mg",
-        parse_html_number(r'維持率[^0-9]{0,60}?(1\d{2}\.\d{1,2})'))
+    # 大盤融資維持率：HiStock 頁面沒有「維持率」字樣，改試其他來源
+    margin = None
+    margin_candidates = [
+        ("富邦DJ 大盤資券",
+         "https://fubon-ebrokerdj.fbs.com.tw/z/zg/zg_AG.djhtm",
+         parse_html_number(r'維持率[^0-9]{0,80}?(1\d{2}\.\d{1,2})')),
+        ("Goodinfo 融資融券",
+         "https://goodinfo.tw/tw/ShowMarginChart.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8&CHT_CAT=DATE",
+         parse_html_number(r'維持率[^0-9]{0,80}?(1\d{2}\.\d{1,2})')),
+    ]
+    for name, url, parser in margin_candidates:
+        margin = try_fetch(name, url, parser)
+        if margin:
+            break
     if margin is None:
-        # 沒抓到就把「維持率」附近的原文印出來，下一輪修正則
-        try:
-            raw = fetch("https://histock.tw/stock/three.aspx?m=mg")
-            for m in re.finditer(r'維持率', raw):
-                s = max(0, m.start() - 80)
-                print(f"[INFO] HiStock context: {raw[s:m.end()+160]!r}")
-        except Exception as e:
-            print(f"[INFO] HiStock debug failed: {e}")
+        # 偵察：印出候選頁面中「維持率/融資」上下文
+        for name, url in [("HiStock mt", "https://histock.tw/stock/three.aspx?m=mt"),
+                          ("HiStock mg", "https://histock.tw/stock/three.aspx?m=mg")]:
+            try:
+                raw = fetch(url)
+                hits = list(re.finditer(r'維持率|融資', raw))[:3]
+                print(f"[INFO] {name}: len={len(raw)}, "
+                      f"title={re.search(r'<title>(.*?)</title>', raw).group(1) if re.search(r'<title>(.*?)</title>', raw) else '?'}")
+                for m in hits:
+                    s = max(0, m.start() - 60)
+                    print(f"       {name} ctx: {raw[s:m.end()+120]!r}")
+            except Exception as e:
+                print(f"[INFO] {name} failed: {type(e).__name__}")
 
     foreign_today = None
     if inst:
