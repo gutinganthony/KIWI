@@ -25,3 +25,4 @@
 | 2026-06-12 | [Serenity 報告：Mersen 深掘 + 光通訊四巨頭評鑑（AAOI/LITE/COHR/NOK）+ 持倉 read-through](./2026-06-12-serenity-mersen-optics-giants.md) | investment, serenity-chokepoint, Mersen, 800VDC, optical-transceiver, CPO, LITE, COHR, read-through |
 | 2026-06-12 | [Serenity 報告：光罩三雄比較（Tekscend/DNP/PLAB）+ 光罩在光通訊鏈的位置](./2026-06-12-serenity-photomask-trio-photonics-position.md) | investment, serenity-chokepoint, photomask, Tekscend, DNP, PLAB, EUV, silicon-photonics, supply-chain |
 | 2026-06-12 | [Serenity 獵殺：美股光通訊瓶頸層 + 先進封裝鏈小型股（找「下一個 AAOI」）](./2026-06-12-serenity-us-smallcap-hunt.md) | investment, serenity-chokepoint, US-stocks, silicon-photonics, advanced-packaging, CoWoS, burn-in, upstream-hunt |
+| 2026-06-12 | [Serenity 獵殺：CoPoS 面板級封裝鏈 + COUPE 光學引擎耗材層（台日小型股）](./2026-06-12-serenity-copos-coupe-hunt.md) | investment, serenity-chokepoint, CoPoS, FOPLP, CPO, COUPE, Taiwan-stocks, Japan-stocks, panel-level-packaging |
