@@ -23,3 +23,4 @@
 | 2026-06-12 | [Serenity 報告：九檔美股快篩 + 三鏈上游獵殺（記憶體/電源/ASIC・光學）](./2026-06-12-serenity-nine-ticker-triage-upstream-hunt.md) | investment, serenity-chokepoint, supply-chain, HBM, AI-power, test-socket, Japan-stocks, upstream-hunt |
 | 2026-06-12 | [Serenity 深度報告：Yamaichi/Tamura/JEM/Towa Step 1–9 + PLAB 事件鑑識](./2026-06-12-serenity-deep-dive-yamaichi-tamura-jem-towa-plab.md) | investment, serenity-chokepoint, deep-dive, HBM, probe-card, test-socket, Japan-stocks, PLAB-forensic |
 | 2026-06-12 | [Serenity 報告：Mersen 深掘 + 光通訊四巨頭評鑑（AAOI/LITE/COHR/NOK）+ 持倉 read-through](./2026-06-12-serenity-mersen-optics-giants.md) | investment, serenity-chokepoint, Mersen, 800VDC, optical-transceiver, CPO, LITE, COHR, read-through |
+| 2026-06-12 | [Serenity 報告：光罩三雄比較（Tekscend/DNP/PLAB）+ 光罩在光通訊鏈的位置](./2026-06-12-serenity-photomask-trio-photonics-position.md) | investment, serenity-chokepoint, photomask, Tekscend, DNP, PLAB, EUV, silicon-photonics, supply-chain |
