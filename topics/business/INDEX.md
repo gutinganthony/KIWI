@@ -21,3 +21,4 @@
 | 2026-06-03 | [Redefine Fund — Jake × Vince 共同基金專案（策略 + 結構 + Action Plan + 模板）](./2026-06-03-redefine-fund-project.md) | startup, fund, EAM, semiconductor, AI, redefine, fundraising, partnership, action-plan |
 | 2026-06-10 | [Serenity 深度報告：七檔 Step 1–9 完整分析（Seikoh/santec/IQE/PLAB/PPIH/AAOI/GHM）](./2026-06-10-serenity-deep-dive-seven-stocks.md) | investment, serenity-chokepoint, supply-chain, semiconductor, silicon-photonics, AI-infrastructure, deep-dive, watchlist |
 | 2026-06-12 | [Serenity 報告：九檔美股快篩 + 三鏈上游獵殺（記憶體/電源/ASIC・光學）](./2026-06-12-serenity-nine-ticker-triage-upstream-hunt.md) | investment, serenity-chokepoint, supply-chain, HBM, AI-power, test-socket, Japan-stocks, upstream-hunt |
+| 2026-06-12 | [Serenity 深度報告：Yamaichi/Tamura/JEM/Towa Step 1–9 + PLAB 事件鑑識](./2026-06-12-serenity-deep-dive-yamaichi-tamura-jem-towa-plab.md) | investment, serenity-chokepoint, deep-dive, HBM, probe-card, test-socket, Japan-stocks, PLAB-forensic |
