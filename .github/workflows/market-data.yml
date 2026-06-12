@@ -5,6 +5,10 @@ on:
   schedule:
     # 台股收盤後（13:30 台北 = 05:30 UTC），平日 06:30 UTC 抓一次
     - cron: "30 6 * * 1-5"
+  push:
+    paths:
+      - ".github/workflows/market-data.yml"
+      - "personal/market-data/fetch.py"
 
 permissions:
   contents: write
