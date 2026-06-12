@@ -163,7 +163,16 @@
 
 深掘戰績：JEM 升格買進；Yamaichi/Towa/Mersen/Tamura 全部降為等觸發價——驗證「架上剩的都有理由」。下一批 alpha 來源：①觸發價成交；②6/24–25 有報季 + 7/30–8 月財報季新資訊；③新獵殺方向。
 
-**觸發價觀察池**：Enplas（P/E 回 20×）、IntelliEPI（P/S <8×）、VPEC（壓線 $2B）、Tri Chemical（中國 <40% 確認）、Shizuki（僅小倉位）、Aichi Electric（查中部電力依存）、Techwing（P/S 回落）、Rogers（DC 轉量產）、**Nittobo（再跌 ~50% 重新撿起——T-glass 壟斷全鏈最強）**、Baotek（治理折價）。
+**觸發價觀察池（亞洲/歐洲）**：Enplas（P/E 回 20×）、IntelliEPI（P/S <8×）、VPEC（壓線 $2B）、Tri Chemical（中國 <40% 確認）、Shizuki（僅小倉位）、Aichi Electric（查中部電力依存）、Techwing（P/S 回落）、Rogers（DC 轉量產）、**Nittobo（再跌 ~50% 重新撿起——T-glass 壟斷全鏈最強）**、Baotek（治理折價）、Tekscend 429A.T（GARP 非 Serenity：PE/Toppan 賣壓除淨後）。
+
+**觸發價觀察池（美股，2026-06-12 掃描——「下一個 AAOI」已演完，窗口 2025 年中已關）**：
+- **CLFD（~$510M）**：唯一全過硬篩——現金佔市值 31% + NOVA DC 選擇權；升評 = NOVA 首張具名訂單（FQ3 ~8 月）
+- **TRT（~$101M）**：投機極小倉——AI GPU 燒機板 +124%、腰斬後 P/S 1.5；否證 = 再增資（直接出場）
+- **ADEA <$23**：hybrid bonding IP 雙寡占（TSMC+Adeia）——Towa 技術斷點的另一面收稅人
+- **ASYS <$12–14**：reflow 三玩家利基、AI 佔比 >40% 兌現後
+- **AEHR -60%（回 ~$1B）**：唯一商用 WLBI、SiPho 燒機真瓶頸——但 +993% 後 55× P/S 不可追
+- **AXTI = 儀表非倉位**（中國否決）：擴產進度 = InP 鏈需求讀數；Tongmei STAR 過會 = 對 IQE 定價負面
+- **IPO 管線監控**：Ayar Labs / Lightmatter / Xscape / nEYE 任一遞件 = 觸發新獵殺（未上市瓶頸被收購前科：DustPhotonics→Credo、Celestial AI→Marvell）
 
 **整層否決**（重工禁止）：SiC 基板/磊晶、燃料電池備援、美國變壓器（全重評）、液冷快接頭（無壟斷層）。個股否決名單見報告。
 
