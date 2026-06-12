@@ -13,6 +13,7 @@
 import json
 import re
 import sys
+import time
 import datetime
 import urllib.request
 import urllib.parse
@@ -142,9 +143,21 @@ def main():
     today = datetime.date.today().isoformat()
     print(f"=== 摸魚記 market data fetch {today} ===\n")
 
-    taiex = try_fetch(
-        "TAIEX", "https://openapi.twse.com.tw/v1/exchangeReport/FMTQIK",
-        parse_taiex)
+    taiex = None
+    for attempt in range(3):
+        taiex = try_fetch(
+            "TAIEX", "https://openapi.twse.com.tw/v1/exchangeReport/FMTQIK",
+            parse_taiex)
+        if taiex:
+            break
+        time.sleep(5)
+
+    # 自高點回檔（高點先以 2026/6/3 歷史高點 46,552 為錨，創新高時手動更新）
+    ATH = 46552.0
+    drawdown = None
+    if taiex and taiex.get("close"):
+        drawdown = round((taiex["close"] - ATH) / ATH * 100, 2)
+        print(f"[CALC] 自高點 {ATH:.0f} 回檔 {drawdown}%")
 
     inst = (try_fetch(
         "三大法人(rwd)",
@@ -256,6 +269,8 @@ def main():
         "fetched_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "date": today,
         "taiex": taiex,
+        "taiex_ath": 46552.0,
+        "drawdown_from_ath_pct": drawdown,
         "vixtwn": vixtwn,
         "margin_maintenance_ratio": margin,
         "institutional_net_buy_yi": inst,
