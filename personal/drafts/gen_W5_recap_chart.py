@@ -65,7 +65,7 @@ for i, c in [(I_HIGH, LGREY), (I_BOT, LRED), (I_NEW, GREEN)]:
                edgecolors=WHITE, linewidths=1.4)
 
 # ── 6/11 bottom annotation (the article day) ──
-ax.annotate('6/11 我們寫文章當天\n收 43,149（這波最低）\n儀表板只亮 2/4 盞\n我說：「再等等」',
+ax.annotate('6/11 我們寫文章當天\n收 43,149（這波最低）\n儀表板只亮 2/4 盞',
             xy=(x[I_BOT], taiex[I_BOT]), xytext=(x[I_BOT]-0.3, 41250),
             ha='center', va='top', color=WHITE, fontsize=11, fontweight='bold',
             arrowprops=dict(arrowstyle='->', color=LRED, lw=1.8),
@@ -99,7 +99,7 @@ for k, (label, lit) in enumerate(lamps):
     ax.text(lx0+0.25, cy, f'{label}　{"亮" if lit else "暗"}',
             color=WHITE if lit else LGREY, fontsize=10.5,
             va='center', fontweight='bold' if lit else 'normal')
-ax.text(lx0-0.15, lamp_y+430, '寫文章當天的四盞燈：', color=GOLD,
+ax.text(lx0-0.15, lamp_y+430, '台股抄底四盞訊號燈：', color=GOLD,
         fontsize=10.5, fontweight='bold', va='bottom')
 
 # ── "the two lamps that never came" callout ──
@@ -121,9 +121,7 @@ for sp in ax.spines.values():
     sp.set_color(DGREY)
 ax.yaxis.grid(True, color=DGREY, alpha=0.35, zorder=0)
 
-fig.text(0.5, 0.955, '沒等到三盞燈，台股就 V 轉創新高了',
-         ha='center', color=WHITE, fontsize=19, fontweight='bold')
-fig.text(0.5, 0.905,
+fig.text(0.5, 0.945,
          '抄底儀表板是「部位大小的旋鈕」，不是「進場開關」——兩盞燈，就是這一輪的底',
          ha='center', color=GOLD, fontsize=11.5)
 fig.text(0.5, 0.045,
