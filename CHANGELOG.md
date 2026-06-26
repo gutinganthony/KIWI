@@ -5,6 +5,7 @@ All updates to entries are logged here chronologically.
 ---
 
 <!-- CHANGELOG_ENTRIES_START -->
+| 2026-06-26 | Added | [個人壟斷飛輪 — L1/L2/L3 + B2B 授權行動計畫](./topics/business/2026-06-26-personal-monopoly-flywheel-action-plan.md) | 把 AVI/Serenity 引擎 + 國泰履歷收斂成「免費觸及→付費研究→管理資本」三層飛輪 + B2B 授權：定位/法規、各層受眾/定價/通路/90天動作、Vince 重新定義為網絡型期權、北極星=付費人數 |
 | 2026-06-03 | Added | [Redefine Fund — Jake × Vince 共同基金專案](./topics/business/2026-06-03-redefine-fund-project.md) | 與前 ASML PM Vince 共組半導體/AI 基金：整合點、風險、在職+海外合規地圖、結構選項比較、Action Plan、合夥對齊書 + 策略 1-pager 模板 |
 | 2026-06-02 | Added | [AI 投資研究副駕駛 — 可測試假設 + 客戶訪談訪綱](./topics/business/2026-06-02-ai-investment-copilot-hypothesis.md) | 依 Founder's Playbook Idea 階段：可測試問題陳述、對抗性壓力測試、競品地圖、客戶訪談訪綱（可複製）、退出條件 checklist |
 | 2026-04-20 | Updated | [AVI V4 — IG + Threads 社群發文素材庫](./topics/business/2026-04-20-avi-v4-social-posts.md) | v2.1：新增 ZIP 打包（14 圖 + 4 MD + 2 OVERVIEW）、素材總覽縮圖、發文行事曆 XLSX |
