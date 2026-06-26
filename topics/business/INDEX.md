@@ -26,3 +26,4 @@
 | 2026-06-10 | [AI 半導體終局 — token 經濟學從 GPU 算力轉移到 HBM（摘要+驗證+趨勢+關鍵節點）](./2026-06-10-hbm-token-economics-ai-semiconductor-endgame.md) | HBM, semiconductor, AI-inference, token-economics, nvidia, sk-hynix, micron, samsung, memory, chokepoint, rubin, hbm4 |
 | 2026-06-10 | [HBM 理論下的持股影響評估 + 最值得佈局 + 尚未反映的板塊（Jake 持股）](./2026-06-10-hbm-thesis-portfolio-impact-positioning.md) | HBM, portfolio, apacer, AAOI, murata, tokyo-electron, micron, hybrid-bonding, besi, advantest, TSMC, GUC, power-semi |
 | 2026-06-10 | [Serenity 評分卡 + 估值快照 ×10 — HBM/記憶體/測試/封裝/光通訊](./2026-06-10-serenity-scorecards-hbm-memory-optical.md) | serenity, scorecard, valuation, HBM, murata, besi, advantest, GUC, sk-hynix, micron, sandisk, AAOI, lumentum, coherent |
+| 2026-06-10 | [追蹤：Nvidia 砍 Rubin / SK Hynix 放緩 HBM4 — capex 消化還是雜訊？](./2026-06-10-nvidia-rubin-cut-hbm4-slowdown-tracker.md) | HBM, HBM4, nvidia, rubin, sk-hynix, micron, DRAM, memory-supercycle, capex-digestion, catalyst-tracker |
