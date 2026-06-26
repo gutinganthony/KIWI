@@ -42,10 +42,10 @@ ax.set_ylim(0, 2.2)
 ax.axis('off')
 
 lamps = [
-    ("① VIXTWN", True,  "≈ 38，創新高都不肯熄\n（恐慌指數型）"),
+    ("① VIXTWN", True,  "44.27（+9.61%）\n破 40，極端恐慌"),
     ("② 外資賣超", True,  "連四天 >1,700 億\n（歷史級賣法）"),
     ("③ 跌幅 −20%", False, "才 −6.6%\n離 −20% 還很遠"),
-    ("④ 融資維持率", False, "離 130–140%\n斷頭區尚遠"),
+    ("④ 融資維持率", False, "174.57%（6/25）\n正常區、沒壓力"),
 ]
 
 for j, (name, lit, stat) in enumerate(lamps):
@@ -102,8 +102,8 @@ fig.text(0.5, 0.955,
          '亮兩盞 → 可以試單，不是倒車接貨；而這次是「混血刀」，節奏要再放慢',
          ha='center', color=GOLD, fontsize=13.5, fontweight='bold')
 fig.text(0.5, 0.012,
-         '摸魚記 · 2026/6/26 盤後 · VIXTWN／融資維持率當日確切讀數以期交所、TWSE 為準 · 個人觀點非投資建議',
-         ha='center', color=LGREY, fontsize=8.0, alpha=0.85)
+         '摸魚記 · 2026/6/26 盤後 · VIXTWN 為 6/26 收盤、融資維持率為 6/25（M平方，6/26 尚未公布）· 個人觀點非投資建議',
+         ha='center', color=LGREY, fontsize=7.6, alpha=0.85)
 
 out = '/home/user/KIWI/personal/drafts/W5S2-chart-lamps.png'
 plt.savefig(out, dpi=170, facecolor=NAVY)
