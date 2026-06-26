@@ -218,7 +218,7 @@ def card(slide, x, y, w, h, header, header_color, items, body_size=11.5,
 s = prs.slides.add_slide(BLANK)
 for ph in list(s.placeholders):
     ph._element.getparent().remove(ph._element)
-s.shapes.add_picture(f"{MEDIA}/image3.jpeg", 0, 0, W, H)         # skyline
+s.shapes.add_picture("/tmp/claude-0/-home-user-KIWI/9135307e-1a7d-5ee9-8555-29af972de8d1/scratchpad/sky_24.jpg", 0, 0, W, H)  # skyline (compressed)
 ov = box(s, 0, 0, 13.333, 7.5, RGBColor(0x12, 0x1C, 0x26)); set_alpha(ov, 46)
 panel = box(s, 0, 3.2, 8.2, 2.25, RGBColor(0x0E, 0x18, 0x22)); set_alpha(panel, 40)
 box(s, 0.32, 3.49, 6.4, 0.028, GOLD)                            # upper gold line
