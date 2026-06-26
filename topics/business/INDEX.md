@@ -23,3 +23,4 @@
 | 2026-06-06 | [抄底「最高勝率」指標組合回測 — 美股+台股（真實數據、統計顯著、逐事件驗證）](./2026-06-06-dip-buying-best-indicator-combos-backtest.md) | backtest, dip-buying, vix, fear-greed-index, 200dma, taiex, sp500, win-rate, statistical-significance |
 | 2026-06-10 | [矽光子/CPO 光通訊報告分析 — LITE/COHR/AAOI/汎銓6830（Serenity評分+估值）](./2026-06-10-silicon-photonics-cpo-optical-report-analysis.md) | silicon-photonics, CPO, optical, lumentum, coherent, aaoi, fanci-6830, serenity-chokepoint, valuation, nvidia |
 | 2026-06-10 | [High Growth Handbook（Elad Gil）重點 + 招高階主管/管理董事會 Checklist + Elon 類比](./2026-06-10-high-growth-handbook-notes-checklists.md) | reading-notes, scaling, CEO, board, executive-hiring, elad-gil, redefine-fund, elon-musk, playbook |
+| 2026-06-10 | [AI 半導體終局 — token 經濟學從 GPU 算力轉移到 HBM（摘要+驗證+趨勢+關鍵節點）](./2026-06-10-hbm-token-economics-ai-semiconductor-endgame.md) | HBM, semiconductor, AI-inference, token-economics, nvidia, sk-hynix, micron, samsung, memory, chokepoint, rubin, hbm4 |
