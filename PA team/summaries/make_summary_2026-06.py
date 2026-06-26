@@ -43,6 +43,60 @@ for sldId in list(sldIdLst):
 BLANK   = prs.slide_layouts[7]   # 空白
 CONTENT = prs.slide_layouts[2]   # 自訂版面配置 (logo + watermark + line + page no.)
 
+FONT = "微軟正黑體"
+_A = 'http://schemas.openxmlformats.org/drawingml/2006/main'
+
+def set_theme_font(face=FONT):
+    """Rewrite theme major/minor fonts so ALL inherited text uses `face`."""
+    from lxml import etree
+    master = prs.slide_masters[0]
+    theme_part = None
+    for rel in master.part.rels.values():
+        if rel.reltype.endswith('/theme'):
+            theme_part = rel.target_part; break
+    if theme_part is None:
+        return
+    root = etree.fromstring(theme_part.blob)
+    ns = {'a': _A}
+    for tag in ('majorFont', 'minorFont'):
+        fe = root.find(f'.//a:{tag}', ns)
+        if fe is None:
+            continue
+        for sub in ('latin', 'ea', 'cs'):
+            el = fe.find(f'a:{sub}', ns)
+            if el is None:
+                el = etree.SubElement(fe, qn(f'a:{sub}'))
+            el.set('typeface', face)
+        for f in fe.findall('a:font', ns):
+            if f.get('script') in ('Hant', 'Hans'):
+                f.set('typeface', face)
+    theme_part._blob = etree.tostring(
+        root, xml_declaration=True, encoding='UTF-8', standalone=True)
+
+def _force_run(r_el, face=FONT):
+    rPr = r_el.find(qn('a:rPr'))
+    if rPr is None:
+        rPr = r_el.makeelement(qn('a:rPr'), {}); r_el.insert(0, rPr)
+    for tag in ('a:latin', 'a:ea', 'a:cs'):
+        el = rPr.find(qn(tag))
+        if el is None:
+            el = rPr.makeelement(qn(tag), {}); rPr.append(el)
+        el.set('typeface', face)
+
+def force_all_fonts(face=FONT):
+    for slide in prs.slides:
+        for shape in slide.shapes:
+            if shape.has_text_frame:
+                for r in shape.text_frame._txBody.iter(qn('a:r')):
+                    _force_run(r, face)
+            if shape.has_table:
+                for row in shape.table.rows:
+                    for cell in row.cells:
+                        for r in cell.text_frame._txBody.iter(qn('a:r')):
+                            _force_run(r, face)
+
+set_theme_font()
+
 
 # ── helpers ─────────────────────────────────────────────────────
 def md(text):
@@ -380,6 +434,8 @@ tf = tbox(s, 0.45, 6.66, 12.4, 0.42, MSO_ANCHOR.MIDDLE).text_frame
 para(tf, md("底線：基本面仍穩，但市場容錯率低 —— 增持盈餘確定性、控制集中與槓桿，緊盯油價與利率兩大搖擺因子。"),
      12.5, WHITE, first=True, bold=True, space_after=0)
 
+
+force_all_fonts()
 
 prs.save(OUT)
 print("Saved:", OUT)
