@@ -304,4 +304,12 @@ related: [./2026-06-02-ai-investment-copilot-hypothesis.md, ./2026-06-03-redefin
 
 ---
 
-*Maintained by Jake × Claude ｜ 延續自 [AI 投資研究副駕駛假設](./2026-06-02-ai-investment-copilot-hypothesis.md) 與 [Redefine Fund 專案](./2026-06-03-redefine-fund-project.md)。北極星（現階段）：第一個付費關係（框架諮詢）→ 付費訂閱 → 你自己的代操/基金。*
+### 更新 2026-06-27 pt.2｜諮詢開口門檻調整（Jake 拍板）
+- **66 訂閱不開口**：樣本多為冷啟動朋友/同溫層，訊號易被人情污染、亦掉價。**諮詢開口門檻上調為 ≥100 訂閱。**
+- **防呆：「100」是硬扣板機，不是「100 再說」。** 到 100 自動開口、不再往後挪（避免門檻悄悄滑到 200/500/never）。
+- **到 100 前**：北極星＝衝訂閱數（照 `personal/growth-plan-2026-06.md`）；被動接招（讀者主動聊深可自然帶到諮詢，有機來的第一個客戶 OK，但不主動推銷）；順手記讀者痛點當彈藥。
+- **到 100**：北極星切換為「第一個付費關係（框架諮詢）」，啟動 A 的開口 4 步。
+
+---
+
+*Maintained by Jake × Claude ｜ 延續自 [AI 投資研究副駕駛假設](./2026-06-02-ai-investment-copilot-hypothesis.md) 與 [Redefine Fund 專案](./2026-06-03-redefine-fund-project.md)。北極星：到 100 訂閱前＝衝訂閱；到 100＝第一個付費關係（框架諮詢）→ 付費訂閱 → 你自己的代操/基金。*
