@@ -679,7 +679,41 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
         },
         "alert": alert,
     }
-    return payload
+    return _to_native(payload)
+
+
+def _to_native(obj):
+    """Recursively convert numpy/pandas scalar types to native Python types.
+
+    numpy 2.x 的 np.bool_ 不再是 Python bool 的子類，json.dumps 會丟
+    'Object of type bool is not JSON serializable'。本函式把整個 payload 的
+    numpy/pandas 標量（bool_/int64/float64 等）轉成原生型別，讓後續 json
+    序列化（注入 HTML、寫 history.json）都安全。
+    """
+    if isinstance(obj, dict):
+        return {k: _to_native(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_to_native(v) for v in obj]
+    if isinstance(obj, np.bool_):
+        return bool(obj)
+    if isinstance(obj, np.integer):
+        return int(obj)
+    if isinstance(obj, np.floating):
+        return float(obj)
+    if isinstance(obj, np.generic):   # 其餘 numpy 標量（如 np.str_）
+        return obj.item()
+    if isinstance(obj, (pd.Timestamp,)):
+        return obj.strftime("%Y-%m-%d")
+    return obj
+
+
+def _json_default(o):
+    """json.dumps 的最後防線：把漏網的 numpy/pandas 標量轉成原生型別。"""
+    if isinstance(o, np.generic):
+        return o.item()
+    if isinstance(o, pd.Timestamp):
+        return o.strftime("%Y-%m-%d")
+    raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
 
 
 # ── HTML Injection ─────────────────────────────────────────────────────────────
@@ -767,7 +801,7 @@ def inject_into_html(payload, html_path):
     with open(html_path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    json_str = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    json_str = json.dumps(payload, ensure_ascii=False, separators=(",", ":"), default=_json_default)
     new_block = f"{MARKER_START}\nvar KIWI_DATA = {json_str};\n{MARKER_END}"
 
     # Replace between markers (inclusive)
