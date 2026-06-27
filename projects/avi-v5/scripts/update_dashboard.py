@@ -619,16 +619,24 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
     tsi_inds  = build_tsi_indicators(tsi_result)
 
     # ── Market snapshot ───────────────────────────────────────────────────────
+    # yfinance 偶爾在最後一根 K 棒回傳 NaN 收盤（盤中未定/數據源延遲），
+    # 直接取 iloc[-1] 會讓 SPX 變成 NaN。一律 dropna 後取最後一個有效值。
     def latest_close(key, default=0.0):
         df = yf_data.get(key)
         if df is None or df.empty:
             return default
         col = "Close" if "Close" in df.columns else df.columns[0]
-        return round(float(df[col].iloc[-1]), 2)
+        s = df[col].dropna()
+        if s.empty:
+            return default
+        return round(float(s.iloc[-1]), 2)
 
     def latest_fred(key, default=0.0):
         s = fred_data.get(key)
         if s is None or s.empty:
+            return default
+        s = s.dropna()
+        if s.empty:
             return default
         return round(float(s.iloc[-1]), 4)
 
@@ -639,11 +647,14 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
     t30y  = latest_fred("treasury_30y", FALLBACK["t30y"])
     cape  = cape_val if cape_val else FALLBACK["cape"]
 
-    # 美股實際數據日期（^GSPC 最後一根 K 棒），供前端顯示與 history 對齊
+    # 美股實際數據日期：取 ^GSPC 最後一個「有效收盤」的日期（與上面 dropna 對齊）
     data_date = ""
     gspc_df = yf_data.get("^GSPC")
     if gspc_df is not None and not gspc_df.empty:
-        data_date = gspc_df.index[-1].strftime("%Y-%m-%d")
+        _col = "Close" if "Close" in gspc_df.columns else gspc_df.columns[0]
+        _valid = gspc_df[_col].dropna()
+        if not _valid.empty:
+            data_date = _valid.index[-1].strftime("%Y-%m-%d")
 
     # ── Alert ─────────────────────────────────────────────────────────────────
     alert = build_alert(tsi_score, cri_score, tsi_bias, avi_lvl)
