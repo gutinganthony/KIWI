@@ -28,3 +28,4 @@
 | 2026-06-10 | [Serenity 評分卡 + 估值快照 ×10 — HBM/記憶體/測試/封裝/光通訊](./2026-06-10-serenity-scorecards-hbm-memory-optical.md) | serenity, scorecard, valuation, HBM, murata, besi, advantest, GUC, sk-hynix, micron, sandisk, AAOI, lumentum, coherent |
 | 2026-06-10 | [追蹤：Nvidia 砍 Rubin / SK Hynix 放緩 HBM4 — capex 消化還是雜訊？](./2026-06-10-nvidia-rubin-cut-hbm4-slowdown-tracker.md) | HBM, HBM4, nvidia, rubin, sk-hynix, micron, DRAM, memory-supercycle, capex-digestion, catalyst-tracker |
 | 2026-06-10 | [AI 半導體終局 Part II — HBM/DRAM/NAND 到 2030 會不會重回週期（分析師驗證版）](./2026-06-10-memory-supercycle-2030-part2-analyst-review.md) | HBM, DRAM, NAND, memory-supercycle, cyclicality, CXMT, YMTC, agentic-AI, CPU, sk-hynix, micron, apacer, sandisk |
+| 2026-06-10 | [🗺️ 記憶體超級循環 — 一頁戰情圖（HBM/DRAM/NAND）](./2026-06-10-memory-supercycle-battle-map.md) | HBM, DRAM, NAND, memory-supercycle, battle-map, dashboard, sk-hynix, micron, apacer, sandisk, CXMT, serenity, position-sizing |
