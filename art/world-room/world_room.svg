@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+  <defs>
+    <!-- Sky / cosmos seen through the window -->
+    <linearGradient id="cosmos" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#0b1026"/>
+      <stop offset="45%" stop-color="#1b2a55"/>
+      <stop offset="75%" stop-color="#3b4f8a"/>
+      <stop offset="100%" stop-color="#c98a6b"/>
+    </linearGradient>
+    <!-- Room wall, warm and lived-in -->
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#2a2333"/>
+      <stop offset="100%" stop-color="#15121d"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#241a22"/>
+      <stop offset="100%" stop-color="#0d0a10"/>
+    </linearGradient>
+    <!-- Lamp glow -->
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"  stop-color="#ffe7b3" stop-opacity="0.95"/>
+      <stop offset="35%" stop-color="#ffcf7a" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#ffcf7a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="doorlight" cx="50%" cy="40%" r="70%">
+      <stop offset="0%"  stop-color="#fff3d6"/>
+      <stop offset="60%" stop-color="#ffd98a"/>
+      <stop offset="100%" stop-color="#e8a85f"/>
+    </radialGradient>
+    <radialGradient id="vignette" cx="50%" cy="42%" r="75%">
+      <stop offset="60%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.55"/>
+    </radialGradient>
+  </defs>
+
+  <!-- ===== WALLS & FLOOR ===== -->
+  <rect x="0" y="0" width="1080" height="1430" fill="url(#wall)"/>
+  <rect x="0" y="1430" width="1080" height="490" fill="url(#floor)"/>
+  <!-- floor boards -->
+  <g stroke="#000" stroke-opacity="0.25" stroke-width="2">
+    <line x1="0" y1="1520" x2="1080" y2="1500"/>
+    <line x1="0" y1="1640" x2="1080" y2="1610"/>
+    <line x1="0" y1="1780" x2="1080" y2="1740"/>
+  </g>
+
+  <!-- ===== THE WINDOW: the world outside the self ===== -->
+  <g>
+    <rect x="150" y="220" width="500" height="720" rx="10" fill="#0a0d1e"/>
+    <rect x="166" y="236" width="468" height="688" rx="6" fill="url(#cosmos)"/>
+    <!-- stars -->
+    <g fill="#ffffff">
+      <circle cx="230" cy="320" r="3"/><circle cx="300" cy="280" r="2"/>
+      <circle cx="380" cy="360" r="2.5"/><circle cx="470" cy="300" r="2"/>
+      <circle cx="560" cy="350" r="3"/><circle cx="520" cy="440" r="2"/>
+      <circle cx="250" cy="470" r="2.5"/><circle cx="420" cy="500" r="2"/>
+      <circle cx="340" cy="430" r="1.8"/><circle cx="600" cy="420" r="2"/>
+    </g>
+    <!-- a distant moon: a quiet, constant guide -->
+    <circle cx="500" cy="400" r="55" fill="#f4ead2" opacity="0.92"/>
+    <circle cx="478" cy="386" r="12" fill="#dcd0b4" opacity="0.6"/>
+    <circle cx="520" cy="420" r="8"  fill="#dcd0b4" opacity="0.5"/>
+    <!-- horizon sea: the unknown, the open -->
+    <rect x="166" y="760" width="468" height="164" fill="#1f3a5c" opacity="0.85"/>
+    <g stroke="#9fc6e0" stroke-opacity="0.35" stroke-width="2">
+      <line x1="200" y1="800" x2="320" y2="800"/>
+      <line x1="380" y1="830" x2="520" y2="830"/>
+      <line x1="240" y1="870" x2="430" y2="870"/>
+    </g>
+    <!-- window frame cross -->
+    <rect x="392" y="236" width="16" height="688" fill="#0a0d1e"/>
+    <rect x="166" y="572" width="468" height="16" fill="#0a0d1e"/>
+    <!-- light spilling onto the floor -->
+    <polygon points="200,940 600,940 720,1430 120,1430" fill="#6f86c4" opacity="0.10"/>
+  </g>
+
+  <!-- ===== THE DOOR: possibility, what comes next ===== -->
+  <g>
+    <rect x="760" y="430" width="250" height="600" rx="8" fill="#1c1622"/>
+    <rect x="775" y="445" width="220" height="570" rx="6" fill="#120e18"/>
+    <!-- a sliver of warm light, the door left ajar -->
+    <rect x="775" y="445" width="34" height="570" fill="url(#doorlight)"/>
+    <polygon points="809,1015 1010,1015 1120,1500 700,1500" fill="url(#doorlight)" opacity="0.10"/>
+    <circle cx="958" cy="740" r="9" fill="#e8c889"/>
+  </g>
+
+  <!-- ===== DESK: the place of making ===== -->
+  <g>
+    <rect x="120" y="1250" width="540" height="34" rx="6" fill="#3a2c24"/>
+    <rect x="150" y="1284" width="26" height="180" fill="#2c211b"/>
+    <rect x="604" y="1284" width="26" height="180" fill="#2c211b"/>
+
+    <!-- lamp glow -->
+    <ellipse cx="250" cy="1180" rx="320" ry="320" fill="url(#glow)"/>
+    <!-- lamp -->
+    <rect x="236" y="1110" width="28" height="140" fill="#241b16"/>
+    <path d="M200 1110 q50 -60 100 0 z" fill="#caa15a"/>
+    <circle cx="250" cy="1120" r="10" fill="#ffe7b3"/>
+
+    <!-- stacked books: memory & knowledge -->
+    <rect x="430" y="1226" width="150" height="14" rx="3" fill="#7a4b3a"/>
+    <rect x="445" y="1212" width="135" height="14" rx="3" fill="#43607a"/>
+    <rect x="438" y="1198" width="120" height="14" rx="3" fill="#5e7a52"/>
+
+    <!-- an open book / page: the present thought -->
+    <g transform="translate(300,1232)">
+      <path d="M0 0 q40 -16 80 0 v40 q-40 -14 -80 0 z" fill="#efe6d2"/>
+      <path d="M80 0 q40 -16 80 0 v40 q-40 -14 -80 0 z" fill="#e3d8c0"/>
+      <line x1="80" y1="2" x2="80" y2="40" stroke="#b9ad93" stroke-width="2"/>
+    </g>
+  </g>
+
+  <!-- ===== THE PLANT: growth, the living self ===== -->
+  <g transform="translate(870,1250)">
+    <path d="M0 120 q-26 -10 -34 0 q8 60 34 60 q26 0 34 -60 q-8 -10 -34 0 z" fill="#2e211a"/>
+    <rect x="-34" y="118" width="68" height="20" rx="4" fill="#3a2a20"/>
+    <g fill="#4e7a45" stroke="#3c6135" stroke-width="2">
+      <path d="M0 120 C -10 60 -60 50 -50 10 C -10 30 6 70 0 120 Z"/>
+      <path d="M0 120 C 10 50 64 48 52 4 C 14 26 -4 66 0 120 Z"/>
+      <path d="M0 120 C -2 40 -8 -16 8 -40 C 22 0 8 70 0 120 Z"/>
+    </g>
+  </g>
+
+  <!-- ===== FLOATING THOUGHTS: ideas drifting through the room ===== -->
+  <g fill="#ffe7b3" opacity="0.85">
+    <circle cx="700" cy="360" r="5"/>
+    <circle cx="745" cy="430" r="3.5"/>
+    <circle cx="690" cy="500" r="2.5"/>
+    <circle cx="660" cy="620" r="4"/>
+    <circle cx="730" cy="720" r="2.5"/>
+  </g>
+  <!-- a paper plane: a wish sent toward the window -->
+  <g transform="translate(560,640) rotate(-18)" fill="#f1ead6" stroke="#c7bda0" stroke-width="2">
+    <polygon points="0,0 70,22 0,44 18,22"/>
+    <line x1="18" y1="22" x2="70" y2="22"/>
+  </g>
+
+  <!-- ===== THE CHAIR: the self, alone but at rest ===== -->
+  <g>
+    <rect x="370" y="1430" width="160" height="20" rx="6" fill="#2b2029"/>
+    <rect x="370" y="1290" width="22" height="160" fill="#241a22"/>
+    <rect x="508" y="1290" width="22" height="160" fill="#241a22"/>
+    <rect x="370" y="1280" width="160" height="22" rx="6" fill="#34272f"/>
+    <rect x="370" y="1290" width="22" height="60" fill="#241a22"/>
+    <!-- a small warm cushion: comfort -->
+    <rect x="398" y="1268" width="104" height="22" rx="10" fill="#a35a4a"/>
+  </g>
+
+  <!-- a thin rug anchoring the room -->
+  <ellipse cx="430" cy="1560" rx="300" ry="70" fill="#3a2530" opacity="0.5"/>
+
+  <!-- vignette to focus the eye inward -->
+  <rect x="0" y="0" width="1080" height="1920" fill="url(#vignette)"/>
+</svg>
