@@ -35,6 +35,7 @@ Use ~/.claude/skills/gstack/... for gstack file paths (the global path).
 - 「用 Serenity 框架分析 $TICKER」→ 依照 skills/serenity/SKILL.md 執行完整分析
 - 「用 WaveTrend 分析 $TICKER」→ 依照 skills/wavetrend/SKILL.md 執行技術分析
 - 「用 Serenity + WaveTrend 分析 $TICKER，搭配 ACT index 判讀」→ 三合一分析
+- 「跑 Serenity 週報」→ 依照 skills/serenity/weekly-screen.md 執行每週篩選器（重定價 + 觸發/否證 + 催化劑 + 新標的獵殺）；自動排程見 .github/workflows/serenity-weekly.yml（週六）
 
 新增分析模組時，在 `skills/` 下建新資料夾並寫 SKILL.md，然後在此處加一行載入路徑即可。
 
