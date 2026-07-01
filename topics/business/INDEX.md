@@ -30,3 +30,4 @@
 | 2026-06-12 | [Serenity 深掘：CLFD/TRT/ADEA/ASYS Step 1–9（美股獵殺收官——0 檔可建倉）](./2026-06-12-serenity-us-four-deep-dive.md) | investment, serenity-chokepoint, deep-dive, US-stocks, CLFD, TRT, ADEA, ASYS, hybrid-bonding, stock-promotion |
 | 2026-06-30 | [HBM 三巨頭對比 + SK hynix 美國上市先例 + FormFactor 鏟子皇冠](./2026-06-30-hbm-three-giants-skhynix-listing-formfactor.md) | investment, HBM, SK-hynix, Micron, Samsung, FormFactor, ADR-listing, memory-cycle, valuation |
 | 2026-06-30 | [二階記憶體：商品/利基 DRAM 擠壓 + 軍火商 + CXMT 風險時鐘](./2026-06-30-memory-second-derivative-legacy-dram-arms-dealers-cxmt.md) | investment, memory, legacy-DRAM, DDR4, Nanya, Winbond, Towa, Rambus, Phison, CXMT, NAND, memory-cycle |
+| 2026-06-30 | [Serenity Step 1–9 四檔深掘：Towa/Nanya/Winbond/Rambus](./2026-06-30-serenity-step1-9-towa-nanya-winbond-rambus.md) | investment, serenity-chokepoint, deep-dive, Towa, Nanya, Winbond, Rambus, MR-MUF, RCD, DDR4, memory-cycle, valuation |
