@@ -2,12 +2,23 @@ name: Auto-update Dashboard Data
 
 on:
   schedule:
-    - cron: '0 2 * * *'   # 02:00 UTC = 10:00 Taiwan time (daily)
+    # 注意：GitHub cron 經常延遲 30 分鐘～數小時，所以排 3 班互為備援。
+    - cron: '0 21 * * 1-5'  # 21:00 UTC = 台北 05:00 次日（美股剛收盤，最早抓到當日收盤）
+    - cron: '0 23 * * 1-5'  # 23:00 UTC = 台北 07:00 次日（備援：確保台灣早晨開盤前已更新）
+    - cron: '0 2 * * *'     # 02:00 UTC = 台北 10:00（每天，含週末，刷新日期戳）
+  push:
+    branches: [main]
+    paths:                  # 計算邏輯或 workflow 本身改動時，立即重算一次
+      - 'projects/avi-v5/scripts/**'
+      - 'projects/avi-v5/src/**'
+      - '.github/workflows/update-dashboard.yml'
   workflow_dispatch:        # allow manual trigger
 
 jobs:
   update:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     permissions:
       contents: write
 
@@ -37,7 +48,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/index.html docs/taiwan_data.json
+          git add docs/index.html docs/taiwan_data.json docs/history.json
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else

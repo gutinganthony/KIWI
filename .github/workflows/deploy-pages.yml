@@ -1,6 +1,14 @@
 name: Deploy Dashboard to GitHub Pages
 
 on:
+  # 關鍵：每天的 auto-update 是 github-actions[bot] 用 GITHUB_TOKEN 推 commit，
+  # GitHub 防遞迴機制讓這種 commit「不會」觸發其他 workflow 的 push trigger，
+  # 所以單靠下面的 push 觸發，Pages 從來不會在數據更新後重新部署。
+  # 用 workflow_run 監聽 update workflow 完成 → 不受該限制，確保數據一更新就部署。
+  workflow_run:
+    workflows: ["Auto-update Dashboard Data"]
+    types:
+      - completed
   push:
     branches:
       - main
@@ -23,6 +31,8 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4

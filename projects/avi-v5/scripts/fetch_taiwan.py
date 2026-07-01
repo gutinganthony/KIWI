@@ -5,6 +5,10 @@ fetch_taiwan.py — Fetch Taiwan market indicators for KIWI Dashboard.
 Data sources:
   • 外資台指期貨淨多空口數  → FinMind API (TaiwanFuturesInstitutionalInvestors, TX)
   • 融資餘額              → TWSE exchangeReport/MI_MARGN (MS)
+  • 加權指數 TAIEX        → FinMind (TaiwanStockPrice, TAIEX)；備援 TWSE FMTQIK
+
+融資餘額用「融資餘額 ÷ 加權指數」正規化：指數翻倍時融資自然跟著變大，
+絕對金額跨年代不可比；比率上升才代表槓桿增速超過大盤（真正的過熱訊號）。
 
 Writes docs/taiwan_data.json with rolling 90-day history.
 Run from projects/avi-v5/: python scripts/fetch_taiwan.py
@@ -63,6 +67,69 @@ def fetch_futures_net_range(start: date, end: date) -> dict[str, int]:
     except Exception as e:
         log.warning(f"FinMind TX fetch failed: {e}")
         return {}
+
+
+# ── TAIEX 加權指數 ─────────────────────────────────────────────────────────────
+
+def fetch_taiex_range(start: date, end: date) -> dict[str, float]:
+    """
+    Fetch TAIEX daily closes for a date range.
+    Primary: FinMind TaiwanStockPrice (data_id=TAIEX).
+    Fallback: TWSE FMTQIK monthly tables (發行量加權股價指數).
+    Returns {date_str: close}.
+    """
+    # ── Primary: FinMind ──
+    url = (
+        "https://api.finmindtrade.com/api/v4/data"
+        "?dataset=TaiwanStockPrice"
+        f"&data_id=TAIEX&start_date={start}&end_date={end}"
+    )
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=20)
+        resp.raise_for_status()
+        payload = resp.json()
+        if payload.get("status") == 200 and payload.get("data"):
+            result = {rec["date"]: float(rec["close"]) for rec in payload["data"]}
+            log.info(f"FinMind TAIEX: fetched {len(result)} dates ({start} → {end})")
+            if result:
+                return result
+        else:
+            log.warning(f"FinMind TAIEX: status={payload.get('status')} msg={payload.get('msg')}")
+    except Exception as e:
+        log.warning(f"FinMind TAIEX fetch failed: {e}")
+
+    # ── Fallback: TWSE FMTQIK（每月一表，含每日發行量加權股價指數收盤）──
+    result: dict[str, float] = {}
+    cur = date(start.year, start.month, 1)
+    while cur <= end:
+        url = (
+            f"https://www.twse.com.tw/rwd/zh/afterTrading/FMTQIK"
+            f"?date={cur.strftime('%Y%m%d')}&response=json"
+        )
+        try:
+            resp = requests.get(url, headers=HEADERS, timeout=20)
+            resp.raise_for_status()
+            payload = resp.json()
+            if payload.get("stat") in ("OK", "ok"):
+                fields = payload.get("fields", [])
+                try:
+                    idx_col = fields.index("發行量加權股價指數")
+                except ValueError:
+                    idx_col = 4
+                for row in payload.get("data", []):
+                    # 民國年格式 115/06/11 → 2026-06-11
+                    m = re.match(r"(\d+)/(\d+)/(\d+)", row[0])
+                    if not m:
+                        continue
+                    y = int(m.group(1)) + 1911
+                    dstr = f"{y:04d}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
+                    result[dstr] = float(row[idx_col].replace(",", ""))
+        except Exception as e:
+            log.warning(f"TWSE FMTQIK fetch failed ({cur}): {e}")
+        # next month
+        cur = date(cur.year + (cur.month == 12), (cur.month % 12) + 1, 1)
+    log.info(f"TWSE FMTQIK TAIEX fallback: fetched {len(result)} dates")
+    return result
 
 
 # ── TWSE: 融資餘額 ─────────────────────────────────────────────────────────────
@@ -137,7 +204,23 @@ def trading_days(start: date, end: date) -> list[date]:
     return days
 
 
-def compute_signals(dates: list, futures: list, margin: list) -> dict:
+def compute_ratio_series(margin: list, taiex: list) -> list:
+    """
+    融資餘額 ÷ 加權指數，再以窗內第一個有效值為基期 100 的百分比序列。
+    111 = 槓桿強度比 90 日前高 11%（融資增速超過大盤）。
+    任一邊缺值時該點為 None。
+    """
+    raw = [
+        (m / t) if (m is not None and t is not None and t > 0) else None
+        for m, t in zip(margin, taiex)
+    ]
+    base = next((v for v in raw if v is not None), None)
+    if base is None or base == 0:
+        return [None] * len(raw)
+    return [round(v / base * 100, 2) if v is not None else None for v in raw]
+
+
+def compute_signals(dates: list, futures: list, margin: list, ratio_pct: list) -> dict:
     vf = [(d, v) for d, v in zip(dates, futures) if v is not None]
     vm = [(d, v) for d, v in zip(dates, margin) if v is not None]
 
@@ -146,9 +229,18 @@ def compute_signals(dates: list, futures: list, margin: list) -> dict:
 
     f_signal = "BULLISH" if f_latest > 10000 else ("BEARISH" if f_latest < -10000 else "NEUTRAL")
 
-    m_vals = [v for _, v in vm]
-    m_pct = (int(sum(1 for v in m_vals if v < m_latest) / len(m_vals) * 100)
-             if len(m_vals) > 10 else 50)
+    # 過熱百分位：優先用「融資÷指數」正規化序列（消除大盤水位影響），
+    # 沒有 TAIEX 數據時退回原始融資金額。
+    r_vals = [v for v in ratio_pct if v is not None]
+    if len(r_vals) > 10:
+        r_latest = r_vals[-1]
+        m_pct = int(sum(1 for v in r_vals if v < r_latest) / len(r_vals) * 100)
+        pct_basis = "ratio"
+    else:
+        m_vals = [v for _, v in vm]
+        m_pct = (int(sum(1 for v in m_vals if v < m_latest) / len(m_vals) * 100)
+                 if len(m_vals) > 10 else 50)
+        pct_basis = "raw"
     m_level = "HIGH" if m_pct >= 85 else ("ELEVATED" if m_pct >= 65 else "NORMAL")
 
     return {
@@ -156,6 +248,8 @@ def compute_signals(dates: list, futures: list, margin: list) -> dict:
         "futures_signal": f_signal,
         "margin_latest": m_latest,
         "margin_pct": m_pct,
+        "margin_pct_basis": pct_basis,
+        "margin_ratio_latest": (r_vals[-1] if r_vals else None),
         "margin_level": m_level,
     }
 
@@ -204,12 +298,23 @@ def main():
     futures_series = [records[d]["futures_net"] for d in sorted_dates]
     margin_series = [records[d]["margin_balance"] for d in sorted_dates]
 
-    signals = compute_signals(sorted_dates, futures_series, margin_series)
+    # ── TAIEX：每次整窗重抓（單一 range 請求，便宜），用於融資正規化 ──────────
+    taiex_map: dict[str, float] = {}
+    if sorted_dates:
+        t_start = date.fromisoformat(sorted_dates[0])
+        t_end = date.fromisoformat(sorted_dates[-1])
+        taiex_map = fetch_taiex_range(t_start, t_end)
+    taiex_series = [taiex_map.get(d) for d in sorted_dates]
+    ratio_pct = compute_ratio_series(margin_series, taiex_series)
+
+    signals = compute_signals(sorted_dates, futures_series, margin_series, ratio_pct)
     output = {
         "updated": today.strftime("%Y-%m-%d"),
         "dates": sorted_dates,
         "futures_net": futures_series,
         "margin_balance": margin_series,
+        "taiex": taiex_series,
+        "margin_ratio_pct": ratio_pct,
         **signals,
     }
 

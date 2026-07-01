@@ -36,6 +36,10 @@ FRED_KEY = os.environ.get("FRED_API_KEY", "")
 DOCS_HTML = os.path.abspath(
     os.path.join(_SCRIPT_DIR, "..", "..", "..", "docs", "index.html")
 )
+DOCS_HISTORY = os.path.abspath(
+    os.path.join(_SCRIPT_DIR, "..", "..", "..", "docs", "history.json")
+)
+HISTORY_MAX_DAYS = 1826  # keep 5 years rolling
 
 # Fallback constants (used when live fetch fails)
 FALLBACK = {
@@ -64,8 +68,10 @@ def fetch_yfinance_data():
     # ^VVIX = vol-of-vol (1-2 day lead before VIX explosion)
     # HYG = high yield bonds (credit divergence, 2-3 day lead before equity selloff)
     tickers = ["^GSPC", "^VIX", "^VVIX", "QQQ", "SOXX", "SMH", "SPY", "MU", "HYG", "BZ=F"]
-    end = datetime.today()
-    start = end - timedelta(days=730)
+    # yfinance 的 end 是「排他」邊界：end=今天 會漏掉當天剛收盤的數據。
+    # 加 1 天確保 21:00 UTC（美股收盤後）的排程能抓到當日收盤。
+    end = datetime.today() + timedelta(days=1)
+    start = end - timedelta(days=731)
 
     result = {}
     for ticker in tickers:
@@ -546,14 +552,59 @@ def build_tsi_indicators(tsi_result):
     return ind_map
 
 
+def compute_avi_from_v5():
+    """跑「真」AVI V5 管線（14 指標 × 6 維度 + Regime(HMM) + GARCH）。
+
+    回傳 (score, level, dims) — 與 run_monthly.py --v5 同一套、同一個數字。
+    跑失敗回 None → 上層自動退回舊的簡化代理(compute_avi_dimensions)，網頁絕不開天窗。
+    """
+    try:
+        from src.pipeline.avi_v5_pipeline import AVIV5Pipeline
+
+        res = AVIV5Pipeline().run()
+        score = round(float(res.avi_v5_score), 2)
+
+        # 維度分數(0-10) → 百分位顯示(0-100)；V5 的 'rates' 對應網頁鍵 'rate'
+        keymap = {"rates": "rate"}
+        dims = {}
+        for k, ds in res.v4_result.dimension_scores.items():
+            dk = keymap.get(k, k)
+            pct = int(min(100, max(0, round(ds.score * 10))))
+            dims[dk] = {"pct": pct, "emoji": _pct_emoji(pct)}
+        # 確保網頁需要的 6 維都存在（缺的補中性，避免前端讀不到鍵）
+        for dk in ("valuation", "profitability", "macro", "rate", "credit", "momentum"):
+            dims.setdefault(dk, {"pct": 50, "emoji": _pct_emoji(50)})
+
+        log.info(
+            f"AVI V5 pipeline OK: score={score} "
+            f"(V4={res.avi_v4_score:.2f}, regime={res.regime_label}, "
+            f"garch_adj={res.garch_adjustment:+.2f}) "
+            f"dims={ {k: v['pct'] for k, v in dims.items()} }"
+        )
+        return score, avi_level(score), dims
+    except Exception as e:
+        log.warning(f"AVI V5 pipeline failed -> fallback to proxy: {e}", exc_info=True)
+        return None
+
+
 def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
     """Assemble the full JSON payload."""
-    today = datetime.today().strftime("%Y-%m-%d")
+    # 日期戳用台北時區：GitHub runner 是 UTC，21:00 UTC 跑的時候台北已是隔天早上。
+    # 用 UTC 日期會讓台灣使用者覺得「資料是昨天的」。
+    from zoneinfo import ZoneInfo
+    today = datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y-%m-%d")
 
     # ── AVI ──────────────────────────────────────────────────────────────────
-    dims = compute_avi_dimensions(yf_data, fred_data, cape_val)
-    avi_score = compute_avi_score(dims)
-    avi_lvl   = avi_level(avi_score)
+    # 優先用「真」AVI V5 管線（與 run_monthly --v5 同一個數字）；跑失敗才退回簡化代理
+    avi_source = "v5"
+    _v5 = compute_avi_from_v5()
+    if _v5 is not None:
+        avi_score, avi_lvl, dims = _v5
+    else:
+        avi_source = "proxy"
+        dims = compute_avi_dimensions(yf_data, fred_data, cape_val)
+        avi_score = compute_avi_score(dims)
+        avi_lvl   = avi_level(avi_score)
 
     # ── CRI ──────────────────────────────────────────────────────────────────
     cri_score = cpi_result.score if cpi_result else FALLBACK["cri_score"]
@@ -568,16 +619,24 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
     tsi_inds  = build_tsi_indicators(tsi_result)
 
     # ── Market snapshot ───────────────────────────────────────────────────────
+    # yfinance 偶爾在最後一根 K 棒回傳 NaN 收盤（盤中未定/數據源延遲），
+    # 直接取 iloc[-1] 會讓 SPX 變成 NaN。一律 dropna 後取最後一個有效值。
     def latest_close(key, default=0.0):
         df = yf_data.get(key)
         if df is None or df.empty:
             return default
         col = "Close" if "Close" in df.columns else df.columns[0]
-        return round(float(df[col].iloc[-1]), 2)
+        s = df[col].dropna()
+        if s.empty:
+            return default
+        return round(float(s.iloc[-1]), 2)
 
     def latest_fred(key, default=0.0):
         s = fred_data.get(key)
         if s is None or s.empty:
+            return default
+        s = s.dropna()
+        if s.empty:
             return default
         return round(float(s.iloc[-1]), 4)
 
@@ -588,6 +647,15 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
     t30y  = latest_fred("treasury_30y", FALLBACK["t30y"])
     cape  = cape_val if cape_val else FALLBACK["cape"]
 
+    # 美股實際數據日期：取 ^GSPC 最後一個「有效收盤」的日期（與上面 dropna 對齊）
+    data_date = ""
+    gspc_df = yf_data.get("^GSPC")
+    if gspc_df is not None and not gspc_df.empty:
+        _col = "Close" if "Close" in gspc_df.columns else gspc_df.columns[0]
+        _valid = gspc_df[_col].dropna()
+        if not _valid.empty:
+            data_date = _valid.index[-1].strftime("%Y-%m-%d")
+
     # ── Alert ─────────────────────────────────────────────────────────────────
     alert = build_alert(tsi_score, cri_score, tsi_bias, avi_lvl)
 
@@ -597,6 +665,7 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
             "score":      avi_score,
             "level":      avi_lvl,
             "dimensions": dims,
+            "source":     avi_source,
         },
         "cri": {
             "score":      round(cri_score, 1),
@@ -617,16 +686,121 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
             "t30y":  t30y,
             "cape":  cape,
             "oil":   oil,
+            "data_date": data_date,
         },
         "alert": alert,
     }
-    return payload
+    return _to_native(payload)
+
+
+def _to_native(obj):
+    """Recursively convert numpy/pandas scalar types to native Python types.
+
+    numpy 2.x 的 np.bool_ 不再是 Python bool 的子類，json.dumps 會丟
+    'Object of type bool is not JSON serializable'。本函式把整個 payload 的
+    numpy/pandas 標量（bool_/int64/float64 等）轉成原生型別，讓後續 json
+    序列化（注入 HTML、寫 history.json）都安全。
+    """
+    if isinstance(obj, dict):
+        return {k: _to_native(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_to_native(v) for v in obj]
+    if isinstance(obj, np.bool_):
+        return bool(obj)
+    if isinstance(obj, np.integer):
+        return int(obj)
+    if isinstance(obj, np.floating):
+        return float(obj)
+    if isinstance(obj, np.generic):   # 其餘 numpy 標量（如 np.str_）
+        return obj.item()
+    if isinstance(obj, (pd.Timestamp,)):
+        return obj.strftime("%Y-%m-%d")
+    return obj
+
+
+def _json_default(o):
+    """json.dumps 的最後防線：把漏網的 numpy/pandas 標量轉成原生型別。"""
+    if isinstance(o, np.generic):
+        return o.item()
+    if isinstance(o, pd.Timestamp):
+        return o.strftime("%Y-%m-%d")
+    raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
 
 
 # ── HTML Injection ─────────────────────────────────────────────────────────────
 
 MARKER_START = "// [KIWI-DATA-START]"
 MARKER_END   = "// [KIWI-DATA-END]"
+HISTORY_START = "// [KIWI-HISTORY-START]"
+HISTORY_END   = "// [KIWI-HISTORY-END]"
+
+
+def append_to_history(payload, html_path):
+    """Append today's AVI/CRI/TSI scores to history.json and update HTML markers.
+
+    歷史序列的 key 用「美股實際數據日期」（^GSPC 最後一根 K 棒），
+    與回填產生的歷史對齊：每個美股交易日恰好一筆，週末/重跑只會 upsert 不會重複。
+    """
+    entry_date = payload.get("market", {}).get("data_date") or payload["updated"]
+    avi_v   = round(payload["avi"]["score"], 2)
+    cri_v   = round(payload["cri"]["score"], 1)
+    tsi_v   = round(payload["tsi"]["score"], 1)
+
+    # Load existing history
+    if os.path.exists(DOCS_HISTORY):
+        try:
+            hist = json.loads(open(DOCS_HISTORY, encoding="utf-8").read())
+        except Exception:
+            hist = {"d": [], "a": [], "c": [], "t": []}
+    else:
+        hist = {"d": [], "a": [], "c": [], "t": []}
+
+    # Upsert this market-date's entry (keep series sorted by date)
+    if entry_date in hist["d"]:
+        idx = hist["d"].index(entry_date)
+        hist["a"][idx] = avi_v
+        hist["c"][idx] = cri_v
+        hist["t"][idx] = tsi_v
+    else:
+        hist["d"].append(entry_date)
+        hist["a"].append(avi_v)
+        hist["c"].append(cri_v)
+        hist["t"].append(tsi_v)
+        if len(hist["d"]) >= 2 and hist["d"][-1] < hist["d"][-2]:
+            order = sorted(range(len(hist["d"])), key=lambda i: hist["d"][i])
+            for k in ("d", "a", "c", "t"):
+                hist[k] = [hist[k][i] for i in order]
+
+    # Keep rolling 5-year window
+    if len(hist["d"]) > HISTORY_MAX_DAYS:
+        for k in ("d", "a", "c", "t"):
+            hist[k] = hist[k][-HISTORY_MAX_DAYS:]
+
+    # Write history.json
+    try:
+        with open(DOCS_HISTORY, "w", encoding="utf-8") as f:
+            json.dump(hist, f, separators=(",", ":"))
+        log.info(f"history.json updated ({len(hist['d'])} entries)")
+    except Exception as e:
+        log.warning(f"Failed to write history.json: {e}")
+
+    # Inject into HTML between KIWI-HISTORY markers
+    if not os.path.exists(html_path):
+        return
+    try:
+        content = open(html_path, encoding="utf-8").read()
+        json_str  = json.dumps(hist, separators=(",", ":"))
+        new_block = f"{HISTORY_START}\nvar KIWI_HISTORY = {json_str};\n{HISTORY_END}"
+        pattern   = re.compile(
+            re.escape(HISTORY_START) + r".*?" + re.escape(HISTORY_END), re.DOTALL
+        )
+        if pattern.search(content):
+            content = pattern.sub(new_block, content)
+            with open(html_path, "w", encoding="utf-8") as f:
+                f.write(content)
+            log.info("KIWI-HISTORY block updated in HTML")
+    except Exception as e:
+        log.warning(f"Failed to update KIWI-HISTORY in HTML: {e}")
 
 
 def inject_into_html(payload, html_path):
@@ -638,7 +812,7 @@ def inject_into_html(payload, html_path):
     with open(html_path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    json_str = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    json_str = json.dumps(payload, ensure_ascii=False, separators=(",", ":"), default=_json_default)
     new_block = f"{MARKER_START}\nvar KIWI_DATA = {json_str};\n{MARKER_END}"
 
     # Replace between markers (inclusive)
@@ -699,6 +873,9 @@ def main():
         log.info("=== Dashboard update complete ===")
     else:
         log.error("=== Dashboard update failed (HTML injection) ===")
+
+    # 5. Append to history rolling store
+    append_to_history(payload, DOCS_HTML)
 
 
 if __name__ == "__main__":

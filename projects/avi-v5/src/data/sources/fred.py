@@ -71,24 +71,43 @@ class FREDSource:
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
     ) -> pd.Series:
-        """Compute Buffett Indicator: Wilshire 5000 / GDP.
+        """Compute Buffett Indicator: total equity market value / GDP.
+
+        修正：FRED 於 2024-06-03 下架所有 Wilshire 5000 系列（WILL5000IND 已不存在、
+        會回 "series does not exist"）。改用 Z.1 資產負債表「非金融企業權益市值」
+        NCBEILQ027S（$百萬, 季度）作為市值代理 / GDP（$十億, 季度）。百分位評分對
+        絕對尺度不敏感，趨勢與相對高低和 Wilshire 版一致（絕對值較低，因僅含非金融
+        企業）。
 
         Returns:
-            Monthly-interpolated ratio series.
+            Monthly ratio series (%).
         """
-        wilshire = self.fetch_series("WILL5000IND", start_date, end_date)
+        # NCBEILQ027S = Nonfinancial Corporate Business; Corporate Equities; Market Value ($M)
+        mktcap = self.fetch_series("NCBEILQ027S", start_date, end_date)
         gdp = self.fetch_series("GDP", start_date, end_date)
 
-        wilshire_m = wilshire.resample("ME").last().dropna()
-        gdp_m = gdp.resample("ME").last().ffill().dropna()
+        mktcap_q = mktcap.resample("ME").last().dropna()  # $百萬, 季度
+        gdp_q = gdp.resample("ME").last().dropna()         # $十億, 季度
 
-        combined = pd.DataFrame({"wilshire": wilshire_m, "gdp": gdp_m}).dropna()
+        # 兩者皆季度、發布時點略不同 → 把最近一筆 GDP 前填(ffill)到市值的每個月份，
+        # 避免「GDP 還沒出」的最近月份被 dropna 丟掉（同 multpl P/S dagger 的卡舊季問題）。
+        gdp_aligned = gdp_q.reindex(mktcap_q.index, method="ffill")
+        combined = pd.DataFrame({"mktcap": mktcap_q, "gdp": gdp_aligned}).dropna()
         if combined.empty:
             raise RuntimeError("No overlapping data for Buffett Indicator")
 
-        result = (combined["wilshire"] / combined["gdp"]) * 100
+        # 單位對齊：市值 $百萬 / (GDP $十億 × 1000) = 比率；×100 為 %
+        ratio = (combined["mktcap"] / (combined["gdp"] * 1000.0)) * 100
+        # 季度→月度(前填到當月)，粒度與其他月度指標一致、且 as-of 跟得上當月
+        monthly_idx = pd.date_range(
+            ratio.index.min(), pd.Timestamp.today().normalize(), freq="ME"
+        )
+        result = ratio.reindex(monthly_idx, method="ffill").dropna()
         result.name = "buffett_indicator"
-        logger.info(f"Computed Buffett Indicator: {len(result)} monthly observations")
+        logger.info(
+            f"Computed Buffett Indicator (NCBEILQ027S/GDP): {len(result)} monthly obs, "
+            f"latest={result.index[-1].date()} = {result.iloc[-1]:.1f}%"
+        )
         return result
 
     def fetch_roic(

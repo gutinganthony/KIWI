@@ -31,9 +31,9 @@ indicators:
     name: "Buffett Indicator (Market Cap / GDP)"
     source: fred
     fred_ids:
-      - WILL5000IND  # Active series (WILL5000PRFC and WILL5000INDFC are discontinued)
+      - NCBEILQ027S  # Z.1 非金融企業權益市值($M)；FRED 已於 2024-06 下架 WILL5000IND
       - GDP
-    computation: ratio  # WILL5000PRFC / GDP
+    computation: ratio  # NCBEILQ027S / (GDP*1000) -> %
     direction: up_is_risk  # ↑=↑risk
     dimension: valuation
     weight: 0.09

@@ -1,16 +1,20 @@
-name: Weekend Bridge Alert
+name: Generate 5-Year History (One-Time)
 
 on:
-  schedule:
-    # 週六 08:00 TST (00:00 UTC Sat) — 週五美股收盤後隔日檢查
-    - cron: '0 0 * * 6'
   workflow_dispatch:
+    inputs:
+      days:
+        description: '回填天數（預設1825=5年）'
+        required: false
+        default: '1825'
 
 jobs:
-  weekend-check:
+  generate:
     runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -24,27 +28,20 @@ jobs:
       - name: Install dependencies
         run: pip install -r projects/avi-v5/requirements.txt
 
-      - name: Update dashboard with Friday close data
+      - name: Generate history data
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         working-directory: projects/avi-v5
-        run: python scripts/update_dashboard.py
+        run: python scripts/generate_history.py --days ${{ github.event.inputs.days || 1825 }}
 
-      - name: Commit updated dashboard
+      - name: Commit and push
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/index.html
+          git add docs/history.json docs/index.html
           if git diff --staged --quiet; then
             echo "No changes"
           else
-            git commit -m "auto: weekend bridge update $(date -u +%Y-%m-%d)"
+            git commit -m "feat: 生成過去5年 AVI/CRI/TSI 歷史走勢數據"
             git push
           fi
-
-      - name: Send weekend alert if stress detected
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
-        run: python projects/avi-v5/scripts/notify.py --weekend
