@@ -1,0 +1,51 @@
+name: Serenity Weekly Screen
+
+# 每週六自動跑 Serenity 篩選器（依 skills/serenity/weekly-screen.md）
+# 需要 repo secret: ANTHROPIC_API_KEY
+# 手動測試：Actions → Serenity Weekly Screen → Run workflow
+
+on:
+  schedule:
+    # 週六 02:13 UTC = 10:13 台灣時間（全球週五收盤後）
+    - cron: '13 2 * * 6'
+  workflow_dispatch:
+
+# 關鍵：id-token: write 是 claude-code-action 做 OIDC token 交換必需的，
+# 少了它排程/手動都會以 401「no write access」失敗（issue #814）。
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  serenity-weekly:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Run Serenity weekly screen
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: "--max-turns 60"
+          prompt: |
+            依 skills/serenity/weekly-screen.md 執行完整 Serenity 週報（全掃模式）。
+            1. 讀 skills/serenity/SKILL.md 與 skills/serenity/watchlist.md
+            2. 用 WebSearch 重拉全 watchlist 每一檔的 LIVE 現價/市值/forward P/E，
+               計算 vs 上週變化，標記一週 >15% 的移動（注意日圓億/兆、台幣億單位陷阱）
+            3. 逐檔比對觸發價與否證條件，標記 🟢買進命中 / 🔴賣出否證命中；
+               過 <$2B 硬門檻者確認是否漲出框
+            4. 掃未來 2 週催化劑（財報/有報/指數/政策/IPO）
+            5. 四市場（US/日/台/韓）輕掃新的 <$2B 卡口候選，flag 待深掘
+            6. Phase 6 宏觀前提監控（AI capex 下修、JPY、記憶體過剩訊號、CXMT 實體清單）
+            7. 寫 dated digest 到 topics/business/serenity-weekly/YYYY-MM-DD.md；
+               更新 docs/serenity/data.json（每檔 price/wk 填今天重拉的值、headline 更新）；
+               更新 skills/serenity/watchlist.md 價格快照；在 INDEX.md 加連結
+            8. 用 git 把以上變更 commit 並 push 到 main（讓 GitHub Pages 自動重新部署儀表板）
+            全程來源三級標示（已確認/[推論]/[推測]）、非投資建議。
