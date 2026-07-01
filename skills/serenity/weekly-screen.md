@@ -1,8 +1,10 @@
 # Serenity 每週篩選器（weekly-screen）
 
 **執行時機**：每週六（週末覆盤，全球週五收盤後、資料穩定）
-**範圍**：全掃（重定價 + 觸發/否證 + 催化劑 + 新標的獵殺）
-**輸出**：完整 digest + 更新 watchlist + commit/push + 通知使用者（每週都要完整摘要）
+**節奏**（自動排程 `.github/workflows/serenity-weekly.yml`）：
+- **每週六「輕量」**＝Phase 1 重定價 + Phase 2 觸發/否證 + Phase 3 催化劑 + Phase 6 宏觀（**跳過 Phase 4 新標的獵殺**），省 credits
+- **每月第一個週六「全掃」**＝含 Phase 4 四市場新標的獵殺（手動 workflow_dispatch 也是全掃）
+**輸出**：digest + 更新 watchlist + 更新 `docs/serenity/data.json` + commit/push
 **框架**：`skills/serenity/SKILL.md`；名單：`skills/serenity/watchlist.md`
 
 > **核心紀律（本輪反覆踩到的教訓）**：資料幾週就過時（Seikoh 9 天 +30%、MEC 15×→33×、santec 衝破 $2B）。**第一步永遠先重拉現價市值，不靠記憶。**
