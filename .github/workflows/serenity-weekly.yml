@@ -10,8 +10,7 @@ on:
     - cron: '13 2 * * 6'
   workflow_dispatch:
 
-# 關鍵：id-token: write 是 claude-code-action 做 OIDC token 交換必需的，
-# 少了它排程/手動都會以 401「no write access」失敗（issue #814）。
+# id-token: write 是 claude-code-action 做 OIDC token 交換必需的（issue #814）。
 permissions:
   contents: write
   id-token: write
@@ -23,7 +22,7 @@ jobs:
       contents: write
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: main
           fetch-depth: 0
@@ -33,7 +32,11 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          claude_args: "--max-turns 60"
+          # 關鍵：預設權限模式會擋掉 WebSearch/Write/Edit（上次 39 次 permission denial、零產出）。
+          # 明確放行篩選器需要的工具，並給足回合數。
+          claude_args: |
+            --max-turns 120
+            --allowedTools WebSearch,WebFetch,Read,Write,Edit,MultiEdit,Glob,Grep,Bash
           prompt: |
             依 skills/serenity/weekly-screen.md 執行完整 Serenity 週報（全掃模式）。
             1. 讀 skills/serenity/SKILL.md 與 skills/serenity/watchlist.md
