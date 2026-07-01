@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Serenity 篩選器 — 供應鏈瓶頸選股</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #131722; --bg2: #1e222d; --bg3: #2a2e39; --border: #363a45;
+  --text: #d1d4dc; --text2: #787b86; --text3: #555962;
+  --green: #26a69a; --green-bg: rgba(38,166,154,0.12);
+  --yellow: #f7c948; --yellow-bg: rgba(247,201,72,0.12);
+  --orange: #ff9800; --orange-bg: rgba(255,152,0,0.12);
+  --red: #ef5350; --red-bg: rgba(239,83,80,0.12);
+  --blue: #42a5f5; --blue-bg: rgba(66,165,245,0.1);
+  --purple: #7c4dff;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Ubuntu, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.5; min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+.container { max-width: 1100px; margin: 0 auto; padding: 16px; }
+.header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border);
+  flex-wrap: wrap; gap: 8px;
+}
+.header-left { display: flex; align-items: center; gap: 10px; }
+.header-logo {
+  width: 28px; height: 28px; background: linear-gradient(135deg, var(--green), var(--blue));
+  border-radius: 6px; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: #fff;
+}
+.header h1 { font-size: 17px; font-weight: 600; }
+.header .sub { font-size: 11px; color: var(--text3); }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.updated { font-size: 12px; color: var(--text3); white-space: nowrap; }
+.navlink { font-size: 12px; color: var(--blue); text-decoration: none; border: 1px solid var(--border); padding: 4px 10px; border-radius: 16px; }
+.navlink:hover { background: var(--bg3); }
+
+.headline { background: var(--bg2); border: 1px solid var(--border); border-left: 3px solid var(--green); border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-size: 14px; }
+
+.section-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin: 22px 0 10px; }
+
+.macro { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: flex; flex-direction: column; gap: 2px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; min-width: 150px; flex: 1; }
+.chip .k { font-size: 11px; color: var(--text2); display: flex; align-items: center; gap: 6px; }
+.chip .k .dot { width: 7px; height: 7px; border-radius: 50%; }
+.chip .v { font-size: 12px; color: var(--text); }
+.dot.ok { background: var(--green); } .dot.watch { background: var(--yellow); } .dot.alert { background: var(--red); }
+
+.tier { margin-bottom: 6px; }
+.tier-head { font-size: 13px; font-weight: 600; margin: 18px 0 8px; padding: 4px 0; }
+.tier-head.green { color: var(--green); } .tier-head.yellow { color: var(--yellow); }
+.tier-head.blue { color: var(--blue); } .tier-head.red { color: var(--red); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px; }
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; border-left: 3px solid var(--border); }
+.card.green { border-left-color: var(--green); } .card.yellow { border-left-color: var(--yellow); }
+.card.blue { border-left-color: var(--blue); } .card.red { border-left-color: var(--red); }
+.card-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.card-name { font-size: 14px; font-weight: 600; }
+.card-name .tk { color: var(--text2); font-weight: 400; font-size: 12px; margin-left: 4px; }
+.badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: var(--bg3); color: var(--text2); }
+.card-metrics { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; margin-bottom: 6px; }
+.card-metrics span { color: var(--text2); }
+.card-metrics b { color: var(--text); font-weight: 600; }
+.card-dir { font-size: 12.5px; font-weight: 600; margin-bottom: 3px; }
+.card-trig { font-size: 12px; color: var(--yellow); margin-bottom: 5px; }
+.card-note { font-size: 11.5px; color: var(--text2); line-height: 1.45; }
+
+.list { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.list-row { display: flex; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
+.list-row:last-child { border-bottom: none; }
+.list-row .date { color: var(--yellow); font-weight: 600; white-space: nowrap; min-width: 88px; font-size: 12px; }
+.list-row .ev { color: var(--text); }
+.cand .nm { font-weight: 600; min-width: 140px; }
+.cand .nt { color: var(--text2); font-size: 12px; }
+
+.footer { margin-top: 28px; padding-top: 14px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text3); line-height: 1.7; }
+.footer code { background: var(--bg3); padding: 1px 5px; border-radius: 3px; color: var(--text2); }
+.err { background: var(--red-bg); border: 1px solid var(--red); border-radius: 8px; padding: 14px; color: var(--red); font-size: 13px; }
+@media (max-width: 560px) { .cards { grid-template-columns: 1fr; } .list-row { flex-direction: column; gap: 3px; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="header-left">
+      <div class="header-logo">S</div>
+      <div>
+        <h1>Serenity 篩選器</h1>
+        <div class="sub">供應鏈瓶頸選股 · AI 記憶體/光通訊/先進封裝</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <a class="navlink" href="../">← AVI 儀表板</a>
+      <span class="updated" id="updated">載入中…</span>
+    </div>
+  </div>
+
+  <div id="app"></div>
+
+  <div class="footer" id="footer"></div>
+</div>
+
+<script>
+const COLOR = { buy:'green', conditional:'yellow', trigger:'yellow', hold:'blue', framework_out:'red' };
+const MKT = { JP:'🇯🇵 JP', KR:'🇰🇷 KR', TW:'🇹🇼 TW', US:'🇺🇸 US', UK:'🇬🇧 UK' };
+
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+function render(d){
+  document.getElementById('updated').textContent = '更新：' + esc(d.updated);
+  const app = document.getElementById('app');
+  let h = '';
+
+  if (d.headline) h += `<div class="headline">${esc(d.headline)}</div>`;
+
+  // Macro
+  if (d.macro && d.macro.length){
+    h += `<div class="section-title">宏觀前提監控</div><div class="macro">`;
+    for (const m of d.macro){
+      h += `<div class="chip"><div class="k"><span class="dot ${esc(m.state)}"></span>${esc(m.signal)}</div><div class="v">${esc(m.note)}</div></div>`;
+    }
+    h += `</div>`;
+  }
+
+  // Positions by tier
+  if (d.positions && d.positions.length){
+    h += `<div class="section-title">觀察名單</div>`;
+    for (const t of (d.tiers||[])){
+      const rows = d.positions.filter(p => p.tier === t.key);
+      if (!rows.length) continue;
+      h += `<div class="tier"><div class="tier-head ${esc(t.color)}">${esc(t.label)}</div><div class="cards">`;
+      for (const p of rows){
+        const c = COLOR[p.tier] || 'blue';
+        h += `<div class="card ${c}">
+          <div class="card-top"><div class="card-name">${esc(p.name)}<span class="tk">${esc(p.ticker)}</span></div><span class="badge">${MKT[p.market]||esc(p.market)}</span></div>
+          <div class="card-metrics"><span>市值 <b>${esc(p.mcap)}</b></span><span>fwd <b>${esc(p.fwd_pe)}</b></span><span>現價 <b>${esc(p.price)}</b></span>${p.wk&&p.wk!=='—'?`<span>週 <b>${esc(p.wk)}</b></span>`:''}</div>
+          <div class="card-dir">${esc(p.direction)}</div>
+          ${p.trigger?`<div class="card-trig">🎯 ${esc(p.trigger)}</div>`:''}
+          <div class="card-note">${esc(p.note)}</div>
+        </div>`;
+      }
+      h += `</div></div>`;
+    }
+  }
+
+  // Catalysts
+  if (d.catalysts && d.catalysts.length){
+    h += `<div class="section-title">⏰ 催化劑日曆</div><div class="list">`;
+    for (const c of d.catalysts){
+      h += `<div class="list-row"><span class="date">${esc(c.date)}</span><span class="ev">${esc(c.event)}</span></div>`;
+    }
+    h += `</div>`;
+  }
+
+  // Candidates
+  if (d.candidates && d.candidates.length){
+    h += `<div class="section-title">🆕 新標的候選 / 監控</div><div class="list">`;
+    for (const c of d.candidates){
+      h += `<div class="list-row cand"><span class="nm">${esc(c.name)}</span><span class="nt">${esc(c.note)}</span></div>`;
+    }
+    h += `</div>`;
+  }
+
+  app.innerHTML = h;
+
+  document.getElementById('footer').innerHTML =
+    `${esc(d.as_of_note||'')}<br>資料由 Claude session 依 <code>skills/serenity/weekly-screen.md</code> 每週重拉更新，寫入 <code>docs/serenity/data.json</code>，經 GitHub Pages 自動部署。框架見 <code>skills/serenity/SKILL.md</code>。`;
+}
+
+fetch('./data.json?_=' + Date.now())
+  .then(r => { if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+  .then(render)
+  .catch(e => {
+    document.getElementById('updated').textContent = '';
+    document.getElementById('app').innerHTML = `<div class="err">載入 data.json 失敗：${esc(e.message)}。若剛部署請稍候重整；或確認 <code>docs/serenity/data.json</code> 已存在於 main 分支。</div>`;
+  });
+</script>
+</body>
+</html>

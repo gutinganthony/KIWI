@@ -1,0 +1,54 @@
+{
+  "updated": "2026-07-01",
+  "as_of_note": "價格為 2026 年 6 月下旬研究快照，非即時報價；每週由 Claude session 依 skills/serenity/weekly-screen.md 重拉更新。非投資建議。",
+  "headline": "😴 初始化 — 尚無新觸發命中。JEM 在建倉區上緣、Towa 中國紅旗剛觸發；本週兩大催化：7/10 SK hynix ADR 掛牌 + 群翊 6 月營收否證鐘。",
+  "macro": [
+    { "signal": "AI capex（大廠指引）", "state": "ok", "note": "未見下修" },
+    { "signal": "JPY", "state": "ok", "note": "無急升 10%+" },
+    { "signal": "記憶體週期", "state": "watch", "note": "仍緊缺至 2027；2028–29 才是過剩風險。盯 CXMT DDR5 擴產 + TrendForce 合約價漲幅是否收斂" },
+    { "signal": "CXMT 實體清單", "state": "watch", "note": "已跨部會核准、待公布＝懸劍；中國記憶體鏈頭號尾險" },
+    { "signal": "需求破壞", "state": "watch", "note": "Gartner 已下修 2026 PC -10.4%／手機 -8.4%；漲價開始咬終端量" }
+  ],
+  "tiers": [
+    { "key": "buy", "label": "🟢 買進／建倉候選", "color": "green" },
+    { "key": "conditional", "label": "⚠️ 條件式（待驗證）", "color": "yellow" },
+    { "key": "trigger", "label": "🟡 觸發價等待", "color": "yellow" },
+    { "key": "hold", "label": "⚪ 持有／觀察", "color": "blue" },
+    { "key": "framework_out", "label": "❌ 框架外（週期擇時／參考）", "color": "red" }
+  ],
+  "positions": [
+    { "tier": "buy", "ticker": "6855", "name": "JEM 日本電子材料", "market": "JP", "mcap": "$0.72B", "fwd_pe": "16–19×", "price": "~¥7,500", "wk": "—", "direction": "買進（Micron-beta）", "trigger": "首批 ¥6,400–6,800（現價略高）", "note": "HBM 探針卡 #3，Micron ~31%、中國 ~10%、淨現金；是 Micron-beta 不是 HBM-beta" },
+    { "tier": "buy", "ticker": "098460", "name": "Koh Young 高영", "market": "KR", "mcap": "$1.66B", "fwd_pe": "~21× EV/EBITDA", "price": "~₩32,950", "wk": "—", "direction": "回檔累積", "trigger": "已回 ~20%，分批", "note": "3D SPI 47%/AOI 33% 全球雙寡占，客戶分散（無 captive），淨現金；韓國最乾淨 4 門檻" },
+    { "tier": "buy", "ticker": "064290", "name": "Intekplus 인텍플러스", "market": "KR", "mcap": "$0.29B", "fwd_pe": "~18×", "price": "~₩9,760", "wk": "—", "direction": "小倉候選", "trigger": "可建小倉；盯 CoWoS 認證轉單", "note": "先進封裝外觀檢測（HBM + TSMC CoWoS），多客戶，虧轉盈；最便宜的真卡口小型股" },
+    { "tier": "conditional", "ticker": "053610", "name": "Protec 프로텍", "market": "KR", "mcap": "$0.30B", "fwd_pe": "n/a", "price": "~₩82,000", "wk": "—", "direction": "待查客戶集中度", "trigger": "確認無單一 >50% 再進", "note": "雷射鍵合（TCB 新興替代），OP +428%；本輪韓國最佳風險報酬，唯缺集中度驗證" },
+    { "tier": "trigger", "ticker": "6834", "name": "Seikoh 精工技研", "market": "JP", "mcap": "$1.7B", "fwd_pe": "35–43×", "price": "~¥31,100", "wk": "—", "direction": "別追／回檔買", "trigger": "<¥24,000 或 8/13 Q1 確認 sandbag", "note": "光纖連接器/端面研磨壟斷；兩週飆 +30%、FY27 利潤高原；無稀釋、淨現金" },
+    { "tier": "trigger", "ticker": "6941", "name": "Yamaichi 山一電機", "market": "JP", "mcap": "$1.3B", "fwd_pe": "~22×", "price": "~¥10,260", "wk": "—", "direction": "觸發價等待", "trigger": "¥6,700–7,200（fwd ≤15×）", "note": "burn-in socket ~40% 寡占，全名單最佳資產負債表（淨現金、反稀釋）；但共識目標僅現價半價" },
+    { "tier": "trigger", "ticker": "6315", "name": "Towa", "market": "JP", "mcap": "$1.6B", "fwd_pe": "29–34×", "price": "~¥2,915", "wk": "—", "direction": "持有／觀察（近否決）", "trigger": "¥1,850–2,000 + 中國受注 <35%", "note": "MR-MUF 壓縮成型 ~60% 壟斷，HBM4/HBM4E 續用已確認；但中國 40.9% 紅旗觸發、淨利 -43%" },
+    { "tier": "trigger", "ticker": "4971", "name": "MEC メック", "market": "JP", "mcap": "$1.3B", "fwd_pe": "~37×", "price": "~¥11,660", "wk": "—", "direction": "觸發價等待", "trigger": "<¥6,200（fwd ~20×）；🔥<¥4,500", "note": "CZ ~100% 先進基板銅處理壟斷，無客戶 >10%、中國 ~32%、淨現金；但 4–5 倍漲幅後貴" },
+    { "tier": "trigger", "ticker": "131290", "name": "TSE 티에스이", "market": "KR", "mcap": "$1.78B", "fwd_pe": "~13× fwd", "price": "~₩213,500", "wk": "—", "direction": "觸發價等待", "trigger": "<₩180k", "note": "HBM4 探針卡已出貨三星、雙源、淨現金；但 52 週漲 ~6 倍。同時是 JEM 的韓系威脅" },
+    { "tier": "trigger", "ticker": "6524", "name": "Kohoku 湖北工業", "market": "JP", "mcap": "$0.96B", "fwd_pe": "~40×", "price": "~¥5,480", "wk": "—", "direction": "觸發價等待", "trigger": "~¥4,500（fwd ~25×）", "note": "海纜光隔離器 >50%（≈半營收）；CPO/ELS 收稅人其實是古河、非它。另一半是大宗電容引線" },
+    { "tier": "trigger", "ticker": "6664", "name": "群翊 Group Up", "market": "TW", "mcap": "$0.71B", "fwd_pe": "22–24×", "price": "~NT$368", "wk": "—", "direction": "觸發＋否證鐘", "trigger": "NT$330–360 + 6 月營收 ≥10%", "note": "面板級烘烤/塗佈；4 月 +9.66%、5 月 +7.92%，6 月 <10% = 三連月出局（~7/10 揭曉）。CB 稀釋懸頂" },
+    { "tier": "trigger", "ticker": "RMBS", "name": "Rambus", "market": "US", "mcap": "$13.4B", "fwd_pe": "~42×", "price": "~$124", "wk": "—", "direction": "框架外／等回檔", "trigger": "<$90（<30× fwd）", "note": "RCD 3 家寡占、結構成長非純週期 + IP 年金；四檔 Step 1–9 裡最好的生意，但貴、超框 6.7×" },
+    { "tier": "hold", "ticker": "6777", "name": "santec", "market": "JP", "mcap": "$2.1B", "fwd_pe": "~37×", "price": "~¥28,940", "wk": "—", "direction": "持有（超 $2B 失格）", "trigger": "深回檔才看", "note": "光學測試/可調雷射；市值衝破 $2B 硬門檻失格 + 峰值倍數" },
+    { "tier": "hold", "ticker": "FORM", "name": "FormFactor", "market": "US", "mcap": "$10B", "fwd_pe": "~50×", "price": "—", "wk": "—", "direction": "觀察（框架外）", "trigger": "等週期回檔", "note": "HBM 探針卡皇冠（SKH #1 供應商、賣三大廠全部）；是 JEM 的反面，但完整定價" },
+    { "tier": "hold", "ticker": "005930", "name": "Samsung 三星電子", "market": "KR", "mcap": "$1.48T", "fwd_pe": "~中teens", "price": "~₩323,000", "wk": "—", "direction": "反直覺價值（框架外）", "trigger": "—", "note": "HBM 三巨頭裡唯一便宜（最低 P/B）+ 剛過 NVIDIA HBM4 認證的追趕選擇權" },
+    { "tier": "framework_out", "ticker": "2408", "name": "Nanya 南亞科", "market": "TW", "mcap": "$49B", "fwd_pe": "6–8×", "price": "~NT$449", "wk": "—", "direction": "持有／偏賣（週期頂）", "trigger": "非 Serenity；合約價漲幅收斂＝賣", "note": "DDR4 寡占 + CXMT 撤退集中；但個位數 P/E 是週期頂海市蜃樓（P/B 7× 近高）、零 HBM、峰值 capex" },
+    { "tier": "framework_out", "ticker": "2344", "name": "Winbond 華邦電", "market": "TW", "mcap": "$29.5B", "fwd_pe": "7–11.6×", "price": "~NT$208", "wk": "—", "direction": "持有／迴避", "trigger": "同週期選 Nanya", "note": "NOR #1 但 TAM 太小；淨負債 + 25nm 死路（無 DDR5/HBM 退路）→ 明確劣於淨現金的 Nanya" },
+    { "tier": "framework_out", "ticker": "000660", "name": "SK hynix（SKHY ADR）", "market": "KR", "mcap": "$1.23T", "fwd_pe": "5–7×", "price": "~₩2.92M", "wk": "—", "direction": "持有（週期高）", "trigger": "P/B <2.3×（~₩2.0–2.3M）", "note": "最純 HBM 龍頭；5–7× P/E 是週期鏡花（P/B 2.8× 近高）。7/10 Nasdaq ADR = 稀釋+sell-the-news；三星 HBM4 追上" }
+  ],
+  "catalysts": [
+    { "date": "2026-07-10", "event": "SK hynix Nasdaq ADR「SKHY」掛牌（~$29B）— sell-the-news + 稀釋觀察" },
+    { "date": "2026-07-10", "event": "群翊 6 月營收公布 — <10% = 三連月否證定讞、移出框架" },
+    { "date": "2026-07-10", "event": "Korea Instrument KOSDAQ 上市（三星 captive 探針卡，觀察）" },
+    { "date": "2026-07-30", "event": "Mersen H1 財報（DC busbar 業務驗證）" },
+    { "date": "2026-08-01", "event": "santec Q1（sandbag 上修是否延續）" },
+    { "date": "2026-08-12", "event": "JEM Q1（sandbag 循環是否延續 — JEM 最關鍵裁判日）" },
+    { "date": "2026-08-13", "event": "Seikoh Q1（FY27 利潤壓縮是投資期還是真弱）" },
+    { "date": "2026-08 中", "event": "CXMT STAR 板掛牌（2026 最大 A 股 IPO；不可直接投）" }
+  ],
+  "candidates": [
+    { "name": "Ayar Labs / Lightmatter / Lightelligence", "note": "未上市 CPO 瓶頸；任一遞 S-1 = 觸發新獵殺（美股光學窗口已關，alpha 遷往未上市）" },
+    { "name": "CXMT 鏈（ACMR / KSTR ETF）", "note": "中國記憶體 capex 唯一可投間接管道；帶實體清單尾險，小倉監控非持倉" },
+    { "name": "Team Group 十銓 4967（TW, $0.7B）", "note": "唯一 <$1B 的模組廠庫存重估戰術；無護城河、反轉先爆，交易不結婚" }
+  ]
+}
