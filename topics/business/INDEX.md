@@ -19,3 +19,4 @@
 | 2026-05-29 | [Serenity Chokepoint 三市場隱藏壟斷供應商掃描 — 美日台 45 支待發現標的](./2026-05-29-serenity-chokepoint-three-market-scan.md) | investment, serenity-chokepoint, supply-chain, semiconductor, silicon-photonics, AI-infrastructure |
 | 2026-06-02 | [AI 投資研究副駕駛 — 可測試假設 + 客戶訪談訪綱（Idea 階段）](./2026-06-02-ai-investment-copilot-hypothesis.md) | startup, investment, AI-copilot, AVI, hypothesis, customer-discovery, founders-playbook, idea-stage |
 | 2026-06-03 | [Redefine Fund — Jake × Vince 共同基金專案（策略 + 結構 + Action Plan + 模板）](./2026-06-03-redefine-fund-project.md) | startup, fund, EAM, semiconductor, AI, redefine, fundraising, partnership, action-plan |
+| 2026-06-26 | [個人壟斷飛輪 — L1/L2/L3 三層變現 + B2B 授權完整行動計畫](./2026-06-26-personal-monopoly-flywheel-action-plan.md) | strategy, monetization, personal-monopoly, flywheel, AVI, serenity, newsletter, subscription, fund, B2B, licensing, action-plan |
