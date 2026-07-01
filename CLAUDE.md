@@ -28,12 +28,14 @@ Use ~/.claude/skills/gstack/... for gstack file paths (the global path).
 
 1. `docs/KIWI_INDEX_FRAMEWORK.md` — ACT index（AVI/CRI/TSI）完整定義
 2. `skills/serenity/SKILL.md` — Serenity 供應鏈瓶頸選股框架
-3. `skills/wavetrend/SKILL.md` — WaveTrend Oscillator 技術分析框架
+3. `skills/serenity/watchlist.md` — Serenity 現役觀察名單（7 檔觸發條件 + 否證條件）
+4. `skills/wavetrend/SKILL.md` — WaveTrend Oscillator 技術分析框架
 
 載入後，使用者可以直接說：
 - 「用 Serenity 框架分析 $TICKER」→ 依照 skills/serenity/SKILL.md 執行完整分析
 - 「用 WaveTrend 分析 $TICKER」→ 依照 skills/wavetrend/SKILL.md 執行技術分析
 - 「用 Serenity + WaveTrend 分析 $TICKER，搭配 ACT index 判讀」→ 三合一分析
+- 「跑 Serenity 週報」→ 依照 skills/serenity/weekly-screen.md 執行每週篩選器（重定價 + 觸發/否證 + 催化劑 + 新標的獵殺）；自動排程見 .github/workflows/serenity-weekly.yml（週六）
 
 新增分析模組時，在 `skills/` 下建新資料夾並寫 SKILL.md，然後在此處加一行載入路徑即可。
 
