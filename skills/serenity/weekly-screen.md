@@ -42,9 +42,20 @@
 ### Phase 5 — 輸出
 1. 寫 dated digest → `topics/business/serenity-weekly/YYYY-MM-DD.md`
 2. 更新 `skills/serenity/watchlist.md`（價格快照 + 任何觸發/降評/新增）
-3. 在 INDEX.md 加該週 digest 連結
-4. `git commit` + `git push`（branch: claude/kind-pascal-exyvz6）
-5. **通知使用者：完整 digest**
+3. **更新網站儀表板資料 `docs/serenity/data.json`**（結構化，餵 `docs/serenity/index.html`）——
+   欄位見下方 schema；`updated` 填當日、`headline` 一句話狀態、`macro` 五項燈號、
+   `positions` 全名單（tier/flag/現價/週變化/觸發/note）、`catalysts` 未來事件、`candidates` 新標的。
+   **重拉到的現價要填進每檔 `price` 與 `wk`（週變化）。** GitHub Pages 會自動部署到
+   `gutinganthony.github.io/KIWI/serenity/`。
+4. 在 INDEX.md 加該週 digest 連結
+5. `git commit` + `git push`（**merge/推到 main 才會觸發 Pages 部署**；日常 digest 可留分支，
+   但 `docs/serenity/data.json` 需進 main 網站才更新）
+6. **通知使用者：完整 digest**
+
+**`docs/serenity/data.json` schema**（維持既有欄位，逐週覆蓋值）：
+`updated` `as_of_note` `headline` · `macro[]{signal,state(ok/watch/alert),note}` ·
+`tiers[]{key,label,color}` · `positions[]{tier,ticker,name,market,mcap,fwd_pe,price,wk,direction,trigger,note}` ·
+`catalysts[]{date,event}` · `candidates[]{name,note}`
 
 ### Phase 6 — 宏觀共同前提監控（每週檢查，任一出現 → 整體降權提示）
 - AI capex 大廠（NVIDIA/Google/AWS/MSFT）公開下修指引
