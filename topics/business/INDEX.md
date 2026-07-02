@@ -30,3 +30,4 @@
 | 2026-06-10 | [AI 半導體終局 Part II — HBM/DRAM/NAND 到 2030 會不會重回週期（分析師驗證版）](./2026-06-10-memory-supercycle-2030-part2-analyst-review.md) | HBM, DRAM, NAND, memory-supercycle, cyclicality, CXMT, YMTC, agentic-AI, CPU, sk-hynix, micron, apacer, sandisk |
 | 2026-06-10 | [🗺️ 記憶體超級循環 — 一頁戰情圖（HBM/DRAM/NAND）](./2026-06-10-memory-supercycle-battle-map.md) | HBM, DRAM, NAND, memory-supercycle, battle-map, dashboard, sk-hynix, micron, apacer, sandisk, CXMT, serenity, position-sizing |
 | 2026-06-23 | [Julius Baer 2026 年中市場展望「From glut to grab」— 繁中摘要](./2026-06-23-julius-baer-midyear-2026-outlook-summary.md) | market-outlook, julius-baer, macro, equities, fixed-income, gold, oil, AI, memory, china, japan, allocation |
+| 2026-06-23 | [機構觀點（Julius Baer）vs KIWI 自有研究 — 對照表](./2026-06-23-institutional-vs-kiwi-view-comparison.md) | comparison, julius-baer, macro, AI-bubble, memory, fed, allocation, positioning, kiwi-view |
