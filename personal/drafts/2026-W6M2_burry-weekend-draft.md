@@ -102,7 +102,7 @@ Palantir 執行長 Karp 在 CNBC 罵的是 OpenAI 和 Anthropic 的 token 收費
 
 ## 〔草稿製作註記，發佈前刪除〕
 
-- 美光收盤：6/30 = 1,154.28（由 7/1 -10.57% 反推）、7/1 = 1,032.28、7/2 = 975.56（7/3 美股國慶補假休市）
+- 美光收盤：6/30 = 1,154.29（由 7/1 -10.57% 反推）、7/1 = 1,032.28、7/2 = 975.56（7/3 美股國慶補假休市）
 - Burry 各案例出處已存 2026-W6M2_burry-weekend-plan.md（Bloomberg/Citywire/markman）
 - Karp 嘲諷 Burry 的原話用詞未逐字查證，文中刻意寫「公開嘲諷過」不引原文
 - 「中位 ROIC 4%」出自 Burry Substack 的轉述報導（gurufocus/stocktwits）

@@ -48,7 +48,7 @@ axL.text(0, 1.045, "收盤價（美元）", transform=axL.transAxes,
          color=GREY, fontsize=9.5)
 
 x = [0, 1, 2]
-mu = [1154.28, 1032.28, 975.56]
+mu = [1154.29, 1032.28, 975.56]
 axL.plot(x, mu, color=RED, lw=2.0, marker='o', markersize=6,
          markerfacecolor=RED, markeredgecolor=BG, markeredgewidth=1.2, zorder=5)
 
@@ -59,7 +59,7 @@ axL.annotate("Burry 放空進場 1,051.87", xy=(1.35, 1051.87), xytext=(1.02, 10
              arrowprops=dict(arrowstyle='->', color=INK, lw=0.8))
 
 # 數據標籤（選擇性直標）
-axL.text(0, 1154.28 + 18, "1,154.28", ha='center', color=GREY, fontsize=9.5)
+axL.text(0, 1154.29 + 18, "1,154.29", ha='center', color=GREY, fontsize=9.5)
 axL.text(1, 1032.28 - 34, "1,032.28\n(-10.57%)", ha='center', color=RED, fontsize=9.5)
 axL.text(2.02, 975.56 - 34, "975.56\n(-5.49%)", ha='center', color=RED,
          fontsize=10, fontproperties=serif_b)
@@ -130,8 +130,6 @@ fig.text(0.052, 0.075,
          "合約價為 2026 年 5 月下半月均價漲幅；現貨為 7/2 14:40（GMT+8）盤中；美光 7/3 因美國國慶補假休市無交易。\n"
          "反映截至 02/07/26 的最新數據。過往表現並非當前及未來業績的可靠指標。",
          color=GREY, fontsize=7.8, linespacing=1.7, va='top')
-fig.text(0.965, 0.045, "摸魚記", color=GOLD, fontsize=15,
-         fontproperties=serif_b, ha='right')
 
 out = '/home/user/KIWI/personal/drafts/W6M2-chart-burry.png'
 plt.savefig(out, dpi=170, facecolor=BG)
