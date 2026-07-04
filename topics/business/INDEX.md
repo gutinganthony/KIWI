@@ -20,3 +20,4 @@
 | 2026-06-02 | [AI 投資研究副駕駛 — 可測試假設 + 客戶訪談訪綱（Idea 階段）](./2026-06-02-ai-investment-copilot-hypothesis.md) | startup, investment, AI-copilot, AVI, hypothesis, customer-discovery, founders-playbook, idea-stage |
 | 2026-06-03 | [Redefine Fund — Jake × Vince 共同基金專案（策略 + 結構 + Action Plan + 模板）](./2026-06-03-redefine-fund-project.md) | startup, fund, EAM, semiconductor, AI, redefine, fundraising, partnership, action-plan |
 | 2026-06-26 | [個人壟斷飛輪 — L1/L2/L3 三層變現 + B2B 授權完整行動計畫](./2026-06-26-personal-monopoly-flywheel-action-plan.md) | strategy, monetization, personal-monopoly, flywheel, AVI, serenity, newsletter, subscription, fund, B2B, licensing, action-plan |
+| 2026-07-04 | [Jake as a Product — 產品經理視角的個人優化藍圖](./2026-07-04-jake-as-a-product-blueprint.md) | strategy, personal-development, product-thinking, moat, risk-management, career, happiness, long-term |
