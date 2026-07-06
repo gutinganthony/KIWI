@@ -30,11 +30,14 @@ Use ~/.claude/skills/gstack/... for gstack file paths (the global path).
 2. `skills/serenity/SKILL.md` — Serenity 供應鏈瓶頸選股框架
 3. `skills/serenity/watchlist.md` — Serenity 現役觀察名單（7 檔觸發條件 + 否證條件）
 4. `skills/wavetrend/SKILL.md` — WaveTrend Oscillator 技術分析框架
+5. `skills/socialarb/SKILL.md` — 社會套利觸發訊號框架（Chris Camillo 邏輯：資訊差 + 三閘門）
+6. `skills/socialarb/watchlist.md` — 社會套利現役訊號名單（三閘門 + 觸發/否證）
 
 載入後，使用者可以直接說：
 - 「用 Serenity 框架分析 $TICKER」→ 依照 skills/serenity/SKILL.md 執行完整分析
 - 「用 WaveTrend 分析 $TICKER」→ 依照 skills/wavetrend/SKILL.md 執行技術分析
 - 「用 Serenity + WaveTrend 分析 $TICKER，搭配 ACT index 判讀」→ 三合一分析
+- 「用社會套利框架分析 $TICKER」或「我觀察到 XX 現象，跑社會套利三閘門」→ 依照 skills/socialarb/SKILL.md 執行（消費性需求端突發異常；B2B 上游則移交 Serenity）
 - 「跑 Serenity 週報」→ 依照 skills/serenity/weekly-screen.md 執行每週篩選器（重定價 + 觸發/否證 + 催化劑 + 新標的獵殺）；自動排程見 .github/workflows/serenity-weekly.yml（週六）
 
 新增分析模組時，在 `skills/` 下建新資料夾並寫 SKILL.md，然後在此處加一行載入路徑即可。
