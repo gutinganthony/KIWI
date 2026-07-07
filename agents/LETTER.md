@@ -20,7 +20,7 @@ KIWI 的分析產出（Serenity、WaveTrend、ACT 判讀、週報）會影響實
 
 ### 2. 自動化管線會靜默腐爛——接分析任務前先花 30 秒驗資料新鮮度
 
-每日 dashboard 更新、每日 Telegram/LINE 警報、每週六 Serenity 週報都是無人看管的
+每日 dashboard 更新、平日與週六的 Telegram/LINE 警報、每週六 Serenity 週報都是無人看管的
 GitHub Actions。API 金鑰過期、資料源改版、上游欄位改名，都會讓 dashboard 靜默停更
 或顯示舊資料——而使用者可能每天在看它做決定。
 
