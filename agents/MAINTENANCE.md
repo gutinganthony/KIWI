@@ -23,7 +23,7 @@
 - `.claude/agents/*.md`（verifier/applier 的 frontmatter 與正文）。
 - `.claude/settings.json`、`.claude/hooks/`、`.github/workflows/`。
 
-**永远不改（唯讀歷史文件）**：
+**永遠不改（唯讀歷史文件）**：
 
 - `agents/backups/` 內所有檔案。
 - `agents/DIAGNOSIS.md`、`agents/LETTER.md` —— 只允許在文末追加「後記：[日期] …」，不允許改動原文。
@@ -34,7 +34,9 @@
 2. 修改。
 3. read-back：用 Read 把改動段落讀回來，逐字核對。
 4. 自問一個具體場景：「Haiku 等級的模型讀到這段，會不會做錯？」有疑慮就改到沒有歧義。
-5. commit（訊息用 `docs(agents): ...` 前綴）＋ push，確認 push 輸出成功。
+5. commit（訊息用 `docs(agents): ...` 前綴）＋ push **到目前工作分支**，確認 push 輸出成功。
+   若目前在 main：LEARNINGS 條目與配方類事實校正可直接 push（視同既有授權）；
+   其他制度檔改動先開分支，或按 agents/JUDGMENT.md §3 問使用者。
 
 ## §3 教訓回寫格式（agents/LEARNINGS.md）
 

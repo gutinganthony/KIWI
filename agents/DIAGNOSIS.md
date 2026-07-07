@@ -36,8 +36,8 @@
 
 | 檔案 | 大小 | 內容 |
 |---|---|---|
-| saved_collections.json | 2.5 MB | FB 收藏。array，每筆 ~1.6KB：`{fbid, label_values:[{label,value,href}], media, timestamp}` |
-| saved_posts.json | 1.0 MB | 同結構 |
+| saved_collections.json | 2.5 MB | FB 收藏合輯。只有 5 筆但單筆可達 1.4MB，label_values 結構異質（詳見 DISPATCH §5） |
+| saved_posts.json | 1.0 MB | FB 收藏貼文。array，每筆 ~1.6KB：`{fbid, label_values:[{label,value,href}], media, timestamp}`；內文為 mojibake 編碼（中文搜尋需先轉換，見 DISPATCH §5） |
 | docs/index.html | 115 KB | dashboard 網頁原始碼 |
 | docs/history.json | 35 KB | ACT 指數歷史，平行陣列 `{d:日期, a:AVI, c:CRI, t:TSI}` |
 
