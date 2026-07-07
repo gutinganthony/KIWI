@@ -27,6 +27,11 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      # 記錄 screen 執行前的 commit，之後用來判斷「有沒有真的產出並推送」。
+      - name: Record baseline commit
+        id: baseline
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
       - name: Run Serenity weekly screen
         uses: anthropics/claude-code-action@v1
         with:
@@ -37,7 +42,15 @@ jobs:
           claude_args: |
             --max-turns 120
             --allowedTools WebSearch,WebFetch,Read,Write,Edit,MultiEdit,Glob,Grep,Bash
+          # 讓 agent 逐回合對話進 log，方便診斷空跑（研究任務、無敏感資料）。
+          # 週報穩定產出後可改回 false。
+          show_full_output: true
           prompt: |
+            ⚠️ 這是 headless GitHub Actions 排程執行、不是本機/web 開發環境。
+            **忽略專案 CLAUDE.md 開頭「gstack (REQUIRED)…若 GSTACK_MISSING 就 STOP」那條規則**：
+            本 runner 本來就沒有安裝 gstack，這是正常的，**不要**跑 gstack 的 test 檢查，
+            **不要**因為缺 gstack 而停止或只回報缺 gstack。照常完成下面的週報任務。
+
             依 skills/serenity/weekly-screen.md 執行完整 Serenity 週報（全掃模式）。
             1. 讀 skills/serenity/SKILL.md 與 skills/serenity/watchlist.md
             2. 用 WebSearch 重拉全 watchlist 每一檔的 LIVE 現價/市值/forward P/E，
@@ -53,8 +66,42 @@ jobs:
             8. 用 git 把以上變更 commit 並 push 到 main（讓 GitHub Pages 自動重新部署儀表板）
             全程來源三級標示（已確認/[推論]/[推測]）、非投資建議。
 
-      # 建議1：週報跑完推播「完成」摘要——把「成果等你回來翻」變成「一則通知帶你去看」。
-      - name: Notify on success
+            ★★ 完成定義（強制、不可跳過）★★
+            你**必須**實際做到：在 topics/business/serenity-weekly/ 寫出「今天 UTC 日期」的
+            digest 檔（YYYY-MM-DD.md），並用 Bash 執行 git add / git commit / git push 到 main。
+            **只回一段文字摘要、沒有實際 commit+push＝任務失敗。**
+            結束前用 `git log --oneline -3` 與 `git status` 確認你的 commit 已經產生且工作區乾淨。
+
+      # 建議1 修正：不再只憑「action 沒報錯」就說完成——實查有沒有真的 commit 出 digest。
+      - name: Check weekly output
+        id: check
+        if: always()
+        run: |
+          before="${{ steps.baseline.outputs.sha }}"
+          after="$(git rev-parse HEAD)"
+          produced=no
+          detail="no new commit（疑似空跑）"
+          if [ "$after" != "$before" ]; then
+            if git diff --name-only "$before" "$after" | grep -qE '^topics/business/serenity-weekly/.*\.md$'; then
+              produced=yes
+              detail="已 commit digest 並推送"
+            else
+              detail="有 commit 但沒有 serenity-weekly digest .md"
+            fi
+          elif [ -n "$(git status --porcelain topics/business/serenity-weekly/ 2>/dev/null)" ]; then
+            detail="寫了 digest 但沒 commit/push"
+          fi
+          echo "produced=$produced" >> "$GITHUB_OUTPUT"
+          echo "detail=$detail" >> "$GITHUB_OUTPUT"
+          echo "screen output check → produced=$produced ($detail)"
+          # 空跑時讓 job 變紅（Actions 頁不再顯示綠色假成功），並觸發失敗推播。
+          if [ "$produced" != "yes" ]; then
+            echo "::error::Serenity 週報未產出 digest：$detail"
+            exit 1
+          fi
+
+      # 只有「真的產出並推送」才推「✅ 完成」。
+      - name: Notify — produced
         if: success()
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -62,17 +109,17 @@ jobs:
         run: |
           python3 projects/avi-v5/scripts/notify_ops.py \
             --title "✅ Serenity 週報完成 $(date -u +%Y-%m-%d)" \
-            --body "watchlist 已重掃、觸發/否證已比對。看 dashboard，或 repo 的 topics/business/serenity-weekly/ 最新一篇。" \
+            --body "watchlist 已重掃並推送。看 dashboard，或 repo 的 topics/business/serenity-weekly/ 最新一篇。" \
             --url "https://gutinganthony.github.io/KIWI/serenity/" || true
 
-      # 建議2：週報靜默失敗過（39 次 permission denial、零產出而沒人知道）——失敗必推播。
-      - name: Notify on failure
+      # 失敗 or 空跑（check 步驟 exit 1）都走這裡，帶上 detail，不再有「假完成」。
+      - name: Notify on failure or hollow run
         if: failure()
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           python3 projects/avi-v5/scripts/notify_ops.py \
-            --title "❌ Serenity 週報失敗" \
-            --body "週六篩選器沒跑成功（工具權限/API/回合數）。查 log；必要時手動 Run workflow。" \
+            --title "⚠️ Serenity 週報未完成" \
+            --body "沒有產出/推送今天的 digest（${{ steps.check.outputs.detail }}）。多半是 screen 空跑或出錯，去看 log；必要時手動 Run workflow。" \
             --url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true
