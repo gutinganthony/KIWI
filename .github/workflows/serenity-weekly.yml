@@ -52,3 +52,27 @@ jobs:
                更新 skills/serenity/watchlist.md 價格快照；在 INDEX.md 加連結
             8. 用 git 把以上變更 commit 並 push 到 main（讓 GitHub Pages 自動重新部署儀表板）
             全程來源三級標示（已確認/[推論]/[推測]）、非投資建議。
+
+      # 建議1：週報跑完推播「完成」摘要——把「成果等你回來翻」變成「一則通知帶你去看」。
+      - name: Notify on success
+        if: success()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python3 projects/avi-v5/scripts/notify_ops.py \
+            --title "✅ Serenity 週報完成 $(date -u +%Y-%m-%d)" \
+            --body "watchlist 已重掃、觸發/否證已比對。看 dashboard，或 repo 的 topics/business/serenity-weekly/ 最新一篇。" \
+            --url "https://gutinganthony.github.io/KIWI/serenity/" || true
+
+      # 建議2：週報靜默失敗過（39 次 permission denial、零產出而沒人知道）——失敗必推播。
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python3 projects/avi-v5/scripts/notify_ops.py \
+            --title "❌ Serenity 週報失敗" \
+            --body "週六篩選器沒跑成功（工具權限/API/回合數）。查 log；必要時手動 Run workflow。" \
+            --url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true
