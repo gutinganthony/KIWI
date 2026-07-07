@@ -55,3 +55,15 @@ jobs:
             git commit -m "auto: update dashboard data $(date -u +%Y-%m-%d)"
             git push
           fi
+
+      # 資料抓取/計算失敗（如 6/26 numpy 凍結、SPX NaN）時推播，避免 dashboard 靜默凍結。
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python3 projects/avi-v5/scripts/notify_ops.py \
+            --title "❌ KIWI Dashboard 更新失敗" \
+            --body "資料抓取或計算出錯，dashboard 可能停在舊數據。查 log 找原因。" \
+            --url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true
