@@ -6,7 +6,7 @@ last_updated: 2026-06-15
 topic: business
 tags: [mental-model, talent, fund, partnership, elon-musk, sequoia, calibrated-eye, collective, vince-liu, redefine-fund]
 source: Vince Liu 推薦；NotebookLM 製作簡報，基於 Shaun Maguire（Sequoia Capital 合夥人）受訪內容
-related: [./2026-06-03-redefine-fund-project.md]
+related: [./2026-06-03-redefine-fund-project.md, ./2026-06-15-precedent-engineering-jake.md]
 ---
 
 > **核心問題**：一個人怎麼可能同時打造多家改變世界的公司（SpaceX, Tesla, Boring Company）？這是「規模與執行」的異常現象，光靠「努力」解釋不了。
