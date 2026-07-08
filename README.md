@@ -16,7 +16,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 
 | Topic | Entries |
 |-------|---------|
-| [Technology](./topics/technology/INDEX.md) | 2 |
+| [Technology](./topics/technology/INDEX.md) | 5 |
 | [Science](./topics/science/INDEX.md) | 0 |
 | [Business](./topics/business/INDEX.md) | 17 |
 | [Health](./topics/health/INDEX.md) | 0 |
@@ -32,11 +32,11 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-07-08 | [Claude Code 使用行為分析 × 高效使用者對照 × 升級計畫](./topics/technology/2026-07-08-claude-code-usage-analysis-upgrade-plan.md) | Technology |
 | 2026-06-03 | [Redefine Fund — Jake × Vince 共同基金專案](./topics/business/2026-06-03-redefine-fund-project.md) | Business |
 | 2026-06-02 | [AI 投資研究副駕駛 — 可測試假設 + 客戶訪談訪綱](./topics/business/2026-06-02-ai-investment-copilot-hypothesis.md) | Business |
 | 2026-05-29 | [Serenity Chokepoint 三市場隱藏壟斷供應商掃描](./topics/business/2026-05-29-serenity-chokepoint-three-market-scan.md) | Business |
 | 2026-04-21 | [KIWI Sleep — 睡眠修復創業策略](./topics/business/2026-04-21-sleep-startup-strategy.md) | Business |
-| 2026-04-20 | [AVI V4 — IG + Threads 社群發文素材庫](./topics/business/2026-04-20-avi-v4-social-posts.md) | Business |
 <!-- RECENT_ENTRIES_END -->
 
 ---
@@ -56,6 +56,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-04-14 | [芋泥 Yuni — 行銷啟動計畫](./topics/business/2026-04-14-yuni-launch-campaign.md) | Business |
 | 2026-04-17 | [芋泥 Yuni — 行銷執行素材庫](./topics/business/2026-04-17-yuni-marketing-execution.md) | Business |
 | 2026-04-20 | [AVI V4 — 美股市場風險指標](./topics/business/2026-04-20-avi-v4-market-risk-index.md) | Business |
+| 2026-07-08 | [Claude Code 使用行為分析 × 高效使用者對照 × 升級計畫](./topics/technology/2026-07-08-claude-code-usage-analysis-upgrade-plan.md) | Technology |
 <!-- ALL_ENTRIES_END -->
 
 ---
