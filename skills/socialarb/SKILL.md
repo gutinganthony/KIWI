@@ -37,6 +37,8 @@ Camillo 的績效由 Jack Schwager 在《Unknown Market Wizards》查核過（20
 - 公司市值夠小、單一產品能動搖營收嗎？
 - 不適用（B2B、大型股、生技）→ 直接說「這不是社會套利的射程」，若指向供應鏈上游則移交 Serenity，不強套框架。
 
+> **主題 ≠ 訊號**：若用戶給的是宏觀趨勢（「大家開始注意 X」）而非具體急性異常，先判斷這是**慢變數 megatrend** 還是**急性 spike**。megatrend 通常閘門 2 主題層級已破（公開共識），且純受惠者常為私人公司（無 ticker）→ 不進場，改記入 watchlist 的「主題掃描筆記」，並定義「要等哪個收斂後的急性訊號才回來跑三閘門」。收斂方向：某上市品牌單一新品急性缺貨且股價未動、私人純玩家 IPO/被併（event-driven）、單一事件引爆單一 SKU 搶購。
+
 ### Step 2：訊號來源分類（六類，標明訊號的「原生地」）
 1. **社群聲量異常**：TikTok 標籤、YouTube 開箱、Reddit 討論串、X 話題、Google Trends 斜率突變
 2. **實體通路異常**：缺貨、排隊、貨架空間變化（Camillo 的 Snapple 賣權、Elmer's 膠水原型）
