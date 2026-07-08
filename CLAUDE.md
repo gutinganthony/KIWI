@@ -22,6 +22,13 @@ Using gstack skills: After install, skills like /qa, /ship, /review, /investigat
 and /browse are available. Use /browse for all web browsing.
 Use ~/.claude/skills/gstack/... for gstack file paths (the global path).
 
+## Data Accuracy（摸魚記文章鐵律）
+
+- 所有市場數據（指數、個股價、VIX、報價）發佈前必須對公開來源查證；WebFetch 失敗就明講並請 Jake 確認，絕不憑記憶填數字。
+- **事件日期必須對官方行事曆查證**：財報日（去公司 IR 頁確認，注意會計年度：美光 FQ 結束於 2/5/8/11 月底、財報約在其後一個月）、FOMC（約六週一次）、CPI（隔月中旬）。不要從新聞標題反推事件——2026/7 曾因誤讀「Micron could fall after July 10」把 SKHY 掛牌日錯寫成美光財報日，錯誤進了兩篇已發佈文章。
+- 範圍限定詞不可省略：說「唯一」「第一」前先窮舉反例（例：美股記憶體標的除美光還有 SanDisk/威騰；HSBC 35% 溢價統計限定「DRAM 純標的」）。
+- 查不到的數字標〔待補〕留白，寧可晚發不編數字。
+
 ## Skill routing
 
 When the user's request matches an available skill, invoke it via the Skill tool. When in doubt, invoke the skill.
