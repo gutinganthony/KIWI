@@ -1,0 +1,43 @@
+# 摸魚記 內容日曆（living document）
+
+> 最後更新：2026-07-09
+> 這是唯一的排程總表。所有選題決定都更新在這裡，其他檔案只放素材與草稿。
+> 檔案位置：repo 分支 `claude/evaluate-business-opportunities-mJXMo` → `personal/content-calendar.md`
+
+---
+
+## 已發佈（連載脈絡）
+
+| 日期 | 篇名 | 主軸 |
+|------|------|------|
+| 6/26 | W5S2 台股抄底儀表板 | 四盞燈、快層慢層、旋鈕 |
+| 7/2 | W6M 崩的是股價還是記憶體 | 記憶體五盞燈、股價 vs 報價 |
+| 7/4 | W6M2 Burry 押紅燈我押綠燈 | Burry 戰績、Karp 三鏈 |
+| 7/9 | W7 海力士為什麼現在來美股 | ADR＝擴產軍費、BI 報告、HBM 十年 30 倍 |
+
+## 排程中
+
+| 檔期 | 內容 | 狀態與素材 |
+|------|------|-----------|
+| **7/12–13（週末）** | **SKHY 掛牌首日復盤**（形式視戲劇性：平淡→Notes 2-3 則；戲劇性→800 字番外） | ✅ Jake 拍板。素材：Kenji roadshow（1.779 億 ADS × $158.14 = $281.33 億，定價比初版下修 4%）＋**大叔美股 MU FQ3 podcast**（「由價格而非數量驅動的超級循環」，Jake 指定加入）＋App Economy「AI Broke the Cycle」對手觀點。**等 Jake 提供首日開盤/收盤價** |
+| **7 月中（CPI 落地後）** | **W6 三關驗證正篇**（台積電除息＋CPI＋Fed 事件） | 劇本：`drafts/2026-W6_signal-tracking-playbook.md`（決策樹已寫死）。**新增：capitalcycle〈灰色地帶〉入總經段**（美元三段論：短期被動寬鬆／中期政策風險／長期 American exceptionalism 重新定價，Jake 拍板） |
+| **W8** | **1999 持倉指南**（泡沫裡的人怎麼活），吸收「AI broke the cycle?」命題 | 研究檔：`research/bubble-1999-survival-research.md`（Robertson 20 天、三種策略下場）。缺：Nasdaq 200 日線回測（我可寫 Python 算） |
+| **W9** | **國安基金九場戰役** | 研究檔：`research/nsf-nine-battles-research.md`（出手線 -25%~-44%、唯一敗仗）。缺：第 1–3 役精確指數 TWSE 核實 |
+| **W10** | **「輝達之外，錢正在流向誰」ASIC 定制晶片** | ✅ Jake 拍板。素材：Kenji Marvell 10 倍股三部曲＋BI 報告（ASIC 份額 2030 至 45–50%、GPU+ASIC 出貨 800 萬→2,800 萬顆、台積電 AI 訂單占比 90%+）。動工前需做定制晶片賽道研究（博通/Marvell/世芯/創意） |
+
+## 彈藥庫（未排期，遇事件觸發）
+
+| 主題 | 觸發條件 | 素材位置 |
+|------|---------|---------|
+| 日圓：全世界最誠實的恐慌計 | 日股/日圓大波動 | W7 選題檔 B2 |
+| 名人訊號學 | 下一個名人喊單事件 | W6M2 plan（Burry 戰績表可複用）|
+| 當國家隊變成公司隊（三星 90 兆） | 三星財報週 | W5S2 素材 |
+| SpaceX IPO 一個月後（驗證回顧） | 靜默期結束/解禁日 | W2 草稿＋Barchart 線索 |
+| AI 光通訊（Coherent/Lumentum） | 光通訊財報/大單新聞 | 大叔 podcast 兩集 |
+| 稀缺性溢價完整版（Tesla/Coupang/Arm 三種下場） | TSM ADR 溢價再創極值時 | `research/scarcity-premium-research.md`（W7 v1 未用素材）|
+
+## 固定節奏提醒
+
+- 每月底：DRAM 合約價更新（DRAMeXchange）→ 記憶體儀表板①號燈月檢
+- 每週三/五：Notes 發文（成稿庫 `distribution/notes-ready-2026-07.md`）
+- 出刊後 1 小時：Notes 鉤子；出刊後私訊名單 5–10 人（growth plan）
