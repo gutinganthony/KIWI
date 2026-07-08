@@ -224,4 +224,5 @@ Phase 5 🔍 (完全未被發現)
 
 ## Update Log
 
+- 2026-06-10 v1.1: **排名已被 SemiAnalysis《Scaling with Light》CPO 報告更新** — AAOI 降級出榜(scale-up CPO 結構威脅)、ACON 升 23/30、新增上詮3363/波若威3163/采鈺6789、PLAB/ITEQ/Fujimi 等不受影響。最新 Top 10 見 `2026-06-10-silicon-photonics-cpo-optical-report-analysis.md` §9.5。
 - 2026-05-29 v1.0: Initial entry — 完整三市場掃描 + 機構輪動地圖 + 45支候選標的

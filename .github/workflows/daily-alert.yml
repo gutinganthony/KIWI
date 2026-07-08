@@ -24,3 +24,16 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
         run: python projects/avi-v5/scripts/notify.py
+
+      # 每日預警本身失敗時（如 dashboard 資料缺、通道故障）補一則 ops 推播。
+      # 注意：若是通道整個掛掉，這則也可能發不出去，但常見情況是單一通道故障，值得一試。
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python3 projects/avi-v5/scripts/notify_ops.py \
+            --title "❌ KIWI 每日預警發送失敗" \
+            --body "notify.py 執行失敗，今天的市場體溫可能沒發出去。查 log。" \
+            --url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true

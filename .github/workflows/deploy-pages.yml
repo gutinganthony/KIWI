@@ -48,3 +48,16 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      # Pages 後端偶爾回「Deployment failed, try again later」(非程式問題)。
+      # 失敗時推播到 Telegram，讓 Jake 直接去按 Re-run，而不是自己發現網站沒更新。
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python3 projects/avi-v5/scripts/notify_ops.py \
+            --title "❌ KIWI Pages 部署失敗" \
+            --body "Dashboard 沒更新到線上。多半是 Pages 後端暫時性錯誤 → 去 Actions 按 Re-run failed jobs。" \
+            --url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true
