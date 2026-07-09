@@ -9,6 +9,16 @@
 
 ---
 
+## 🟣 我的持倉追蹤（實際持有，非 Serenity 候選；週報需重拉並保留於 data.json 的 `holding` 層）
+
+| 標的 | 類型 | 現價/註記 | 賣訊監控 |
+|---|---|---|---|
+| **DRAM**（Roundhill Memory ETF）| 記憶體週期籃子（73% Samsung/SKH/Micron + Kioxia/SanDisk/WD/Nanya/Winbond）| ~$62（NAV $59.8）、AUM $24.6B、ER 0.65%、2026 +100%。**2026-07-09 由 AAOI 全數換入**（成本~$170→出~$108，實現~-36%）| DRAM 合約價季轉跌 / 量價背離 / CXMT DDR5 擴產+實體清單 / hyperscaler capex 下修（＝上方「記憶體週期」宏觀燈號）|
+
+> 單一股風險已消除，但為**純記憶體週期曝險**、與直接持有的 MU 重疊、且買在合約價漲幅收斂（3Q26 +13–18% vs 1Q26 +81%）的早期轉折上。**週報 Phase 1 需重拉 DRAM 現價、Phase 5 需以 `holding` 層寫回 data.json（勿與 Serenity 候選混淆）。**
+
+---
+
 ## 現況總表
 
 | 排序 | 標的 | 市場 | 市值（深掘時） | 方向 | 狀態 | 上次更新 |
