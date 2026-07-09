@@ -44,11 +44,19 @@ jobs:
         working-directory: projects/avi-v5
         run: python scripts/fetch_taiwan.py
 
+      # 回測延伸資料橋：雲端 Claude 容器抓不到 yfinance/FRED/stooq，
+      # 由本 job 每 ~6 天更新一次 data/ext/（SPY/QQQ/HYG/SMH/VVIX, 2019→今），
+      # 供研究 session 直接 git pull 取得現代樣本。best-effort，永不擋 dashboard。
+      - name: Fetch backtest extension data (weekly, best-effort)
+        working-directory: projects/avi-v5
+        run: python scripts/fetch_backtest_ext.py || true
+
       - name: Commit and push if changed
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/index.html docs/taiwan_data.json docs/history.json
+          git add projects/avi-v5/data/ext/*.csv 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
