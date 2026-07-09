@@ -35,7 +35,7 @@ last_updated: 2026-07-06
   - 三項全過 → JEM 首批建倉區 ¥6,400–6,800 紀律恢復有效（第二關 8/7 Q1 財報再定第二批）。
 
 ### 2026-07-07 session 產生的（AXW/AIR TRF 研究）
-- [ ] **AIR TRF 真實利差數據探路**：在 Mac 上試 yfinance/券商終端有無 ASR（S&P 500 AIR TRF）連續合約價；沒有的話看 CME 每日 settlement 頁能否腳本化抓取（今後累積序列）；評估 DataMine `cme.air` 是否值得買。→ 用途：驗證 `lev_stress_proxy` 與真品的相關性（報告 §8 否證條件 ②）。
+- [ ] **AIR TRF 真實利差序列建檔（文獻查證：DataMine 有免費日檔！）**：註冊 CME DataMine → 拉 AIR TRF 免費 CSV（欄位 `DLY_FUND` FID#10335、`ACC_FUND` #10337）→ 建歷史序列存進 `projects/avi-v5/data/ext/air_trf.csv` → 跑與 `lev_stress_proxy` 的相關性（報告 §8 否證 ②）。備用免費儀表板：snippet.finance「S&P 500 Futures Financing」（2012 迄今）。每週順手記一次 CME 產品頁的近月 bps 與分位數。
 
 ---
 
