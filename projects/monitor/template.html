@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>聰明錢系統監控</title>
+<style>
+/* ── 色彩：dataviz 參考調色盤（validate_palette.js 驗證通過） ───────────── */
+:root{
+  --page:#f9f9f7; --surface:#fcfcfb;
+  --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,.10);
+  --accent:#2a78d6;
+  --pos:#008300; --neg:#e34948;            /* 月度 PnL 極性（marks） */
+  --pos-text:#006300; --neg-text:#d03b3b;  /* 極性文字 */
+  --st-good:#0ca30c; --st-warn:#fab219; --st-crit:#d03b3b; /* 狀態燈（固定） */
+  --f1:#86b6ef; --f2:#5598e7; --f3:#2a78d6; --f4:#1c5cab;  /* 漏斗序級藍 */
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --page:#0d0d0d; --surface:#1a1a19;
+    --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10);
+    --accent:#3987e5;
+    --pos:#008300; --neg:#e66767;
+    --pos-text:#0ca30c; --neg-text:#e66767;
+    --f1:#6da7ec; --f2:#3987e5; --f3:#256abf; --f4:#184f95;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--page);color:var(--ink);
+  font:15px/1.55 system-ui,-apple-system,"Segoe UI","Noto Sans TC",sans-serif;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 48px}
+a{color:var(--accent)}
+h1{font-size:24px;margin:0 0 2px}
+h2{font-size:18px;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+h2 .no{display:inline-flex;align-items:center;justify-content:center;
+  min-width:22px;height:22px;border-radius:6px;background:var(--accent);
+  color:#fff;font-size:13px;font-weight:600}
+h3{font-size:14px;margin:18px 0 8px;color:var(--ink2)}
+section{margin-top:22px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px}
+.stamp{color:var(--ink2);font-size:13px}
+.disclaimer{color:var(--muted);font-size:12px;margin-top:4px}
+.placeholder{border:1px dashed var(--axis);border-radius:10px;padding:22px;
+  text-align:center;color:var(--muted);background:var(--surface)}
+.note{color:var(--muted);font-size:12px;margin-top:8px}
+.small{font-size:12px;color:var(--ink2)}
+.mono{font-variant-numeric:tabular-nums}
+.addr{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:var(--ink2);word-break:break-all}
+
+/* 證據閘門記分板 */
+.gates{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:8px}
+.gate{border:1px solid var(--border);border-radius:8px;padding:8px 10px;background:var(--surface)}
+.gate .g-head{font-weight:600;font-size:13px;display:flex;gap:6px;align-items:center}
+.gate .g-detail{font-size:12px;color:var(--ink2);margin-top:2px}
+
+/* 指標卡（stat tiles） */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:8px}
+.tile{border:1px solid var(--border);border-radius:8px;padding:10px 12px;background:var(--surface)}
+.tile .t-label{font-size:12px;color:var(--ink2)}
+.tile .t-value{font-size:21px;font-weight:600;margin-top:2px}
+.tile .t-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.t-value.up{color:var(--pos-text)} .t-value.down{color:var(--neg-text)}
+
+/* 表格 */
+.table-scroll{overflow-x:auto;margin-top:8px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{color:var(--muted);font-weight:500;text-align:left;padding:6px 10px;
+  border-bottom:1px solid var(--grid);white-space:nowrap}
+td{padding:6px 10px;border-bottom:1px solid var(--grid);white-space:nowrap}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:none}
+
+/* 月度 PnL 圖 */
+.chart-box{position:relative;margin-top:8px}
+.chart-scroll{overflow-x:auto}
+.chart-box svg{display:block}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--ink2);margin-top:6px;flex-wrap:wrap}
+.legend .key{display:inline-flex;align-items:center;gap:6px}
+.legend .key i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.tooltip{position:absolute;pointer-events:none;background:var(--surface);color:var(--ink);
+  border:1px solid var(--border);border-radius:6px;padding:5px 9px;font-size:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);display:none;z-index:5;white-space:nowrap}
+details.dtable{margin-top:8px;font-size:12px;color:var(--ink2)}
+details.dtable summary{cursor:pointer;color:var(--muted)}
+
+/* 漏斗流程圖 */
+.flow{display:flex;flex-direction:column;gap:0;margin-top:8px}
+.layer{border:1px solid var(--border);border-left:4px solid var(--accent);
+  border-radius:8px;padding:10px 14px;background:var(--surface)}
+.layer .l-title{font-weight:600;font-size:13px}
+.layer .l-badge{display:inline-block;font-size:11px;color:var(--ink2);
+  border:1px solid var(--axis);border-radius:99px;padding:0 8px;margin-left:8px}
+.layer ul{margin:6px 0 0;padding-left:18px;font-size:13px;color:var(--ink2)}
+.layer li{margin:2px 0}
+.stars{color:var(--muted);letter-spacing:1px;white-space:nowrap}
+.flow-arrow{text-align:center;color:var(--muted);font-size:13px;line-height:1.6}
+
+/* 漏斗計數條（序級藍 ramp，直接標示計數） */
+.fbars{margin-top:10px;display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center}
+.fbars .fb-label{font-size:12px;color:var(--ink2);white-space:nowrap}
+.fbars .fb-track{height:16px;position:relative}
+.fbars .fb-bar{height:16px;border-radius:0 4px 4px 0;min-width:3px}
+.fbars .fb-count{font-size:12px;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+
+/* 系統狀態燈：色點＋文字標籤（不靠顏色單獨傳達） */
+.dot{display:inline-block;width:10px;height:10px;border-radius:99px;margin-right:6px;vertical-align:baseline}
+.st-good .dot{background:var(--st-good)} .st-warn .dot{background:var(--st-warn)}
+.st-crit .dot{background:var(--st-crit)} .st-miss .dot{background:var(--st-crit)}
+.st-label{font-size:13px;white-space:nowrap}
+
+footer{margin-top:32px;color:var(--muted);font-size:12px;border-top:1px solid var(--grid);padding-top:12px}
+@media (max-width:640px){
+  .wrap{padding:14px 10px 40px}
+  h1{font-size:20px}
+  .tiles{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>聰明錢系統監控</h1>
+  <div class="stamp">產生時間：<span id="generated-at">—</span></div>
+  <div class="disclaimer">純唯讀觀察・所有數據為公開鏈上/公開申報資料的時點快照・非投資建議。</div>
+</header>
+
+<section id="sec-hl">
+  <h2><span class="no">1</span>HL 持續贏家追蹤（Hyperliquid）</h2>
+  <div class="card" id="hl-body">
+    <noscript><p>本頁需要 JavaScript 渲染數據。</p></noscript>
+  </div>
+</section>
+
+<section id="sec-us">
+  <h2><span class="no">2</span>美股 Form 4 漏斗</h2>
+  <div class="card">
+    <h3 style="margin-top:0">方法論：三層漏斗（負面硬關卡＋正面等權評分）</h3>
+    <div class="flow">
+      <div class="layer" style="border-left-color:var(--f2)">
+        <div class="l-title">第一層｜事件資格關卡<span class="l-badge">進場券</span></div>
+        <ul>
+          <li>Form 4 自主買入（排除 10b5-1 計畫單）＋ 7 日內 ≥2 名內部人集群 <span class="stars">★★★</span></li>
+          <li>申報人含 opportunistic 型（排除規律交易的 routine 型） <span class="stars">★★★</span></li>
+        </ul>
+      </div>
+      <div class="flow-arrow">▼</div>
+      <div class="layer" style="border-left-color:var(--f3)">
+        <div class="l-title">第二層｜否決關卡<span class="l-badge">一票否決</span></div>
+        <ul>
+          <li>可交易性：日均量下限（保留小市值 alpha 帶）</li>
+          <li>操縱/災難紅旗：M-Score 級操縱嫌疑、退市/訴訟窗口</li>
+          <li>內部人同窗口大額賣出對沖（訊號自相矛盾）</li>
+        </ul>
+      </div>
+      <div class="flow-arrow">▼</div>
+      <div class="layer" style="border-left-color:var(--f4)">
+        <div class="l-title">第三層｜等權評分排名取前 N<span class="l-badge">0–2 分等權加總</span></div>
+        <ul>
+          <li>集群人數與金額佔薪酬比 <span class="stars">★★★</span></li>
+          <li>買方職位：CFO/高管 &gt; 董事 <span class="stars">★★</span></li>
+          <li>市值帶：微型/小型 &gt; 中大型 <span class="stars">★★</span></li>
+          <li>13F 慢錢共振（低週轉價值型管理人同時持有） <span class="stars">★★</span></li>
+          <li>買入相對股價位置（下跌後買入 &gt; 高位加碼） <span class="stars">★</span></li>
+          <li>持有模式：慢跟 1–12 個月、限價分批</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note">掃描排程：每日 UTC 03:30（美東申報日結束後）。</div>
+    <div id="us-data"></div>
+  </div>
+</section>
+
+<section id="sec-tw">
+  <h2><span class="no">3</span>台股漏斗（投信 × 營收動能）</h2>
+  <div class="card">
+    <h3 style="margin-top:0">方法論：三層漏斗（負面硬關卡＋正面等權評分）</h3>
+    <div class="flow">
+      <div class="layer" style="border-left-color:var(--f2)">
+        <div class="l-title">第一層｜事件資格關卡<span class="l-badge">進場券</span></div>
+        <ul>
+          <li>投信買超（首次買超或連續 ≥3 日） <span class="stars">★★</span>——須與第三層營收動能同時成立才入池</li>
+        </ul>
+      </div>
+      <div class="flow-arrow">▼</div>
+      <div class="layer" style="border-left-color:var(--f3)">
+        <div class="l-title">第二層｜否決關卡<span class="l-badge">一票否決</span></div>
+        <ul>
+          <li>董監事申讓申報 <span class="stars">★★★</span></li>
+          <li>董監質押比 &gt;50% <span class="stars">★★★</span></li>
+          <li>1 月作帳反轉窗口 <span class="stars">★★</span></li>
+          <li>處置股/警示股/流動性下限</li>
+        </ul>
+      </div>
+      <div class="flow-arrow">▼</div>
+      <div class="layer" style="border-left-color:var(--f4)">
+        <div class="l-title">第三層｜等權評分排名取前 N<span class="l-badge">等權加總</span></div>
+        <ul>
+          <li>月營收動能：YoY 加速幅度 <span class="stars">★★★</span></li>
+          <li>投信買超強度：金額/市值比、連續天數 <span class="stars">★★</span></li>
+          <li>市值帶：小型股（投信認養效應帶） <span class="stars">★★</span></li>
+          <li>董監申報增持 <span class="stars">★</span></li>
+          <li>外資同向（僅加分參考） <span class="stars">★</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="note">掃描排程：每日台北 17:45＋每月 10/11 加掃（月營收申報後）。</div>
+    <div id="tw-data"></div>
+  </div>
+</section>
+
+<section id="sec-status">
+  <h2><span class="no">4</span>系統狀態板</h2>
+  <div class="card">
+    <div class="table-scroll">
+      <table id="status-table">
+        <thead><tr>
+          <th>管線</th><th>內容</th><th>排程</th><th>最後數據</th><th>資料齡</th><th>狀態</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="note">狀態燈規則：資料齡 &lt;48h 綠（正常）、48–96h 黃（遲滯）、&gt;96h 紅（停擺）、缺檔紅（缺檔/建置中）。資料齡以你開啟本頁的當下計算——本頁若停止更新，「monitor-build」自己也會轉紅。</div>
+  </div>
+</section>
+
+<footer>
+  本頁由 <code>projects/monitor/build_monitor.py</code> 聚合各管線公開產出自動產生（每日兩班）。
+  所有內容為公開鏈上數據、公開申報資料與已發表文獻方法論之彙整，僅供觀察研究，非投資建議。
+</footer>
+
+</div>
+
+<script id="monitor-data" type="application/json">__MONITOR_DATA_JSON__</script>
+<script>
+"use strict";
+var D = JSON.parse(document.getElementById('monitor-data').textContent);
+
+/* ── helpers ─────────────────────────────────────────────── */
+function esc(s){ return String(s==null?'—':s).replace(/[&<>"]/g, function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function fmtUsd(v, digits){
+  if(v==null || isNaN(v)) return '—';
+  var sign = v<0 ? '-' : '';
+  var a = Math.abs(v);
+  if(a>=1e6) return sign+'$'+(a/1e6).toFixed(digits==null?2:digits)+'M';
+  if(a>=1e4) return sign+'$'+Math.round(a/1e3)+'K';
+  return sign+'$'+a.toLocaleString('en-US',{maximumFractionDigits:0});
+}
+function fmtUsdFull(v){ if(v==null||isNaN(v)) return '—';
+  return (v<0?'-':'')+'$'+Math.abs(v).toLocaleString('en-US',{maximumFractionDigits:0}); }
+function fmtPct(v, digits){ if(v==null||isNaN(v)) return '—';
+  return (v*100).toFixed(digits==null?1:digits)+'%'; }
+function fmtRet(v){ if(v==null||isNaN(v)) return '—';
+  return (v>0?'+':'')+(v*100).toFixed(1)+'%'; }
+function fmtNum(v){ return (v==null||isNaN(v)) ? '—' : Number(v).toLocaleString('en-US'); }
+function signedUsd(v){ if(v==null||isNaN(v)) return '—';
+  return (v>=0?'+':'')+fmtUsd(v); }
+function placeholderHTML(msg){
+  return '<div class="placeholder">'+esc(msg||'管線建置中——資料就緒後本區塊自動出現。')+'</div>'; }
+
+/* ── header stamp ────────────────────────────────────────── */
+(function(){
+  var t = new Date(D.generated_at);
+  document.getElementById('generated-at').textContent =
+    t.toISOString().replace('T',' ').slice(0,16)+' UTC（你的時區 '+
+    t.toLocaleString(undefined,{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})+'）';
+})();
+
+/* ── §1 HL 持續贏家 ──────────────────────────────────────── */
+(function(){
+  var el = document.getElementById('hl-body');
+  var hl = D.hl || {};
+  if(!hl.available){ el.innerHTML = placeholderHTML(hl.placeholder); return; }
+  var m = hl.metrics || {};
+  var html = '';
+  html += '<div class="small">追蹤對象 <span class="addr">'+esc(hl.address)+'</span>'
+        + '（標籤：'+esc(hl.label)+'・分類：'+esc(hl.classification)+'・快照 '+esc(hl.snapshot_date)+'）</div>';
+
+  /* 證據閘門記分板 */
+  html += '<h3>證據閘門記分板</h3><div class="gates">';
+  var ICON = {pass:'✅', pending:'⏳', fail:'❌', unknown:'❓'};
+  (hl.gates||[]).forEach(function(g){
+    html += '<div class="gate"><div class="g-head">'+(ICON[g.status]||ICON.unknown)+' '+esc(g.name)+'</div>'
+          + '<div class="g-detail">'+esc(g.detail)+'</div></div>';
+  });
+  html += '</div>';
+
+  /* 關鍵指標 */
+  html += '<h3>關鍵指標</h3><div class="tiles">';
+  function tile(label, value, sub, cls){
+    html += '<div class="tile"><div class="t-label">'+esc(label)+'</div>'
+          + '<div class="t-value'+(cls?' '+cls:'')+'">'+value+'</div>'
+          + (sub?'<div class="t-sub">'+esc(sub)+'</div>':'')+'</div>';
+  }
+  tile('總 PnL（全期）', esc(fmtUsd(m.total_pnl)), '峰值 '+fmtUsd(m.peak_pnl), m.total_pnl>=0?'up':'down');
+  tile('最大回撤', esc(fmtPct(m.max_drawdown_pct)), '目前回撤 '+fmtPct(m.current_drawdown_pct));
+  tile('Profit factor', m.profit_factor==null?'—':esc(m.profit_factor.toFixed(1)),
+       m.n_fills_truncated ? 'fills 截斷樣本、低信心參考' : null);
+  tile('已實現勝率', esc(fmtPct(m.realized_win_rate)), '平均贏 '+fmtUsd(m.avg_win)+'／輸 '+fmtUsd(m.avg_loss));
+  tile('平均持倉時間', m.avg_hold_hours==null?'—':esc(m.avg_hold_hours.toFixed(0))+' h',
+       m.avg_hold_hours==null?null:'約 '+(m.avg_hold_hours/24).toFixed(1)+' 天');
+  tile('30 日事件數', esc(fmtNum(m.n_events_last_30d)), '事件中位名目 '+fmtUsd(m.median_event_notional));
+  tile('帳戶淨值', esc(fmtUsd(m.account_value)), '持倉名目 '+fmtUsd(hl.position_value));
+  tile('未實現 PnL', esc(signedUsd(hl.unrealized_pnl)), null, hl.unrealized_pnl>=0?'up':'down');
+  html += '</div>';
+
+  /* 目前持倉 */
+  html += '<h3>目前持倉（'+(hl.positions||[]).length+' 檔）</h3>';
+  if((hl.positions||[]).length){
+    html += '<div class="table-scroll"><table><thead><tr>'
+          + '<th>幣種</th><th>方向</th><th class="num">槓桿</th><th class="num">名目 USD</th>'
+          + '<th class="num">入場價</th><th class="num">未實現 PnL</th></tr></thead><tbody>';
+    hl.positions.forEach(function(p){
+      var up = (p.unrealized_pnl||0)>=0;
+      html += '<tr><td>'+esc(p.coin)+'</td><td>'+esc(p.side==='long'?'做多':(p.side==='short'?'做空':p.side))+'</td>'
+            + '<td class="num">'+esc(p.leverage_value)+'x '+esc(p.leverage_type||'')+'</td>'
+            + '<td class="num">'+esc(fmtUsdFull(p.position_value))+'</td>'
+            + '<td class="num">'+esc(p.entry_px)+'</td>'
+            + '<td class="num" style="color:var(--'+(up?'pos':'neg')+'-text)">'+esc(signedUsd(p.unrealized_pnl))+'</td></tr>';
+    });
+    html += '</tbody></table></div>';
+  } else { html += '<div class="small">目前無持倉。</div>'; }
+
+  /* 月度 PnL 圖 */
+  html += '<h3>月度 PnL</h3><div class="chart-box"><div class="chart-scroll" id="hl-chart"></div>'
+        + '<div class="tooltip" id="hl-tip"></div>'
+        + '<div class="legend"><span class="key"><i style="background:var(--pos)"></i>單月獲利</span>'
+        + '<span class="key"><i style="background:var(--neg)"></i>單月虧損</span>'
+        + '<span class="key" style="color:var(--muted)">'+esc(hl.monthly_range||'')+'</span></div>'
+        + '<details class="dtable"><summary>檢視數據表</summary><div class="table-scroll" id="hl-chart-table"></div></details>'
+        + '</div>';
+
+  /* 影子深度摘要 */
+  var sh = hl.shadow || {};
+  html += '<h3>影子深度實測摘要（唯讀）</h3>';
+  if(sh.available){
+    html += '<div class="small">'
+      + '主力市場 <b>'+esc(sh.main_market)+'</b>：$1k 往返成本 <b>'+esc(fmtPct(sh.roundtrip_1k_pct/100, 3))+'</b>'
+      + '（快照 walk-the-book 估算）・本班輪詢 '+esc(fmtNum(sh.polls))+' 次、失敗 0'
+      + '・監測標的 '+esc(sh.n_targets)+' 個・本班新成交 '+esc(fmtNum(sh.new_fills_detected))+' 筆'
+      + (sh.new_fills_detected===0?'（劣化樣本累積中，低頻標的單班零成交屬預期）':'')
+      + '・採樣 '+esc(sh.date)+'</div>';
+  } else {
+    html += '<div class="small" style="color:var(--muted)">影子數據缺失——'+esc(sh.placeholder||'待下一班採樣')+'</div>';
+  }
+
+  /* 掃描裁決 */
+  var sc = hl.scan || {};
+  html += '<h3>掃描裁決（全市場複掃）</h3>';
+  if(sc.available){
+    var cc = sc.classification_counts || {};
+    var chips = Object.keys(cc).map(function(k){ return esc(k)+' '+esc(cc[k]); }).join('・');
+    html += '<div class="small">'+esc(sc.verdict)+'<br><span style="color:var(--muted)">分類分佈：'+chips+'（'+esc(sc.date)+'）</span></div>';
+  } else {
+    html += '<div class="small" style="color:var(--muted)">掃描報告缺失。</div>';
+  }
+
+  /* Polymarket 一行狀態 */
+  var po = D.poly || {};
+  html += '<h3>Polymarket 追蹤（一行狀態）</h3>';
+  if(po.available){
+    html += '<div class="small">$'+esc((po.total_pnl/1e6).toFixed(1))+'M 戶（'+esc(po.label)+'）：'
+      + '<b>已判不可跟</b>——'+esc(po.reason)+'；影子持續採樣：偵測延遲中位 '
+      + esc(po.lag_median==null?'—':po.lag_median.toFixed(1))+'s／p90 '
+      + esc(po.lag_p90==null?'—':po.lag_p90.toFixed(1))+'s、最佳價可成交率 '
+      + esc(fmtPct(po.fillable_ratio,0))+'（$50 固定額）。watchlist 共 '
+      + esc(po.watchlist_total)+' 錢包、active '+esc(po.watchlist_active)+' 個。</div>';
+  } else {
+    html += '<div class="small" style="color:var(--muted)">'+esc(po.placeholder||'Polymarket 數據缺失。')+'</div>';
+  }
+
+  el.innerHTML = html;
+  if(hl.monthly_pnl) renderMonthly('hl-chart','hl-tip','hl-chart-table', hl.monthly_pnl);
+})();
+
+/* ── 月度 PnL 直條圖（純 SVG，正上負下、零基線） ─────────── */
+function renderMonthly(chartId, tipId, tableId, monthly){
+  var box = document.getElementById(chartId);
+  var tip = document.getElementById(tipId);
+  var keys = Object.keys(monthly).sort();
+  if(!keys.length){ box.textContent = '無月度數據'; return; }
+  var vals = keys.map(function(k){ return monthly[k]; });
+  var maxV = Math.max.apply(null, vals.concat([0]));
+  var minV = Math.min.apply(null, vals.concat([0]));
+  var padL=56, padR=10, padT=16, padB=34, slot=32, barW=22;
+  var W = padL + keys.length*slot + padR, H = 232, plotH = H-padT-padB;
+  var span = (maxV-minV)||1;
+  function y(v){ return padT + (maxV-v)/span*plotH; }
+  var y0 = y(0);
+  /* nice tick step */
+  var rawStep = span/4, mag = Math.pow(10, Math.floor(Math.log(rawStep)/Math.LN10));
+  var step = [1,2,5,10].map(function(x){return x*mag;}).filter(function(s){return s>=rawStep;})[0] || mag*10;
+  var ticks=[]; for(var t=Math.ceil(minV/step)*step; t<=maxV+step*0.001; t+=step) ticks.push(t);
+  var iMax = vals.indexOf(Math.max.apply(null,vals));
+  var iMin = vals.indexOf(Math.min.apply(null,vals));
+  var s = '<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" role="img" aria-label="月度 PnL 直條圖">';
+  ticks.forEach(function(tv){
+    var ty = y(tv);
+    s += '<line x1="'+padL+'" y1="'+ty+'" x2="'+(W-padR)+'" y2="'+ty+'" stroke="var(--grid)" stroke-width="1"/>';
+    s += '<text x="'+(padL-6)+'" y="'+(ty+3)+'" text-anchor="end" font-size="10" fill="var(--muted)">'
+       + esc(fmtUsd(tv,1))+'</text>';
+  });
+  /* zero baseline（軸色，較格線深一階） */
+  s += '<line x1="'+padL+'" y1="'+y0+'" x2="'+(W-padR)+'" y2="'+y0+'" stroke="var(--axis)" stroke-width="1"/>';
+  function barPath(x,v){
+    var yv=y(v), up=v>=0, h=Math.abs(yv-y0), r=Math.min(4,h);
+    if(h<0.5){ yv = y0 + (up?-0.5:0.5); h=0.5; r=0.5; }
+    if(up) return 'M'+x+','+y0+' L'+x+','+(yv+r)+' Q'+x+','+yv+' '+(x+r)+','+yv
+      +' L'+(x+barW-r)+','+yv+' Q'+(x+barW)+','+yv+' '+(x+barW)+','+(yv+r)+' L'+(x+barW)+','+y0+' Z';
+    return 'M'+x+','+y0+' L'+x+','+(yv-r)+' Q'+x+','+yv+' '+(x+r)+','+yv
+      +' L'+(x+barW-r)+','+yv+' Q'+(x+barW)+','+yv+' '+(x+barW)+','+(yv-r)+' L'+(x+barW)+','+y0+' Z';
+  }
+  keys.forEach(function(k,i){
+    var v=vals[i], x=padL+i*slot+(slot-barW)/2;
+    s += '<path d="'+barPath(x,v)+'" fill="var(--'+(v>=0?'pos':'neg')+')" data-i="'+i+'"/>';
+    /* 選擇性直接標示：最佳月與最差月 */
+    if(i===iMax || i===iMin){
+      var ly = v>=0 ? y(v)-5 : y(v)+12;
+      s += '<text x="'+(x+barW/2)+'" y="'+ly+'" text-anchor="middle" font-size="10" fill="var(--ink2)">'
+         + esc(fmtUsd(v,1))+'</text>';
+    }
+    s += '<text x="'+(x+barW/2)+'" y="'+(H-8)+'" text-anchor="middle" font-size="9" fill="var(--muted)">'
+       + esc(k.slice(5))+'</text>';
+    /* hover 命中區（比 mark 大） */
+    s += '<rect x="'+(padL+i*slot)+'" y="'+padT+'" width="'+slot+'" height="'+plotH
+       + '" fill="transparent" data-hit="'+i+'"/>';
+  });
+  s += '</svg>';
+  box.innerHTML = s;
+  var svg = box.querySelector('svg');
+  svg.addEventListener('mousemove', function(ev){
+    var t = ev.target, i = t.getAttribute('data-hit');
+    if(i==null){ tip.style.display='none'; return; }
+    i = +i;
+    tip.style.display='block';
+    tip.innerHTML = '<b>'+esc(keys[i])+'</b><br>'+esc(signedUsd(vals[i]))+'（'+esc(fmtUsdFull(vals[i]))+'）';
+    var host = box.parentNode.getBoundingClientRect();
+    tip.style.left = Math.min(ev.clientX-host.left+12, host.width-140)+'px';
+    tip.style.top  = (ev.clientY-host.top-40)+'px';
+  });
+  svg.addEventListener('mouseleave', function(){ tip.style.display='none'; });
+  /* 數據表 fallback */
+  var tb = document.getElementById(tableId);
+  if(tb){
+    var rows = keys.map(function(k,i){
+      return '<tr><td>'+esc(k)+'</td><td class="num">'+esc(fmtUsdFull(vals[i]))+'</td></tr>'; }).join('');
+    tb.innerHTML = '<table><thead><tr><th>月份</th><th class="num">PnL</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  }
+}
+
+/* ── §2/§3 漏斗數據區 ────────────────────────────────────── */
+function renderFunnel(mountId, f, marketName){
+  var el = document.getElementById(mountId);
+  var html = '<h3>管線即時數據</h3>';
+  if(!f || !f.available){
+    el.innerHTML = html + placeholderHTML((f&&f.placeholder)||'管線建置中——資料就緒後本區塊自動出現。');
+    return;
+  }
+  var fs = f.funnel_stats || {};
+  var stages = [
+    ['raw_filings','原始申報','--f1'],
+    ['qualified_events','資格事件','--f2'],
+    ['post_veto','否決後','--f3'],
+    ['final_candidates','最終候選','--f4']];
+  var known = stages.filter(function(s){ return fs[s[0]]!=null; });
+  if(known.length){
+    var maxC = Math.max.apply(null, known.map(function(s){return fs[s[0]];}).concat([1]));
+    html += '<div class="small">最後掃描：'+esc(String(f.generated_at||'—').replace('T',' '))+'</div><div class="fbars">';
+    stages.forEach(function(sg,idx){
+      var c = fs[sg[0]];
+      var w = c==null ? 0 : Math.max(100*c/maxC, 0.8);
+      var prev = idx>0 ? fs[stages[idx-1][0]] : null;
+      var conv = (c!=null && prev) ? '（'+(100*c/prev).toFixed(0)+'%）' : '';
+      html += '<div class="fb-label">'+esc(sg[1])+'</div>'
+        + '<div class="fb-track"><div class="fb-bar" style="width:'+w+'%;background:var('+sg[2]+')"></div></div>'
+        + '<div class="fb-count">'+esc(fmtNum(c))+' '+conv+'</div>';
+    });
+    html += '</div>';
+  }
+  /* 最新候選表 */
+  var cands = f.candidates || [];
+  html += '<h3>最新候選'+(cands.length?'（前 '+cands.length+' 檔）':'')+'</h3>';
+  if(cands.length){
+    html += '<div class="table-scroll"><table><thead><tr>'
+      + '<th>代號</th><th>公司</th><th class="num">評分</th><th>首次申報日</th><th class="num">參考進場價</th>'
+      + '</tr></thead><tbody>';
+    cands.forEach(function(c){
+      html += '<tr><td>'+esc(c.ticker)+'</td><td>'+esc(c.company)+'</td>'
+        + '<td class="num">'+esc(c.score)+'</td><td>'+esc(c.first_filing_date)+'</td>'
+        + '<td class="num">'+esc(c.entry_price_ref)+'</td></tr>';
+    });
+    html += '</tbody></table></div>';
+  } else {
+    html += '<div class="small" style="color:var(--muted)">本次掃描無最終候選。</div>';
+  }
+  /* 前瞻表現表 */
+  html += '<h3>前瞻表現追蹤</h3>';
+  var pos = (f.performance && f.performance.positions) || [];
+  if(pos.length){
+    html += '<div class="small">更新：'+esc((f.performance&&f.performance.updated_at)||'—')+'</div>';
+    html += '<div class="table-scroll"><table><thead><tr>'
+      + '<th>代號</th><th>訊號日</th><th class="num">參考進場</th><th class="num">現價</th>'
+      + '<th class="num">1w</th><th class="num">1m</th><th class="num">3m</th><th class="num">6m</th><th class="num">12m</th><th>狀態</th>'
+      + '</tr></thead><tbody>';
+    pos.forEach(function(p){
+      var r = p.returns || {};
+      function rc(v){ if(v==null||isNaN(v)) return '<td class="num">—</td>';
+        return '<td class="num" style="color:var(--'+(v>=0?'pos':'neg')+'-text)">'+esc(fmtRet(v))+'</td>'; }
+      html += '<tr><td>'+esc(p.ticker)+'</td><td>'+esc(p.signal_date)+'</td>'
+        + '<td class="num">'+esc(p.entry_price_ref)+'</td><td class="num">'+esc(p.current_price)+'</td>'
+        + rc(r['1w'])+rc(r['1m'])+rc(r['3m'])+rc(r['6m'])+rc(r['12m'])
+        + '<td>'+esc(p.status)+'</td></tr>';
+    });
+    html += '</tbody></table></div>';
+  } else {
+    html += '<div class="small" style="color:var(--muted)">累積中——首批候選進場後自動回填。</div>';
+  }
+  el.innerHTML = html;
+}
+renderFunnel('us-data', D.us_funnel, '美股');
+renderFunnel('tw-data', D.tw_funnel, '台股');
+
+/* ── §4 系統狀態板 ───────────────────────────────────────── */
+(function(){
+  var tb = document.querySelector('#status-table tbody');
+  var rows = '';
+  (D.pipelines||[]).forEach(function(p){
+    var ts = null;
+    if(p.ts){ ts = p.precision==='date' ? Date.parse(p.ts+'T23:59:00Z') : Date.parse(p.ts); }
+    var ageH = ts==null ? null : (Date.now()-ts)/3600000;
+    var cls, label;
+    if(ageH==null){ cls='st-miss'; label = p.missing_label || '缺檔（建置中）'; }
+    else if(ageH<48){ cls='st-good'; label='正常'; }
+    else if(ageH<96){ cls='st-warn'; label='遲滯'; }
+    else { cls='st-crit'; label='停擺'; }
+    if(cls==='st-miss') cls += ' st-crit-text';
+    var ageTxt;
+    if(ageH==null){ ageTxt='—'; }
+    else if(p.precision==='date'){
+      var days = Math.floor((Date.now()-Date.parse(p.ts+'T00:00:00Z'))/86400000);
+      ageTxt = days<=0 ? '同日' : days+' 天';
+    }
+    else { ageTxt = ageH<1 ? Math.max(0,Math.round(ageH*60))+' 分鐘' :
+           (ageH<48 ? ageH.toFixed(1)+' 小時' : (ageH/24).toFixed(1)+' 天'); }
+    var tsTxt = p.ts ? (p.precision==='date' ? p.ts+'（日期精度）' :
+                 new Date(ts).toISOString().replace('T',' ').slice(0,16)+' UTC') : '—';
+    rows += '<tr><td><b>'+esc(p.name)+'</b></td><td class="small">'+esc(p.desc)+'</td>'
+      + '<td class="small">'+esc(p.schedule)+'</td><td class="small mono">'+esc(tsTxt)+'</td>'
+      + '<td class="small mono">'+esc(ageTxt)+'</td>'
+      + '<td class="'+cls+'"><span class="dot"></span><span class="st-label">'+esc(label)+'</span></td></tr>';
+  });
+  tb.innerHTML = rows;
+})();
+</script>
+</body>
+</html>

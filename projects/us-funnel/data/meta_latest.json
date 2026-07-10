@@ -1,0 +1,123 @@
+{
+ "fetch": {
+  "ran_at": "2026-07-10T18:29:32.075558+00:00",
+  "days_scanned": 8,
+  "days_fetched": 0,
+  "days_skipped_cached": 0,
+  "raw_filings": 0,
+  "parse_failed": 0,
+  "requests_ok": 0,
+  "requests_failed": 8,
+  "elapsed_sec": 54.2,
+  "endpoint_health": [
+   {
+    "name": "daily-index 2026-07-10",
+    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260710.idx",
+    "ok": false,
+    "status": null,
+    "error": "ProxyError: HTTPSConnectionPool(host='www.sec.gov', port=443): Max retries exceeded with url: /Archives/edgar/daily-index/2026/QTR3/form.20260710.idx (Caused by ProxyError('Unable to connect to proxy'",
+    "elapsed_sec": 4.92
+   },
+   {
+    "name": "daily-index 2026-07-09",
+    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260709.idx",
+    "ok": false,
+    "status": null,
+    "error": "ProxyError: HTTPSConnectionPool(host='www.sec.gov', port=443): Max retries exceeded with url: /Archives/edgar/daily-index/2026/QTR3/form.20260709.idx (Caused by ProxyError('Unable to connect to proxy'",
+    "elapsed_sec": 5.04
+   },
+   {
+    "name": "daily-index 2026-07-08",
+    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260708.idx",
+    "ok": false,
+    "status": null,
+    "error": "ProxyError: HTTPSConnectionPool(host='www.sec.gov', port=443): Max retries exceeded with url: /Archives/edgar/daily-index/2026/QTR3/form.20260708.idx (Caused by ProxyError('Unable to connect to proxy'",
+    "elapsed_sec": 5.18
+   },
+   {
+    "name": "daily-index 2026-07-07",
+    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260707.idx",
+    "ok": false,
+    "status": null,
+    "error": "ProxyError: HTTPSConnectionPool(host='www.sec.gov', port=443): Max retries exceeded with url: /Archives/edgar/daily-index/2026/QTR3/form.20260707.idx (Caused by ProxyError('Unable to connect to proxy'",
+    "elapsed_sec": 5.09
+   },
+   {
+    "name": "daily-index 2026-07-06",
+    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260706.idx",
+    "ok": false,
+    "status": null,
+    "error": "ProxyError: HTTPSConnectionPool(host='www.sec.gov', port=443): Max retries exceeded with url: /Archives/edgar/daily-index/2026/QTR3/form.20260706.idx (Caused by ProxyError('Unable to connect to proxy'",
+    "elapsed_sec": 5.12
+   },
+   {
+    "name": "daily-index 2026-07-03",
+    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260703.idx",
+    "ok": false,
+    "status": null,
+    "error": "ProxyError: HTTPSConnectionPool(host='www.sec.gov', port=443): Max retries exceeded with url: /Archives/edgar/daily-index/2026/QTR3/form.20260703.idx (Caused by ProxyError('Unable to connect to proxy'",
+    "elapsed_sec": 6.43
+   },
+   {
+    "name": "daily-index 2026-07-02",
+    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260702.idx",
+    "ok": false,
+    "status": 502,
+    "error": "ProxyError: HTTPSConnectionPool(host='www.sec.gov', port=443): Max retries exceeded with url: /Archives/edgar/daily-index/2026/QTR3/form.20260702.idx (Caused by ProxyError('Unable to connect to proxy'",
+    "elapsed_sec": 15.54
+   },
+   {
+    "name": "daily-index 2026-07-01",
+    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260701.idx",
+    "ok": false,
+    "status": null,
+    "error": "ProxyError: HTTPSConnectionPool(host='www.sec.gov', port=443): Max retries exceeded with url: /Archives/edgar/daily-index/2026/QTR3/form.20260701.idx (Caused by ProxyError('Unable to connect to proxy'",
+    "elapsed_sec": 5.62
+   }
+  ],
+  "errors": [
+   "2026-07-10 索引抓取失敗（status=None）",
+   "2026-07-09 索引抓取失敗（status=None）",
+   "2026-07-08 索引抓取失敗（status=None）",
+   "2026-07-07 索引抓取失敗（status=None）",
+   "2026-07-06 索引抓取失敗（status=None）",
+   "2026-07-03 索引抓取失敗（status=None）",
+   "2026-07-02 索引抓取失敗（status=502）",
+   "2026-07-01 索引抓取失敗（status=None）"
+  ]
+ },
+ "updated_at": "2026-07-10T18:30:34.258506+00:00",
+ "funnel": {
+  "ran_at": "2026-07-10T18:30:34.098329+00:00",
+  "days_loaded": 0,
+  "funnel_stats": {
+   "raw_filings": 0,
+   "qualified_events": 0,
+   "post_veto": 0,
+   "final_candidates": 0
+  },
+  "veto_counts": {
+   "penny": 0,
+   "sell_offset": 0,
+   "illiquid": 0
+  },
+  "skipped_checks": [],
+  "requests_ok": 0,
+  "requests_failed": 0,
+  "elapsed_sec": 0.0,
+  "endpoint_health": [],
+  "errors": []
+ },
+ "tracking": {
+  "ran_at": "2026-07-10T18:30:34.258391+00:00",
+  "positions_total": 0,
+  "positions_new": 0,
+  "positions_updated": 0,
+  "price_failed": 0,
+  "requests_ok": 0,
+  "requests_failed": 0,
+  "elapsed_sec": 0.0,
+  "endpoint_health": [],
+  "errors": []
+ }
+}

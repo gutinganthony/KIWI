@@ -1,0 +1,59 @@
+name: Monitor Build (聰明錢系統監控頁)
+
+on:
+  push:
+    branches: [claude/polymarket-wallet-copy-trade-0l7v2z]
+    paths:
+      - 'projects/monitor/**'
+      - '.github/workflows/monitor-build.yml'
+  workflow_dispatch:
+  schedule:
+    # 每日兩班（UTC）；只在 default branch 生效。
+    # 04:15＝美股班後（hyper/poly 晨班 22:30/22:45 與 us-funnel 03:30 之後）
+    # 10:15＝台股班後（tw-funnel 台北 17:45 = UTC 09:45 之後）
+    - cron: '15 4 * * *'
+    - cron: '15 10 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # 純標準函式庫、離線聚合：讀各管線已落地的 data 檔 → 產 docs/monitor/index.html
+      - name: Build monitor page
+        run: python3 projects/monitor/build_monitor.py
+
+      # du 哨兵：CI 產物必須 <1MB（build 腳本內另有同款檢查，此處雙保險）
+      - name: Size sentinel (<1MB)
+        run: |
+          du -sh docs/monitor
+          SIZE=$(stat -c%s docs/monitor/index.html)
+          echo "docs/monitor/index.html = ${SIZE} bytes"
+          if [ "$SIZE" -ge 1000000 ]; then
+            echo "::error::docs/monitor/index.html >= 1MB，拒絕 commit"
+            exit 1
+          fi
+
+      # 只 commit docs/monitor/（commit 訊息刻意不含 skip-ci 方括號字樣，
+      # 避免 GitHub 因訊息字面跳過其他 workflow 觸發）。
+      - name: Commit page back
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/monitor/
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "auto: monitor page update $(date -u +'%F %H:%M')"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push
+          fi
