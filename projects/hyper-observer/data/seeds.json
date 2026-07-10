@@ -1,0 +1,15 @@
+{
+  "_comment": "永遠納入宇宙的種子錢包。地址來自 2026-07-10 研究快照，本環境未鏈上驗證；首次 CI 跑會用真 info API 覆核。",
+  "wallets": [
+    {
+      "address": "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6",
+      "label": "james-wynn-blowup-groundtruth",
+      "note": "James Wynn：40x BTC 高槓桿、累計 194 次強平、$100M → $900。ground-truth 反例，分類器應判 blowup_risk。"
+    },
+    {
+      "address": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+      "label": "hft-highvolume-candidate",
+      "note": "高單量趨勢做空/高頻套利者（單日 1,394 筆），可能含刷量/做市，待分類器以量-PnL 比＋淨方向覆核。"
+    }
+  ]
+}

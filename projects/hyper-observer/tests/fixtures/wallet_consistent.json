@@ -1,0 +1,80 @@
+{
+  "address": "0x1111111111111111111111111111111111111111",
+  "fetched_at": "2026-07-01T06:45:00+00:00",
+  "clearinghouseState": {
+    "assetPositions": [
+      {
+        "type": "oneWay",
+        "position": {
+          "coin": "BTC",
+          "szi": "0.6",
+          "entryPx": "48000",
+          "positionValue": "30600",
+          "unrealizedPnl": "1800",
+          "leverage": {"type": "cross", "value": 5, "rawUsd": "-24480"},
+          "liquidationPx": "40000",
+          "marginUsed": "6120",
+          "maxLeverage": 50,
+          "cumFunding": {"allTime": "120.5", "sinceChange": "0.0", "sinceOpen": "0.0"}
+        }
+      },
+      {
+        "type": "oneWay",
+        "position": {
+          "coin": "ETH",
+          "szi": "-4",
+          "entryPx": "2900",
+          "positionValue": "11600",
+          "unrealizedPnl": "-200",
+          "leverage": {"type": "isolated", "value": 8, "rawUsd": "1450"},
+          "liquidationPx": "3400",
+          "marginUsed": "1450",
+          "maxLeverage": 25,
+          "cumFunding": {"allTime": "-45.2", "sinceChange": "0.0", "sinceOpen": "0.0"}
+        }
+      }
+    ],
+    "crossMarginSummary": {"accountValue": "55000", "totalNtlPos": "42200", "totalRawUsd": "12800", "totalMarginUsed": "7570"},
+    "marginSummary": {"accountValue": "55000", "totalNtlPos": "42200", "totalRawUsd": "12800", "totalMarginUsed": "7570"},
+    "crossMaintenanceMarginUsed": "500.0",
+    "withdrawable": "12800",
+    "time": 1782345600000
+  },
+  "portfolio": [
+    ["day", {"accountValueHistory": [[1782259200000, "54000"], [1782345600000, "55000"]], "pnlHistory": [[1782259200000, "49500"], [1782345600000, "50000"]], "vlm": "12000"}],
+    ["allTime", {"accountValueHistory": [[1769904000000, "5000"], [1782345600000, "55000"]], "pnlHistory": [[1769904000000, "0"], [1782345600000, "50000"]], "vlm": "520000"}],
+    ["perpDay", {"accountValueHistory": [[1782345600000, "55000"]], "pnlHistory": [[1782345600000, "50000"]], "vlm": "12000"}],
+    ["perpAllTime", {
+      "accountValueHistory": [
+        [1769904000000, "5000"], [1771113600000, "13000"], [1772323200000, "17000"],
+        [1773532800000, "23000"], [1775001600000, "27000"], [1776211200000, "33000"],
+        [1777593600000, "37000"], [1778803200000, "43000"], [1780272000000, "48000"],
+        [1781481600000, "52000"], [1782345600000, "55000"]
+      ],
+      "pnlHistory": [
+        [1769904000000, "0"], [1771113600000, "8000"], [1772323200000, "12000"],
+        [1773532800000, "18000"], [1775001600000, "22000"], [1776211200000, "28000"],
+        [1777593600000, "32000"], [1778803200000, "38000"], [1780272000000, "43000"],
+        [1781481600000, "47000"], [1782345600000, "50000"]
+      ],
+      "vlm": "500000"
+    }]
+  ],
+  "userFills": [
+    {"coin": "BTC", "px": "45000", "sz": "0.5", "side": "B", "time": 1770249600000, "closedPnl": "0.0", "fee": "10.0", "dir": "Open Long", "hash": "0xc001"},
+    {"coin": "BTC", "px": "50000", "sz": "0.5", "side": "A", "time": 1771545600000, "closedPnl": "2500.0", "fee": "11.0", "dir": "Close Long", "hash": "0xc002"},
+    {"coin": "ETH", "px": "3000", "sz": "5", "side": "B", "time": 1772668800000, "closedPnl": "0.0", "fee": "6.0", "dir": "Open Long", "hash": "0xc003"},
+    {"coin": "ETH", "px": "3200", "sz": "5", "side": "A", "time": 1773964800000, "closedPnl": "1000.0", "fee": "6.4", "dir": "Close Long", "hash": "0xc004"},
+    {"coin": "BTC", "px": "52000", "sz": "0.4", "side": "A", "time": 1775347200000, "closedPnl": "0.0", "fee": "9.0", "dir": "Open Short", "hash": "0xc005"},
+    {"coin": "BTC", "px": "50000", "sz": "0.4", "side": "B", "time": 1776470400000, "closedPnl": "800.0", "fee": "8.0", "dir": "Close Short", "hash": "0xc006"},
+    {"coin": "ETH", "px": "3100", "sz": "4", "side": "B", "time": 1777939200000, "closedPnl": "0.0", "fee": "5.0", "dir": "Open Long", "hash": "0xc007"},
+    {"coin": "ETH", "px": "2900", "sz": "4", "side": "A", "time": 1779062400000, "closedPnl": "-800.0", "fee": "4.6", "dir": "Close Long", "hash": "0xc008"},
+    {"coin": "BTC", "px": "48000", "sz": "0.6", "side": "B", "time": 1780617600000, "closedPnl": "0.0", "fee": "12.0", "dir": "Open Long", "hash": "0xc009"},
+    {"coin": "BTC", "px": "51000", "sz": "0.6", "side": "A", "time": 1781913600000, "closedPnl": "1800.0", "fee": "12.6", "dir": "Close Long", "hash": "0xc010"}
+  ],
+  "userFunding": [
+    {"time": 1775001600000, "delta": {"type": "funding", "coin": "BTC", "usdc": "-12.5", "szi": "0.6", "fundingRate": "0.0000125"}},
+    {"time": 1778803200000, "delta": {"type": "funding", "coin": "ETH", "usdc": "5.3", "szi": "-4", "fundingRate": "0.0000098"}}
+  ],
+  "errors": []
+}
