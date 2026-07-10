@@ -70,7 +70,7 @@ jobs:
           TODAY=$(date -u +%F)
           if [ -f "data/scan/candidates_${TODAY}.json" ]; then
             python3 fetch.py --wallets-file "data/scan/candidates_${TODAY}.json" \
-              --max-wallets 150 --sleep 0.75 --snapshot-suffix "-scan" || true
+              --max-wallets 150 --sleep 0.75 --snapshot-suffix=-scan || true
           fi
 
       - name: Classify scan candidates (scan report)
