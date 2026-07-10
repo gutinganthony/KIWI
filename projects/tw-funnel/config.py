@@ -1,7 +1,8 @@
 """tw-funnel 集中設定：台股投信×營收動能三層漏斗（v0，上市 TWSE only）。
 
-純唯讀觀察管線。此專案不包含任何下單、簽章、金鑰、券商連線功能，
-所有請求皆為 TWSE 公開免金鑰端點的 read-only GET 查詢。不構成投資建議。
+純唯讀觀察管線。此專案不包含任何下單、簽章、券商連線功能，
+所有請求皆為公開 API（FinMind 主源、TWSE OpenAPI 次源）的 read-only GET 查詢。
+FINMIND_TOKEN 為可選的免費註冊配額提升參數，非交易憑證。不構成投資建議。
 
 設計依據：topics/business/2026-07-10-us-tw-signal-funnel-design.md §2（台股漏斗定稿）
 ＋ topics/business/2026-07-10-stock-signal-appendix/stock_signal_taiwan.md。
@@ -24,13 +25,51 @@ USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
 )
-ERROR_BODY_SNIPPET_LEN = 200  # 端點失敗時記錄 body 前 N 字
+ERROR_BODY_SNIPPET_LEN = 150  # 端點失敗時記錄 body 前 N 字（meta.endpoint_health 診斷用）
 
 # ---------------------------------------------------------------------------
-# TWSE 公開端點（全部免金鑰、唯讀 GET）
+# FinMind 主源（api.finmindtrade.com；免費、海外可用；GitHub: FinMind/FinMind）
+#
+# 背景：2026-07-10 CI 實跑證實 TWSE OpenAPI 對 GitHub Actions 海外 IP 全數阻擋
+# （status 200 但回 HTML 阻擋頁「Expecting value: line 1 column 1」、部分連線層
+# 直接失敗、t86 rwd 回 307）——證據見 data/meta_latest.json 的 endpoint_health。
+# 故每類數據改以 FinMind 為主源，TWSE 降為次源 fallback；兩源健康都記入 meta。
 # ---------------------------------------------------------------------------
 
-# 三大法人買賣超日報（含投信買進/賣出/買賣超股數）——主端點：OpenAPI 最新交易日全表
+FINMIND_API_URL = "https://api.finmindtrade.com/api/v4/data"
+# 認證（可選）：讀環境變數 FINMIND_TOKEN，非空才以 GET param `token=` 附上。
+# 未設定＝匿名模式照樣能跑（額度較低）；免費註冊 token 後 600 req/hr。
+# workflow 由 repo 設定注入，未設定時為空字串 → 優雅降級為匿名模式。
+FINMIND_TOKEN_ENV = "FINMIND_TOKEN"
+
+FINMIND_DS_INSTITUTIONAL = "TaiwanStockInstitutionalInvestorsBuySell"  # 三大法人買賣超（日）
+FINMIND_DS_MONTH_REVENUE = "TaiwanStockMonthRevenue"                   # 月營收（逐檔）
+FINMIND_DS_PRICE = "TaiwanStockPrice"                                  # 日收盤/成交金額
+FINMIND_DS_STOCK_INFO = "TaiwanStockInfo"                              # 代號/名稱/type(twse|tpex)
+FINMIND_TRUST_NAME_KEY = "Investment_Trust"   # name 欄含此字串＝投信
+
+FINMIND_DAY_LOOKBACK = 3        # 全市場單日拉法：當日無資料（假日/未發布）最多共試 N 天
+REVENUE_LOOKBACK_MONTHS = 15    # 逐檔月營收窗口：本月＋上月 YoY 都需去年同期（14 個月），
+                                # 再 +1 月吸收「月初上月營收未發布」的時滯 → 15
+REVENUE_POOL_MAX = 100          # 逐檔查營收的候選池上限（額度保護；截斷取 3 日買超市值大者）
+FINMIND_SLEEP_BETWEEN = 0.3     # FinMind 逐檔請求間隔（秒）
+FINMIND_ABORT_AFTER_ERRORS = 3  # 逐檔迴圈連續硬失敗 N 次即中止（額度保護）
+
+# 每日請求數估算（無 token 額度內要能跑完；有 token 600 req/hr 更寬裕）：
+#   TaiwanStockInfo 全表 1
+# ＋ 投信買賣超 全市場單日 1（假日/未發布回溯最多 FINMIND_DAY_LOOKBACK=3）
+# ＋ 收盤/成交額 全市場單日 1（同上最多 3）
+# ＋ 月營收 先篩後逐檔：買超資格先篩出候選池 ~50 檔 × 各 1 req（近 15 個月窗口）
+#   —— 用 data_id 逐檔查全市場太貴，故先以買超資格（同 funnel 第一層籌碼關）縮池
+# ≈ 常態 1+1+1+50 ≈ ~53 req/日；上限 1+3+3+REVENUE_POOL_MAX(100) ≈ ~107 req/日。
+
+# ---------------------------------------------------------------------------
+# TWSE 公開端點（次源 fallback；全部免費、唯讀 GET）
+# ⚠ 2026-07-10 起對 GitHub Actions 海外 IP 全數阻擋（見上），保留作為
+#   FinMind 失敗時的備援與本地（台灣 IP）執行路徑；兩者都失敗＝誠實降級。
+# ---------------------------------------------------------------------------
+
+# 三大法人買賣超日報（含投信買進/賣出/買賣超股數）——OpenAPI 最新交易日全表
 T86_OPENAPI_URL = "https://openapi.twse.com.tw/v1/fund/T86"
 # 備援：rwd JSON（可指定日期；date=YYYYMMDD, selectType=ALL）
 T86_RWD_URL = "https://www.twse.com.tw/rwd/zh/fund/T86"

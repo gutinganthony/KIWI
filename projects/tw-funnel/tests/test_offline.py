@@ -11,7 +11,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import config  # noqa: E402
-import fetch_twse  # noqa: E402
+import fetch_data  # noqa: E402
 import funnel  # noqa: E402
 import track_performance as tp  # noqa: E402
 
@@ -107,31 +107,127 @@ def rich_state():
 # ---------------------------------------------------------------------------
 
 def test_parsers():
-    date, net, names = fetch_twse.parse_t86_openapi(fixture("t86_openapi.json"))
+    date, net, names = fetch_data.parse_t86_openapi(fixture("t86_openapi.json"))
     ok(date == "2026-07-10", "t86 openapi：民國日期 1150710 → 2026-07-10")
     ok(net == {"1101": 300_000, "1102": -100_000}, "t86 openapi：買賣超解析（零值排除）")
     ok(names.get("1101") == "台泥", "t86 openapi：名稱解析")
 
-    date, net, names = fetch_twse.parse_t86_rwd(fixture("t86_rwd.json"))
+    date, net, names = fetch_data.parse_t86_rwd(fixture("t86_rwd.json"))
     ok(date == "2026-07-10" and net == {"2330": 2_500_000}, "t86 rwd 備援：日期+買賣超解析")
 
-    close, value = fetch_twse.parse_stock_day_all(fixture("stock_day_all.json"))
+    close, value = fetch_data.parse_stock_day_all(fixture("stock_day_all.json"))
     ok(close["2330"] == 1050.0 and value["1101"] == 350_000_000, "STOCK_DAY_ALL：收盤/成交額")
     ok("0050" not in close, "STOCK_DAY_ALL：'--' 收盤價排除")
 
-    months = fetch_twse.parse_revenue(fixture("revenue.json"))
+    months = fetch_data.parse_revenue(fixture("revenue.json"))
     ok(list(months) == ["2026-06"], "營收：民國年月 11506 → 2026-06")
     ok(months["2026-06"]["1101"]["yoy"] == 11.11, "營收：去年同月增減(%) 解析")
     ok("9998" not in months["2026-06"], "營收：空 YoY 排除")
 
-    shares = fetch_twse.parse_shares_outstanding(fixture("company_basic.json"))
+    shares = fetch_data.parse_shares_outstanding(fixture("company_basic.json"))
     ok(shares["1101"] == 7_500_000_000, "基本資料：已發行普通股數")
     ok(shares["2330"] == 25_930_380_458, "基本資料：缺股數欄 → 實收資本額/10 退化")
 
-    pledge = fetch_twse.parse_pledge(fixture("pledge.json"))
+    pledge = fetch_data.parse_pledge(fixture("pledge.json"))
     ok(pledge == {"1101": 0.6, "2330": 0.05}, "質押：設質/持股比率")
-    ok(fetch_twse.parse_pledge([{"公司代號": "1101", "持股比率": "12%"}]) == {},
+    ok(fetch_data.parse_pledge([{"公司代號": "1101", "持股比率": "12%"}]) == {},
        "質押：欄位假設不成立 → 空 dict（誠實降級）")
+
+
+# ---------------------------------------------------------------------------
+# 1b. FinMind 主源：回應包裝、四個 dataset 解析、先篩後逐檔、狀態合併
+# ---------------------------------------------------------------------------
+
+def test_finmind_envelope():
+    payload = fixture("finmind_institutional.json")
+    rows = fetch_data.finmind_unwrap(payload)
+    ok(isinstance(rows, list) and len(rows) == 6,
+       "FinMind 包裝：msg=success/status=200 → 取出 data list")
+    ok(fetch_data.finmind_unwrap({"msg": "success", "status": 200, "data": []}) == [],
+       "FinMind 包裝：成功但無資料 → 空 list（假日語意，與失敗有別）")
+    ok(fetch_data.finmind_unwrap(
+        {"msg": "Your usage is more than free quota.", "status": 402, "data": []}) is None,
+       "FinMind 包裝：msg 非 success（額度用盡）→ None（視為硬失敗）")
+    ok(fetch_data.finmind_unwrap({"msg": "success", "status": 200}) is None,
+       "FinMind 包裝：缺 data 欄 → None")
+    ok(fetch_data.finmind_unwrap(None) is None and fetch_data.finmind_unwrap([1]) is None,
+       "FinMind 包裝：非 dict（HTML 阻擋頁解析物等）→ None")
+
+
+def test_finmind_parsers():
+    info_rows = fetch_data.finmind_unwrap(fixture("finmind_stock_info.json"))
+    names, listed = fetch_data.parse_finmind_stock_info(info_rows)
+    ok(names.get("1101") == "台泥" and names.get("2330") == "台積電",
+       "TaiwanStockInfo：公司名解析")
+    ok(listed == {"1101", "1102", "2330", "0050"}, "TaiwanStockInfo：上市集合（type=twse）")
+    ok("6488" not in listed, "TaiwanStockInfo：type=tpex（上櫃）排除——v0 只做上市")
+    ok("TAIEX" not in listed, "TaiwanStockInfo：非數字代號（指數）排除")
+
+    rows = fetch_data.finmind_unwrap(fixture("finmind_institutional.json"))
+    date, net = fetch_data.parse_finmind_institutional(rows)
+    ok(date == "2026-07-10", "FinMind 法人：日期解析")
+    ok(net == {"1101": 300_000, "1102": -100_000, "6488": 300_000},
+       "FinMind 法人：只取 name 含 Investment_Trust、net=buy−sell、零值排除")
+    _, net2 = fetch_data.parse_finmind_institutional(rows, listed=listed)
+    ok(net2 == {"1101": 300_000, "1102": -100_000},
+       "FinMind 法人：上市過濾（6488=tpex 排除）")
+
+    price_rows = fetch_data.finmind_unwrap(fixture("finmind_price.json"))
+    close, value = fetch_data.parse_finmind_price(price_rows)
+    ok(close["2330"] == 1050.0 and value["1101"] == 350_000_000,
+       "FinMind 價量：close/Trading_money 解析")
+    ok("9998" not in close, "FinMind 價量：close=0（全日無成交）排除")
+    close2, _ = fetch_data.parse_finmind_price(price_rows, listed=listed)
+    ok("6488" not in close2 and "2330" in close2, "FinMind 價量：上市過濾")
+
+    rev = fetch_data.parse_finmind_month_revenue(
+        fetch_data.finmind_unwrap(fixture("finmind_month_revenue.json")))
+    ok(rev == {"2025-05": 5_000_000, "2025-06": 7_200_000,
+               "2026-05": 5_500_000, "2026-06": 8_640_000},
+       "FinMind 月營收：revenue_year/revenue_month → YYYY-MM")
+    months = fetch_data.yoy_from_revenue(rev)
+    ok(months["2026-06"] == {"rev": 8_640_000, "yoy": 20.0}
+       and months["2026-05"]["yoy"] == 10.0,
+       "FinMind 月營收：YoY 自算（本月 20%、上月 10% → funnel 可判加速）")
+    ok("2025-06" not in months and "2025-05" not in months,
+       "FinMind 月營收：缺去年同期 → 該月不產 YoY（誠實不假造）")
+    ok(fetch_data.yoy_from_revenue({"2026-06": 100.0, "2025-06": 0.0}) == {},
+       "FinMind 月營收：去年同期 ≤0 → 不產 YoY（避免除零/失真）")
+
+
+def test_chip_pool_and_state_merge():
+    # 先篩後逐檔的候選池：與 funnel 籌碼關同判準（股數 OR 金額門檻、當日須買超）
+    trust = {D1: {"1101": 300_000}, D2: {"1101": 300_000},
+             D3: {"1101": 300_000, "2330": 30_000, "1102": 100_000, "1104": -600_000}}
+    close = {"1101": 50.0, "2330": 2000.0, "1102": 30.0}
+    pool = fetch_data.chip_pass_pool(trust, close, mk_cfg())
+    ok(pool == ["2330", "1101"],
+       f"候選池：1101 股數達標、2330 金額達標（6 千萬）；按買超市值排序（實得 {pool}）")
+    ok("1102" not in pool and "1104" not in pool, "候選池：門檻不達/賣超排除")
+    ok(fetch_data.chip_pass_pool({}, {}, mk_cfg()) == [], "候選池：無投信狀態 → 空池")
+    # 無收盤價 → 金額門檻不可判，只用股數門檻（防禦）
+    pool2 = fetch_data.chip_pass_pool({D3: {"2330": 30_000}}, {}, mk_cfg())
+    ok(pool2 == [], "候選池：無收盤價 → 金額門檻不生效，僅剩股數門檻")
+
+    # 月營收狀態合併：同月逐檔 update（FinMind 逐檔制），不整月覆蓋
+    existing = {"2026-05": {"1101": {"rev": 1, "yoy": 5.0}},
+                "2026-06": {"1101": {"rev": 2, "yoy": 12.0}}}
+    merged = fetch_data.merge_revenue_months(
+        existing, {"2026-06": {"2330": {"rev": 9, "yoy": 30.0}}}, keep=4)
+    ok(merged["2026-06"] == {"1101": {"rev": 2, "yoy": 12.0},
+                             "2330": {"rev": 9, "yoy": 30.0}},
+       "營收合併：同月逐檔 update，不洗掉先前股票")
+    ok(merged["2026-05"] == existing["2026-05"] and existing["2026-06"] == {
+        "1101": {"rev": 2, "yoy": 12.0}}, "營收合併：不就地改動輸入 dict")
+    trimmed = fetch_data.merge_revenue_months(
+        merged, {"2026-07": {"1101": {"rev": 3, "yoy": 9.0}},
+                 "2026-08": {"1101": {"rev": 3, "yoy": 9.0}}}, keep=2)
+    ok(sorted(trimmed) == ["2026-07", "2026-08"], "營收合併：修剪只留最近 keep 個月")
+
+    ok(fetch_data.month_start_n_ago("2026-07-10", 14) == "2025-05-01",
+       "逐檔營收窗口起點：14 個月前月初（涵蓋上月 YoY 的去年同期）")
+    ok(fetch_data.month_start_n_ago("2026-01-31", 1) == "2025-12-01",
+       "月窗起點：跨年正確")
 
 
 # ---------------------------------------------------------------------------
@@ -393,11 +489,27 @@ def test_config_sanity():
     ok(config.PERFORMANCE_WINDOWS_DAYS == {"1w": 7, "1m": 30, "3m": 91, "6m": 182, "12m": 365},
        "追蹤視窗 1w/1m/3m/6m/12m")
     ok(config.DIRECTOR_TRANSFER_URL is None, "董監申讓 v0 未接線（None，誠實）")
+    # FinMind 主源設定（2026-07-10 起 TWSE 對 CI 海外 IP 阻擋 → FinMind 為主、TWSE 次源）
+    ok(config.FINMIND_API_URL == "https://api.finmindtrade.com/api/v4/data",
+       "FinMind 主源端點（v4 data）")
+    ok(config.FINMIND_TOKEN_ENV == "FINMIND_TOKEN",
+       "token 讀環境變數 FINMIND_TOKEN（可選；未設定＝匿名模式照樣能跑）")
+    ok(config.FINMIND_DS_INSTITUTIONAL == "TaiwanStockInstitutionalInvestorsBuySell"
+       and config.FINMIND_DS_MONTH_REVENUE == "TaiwanStockMonthRevenue"
+       and config.FINMIND_DS_PRICE == "TaiwanStockPrice"
+       and config.FINMIND_DS_STOCK_INFO == "TaiwanStockInfo",
+       "FinMind 四個 dataset 名稱正確")
+    ok(config.REVENUE_LOOKBACK_MONTHS >= 15,
+       "逐檔營收窗 ≥15 月（本月＋上月 YoY 都需去年同期，+1 月吸收發布時滯）")
+    ok(config.ERROR_BODY_SNIPPET_LEN == 150, "端點失敗記 body 前 150 字（診斷用）")
+    # 無 token 額度守則：常態 ~53 req/日、最壞 1＋3＋3＋池上限 ≈ ~107 req/日
+    worst = 1 + 2 * config.FINMIND_DAY_LOOKBACK + config.REVENUE_POOL_MAX
+    ok(worst <= 150, f"最壞情境請求數 {worst} 在無 token 額度內（≤150/日）")
     ok(config.TRUST_HISTORY_KEEP_DAYS >= config.FIRST_BUY_LOOKBACK_DAYS,
        "投信歷史保留 ≥ 首次買超回看視窗")
     ok(config.TOP_N == 15, "預設輸出前 15 檔")
     src = Path(FIXTURES.parents[1], "config.py").read_text(encoding="utf-8") \
-        + Path(FIXTURES.parents[1], "fetch_twse.py").read_text(encoding="utf-8") \
+        + Path(FIXTURES.parents[1], "fetch_data.py").read_text(encoding="utf-8") \
         + Path(FIXTURES.parents[1], "funnel.py").read_text(encoding="utf-8") \
         + Path(FIXTURES.parents[1], "track_performance.py").read_text(encoding="utf-8")
     # 唯讀驗證：不得出現金鑰/下單類 code token（宣告句裡的中文「下單」不算）
@@ -410,6 +522,9 @@ def test_config_sanity():
 
 def main():
     test_parsers()
+    test_finmind_envelope()
+    test_finmind_parsers()
+    test_chip_pool_and_state_merge()
     test_qualification()
     test_vetoes()
     test_scoring()

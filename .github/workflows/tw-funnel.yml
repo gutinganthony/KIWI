@@ -32,10 +32,16 @@ jobs:
       - name: Install dependencies
         run: pip install -r projects/tw-funnel/requirements.txt
 
-      # fetch 內部防禦：端點失敗記 endpoint_health、沿用既有狀態，永遠 exit 0
-      - name: Fetch TWSE data (read-only, defensive)
+      # fetch 內部防禦：FinMind 主源、TWSE 次源 fallback（2026-07-10 CI 實跑證實
+      # TWSE OpenAPI 對 Actions 海外 IP 全數阻擋）；端點失敗記 endpoint_health、
+      # 沿用既有狀態，永遠 exit 0。
+      # FINMIND_TOKEN 為可選（免費註冊 600 req/hr）：repo 未設定該 secret 時
+      # 展開為空字串 → fetch_data.py 優雅降級為匿名低額度模式（~53 req/日仍夠用）。
+      - name: Fetch market data (FinMind primary, TWSE fallback; read-only, defensive)
         working-directory: projects/tw-funnel
-        run: python3 fetch_twse.py || true
+        env:
+          FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
+        run: python3 fetch_data.py || true
 
       # 漏斗：資格關卡 → 否決關卡 → 等權評分 → candidates_latest + meta_latest
       # 狀態為空也產空殼輸出＋誠實降級標註，不 crash
