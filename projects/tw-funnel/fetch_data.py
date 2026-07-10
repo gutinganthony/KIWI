@@ -657,14 +657,21 @@ def run_fetch(t86_date: str | None = None) -> dict:
         if raw is not None:
             save_json(tmp_day / "t86_openapi.json", raw)
             data_date, net, names = parse_t86_openapi(raw)
-        if not net:  # 再退 rwd 備援（帶日期）
-            d = t86_date or today.replace("-", "")
-            raw2 = fetch_json(config.T86_RWD_URL,
-                              {"date": d, "selectType": "ALL", "response": "json"},
-                              health, "t86_rwd")
-            if raw2 is not None:
-                save_json(tmp_day / "t86_rwd.json", raw2)
-                data_date, net, names = parse_t86_rwd(raw2)
+        if not net:  # 再退 rwd 備援（帶日期＋交易日回溯：週末/假日/凌晨觸發時當日無資料）
+            base_dt = datetime.strptime(t86_date, "%Y%m%d") if t86_date \
+                else datetime.strptime(today, "%Y-%m-%d")
+            for back in range(7):
+                d = (base_dt - timedelta(days=back)).strftime("%Y%m%d")
+                raw2 = fetch_json(config.T86_RWD_URL,
+                                  {"date": d, "selectType": "ALL", "response": "json"},
+                                  health, "t86_rwd")
+                if raw2 is not None:
+                    parsed_date, parsed_net, parsed_names = parse_t86_rwd(raw2)
+                    if parsed_net:
+                        save_json(tmp_day / "t86_rwd.json", raw2)
+                        data_date, net, names = parsed_date, parsed_net, parsed_names
+                        break
+                time.sleep(config.HTTP_SLEEP_BETWEEN)
     if net:
         data_date = data_date or today
         trust = load_json(STATE_DIR / "trust_history.json", {"days": {}, "names": {}})
