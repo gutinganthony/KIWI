@@ -8,31 +8,32 @@
 
 | 端點 | 成功 | 失敗 | 失敗樣本 |
 |---|---:|---:|---|
-| `clearinghouseState @ api.hyperliquid.xyz/info` | 62 | 0 | — |
-| `portfolio @ api.hyperliquid.xyz/info` | 62 | 0 | — |
-| `userFills @ api.hyperliquid.xyz/info` | 62 | 0 | — |
-| `userFunding @ api.hyperliquid.xyz/info` | 62 | 0 | — |
+| `clearinghouseState @ api.hyperliquid.xyz/info` | 34 | 0 | — |
+| `portfolio @ api.hyperliquid.xyz/info` | 34 | 0 | — |
+| `userFills @ api.hyperliquid.xyz/info` | 34 | 0 | — |
+| `userFunding @ api.hyperliquid.xyz/info` | 34 | 0 | — |
 
 ## 2. 分類統計
 
 | 分類 | 錢包數 | 佔比 |
 |---|---:|---:|
-| consistent_winner | 3 | 5% |
-| blowup_risk | 41 | 66% |
-| wash_suspect | 3 | 5% |
-| one_hit | 3 | 5% |
+| consistent_winner | 4 | 12% |
+| blowup_risk | 21 | 62% |
+| wash_suspect | 1 | 3% |
+| one_hit | 1 | 3% |
 | dormant | 0 | 0% |
-| choppy | 12 | 19% |
+| choppy | 7 | 21% |
 | insufficient_data | 0 | 0% |
-| **合計** | **62** | |
+| **合計** | **34** | |
 
 ## 3. consistent_winner 明細
 
 | 地址 | 總 PnL | 峰值回撤 | profit factor | 目前槓桿 | 主力幣 | 活躍天 | 可跟 |
 |---|---:|---:|---:|---:|---|---:|---|
-| `0x8e096995c3e4a3f0bc5b3ea1cba94de2aa4d70c9` | $59,337,520 | 35% | 453,866.15 | 20x | xyz:SKHX | 576 | ❌ 槓桿過高：目前 20x > 10x（30d 事件 8（截斷外推 31）／fills 2,000）|
-| `0x84abc08c0ea62e687c370154de1f38ea462f4d37` | $9,642,207 | 21% | 121.22 | —x | xyz:SPCX | 352 | ❌ 頻率過高：30 日推估 191 個部位事件 > 150（fills 截斷窗覆蓋 1.4 天、實測 9 個外推；fills 2000 筆僅參考）；平均持倉時間估不出（無 Open/Close 成交可配對），保守判不可跟（30d 事件 9（截斷外推 191）／fills 2,000）|
-| `0x8bae3527e5a33fa0cf184f37bc112d071463ab6d` | $9,314,944 | 6% | 14.01 | 3x | @166 | 359 | ✅（30d 事件 32／fills 1,080）|
+| `0x8e096995c3e4a3f0bc5b3ea1cba94de2aa4d70c9` | $59,351,806 | 35% | 453,866.15 | 20x | xyz:SKHX | 576 | ❌ 槓桿過高：目前 20x > 10x（30d 事件 8（截斷外推 31）／fills 2,000）|
+| `0x84abc08c0ea62e687c370154de1f38ea462f4d37` | $9,670,050 | 21% | 26.40 | —x | xyz:SPCX | 352 | ❌ 頻率過高：30 日推估 237 個部位事件 > 150（fills 截斷窗覆蓋 1.4 天、實測 11 個外推；fills 2000 筆僅參考）；平均持倉時間估不出（無 Open/Close 成交可配對），保守判不可跟（30d 事件 11（截斷外推 237）／fills 2,000）|
+| `0x8bae3527e5a33fa0cf184f37bc112d071463ab6d` | $9,424,135 | 6% | 14.01 | 3x | @166 | 359 | ✅（30d 事件 33／fills 1,081）|
+| `0xb5101614ad71468a041a83e64d8b834aa17a1ed6` | $945,394 | 39% | 0.89 | 5x | HYPE | 583 | ✅（30d 事件 38／fills 1,636）|
 
 ## 4. Ground-truth 校驗
 
@@ -40,10 +41,10 @@
 
 ## 5. 裁決
 
-consistent_winner 數量：**3**
-其中 followable（可跟）數量：**1**
+consistent_winner 數量：**4**
+其中 followable（可跟）數量：**2**
 
-**consistent_winner 3 個，其中 followable 1 個（僅少數可跟候選，證據不足，需持續觀察）**
+**consistent_winner 4 個，其中 followable 2 個（僅少數可跟候選，證據不足，需持續觀察）**
 
 限制與醒目聲明：
 - **回望偏差**：宇宙來自全量排行榜以歷史窗績效過濾（非僅榜頂，倖存者偏差較輕），但「過去可跟畫像」仍是回望篩選；存在性 ≠ 未來獲利。

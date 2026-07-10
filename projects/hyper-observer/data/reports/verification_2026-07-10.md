@@ -18,8 +18,8 @@
 | 分類 | 錢包數 | 佔比 |
 |---|---:|---:|
 | consistent_winner | 1 | 2% |
-| blowup_risk | 33 | 55% |
-| wash_suspect | 21 | 35% |
+| blowup_risk | 27 | 45% |
+| wash_suspect | 27 | 45% |
 | one_hit | 1 | 2% |
 | dormant | 0 | 0% |
 | choppy | 4 | 7% |
@@ -30,7 +30,7 @@
 
 | 地址 | 總 PnL | 峰值回撤 | profit factor | 目前槓桿 | 主力幣 | 活躍天 |
 |---|---:|---:|---:|---:|---|---:|
-| `0x8bae3527e5a33fa0cf184f37bc112d071463ab6d` | $9,305,596 | 6% | 14.01 | 3x | @166 | 359 |
+| `0x8bae3527e5a33fa0cf184f37bc112d071463ab6d` | $9,426,542 | 6% | 14.01 | 3x | @166 | 359 |
 
 ## 4. Ground-truth 校驗
 
