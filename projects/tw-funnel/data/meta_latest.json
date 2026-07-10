@@ -1,8 +1,8 @@
 {
- "generated_at": "2026-07-10T19:00:25Z",
+ "generated_at": "2026-07-10T19:04:48Z",
  "market": "TW",
  "pipeline": "tw-funnel",
- "as_of_trading_day": null,
+ "as_of_trading_day": "2026-07-09",
  "endpoint_health": {
   "finmind_stock_info": {
    "ok": true,
@@ -44,13 +44,10 @@
   "finmind_month_revenue": {
    "ok": true,
    "source": "finmind",
-   "pool": 0,
-   "note": "候選池為空（無買超達標股），本日無需逐檔查營收"
-  },
-  "revenue_t187ap05_L": {
-   "ok": true,
-   "status": 200,
-   "url": "https://openapi.twse.com.tw/v1/opendata/t187ap05_L"
+   "dataset": "TaiwanStockMonthRevenue",
+   "pool": 43,
+   "fetched": 42,
+   "errors": 0
   },
   "company_basic": {
    "ok": true,
@@ -75,16 +72,19 @@
   }
  },
  "funnel_stats": {
-  "raw_filings": 0,
-  "qualified_events": 0,
+  "raw_filings": 320,
+  "qualified_events": 27,
   "post_veto": 0,
   "final_candidates": 0
  },
- "veto_reasons": {},
+ "veto_reasons": {
+  "turnover_unknown": 26,
+  "punish_list": 1
+ },
  "january_window_active": false,
  "degradations": [
   "pledge_data_unavailable: 董監質押比取數失敗/欄位不符，質押否決不生效",
-  "no_trust_data: 投信買賣超狀態為空（端點失敗且無既有狀態）"
+  "revenue_prev_month_missing: 1 檔通過籌碼關但無上月 YoY（月營收史料未累積滿 2 期），無法判加速，誠實不入池"
  ],
  "todo_not_wired": [
   "tpex_otc_not_wired: v0 只做上市（TWSE），上櫃 TPEx 未接線",
