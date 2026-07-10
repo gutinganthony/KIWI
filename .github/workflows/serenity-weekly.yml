@@ -1,14 +1,15 @@
 name: Serenity Weekly Screen
 
-# 每週六自動跑 Serenity 篩選器（依 skills/serenity/weekly-screen.md）
-# 節奏：每月第一個週六(當月 1–7 日)＝全掃(含新標的獵殺, max-turns 120)；其餘週六＝輕量(max-turns 60, 省 credits)。手動觸發＝全掃。
+# 每週日 & 週三自動跑 Serenity 篩選器（依 skills/serenity/weekly-screen.md）
+# 節奏：每月第一個週日＝全掃(含新標的獵殺, max-turns 120)；其餘週日 + 每個週三＝輕量(max-turns 60, 省 credits)。手動觸發＝全掃。
 # 需要 repo secret: ANTHROPIC_API_KEY
 # 手動測試：Actions → Serenity Weekly Screen → Run workflow
 
 on:
   schedule:
-    # 週六 02:13 UTC = 10:13 台灣時間（全球週五收盤後）
-    - cron: '13 2 * * 6'
+    # 02:13 UTC = 10:13 台灣時間。週日＝週末覆盤（全球週五收盤+週末新聞）；週三＝接週二美股收盤+月初合約價。
+    - cron: '13 2 * * 0'
+    - cron: '13 2 * * 3'
   workflow_dispatch:
 
 # id-token: write 是 claude-code-action 做 OIDC token 交換必需的（issue #814）。
@@ -40,7 +41,9 @@ jobs:
             FULL=true
           else
             DOM=$((10#$(date -u +%d)))
-            if [ "$DOM" -le 7 ]; then FULL=true; else FULL=false; fi
+            DOW=$(date -u +%u)   # 1=Mon .. 7=Sun
+            # 全掃＝每月第一個週日（週日 且 當月 1–7 日）；其餘（其他週日 + 每個週三）＝輕量。
+            if [ "$DOW" = "7" ] && [ "$DOM" -le 7 ]; then FULL=true; else FULL=false; fi
           fi
           echo "full=$FULL" >> "$GITHUB_OUTPUT"
           echo "本次模式：full=$FULL（UTC 日=$(date -u +%d)）"
