@@ -50,3 +50,4 @@
 | 2026-07-10 | [Polymarket 跟單「月賺5萬美金」文查證 — 導流漏斗解剖 + 跟單策略可行性評估](./2026-07-10-polymarket-copy-trading-guide-verification.md) | polymarket, copy-trading, prediction-markets, due-diligence, scam-analysis, kol-funnel, verification, taiwan-compliance |
 | 2026-07-10 | [跟單聰明錢觀察器 — Polymarket + Hyperliquid 跨平台實證結論](./2026-07-10-copy-trading-smart-money-observer-findings.md) | copy-trading, smart-money, polymarket, hyperliquid, perps, on-chain, wallet-tracking, read-only, quant |
 | 2026-07-10 | [股票慢訊號價值評估 — 13F / Form 4 / 台股籌碼](./2026-07-10-stock-slow-signal-value-assessment.md) | 13f, form4, insider-trading, taiwan-stocks, institutional-flow, slow-signal, evidence-based |
+| 2026-07-10 | [台股／美股慢訊號篩選漏斗設計 — 三層架構（實證定稿）](./2026-07-10-us-tw-signal-funnel-design.md) | funnel-design, form4, 13f, taiwan-stocks, screening, composite-score, piotroski, aqr |
