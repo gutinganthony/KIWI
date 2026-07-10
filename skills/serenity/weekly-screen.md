@@ -16,7 +16,7 @@
 - 記下上次篩選日期與各檔上次價格
 
 ### Phase 1 — 重定價（鐵律）
-對 watchlist 每一檔（Serenity 候選 + 週期擇時大型股都要）：
+對 watchlist 每一檔（Serenity 候選 + 週期擇時大型股 + **🟣 我的持倉追蹤**如 DRAM ETF 都要）：
 - WebSearch 重拉 **LIVE 現價 + 市值 + forward P/E**（財經網站常 403，用搜尋 snippet 交叉驗證；注意日圓億/兆、台幣億的單位陷阱與 10× 誤植）
 - 計算 vs 上週變化 %
 - 🚩 標記任何**一週移動 >15%** 的（無論漲跌）
@@ -54,7 +54,7 @@
 
 **`docs/serenity/data.json` schema**（維持既有欄位，逐週覆蓋值）：
 `updated` `as_of_note` `headline` · `macro[]{signal,state(ok/watch/alert),note}` ·
-`tiers[]{key,label,color}` · `positions[]{tier,ticker,name,market,mcap,fwd_pe,price,wk,direction,trigger,note}` ·
+`tiers[]{key,label,color}`（**必含 `holding` 層＝使用者實際持倉，如 DRAM ETF，置頂、勿與候選混淆、每週重拉現價**）· `positions[]{tier,ticker,name,market,mcap,fwd_pe,price,wk,direction,trigger,note}` ·
 `catalysts[]{date,event}` · `candidates[]{name,note}`
 
 ### Phase 6 — 宏觀共同前提監控（每週檢查，任一出現 → 整體降權提示）

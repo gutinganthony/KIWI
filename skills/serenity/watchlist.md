@@ -9,6 +9,16 @@
 
 ---
 
+## 🟣 我的持倉追蹤（實際持有，非 Serenity 候選；週報需重拉並保留於 data.json 的 `holding` 層）
+
+| 標的 | 類型 | 現價/註記 | 賣訊監控 |
+|---|---|---|---|
+| **DRAM**（Roundhill Memory ETF）| 記憶體週期籃子（73% Samsung/SKH/Micron + Kioxia/SanDisk/WD/Nanya/Winbond）| ~$62（NAV $59.8）、AUM $24.6B、ER 0.65%、2026 +100%。**2026-07-09 由 AAOI 全數換入**（成本~$170→出~$108，實現~-36%）| DRAM 合約價季轉跌 / 量價背離 / CXMT DDR5 擴產+實體清單 / hyperscaler capex 下修（＝上方「記憶體週期」宏觀燈號）|
+
+> 單一股風險已消除，但為**純記憶體週期曝險**、與直接持有的 MU 重疊、且買在合約價漲幅收斂（3Q26 +13–18% vs 1Q26 +81%）的早期轉折上。**週報 Phase 1 需重拉 DRAM 現價、Phase 5 需以 `holding` 層寫回 data.json（勿與 Serenity 候選混淆）。**
+
+---
+
 ## 現況總表
 
 | 排序 | 標的 | 市場 | 市值（深掘時） | 方向 | 狀態 | 上次更新 |
@@ -207,11 +217,19 @@
 
 ## 參考（框架外 / 不適用）
 
-### AAOI — 框架外（市值 ~$13.1B，超標 6.5 倍）
-- 真瓶頸：「受產能限制而非需求限制到 2027 年中」已確認
-- 框架紅旗：$600M ATM（2026/5 啟動，現在進行式）、3.5 年稀釋 180%
-- 觀察點（非 Serenity 操作）：Q2 財報（~2026/8 初）驗證 800G ramp 是否超越 400G 退坡速率
-- 否證：任一季 800G ramp 不達標 or ATM 開始實際執行
+### AAOI — 框架外（🔁 2026-07-09 使用者已全數換出 → Roundhill Memory ETF「DRAM」）
+- 持倉狀態：**已賣出**（成本 ~$170、出場 ~$108，實現 ~-36%），資金轉入 DRAM ETF（記憶體籃子，73% Samsung/SKH/Micron）
+- 原真瓶頸判定：「受產能限制而非需求限制到 2027 年中」；框架紅旗：$600M ATM 稀釋、薄護城河（GM 27% << Coherent/Lumentum）、虧損、客戶 MSFT 29%/前二 >80%
+- 保留為 read-through 情報（800G/1.6T ramp、EML 缺貨讀數），非 Serenity 持倉
+
+### AI 光學/矽互連候選（框架外，AAOI 換倉品質+循環評估，2026-07-09 新增追蹤）
+> 詳見 `topics/business/2026-07-09-serenity-step1-9-cohr-mrvl-aaoi-replacement.md`。三檔皆超 <$2B 硬門檻，屬「品質+循環」而非 Serenity alpha。共同賣訊＝AI capex 下修 / DRAM 合約價轉跌 / 循環反轉。
+
+| 標的 | 卡口 | 估值 | 進場區 / 觀察 |
+|---|---|---|---|
+| **COHR**（NYSE）| InP/EML 雷射元件卡口（缺貨定價權）、垂直整合、NVIDIA 入股後淨現金化；GM 40%→42% | fwd ~45×、目標≈現價 | 回 **<$300–320** 分批，別追 >$420；8 月 Q4 FY26 財報驗證 1.6T + 毛利率 |
+| **MRVL**（Nasdaq）| 光學 DSP 雙頭 ~70%（最深護城河）+ 自訂 ASIC（弱二哥）| fwd ~60×（=AVGO 2 倍）、trailing 84× | 回 **$175–195**；🔴盯微軟 Maia 是否被 Broadcom 搶走、Amazon 集中度 |
+| **AVGO**（Nasdaq，比較用）| 交換器矽 + 自訂 ASIC >70% + CPO 領導（更強一哥）| fwd ~32×（MRVL 一半）、AI 營收 9 倍 | 若換倉目標＝互連矽，風險報酬可能優於 MRVL |
 
 ### GHM — 框架不適用
 - 零 AI 供應鏈文件連結、法人持股 81%（>40% 門檻）、trailing P/E ~77×

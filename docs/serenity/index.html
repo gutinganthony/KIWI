@@ -58,11 +58,13 @@ body {
 .tier-head { font-size: 13px; font-weight: 600; margin: 18px 0 8px; padding: 4px 0; }
 .tier-head.green { color: var(--green); } .tier-head.yellow { color: var(--yellow); }
 .tier-head.blue { color: var(--blue); } .tier-head.red { color: var(--red); }
+.tier-head.purple { color: var(--purple); }
 
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px; }
 .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; border-left: 3px solid var(--border); }
 .card.green { border-left-color: var(--green); } .card.yellow { border-left-color: var(--yellow); }
 .card.blue { border-left-color: var(--blue); } .card.red { border-left-color: var(--red); }
+.card.purple { border-left-color: var(--purple); background: rgba(124,77,255,0.06); }
 .card-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
 .card-name { font-size: 14px; font-weight: 600; }
 .card-name .tk { color: var(--text2); font-weight: 400; font-size: 12px; margin-left: 4px; }
@@ -110,7 +112,7 @@ body {
 </div>
 
 <script>
-const COLOR = { buy:'green', conditional:'yellow', trigger:'yellow', hold:'blue', framework_out:'red' };
+const COLOR = { holding:'purple', buy:'green', conditional:'yellow', trigger:'yellow', hold:'blue', framework_out:'red' };
 const MKT = { JP:'🇯🇵 JP', KR:'🇰🇷 KR', TW:'🇹🇼 TW', US:'🇺🇸 US', UK:'🇬🇧 UK' };
 
 function esc(s){ return (s==null?'':String(s)).replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
