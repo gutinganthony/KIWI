@@ -9,6 +9,7 @@ track dossier 與 fetch 的 leaderboard 失敗退回 seeds 分支。
 import json
 import sys
 import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 
 TESTS_DIR = Path(__file__).resolve().parent
@@ -84,6 +85,197 @@ def test_metrics_sanity():
     mw = classify.compute_metrics(ww, SNAP_DATE)
     ok(mw["vlm_to_pnl_ratio"] is not None and mw["vlm_to_pnl_ratio"] >= 500,
        f"wash fixture 量/PnL 比極端（{mw['vlm_to_pnl_ratio']}）")
+
+
+def _ms(year, month, day=1):
+    return int(datetime(year, month, day, tzinfo=timezone.utc).timestamp() * 1000)
+
+
+def _pnl_window(pnl_points, vlm):
+    """由 [(ms, pnl), ...] 組一個 perpAllTime portfolio 視窗（accountValueHistory 同步造）。"""
+    return [["perpAllTime", {
+        "accountValueHistory": [[ts, str(v + 5000)] for ts, v in pnl_points],
+        "pnlHistory": [[ts, str(v)] for ts, v in pnl_points],
+        "vlm": str(vlm),
+    }]]
+
+
+def _pos(coin="BTC", szi="0.5", lev=5):
+    return {"type": "oneWay", "position": {
+        "coin": coin, "szi": szi, "entryPx": "60000", "positionValue": "30000",
+        "unrealizedPnl": "1000", "leverage": {"type": "cross", "value": lev},
+        "liquidationPx": "50000", "marginUsed": "6000", "maxLeverage": 50,
+        "cumFunding": {"allTime": "10.0"}}}
+
+
+def test_bugfix_metrics_and_classify():
+    print("[bugfix] BUG1 崩跌封頂 / BUG2 MM攔截 / BUG3 截斷贏家 / BUG4 缺資料 / Wynn 仍 blowup")
+
+    # BUG 1：小正峰值($15k，勉強過 min_peak)→深負(-$1.5M)，drop/peak 應被封頂 <= 1.0（不再爆量）
+    w_crash = {"address": "0xa000000000000000000000000000000000000001",
+               "clearinghouseState": {"assetPositions": []},
+               "portfolio": _pnl_window([(_ms(2026, 1), 0), (_ms(2026, 3), 15000),
+                                         (_ms(2026, 5), -1500000)], vlm="2000000"),
+               "userFills": [], "userFunding": []}
+    mc = classify.compute_metrics(w_crash, SNAP_DATE)
+    ok(mc["max_single_day_crash_pct"] is not None and mc["max_single_day_crash_pct"] <= 1.0,
+       f"BUG1 單步崩跌封頂 <=1.0（{mc['max_single_day_crash_pct']}，未封頂為 ~101）")
+    ok(mc["max_drawdown_pct"] is not None and mc["max_drawdown_pct"] <= 1.0,
+       f"BUG1 峰值回撤同步封頂 <=1.0（{mc['max_drawdown_pct']}）")
+
+    # BUG 2：巨量($4B)、量/PnL=200(>=50)、PnL 正(+$20M) 但做市商 → wash_suspect（非 choppy/winner）
+    w_mm = {"address": "0xb000000000000000000000000000000000000002",
+            "clearinghouseState": {"assetPositions": []},
+            "portfolio": _pnl_window(
+                [(_ms(2026, 1), 0), (_ms(2026, 2), 5000000), (_ms(2026, 3), 10000000),
+                 (_ms(2026, 4), 8000000), (_ms(2026, 5), 15000000), (_ms(2026, 6), 20000000)],
+                vlm="4000000000"),
+            "userFills": [
+                {"coin": "BTC", "px": "50000", "sz": "0.001", "side": "B",
+                 "time": _ms(2026, 6, 20), "closedPnl": "45.0", "dir": "Close Long"},
+                {"coin": "BTC", "px": "50000", "sz": "0.001", "side": "A",
+                 "time": _ms(2026, 6, 21), "closedPnl": "-45.8", "dir": "Close Short"}],
+            "userFunding": []}
+    mm = classify.compute_metrics(w_mm, SNAP_DATE)
+    lbl_mm, why_mm = classify.classify(mm)
+    ok(mm["vlm_to_pnl_ratio"] is not None and mm["vlm_to_pnl_ratio"] >= config.MM_MIN_VLM_TO_PNL,
+       f"BUG2 量/PnL 比 {mm['vlm_to_pnl_ratio']} >= {config.MM_MIN_VLM_TO_PNL}")
+    ok(lbl_mm == "wash_suspect",
+       f"BUG2 做市商($28M 型)判 wash_suspect（{lbl_mm}）不進 choppy/winner；{why_mm[:1]}")
+
+    # BUG 3：portfolio 曲線明確獲利(+$5M、dd<40%、span 長、正月比高)，但 n_fills 達截斷上限(2000)、
+    # profit_factor 低(<1.3) → 不因 pf 硬否決，仍判 consistent_winner
+    fills = []
+    for i in range(1000):
+        t = _ms(2026, 6, 1) + i * 7200 * 1000  # 每對相隔，close 較 open 晚 1h（avg_hold>=0.1）
+        fills.append({"coin": "BTC", "px": "60000", "sz": "0.01", "side": "B",
+                      "time": t, "closedPnl": "0.0", "dir": "Open Long"})
+        fills.append({"coin": "BTC", "px": "60000", "sz": "0.01", "side": "A",
+                      "time": t + 3600 * 1000,
+                      "closedPnl": ("10.0" if i % 2 == 0 else "-12.0"), "dir": "Close Long"})
+    w_trunc = {"address": "0xc000000000000000000000000000000000000003",
+               "clearinghouseState": {"assetPositions": [_pos()],
+                                      "marginSummary": {"accountValue": "5000000"}},
+               "portfolio": _pnl_window(
+                   [(_ms(2026, 1), 0), (_ms(2026, 2), 800000), (_ms(2026, 3), 1300000),
+                    (_ms(2026, 4), 1100000), (_ms(2026, 5), 2400000), (_ms(2026, 6), 3600000),
+                    (_ms(2026, 7), 5000000)], vlm="50000000"),
+               "userFills": fills, "userFunding": []}
+    mt = classify.compute_metrics(w_trunc, SNAP_DATE)
+    lbl_t, why_t = classify.classify(mt)
+    ok(mt["n_fills"] == 2000 and mt["n_fills_truncated"] is True,
+       f"BUG3 fills 達截斷上限（n_fills={mt['n_fills']}, truncated={mt['n_fills_truncated']}）")
+    ok(mt["profit_factor"] is not None and mt["profit_factor"] < config.CONSISTENT_MIN_PROFIT_FACTOR,
+       f"BUG3 截斷樣本 pf 低於門檻（{mt['profit_factor']} < {config.CONSISTENT_MIN_PROFIT_FACTOR}）")
+    ok(lbl_t == "consistent_winner",
+       f"BUG3 截斷但曲線獲利 → consistent_winner（{lbl_t}），pf 未硬否決；{why_t[-1:]}")
+
+    # BUG 4：portfolio 曲線缺失（空 pnlHistory）＋無 liquidation，即使成交 10 筆 → insufficient_data
+    w_missing = {"address": "0xd000000000000000000000000000000000000004",
+                 "clearinghouseState": {"assetPositions": []},
+                 "portfolio": [["perpAllTime", {"accountValueHistory": [], "pnlHistory": [],
+                                                "vlm": "0"}]],
+                 "userFills": [{"coin": "SOL", "px": "150", "sz": "2", "side": "B",
+                                "time": _ms(2026, 6, i % 27 + 1), "closedPnl": "5.0",
+                                "dir": "Close Long"} for i in range(10)],
+                 "userFunding": []}
+    mmiss = classify.compute_metrics(w_missing, SNAP_DATE)
+    lbl_x, _ = classify.classify(mmiss)
+    ok(mmiss["pnl_source"] is None and mmiss["n_fills"] == 10,
+       f"BUG4 無 portfolio 曲線但成交 10 筆（pnl_source={mmiss['pnl_source']}）")
+    ok(lbl_x == "insufficient_data",
+       f"BUG4 缺曲線＋無強平 → insufficient_data（{lbl_x}），不進 choppy")
+
+    # Wynn ground-truth：靠 had_liquidation（＋高 dd）仍判 blowup_risk，不靠爆量崩跌%
+    wynn = json.loads((FIXTURES / "wallet_blowup.json").read_text(encoding="utf-8"))
+    mwynn = classify.compute_metrics(wynn, SNAP_DATE)
+    lbl_w, _ = classify.classify(mwynn)
+    ok(mwynn["had_liquidation"] is True and mwynn["max_single_day_crash_pct"] <= 1.0,
+       f"Wynn had_liquidation＝True 且崩跌%已封頂（crash={mwynn['max_single_day_crash_pct']}）")
+    ok(lbl_w == "blowup_risk", f"Wynn ground-truth 仍 blowup_risk（{lbl_w}）")
+
+
+def test_final_bugfix_A_B():
+    print("[final] 修正A 回撤 min_peak 閘（殺早期小峰值假象）/ 修正B 強平次數取代有無")
+
+    # (a) 早期小峰值($15k)→深負(-$1.5M)→大額正 PnL(+$50M，一度 40M→35M 真實回撤 12.5%)。
+    # 修正A：早期 dip 因 running peak 遠低於全期峰值 10% 而不計入，dd 只反映真實 12.5% 回撤，
+    # 非爆量、非假 100%；且大額淨正、已復原 → 不得判 blowup。
+    w_recover = {"address": "0xe000000000000000000000000000000000000005",
+                 "clearinghouseState": {"assetPositions": []},
+                 "portfolio": _pnl_window(
+                     [(_ms(2026, 1, 1), 0), (_ms(2026, 2, 1), 15000),
+                      (_ms(2026, 3, 1), -1500000), (_ms(2026, 4, 1), 3000000),
+                      (_ms(2026, 5, 1), 8000000), (_ms(2026, 6, 1), 40000000),
+                      (_ms(2026, 6, 20), 35000000), (_ms(2026, 7, 1), 50000000)],
+                     vlm="30000000"),
+                 "userFills": [], "userFunding": []}
+    mr = classify.compute_metrics(w_recover, SNAP_DATE)
+    lbl_r, why_r = classify.classify(mr)
+    ok(mr["max_drawdown_pct"] is not None and mr["max_drawdown_pct"] < 0.40,
+       f"修正A dd 合理、不受早期 dip 污染、非爆量（{mr['max_drawdown_pct']}，未修為 1.0）")
+    ok(mr["current_drawdown_pct"] is not None and mr["current_drawdown_pct"] < 0.10,
+       f"修正A 現值已復原到峰值附近（current_drawdown={mr['current_drawdown_pct']}）")
+    ok(lbl_r != "blowup_risk",
+       f"修正A 大額淨正、已復原錢包不因假回撤判 blowup（{lbl_r}）；{why_r[:1]}")
+
+    # (b) n_liquidations>=3（反覆爆倉）→ blowup，即使淨正、回撤溫和、槓桿不極端（只靠條件 1）
+    liq_fills = [{"coin": "BTC", "px": "60000", "sz": "0.1", "side": "A",
+                  "time": _ms(2026, 3 + i, 1), "closedPnl": "-5000.0", "dir": "Close Long",
+                  "liquidation": {"liquidatedUser": "0xe00", "markPx": "60000",
+                                  "method": "market"}} for i in range(4)]
+    w_multiliq = {"address": "0xe000000000000000000000000000000000000006",
+                  "clearinghouseState": {"assetPositions": [_pos(lev=10)]},
+                  "portfolio": _pnl_window(
+                      [(_ms(2026, 1), 0), (_ms(2026, 2), 5000), (_ms(2026, 3), 12000),
+                       (_ms(2026, 4), 9000), (_ms(2026, 5), 15000), (_ms(2026, 6), 11000)],
+                      vlm="2000000"),
+                  "userFills": liq_fills, "userFunding": []}
+    mml = classify.compute_metrics(w_multiliq, SNAP_DATE)
+    lbl_ml, why_ml = classify.classify(mml)
+    ok(mml["n_liquidations"] >= config.BLOWUP_MIN_LIQUIDATIONS,
+       f"修正B 反覆爆倉計數 n_liquidations={mml['n_liquidations']} >= {config.BLOWUP_MIN_LIQUIDATIONS}")
+    ok(lbl_ml == "blowup_risk",
+       f"修正B 反覆爆倉 → blowup_risk（{lbl_ml}）；{why_ml[:1]}")
+
+    # (c) 單次強平(n_liquidations==1)但強獲利、低回撤、槓桿合理 → 不判 blowup，走 consistent_winner；
+    # metrics 保留 had_liquidation/n_liquidations，明細揭露「曾強平 N 次」，不隱藏風險
+    oneliq_fills = [
+        {"coin": "BTC", "px": "60000", "sz": "0.5", "side": "B", "time": _ms(2026, 1, 10),
+         "closedPnl": "0.0", "dir": "Open Long"},
+        {"coin": "BTC", "px": "66000", "sz": "0.5", "side": "A", "time": _ms(2026, 2, 10),
+         "closedPnl": "30000.0", "dir": "Close Long"},
+        {"coin": "ETH", "px": "3000", "sz": "5", "side": "B", "time": _ms(2026, 3, 10),
+         "closedPnl": "0.0", "dir": "Open Long"},
+        {"coin": "ETH", "px": "3200", "sz": "5", "side": "A", "time": _ms(2026, 4, 10),
+         "closedPnl": "10000.0", "dir": "Close Long"},
+        {"coin": "SOL", "px": "150", "sz": "10", "side": "A", "time": _ms(2026, 5, 10),
+         "closedPnl": "-8000.0", "dir": "Close Long",
+         "liquidation": {"liquidatedUser": "0xe00", "markPx": "150", "method": "market"}},
+        {"coin": "BTC", "px": "64000", "sz": "0.5", "side": "B", "time": _ms(2026, 6, 1),
+         "closedPnl": "0.0", "dir": "Open Long"},
+        {"coin": "BTC", "px": "70000", "sz": "0.5", "side": "A", "time": _ms(2026, 6, 20),
+         "closedPnl": "12000.0", "dir": "Close Long"}]
+    w_oneliq = {"address": "0xe000000000000000000000000000000000000007",
+                "clearinghouseState": {"assetPositions": [_pos(lev=8)],
+                                       "marginSummary": {"accountValue": "80000"}},
+                "portfolio": _pnl_window(
+                    [(_ms(2026, 1), 0), (_ms(2026, 2), 30000), (_ms(2026, 3), 35000),
+                     (_ms(2026, 4), 45000), (_ms(2026, 5), 40000), (_ms(2026, 6), 52000)],
+                    vlm="500000"),
+                "userFills": oneliq_fills, "userFunding": []}
+    mol = classify.compute_metrics(w_oneliq, SNAP_DATE)
+    lbl_ol, why_ol = classify.classify(mol)
+    ok(mol["n_liquidations"] == 1 and mol["had_liquidation"] is True,
+       f"修正B 單次強平於 metrics 揭露（n_liquidations={mol['n_liquidations']}, "
+       f"had_liquidation={mol['had_liquidation']}）")
+    ok(lbl_ol == "consistent_winner",
+       f"修正B 單次強平但強獲利低回撤 → 不判 blowup、走 consistent_winner（{lbl_ol}）；{why_ol[:1]}")
+    md = classify.build_markdown(
+        SNAP_DATE, [{"metrics": mol, "classification": lbl_ol, "reasons": why_ol}],
+        None, [], "test")
+    ok("曾強平 1 次" in md,
+       "consistent_winner 明細揭露『曾強平 N 次』註記（不隱藏風險）")
 
 
 def test_reports(tmp):
@@ -218,6 +410,8 @@ def main():
         tmp = Path(td)
         test_classification()
         test_metrics_sanity()
+        test_bugfix_metrics_and_classify()
+        test_final_bugfix_A_B()
         test_reports(tmp)
         test_track_wallet(tmp)
         test_fetch_fallback()

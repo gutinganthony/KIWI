@@ -48,3 +48,4 @@
 | 2026-07-07 | [AXW（AIR TRF 融資利差）能不能預判大盤？＋短線領先指標全面回測（FDR 校正）](./2026-07-07-air-trf-funding-spread-leading-indicators-backtest.md) | AIR-TRF, funding-spread, leverage, leading-indicators, backtest, VIX, VVIX, credit, CRI, market-timing, FDR |
 | 2026-07-08 | [Serenity 週報 2026-07-08（全掃）— IQE 否證命中 + santec 摔進回檔買進區](./serenity-weekly/2026-07-08.md) | serenity-weekly, watchlist, reprice, IQE, santec, IQE-falsification, memory-selloff, catalysts, macro-monitor |
 | 2026-07-10 | [Polymarket 跟單「月賺5萬美金」文查證 — 導流漏斗解剖 + 跟單策略可行性評估](./2026-07-10-polymarket-copy-trading-guide-verification.md) | polymarket, copy-trading, prediction-markets, due-diligence, scam-analysis, kol-funnel, verification, taiwan-compliance |
+| 2026-07-10 | [跟單聰明錢觀察器 — Polymarket + Hyperliquid 跨平台實證結論](./2026-07-10-copy-trading-smart-money-observer-findings.md) | copy-trading, smart-money, polymarket, hyperliquid, perps, on-chain, wallet-tracking, read-only, quant |

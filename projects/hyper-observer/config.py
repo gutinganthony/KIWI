@@ -69,15 +69,32 @@ PORTFOLIO_FALLBACK_WINDOW = "allTime"
 # insufficient_data：無 portfolio PnL 曲線且成交筆數低於此值 → 資料不足
 MIN_FILLS_FOR_CLASSIFICATION = 5
 
-# --- blowup_risk（James Wynn 型：曾爆倉／極端槓桿＋大回撤）---
+# userFills 由 Hyperliquid info API 截斷在此筆數（近端窗）。n_fills >= 此值 → 視為截斷：
+# 此時 profit_factor / realized_win_rate 只反映近端樣本、偏誤大，consistent_winner 不以
+# profit_factor 硬否決（改由 portfolio 曲線指標主導）。見 classify BUG 3。
+MAX_USER_FILLS = 2000
+
+# --- blowup_risk（James Wynn 型：反覆爆倉／極端槓桿＋大回撤／近全損）---
 # 目前任一部位槓桿 >= 此值且回撤夠大 → 判 blowup（高槓桿賭徒）
 BLOWUP_EXTREME_LEVERAGE = 25.0
-BLOWUP_DRAWDOWN_PCT = 0.60            # 搭配高槓桿的回撤門檻（占 peak）
-# pnl 曲線單步崩跌 >= 此比例（占 peak）→ 判 blowup；只在 peak 夠大時計算，
-# 避免 PnL≈0 的刷量戶因小額波動被誤判崩跌。
+BLOWUP_DRAWDOWN_PCT = 0.60            # 搭配高槓桿或「近全損」的回撤門檻（占 peak）
+# pnl 曲線單步崩跌 >= 此比例（占 peak）→ 佐證用；只在 peak 夠大時計算，
+# 避免 PnL≈0 的刷量戶因小額波動被誤判崩跌。（本輪起崩塌判據以峰值回撤為主，此值僅供報告揭露）
 BLOWUP_SINGLE_DAY_CRASH_PCT = 0.50
 BLOWUP_MIN_PEAK_FOR_CRASH = 10_000.0
-# fills 出現 liquidation dir / liquidation 欄位 → 一律 blowup（不需其他條件）
+# 修正 B：反覆爆倉次數門檻。n_liquidations（統計 dir/欄位含 'liquidat' 的成交筆數）>= 此值
+# → 一律 blowup 硬事實，即使 portfolio 缺失也照判（如 James Wynn 194 次強平）。
+# 單次歷史強平（n_liquidations 在 1..2）不再強制 blowup：走正常分類（consistent/wash/choppy），
+# 但於 metrics 保留 had_liquidation／n_liquidations 供 dossier 與報告揭露風險，不隱藏。
+BLOWUP_MIN_LIQUIDATIONS = 3
+
+# --- 峰值回撤/崩跌的最小 peak 閘（修正 A：殺早期小峰值假象）---
+# 回撤與崩跌只在 running peak >= max(DD_MIN_PEAK_ABS, DD_MIN_PEAK_FRACTION × 全期峰值) 時才累計。
+# 根因：running peak 從第一筆的小正值（如 $100）起算，之後任何一次跌破 0 都相對那個小峰值算出
+# 天文數字回撤%（觀測到 dd=78028、6.46 等荒謬值）。加此閘後「$100→-$500→$181M」的早期 dip
+# 不計入回撤（其 peak 遠低於全期峰值的 10%），而「$181M→$90M」的真實回撤仍計入。
+DD_MIN_PEAK_ABS = 10_000.0           # 絕對地板：running peak 至少 $1 萬才開始計回撤
+DD_MIN_PEAK_FRACTION = 0.10          # 且須達全期峰值（global_peak）的 10%
 
 # --- wash_suspect（刷量／對敲：巨量但 PnL≈0，或無淨方向＋極短持倉高頻）---
 WASH_MIN_VLM = 1_000_000.0           # 只有交易量真的巨大才考慮判刷量
@@ -85,6 +102,13 @@ WASH_VLM_TO_PNL_RATIO = 500.0        # 量 / max(|總PnL|,eps) >= 此值 → 疑
 WASH_NET_DIRECTION_MAX = 0.05        # |買量-賣量|/(買量+賣量) <= 此值 → 無淨方向
 WASH_MAX_HOLD_HOURS = 0.1            # 平均持倉 < 此小時數 → 極短持倉
 WASH_MIN_FILLS = 50                  # 無淨方向分支另要求成交筆數夠高（高頻自成交特徵）
+
+# --- mm_like / 高量低效（BUG 2：做市商/高頻，巨量但量/PnL 比極高，即使 PnL 為正也不可跟）---
+# 與 wash 併類為 wash_suspect（語意：非方向性 alpha，跟不到）。校準自真實 CI：某 +$28.1M PnL
+# 錢包 vlm=$45.9 億、vlm_to_pnl=163、avg_win≈avg_loss≈$45、realized_win_rate 1.3% → 做市商，
+# 應排除而非丟進 choppy。此條要在 consistent 檢查之前判。正常方向性贏家 vlm/PnL 應遠低於門檻。
+MM_MIN_VLM = 100_000_000.0           # 交易量 >= $1 億才考慮（避免誤殺小額戶）
+MM_MIN_VLM_TO_PNL = 50.0             # 量 / max(|總PnL|,eps) >= 此值 → 高量低效（做市商特徵）
 
 # --- one_hit（單期爆賺主導，或活躍太短）---
 ONE_HIT_BEST_MONTH_SHARE = 0.70      # 單一最佳月 PnL > 總 PnL 的此比例

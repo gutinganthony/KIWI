@@ -248,22 +248,36 @@ def monthly_from_curve(points):
     return out
 
 
-def max_drawdown_pct(series):
-    """峰值回撤占 peak 的比例。series = 依時間排序的累積 PnL 值。"""
-    peak, worst = None, 0.0
+def max_drawdown_pct(series, min_peak):
+    """峰值回撤占 peak 的比例（封頂於 1.0）。series = 依時間排序的累積 PnL 值。
+
+    回撤語意上不超過 100%（把 peak 全數吐光即 1.0）。曲線跌破 0 時 (peak-val)/peak > 1，
+    若 peak 又只是勉強過 0 的小正值就會爆成天文數字（觀測到 dd=7,802,892%），純屬除以小 peak
+    的假象。故每步以 min(1.0, ·) 封頂，讓 dd 成為 [0,1] 的「峰值吐回比例」，與門檻語意一致。
+
+    修正 A：只在 running peak >= min_peak 時才累計回撤。min_peak 取
+    max(DD_MIN_PEAK_ABS, DD_MIN_PEAK_FRACTION × 全期峰值)，殺掉「早期小峰值→短暫負值」的假象
+    （早期 $100 小峰值的 dip 因 peak 遠低於門檻而不計入）；running peak 從未達門檻回 None。
+    """
+    peak, worst, counted = None, 0.0, False
     for val in series:
         if peak is None or val > peak:
             peak = val
-        if peak is not None and peak > EPS:
-            worst = max(worst, (peak - val) / peak)
-    return worst if peak is not None and peak > EPS else None
+        if peak is not None and peak >= min_peak:
+            counted = True
+            worst = max(worst, min(1.0, (peak - val) / peak))
+    return worst if counted else None
 
 
 def max_single_day_crash_pct(points, min_peak):
-    """最大單步崩跌（占 running peak 的比例），只在 peak >= min_peak 時計算。
+    """最大單步崩跌（占 running peak 的比例，封頂於 1.0），只在 peak >= min_peak 時計算。
 
     用來抓 James Wynn 型「$100M → $900」單日崩塌；PnL≈0 的刷量戶因 peak 太小而不計，
     避免小額波動被誤判崩跌。
+
+    BUG 1：當 peak 只是勉強過 min_peak 的小正值、下一步崩進深負，drop/peak 會爆成 284%、
+    1586%（觀測值），這其實是「小正峰值→大負」的虧損戶、非槓桿崩塌。崩跌%語意上不超過
+    100%，故每步以 min(1.0, drop/peak) 封頂；崩塌判據改以峰值回撤 max_drawdown_pct 為主。
     """
     peak, worst = None, 0.0
     for i, (_, val) in enumerate(points):
@@ -272,7 +286,7 @@ def max_single_day_crash_pct(points, min_peak):
         if i > 0 and peak is not None and peak >= min_peak:
             drop = points[i - 1][1] - val
             if drop > 0:
-                worst = max(worst, drop / peak)
+                worst = max(worst, min(1.0, drop / peak))
     return worst
 
 
@@ -357,6 +371,8 @@ def compute_metrics(wallet, snapshot_date):
 
     fills = parse_fills(wallet.get("userFills"))
     n_fills = len(fills)
+    # userFills 被 info API 截斷（近端窗）→ profit_factor/realized_win_rate 樣本偏誤大（BUG 3）
+    fills_truncated = n_fills >= config.MAX_USER_FILLS
     positions = parse_positions(wallet.get("clearinghouseState"))
     acct = account_summary(wallet.get("clearinghouseState"))
 
@@ -365,12 +381,19 @@ def compute_metrics(wallet, snapshot_date):
         pnl_source = "portfolio_curve"
         total_pnl = pnl_points[-1][1] - pnl_points[0][1]
         monthly = monthly_from_curve(pnl_points)
-        dd = max_drawdown_pct([v for _, v in pnl_points])
-        crash = max_single_day_crash_pct(pnl_points, config.BLOWUP_MIN_PEAK_FOR_CRASH)
         peak_pnl = max(v for _, v in pnl_points)
+        # 修正 A：回撤/崩跌共用的最小 peak 閘 = max(絕對地板, 全期峰值的固定比例)
+        dd_min_peak = max(config.DD_MIN_PEAK_ABS, config.DD_MIN_PEAK_FRACTION * peak_pnl)
+        dd = max_drawdown_pct([v for _, v in pnl_points], dd_min_peak)
+        crash = max_single_day_crash_pct(pnl_points, dd_min_peak)
+        # current_drawdown_pct：現值較全期峰值回落的比例（「近全損 vs 已復原」的判別信號）。
+        # 只在峰值夠大（>= dd_min_peak）時有意義，否則回 None（避免小峰值假象）。
+        final_pnl = pnl_points[-1][1]
+        current_dd = (min(1.0, (peak_pnl - final_pnl) / peak_pnl)
+                      if peak_pnl is not None and peak_pnl >= dd_min_peak else None)
     else:
         pnl_source = None
-        total_pnl, monthly, dd, crash, peak_pnl = None, {}, None, 0.0, None
+        total_pnl, monthly, dd, crash, peak_pnl, current_dd = None, {}, None, 0.0, None, None
 
     pnl_months = {m for m, v in monthly.items() if abs(v) > 0.01}
     pos_ratio = None
@@ -391,7 +414,10 @@ def compute_metrics(wallet, snapshot_date):
     pf_stats = profit_factor_stats(fills)
     hold_h = avg_hold_hours(fills)
     net_dir = net_direction_ratio(fills)
-    had_liquidation = any(f["is_liquidation"] for f in fills)
+    # 修正 B：由 fills 統計強平「次數」（is_liquidation 已寬鬆比對 dir/欄位含 'liquidat'），
+    # 取代舊的「有無」布林。had_liquidation 保留供揭露，n_liquidations 供反覆爆倉判據。
+    n_liquidations = sum(1 for f in fills if f["is_liquidation"])
+    had_liquidation = n_liquidations > 0
     coin_counts = Counter(f["coin"] for f in fills if f["coin"])
     top_coin = coin_counts.most_common(1)[0][0] if coin_counts else None
 
@@ -420,6 +446,7 @@ def compute_metrics(wallet, snapshot_date):
         "positive_month_ratio": round(pos_ratio, 3) if pos_ratio is not None else None,
         "best_month_pnl": round(best_month, 2) if best_month is not None else None,
         "max_drawdown_pct": round(dd, 4) if dd is not None else None,
+        "current_drawdown_pct": round(current_dd, 4) if current_dd is not None else None,
         "max_single_day_crash_pct": round(crash, 4) if crash is not None else None,
         "span_days": round(span_days, 1) if span_days is not None else None,
         "days_idle": round(days_idle, 1) if days_idle is not None else None,
@@ -432,7 +459,9 @@ def compute_metrics(wallet, snapshot_date):
         if pf_stats["realized_win_rate"] is not None else None,
         "avg_hold_hours": round(hold_h, 3) if hold_h is not None else None,
         "net_direction_ratio": round(net_dir, 4) if net_dir is not None else None,
+        "n_fills_truncated": fills_truncated,
         "had_liquidation": had_liquidation,
+        "n_liquidations": n_liquidations,
         "top_coin": top_coin,
         "vlm": round(vlm, 2) if vlm is not None else None,
         "vlm_to_pnl_ratio": round(vlm_to_pnl, 2) if vlm_to_pnl is not None else None,
@@ -453,35 +482,55 @@ def compute_metrics(wallet, snapshot_date):
 # ---------------------------------------------------------------------------
 
 def classify(m):
-    """回傳 (label, reasons)。門檻全在 config.py。順序：安全性優先（爆倉/刷量早判）。"""
+    """回傳 (label, reasons)。門檻全在 config.py。順序：安全性優先（爆倉/資料不足/刷量早判）。"""
     has_curve = m["pnl_source"] == "portfolio_curve"
+    lev = m.get("current_max_leverage")
+    dd = m.get("max_drawdown_pct")
+    cur_dd = m.get("current_drawdown_pct")
+    span = m.get("span_days")
+    n_liq = m.get("n_liquidations") or 0
 
-    # insufficient_data：無 PnL 曲線且成交太少 → 無從判斷
-    if not has_curve and m["n_fills"] < config.MIN_FILLS_FOR_CLASSIFICATION:
+    # 修正 B：反覆爆倉（>= BLOWUP_MIN_LIQUIDATIONS 次）＝真高風險硬事實，最高優先，即使
+    # portfolio 缺失也照判（如 James Wynn 194 次）。單次歷史強平（1..2）不再強制 blowup，往下走
+    # 正常分類（consistent/wash/choppy），風險於 metrics 的 n_liquidations/had_liquidation 揭露。
+    if n_liq >= config.BLOWUP_MIN_LIQUIDATIONS:
+        return "blowup_risk", [
+            f"userFills 出現 {n_liq} 次強平 >= {config.BLOWUP_MIN_LIQUIDATIONS}（反覆爆倉，真高風險）"]
+
+    # insufficient_data（BUG 4）：portfolio 曲線缺失（pnl_source 無、回撤/跨度皆無）→ 無 total_pnl/
+    # dd/月度序列等核心信號可算，不得進 choppy/winner/blowup（除非上面反覆爆倉硬事實）。
+    if not has_curve or (dd is None and span is None):
         return "insufficient_data", [
-            f"無 portfolio PnL 曲線且成交僅 {m['n_fills']} 筆 "
-            f"(<{config.MIN_FILLS_FOR_CLASSIFICATION})"]
+            "無 portfolio PnL 曲線（pnl_source 缺失或回撤/跨度皆無），核心信號不足以分類"]
     if not m["monthly_pnl"] and m["n_fills"] < config.MIN_FILLS_FOR_CLASSIFICATION:
         return "insufficient_data", ["無月度 PnL 序列且成交紀錄不足"]
 
-    # blowup_risk（優先於一切歷史型態：曾爆倉就是主導事實，高勝率無用）
-    lev = m.get("current_max_leverage")
-    dd = m.get("max_drawdown_pct")
-    crash = m.get("max_single_day_crash_pct") or 0.0
-    if m.get("had_liquidation"):
-        return "blowup_risk", ["userFills 出現 liquidation（曾被強平）"]
-    if crash >= config.BLOWUP_SINGLE_DAY_CRASH_PCT:
-        return "blowup_risk", [
-            f"PnL 曲線單步崩跌 {crash:.0%} >= {config.BLOWUP_SINGLE_DAY_CRASH_PCT:.0%}"]
+    # blowup_risk（曲線衍生）：極端槓桿＋大回撤（條件 3），或峰值回撤大且「現值仍近全損」（條件 2）。
+    # 修正 A/B：條件 2 以修正 A 後（加了 min_peak 閘）的峰值回撤為主，並要求 current_drawdown 亦大
+    # （現值較峰值仍深陷、未復原）才判 blowup——避免大額淨正、深回撤後完全復原的錢包（如 +$181M
+    # HFT，其歷史回撤真實但已回到峰值附近）被假回撤誤判、藏起真正候選贏家。
+    # 條件 3 的極端槓桿本身即前瞻爆倉風險，故照舊只看槓桿＋回撤、不看是否復原。
     if (lev is not None and lev >= config.BLOWUP_EXTREME_LEVERAGE
             and dd is not None and dd >= config.BLOWUP_DRAWDOWN_PCT):
         return "blowup_risk", [
             f"目前槓桿 {lev:.0f}x >= {config.BLOWUP_EXTREME_LEVERAGE:.0f}x 且回撤 "
             f"{dd:.0%} >= {config.BLOWUP_DRAWDOWN_PCT:.0%}"]
+    if (dd is not None and dd >= config.BLOWUP_DRAWDOWN_PCT
+            and cur_dd is not None and cur_dd >= config.BLOWUP_DRAWDOWN_PCT):
+        return "blowup_risk", [
+            f"峰值回撤 {dd:.0%} >= {config.BLOWUP_DRAWDOWN_PCT:.0%} 且現值較峰值回落 "
+            f"{cur_dd:.0%} >= {config.BLOWUP_DRAWDOWN_PCT:.0%}（近全損、未復原）"]
 
-    # wash_suspect（刷量／對敲：巨量但 PnL≈0，或無淨方向＋極短持倉高頻自成交）
+    # wash_suspect / mm_like（BUG 2）：做市商/高量低效戶——巨量且 量/PnL 比高，即使 PnL 為正
+    # 也非方向性 alpha，須在 consistent 檢查之前攔下（否則被丟進 choppy 或誤混進 winner）。
     vlm = m.get("vlm")
     vpr = m.get("vlm_to_pnl_ratio")
+    if (vlm is not None and vlm >= config.MM_MIN_VLM
+            and vpr is not None and vpr >= config.MM_MIN_VLM_TO_PNL):
+        return "wash_suspect", [
+            f"量 ${vlm:,.0f} >= ${config.MM_MIN_VLM:,.0f} 且 量/PnL 比 {vpr:,.0f} >= "
+            f"{config.MM_MIN_VLM_TO_PNL:,.0f}（做市商/高量低效，非方向性贏家，不可跟）"]
+    # 既有 wash（純刷量／對敲：巨量但 PnL≈0）
     if (vlm is not None and vlm >= config.WASH_MIN_VLM
             and vpr is not None and vpr >= config.WASH_VLM_TO_PNL_RATIO):
         return "wash_suspect", [
@@ -504,7 +553,6 @@ def classify(m):
             f"閒置 {idle:.0f} 天 > {config.DORMANT_MAX_IDLE_DAYS} 且目前無持倉"]
 
     # one_hit：活躍太短，或單一最佳期主導
-    span = m.get("span_days")
     if span is not None and span < config.ONE_HIT_MIN_SPAN_DAYS:
         return "one_hit", [f"活躍跨度 {span:.0f} 天 < {config.ONE_HIT_MIN_SPAN_DAYS}"]
     total, best = m.get("total_pnl"), m.get("best_month_pnl")
@@ -513,9 +561,12 @@ def classify(m):
         return "one_hit", [
             f"最佳月 {best:,.0f} > {config.ONE_HIT_BEST_MONTH_SHARE:.0%} × 總 PnL {total:,.0f}"]
 
-    # consistent_winner 核心條件（非 wash/blowup、槓桿合理、風險調整後仍穩定獲利）
+    # consistent_winner 核心條件（非 wash/blowup、槓桿合理、風險調整後仍穩定獲利）。
+    # BUG 3：portfolio 曲線指標（跨度/總PnL/回撤/正月比）為主；profit_factor 僅在 fills 未截斷時
+    # 作硬條件——fills 截斷（n>=MAX_USER_FILLS）時 pf 只反映近端偏誤樣本，降級為低信心參考，不硬否決。
     pf = m.get("profit_factor")
     ratio = m.get("positive_month_ratio")
+    fills_truncated = m.get("n_fills_truncated")
     core_checks = {
         f"活動跨度 {span} 天 >= {config.CONSISTENT_MIN_SPAN_DAYS}":
             span is not None and span >= config.CONSISTENT_MIN_SPAN_DAYS,
@@ -523,15 +574,21 @@ def classify(m):
             total is not None and total > config.CONSISTENT_MIN_TOTAL_PNL,
         f"回撤 {dd} < {config.CONSISTENT_MAX_DRAWDOWN_PCT:.0%} peak":
             dd is not None and dd < config.CONSISTENT_MAX_DRAWDOWN_PCT,
-        f"profit factor {pf} >= {config.CONSISTENT_MIN_PROFIT_FACTOR}":
-            pf is not None and pf >= config.CONSISTENT_MIN_PROFIT_FACTOR,
         f"目前槓桿 {lev} <= {config.CONSISTENT_MAX_LEVERAGE:.0f}x":
             lev is None or lev <= config.CONSISTENT_MAX_LEVERAGE,
         f"正月比率 {ratio} >= {config.CONSISTENT_MIN_POSITIVE_MONTH_RATIO}":
             ratio is not None and ratio >= config.CONSISTENT_MIN_POSITIVE_MONTH_RATIO,
     }
+    if not fills_truncated:
+        core_checks[f"profit factor {pf} >= {config.CONSISTENT_MIN_PROFIT_FACTOR}"] = (
+            pf is not None and pf >= config.CONSISTENT_MIN_PROFIT_FACTOR)
     if all(core_checks.values()):
-        return "consistent_winner", [k for k in core_checks]
+        reasons = [k for k in core_checks]
+        if fills_truncated:
+            reasons.append(
+                f"（fills 截斷 n>={config.MAX_USER_FILLS}，profit factor {pf} 樣本偏誤大，"
+                f"僅供低信心參考，不硬否決）")
+        return "consistent_winner", reasons
     return "choppy", [k for k, ok in core_checks.items() if not ok] or ["不符合任何特定型態"]
 
 
@@ -636,8 +693,11 @@ def build_markdown(date, results, meta, ground_truth, verdict):
                   "|---|---:|---:|---:|---:|---|---:|"]
         for r in sorted(winners, key=lambda x: -(x["metrics"]["total_pnl"] or 0)):
             m = r["metrics"]
+            # 風險揭露：consistent_winner 若曾被強平，明細標「曾強平 N 次」，不隱藏風險。
+            liq_note = (f"（⚠️ 曾強平 {m.get('n_liquidations')} 次）"
+                        if m.get("n_liquidations") else "")
             lines.append(
-                f"| `{m['address']}` | ${_fmt(m['total_pnl'])} "
+                f"| `{m['address']}`{liq_note} | ${_fmt(m['total_pnl'])} "
                 f"| {_fmt(m['max_drawdown_pct'], '.0%')} "
                 f"| {_fmt(m['profit_factor'], ',.2f')} "
                 f"| {_fmt(m['current_max_leverage'], ',.0f')}x "
