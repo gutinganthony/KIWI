@@ -167,6 +167,13 @@ def apply_vetoes(qualified: list, state: dict, cfg: dict, as_of: str) -> tuple[l
     def veto(reason):
         reasons[reason] = reasons.get(reason, 0) + 1
 
+    # 系統性缺失降級：成交額 state 完全為空＝數據源整體故障（非個股問題），
+    # 此時流動性關不生效並記 warning，避免單一數據源故障把全部合格事件否決光。
+    # 個股層級查無（其他股有數據）仍照 VETO_UNKNOWN_TURNOVER 保守否決。
+    turnover_available = bool(state["turnover_days"])
+    if not turnover_available:
+        reasons["turnover_gate_inactive_source_down"] = 0
+
     for c in qualified:
         t = c["ticker"]
         if jan_window:
@@ -181,14 +188,15 @@ def apply_vetoes(qualified: list, state: dict, cfg: dict, as_of: str) -> tuple[l
         if pledge.get(t, 0) > cfg["PLEDGE_VETO_RATIO"]:
             veto("pledge_ratio")
             continue
-        avg = avg_turnover(state["turnover_days"], t, as_of, cfg["TURNOVER_AVG_WINDOW"])
-        if avg is None:
-            if cfg["VETO_UNKNOWN_TURNOVER"]:
-                veto("turnover_unknown")
+        if turnover_available:
+            avg = avg_turnover(state["turnover_days"], t, as_of, cfg["TURNOVER_AVG_WINDOW"])
+            if avg is None:
+                if cfg["VETO_UNKNOWN_TURNOVER"]:
+                    veto("turnover_unknown")
+                    continue
+            elif avg < cfg["MIN_AVG_DAILY_TURNOVER_TWD"]:
+                veto("turnover_floor")
                 continue
-        elif avg < cfg["MIN_AVG_DAILY_TURNOVER_TWD"]:
-            veto("turnover_floor")
-            continue
         survivors.append(c)
     return survivors, reasons
 

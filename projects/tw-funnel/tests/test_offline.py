@@ -298,9 +298,15 @@ def test_vetoes():
     ok(sv == [] and reasons == {"turnover_floor": 1}, "日均成交額低於下限 → 否決")
 
     s = copy.deepcopy(state)
-    s["turnover_days"] = {}
+    s["turnover_days"] = {D3: {"9999": 99_000_000}}  # 源有數據、僅該股查無 → 個股層級保守否決
     sv, reasons = funnel.apply_vetoes(qualified, s, cfg, D3)
-    ok(sv == [] and reasons == {"turnover_unknown": 1}, "成交額不可得 → 保守否決")
+    ok(sv == [] and reasons == {"turnover_unknown": 1}, "個股成交額查無（源正常）→ 保守否決")
+
+    s = copy.deepcopy(state)
+    s["turnover_days"] = {}  # 源整體故障 → 流動性關降級不生效，事件放行＋記警示
+    sv, reasons = funnel.apply_vetoes(qualified, s, cfg, D3)
+    ok(len(sv) == 1 and "turnover_gate_inactive_source_down" in reasons,
+       "成交額源整體故障 → 降級放行＋警示")
 
     # 1 月窗：開關開 → 上半月全否決；下半月/關閉 → 放行
     jan10, jan20 = "2027-01-10", "2027-01-20"
