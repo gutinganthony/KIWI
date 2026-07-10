@@ -1,0 +1,109 @@
+{
+  "date": "2026-07-10",
+  "generated_at": "2026-07-10T08:02:26.830573+00:00",
+  "snapshot_dir": "/home/runner/work/KIWI/KIWI/projects/poly-observer/data/snapshots/2026-07-10",
+  "verdict": "弱存在（樣本內僅少數 consistent_winner，證據不足，需持續觀察）",
+  "classification_counts": {
+    "consistent_winner": 1
+  },
+  "wallets": {
+    "0x25e28169faea17421fcd4cc361f6436d1e449a09": {
+      "metrics": {
+        "address": "0x25e28169faea17421fcd4cc361f6436d1e449a09",
+        "snapshot_date": "2026-07-10",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 176389.8,
+        "monthly_pnl": {
+          "2025-10": 59.8,
+          "2025-11": 59.13,
+          "2025-12": 0.0,
+          "2026-01": 69984.2,
+          "2026-02": 52453.17,
+          "2026-03": 117136.06,
+          "2026-04": -63302.56,
+          "2026-05": 0.0,
+          "2026-06": 0.0,
+          "2026-07": 0.0
+        },
+        "active_months": 6,
+        "positive_month_ratio": 0.833,
+        "best_month_pnl": 117136.06,
+        "max_drawdown_pct": 0.328,
+        "recent_30d_pnl": 0.0,
+        "n_trades": 783,
+        "trade_months": 6,
+        "trades_per_month": 130.5,
+        "avg_hold_hours": 8.069,
+        "category_counts": {
+          "esports": 453,
+          "other": 260,
+          "sports": 70
+        },
+        "top_category": "esports",
+        "top_category_share": 0.579,
+        "activity_truncated": false,
+        "fetch_errors": []
+      },
+      "classification": "consistent_winner",
+      "reasons": [
+        "活躍月數 6 >= 3",
+        "正月比率 0.833 >= 0.6",
+        "總 PnL 176389.8 > 10,000",
+        "回撤 0.328 < 50% peak",
+        "頻率 130.5 在 5–1500 筆/月"
+      ]
+    }
+  },
+  "ground_truth": [
+    {
+      "address": "0x25e28169faea17421fcd4cc361f6436d1e449a09",
+      "expected": [
+        "one_hit",
+        "degraded"
+      ],
+      "actual": "consistent_winner",
+      "ok": false,
+      "note": null
+    }
+  ],
+  "endpoint_health_summary": [
+    {
+      "endpoint": "data-api.polymarket.com/activity",
+      "ok": 2,
+      "failed": 0,
+      "sample_error": null
+    },
+    {
+      "endpoint": "data-api.polymarket.com/leaderboard",
+      "ok": 0,
+      "failed": 3,
+      "sample_error": "status=404 HTTP 404; body=404 page not found"
+    },
+    {
+      "endpoint": "data-api.polymarket.com/positions",
+      "ok": 1,
+      "failed": 0,
+      "sample_error": null
+    },
+    {
+      "endpoint": "data-api.polymarket.com/value",
+      "ok": 1,
+      "failed": 0,
+      "sample_error": null
+    },
+    {
+      "endpoint": "lb-api.polymarket.com/leaderboard",
+      "ok": 0,
+      "failed": 3,
+      "sample_error": "status=404 HTTP 404; body=404 page not found"
+    },
+    {
+      "endpoint": "user-pnl-api.polymarket.com/user-pnl",
+      "ok": 1,
+      "failed": 0,
+      "sample_error": null
+    }
+  ],
+  "snapshot_load_errors": []
+}

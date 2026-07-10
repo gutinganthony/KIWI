@@ -1,0 +1,105 @@
+{
+  "date": "2026-07-10",
+  "snapshot_dir": "/home/runner/work/KIWI/KIWI/projects/poly-observer/data/snapshots/2026-07-10",
+  "universe_size": 1,
+  "wallets_ok": 1,
+  "wallets_partial": 0,
+  "wallets_failed": 0,
+  "requests_ok": 5,
+  "requests_failed": 6,
+  "elapsed_sec": 32.6,
+  "endpoint_health": [
+    {
+      "name": "leaderboard[1m]",
+      "url": "https://lb-api.polymarket.com/leaderboard?window=1m&rankType=pnl&limit=50",
+      "ok": false,
+      "status": 404,
+      "error": "HTTP 404; body=404 page not found\n",
+      "elapsed_sec": 4.38
+    },
+    {
+      "name": "leaderboard[1m]",
+      "url": "https://data-api.polymarket.com/leaderboard?window=1m&rankType=pnl&limit=50",
+      "ok": false,
+      "status": 404,
+      "error": "HTTP 404; body=404 page not found\n",
+      "elapsed_sec": 4.65
+    },
+    {
+      "name": "leaderboard[month]",
+      "url": "https://lb-api.polymarket.com/leaderboard?window=month&rankType=pnl&limit=50",
+      "ok": false,
+      "status": 404,
+      "error": "HTTP 404; body=404 page not found\n",
+      "elapsed_sec": 4.33
+    },
+    {
+      "name": "leaderboard[month]",
+      "url": "https://data-api.polymarket.com/leaderboard?window=month&rankType=pnl&limit=50",
+      "ok": false,
+      "status": 404,
+      "error": "HTTP 404; body=404 page not found\n",
+      "elapsed_sec": 4.67
+    },
+    {
+      "name": "leaderboard[all]",
+      "url": "https://lb-api.polymarket.com/leaderboard?window=all&rankType=pnl&limit=50",
+      "ok": false,
+      "status": 404,
+      "error": "HTTP 404; body=404 page not found\n",
+      "elapsed_sec": 4.35
+    },
+    {
+      "name": "leaderboard[all]",
+      "url": "https://data-api.polymarket.com/leaderboard?window=all&rankType=pnl&limit=50",
+      "ok": false,
+      "status": 404,
+      "error": "HTTP 404; body=404 page not found\n",
+      "elapsed_sec": 4.94
+    },
+    {
+      "name": "activity[0x25e28169…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x25e28169faea17421fcd4cc361f6436d1e449a09&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.32
+    },
+    {
+      "name": "activity[0x25e28169…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x25e28169faea17421fcd4cc361f6436d1e449a09&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.32
+    },
+    {
+      "name": "positions[0x25e28169…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x25e28169faea17421fcd4cc361f6436d1e449a09&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.31
+    },
+    {
+      "name": "value[0x25e28169…]",
+      "url": "https://data-api.polymarket.com/value?user=0x25e28169faea17421fcd4cc361f6436d1e449a09",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "pnl[0x25e28169…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x25e28169faea17421fcd4cc361f6436d1e449a09&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    }
+  ],
+  "notes": [
+    "leaderboard window=1m 全部端點失敗，該窗略過",
+    "leaderboard window=all 全部端點失敗，該窗略過"
+  ]
+}
