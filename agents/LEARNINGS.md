@@ -10,3 +10,4 @@
 - [2026-07-07] 情境：在 avi-v5 裝依賴｜錯誤：`pip install -r requirements.txt` 撞 debian 系統套件衝突（PyJWT RECORD file not found）｜正解：加 `--user`｜規則：本環境 pip 安裝一律用 `pip install --user`。
 - [2026-07-07] 情境：Bash 工具跨呼叫的工作目錄會延續｜錯誤：上一個指令 cd 進子目錄後，下一個指令用相對路徑找不到檔案｜正解：一律用絕對路徑（/home/user/KIWI/...）｜規則：Bash 指令不依賴前一次呼叫留下的 cwd。
 - [2026-07-10] 情境：查證外部網站與鏈上數據｜事實：本環境 WebFetch 整體 403（連 example.com 都擋），agent proxy 對大量外站（polymarket.com、data-api、etherscan、t.me、x.com、medium.com 等）CONNECT 一律 403，只有 WebSearch（搜尋索引快照）可用｜正解：網路查證派 subagent 用 WebSearch 多來源交叉，數字標註「快照非即時」，頁面級驗證回寫 mac-manual-homework 待辦｜規則：不要浪費回合對外站試 WebFetch/curl，直接用 WebSearch。
+- [2026-07-10] 情境：push 後 GitHub Actions 毫無反應（run 數 0、workflow 未註冊）｜錯誤：commit 訊息的「說明文字」裡含字面 [skip ci]（描述防迴圈機制），GitHub 對訊息任何位置的 [skip ci]/[ci skip] 都會跳過觸發｜正解：推一個乾淨訊息、且觸及 workflow paths 過濾的 commit 重新觸發｜規則：commit 訊息絕不出現字面 [skip ci]，要描述機制就寫「skip-ci 標記」。

@@ -53,3 +53,5 @@ jobs:
             git commit -m "auto: poly-observer data update $(date -u +%F) [skip ci]"
             git push
           fi
+
+# retrigger note: 2026-07-10 首次觸發因 commit 訊息含 skip-ci 字面被跳過
