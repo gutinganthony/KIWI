@@ -2,23 +2,31 @@
   "address": "0x25e28169faea17421fcd4cc361f6436d1e449a09",
   "snapshot_date": "2026-07-10",
   "bankroll": 10000.0,
+  "reliable": true,
+  "unreliable_reasons": [],
   "coverage": {
     "first_date": "2025-10-25",
     "last_date": "2026-06-22",
     "n_events": 852,
     "n_trades": 783,
     "n_redeems": 69,
-    "n_markets_closed": 81,
-    "n_markets_open": 0,
+    "window_hours": 5753.08,
+    "trades_per_hour": 0.136,
+    "n_markets_roundtrip": 81,
+    "n_markets_settle_only": 0,
+    "n_markets_open_only": 0,
+    "losing_redeem_count": 25,
     "activity_truncated": false
   },
   "wallet_window": {
     "cost": 1341493.2,
     "recovered": 1515844.39,
     "realized_pnl": 174351.2,
+    "realized_is_upper_bound": true,
     "roi": 0.13,
     "curve_delta": 176389.8,
-    "curve_divergence_warning": null
+    "curve_divergence_warning": null,
+    "excluded_settle_only_proceeds": 0.0
   },
   "matrix": {
     "optimistic": {
@@ -34,7 +42,8 @@
         "copied_buys": 200,
         "n_markets_copied": 21,
         "win_rate": 0.905,
-        "capture_rate": 1.83
+        "capture_rate": 1.83,
+        "capture_biased": true
       },
       "proportional": {
         "scenario": "optimistic",
@@ -48,7 +57,8 @@
         "copied_buys": 50,
         "n_markets_copied": 14,
         "win_rate": 0.857,
-        "capture_rate": 2.875
+        "capture_rate": 2.875,
+        "capture_biased": true
       }
     },
     "realistic": {
@@ -64,7 +74,8 @@
         "copied_buys": 200,
         "n_markets_copied": 21,
         "win_rate": 0.905,
-        "capture_rate": 1.29
+        "capture_rate": 1.29,
+        "capture_biased": true
       },
       "proportional": {
         "scenario": "realistic",
@@ -78,7 +89,8 @@
         "copied_buys": 50,
         "n_markets_copied": 14,
         "win_rate": 0.857,
-        "capture_rate": 2.263
+        "capture_rate": 2.263,
+        "capture_biased": true
       }
     },
     "pessimistic": {
@@ -94,7 +106,8 @@
         "copied_buys": 200,
         "n_markets_copied": 21,
         "win_rate": 0.857,
-        "capture_rate": 0.78
+        "capture_rate": 0.78,
+        "capture_biased": false
       },
       "proportional": {
         "scenario": "pessimistic",
@@ -108,7 +121,8 @@
         "copied_buys": 50,
         "n_markets_copied": 14,
         "win_rate": 0.857,
-        "capture_rate": 1.685
+        "capture_rate": 1.685,
+        "capture_biased": true
       }
     }
   },

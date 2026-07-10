@@ -17,11 +17,11 @@
 
 | 分類 | 錢包數 | 佔比 |
 |---|---:|---:|
-| consistent_winner | 1 | 2% |
+| consistent_winner | 2 | 3% |
 | degraded | 0 | 0% |
 | dormant | 5 | 8% |
 | one_hit | 34 | 57% |
-| mm_bot_like | 3 | 5% |
+| mm_bot_like | 2 | 3% |
 | choppy | 17 | 28% |
 | insufficient_data | 0 | 0% |
 | **合計** | **60** | |
@@ -30,7 +30,8 @@
 
 | 地址 | 總 PnL | 正月比率 | 峰值回撤 | 頻率(筆/月) | 主類別 | 低信心 |
 |---|---:|---:|---:|---:|---|---|
-| `0x2005d16a84ceefa912d4e380cd32e7ff827875ea` | $11,011,636 | 100% | 10% | 1,344.0 | sports (81%) | 否 |
+| `0x2005d16a84ceefa912d4e380cd32e7ff827875ea` | $11,011,636 | 100% | 10% | 1,345.0 | sports (81%) | 否 |
+| `0x2663daca3cecf3767ca1c3b126002a8578a8ed1f` | $1,300,248 | 71% | 44% | 1,480.0 | sports (72%) | 否 |
 
 ## 4. Ground-truth 校驗
 
@@ -38,7 +39,7 @@
 
 ## 5. 裁決
 
-consistent_winner 數量：**1**
+consistent_winner 數量：**2**
 
 **弱存在（樣本內僅少數 consistent_winner，證據不足，需持續觀察）**
 
