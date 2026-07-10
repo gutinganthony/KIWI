@@ -193,14 +193,19 @@ def test_track_wallet(tmp):
 
 
 def test_simulate_copy():
-    print("[6] simulate_copy：錢包原始 PnL 手算對得上＋摩擦侵蝕＋情境單調")
+    print("[6] simulate_copy：錢包原始 PnL 手算對得上＋摩擦侵蝕＋情境單調（可靠案例）")
     wallet = json.loads((FIXTURES / "wallet_sim.json").read_text(encoding="utf-8"))
     result = simulate_copy.simulate(wallet, SNAP_DATE)
 
+    # wallet_sim：7 天、未截斷、4 市場皆完整 round-trip、含明確輸贏 → 應可靠
+    ok(result["reliable"] is True,
+       f"wallet_sim 為可靠案例 reliable==True（reasons={result['unreliable_reasons']}）")
+
     ww = result["wallet_window"]
-    # (a) 錢包原始已實現 PnL：回收 220（A100+B10+C110+D0）− 成本 170（40+50+60+20）= 50
+    # (a) 錢包已實現 PnL（只算 round-trip；4 市場全為 round-trip）：
+    #     回收 220（A100+B10+C110+D0）− 成本 170（40+50+60+20）= 50
     ok(abs(ww["realized_pnl"] - 50.0) < 0.01,
-       f"錢包同窗原始已實現 PnL=50（手算對照）：{ww['realized_pnl']}")
+       f"錢包同窗已實現 PnL=50（手算對照，只算 round-trip）：{ww['realized_pnl']}")
     ok(ww["curve_divergence_warning"] is None,
        "重建 PnL 與 pnl 曲線同窗變動一致（無示警）")
     ok(ww["roi"] is not None and ww["roi"] > 0, f"錢包同窗 ROI 為正（{ww['roi']}）")
@@ -216,6 +221,37 @@ def test_simulate_copy():
     ok(pess < opt, f"pessimistic 淨 PnL {pess} < optimistic 淨 PnL {opt}")
 
 
+def test_simulate_copy_unreliable():
+    print("[7] simulate_copy：高頻截斷錢包（贏家倖存者偏誤）→ 誠實拒答")
+    wallet = json.loads((FIXTURES / "wallet_hyperactive.json").read_text(encoding="utf-8"))
+    result = simulate_copy.simulate(wallet, SNAP_DATE)
+
+    # (a) 整體判定不可靠
+    ok(result["reliable"] is False,
+       f"高頻截斷錢包 reliable==False（{result['reliable']}）")
+
+    reasons = "\n".join(result["unreliable_reasons"])
+    # (b) 至少命中原因 (b) 幽靈利潤主導 與 (d) 結算全為贏家
+    ok("幽靈利潤主導" in reasons,
+       f"命中原因(b) 結算-only 幽靈利潤主導（{result['unreliable_reasons']}）")
+    ok("輸家不產生 REDEEM" in reasons,
+       f"命中原因(d) 結算全為贏家（{result['unreliable_reasons']}）")
+
+    md = simulate_copy.build_markdown(result)
+    # (c) 報告含「無法可靠模擬」且絕不含「淨正 ✅」
+    ok("無法可靠模擬" in md, "報告含醒目拒答區塊「無法可靠模擬」")
+    ok("淨正 ✅" not in md, "報告不含「淨正 ✅」（不誤導為可獲利）")
+    # (d) 報告含固定的「頻率 × 延遲可行性」區塊
+    ok("頻率 × 延遲可行性" in md, "報告含「頻率 × 延遲可行性」區塊")
+
+    # capture 防呆：不可靠 → 每格 capture 皆標記偏誤、md 印「—（資料偏誤）」
+    all_biased = all(result["matrix"][s][m]["capture_biased"]
+                     for s in ("optimistic", "realistic", "pessimistic")
+                     for m in ("fixed", "proportional"))
+    ok(all_biased, "不可靠時所有格 capture_biased==True")
+    ok("—（資料偏誤）" in md, "md 的捕獲率格印「—（資料偏誤）」")
+
+
 def main():
     with tempfile.TemporaryDirectory(prefix="poly-observer-test-") as td:
         tmp = Path(td)
@@ -225,6 +261,7 @@ def main():
         test_analyze(tmp, snap_dir, report_dir)
         test_track_wallet(tmp)
         test_simulate_copy()
+        test_simulate_copy_unreliable()
     print(f"ALL TESTS PASSED ({checks} checks)")
     return 0
 

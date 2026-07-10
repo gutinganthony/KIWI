@@ -189,3 +189,12 @@ SIM_LATENCY_EXTRA_SLIPPAGE = 0.01   # 延遲另加的單邊摩擦（假設值，
 SIM_COPY_MODES = ["fixed", "proportional"]
 SIM_FIXED_USD = 50.0              # fixed 模式：每單固定投入（USD）
 SIM_PROP_FRACTION = 0.02          # proportional 模式：每單投入 = bankroll × 此值
+
+# 可靠性閘門（simulate_copy 判斷「本窗能否可靠模擬跟單損益」）
+# 動機：Polymarket 輸的部位不產生 REDEEM（只有贏了領獎才有），且 1500 筆 activity
+# 上限對高頻錢包只涵蓋數小時 → 用 activity 重建已實現 PnL 會系統性高估（贏家倖存者偏誤
+# ＋結算/買入錯配的幽靈利潤）。以下門檻用來偵測並在報告中明白拒答，不印假的正報酬。
+SIM_MIN_WINDOW_HOURS = 72         # 視窗短於此小時數且 activity 已截斷 → 不可靠
+SIM_SETTLE_ONLY_RATIO = 0.5       # settle-only 市場數 > 此比例 × round-trip 市場數 → 幽靈利潤主導
+# 跟單者「偵測 + 執行」延遲假設（秒）；用來換算高頻錢包在延遲內平均新增幾筆單
+SIM_LATENCY_SCENARIOS_SEC = {"fast": 30, "typical": 120}
