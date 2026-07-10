@@ -11,15 +11,15 @@
 | `leaderboard @ stats-data.hyperliquid.xyz/Mainnet/leaderboard` | 1 | 0 | — |
 | `portfolio @ api.hyperliquid.xyz/info` | 60 | 0 | — |
 | `userFills @ api.hyperliquid.xyz/info` | 60 | 0 | — |
-| `userFunding @ api.hyperliquid.xyz/info` | 60 | 0 | — |
+| `userFunding @ api.hyperliquid.xyz/info` | 59 | 1 | status=429 HTTP 429; body=null |
 
 ## 2. 分類統計
 
 | 分類 | 錢包數 | 佔比 |
 |---|---:|---:|
 | consistent_winner | 0 | 0% |
-| blowup_risk | 29 | 48% |
-| wash_suspect | 26 | 43% |
+| blowup_risk | 30 | 50% |
+| wash_suspect | 25 | 42% |
 | one_hit | 1 | 2% |
 | dormant | 0 | 0% |
 | choppy | 4 | 7% |
