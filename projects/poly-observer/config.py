@@ -75,6 +75,9 @@ ONE_HIT_MIN_ACTIVE_MONTHS = 2
 
 # consistent_winner：活躍 >=3 個月、正月比率 >=0.6、總 PnL > $10,000、
 # 峰值回撤 < 50% peak、頻率 5–1500 筆/月
+# 2026-07-10 實測教訓：只數日曆月會讓 55-69 天的熱 streak 混過「3 個月」門檻
+# （5/17 開始的錢包在 7 月拿到 5、6、7 三個月鍵），故加最短實際跨度天數。
+CONSISTENT_MIN_SPAN_DAYS = 75
 CONSISTENT_MIN_ACTIVE_MONTHS = 3
 CONSISTENT_MIN_POSITIVE_MONTH_RATIO = 0.6
 CONSISTENT_MIN_TOTAL_PNL = 10_000.0

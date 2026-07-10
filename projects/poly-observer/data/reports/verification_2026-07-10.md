@@ -7,38 +7,40 @@
 
 | 端點 | 成功 | 失敗 | 失敗樣本 |
 |---|---:|---:|---|
-| `data-api.polymarket.com/activity` | 2 | 0 | — |
-| `data-api.polymarket.com/leaderboard` | 0 | 3 | status=404 HTTP 404; body=404 page not found |
-| `data-api.polymarket.com/positions` | 1 | 0 | — |
-| `data-api.polymarket.com/value` | 1 | 0 | — |
-| `lb-api.polymarket.com/leaderboard` | 0 | 3 | status=404 HTTP 404; body=404 page not found |
-| `user-pnl-api.polymarket.com/user-pnl` | 1 | 0 | — |
+| `data-api.polymarket.com/activity` | 171 | 0 | — |
+| `data-api.polymarket.com/positions` | 60 | 0 | — |
+| `data-api.polymarket.com/v1/leaderboard` | 2 | 0 | — |
+| `data-api.polymarket.com/value` | 60 | 0 | — |
+| `user-pnl-api.polymarket.com/user-pnl` | 60 | 0 | — |
 
 ## 2. 分類統計
 
 | 分類 | 錢包數 | 佔比 |
 |---|---:|---:|
-| consistent_winner | 1 | 100% |
+| consistent_winner | 3 | 5% |
 | degraded | 0 | 0% |
-| one_hit | 0 | 0% |
-| mm_bot_like | 0 | 0% |
-| choppy | 0 | 0% |
+| dormant | 5 | 8% |
+| one_hit | 34 | 57% |
+| mm_bot_like | 3 | 5% |
+| choppy | 15 | 25% |
 | insufficient_data | 0 | 0% |
-| **合計** | **1** | |
+| **合計** | **60** | |
 
 ## 3. consistent_winner 明細
 
 | 地址 | 總 PnL | 正月比率 | 峰值回撤 | 頻率(筆/月) | 主類別 | 低信心 |
 |---|---:|---:|---:|---:|---|---|
-| `0x25e28169faea17421fcd4cc361f6436d1e449a09` | $176,390 | 83% | 33% | 130.5 | esports (58%) | 否 |
+| `0x2005d16a84ceefa912d4e380cd32e7ff827875ea` | $11,011,638 | 100% | 10% | 1,344.0 | sports (81%) | 否 |
+| `0x5966db1fe50763c9e3c014d756369bad07e1f804` | $3,243,968 | 100% | 28% | 730.5 | other (57%) | 否 |
+| `0x511f9c771449162349795d17becf8b37031acbe1` | $496,506 | 100% | 30% | 1,322.0 | other (45%) | 否 |
 
 ## 4. Ground-truth 校驗
 
-- ❌ **【不符，分類器需檢查】** `0x25e28169faea17421fcd4cc361f6436d1e449a09`：預期 one_hit / degraded，實際 **consistent_winner**
+- ✅ `0x25e28169faea17421fcd4cc361f6436d1e449a09`：預期 dormant，實際 **dormant** — 符合
 
 ## 5. 裁決
 
-consistent_winner 數量：**1**
+consistent_winner 數量：**3**
 
 **弱存在（樣本內僅少數 consistent_winner，證據不足，需持續觀察）**
 

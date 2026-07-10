@@ -46,6 +46,12 @@ jobs:
         working-directory: projects/poly-observer
         run: python3 analyze.py --snapshot "data/snapshots/$(date -u +%F)" || true
 
+      # repo 體積控制：原始 wallet 快照每日 ~85MB，只保留衍生報告與 meta；
+      # 原始資料隨時可由公開 API 重抓，verification json 已含全部逐錢包指標
+      - name: Prune raw wallet snapshots
+        working-directory: projects/poly-observer
+        run: rm -rf data/snapshots/*/wallets
+
       # paths 過濾已排除 data/**，加上 [skip ci] 雙保險，不會自我觸發
       - name: Commit data back
         run: |

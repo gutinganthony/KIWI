@@ -327,6 +327,14 @@ def compute_metrics(wallet, snapshot_date):
                          default=None)
     days_idle = ((end_ts - last_active_ts) / DAY_SEC) if last_active_ts is not None else None
 
+    # 實際活動跨度（天）：最早到最晚的 PnL 點/交易，防日曆月計數高估資歷
+    first_trade_ts = min((t["ts"] for t in trades if t["ts"] is not None), default=None)
+    first_ts_cands = [ts for ts in (first_trade_ts, points[0][0] if points else None)
+                      if ts is not None]
+    span_days = None
+    if first_ts_cands and last_active_ts is not None:
+        span_days = (last_active_ts - min(first_ts_cands)) / DAY_SEC
+
     # 目前持倉價值（value 端點：[{user, value}] 或 {value: x}；缺資料 → None）
     current_value = None
     raw_value = wallet.get("value")
@@ -360,6 +368,7 @@ def compute_metrics(wallet, snapshot_date):
         "top_category_share": round(top_share, 3) if top_share is not None else None,
         "days_idle": round(days_idle, 1) if days_idle is not None else None,
         "current_value": round(current_value, 2) if current_value is not None else None,
+        "span_days": round(span_days, 1) if span_days is not None else None,
         "activity_truncated": bool(wallet.get("activity_truncated")),
         "fetch_errors": wallet.get("errors") or [],
     }
@@ -409,9 +418,12 @@ def classify(m):
     # consistent 核心條件
     ratio, dd = m["positive_month_ratio"], m["max_drawdown_pct"]
     lo, hi = config.CONSISTENT_FREQ_RANGE
+    span = m.get("span_days")
     core_checks = {
         f"活躍月數 {m['active_months']} >= {config.CONSISTENT_MIN_ACTIVE_MONTHS}":
             m["active_months"] >= config.CONSISTENT_MIN_ACTIVE_MONTHS,
+        f"活動跨度 {span} 天 >= {config.CONSISTENT_MIN_SPAN_DAYS}":
+            span is not None and span >= config.CONSISTENT_MIN_SPAN_DAYS,
         f"正月比率 {ratio} >= {config.CONSISTENT_MIN_POSITIVE_MONTH_RATIO}":
             ratio is not None and ratio >= config.CONSISTENT_MIN_POSITIVE_MONTH_RATIO,
         f"總 PnL {total} > {config.CONSISTENT_MIN_TOTAL_PNL:,.0f}":
