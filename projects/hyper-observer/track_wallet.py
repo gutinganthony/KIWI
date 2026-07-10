@@ -51,6 +51,9 @@ def compute_dossier(wallet, date):
     addr = str(wallet.get("address", "")).lower()
     metrics = classify.compute_metrics(wallet, date)
     classification, reasons = classify.classify(metrics)
+    # 決策頻率複核：升級後 followability（頻率以「部位事件數」判，fills 數僅參考）。
+    # tracked 錢包不論分類一律出判定，讓 dossier 直接落地可跟性結論。
+    follow_ok, follow_reasons = classify.followability(metrics)
 
     positions = classify.parse_positions(wallet.get("clearinghouseState"))
     position_value = round(sum(p["position_value"] for p in positions
@@ -79,6 +82,7 @@ def compute_dossier(wallet, date):
         "snapshot_date": date,
         "classification": classification,
         "classification_reasons": reasons,
+        "followable": {"ok": follow_ok, "reasons": follow_reasons},
         "metrics": metrics,
         "position_value": position_value,
         "unrealized_pnl": unrealized_pnl,
@@ -233,7 +237,35 @@ def build_markdown(dossier, new_positions, disappeared, initialized):
     else:
         lines.append("（無成交紀錄）")
 
-    lines += ["", "## 5. 新開倉/平倉偵測", ""]
+    lines += ["", "## 5. 決策頻率複核（fills → 部位事件）", "",
+              "> fills ≠ 決策：一張大單在薄訂單簿會拆成多筆成交、分批建倉/出場也是同一個",
+              f"> 交易決策。同幣種同方向、相鄰 fills 間隔 <= {config.AGG_EVENT_GAP_MINUTES} "
+              "分鐘聚合為一「部位事件」，以事件數重算真實決策頻率。",
+              "",
+              f"- 近 30 天部位事件數：**{_fmt(m.get('n_events_last_30d'), ',.0f')}** 個"
+              f"（vs fills {_fmt(m.get('n_fills_last_30d'), ',.0f')} 筆；"
+              f"頻率門檻 <= {config.FOLLOWABLE_MAX_EVENTS_30D} 事件，fills 數僅參考）",
+              f"- 30 天窗 fills 覆蓋：{_fmt(m.get('events_30d_coverage_days'), ',.1f')} 天"
+              + (f"（fills 截斷，30 日事件外推 ≈ "
+                 f"{_fmt(m.get('n_events_last_30d_est'), ',.0f')} 個，頻率判定用外推值）"
+                 if m.get("n_events_last_30d_est") != m.get("n_events_last_30d") else ""),
+              f"- 全 fills 窗事件數：{_fmt(m.get('n_events'), ',.0f')} 個"
+              f"（fills 共 {_fmt(m.get('n_fills'), ',.0f')} 筆）",
+              f"- median 每事件 fills：{_fmt(m.get('median_fills_per_event'), ',.1f')} 筆",
+              f"- median 事件名目：${_fmt(m.get('median_event_notional'))}",
+              f"- 事件間隔分布：median {_fmt(m.get('median_gap_between_events_hours'))} 小時"
+              f"／p90 {_fmt(m.get('p90_gap_between_events_hours'))} 小時",
+              ""]
+    fol = dossier.get("followable") or {}
+    if fol.get("ok"):
+        lines.append("**升級後可跟性判定：✅ 通過** — 頻率（近 30 天部位事件數）、"
+                     "平均持倉、槓桿三條件皆符合。")
+    else:
+        lines.append("**升級後可跟性判定：❌ 不通過**，原因：")
+        for r in fol.get("reasons") or ["未判定"]:
+            lines.append(f"- {r}")
+
+    lines += ["", "## 6. 新開倉/平倉偵測", ""]
     if initialized:
         lines.append("**initialized** — 首次追蹤，無前次持倉可比對（下次執行起偵測異動）。")
     else:

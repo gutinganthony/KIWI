@@ -582,6 +582,167 @@ def test_fetch_fallback():
     ok(merged[:2] == seeds and len(merged) == 3, f"seeds 永遠保留＋補入 lb 地址（{len(merged)}）")
 
 
+def test_aggregate_events():
+    print("[9] fills→部位事件聚合：方向鍵/gap 合併/notional/closedPnl/排序/衍生指標")
+    t0 = _ms(2026, 6, 10)
+    minute = 60 * 1000
+
+    def raw(coin, px, sz, side, t, pnl, d):
+        return {"coin": coin, "px": px, "sz": sz, "side": side,
+                "time": t, "closedPnl": pnl, "dir": d}
+
+    raw_fills = []
+    # BTC Open Long 5 筆，間隔 10 分鐘（<60min）→ 1 事件
+    for i in range(5):
+        raw_fills.append(raw("BTC", "60000", "0.1", "B",
+                             t0 + i * 10 * minute, "0.0", "Open Long"))
+    # ETH Open Short 4 筆：前 2 筆間隔 30 分，隔 90 分（>60min）再 2 筆 → 跨 gap 分 2 事件
+    eth0 = t0 + 5 * minute
+    for dt in (0, 30 * minute, 120 * minute, 130 * minute):
+        raw_fills.append(raw("ETH", "3000", "1", "A", eth0 + dt, "0.0", "Open Short"))
+    # 數小時後 BTC Close Long 3 筆，間隔 5 分鐘 → 1 事件（方向鍵異於 Open Long，不合併）
+    btc_close0 = t0 + 240 * minute
+    for i in range(3):
+        raw_fills.append(raw("BTC", "61000", "0.1", "A",
+                             btc_close0 + i * 5 * minute, "100.0", "Close Long"))
+
+    fills = classify.parse_fills(raw_fills)
+    ok(len(fills) == 12, f"fixture 共 12 筆 fills（{len(fills)}）")
+    events = classify.aggregate_fills_to_events(fills, gap_minutes=60)
+    ok(len(events) == 4, f"聚合成 4 個部位事件（{len(events)}）")
+    starts = [e["start_ts"] for e in events]
+    ok(starts == sorted(starts), "事件清單按 start_ts 排序")
+    ok([e["n_fills"] for e in events] == [5, 2, 2, 3],
+       f"各事件 n_fills=[5,2,2,3]（{[e['n_fills'] for e in events]}）")
+    ok([e["direction"] for e in events]
+       == ["open long", "open short", "open short", "close long"],
+       f"方向鍵由 dir 正規化（{[e['direction'] for e in events]}）")
+    ok(abs(events[0]["total_notional"] - 30000.0) < 1e-6,
+       f"BTC Open Long 事件 notional=Σ|px×sz|=30000（{events[0]['total_notional']}）")
+    ok(abs(events[1]["total_notional"] - 6000.0) < 1e-6
+       and abs(events[2]["total_notional"] - 6000.0) < 1e-6,
+       "ETH Open Short 兩事件 notional 各 6000")
+    ok(abs(events[3]["total_notional"] - 18300.0) < 1e-6,
+       f"BTC Close Long 事件 notional=18300（{events[3]['total_notional']}）")
+    ok(abs(events[3]["total_closed_pnl"] - 300.0) < 1e-6,
+       f"BTC Close Long 事件 closedPnl 加總=300（{events[3]['total_closed_pnl']}）")
+
+    # dir 缺失 → 退回 (coin, side) 鍵
+    no_dir = classify.parse_fills([
+        raw("SOL", "150", "1", "B", t0, "0.0", ""),
+        raw("SOL", "150", "1", "B", t0 + 10 * minute, "0.0", ""),
+        raw("SOL", "150", "1", "A", t0 + 20 * minute, "0.0", ""),
+    ])
+    ev_sol = classify.aggregate_fills_to_events(no_dir, gap_minutes=60)
+    ok(len(ev_sol) == 2 and {e["direction"] for e in ev_sol} == {"B", "A"},
+       f"dir 缺失退回 side 鍵（{[(e['direction'], e['n_fills']) for e in ev_sol]}）")
+
+    # 衍生指標：4 事件全落在 30 天窗內；start 序列 gap = [5min, 2h, 1h55m]
+    end_ts = (t0 / 1000.0) + 5 * 86400
+    stats = classify.compute_event_metrics(fills, end_ts)
+    ok(stats["n_events"] == 4 and stats["n_events_last_30d"] == 4,
+       f"n_events=4 且 30 日事件數=4（{stats['n_events_last_30d']}）")
+    ok(stats["n_events_last_30d_est"] == 4,
+       f"未截斷 → 外推值 == 實測值（{stats['n_events_last_30d_est']}）")
+    ok(stats["median_fills_per_event"] == 2.5,
+       f"median 每事件 fills=2.5（{stats['median_fills_per_event']}）")
+    ok(stats["median_event_notional"] == 12150.0,
+       f"median 事件名目=12150（{stats['median_event_notional']}）")
+    ok(stats["median_gap_between_events_hours"] == 1.92
+       and stats["p90_gap_between_events_hours"] == 2.0,
+       f"事件間隔 median=1.92h、p90=2.0h（{stats['median_gap_between_events_hours']}/"
+       f"{stats['p90_gap_between_events_hours']}）")
+
+
+def test_followability_events():
+    print("[10] followability 升級：頻率以 30 日部位事件數判定，fills 數僅參考不否決")
+    base = {"n_fills_last_30d": 800, "n_events_last_30d": 40,
+            "avg_hold_hours": 250.0, "current_max_leverage": 3.0}
+    ok(base["n_fills_last_30d"] > config.SCAN_FOLLOWABLE_MAX_FREQ,
+       f"前提：fills 800 > 舊 fills 門檻 {config.SCAN_FOLLOWABLE_MAX_FREQ}（舊制會否決）")
+    ok_flag, reasons = classify.followability(base)
+    ok(ok_flag is True and reasons == [],
+       f"30 日 fills 800 但事件 40 <= {config.FOLLOWABLE_MAX_EVENTS_30D} → "
+       f"頻率條件通過（reasons={reasons}）")
+
+    too_many = dict(base, n_events_last_30d=200)
+    ok_flag2, reasons2 = classify.followability(too_many)
+    ok(ok_flag2 is False
+       and any("頻率過高" in r and "部位事件" in r for r in reasons2),
+       f"事件 200 > {config.FOLLOWABLE_MAX_EVENTS_30D} → 不通過（{reasons2}）")
+    ok(any("fills 800" in r for r in reasons2), "否決理由同時揭露 fills 數（僅參考）")
+
+    missing = dict(base, n_events_last_30d=None)
+    ok_flag3, reasons3 = classify.followability(missing)
+    ok(ok_flag3 is False and any("事件數缺失" in r for r in reasons3),
+       "事件數缺失 → 保守判不可跟（無法驗證 ≠ 通過）")
+
+
+def test_truncation_extrapolation():
+    print("[12] 截斷防洗白：fills 截斷切進 30 天窗 → 事件數外推，真高頻不被洗白")
+    minute = 60 * 1000
+    t0 = _ms(2026, 6, 25)
+    raw_fills = []
+    for b in range(100):  # 100 叢 × 20 筆 = 2000 筆（截斷上限）；叢距 1.5h（>60min 各自成事件）
+        base = t0 + b * 90 * minute
+        for j in range(20):
+            raw_fills.append({"coin": "BTC", "px": "60000", "sz": "0.01", "side": "B",
+                              "time": base + j * minute, "closedPnl": "0.0",
+                              "dir": "Open Long"})
+    fills = classify.parse_fills(raw_fills)
+    ok(len(fills) == config.MAX_USER_FILLS,
+       f"fixture 2000 筆 = 截斷上限（{len(fills)}）")
+    end_ts = datetime(2026, 7, 2, tzinfo=timezone.utc).timestamp()
+    stats = classify.compute_event_metrics(fills, end_ts)
+    ok(stats["n_events_last_30d"] == 100,
+       f"截斷窗實測 30 日事件 100 個（{stats['n_events_last_30d']}；直接用會洗白過門檻）")
+    ok(stats["events_30d_coverage_days"] == 7.0,
+       f"30 天窗 fills 覆蓋僅 7 天（{stats['events_30d_coverage_days']}）")
+    ok(stats["n_events_last_30d_est"] == 429,
+       f"外推 30 日事件 = round(100×30/7) = 429（{stats['n_events_last_30d_est']}）")
+    metrics = dict(stats, n_fills_last_30d=2000, avg_hold_hours=48.0,
+                   current_max_leverage=3.0)
+    ok_flag, reasons = classify.followability(metrics)
+    ok(ok_flag is False and any("頻率過高" in r and "外推" in r for r in reasons),
+       f"外推後頻率仍過高 → 不可跟，真高頻不被截斷窗洗白（{reasons}）")
+
+
+def test_decision_frequency_dossier(tmp):
+    print("[11] track dossier：決策頻率複核節＋升級後可跟性判定＋tracked 名單含 0x8bae35")
+    base = json.loads((FIXTURES / "wallet_consistent.json").read_text(encoding="utf-8"))
+    addr = base["address"]
+    snap_dir = tmp / "snapshots-freq" / SNAP_DATE
+    wallets_dir = snap_dir / "wallets"
+    wallets_dir.mkdir(parents=True, exist_ok=True)
+    (wallets_dir / f"{addr}.json").write_text(
+        json.dumps(base, ensure_ascii=False), encoding="utf-8")
+    tracked_root = tmp / "tracked-freq"
+
+    dossier = track_wallet.run_track_wallet(addr, snap_dir, tracked_root)
+    m = dossier["metrics"]
+    ok(m.get("n_events_last_30d") is not None
+       and m["n_events_last_30d"] <= m["n_fills_last_30d"],
+       f"事件數 <= fills 數（{m['n_events_last_30d']} <= {m['n_fills_last_30d']}）")
+    ok(dossier["followable"]["ok"] is True,
+       f"wallet_consistent 升級後判可跟（{dossier['followable']}）")
+
+    md_text = (tracked_root / addr / f"dossier_{SNAP_DATE}.md").read_text(encoding="utf-8")
+    ok("決策頻率複核" in md_text and "部位事件" in md_text,
+       "dossier 含「決策頻率複核（fills → 部位事件）」節")
+    ok("升級後可跟性判定" in md_text and "✅" in md_text,
+       "dossier 落地升級後可跟性判定結果＋原因")
+    ok("median" in md_text and "p90" in md_text, "dossier 含事件間隔分布 median/p90")
+
+    # 0x8bae35 本機無原始 fills，其複核結論由 CI track 步驟產出——確認名單含它即走同一程式路徑
+    tracked_addrs = [str(w.get("address", "")).lower() for w in config.TRACKED_WALLETS]
+    ok("0x8bae3527e5a33fa0cf184f37bc112d071463ab6d" in tracked_addrs,
+       "TRACKED_WALLETS 含 scan-best-candidate-9M-lowdd（0x8bae35…，CI 自動產 dossier）")
+    seeds = json.loads((PROJECT_DIR / "data" / "seeds.json").read_text(encoding="utf-8"))
+    ok(any(str(w.get("address", "")).lower()
+           == "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d" for w in seeds["wallets"]),
+       "seeds.json 亦含 0x8bae35（永遠納入宇宙）")
+
+
 def main():
     with tempfile.TemporaryDirectory(prefix="hyper-observer-test-") as td:
         tmp = Path(td)
@@ -595,6 +756,10 @@ def main():
         test_scan_report(tmp)
         test_fetch_wallets_file(tmp)
         test_fetch_fallback()
+        test_aggregate_events()
+        test_followability_events()
+        test_truncation_extrapolation()
+        test_decision_frequency_dossier(tmp)
     print(f"ALL TESTS PASSED ({checks} checks)")
     return 0
 

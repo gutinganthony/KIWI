@@ -337,6 +337,125 @@ def avg_hold_hours(fills):
     return (sum(holds) / len(holds)) / 3600.0
 
 
+def _event_direction(fill):
+    """fill → 方向鍵字串。優先由 dir 欄位歸類（'Open Long'/'Close Short' 等），缺失退回 side。
+
+    dir 正規化：小寫後抽 open/close ＋ long/short 兩軸；只抽得到其一就用其一
+    （如 'Buy'/'Sell' 型 dir 抽不到則整段小寫原文）。dir 全缺 → side（'B'/'A'）。
+    """
+    d = str(fill.get("dir") or "").strip().lower()
+    if d:
+        action = "open" if "open" in d else ("close" if "close" in d else None)
+        side = "long" if "long" in d else ("short" if "short" in d else None)
+        parts = [p for p in (action, side) if p]
+        return " ".join(parts) if parts else d
+    return str(fill.get("side") or "")
+
+
+def aggregate_fills_to_events(fills, gap_minutes=None):
+    """fills → 「部位事件」清單（一次交易決策；供 track_wallet 與 followability 用）。
+
+    fills ≠ 決策：一張大單在薄訂單簿會拆成多筆成交，分批建倉/出場也是同一個決策。
+    聚合規則：同 (coin, 方向鍵) 且相鄰 fill 時間間隔 <= gap_minutes → 同一事件。
+    方向鍵見 _event_direction（dir 優先、缺失退回 side）。ts 缺失的 fill 無法定間隔，跳過。
+
+    回傳按 start_ts 排序的事件清單，每事件：
+    {coin, direction, start_ts, end_ts, n_fills, total_notional(Σ|px×sz|), total_closed_pnl}
+    """
+    if gap_minutes is None:
+        gap_minutes = config.AGG_EVENT_GAP_MINUTES
+    gap_sec = gap_minutes * 60.0
+    by_key = defaultdict(list)
+    for f in fills:
+        if f.get("ts") is None:
+            continue
+        by_key[(str(f.get("coin") or ""), _event_direction(f))].append(f)
+
+    events = []
+    for (coin, direction), group in by_key.items():
+        group.sort(key=lambda f: f["ts"])
+        cur = None
+        for f in group:
+            if cur is not None and f["ts"] - cur["end_ts"] <= gap_sec:
+                cur["end_ts"] = f["ts"]
+                cur["n_fills"] += 1
+            else:
+                cur = {"coin": coin, "direction": direction,
+                       "start_ts": f["ts"], "end_ts": f["ts"], "n_fills": 1,
+                       "total_notional": 0.0, "total_closed_pnl": 0.0}
+                events.append(cur)
+            if f.get("px") is not None and f.get("sz") is not None:
+                cur["total_notional"] += abs(f["px"] * f["sz"])
+            if f.get("closed_pnl") is not None:
+                cur["total_closed_pnl"] += f["closed_pnl"]
+    events.sort(key=lambda e: e["start_ts"])
+    return events
+
+
+def _median(values):
+    """中位數；空清單回 None。"""
+    if not values:
+        return None
+    vals = sorted(values)
+    n = len(vals)
+    mid = n // 2
+    return vals[mid] if n % 2 else (vals[mid - 1] + vals[mid]) / 2.0
+
+
+def _percentile(values, q):
+    """簡單百分位（最近排名法）；空清單回 None。q in [0,1]。"""
+    if not values:
+        return None
+    vals = sorted(values)
+    idx = min(len(vals) - 1, max(0, int(round(q * (len(vals) - 1)))))
+    return vals[idx]
+
+
+def compute_event_metrics(fills, end_ts, gap_minutes=None):
+    """fills → 部位事件衍生指標（followability 頻率判定與 dossier 決策頻率複核用）。
+
+    回 {n_events, n_events_last_30d, n_events_last_30d_est, events_30d_coverage_days,
+       median_fills_per_event, median_event_notional,
+       median_gap_between_events_hours, p90_gap_between_events_hours}。
+
+    截斷防洗白：userFills 被 info API 截斷在 MAX_USER_FILLS（近端窗）。若截斷切進 30 天窗
+    （最早 fill 晚於 end_ts-30d），實測 n_events_last_30d 只是「覆蓋天數」內的下限——真高頻戶
+    的 2000 筆可能只涵蓋幾天，直接拿實測數過頻率門檻會把真高頻洗白。此時把實測事件數
+    線性外推到 30 天（n_events_last_30d_est），頻率判定用外推值；未截斷則 est == 實測。
+    """
+    events = aggregate_fills_to_events(fills, gap_minutes)
+    window_start = end_ts - 30 * DAY_SEC
+    n_events_30d = sum(1 for e in events if e["start_ts"] >= window_start)
+    gaps_h = [(events[i]["start_ts"] - events[i - 1]["start_ts"]) / 3600.0
+              for i in range(1, len(events))]
+    med_fills = _median([e["n_fills"] for e in events])
+    med_notional = _median([e["total_notional"] for e in events])
+
+    fill_ts = [f["ts"] for f in fills if f.get("ts") is not None]
+    coverage_days, n_events_30d_est = None, n_events_30d
+    if fill_ts:
+        earliest = min(fill_ts)
+        coverage_days = max(0.0, (end_ts - max(earliest, window_start)) / DAY_SEC)
+        truncated = len(fills) >= config.MAX_USER_FILLS
+        if truncated and earliest > window_start:
+            # 截斷切進 30 天窗 → 覆蓋不足，以覆蓋天數線性外推（至少以 1 小時計，避免除零爆量）
+            n_events_30d_est = int(round(
+                n_events_30d * 30.0 / max(coverage_days, 1.0 / 24)))
+    return {
+        "n_events": len(events),
+        "n_events_last_30d": n_events_30d,
+        "n_events_last_30d_est": n_events_30d_est,
+        "events_30d_coverage_days": (round(coverage_days, 1)
+                                     if coverage_days is not None else None),
+        "median_fills_per_event": round(med_fills, 1) if med_fills is not None else None,
+        "median_event_notional": round(med_notional, 2) if med_notional is not None else None,
+        "median_gap_between_events_hours": (lambda v: round(v, 2) if v is not None else None)(
+            _median(gaps_h)),
+        "p90_gap_between_events_hours": (lambda v: round(v, 2) if v is not None else None)(
+            _percentile(gaps_h, 0.90)),
+    }
+
+
 def net_direction_ratio(fills):
     """|買量-賣量| / (買量+賣量)。≈0 → 來回對敲無淨方向（刷量旗標）。配不到回 None。"""
     buy, sell = 0.0, 0.0
@@ -428,6 +547,9 @@ def compute_metrics(wallet, snapshot_date):
     # 計數 =2000 遠超 SCAN_FOLLOWABLE_MAX_FREQ，判「不可跟」方向正確。
     n_fills_last_30d = sum(1 for f in fills
                            if f["ts"] is not None and f["ts"] >= end_ts - 30 * DAY_SEC)
+    # fills → 部位事件聚合（fills≠決策；一張大單/分批執行 = 一個決策）。
+    # followability 頻率判定改以 n_events_last_30d 為準，n_fills_last_30d 降為參考欄位。
+    event_stats = compute_event_metrics(fills, end_ts)
 
     # --- 量/PnL 比（刷量旗標）---
     vlm_to_pnl = None
@@ -469,6 +591,14 @@ def compute_metrics(wallet, snapshot_date):
         "net_direction_ratio": round(net_dir, 4) if net_dir is not None else None,
         "n_fills_truncated": fills_truncated,
         "n_fills_last_30d": n_fills_last_30d,
+        "n_events": event_stats["n_events"],
+        "n_events_last_30d": event_stats["n_events_last_30d"],
+        "n_events_last_30d_est": event_stats["n_events_last_30d_est"],
+        "events_30d_coverage_days": event_stats["events_30d_coverage_days"],
+        "median_fills_per_event": event_stats["median_fills_per_event"],
+        "median_event_notional": event_stats["median_event_notional"],
+        "median_gap_between_events_hours": event_stats["median_gap_between_events_hours"],
+        "p90_gap_between_events_hours": event_stats["p90_gap_between_events_hours"],
         "had_liquidation": had_liquidation,
         "n_liquidations": n_liquidations,
         "top_coin": top_coin,
@@ -608,18 +738,34 @@ CLASS_ORDER = ["consistent_winner", "blowup_risk", "wash_suspect", "one_hit",
 def followability(m):
     """consistent_winner 之上的「可跟性」判定（真錢跟單的機械可行性）。回 (ok, reasons)。
 
-    三條件（門檻在 config SCAN_FOLLOWABLE_*）：
-    - 頻率：近 30 天成交 <= MAX_FREQ（頻率太高，跟單延遲下根本跟不上）
+    三條件（門檻在 config SCAN_FOLLOWABLE_* / FOLLOWABLE_MAX_EVENTS_30D）：
+    - 頻率：近 30 天「部位事件數」<= FOLLOWABLE_MAX_EVENTS_30D。fills≠決策——一張大單在
+      薄訂單簿拆成多筆成交、分批建倉也是同一決策，故以聚合後事件數判頻率；
+      n_fills_last_30d 保留為參考欄位（報告揭露），不再作硬否決。fills 截斷切進 30 天窗時
+      改用外推值 n_events_last_30d_est（防真高頻靠截斷窗洗白，見 compute_event_metrics）。
     - 持倉：平均持倉 >= MIN_HOLD_H（太短來不及進場就已平倉）
     - 槓桿：目前任一部位 <= MAX_LEVERAGE（跟高槓桿等於跟著賭爆倉）
     avg_hold_hours 估不出（無 Open/Close 可配對）→ 保守判不可跟（無法驗證 ≠ 通過）。
     """
     reasons = []
-    freq = m.get("n_fills_last_30d")
-    if freq is None:
-        reasons.append("近 30 天成交筆數缺失，頻率無法驗證")
-    elif freq > config.SCAN_FOLLOWABLE_MAX_FREQ:
-        reasons.append(f"頻率過高：近 30 天 {freq} 筆 > {config.SCAN_FOLLOWABLE_MAX_FREQ}")
+    n_events = m.get("n_events_last_30d")
+    n_events_est = m.get("n_events_last_30d_est")
+    if n_events_est is None:
+        n_events_est = n_events
+    n_fills_30d = m.get("n_fills_last_30d")
+    fills_ref = f"fills {n_fills_30d if n_fills_30d is not None else '—'} 筆僅參考"
+    if n_events is None:
+        reasons.append("近 30 天部位事件數缺失，頻率無法驗證")
+    elif n_events_est > config.FOLLOWABLE_MAX_EVENTS_30D:
+        if n_events_est != n_events:
+            reasons.append(
+                f"頻率過高：30 日推估 {n_events_est} 個部位事件 > "
+                f"{config.FOLLOWABLE_MAX_EVENTS_30D}（fills 截斷窗覆蓋 "
+                f"{m.get('events_30d_coverage_days')} 天、實測 {n_events} 個外推；{fills_ref}）")
+        else:
+            reasons.append(
+                f"頻率過高：近 30 天 {n_events} 個部位事件 > "
+                f"{config.FOLLOWABLE_MAX_EVENTS_30D}（{fills_ref}）")
     hold = m.get("avg_hold_hours")
     if hold is None:
         reasons.append("平均持倉時間估不出（無 Open/Close 成交可配對），保守判不可跟")
@@ -749,11 +895,16 @@ def build_markdown(date, results, meta, ground_truth, verdict, label=None):
             follow_cell = ""
             if scan_mode:
                 fol = r.get("followable") or {}
+                n_ev, n_est = m.get("n_events_last_30d"), m.get("n_events_last_30d_est")
+                est_note = (f"（截斷外推 {_fmt(n_est)}）"
+                            if n_est is not None and n_est != n_ev else "")
+                freq_note = (f"30d 事件 {_fmt(n_ev)}{est_note}／"
+                             f"fills {_fmt(m.get('n_fills_last_30d'))}")
                 if fol.get("ok"):
-                    follow_cell = " ✅ |"
+                    follow_cell = f" ✅（{freq_note}）|"
                 else:
                     why = "；".join(fol.get("reasons") or ["未判定"]).replace("|", "\\|")
-                    follow_cell = f" ❌ {why} |"
+                    follow_cell = f" ❌ {why}（{freq_note}）|"
             lines.append(
                 f"| `{m['address']}`{liq_note} | ${_fmt(m['total_pnl'])} "
                 f"| {_fmt(m['max_drawdown_pct'], '.0%')} "
