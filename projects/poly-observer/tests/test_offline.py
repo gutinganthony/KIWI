@@ -18,6 +18,7 @@ import analyze  # noqa: E402
 import verify_smart_money as vsm  # noqa: E402
 import track_wallet  # noqa: E402
 import simulate_copy  # noqa: E402
+import shadow_bot  # noqa: E402
 
 FIXTURES = TESTS_DIR / "fixtures"
 SNAP_DATE = "2026-07-01"  # fixtures 的時間軸終點（recent-30d 視窗右端）
@@ -252,6 +253,168 @@ def test_simulate_copy_unreliable():
     ok("—（資料偏誤）" in md, "md 的捕獲率格印「—（資料偏誤）」")
 
 
+def test_shadow_dedup():
+    print("[8] shadow_bot：新交易去重（重複 activity 只記一次、非 TRADE 忽略）")
+    ev_tx = {"type": "TRADE", "transactionHash": "0xaaa", "timestamp": 1751328000,
+             "asset": "111", "side": "BUY", "size": 100, "price": 0.5}
+    ev_no_tx = {"type": "TRADE", "timestamp": 1751328005, "asset": "222",
+                "side": "SELL", "size": 50, "price": 0.6}  # 無 txhash → 組合鍵
+    redeem = {"type": "REDEEM", "timestamp": 1751328010, "asset": "333", "size": 10}
+    seen = set()
+    first = shadow_bot.detect_new_trades([ev_tx, ev_no_tx, redeem], seen)
+    ok(len(first) == 2, f"首輪偵測 2 筆 TRADE（{len(first)}），REDEEM 不計")
+    second = shadow_bot.detect_new_trades([ev_tx, ev_no_tx, redeem], seen)
+    ok(second == [], f"重複餵同一列表 → 0 筆新交易（{len(second)}）")
+    ev_later = dict(ev_no_tx, timestamp=1751328099)  # 組合鍵欄位改變 → 新交易
+    third = shadow_bot.detect_new_trades([ev_tx, ev_no_tx, ev_later], seen)
+    ok(len(third) == 1 and third[0]["timestamp"] == 1751328099,
+       f"時間戳不同的無 txhash 交易視為新（{len(third)}）")
+
+
+def test_shadow_book_and_drift():
+    print("[9] shadow_bot：book 解析＋adverse_drift 方向正確")
+    book = json.loads((FIXTURES / "book_sample.json").read_text(encoding="utf-8"))
+    parsed = shadow_bot.parse_book(book)
+    # fixture 兩側刻意不排序：best_bid=最高買價 0.55、best_ask=最低賣價 0.57
+    ok(parsed["best_bid"] == 0.55 and parsed["best_ask"] == 0.57,
+       f"best_bid=0.55 / best_ask=0.57（{parsed['best_bid']}/{parsed['best_ask']}）")
+    ok(abs(parsed["mid"] - 0.56) < 1e-9 and abs(parsed["spread"] - 0.02) < 1e-9,
+       f"mid=0.56、spread=0.02（{parsed['mid']}/{parsed['spread']}）")
+    ok(abs(parsed["bid_depth_usd"] - 165.0) < 0.01
+       and abs(parsed["ask_depth_usd"] - 114.0) < 0.01,
+       f"第一檔 USD 深度 bid=165 / ask=114（{parsed['bid_depth_usd']}/{parsed['ask_depth_usd']}）")
+    ok(shadow_bot.parse_book({"bids": [], "asks": []}) is None
+       and shadow_bot.parse_book("garbage") is None, "空書/垃圾輸入 → None")
+
+    # BUY：跟單者吃 best_ask，錢包成交 0.55 → drift=(0.57-0.55)/0.55>0＝買更貴
+    buy = shadow_bot.follower_metrics("BUY", 0.55, parsed)
+    ok(buy["follower_entry_px"] == 0.57, f"BUY 進場價=best_ask（{buy['follower_entry_px']}）")
+    ok(abs(buy["adverse_drift"] - 0.036364) < 1e-6,
+       f"BUY adverse_drift=+3.64%（{buy['adverse_drift']}）")
+    ok(abs(buy["depth_at_best"] - 114.0) < 0.01
+       and buy["fillable_usd_at_best"] == buy["depth_at_best"],
+       f"BUY depth 取 ask 側第一檔（{buy['depth_at_best']}）")
+
+    # SELL：跟單者砸 best_bid，錢包成交 0.57 → drift 取反向後 >0＝賣更便宜
+    sell = shadow_bot.follower_metrics("SELL", 0.57, parsed)
+    ok(sell["follower_entry_px"] == 0.55, f"SELL 進場價=best_bid（{sell['follower_entry_px']}）")
+    ok(abs(sell["adverse_drift"] - 0.035088) < 1e-6,
+       f"SELL adverse_drift=+3.51%（{sell['adverse_drift']}）")
+    ok(abs(sell["depth_at_best"] - 165.0) < 0.01,
+       f"SELL depth 取 bid 側第一檔（{sell['depth_at_best']}）")
+
+    none_case = shadow_bot.follower_metrics("BUY", 0.55, None)
+    ok(all(v is None for v in none_case.values()), "book 不可用 → 衍生欄位全 None")
+
+
+def test_shadow_summary_stats():
+    print("[10] shadow_bot：摘要統計 median/p90/可成交比例正確")
+    rows = []
+    for i in range(1, 11):  # 奇數 BUY、偶數 SELL；depth 30..300
+        rows.append({"detect_lag_sec": float(i),
+                     "side": "BUY" if i % 2 else "SELL",
+                     "adverse_drift": 0.01 * i, "spread": 0.02,
+                     "depth_at_best": 30.0 * i, "fillable_usd_at_best": 30.0 * i,
+                     "book_unavailable": False})
+    rows.append({"detect_lag_sec": 11.0, "side": "BUY", "adverse_drift": None,
+                 "spread": None, "depth_at_best": None,
+                 "fillable_usd_at_best": None, "book_unavailable": True})
+    st = shadow_bot.summarize_rows(rows, fixed_usd=50.0)
+    ok(st["n_detected"] == 11 and st["n_book_ok"] == 10 and st["n_book_unavailable"] == 1,
+       f"計數：11 偵測 / 10 book 可用 / 1 不可用（{st['n_detected']}/{st['n_book_ok']}）")
+    lag = st["detect_lag_sec"]
+    ok(lag["median"] == 6.0 and lag["p90"] == 10.0 and lag["n"] == 11,
+       f"lag median=6.0、p90=10.0（nearest-rank）（{lag['median']}/{lag['p90']}）")
+    b, s = st["adverse_drift"]["BUY"], st["adverse_drift"]["SELL"]
+    ok(abs(b["median"] - 0.05) < 1e-9 and abs(b["p90"] - 0.09) < 1e-9 and b["n"] == 5,
+       f"BUY drift median=0.05、p90=0.09、n=5（{b['median']}/{b['p90']}/{b['n']}）")
+    ok(abs(s["median"] - 0.06) < 1e-9 and abs(s["p90"] - 0.10) < 1e-9 and s["n"] == 5,
+       f"SELL drift median=0.06、p90=0.10、n=5（{s['median']}/{s['p90']}/{s['n']}）")
+    ok(abs(st["spread"]["median"] - 0.02) < 1e-9
+       and abs(st["depth_at_best_usd"]["median"] - 165.0) < 1e-9,
+       f"spread median=0.02、depth median=165（{st['spread']['median']}/"
+       f"{st['depth_at_best_usd']['median']}）")
+    ok(abs(st["fillable_at_best_ratio"] - 0.9) < 1e-9,
+       f"$50 固定跟單第一檔可成交比例=0.9（depth 30 那筆不足）（{st['fillable_at_best_ratio']}）")
+    empty = shadow_bot.summarize_rows([])
+    ok(empty["n_detected"] == 0 and empty["detect_lag_sec"]["median"] is None
+       and empty["fillable_at_best_ratio"] is None, "空 session 統計全 None、不 crash")
+
+
+class _FakeClock:
+    """離線假時鐘：sleep 直接推進時間，不真等。"""
+
+    def __init__(self, start=1751328000.0):  # 2025-07-01T00:00:00Z
+        self.t = start
+
+    def now(self):
+        return self.t
+
+    def sleep(self, sec):
+        self.t += sec
+
+
+def _make_fake_http(book, first_activity, later_activity):
+    state = {"calls": 0}
+
+    def fake(url, **kwargs):
+        if "activity" in url:
+            state["calls"] += 1
+            return (first_activity if state["calls"] == 1 else later_activity), None
+        return book, None
+
+    return fake
+
+
+def test_shadow_session(tmp):
+    print("[11] shadow_bot：run_session 端到端（注入 http/時鐘）——baseline、去重、摘要落地")
+    addr = "0x" + "ab" * 20
+    book = json.loads((FIXTURES / "book_sample.json").read_text(encoding="utf-8"))
+    ev_base = {"type": "TRADE", "transactionHash": "0xbase", "timestamp": 1751327990,
+               "asset": "1234567890", "side": "BUY", "size": 100, "price": 0.54,
+               "usdcSize": 54.0, "title": "Sample game", "slug": "sample-game"}
+    ev_new = {"type": "TRADE", "transactionHash": "0xnew", "timestamp": 1751328002,
+              "asset": "1234567890", "side": "BUY", "size": 200, "price": 0.55,
+              "usdcSize": 110.0, "title": "Sample game", "slug": "sample-game"}
+    clock = _FakeClock()
+    out_root = tmp / "shadow"
+    info = shadow_bot.run_session(
+        addr, duration_min=0.5, poll_sec=4, out_root=out_root,
+        http_get=_make_fake_http(book, [ev_base], [ev_base, ev_new]),
+        sleep_fn=clock.sleep, now_fn=clock.now)
+    ok(info["baseline_seeded"] == 1, f"首輪既有交易進 baseline 不記錄（{info['baseline_seeded']}）")
+    ok(info["stats"]["n_detected"] == 1,
+       f"跨多輪輪詢只偵測 1 筆新交易（去重生效）（{info['stats']['n_detected']}）")
+    sdir = out_root / addr
+    jsonl_lines = (sdir / f"session_{info['session_stamp']}.jsonl").read_text(
+        encoding="utf-8").strip().splitlines()
+    ok(len(jsonl_lines) == 1, f"JSONL 恰好 1 列（{len(jsonl_lines)}）")
+    row = json.loads(jsonl_lines[0])
+    ok(row["side"] == "BUY" and row["follower_entry_px"] == 0.57
+       and abs(row["adverse_drift"] - 0.036364) < 1e-6,
+       f"列含衍生欄位：entry=0.57、drift=+3.64%（{row['follower_entry_px']}）")
+    ok(row["detect_lag_sec"] == 2.0,
+       f"detect_lag=偵測時刻−鏈上時戳=2.0s（{row['detect_lag_sec']}）")
+    md_path = sdir / "summary_2025-07-01.md"
+    md = md_path.read_text(encoding="utf-8")
+    ok("不測完整損益" in md and "時鐘" in md, "summary md 頂部含誠實聲明＋時鐘偏移註記")
+    ok("固定跟單在第一檔深度內可成交比例：100.0%" in md,
+       "depth 114 ≥ $50 → 可成交比例 100%")
+
+    # 同日第二個 session：md append 段落、json append 進 sessions
+    info2 = shadow_bot.run_session(
+        addr, duration_min=0.2, poll_sec=4, out_root=out_root,
+        http_get=_make_fake_http(book, [ev_base, ev_new], [ev_base, ev_new]),
+        sleep_fn=clock.sleep, now_fn=clock.now)
+    ok(info2["stats"]["n_detected"] == 0 and info2["baseline_seeded"] == 2,
+       f"第二 session 全數進 baseline、0 偵測（{info2['baseline_seeded']}）")
+    md2 = md_path.read_text(encoding="utf-8")
+    ok(md2.count("## Session") == 2, f"同日多 session → md append 段落（{md2.count('## Session')}）")
+    payload = json.loads((sdir / "summary_2025-07-01.json").read_text(encoding="utf-8"))
+    ok(len(payload["sessions"]) == 2 and payload["sessions"][1]["stats"]["n_detected"] == 0,
+       f"summary json 累積 2 個 session（{len(payload['sessions'])}）")
+
+
 def main():
     with tempfile.TemporaryDirectory(prefix="poly-observer-test-") as td:
         tmp = Path(td)
@@ -262,6 +425,10 @@ def main():
         test_track_wallet(tmp)
         test_simulate_copy()
         test_simulate_copy_unreliable()
+        test_shadow_dedup()
+        test_shadow_book_and_drift()
+        test_shadow_summary_stats()
+        test_shadow_session(tmp)
     print(f"ALL TESTS PASSED ({checks} checks)")
     return 0
 
