@@ -7,19 +7,19 @@
 
 | 端點 | 成功 | 失敗 | 失敗樣本 |
 |---|---:|---:|---|
-| `clearinghouseState @ api.hyperliquid.xyz/info` | 59 | 1 | status=429 HTTP 429; body=null |
+| `clearinghouseState @ api.hyperliquid.xyz/info` | 60 | 0 | — |
 | `leaderboard @ stats-data.hyperliquid.xyz/Mainnet/leaderboard` | 1 | 0 | — |
 | `portfolio @ api.hyperliquid.xyz/info` | 60 | 0 | — |
-| `userFills @ api.hyperliquid.xyz/info` | 60 | 0 | — |
+| `userFills @ api.hyperliquid.xyz/info` | 59 | 1 | status=429 HTTP 429; body=null |
 | `userFunding @ api.hyperliquid.xyz/info` | 60 | 0 | — |
 
 ## 2. 分類統計
 
 | 分類 | 錢包數 | 佔比 |
 |---|---:|---:|
-| consistent_winner | 0 | 0% |
-| blowup_risk | 29 | 48% |
-| wash_suspect | 26 | 43% |
+| consistent_winner | 1 | 2% |
+| blowup_risk | 33 | 55% |
+| wash_suspect | 21 | 35% |
 | one_hit | 1 | 2% |
 | dormant | 0 | 0% |
 | choppy | 4 | 7% |
@@ -28,7 +28,9 @@
 
 ## 3. consistent_winner 明細
 
-（本日無 consistent_winner）
+| 地址 | 總 PnL | 峰值回撤 | profit factor | 目前槓桿 | 主力幣 | 活躍天 |
+|---|---:|---:|---:|---:|---|---:|
+| `0x8bae3527e5a33fa0cf184f37bc112d071463ab6d` | $9,305,596 | 6% | 14.01 | 3x | @166 | 359 |
 
 ## 4. Ground-truth 校驗
 
@@ -36,9 +38,9 @@
 
 ## 5. 裁決
 
-consistent_winner 數量：**0**
+consistent_winner 數量：**1**
 
-**未發現（本日樣本內沒有符合 consistent_winner 條件的錢包）**
+**弱存在（樣本內僅少數 consistent_winner，證據不足，需持續觀察）**
 
 限制與醒目聲明：
 - **倖存者偏差**：宇宙取自今日 leaderboard（＋seeds），只看得到現在還在榜上的贏家。
