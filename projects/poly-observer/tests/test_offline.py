@@ -25,6 +25,7 @@ EXPECTED = {
     "wallet_one_hit.json": "one_hit",
     "wallet_mm_bot.json": "mm_bot_like",
     "wallet_insufficient.json": "insufficient_data",
+    "wallet_dormant.json": "dormant",
 }
 
 checks = 0
@@ -104,13 +105,13 @@ def test_reports(tmp):
     reparsed = json.loads(json_path.read_text(encoding="utf-8"))
     ok(reparsed["classification_counts"] == payload["classification_counts"],
        "json 報告可重新解析且計數一致")
-    expected_counts = {"consistent_winner": 1, "one_hit": 1,
+    expected_counts = {"consistent_winner": 1, "one_hit": 1, "dormant": 1,
                        "mm_bot_like": 1, "insufficient_data": 1}
     ok(payload["classification_counts"] == expected_counts,
        f"分類統計={expected_counts}")
     gt = payload["ground_truth"]
-    ok(len(gt) == 1 and gt[0]["ok"] and gt[0]["actual"] == "one_hit",
-       "ground-truth 種子（xdd07070）如預期分類為 one_hit")
+    ok(len(gt) == 1 and gt[0]["ok"] and gt[0]["actual"] == "dormant",
+       "ground-truth 種子（xdd07070）如預期分類為 dormant")
     ok("弱存在" in payload["verdict"], f"裁決=弱存在（1 個 winner）：{payload['verdict']}")
     md_text = md_path.read_text(encoding="utf-8")
     for section in ("端點健康", "分類統計", "consistent_winner 明細",

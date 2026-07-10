@@ -23,12 +23,15 @@ ERROR_BODY_SNIPPET_LEN = 200  # 端點失敗時記錄 body 前 N 字
 # 佔位符：{window} / {addr} / {off}
 # ---------------------------------------------------------------------------
 
+# 2026-07-10 查證：leaderboard 搬家到 data-api /v1，參數 window→timePeriod、
+# rankType→orderBy（官方文件 docs.polymarket.com/api-reference/core/get-trader-leaderboard-rankings）。
+# 舊 lb-api.polymarket.com 已退役（404），保留為末位 fallback 僅供偵測回歸。
 LEADERBOARD_ENDPOINTS = [
+    "https://data-api.polymarket.com/v1/leaderboard?timePeriod={window}&orderBy=PNL&limit=50&category=OVERALL&offset=0",
     "https://lb-api.polymarket.com/leaderboard?window={window}&rankType=pnl&limit=50",
-    "https://data-api.polymarket.com/leaderboard?window={window}&rankType=pnl&limit=50",
 ]
-LEADERBOARD_WINDOWS = ["1m", "all"]   # 兩窗：近一月、全期
-LEADERBOARD_WINDOW_FALLBACKS = {"1m": "month"}  # window 參數不被接受時的替代值
+LEADERBOARD_WINDOWS = ["MONTH", "ALL"]   # 兩窗：近一月、全期
+LEADERBOARD_WINDOW_FALLBACKS = {"MONTH": "WEEK"}  # timePeriod 不被接受時的替代值
 
 ACTIVITY_ENDPOINTS = [
     "https://data-api.polymarket.com/activity?user={addr}&limit=500&offset={off}",
@@ -80,6 +83,11 @@ CONSISTENT_FREQ_RANGE = (5.0, 1500.0)       # 筆/月（含端點）
 
 # degraded：符合 consistent 核心條件，但最近 30 天 PnL < -15% × 總 PnL
 DEGRADED_RECENT_PNL_FRACTION = -0.15
+
+# dormant：閒置（無交易且 PnL 無變動）超過 N 天、且目前持倉價值 <= 門檻
+# → 不論歷史多輝煌都不可跟（無單可跟）。value 端點缺資料時不判 dormant（證據不足）。
+DORMANT_MAX_IDLE_DAYS = 30
+DORMANT_MAX_CURRENT_VALUE = 100.0
 
 # ---------------------------------------------------------------------------
 # 裁決門檻（verification 報告末段）
@@ -146,6 +154,8 @@ FALLBACK_CATEGORY = "other"
 # ---------------------------------------------------------------------------
 
 GROUND_TRUTH_EXPECTED = {
-    # xdd07070：2026-02 爆紅後 3-4 月爆倉的一次性 esports 錢包
-    "0x25e28169faea17421fcd4cc361f6436d1e449a09": ["one_hit", "degraded"],
+    # xdd07070：esports 錢包，2026-02 爆紅（API 證實終身 PnL +$176k、峰值 $262k@4/6、
+    # 4/14 起曲線躺平、最後 TRADE 4/12、持倉 $0）→ 現況應判 dormant。
+    # 註：媒體傳的「爆倉 −$311k」已被官方 user-pnl API 直查證偽（2026-07-10）。
+    "0x25e28169faea17421fcd4cc361f6436d1e449a09": ["dormant"],
 }

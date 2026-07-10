@@ -29,6 +29,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r projects/poly-observer/requirements.txt
 
+      # 暫時性診斷步驟：記錄各候選端點健康度；端點穩定後可移除
+      - name: Probe leaderboard endpoints (diagnostic, best-effort)
+        working-directory: projects/poly-observer
+        run: python3 probe_leaderboard.py || true
+
       - name: Fetch snapshot (fetch.py 內部防禦，失敗仍落 meta)
         working-directory: projects/poly-observer
         run: python3 fetch.py --max-wallets 60

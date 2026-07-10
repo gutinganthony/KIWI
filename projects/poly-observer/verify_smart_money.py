@@ -313,6 +313,32 @@ def compute_metrics(wallet, snapshot_date):
     freq = (n_trades / len(trade_months)) if trade_months else None
     counts, top_cat, top_share = categorize(trades)
 
+    # 閒置天數：最後一筆交易與最後一次 PnL 變動，取較晚者距 snapshot 的天數
+    last_trade_ts = max((t["ts"] for t in trades if t["ts"] is not None), default=None)
+    last_move_ts = None
+    if points:
+        last_move_ts = points[0][0]
+        final_val = points[-1][1]
+        for i in range(len(points) - 1, 0, -1):
+            if points[i - 1][1] != final_val:
+                last_move_ts = points[i][0]
+                break
+    last_active_ts = max((ts for ts in (last_trade_ts, last_move_ts) if ts is not None),
+                         default=None)
+    days_idle = ((end_ts - last_active_ts) / DAY_SEC) if last_active_ts is not None else None
+
+    # 目前持倉價值（value 端點：[{user, value}] 或 {value: x}；缺資料 → None）
+    current_value = None
+    raw_value = wallet.get("value")
+    if isinstance(raw_value, list) and raw_value and isinstance(raw_value[0], dict):
+        current_value = raw_value[0].get("value")
+    elif isinstance(raw_value, dict):
+        current_value = raw_value.get("value")
+    try:
+        current_value = float(current_value) if current_value is not None else None
+    except (TypeError, ValueError):
+        current_value = None
+
     return {
         "address": addr,
         "snapshot_date": snapshot_date,
@@ -332,6 +358,8 @@ def compute_metrics(wallet, snapshot_date):
         "category_counts": counts,
         "top_category": top_cat,
         "top_category_share": round(top_share, 3) if top_share is not None else None,
+        "days_idle": round(days_idle, 1) if days_idle is not None else None,
+        "current_value": round(current_value, 2) if current_value is not None else None,
         "activity_truncated": bool(wallet.get("activity_truncated")),
         "fetch_errors": wallet.get("errors") or [],
     }
@@ -351,6 +379,15 @@ def classify(m):
     if m["pnl_source"] != "curve" and m["n_trades"] < config.MIN_TRADES_FOR_CLASSIFICATION:
         return "insufficient_data", [
             f"無 PnL 曲線且交易僅 {m['n_trades']} 筆 (<{config.MIN_TRADES_FOR_CLASSIFICATION})"]
+
+    # dormant：閒置超過門檻天數且目前持倉近零 → 無單可跟，優先於一切歷史型態。
+    # value 缺資料（None）時不判 dormant，避免端點故障造成誤殺。
+    idle, cur_val = m.get("days_idle"), m.get("current_value")
+    if (idle is not None and idle > config.DORMANT_MAX_IDLE_DAYS
+            and cur_val is not None and cur_val <= config.DORMANT_MAX_CURRENT_VALUE):
+        return "dormant", [
+            f"閒置 {idle:.0f} 天 > {config.DORMANT_MAX_IDLE_DAYS} 且持倉 ${cur_val:,.0f} "
+            f"<= {config.DORMANT_MAX_CURRENT_VALUE:,.0f}"]
 
     # mm_bot_like
     freq = m["trades_per_month"]
@@ -396,7 +433,7 @@ def classify(m):
     return "choppy", reasons or ["不符合任何特定型態"]
 
 
-CLASS_ORDER = ["consistent_winner", "degraded", "one_hit", "mm_bot_like",
+CLASS_ORDER = ["consistent_winner", "degraded", "dormant", "one_hit", "mm_bot_like",
                "choppy", "insufficient_data"]
 
 
