@@ -153,6 +153,80 @@ def parse_trades(raw_activity):
     return trades
 
 
+def _to_float(val):
+    """寬鬆轉 float；壞值回 None。"""
+    try:
+        return float(val)
+    except (TypeError, ValueError):
+        return None
+
+
+def parse_activity_events(raw_activity):
+    """activity → 完整事件清單（含 REDEEM），供 track_wallet 時間軸與 simulate_copy 重建用。
+
+    與 parse_trades 的差異：保留每筆的 price / shares，且**不丟棄** REDEEM/REWARD/CLAIM，
+    好讓跟單模擬器能重建進出與結算。回傳按時間排序的
+    [{ts, type, side, price, shares, usdc, title, slug, condition_id}]。
+    此函式是共用解析邏輯的單一來源，track_wallet.py 與 simulate_copy.py 皆 import 使用。
+    """
+    if raw_activity is None:
+        return []
+    if isinstance(raw_activity, dict):
+        for key in ("data", "activity", "history", "results"):
+            if isinstance(raw_activity.get(key), list):
+                raw_activity = raw_activity[key]
+                break
+        else:
+            return []
+    if not isinstance(raw_activity, list):
+        return []
+    events = []
+    for item in raw_activity:
+        if not isinstance(item, dict):
+            continue
+        typ = str(item.get("type", "TRADE")).upper()
+        side = str(item.get("side", "")).upper()
+        if side not in ("BUY", "SELL"):
+            side = typ if typ in ("BUY", "SELL") else ""
+        ts = None
+        for k in ("timestamp", "time", "ts", "createdAt", "created_at"):
+            if k in item:
+                ts = _norm_ts(item[k])
+                break
+        price = _to_float(item.get("price"))
+        shares = None
+        for k in ("size", "shares", "quantity", "amount"):
+            if k in item and item[k] is not None:
+                shares = _to_float(item[k])
+                if shares is not None:
+                    break
+        usdc = None
+        for k in ("usdcSize", "usdc_size", "usdSize", "cash", "notional"):
+            if k in item and item[k] is not None:
+                usdc = _to_float(item[k])
+                if usdc is not None:
+                    usdc = abs(usdc)
+                    break
+        if usdc is None and price is not None and shares is not None:
+            usdc = abs(price * shares)
+        cond = (item.get("conditionId") or item.get("condition_id")
+                or item.get("slug") or item.get("eventSlug")
+                or item.get("asset") or item.get("tokenId") or item.get("token_id") or "")
+        events.append({
+            "ts": ts,
+            "type": typ,
+            "side": side,
+            "price": price,
+            "shares": abs(shares) if shares is not None else None,
+            "usdc": usdc if usdc is not None else 0.0,
+            "title": str(item.get("title") or item.get("question") or ""),
+            "slug": str(item.get("slug") or item.get("eventSlug") or ""),
+            "condition_id": str(cond),
+        })
+    events.sort(key=lambda e: (e["ts"] is None, e["ts"] or 0))
+    return events
+
+
 # ---------------------------------------------------------------------------
 # 指標計算
 # ---------------------------------------------------------------------------

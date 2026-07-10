@@ -46,8 +46,22 @@ jobs:
         working-directory: projects/poly-observer
         run: python3 analyze.py --snapshot "data/snapshots/$(date -u +%F)" || true
 
+      # 深度追蹤（唯讀）：對 config.TRACKED_WALLETS 逐一產 dossier ＋跟單成本模擬。
+      # track_wallet 會把 tracked 錢包原始 snapshot 複製到 data/tracked/{addr}/latest_raw.json，
+      # 故必須在 prune 之前執行；每支 || true 保底，永不擋住後續步驟。
+      - name: Track wallets + simulate copy (deep tracking, read-only)
+        working-directory: projects/poly-observer
+        run: |
+          SNAP="data/snapshots/$(date -u +%F)"
+          ADDRS=$(python3 -c "import config; print(' '.join(w['address'] for w in config.TRACKED_WALLETS))")
+          for addr in $ADDRS; do
+            python3 track_wallet.py --address "$addr" --snapshot "$SNAP" || true
+            python3 simulate_copy.py --address "$addr" --snapshot "$SNAP" || true
+          done
+
       # repo 體積控制：原始 wallet 快照每日 ~85MB，只保留衍生報告與 meta；
-      # 原始資料隨時可由公開 API 重抓，verification json 已含全部逐錢包指標
+      # 原始資料隨時可由公開 API 重抓，verification json 已含全部逐錢包指標。
+      # tracked 錢包的原始資料已由上一步複製到 data/tracked/，不受此 prune 影響。
       - name: Prune raw wallet snapshots
         working-directory: projects/poly-observer
         run: rm -rf data/snapshots/*/wallets

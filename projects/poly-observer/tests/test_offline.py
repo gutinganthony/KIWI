@@ -16,6 +16,8 @@ sys.path.insert(0, str(PROJECT_DIR))
 
 import analyze  # noqa: E402
 import verify_smart_money as vsm  # noqa: E402
+import track_wallet  # noqa: E402
+import simulate_copy  # noqa: E402
 
 FIXTURES = TESTS_DIR / "fixtures"
 SNAP_DATE = "2026-07-01"  # fixtures 的時間軸終點（recent-30d 視窗右端）
@@ -133,6 +135,87 @@ def test_analyze(tmp, snap_dir, report_dir):
     ok(len(watchlist[active[0]]["history"]) == 1, "history 有 1 筆逐日快照")
 
 
+def test_track_wallet(tmp):
+    print("[5] track_wallet：dossier 產生＋open positions 列出＋new-position delta＋timeline 落地")
+    base = json.loads((FIXTURES / "wallet_consistent.json").read_text(encoding="utf-8"))
+    addr = base["address"]
+    # 注入兩個未平倉部位（既有 fixture 無 positions，以此驗證持倉列出路徑）
+    base["positions"] = [
+        {"title": "Will Trump win the 2028 Republican nomination?",
+         "slug": "trump-2028-republican-nominee", "outcome": "Yes",
+         "size": 700, "currentValue": 350.0, "avgPrice": 0.42, "conditionId": "cond-3c"},
+        {"title": "Will the Senate pass the budget bill by August?",
+         "slug": "senate-budget-bill-august", "outcome": "No",
+         "size": 400, "currentValue": 264.0, "avgPrice": 0.55, "conditionId": "cond-4b"},
+    ]
+    snap_dir = tmp / "snapshots" / SNAP_DATE
+    wallets_dir = snap_dir / "wallets"
+    wallets_dir.mkdir(parents=True, exist_ok=True)
+    (wallets_dir / f"{addr}.json").write_text(
+        json.dumps(base, ensure_ascii=False), encoding="utf-8")
+    tracked_root = tmp / "tracked"
+
+    dossier = track_wallet.run_track_wallet(addr, snap_dir, tracked_root)
+    ok(dossier is not None, "track_wallet 正常執行並回傳 dossier")
+    ok(dossier["n_open_positions"] == 2, f"列出 2 個未平倉部位（{dossier['n_open_positions']}）")
+    ok(dossier["initialized"] is True, "首次追蹤 new-position delta 標記 initialized")
+    ok(dossier["classification"] == "consistent_winner",
+       f"分類重用 verify.classify（{dossier['classification']}）")
+
+    tdir = tracked_root / addr
+    ok((tdir / f"dossier_{SNAP_DATE}.md").is_file()
+       and (tdir / f"dossier_{SNAP_DATE}.json").is_file(), "dossier md/json 落地")
+    ok((tdir / "latest_raw.json").is_file(), "原始資料持久化到 latest_raw.json")
+    md_text = (tdir / f"dossier_{SNAP_DATE}.md").read_text(encoding="utf-8")
+    ok("senate-budget-bill-august" in md_text or "Senate pass the budget" in md_text,
+       "md dossier 含未平倉部位明細")
+    timeline_lines = (tdir / "timeline.jsonl").read_text(encoding="utf-8").strip().splitlines()
+    ok(len(timeline_lines) == 1, f"timeline.jsonl 落地 1 行（{len(timeline_lines)}）")
+    row = json.loads(timeline_lines[0])
+    ok(row["n_open_positions"] == 2 and row["new_positions_count"] == 0,
+       "timeline 行含持倉數與新建倉數")
+
+    # 第二次執行：改變持倉集合，驗證 new/disappeared delta（不再 initialized）
+    base["positions"] = [
+        base["positions"][0],  # 保留 trump（不變）
+        {"title": "New market E", "slug": "new-market-e", "outcome": "Yes",
+         "size": 100, "currentValue": 50.0, "avgPrice": 0.5, "conditionId": "cond-e"},
+    ]
+    (wallets_dir / f"{addr}.json").write_text(
+        json.dumps(base, ensure_ascii=False), encoding="utf-8")
+    dossier2 = track_wallet.run_track_wallet(addr, snap_dir, tracked_root)
+    ok(dossier2["initialized"] is False, "第二次執行不再 initialized")
+    new_keys = {p["key"] for p in dossier2["new_positions"]}
+    gone_keys = {p["key"] for p in dossier2["disappeared_positions"]}
+    ok("new-market-e" in new_keys, f"偵測到新建倉 new-market-e（{new_keys}）")
+    ok("senate-budget-bill-august" in gone_keys,
+       f"偵測到消失持倉 senate-budget-bill-august（{gone_keys}）")
+
+
+def test_simulate_copy():
+    print("[6] simulate_copy：錢包原始 PnL 手算對得上＋摩擦侵蝕＋情境單調")
+    wallet = json.loads((FIXTURES / "wallet_sim.json").read_text(encoding="utf-8"))
+    result = simulate_copy.simulate(wallet, SNAP_DATE)
+
+    ww = result["wallet_window"]
+    # (a) 錢包原始已實現 PnL：回收 220（A100+B10+C110+D0）− 成本 170（40+50+60+20）= 50
+    ok(abs(ww["realized_pnl"] - 50.0) < 0.01,
+       f"錢包同窗原始已實現 PnL=50（手算對照）：{ww['realized_pnl']}")
+    ok(ww["curve_divergence_warning"] is None,
+       "重建 PnL 與 pnl 曲線同窗變動一致（無示警）")
+    ok(ww["roi"] is not None and ww["roi"] > 0, f"錢包同窗 ROI 為正（{ww['roi']}）")
+
+    real_fixed = result["matrix"]["realistic"]["fixed"]
+    # (b) 加滑點後跟單者 ROI（每投入 $1 報酬率）< 錢包同窗 ROI —— 摩擦必然侵蝕
+    ok(real_fixed["follower_roi"] < ww["roi"],
+       f"跟單者 ROI {real_fixed['follower_roi']} < 錢包 ROI {ww['roi']}（摩擦侵蝕）")
+
+    opt = result["matrix"]["optimistic"]["fixed"]["follower_net_pnl"]
+    pess = result["matrix"]["pessimistic"]["fixed"]["follower_net_pnl"]
+    # (c) pessimistic 情境比 optimistic 差
+    ok(pess < opt, f"pessimistic 淨 PnL {pess} < optimistic 淨 PnL {opt}")
+
+
 def main():
     with tempfile.TemporaryDirectory(prefix="poly-observer-test-") as td:
         tmp = Path(td)
@@ -140,6 +223,8 @@ def main():
         test_metrics_sanity()
         snap_dir, report_dir = test_reports(tmp)
         test_analyze(tmp, snap_dir, report_dir)
+        test_track_wallet(tmp)
+        test_simulate_copy()
     print(f"ALL TESTS PASSED ({checks} checks)")
     return 0
 

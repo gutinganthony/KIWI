@@ -162,3 +162,30 @@ GROUND_TRUTH_EXPECTED = {
     # 註：媒體傳的「爆倉 −$311k」已被官方 user-pnl API 直查證偽（2026-07-10）。
     "0x25e28169faea17421fcd4cc361f6436d1e449a09": ["dormant"],
 }
+
+# ---------------------------------------------------------------------------
+# 深度追蹤名單（track_wallet.py 逐日 dossier；simulate_copy.py 跟單成本模擬）
+# 這些錢包的原始 snapshot 會被 track_wallet.py 複製到 data/tracked/{addr}/，
+# 在每日 prune data/snapshots/*/wallets 之後仍持久化，供模擬器使用。
+# 純唯讀：追蹤與模擬皆為紙上分析，不含任何下單、簽章、金鑰、錢包連線程式碼。
+# ---------------------------------------------------------------------------
+
+TRACKED_WALLETS = [
+    {"address": "0x2005d16a84ceefa912d4e380cd32e7ff827875ea",
+     "label": "sports-syndicate-11M-winner"},
+    {"address": "0x25e28169faea17421fcd4cc361f6436d1e449a09",
+     "label": "xdd07070-dormant-groundtruth"},
+]
+
+# ---------------------------------------------------------------------------
+# 跟單成本模擬器（simulate_copy.py）預設常數
+# 全部為「紙上」假設：延遲與滑點皆為假設參數、非實測，僅供量化摩擦成本的相對比較。
+# ---------------------------------------------------------------------------
+
+SIM_BANKROLL = 10000.0            # 跟單者假想本金（USD）
+# 每筆單邊價格摩擦（占價格比例）：進場買價上抬、出場賣價下壓
+SIM_SLIPPAGE_SCENARIOS = {"optimistic": 0.02, "realistic": 0.05, "pessimistic": 0.08}
+SIM_LATENCY_EXTRA_SLIPPAGE = 0.01   # 延遲另加的單邊摩擦（假設值，非實測）
+SIM_COPY_MODES = ["fixed", "proportional"]
+SIM_FIXED_USD = 50.0              # fixed 模式：每單固定投入（USD）
+SIM_PROP_FRACTION = 0.02          # proportional 模式：每單投入 = bankroll × 此值

@@ -1,0 +1,60 @@
+{
+  "address": "0x5555555555555555555555555555555555555555",
+  "fetched_at": "2026-06-05T00:00:00+00:00",
+  "activity": [
+    {
+      "type": "TRADE", "timestamp": 1780000000, "side": "BUY",
+      "price": 0.40, "size": 100, "usdcSize": 40.0,
+      "title": "Win market A (redeem win)", "slug": "win-market-a", "conditionId": "cond-a"
+    },
+    {
+      "type": "REDEEM", "timestamp": 1780086400,
+      "size": 100, "usdcSize": 100.0,
+      "title": "Win market A (redeem win)", "slug": "win-market-a", "conditionId": "cond-a"
+    },
+    {
+      "type": "TRADE", "timestamp": 1780172800, "side": "BUY",
+      "price": 0.50, "size": 100, "usdcSize": 50.0,
+      "title": "Lose market B (sold at loss)", "slug": "lose-market-b", "conditionId": "cond-b"
+    },
+    {
+      "type": "TRADE", "timestamp": 1780259200, "side": "SELL",
+      "price": 0.10, "size": 100, "usdcSize": 10.0,
+      "title": "Lose market B (sold at loss)", "slug": "lose-market-b", "conditionId": "cond-b"
+    },
+    {
+      "type": "TRADE", "timestamp": 1780345600, "side": "BUY",
+      "price": 0.30, "size": 200, "usdcSize": 60.0,
+      "title": "Win market C (sold at profit)", "slug": "win-market-c", "conditionId": "cond-c"
+    },
+    {
+      "type": "TRADE", "timestamp": 1780432000, "side": "SELL",
+      "price": 0.55, "size": 200, "usdcSize": 110.0,
+      "title": "Win market C (sold at profit)", "slug": "win-market-c", "conditionId": "cond-c"
+    },
+    {
+      "type": "TRADE", "timestamp": 1780518400, "side": "BUY",
+      "price": 0.20, "size": 100, "usdcSize": 20.0,
+      "title": "Lose market D (expired worthless)", "slug": "lose-market-d", "conditionId": "cond-d"
+    },
+    {
+      "type": "REDEEM", "timestamp": 1780604800,
+      "size": 100, "usdcSize": 0.0,
+      "title": "Lose market D (expired worthless)", "slug": "lose-market-d", "conditionId": "cond-d"
+    }
+  ],
+  "activity_truncated": false,
+  "positions": [],
+  "value": [
+    {"user": "0x5555555555555555555555555555555555555555", "value": 0}
+  ],
+  "pnl": [
+    {"t": 1779990000, "p": 1000},
+    {"t": 1780090000, "p": 1060},
+    {"t": 1780260000, "p": 1020},
+    {"t": 1780432000, "p": 1070},
+    {"t": 1780604800, "p": 1050}
+  ],
+  "pnl_endpoint": "fixture",
+  "errors": []
+}
