@@ -44,9 +44,7 @@ gstack 檔案路徑一律用 `~/.claude/skills/gstack/...`（全域路徑）。
 | ACT / AVI / CRI / TSI 指數判讀 | docs/KIWI_INDEX_FRAMEWORK.md |
 | 「用 WaveTrend 分析 $TICKER」 | skills/wavetrend/SKILL.md |
 | 「用 Serenity + WaveTrend 分析 $TICKER，搭配 ACT index 判讀」（三合一） | skills/serenity/SKILL.md + skills/serenity/watchlist.md + skills/wavetrend/SKILL.md + docs/KIWI_INDEX_FRAMEWORK.md（不含 weekly-screen.md） |
-| 新增文章/連結到知識庫 | skills/add-article/SKILL.md（含條目格式與三處索引同步） |
-| 重拉現價/重定價（watchlist、週報、臨時查價） | skills/reprice/SKILL.md（多源 quote.py＋環境分流） |
-| 知識庫體檢（索引漂移/斷鏈/過期主張/矛盾） | skills/kiwi-lint/SKILL.md |
+| 新增文章/連結到知識庫 | README.md 看格式 → 寫入 topics/<主題>/ → 更新該主題 INDEX.md 與 README.md 的索引表 |
 | 改 avi-v5 程式 | projects/avi-v5/ARCHITECTURE.md（改 CPI 相關再加 CPI_ARCHITECTURE.md） |
 
 其餘任務一律不讀上表檔案。新增分析模組：在 `skills/` 下建資料夾寫 SKILL.md，然後在上表加一列。
