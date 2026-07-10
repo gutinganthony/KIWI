@@ -142,8 +142,19 @@ def veto(clusters, sells, price_fn, skipped_checks):
     for s in sells:
         key = (s.get("ticker") or "").strip().upper()
         sell_usd[key] = sell_usd.get(key, 0.0) + (s.get("usd") or 0.0)
-    survivors, counts = {}, {"penny": 0, "sell_offset": 0, "illiquid": 0}
+    survivors, counts = {}, {"penny": 0, "sell_offset": 0, "illiquid": 0,
+                             "fund_issuer": 0, "routine_wave": 0}
     for ticker, c in clusters.items():
+        name_u = (c.get("company") or "").upper()
+        if any(kw in name_u for kw in config.VETO_FUND_NAME_KEYWORDS):
+            counts["fund_issuer"] += 1   # 基金/ETF/信託的內部人申報：非股票訊號
+            continue
+        n_owners = len(c["owners"])
+        per_insider = (c["total_buy_usd"] / n_owners) if n_owners else 0.0
+        if (n_owners > config.VETO_MAX_CLUSTER_SIZE
+                or per_insider < config.VETO_MIN_BUY_PER_INSIDER_USD):
+            counts["routine_wave"] += 1  # 例行申報潮偽裝集群（TSM 31 人型）
+            continue
         vwap = cluster_vwap(c)
         if vwap < config.VETO_MIN_PRICE_USD:
             counts["penny"] += 1

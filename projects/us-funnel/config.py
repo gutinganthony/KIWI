@@ -70,6 +70,16 @@ CLUSTER_MIN_INSIDERS = 2         # 7 日窗內同 issuer ≥2 名不同 reportin
 
 VETO_MIN_PRICE_USD = 1.0             # 仙股排除：集群買入 VWAP < $1 → 否決（操縱紅旗 v0 從簡）
 VETO_SELL_TO_BUY_RATIO = 0.5         # 同窗同 issuer 內部人賣出額 > 買入額 × 此比例 → 否決
+# 非普通股 issuer 排除：Form 4 也涵蓋共同基金/ETF/信託的內部人申報，非股票訊號
+# （2026-07-10 CI 首跑實證混入 First Trust/AMG 系基金）。以 issuer 名稱關鍵字過濾。
+VETO_FUND_NAME_KEYWORDS = (
+    " FUND", " TRUST", " ETF", "PORTFOLIOS", "ASSET-BACKED", "MUNICIPAL",
+    "INCOME FUND", "CREDIT FUND", "CLOSED-END", "ALTERNATIVE STRATEGY",
+)
+# 例行申報潮排除：巨型公司高管定期同窗申報會偽裝成集群（CI 首跑實證 TSM 31 人、
+# 人均僅 ~$8k——非 opportunistic 同謀式買入）。人數超上限或人均金額過低 → 否決。
+VETO_MAX_CLUSTER_SIZE = 8
+VETO_MIN_BUY_PER_INSIDER_USD = 25_000.0
 VETO_MIN_AVG_DOLLAR_VOLUME = 200_000.0  # 近 20 交易日日均成交額（close×volume）下限（USD）；
                                         # 刻意設低——保留小市值 alpha 帶（設計檔 §1 第二層）
 DOLLAR_VOLUME_LOOKBACK_DAYS = 20     # 日均成交額回看交易日數
