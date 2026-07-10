@@ -152,9 +152,30 @@ jobs:
             exit 1
           fi
 
-      # 只有「真的產出並推送」才推「✅ 完成」。
+      # 🚨 變化警報：比對本次執行前後的 data.json，只有「燈號翻轉 / 🟢🔴觸發命中 / 🟣持倉賣訊 / >15% 跳動」
+      # 才推 Telegram + LINE（跟 ACT 每日訊號同一條頻道）。無變化＝靜默。
+      - name: Serenity change alert
+        if: steps.check.outputs.produced == 'yes'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          git show "${{ steps.baseline.outputs.sha }}:docs/serenity/data.json" > /tmp/old.json 2>/dev/null || echo '{}' > /tmp/old.json
+          ALERT="$(python3 projects/avi-v5/scripts/serenity_alert.py /tmp/old.json docs/serenity/data.json || true)"
+          if [ -n "$ALERT" ]; then
+            echo "偵測到變化，推播 Telegram+LINE："; echo "$ALERT"
+            printf '%s' "$ALERT" | python3 projects/avi-v5/scripts/notify_ops.py \
+              --title "🚨 Serenity 訊號變化 $(date -u +%Y-%m-%d)" \
+              --url "https://gutinganthony.github.io/KIWI/serenity/" \
+              --line
+          else
+            echo "無重大變化，不推播（靜默）。"
+          fi
+
+      # 心跳：只在每月全掃跑完推一則「✅ 完成」確認系統存活（輕量日不推，避免噪音——有事才通知靠上面的變化警報）。
       - name: Notify — produced
-        if: success()
+        if: success() && steps.mode.outputs.full == 'true'
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
