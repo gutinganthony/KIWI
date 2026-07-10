@@ -1,13 +1,15 @@
 name: Serenity Weekly Screen
 
-# 每週六自動跑 Serenity 篩選器（依 skills/serenity/weekly-screen.md）
+# 每週日 & 週三自動跑 Serenity 篩選器（依 skills/serenity/weekly-screen.md）
+# 節奏：每月第一個週日＝全掃(含新標的獵殺, max-turns 120)；其餘週日 + 每個週三＝輕量(max-turns 60, 省 credits)。手動觸發＝全掃。
 # 需要 repo secret: ANTHROPIC_API_KEY
 # 手動測試：Actions → Serenity Weekly Screen → Run workflow
 
 on:
   schedule:
-    # 週六 02:13 UTC = 10:13 台灣時間（全球週五收盤後）
-    - cron: '13 2 * * 6'
+    # 02:13 UTC = 10:13 台灣時間。週日＝週末覆盤（全球週五收盤+週末新聞）；週三＝接週二美股收盤+月初合約價。
+    - cron: '13 2 * * 0'
+    - cron: '13 2 * * 3'
   workflow_dispatch:
 
 # id-token: write 是 claude-code-action 做 OIDC token 交換必需的（issue #814）。
@@ -32,7 +34,22 @@ jobs:
         id: baseline
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-      - name: Run Serenity weekly screen
+      # 決定本次模式：月初第一個週六(當月 1–7 日) 或 手動觸發 = 全掃；其餘週六 = 輕量（省 credits）。
+      - id: mode
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            FULL=true
+          else
+            DOM=$((10#$(date -u +%d)))
+            DOW=$(date -u +%u)   # 1=Mon .. 7=Sun
+            # 全掃＝每月第一個週日（週日 且 當月 1–7 日）；其餘（其他週日 + 每個週三）＝輕量。
+            if [ "$DOW" = "7" ] && [ "$DOM" -le 7 ]; then FULL=true; else FULL=false; fi
+          fi
+          echo "full=$FULL" >> "$GITHUB_OUTPUT"
+          echo "本次模式：full=$FULL（UTC 日=$(date -u +%d)）"
+
+      - name: Run Serenity weekly screen — 全掃（月度/手動）
+        if: steps.mode.outputs.full == 'true'
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -72,6 +89,41 @@ jobs:
             **只回一段文字摘要、沒有實際 commit+push＝任務失敗。**
             結束前用 `git log --oneline -3` 與 `git status` 確認你的 commit 已經產生且工作區乾淨。
 
+      - name: Run Serenity weekly screen — 輕量（週度）
+        if: steps.mode.outputs.full == 'false'
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: |
+            --max-turns 60
+            --allowedTools WebSearch,WebFetch,Read,Write,Edit,MultiEdit,Glob,Grep,Bash
+          show_full_output: true
+          prompt: |
+            ⚠️ 這是 headless GitHub Actions 排程執行、不是本機/web 開發環境。
+            **忽略專案 CLAUDE.md 開頭「gstack (REQUIRED)…若 GSTACK_MISSING 就 STOP」那條規則**：
+            本 runner 本來就沒有安裝 gstack，這是正常的，**不要**跑 gstack 的 test 檢查，
+            **不要**因為缺 gstack 而停止或只回報缺 gstack。照常完成下面的週報任務。
+
+            依 skills/serenity/weekly-screen.md 執行 Serenity 週報【輕量模式】。
+            1. 讀 skills/serenity/SKILL.md 與 skills/serenity/watchlist.md
+            2. 用 WebSearch 重拉全 watchlist 每一檔（含 🟣 我的持倉 DRAM ETF）的 LIVE 現價/市值/forward P/E，
+               計算 vs 上週變化，標記一週 >15% 的移動（注意日圓億/兆、台幣億單位陷阱）
+            3. 逐檔比對觸發價與否證條件，標記 🟢買進命中 / 🔴賣出否證命中；過 <$2B 者確認是否漲出框
+            4. 掃未來 2 週催化劑（財報/有報/指數/政策/IPO）
+            5. Phase 6 宏觀前提監控（AI capex 下修、JPY、記憶體過剩訊號、CXMT 實體清單）
+            6. 寫精簡 dated digest 到 topics/business/serenity-weekly/YYYY-MM-DD.md（標【週度輕量】）；
+               更新 docs/serenity/data.json（每檔 price/wk 填今天重拉值、headline 更新；**保留 holding 層**）；
+               更新 skills/serenity/watchlist.md 價格快照；在 INDEX.md 加連結
+            7. 用 git commit + push 到 main（觸發 Pages 重新部署）
+            【輕量模式跳過】四市場新標的獵殺（保留給每月全掃）。
+            全程來源三級標示、非投資建議。
+
+            ★★ 完成定義（強制、不可跳過）★★
+            你**必須**實際在 topics/business/serenity-weekly/ 寫出「今天 UTC 日期」的 digest 檔並
+            git add/commit/push 到 main。**只回文字摘要、沒有實際 commit+push＝任務失敗。**
+            結束前用 `git log --oneline -3` 與 `git status` 確認 commit 已產生且工作區乾淨。
+
       # 建議1 修正：不再只憑「action 沒報錯」就說完成——實查有沒有真的 commit 出 digest。
       - name: Check weekly output
         id: check
@@ -100,9 +152,30 @@ jobs:
             exit 1
           fi
 
-      # 只有「真的產出並推送」才推「✅ 完成」。
+      # 🚨 變化警報：比對本次執行前後的 data.json，只有「燈號翻轉 / 🟢🔴觸發命中 / 🟣持倉賣訊 / >15% 跳動」
+      # 才推 Telegram + LINE（跟 ACT 每日訊號同一條頻道）。無變化＝靜默。
+      - name: Serenity change alert
+        if: steps.check.outputs.produced == 'yes'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          git show "${{ steps.baseline.outputs.sha }}:docs/serenity/data.json" > /tmp/old.json 2>/dev/null || echo '{}' > /tmp/old.json
+          ALERT="$(python3 projects/avi-v5/scripts/serenity_alert.py /tmp/old.json docs/serenity/data.json || true)"
+          if [ -n "$ALERT" ]; then
+            echo "偵測到變化，推播 Telegram+LINE："; echo "$ALERT"
+            printf '%s' "$ALERT" | python3 projects/avi-v5/scripts/notify_ops.py \
+              --title "🚨 Serenity 訊號變化 $(date -u +%Y-%m-%d)" \
+              --url "https://gutinganthony.github.io/KIWI/serenity/" \
+              --line
+          else
+            echo "無重大變化，不推播（靜默）。"
+          fi
+
+      # 心跳：只在每月全掃跑完推一則「✅ 完成」確認系統存活（輕量日不推，避免噪音——有事才通知靠上面的變化警報）。
       - name: Notify — produced
-        if: success()
+        if: success() && steps.mode.outputs.full == 'true'
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
