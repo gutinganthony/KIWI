@@ -1,89 +1,40 @@
 {
  "fetch": {
-  "ran_at": "2026-07-10T18:33:53.857709+00:00",
+  "ran_at": "2026-07-10T19:18:46.904650+00:00",
   "days_scanned": 8,
-  "days_fetched": 6,
-  "days_skipped_cached": 0,
-  "raw_filings": 10995,
+  "days_fetched": 0,
+  "days_skipped_cached": 6,
+  "raw_filings": 0,
   "parse_failed": 0,
-  "requests_ok": 11001,
+  "requests_ok": 0,
   "requests_failed": 2,
-  "elapsed_sec": 2344.2,
+  "elapsed_sec": 9.7,
   "endpoint_health": [
    {
     "name": "daily-index 2026-07-10",
     "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260710.idx",
     "ok": false,
     "status": 403,
-    "error": "HTTP 403; body=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>W7DX4RYMKVA6VH0F</RequestId><HostId>BSNCGAZLfJSIVj/G1EbPXj5VPf8NXpmWrrG",
-    "elapsed_sec": 4.68
-   },
-   {
-    "name": "daily-index 2026-07-09",
-    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260709.idx",
-    "ok": true,
-    "status": 200,
-    "error": null,
-    "elapsed_sec": 0.16
-   },
-   {
-    "name": "daily-index 2026-07-08",
-    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260708.idx",
-    "ok": true,
-    "status": 200,
-    "error": null,
-    "elapsed_sec": 0.14
-   },
-   {
-    "name": "daily-index 2026-07-07",
-    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260707.idx",
-    "ok": true,
-    "status": 200,
-    "error": null,
-    "elapsed_sec": 0.16
-   },
-   {
-    "name": "daily-index 2026-07-06",
-    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260706.idx",
-    "ok": true,
-    "status": 200,
-    "error": null,
-    "elapsed_sec": 0.16
+    "error": "HTTP 403; body=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>NZEJNHPD244EPGS9</RequestId><HostId>uUWjh7O6PKY0quVwGJlFfJuXOmCKQWvYI6v",
+    "elapsed_sec": 4.7
    },
    {
     "name": "daily-index 2026-07-03",
     "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260703.idx",
     "ok": false,
     "status": 403,
-    "error": "HTTP 403; body=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>G8YRGVZXWF4BV003</RequestId><HostId>bMcUhrhW+Iba0mzMsTit4jHXUkmLtERn3q1",
-    "elapsed_sec": 4.62
-   },
-   {
-    "name": "daily-index 2026-07-02",
-    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260702.idx",
-    "ok": true,
-    "status": 200,
-    "error": null,
-    "elapsed_sec": 0.24
-   },
-   {
-    "name": "daily-index 2026-07-01",
-    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260701.idx",
-    "ok": true,
-    "status": 200,
-    "error": null,
-    "elapsed_sec": 0.12
+    "error": "HTTP 403; body=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>RS2W7Y8PCKHRFA6N</RequestId><HostId>rbkMmeCr8JB0c9x0o4SoJSJy7WUBXhHwIWl",
+    "elapsed_sec": 4.65
    }
   ],
   "errors": [
    "2026-07-10 索引抓取失敗（status=403）",
-   "2026-07-03 索引抓取失敗（status=403）",
-   "2026-07-02 Form 4 共 4318 筆 > 上限 4000，截斷"
+   "2026-07-03 索引抓取失敗（status=403）"
   ]
  },
- "updated_at": "2026-07-10T19:17:58.360946+00:00",
+ "updated_at": "2026-07-10T19:19:22.652150+00:00",
  "funnel": {
-  "ran_at": "2026-07-10T19:17:58.360713+00:00",
+  "ran_at": "2026-07-10T19:19:06.846967+00:00",
   "days_loaded": 4,
   "funnel_stats": {
    "raw_filings": 4822,
@@ -109,94 +60,31 @@
    "liquidity:UUUU",
    "liquidity:WRAP"
   ],
-  "requests_ok": 0,
-  "requests_failed": 9,
-  "elapsed_sec": 51.4,
-  "endpoint_health": [
-   {
-    "name": "stooq YPF",
-    "url": "https://stooq.com/q/d/l/?s=ypf.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=ypf.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: ",
-    "elapsed_sec": 5.41
-   },
-   {
-    "name": "stooq PFBX",
-    "url": "https://stooq.com/q/d/l/?s=pfbx.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=pfbx.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed:",
-    "elapsed_sec": 5.12
-   },
-   {
-    "name": "stooq JCTC",
-    "url": "https://stooq.com/q/d/l/?s=jctc.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=jctc.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed:",
-    "elapsed_sec": 5.06
-   },
-   {
-    "name": "stooq HTO",
-    "url": "https://stooq.com/q/d/l/?s=hto.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=hto.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: ",
-    "elapsed_sec": 5.04
-   },
-   {
-    "name": "stooq EWSB",
-    "url": "https://stooq.com/q/d/l/?s=ewsb.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=ewsb.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed:",
-    "elapsed_sec": 5.2
-   },
-   {
-    "name": "stooq VII",
-    "url": "https://stooq.com/q/d/l/?s=vii.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=vii.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: ",
-    "elapsed_sec": 5.01
-   },
-   {
-    "name": "stooq ENR",
-    "url": "https://stooq.com/q/d/l/?s=enr.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=enr.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: ",
-    "elapsed_sec": 5.78
-   },
-   {
-    "name": "stooq UUUU",
-    "url": "https://stooq.com/q/d/l/?s=uuuu.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=uuuu.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed:",
-    "elapsed_sec": 5.07
-   },
-   {
-    "name": "stooq WRAP",
-    "url": "https://stooq.com/q/d/l/?s=wrap.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=wrap.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed:",
-    "elapsed_sec": 5.24
-   }
-  ],
-  "errors": []
+  "requests_ok": 9,
+  "requests_failed": 0,
+  "elapsed_sec": 10.2,
+  "endpoint_health": [],
+  "errors": [
+   "stooq YPF: 回應非有效 CSV（No data？）",
+   "stooq PFBX: 回應非有效 CSV（No data？）",
+   "stooq JCTC: 回應非有效 CSV（No data？）",
+   "stooq HTO: 回應非有效 CSV（No data？）",
+   "stooq EWSB: 回應非有效 CSV（No data？）",
+   "stooq VII: 回應非有效 CSV（No data？）",
+   "stooq ENR: 回應非有效 CSV（No data？）",
+   "stooq UUUU: 回應非有效 CSV（No data？）",
+   "stooq WRAP: 回應非有效 CSV（No data？）"
+  ]
  },
  "tracking": {
-  "ran_at": "2026-07-10T19:13:25.290382+00:00",
+  "ran_at": "2026-07-10T19:19:22.652027+00:00",
   "positions_total": 15,
-  "positions_new": 15,
+  "positions_new": 0,
   "positions_updated": 0,
   "price_failed": 15,
   "requests_ok": 15,
   "requests_failed": 0,
-  "elapsed_sec": 12.9,
+  "elapsed_sec": 15.7,
   "endpoint_health": [],
   "errors": [
    "stooq EWSB: 回應非有效 CSV（No data？）",
