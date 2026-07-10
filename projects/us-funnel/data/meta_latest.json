@@ -1,123 +1,166 @@
 {
  "fetch": {
-  "ran_at": "2026-07-10T18:29:32.075558+00:00",
+  "ran_at": "2026-07-10T18:33:53.857709+00:00",
   "days_scanned": 8,
-  "days_fetched": 0,
+  "days_fetched": 6,
   "days_skipped_cached": 0,
-  "raw_filings": 0,
+  "raw_filings": 10995,
   "parse_failed": 0,
-  "requests_ok": 0,
-  "requests_failed": 8,
-  "elapsed_sec": 54.2,
+  "requests_ok": 11001,
+  "requests_failed": 2,
+  "elapsed_sec": 2344.2,
   "endpoint_health": [
    {
     "name": "daily-index 2026-07-10",
     "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260710.idx",
     "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='www.sec.gov', port=443): Max retries exceeded with url: /Archives/edgar/daily-index/2026/QTR3/form.20260710.idx (Caused by ProxyError('Unable to connect to proxy'",
-    "elapsed_sec": 4.92
+    "status": 403,
+    "error": "HTTP 403; body=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>W7DX4RYMKVA6VH0F</RequestId><HostId>BSNCGAZLfJSIVj/G1EbPXj5VPf8NXpmWrrG",
+    "elapsed_sec": 4.68
    },
    {
     "name": "daily-index 2026-07-09",
     "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260709.idx",
-    "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='www.sec.gov', port=443): Max retries exceeded with url: /Archives/edgar/daily-index/2026/QTR3/form.20260709.idx (Caused by ProxyError('Unable to connect to proxy'",
-    "elapsed_sec": 5.04
+    "ok": true,
+    "status": 200,
+    "error": null,
+    "elapsed_sec": 0.16
    },
    {
     "name": "daily-index 2026-07-08",
     "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260708.idx",
-    "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='www.sec.gov', port=443): Max retries exceeded with url: /Archives/edgar/daily-index/2026/QTR3/form.20260708.idx (Caused by ProxyError('Unable to connect to proxy'",
-    "elapsed_sec": 5.18
+    "ok": true,
+    "status": 200,
+    "error": null,
+    "elapsed_sec": 0.14
    },
    {
     "name": "daily-index 2026-07-07",
     "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260707.idx",
-    "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='www.sec.gov', port=443): Max retries exceeded with url: /Archives/edgar/daily-index/2026/QTR3/form.20260707.idx (Caused by ProxyError('Unable to connect to proxy'",
-    "elapsed_sec": 5.09
+    "ok": true,
+    "status": 200,
+    "error": null,
+    "elapsed_sec": 0.16
    },
    {
     "name": "daily-index 2026-07-06",
     "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260706.idx",
-    "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='www.sec.gov', port=443): Max retries exceeded with url: /Archives/edgar/daily-index/2026/QTR3/form.20260706.idx (Caused by ProxyError('Unable to connect to proxy'",
-    "elapsed_sec": 5.12
+    "ok": true,
+    "status": 200,
+    "error": null,
+    "elapsed_sec": 0.16
    },
    {
     "name": "daily-index 2026-07-03",
     "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260703.idx",
     "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='www.sec.gov', port=443): Max retries exceeded with url: /Archives/edgar/daily-index/2026/QTR3/form.20260703.idx (Caused by ProxyError('Unable to connect to proxy'",
-    "elapsed_sec": 6.43
+    "status": 403,
+    "error": "HTTP 403; body=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>G8YRGVZXWF4BV003</RequestId><HostId>bMcUhrhW+Iba0mzMsTit4jHXUkmLtERn3q1",
+    "elapsed_sec": 4.62
    },
    {
     "name": "daily-index 2026-07-02",
     "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260702.idx",
-    "ok": false,
-    "status": 502,
-    "error": "ProxyError: HTTPSConnectionPool(host='www.sec.gov', port=443): Max retries exceeded with url: /Archives/edgar/daily-index/2026/QTR3/form.20260702.idx (Caused by ProxyError('Unable to connect to proxy'",
-    "elapsed_sec": 15.54
+    "ok": true,
+    "status": 200,
+    "error": null,
+    "elapsed_sec": 0.24
    },
    {
     "name": "daily-index 2026-07-01",
     "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260701.idx",
-    "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='www.sec.gov', port=443): Max retries exceeded with url: /Archives/edgar/daily-index/2026/QTR3/form.20260701.idx (Caused by ProxyError('Unable to connect to proxy'",
-    "elapsed_sec": 5.62
+    "ok": true,
+    "status": 200,
+    "error": null,
+    "elapsed_sec": 0.12
    }
   ],
   "errors": [
-   "2026-07-10 索引抓取失敗（status=None）",
-   "2026-07-09 索引抓取失敗（status=None）",
-   "2026-07-08 索引抓取失敗（status=None）",
-   "2026-07-07 索引抓取失敗（status=None）",
-   "2026-07-06 索引抓取失敗（status=None）",
-   "2026-07-03 索引抓取失敗（status=None）",
-   "2026-07-02 索引抓取失敗（status=502）",
-   "2026-07-01 索引抓取失敗（status=None）"
+   "2026-07-10 索引抓取失敗（status=403）",
+   "2026-07-03 索引抓取失敗（status=403）",
+   "2026-07-02 Form 4 共 4318 筆 > 上限 4000，截斷"
   ]
  },
- "updated_at": "2026-07-10T18:30:34.258506+00:00",
+ "updated_at": "2026-07-10T19:13:25.290524+00:00",
  "funnel": {
-  "ran_at": "2026-07-10T18:30:34.098329+00:00",
-  "days_loaded": 0,
+  "ran_at": "2026-07-10T19:13:12.309137+00:00",
+  "days_loaded": 4,
   "funnel_stats": {
-   "raw_filings": 0,
-   "qualified_events": 0,
-   "post_veto": 0,
-   "final_candidates": 0
+   "raw_filings": 4822,
+   "qualified_events": 18,
+   "post_veto": 15,
+   "final_candidates": 15
   },
   "veto_counts": {
-   "penny": 0,
-   "sell_offset": 0,
+   "penny": 2,
+   "sell_offset": 1,
    "illiquid": 0
   },
-  "skipped_checks": [],
-  "requests_ok": 0,
+  "skipped_checks": [
+   "liquidity:TURB",
+   "liquidity:YPF",
+   "liquidity:PFBX",
+   "liquidity:VFLEX",
+   "liquidity:FTECX",
+   "liquidity:SWZ",
+   "liquidity:JCTC",
+   "liquidity:HTO",
+   "liquidity:EWSB",
+   "liquidity:VII",
+   "liquidity:BBASX",
+   "liquidity:ENR",
+   "liquidity:UUUU",
+   "liquidity:TSM",
+   "liquidity:WRAP"
+  ],
+  "requests_ok": 15,
   "requests_failed": 0,
-  "elapsed_sec": 0.0,
+  "elapsed_sec": 14.1,
   "endpoint_health": [],
-  "errors": []
+  "errors": [
+   "stooq TURB: 回應非有效 CSV（No data？）",
+   "stooq YPF: 回應非有效 CSV（No data？）",
+   "stooq PFBX: 回應非有效 CSV（No data？）",
+   "stooq VFLEX: 回應非有效 CSV（No data？）",
+   "stooq FTECX: 回應非有效 CSV（No data？）",
+   "stooq SWZ: 回應非有效 CSV（No data？）",
+   "stooq JCTC: 回應非有效 CSV（No data？）",
+   "stooq HTO: 回應非有效 CSV（No data？）",
+   "stooq EWSB: 回應非有效 CSV（No data？）",
+   "stooq VII: 回應非有效 CSV（No data？）",
+   "stooq BBASX: 回應非有效 CSV（No data？）",
+   "stooq ENR: 回應非有效 CSV（No data？）",
+   "stooq UUUU: 回應非有效 CSV（No data？）",
+   "stooq TSM: 回應非有效 CSV（No data？）",
+   "stooq WRAP: 回應非有效 CSV（No data？）"
+  ]
  },
  "tracking": {
-  "ran_at": "2026-07-10T18:30:34.258391+00:00",
-  "positions_total": 0,
-  "positions_new": 0,
+  "ran_at": "2026-07-10T19:13:25.290382+00:00",
+  "positions_total": 15,
+  "positions_new": 15,
   "positions_updated": 0,
-  "price_failed": 0,
-  "requests_ok": 0,
+  "price_failed": 15,
+  "requests_ok": 15,
   "requests_failed": 0,
-  "elapsed_sec": 0.0,
+  "elapsed_sec": 12.9,
   "endpoint_health": [],
-  "errors": []
+  "errors": [
+   "stooq EWSB: 回應非有效 CSV（No data？）",
+   "stooq TSM: 回應非有效 CSV（No data？）",
+   "stooq ENR: 回應非有效 CSV（No data？）",
+   "stooq VII: 回應非有效 CSV（No data？）",
+   "stooq UUUU: 回應非有效 CSV（No data？）",
+   "stooq YPF: 回應非有效 CSV（No data？）",
+   "stooq TURB: 回應非有效 CSV（No data？）",
+   "stooq VFLEX: 回應非有效 CSV（No data？）",
+   "stooq BBASX: 回應非有效 CSV（No data？）",
+   "stooq FTECX: 回應非有效 CSV（No data？）",
+   "stooq HTO: 回應非有效 CSV（No data？）",
+   "stooq JCTC: 回應非有效 CSV（No data？）",
+   "stooq PFBX: 回應非有效 CSV（No data？）",
+   "stooq WRAP: 回應非有效 CSV（No data？）",
+   "stooq SWZ: 回應非有效 CSV（No data？）"
+  ]
  }
 }
