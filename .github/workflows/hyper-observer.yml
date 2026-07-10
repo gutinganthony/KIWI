@@ -49,12 +49,49 @@ jobs:
             python3 track_wallet.py --address "$addr" --snapshot "$SNAP" || true
           done
 
+      # 廣域掃描（唯讀）：全量 leaderboard raw（fetch 已落 data/tmp/，工作區暫存、
+      # .gitignore 不入版控）→ 可跟畫像過濾出候選 → 深抓候選到獨立 {date}-scan snapshot
+      # → scan 報告。每步 || true 保底；raw 缺失（leaderboard 端點 403）則整段自動跳過。
+      - name: Scan universe (followable-profile filter, offline)
+        working-directory: projects/hyper-observer
+        run: |
+          TODAY=$(date -u +%F)
+          if [ -f "data/tmp/leaderboard_raw_${TODAY}.json" ]; then
+            python3 scan_universe.py --raw "data/tmp/leaderboard_raw_${TODAY}.json" \
+              --out "data/scan/candidates_${TODAY}.json" || true
+          else
+            echo "leaderboard raw 不存在（端點失敗？），跳過掃描段"
+          fi
+
+      # 150 錢包 ≈ 600 請求；--sleep 0.75 依 fetch.py 內權重計算保留 ~26% rate-limit 餘裕
+      - name: Fetch scan candidates (deep fetch, read-only)
+        working-directory: projects/hyper-observer
+        run: |
+          TODAY=$(date -u +%F)
+          if [ -f "data/scan/candidates_${TODAY}.json" ]; then
+            python3 fetch.py --wallets-file "data/scan/candidates_${TODAY}.json" \
+              --max-wallets 150 --sleep 0.75 --snapshot-suffix "-scan" || true
+          fi
+
+      - name: Classify scan candidates (scan report)
+        working-directory: projects/hyper-observer
+        run: |
+          TODAY=$(date -u +%F)
+          if [ -d "data/snapshots/${TODAY}-scan" ]; then
+            python3 classify.py --snapshot "data/snapshots/${TODAY}-scan" --label scan || true
+          fi
+
       # repo 體積控制：原始 wallet 快照每日可觀，只保留衍生報告與 meta；
       # 原始資料隨時可由公開 info API 重抓，verification json 已含全部逐錢包指標。
       # tracked 錢包的原始資料已由上一步複製到 data/tracked/，不受此 prune 影響。
-      - name: Prune raw wallet snapshots
+      # glob 同時涵蓋 {date} 與 {date}-scan 兩個 snapshot 目錄；data/tmp 的 36MB raw 一併清。
+      - name: Prune raw wallet snapshots and tmp
         working-directory: projects/hyper-observer
-        run: rm -rf data/snapshots/*/wallets
+        run: |
+          rm -rf data/snapshots/*/wallets data/tmp
+          echo "--- data size after prune（commit-back 前檢查，新增產物須 <1MB）---"
+          du -sh data | tail -1
+          du -sh data/* 2>/dev/null || true
 
       # paths 過濾已排除 data/**，不會自我觸發（commit 訊息刻意不含 skip-ci 方括號字樣，
       # poly-observer 曾因訊息含該字面被 GitHub 跳過觸發）。

@@ -20,6 +20,7 @@ import config  # noqa: E402
 import classify  # noqa: E402
 import track_wallet  # noqa: E402
 import fetch  # noqa: E402
+import scan_universe  # noqa: E402
 
 FIXTURES = TESTS_DIR / "fixtures"
 SNAP_DATE = "2026-07-01"  # fixtures 的時間軸終點（idle 視窗右端）
@@ -374,6 +375,182 @@ def test_track_wallet(tmp):
     ok("ETH:short" in gone_keys, f"偵測到消失持倉 ETH:short（{gone_keys}）")
 
 
+def test_scan_universe(tmp):
+    print("[6] scan_universe：載入形狀/漏斗遞減/候選>0/分數排序/schema/top-N 排除")
+    raw = json.loads((FIXTURES / "lb_sample.json").read_text(encoding="utf-8"))
+    rows = scan_universe.load_rows(raw)
+    ok(len(rows) == 500, f"fixture 解析 500 列（{len(rows)}）")
+    wrapped = {"endpoint_tried": [], "addresses": [], "raw": raw}
+    ok(len(scan_universe.load_rows(wrapped)) == 500,
+       "接受 fetch dump 包一層 raw 的形狀")
+    ok(scan_universe.load_rows(None) == [] and scan_universe.load_rows({"x": 1}) == [],
+       "垃圾/None 輸入回空 list，不 crash")
+
+    # 放寬門檻（fixture 只有排行榜頂端 500 列，生產門檻下幾乎全滅）驗證漏斗機制
+    relaxed = {"min_alltime_pnl": 100_000.0, "min_month_pnl": 0.0, "min_week_pnl": 0.0,
+               "min_vlm_to_pnl": 0.0, "max_vlm_to_pnl": 100.0, "min_alltime_roi": 0.01,
+               "min_account": 20_000.0, "max_account": 1e9, "exclude_top_n": 0}
+    cands, funnel = scan_universe.filter_candidates(rows, relaxed)
+    stage_names = ["total_rows", "parsed_valid", "alltime_pnl", "still_winning",
+                   "vlm_to_pnl_band", "alltime_roi", "account_band", "exclude_top_n"]
+    ok(list(funnel.keys()) == stage_names, f"漏斗階段齊全且有序（{list(funnel.keys())}）")
+    vals = [funnel[k] for k in stage_names]
+    ok(all(vals[i] >= vals[i + 1] for i in range(len(vals) - 1)),
+       f"漏斗各階段單調遞減（{vals}）")
+    ok(len(cands) > 0, f"放寬門檻下候選數 > 0（{len(cands)}）")
+    ok(len({c['address'] for c in cands}) == len(cands), "候選地址不重複")
+    ok(all("score" in c and "vlm_to_pnl" in c for c in cands), "候選皆含 score 與 vlm_to_pnl")
+
+    # top-N 排除：把整份 fixture 都列為「已掃過」→ 候選歸零
+    all_excluded = dict(relaxed, exclude_top_n=500)
+    cands0, funnel0 = scan_universe.filter_candidates(rows, all_excluded)
+    ok(len(cands0) == 0 and funnel0["exclude_top_n"] == 0,
+       f"exclude_top_n=500 時候選歸零（{len(cands0)}）")
+
+    # 生產門檻（config SCAN_*）：漏斗仍單調，不 crash（頂端 500 列可為 0 候選）
+    _, funnel_prod = scan_universe.filter_candidates(rows)
+    vals_prod = [funnel_prod[k] for k in stage_names]
+    ok(all(vals_prod[i] >= vals_prod[i + 1] for i in range(len(vals_prod) - 1)),
+       f"生產門檻漏斗單調遞減（{vals_prod}）")
+
+    # build_output：排序正確、截斷生效、schema 齊全
+    out = scan_universe.build_output(cands, funnel, 5, "2026-07-01", "fixture")
+    scores = [c["score"] for c in out["candidates"]]
+    ok(scores == sorted(scores, reverse=True), f"候選依分數遞減排序（{scores}）")
+    ok(out["n_candidates"] == min(5, len(cands)) == len(out["candidates"]),
+       f"max-candidates 截斷生效（{out['n_candidates']}）")
+    for key in ("date", "generated_at", "source", "thresholds", "funnel",
+                "n_candidates", "candidates"):
+        ok(key in out, f"輸出 schema 含 {key}")
+    c0 = out["candidates"][0]
+    ok(all(k in c0 for k in ("address", "score", "account_value", "vlm_to_pnl", "windows"))
+       and all(w in c0["windows"] for w in ("day", "week", "month", "allTime")),
+       "候選條目含地址＋四窗指標＋分數")
+
+    # main() 端到端：讀 fixture → 寫檔（生產門檻，候選數可為 0）
+    out_path = tmp / "scan" / "candidates_e2e.json"
+    rc = scan_universe.main(["--raw", str(FIXTURES / "lb_sample.json"),
+                             "--out", str(out_path)])
+    ok(rc == 0 and out_path.is_file(), "scan_universe main 端到端跑通並落檔")
+    reparsed = json.loads(out_path.read_text(encoding="utf-8"))
+    ok(reparsed["funnel"]["total_rows"] == 500
+       and out_path.stat().st_size < 200 * 1024,
+       f"輸出可重新解析且 <200KB（{out_path.stat().st_size} bytes）")
+
+
+def test_scan_report(tmp):
+    print("[7] classify --label scan：檔名/可跟欄/兩級裁決/followable 判定")
+    snap_dir = tmp / "snapshots" / f"{SNAP_DATE}-scan"
+    wallets_dir = snap_dir / "wallets"
+    wallets_dir.mkdir(parents=True)
+
+    # 可跟 winner：wallet_consistent（近 30 天 2 筆、hold 340.8h、槓桿 8x）
+    w_ok = json.loads((FIXTURES / "wallet_consistent.json").read_text(encoding="utf-8"))
+    (wallets_dir / f"{w_ok['address']}.json").write_text(
+        json.dumps(w_ok, ensure_ascii=False), encoding="utf-8")
+
+    # 不可跟 winner：BUG3 型高頻戶（2000 筆、hold 1h）——曲線獲利判 winner 但頻率/持倉不可跟
+    fills = []
+    for i in range(1000):
+        t = _ms(2026, 6, 1) + i * 7200 * 1000
+        fills.append({"coin": "BTC", "px": "60000", "sz": "0.01", "side": "B",
+                      "time": t, "closedPnl": "0.0", "dir": "Open Long"})
+        fills.append({"coin": "BTC", "px": "60000", "sz": "0.01", "side": "A",
+                      "time": t + 3600 * 1000,
+                      "closedPnl": ("10.0" if i % 2 == 0 else "-12.0"), "dir": "Close Long"})
+    w_hf = {"address": "0xf000000000000000000000000000000000000008",
+            "clearinghouseState": {"assetPositions": [_pos()],
+                                   "marginSummary": {"accountValue": "5000000"}},
+            "portfolio": _pnl_window(
+                [(_ms(2026, 1), 0), (_ms(2026, 2), 800000), (_ms(2026, 3), 1300000),
+                 (_ms(2026, 4), 1100000), (_ms(2026, 5), 2400000), (_ms(2026, 6), 3600000),
+                 (_ms(2026, 7), 5000000)], vlm="50000000"),
+            "userFills": fills, "userFunding": []}
+    (wallets_dir / f"{w_hf['address']}.json").write_text(
+        json.dumps(w_hf, ensure_ascii=False), encoding="utf-8")
+
+    report_dir = tmp / "reports-scan"
+    payload = classify.run_verification(snap_dir, report_dir, label="scan")
+
+    ok(payload["date"] == SNAP_DATE,
+       f"{SNAP_DATE}-scan 目錄名正確抽出日期（{payload['date']}）")
+    md_path = report_dir / f"scan_verification_{SNAP_DATE}.md"
+    json_path = report_dir / f"scan_verification_{SNAP_DATE}.json"
+    ok(md_path.is_file() and json_path.is_file(),
+       f"scan 報告檔名 scan_verification_{SNAP_DATE}.md/json（區別於每日報告）")
+    ok(payload["classification_counts"].get("consistent_winner") == 2,
+       f"兩個 winner（{payload['classification_counts']}）")
+
+    rec_ok = payload["wallets"][w_ok["address"]]
+    rec_hf = payload["wallets"][w_hf["address"]]
+    ok(rec_ok["followable"]["ok"] is True,
+       f"低頻長持倉 winner 判可跟（{rec_ok['followable']}）")
+    ok(rec_hf["followable"]["ok"] is False
+       and any("頻率過高" in r for r in rec_hf["followable"]["reasons"])
+       and any("持倉過短" in r for r in rec_hf["followable"]["reasons"]),
+       f"高頻 winner 判不可跟＋原因含頻率/持倉（{rec_hf['followable']['reasons']}）")
+    ok(rec_hf["metrics"]["n_fills_last_30d"] > config.SCAN_FOLLOWABLE_MAX_FREQ,
+       f"n_fills_last_30d 指標落地（{rec_hf['metrics']['n_fills_last_30d']}）")
+    ok(payload["followable_count"] == 1, f"followable 計數=1（{payload['followable_count']}）")
+    ok("其中 followable 1 個" in payload["verdict"]
+       and "consistent_winner 2 個" in payload["verdict"],
+       f"兩級裁決（{payload['verdict']}）")
+
+    md_text = md_path.read_text(encoding="utf-8")
+    ok("| 可跟 |" in md_text.replace(" 可跟 |", "| 可跟 |", 1) or "可跟" in md_text,
+       "winner 明細表含「可跟」欄")
+    ok("✅" in md_text and "❌" in md_text, "可跟欄同時出現 ✅ 與 ❌")
+    ok("回望偏差" in md_text and "廣域可跟錢包掃描" in md_text,
+       "scan 報告開頭聲明改寫（回望偏差、非僅榜頂）")
+
+    # 每日模式不受影響：同 snapshot 以預設 label 跑 → 檔名照舊、無可跟欄
+    daily_dir = tmp / "reports-daily-check"
+    classify.run_verification(snap_dir, daily_dir)
+    daily_md = (daily_dir / f"verification_{SNAP_DATE}.md").read_text(encoding="utf-8")
+    ok("可跟" not in daily_md and "倖存者偏差" in daily_md,
+       "預設（每日）模式報告不含可跟欄、聲明照舊")
+
+
+def test_fetch_wallets_file(tmp):
+    print("[8] fetch：--wallets-file 解析/去重/seeds 永留＋leaderboard 摘要不含 raw")
+    meta = fetch.Meta()
+    cand_path = tmp / "candidates.json"
+    cand_path.write_text(json.dumps({"candidates": [
+        {"address": "0xAABBcc0000000000000000000000000000000001", "score": 1.0},
+        {"address": "0xaabbcc0000000000000000000000000000000001"},
+        {"address": "0xaabbcc0000000000000000000000000000000002"},
+        {"address": "not-an-address"},
+    ]}), encoding="utf-8")
+    addrs = fetch.load_wallets_file(cand_path, meta)
+    ok(addrs == ["0xaabbcc0000000000000000000000000000000001",
+                 "0xaabbcc0000000000000000000000000000000002"],
+       f"candidates json → 小寫去重地址、壞地址剔除（{addrs}）")
+
+    plain_path = tmp / "plain.json"
+    plain_path.write_text(json.dumps(
+        ["0xaabbcc0000000000000000000000000000000003"]), encoding="utf-8")
+    ok(fetch.load_wallets_file(plain_path, meta)
+       == ["0xaabbcc0000000000000000000000000000000003"], "純地址 list 形狀也可解析")
+    ok(fetch.load_wallets_file(tmp / "missing.json", meta) == []
+       and any("wallets-file 讀取失敗" in n for n in meta.notes),
+       "缺檔回空清單＋記 note，不 crash")
+
+    seeds = ["0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6",
+             "0x5b5d51203a0f9079f8aeb098a6523a13f298c060"]
+    uni = fetch.build_universe(seeds, addrs, 3)
+    ok(uni[:2] == seeds and len(uni) == 3,
+       f"--wallets-file 宇宙仍 seeds 永留＋上限截斷（{len(uni)}）")
+
+    summ = fetch.leaderboard_summary(
+        {"leaderboardRows": [{"ethAddress": f"0x{i:040x}"} for i in range(3)]},
+        ["0x" + "0" * 40], "data/tmp/leaderboard_raw_x.json")
+    ok("raw" not in summ and summ["n_rows_total"] == 3,
+       f"版控 leaderboard.json 摘要不含 raw（keys={sorted(summ)}）")
+    summ_none = fetch.leaderboard_summary(None, [], None)
+    ok("raw" not in summ_none and summ_none["n_rows_total"] == 0,
+       "端點失敗（raw=None）摘要也不含 raw")
+
+
 def test_fetch_fallback():
     print("[5] fetch：leaderboard 端點失敗 → 退回只用 seeds＋記 meta，不 crash")
     meta = fetch.Meta()
@@ -414,6 +591,9 @@ def main():
         test_final_bugfix_A_B()
         test_reports(tmp)
         test_track_wallet(tmp)
+        test_scan_universe(tmp)
+        test_scan_report(tmp)
+        test_fetch_wallets_file(tmp)
         test_fetch_fallback()
     print(f"ALL TESTS PASSED ({checks} checks)")
     return 0

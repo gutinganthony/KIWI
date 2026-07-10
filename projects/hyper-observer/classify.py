@@ -3,6 +3,8 @@
 
 用法：
     python3 classify.py --snapshot data/snapshots/{date} [--report-dir data/reports]
+        [--label scan]   # 掃描報告模式：檔名 scan_verification_{date}.md/json，
+                         # winner 明細加「可跟」欄、裁決改兩級（winner N，其中 followable M）
 
 對 snapshot 內每個錢包，由 portfolio + userFills + clearinghouseState 計算永續專用指標
 （用研究 §4 的風險調整 PnL / profit factor / 量-PnL 比 / 淨方向 / 槓桿 取代天真勝率），
@@ -21,6 +23,7 @@
 
 import argparse
 import json
+import re
 import sys
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
@@ -420,6 +423,11 @@ def compute_metrics(wallet, snapshot_date):
     had_liquidation = n_liquidations > 0
     coin_counts = Counter(f["coin"] for f in fills if f["coin"])
     top_coin = coin_counts.most_common(1)[0][0] if coin_counts else None
+    # 近 30 天成交筆數（≈每月交易頻率，followable 判定用）。userFills 只回近端 2000 筆，
+    # 但「近 30 天」正好落在近端窗，此計數準確；若 30 天內就超過 2000 筆截斷，
+    # 計數 =2000 遠超 SCAN_FOLLOWABLE_MAX_FREQ，判「不可跟」方向正確。
+    n_fills_last_30d = sum(1 for f in fills
+                           if f["ts"] is not None and f["ts"] >= end_ts - 30 * DAY_SEC)
 
     # --- 量/PnL 比（刷量旗標）---
     vlm_to_pnl = None
@@ -460,6 +468,7 @@ def compute_metrics(wallet, snapshot_date):
         "avg_hold_hours": round(hold_h, 3) if hold_h is not None else None,
         "net_direction_ratio": round(net_dir, 4) if net_dir is not None else None,
         "n_fills_truncated": fills_truncated,
+        "n_fills_last_30d": n_fills_last_30d,
         "had_liquidation": had_liquidation,
         "n_liquidations": n_liquidations,
         "top_coin": top_coin,
@@ -596,6 +605,32 @@ CLASS_ORDER = ["consistent_winner", "blowup_risk", "wash_suspect", "one_hit",
                "dormant", "choppy", "insufficient_data"]
 
 
+def followability(m):
+    """consistent_winner 之上的「可跟性」判定（真錢跟單的機械可行性）。回 (ok, reasons)。
+
+    三條件（門檻在 config SCAN_FOLLOWABLE_*）：
+    - 頻率：近 30 天成交 <= MAX_FREQ（頻率太高，跟單延遲下根本跟不上）
+    - 持倉：平均持倉 >= MIN_HOLD_H（太短來不及進場就已平倉）
+    - 槓桿：目前任一部位 <= MAX_LEVERAGE（跟高槓桿等於跟著賭爆倉）
+    avg_hold_hours 估不出（無 Open/Close 可配對）→ 保守判不可跟（無法驗證 ≠ 通過）。
+    """
+    reasons = []
+    freq = m.get("n_fills_last_30d")
+    if freq is None:
+        reasons.append("近 30 天成交筆數缺失，頻率無法驗證")
+    elif freq > config.SCAN_FOLLOWABLE_MAX_FREQ:
+        reasons.append(f"頻率過高：近 30 天 {freq} 筆 > {config.SCAN_FOLLOWABLE_MAX_FREQ}")
+    hold = m.get("avg_hold_hours")
+    if hold is None:
+        reasons.append("平均持倉時間估不出（無 Open/Close 成交可配對），保守判不可跟")
+    elif hold < config.SCAN_FOLLOWABLE_MIN_HOLD_H:
+        reasons.append(f"持倉過短：平均 {hold:.1f}h < {config.SCAN_FOLLOWABLE_MIN_HOLD_H:.0f}h")
+    lev = m.get("current_max_leverage")
+    if lev is not None and lev > config.SCAN_FOLLOWABLE_MAX_LEVERAGE:
+        reasons.append(f"槓桿過高：目前 {lev:.0f}x > {config.SCAN_FOLLOWABLE_MAX_LEVERAGE:.0f}x")
+    return (not reasons), reasons
+
+
 # ---------------------------------------------------------------------------
 # 報告產生
 # ---------------------------------------------------------------------------
@@ -653,18 +688,31 @@ def _fmt(val, spec=",.0f"):
         return str(val)
 
 
-def build_markdown(date, results, meta, ground_truth, verdict):
+def build_markdown(date, results, meta, ground_truth, verdict, label=None):
     counts = defaultdict(int)
     for r in results:
         counts[r["classification"]] += 1
     total_wallets = len(results)
+    scan_mode = label == "scan"
 
-    lines = [
-        f"# Hyperliquid 永續聰明錢存在性檢驗 — {date}",
-        "",
-        "> 純唯讀分析報告。宇宙取自今日 leaderboard（＋seeds），**有倖存者偏差＋刷量污染**；",
-        "> 本檢驗證明的是「存在性」，非「跟得到」。前瞻持續性需觀察器累積數據驗證。",
-        "",
+    if scan_mode:
+        header = [
+            f"# Hyperliquid 廣域可跟錢包掃描 — {date}",
+            "",
+            "> 純唯讀掃描報告。宇宙來自**全量排行榜以「可跟畫像」過濾出的候選**（中段與榜外，",
+            "> 非僅榜頂），倖存者偏差較 top-N 輕，但過濾以歷史窗績效為準，**仍有回望偏差**；",
+            "> 存在性 ≠ 未來獲利、≠ 跟得到。followable 為機械可行性判定，非投資建議。",
+            "",
+        ]
+    else:
+        header = [
+            f"# Hyperliquid 永續聰明錢存在性檢驗 — {date}",
+            "",
+            "> 純唯讀分析報告。宇宙取自今日 leaderboard（＋seeds），**有倖存者偏差＋刷量污染**；",
+            "> 本檢驗證明的是「存在性」，非「跟得到」。前瞻持續性需觀察器累積數據驗證。",
+            "",
+        ]
+    lines = header + [
         "## 1. 端點健康",
         "",
         "| 端點 | 成功 | 失敗 | 失敗樣本 |",
@@ -689,19 +737,29 @@ def build_markdown(date, results, meta, ground_truth, verdict):
     lines += ["", "## 3. consistent_winner 明細", ""]
     winners = [r for r in results if r["classification"] == "consistent_winner"]
     if winners:
-        lines += ["| 地址 | 總 PnL | 峰值回撤 | profit factor | 目前槓桿 | 主力幣 | 活躍天 |",
-                  "|---|---:|---:|---:|---:|---|---:|"]
+        follow_col = " 可跟 |" if scan_mode else ""
+        follow_sep = "---|" if scan_mode else ""
+        lines += [f"| 地址 | 總 PnL | 峰值回撤 | profit factor | 目前槓桿 | 主力幣 | 活躍天 |{follow_col}",
+                  f"|---|---:|---:|---:|---:|---|---:|{follow_sep}"]
         for r in sorted(winners, key=lambda x: -(x["metrics"]["total_pnl"] or 0)):
             m = r["metrics"]
             # 風險揭露：consistent_winner 若曾被強平，明細標「曾強平 N 次」，不隱藏風險。
             liq_note = (f"（⚠️ 曾強平 {m.get('n_liquidations')} 次）"
                         if m.get("n_liquidations") else "")
+            follow_cell = ""
+            if scan_mode:
+                fol = r.get("followable") or {}
+                if fol.get("ok"):
+                    follow_cell = " ✅ |"
+                else:
+                    why = "；".join(fol.get("reasons") or ["未判定"]).replace("|", "\\|")
+                    follow_cell = f" ❌ {why} |"
             lines.append(
                 f"| `{m['address']}`{liq_note} | ${_fmt(m['total_pnl'])} "
                 f"| {_fmt(m['max_drawdown_pct'], '.0%')} "
                 f"| {_fmt(m['profit_factor'], ',.2f')} "
                 f"| {_fmt(m['current_max_leverage'], ',.0f')}x "
-                f"| {m['top_coin'] or '—'} | {_fmt(m['span_days'], ',.0f')} |")
+                f"| {m['top_coin'] or '—'} | {_fmt(m['span_days'], ',.0f')} |{follow_cell}")
     else:
         lines.append("（本日無 consistent_winner）")
 
@@ -719,11 +777,20 @@ def build_markdown(date, results, meta, ground_truth, verdict):
     else:
         lines.append("（無 ground-truth 種子）")
 
+    n_followable = sum(1 for r in winners if (r.get("followable") or {}).get("ok"))
+    bias_bullet = (
+        "- **回望偏差**：宇宙來自全量排行榜以歷史窗績效過濾（非僅榜頂，倖存者偏差較輕），"
+        "但「過去可跟畫像」仍是回望篩選；存在性 ≠ 未來獲利。"
+        if scan_mode else
+        "- **倖存者偏差**：宇宙取自今日 leaderboard（＋seeds），只看得到現在還在榜上的贏家。")
+    verdict_head = [f"consistent_winner 數量：**{counts.get('consistent_winner', 0)}**"]
+    if scan_mode:
+        verdict_head.append(f"其中 followable（可跟）數量：**{n_followable}**")
     lines += ["", "## 5. 裁決", "",
-              f"consistent_winner 數量：**{counts.get('consistent_winner', 0)}**", "",
+              *verdict_head, "",
               f"**{verdict}**", "",
               "限制與醒目聲明：",
-              "- **倖存者偏差**：宇宙取自今日 leaderboard（＋seeds），只看得到現在還在榜上的贏家。",
+              bias_bullet,
               "- **刷量污染**：Hyperliquid 空投以交易量計分，排行榜混雜大量 wash trading；"
               "本檢驗以量/PnL 比＋淨方向旗標排除疑似刷量戶，但無法百分百過濾。",
               "- **存在性 ≠ 跟得到**：本檢驗證明聰明錢的「存在性」，非「跟得到」——"
@@ -741,6 +808,18 @@ def decide_verdict(n_winners):
     if n_winners >= config.VERDICT_WEAK_MIN_WINNERS:
         return "弱存在（樣本內僅少數 consistent_winner，證據不足，需持續觀察）"
     return "未發現（本日樣本內沒有符合 consistent_winner 條件的錢包）"
+
+
+def decide_scan_verdict(n_winners, n_followable):
+    """掃描模式兩級裁決：consistent_winner N 個，其中 followable M 個。"""
+    base = f"consistent_winner {n_winners} 個，其中 followable {n_followable} 個"
+    if n_followable >= config.VERDICT_STRONG_MIN_WINNERS:
+        return base + "（可跟的方向性贏家在中段/榜外存在；前瞻持續性仍需逐日觀察驗證）"
+    if n_followable >= 1:
+        return base + "（僅少數可跟候選，證據不足，需持續觀察）"
+    if n_winners >= 1:
+        return base + "（有贏家但無一通過可跟性判定——頻率/持倉/槓桿不符跟單條件）"
+    return base + "（本次掃描未發現可跟的方向性贏家）"
 
 
 # ---------------------------------------------------------------------------
@@ -768,35 +847,51 @@ def load_snapshot(snapshot_dir):
     return wallets, meta, load_errors
 
 
-def run_verification(snapshot_dir, report_dir):
-    """核心進入點（tests 直接呼叫）。回傳完整結果 dict 並寫出 md/json。"""
+def run_verification(snapshot_dir, report_dir, label=None):
+    """核心進入點（tests 直接呼叫）。回傳完整結果 dict 並寫出 md/json。
+
+    label="scan"：掃描報告模式——檔名 scan_verification_{date}.md/json（date 取目錄名裡的
+    YYYY-MM-DD，容納 {date}-scan 目錄），winner 加 followable 判定、裁決改兩級。
+    """
     snapshot_dir = Path(snapshot_dir)
     report_dir = Path(report_dir)
-    date = snapshot_dir.name
+    dir_name = snapshot_dir.name
+    m_date = re.match(r"\d{4}-\d{2}-\d{2}", dir_name)
+    date = m_date.group(0) if m_date else dir_name
+    scan_mode = label == "scan"
     wallets, meta, load_errors = load_snapshot(snapshot_dir)
 
     results = []
     for w in wallets:
         try:
             m = compute_metrics(w, date)
-            label, reasons = classify(m)
+            cls, reasons = classify(m)
         except Exception as exc:  # 單錢包炸掉不影響整體
             m = {"address": str(w.get("address", "?")).lower()}
-            label, reasons = "insufficient_data", [f"指標計算例外：{exc}"]
-        results.append({"metrics": m, "classification": label, "reasons": reasons})
+            cls, reasons = "insufficient_data", [f"指標計算例外：{exc}"]
+        rec = {"metrics": m, "classification": cls, "reasons": reasons}
+        if cls == "consistent_winner":
+            f_ok, f_reasons = followability(m)
+            rec["followable"] = {"ok": f_ok, "reasons": f_reasons}
+        results.append(rec)
 
     counts = defaultdict(int)
     for r in results:
         counts[r["classification"]] += 1
+    n_winners = counts.get("consistent_winner", 0)
+    n_followable = sum(1 for r in results if (r.get("followable") or {}).get("ok"))
     ground_truth = check_ground_truth(results)
-    verdict = decide_verdict(counts.get("consistent_winner", 0))
+    verdict = (decide_scan_verdict(n_winners, n_followable) if scan_mode
+               else decide_verdict(n_winners))
 
     payload = {
         "date": date,
+        "label": label,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "snapshot_dir": str(snapshot_dir),
         "verdict": verdict,
         "classification_counts": dict(counts),
+        "followable_count": n_followable,
         "wallets": {r["metrics"].get("address", f"unknown_{i}"): r
                     for i, r in enumerate(results)},
         "ground_truth": ground_truth,
@@ -805,13 +900,16 @@ def run_verification(snapshot_dir, report_dir):
     }
 
     report_dir.mkdir(parents=True, exist_ok=True)
-    md_path = report_dir / f"verification_{date}.md"
-    json_path = report_dir / f"verification_{date}.json"
-    md_path.write_text(build_markdown(date, results, meta, ground_truth, verdict),
+    prefix = "scan_verification" if scan_mode else "verification"
+    md_path = report_dir / f"{prefix}_{date}.md"
+    json_path = report_dir / f"{prefix}_{date}.json"
+    md_path.write_text(build_markdown(date, results, meta, ground_truth, verdict,
+                                      label=label),
                        encoding="utf-8")
     json_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2),
                          encoding="utf-8")
-    print(f"[classify] wallets={len(results)} winners={counts.get('consistent_winner', 0)}")
+    print(f"[classify] wallets={len(results)} winners={n_winners}"
+          + (f" followable={n_followable}" if scan_mode else ""))
     print(f"[classify] report: {md_path}")
     print(f"[classify] json:   {json_path}")
     print(f"[classify] verdict: {verdict}")
@@ -823,6 +921,8 @@ def main(argv=None):
     parser.add_argument("--snapshot", required=True,
                         help="snapshot 目錄，例：data/snapshots/2026-07-10")
     parser.add_argument("--report-dir", default=str(BASE_DIR / "data" / "reports"))
+    parser.add_argument("--label", default=None, choices=["scan"],
+                        help="scan：掃描報告模式（scan_verification_{date}、可跟欄、兩級裁決）")
     args = parser.parse_args(argv)
 
     snapshot_dir = Path(args.snapshot)
@@ -836,7 +936,7 @@ def main(argv=None):
     if not snapshot_dir.is_dir():
         print(f"[classify] snapshot 目錄不存在：{snapshot_dir}", file=sys.stderr)
         return 1
-    run_verification(snapshot_dir, report_dir)
+    run_verification(snapshot_dir, report_dir, label=args.label)
     return 0
 
 

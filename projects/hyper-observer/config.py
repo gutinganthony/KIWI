@@ -129,6 +129,43 @@ CONSISTENT_MIN_POSITIVE_MONTH_RATIO = 0.5
 EXTREME_LEVERAGE_FLAG = 25.0
 
 # ---------------------------------------------------------------------------
+# 廣域掃描（scan_universe.py：全量排行榜 → 「可跟畫像」候選過濾）
+# 門檻用 2026-07-10 全量排行榜原始檔（40,381 列）離線校準：
+#   40,381 → pnl 1,342 → 仍在賺 700 → 量/PnL 206 → roi 160 → 帳戶 148 → 排 topN 148
+#   → 取分數前 120 名。起始建議值（pnl>=$100k, vpr<=30, roi>=0.3）產出 2,732 個，
+#   遠超 80–150 目標，故收緊「已證明贏家」端（pnl/roi），反做市端 vpr<=30 維持建議值。
+# ---------------------------------------------------------------------------
+
+# allTime pnl 下限：全量宇宙裡 $100k+ 有 9,200 戶，太寬；$2M 才進「已證明的大贏家」級距
+SCAN_MIN_ALLTIME_PNL = 2_000_000.0
+# 「仍在賺」下限：>0 會放進 month pnl=$0.07 的粉塵戶（校準時實際觀測到），加實質地板
+SCAN_MIN_MONTH_PNL = 10_000.0
+SCAN_MIN_WEEK_PNL = 1_000.0
+# 量/PnL 比帶（反做市/刷量核心條件，雙邊）：
+# 上限 30：做市/高頻的 vpr 遠高於此（參考 MM_MIN_VLM_TO_PNL=50），方向性贏家遠低。
+# 下限 1：pnl 必須能被實際永續成交量解釋——校準時觀測到 allTime vlm=$167 但 pnl=$12.9M
+# 的戶（vault/HLP 型收益，非方向性交易，fills 跟單跟不到），vpr<1 在數學上不可能來自
+# 真永續交易（平倉本身就產生 ≈ 部位名目的量），一律排除。vlm<=0 亦排除。
+SCAN_MIN_VLM_TO_PNL = 1.0
+SCAN_MAX_VLM_TO_PNL = 30.0
+# allTime roi 下限：方向性交易者 roi 不會像做市那樣趨近 0；0.3 太寬（校準後仍 2,500+），
+# 收緊到 1.0（全期 +100%）
+SCAN_MIN_ALLTIME_ROI = 1.0
+# 帳戶淨值帶：排除粉塵與巨鯨（巨鯨滑價/部位結構與散戶跟單不相容）
+SCAN_MIN_ACCOUNT = 20_000.0
+SCAN_MAX_ACCOUNT = 20_000_000.0
+# 排除排行榜前 N 列（每日 top-60 管線已掃過的頂端；與 fetch.extract_addresses 同語意）
+SCAN_EXCLUDE_TOP_N = 200
+# 綜合分數排序後取前 N 名（scan_universe --max-candidates 預設值）
+SCAN_DEFAULT_MAX_CANDIDATES = 120
+
+# --- followable（可跟性；classify --label scan 報告對 consistent_winner 加判）---
+# 真錢跟單的機械可行性門檻：頻率太高跟不上、持倉太短來不及進場、槓桿太高一次爆倉歸零。
+SCAN_FOLLOWABLE_MAX_FREQ = 150      # 近 30 天成交筆數（≈每月筆數）<= 150（≈5 筆/天）
+SCAN_FOLLOWABLE_MIN_HOLD_H = 12.0   # 平均持倉 >= 12 小時
+SCAN_FOLLOWABLE_MAX_LEVERAGE = 10.0  # 目前任一部位槓桿 <= 10x
+
+# ---------------------------------------------------------------------------
 # 裁決門檻（verification 報告末段）
 # ---------------------------------------------------------------------------
 
