@@ -1,8 +1,8 @@
 # Serenity 每週篩選器（weekly-screen）
 
-**執行時機**：每週六（週末覆盤，全球週五收盤後、資料穩定）
-**範圍**：全掃（重定價 + 觸發/否證 + 催化劑 + 新標的獵殺）
-**輸出**：完整 digest + 更新 watchlist + commit/push + 通知使用者（每週都要完整摘要）
+**執行時機**：每週日 & 週三（週日＝週末覆盤，全球週五收盤後；週三＝接週二美股收盤 + 月初合約價）
+**節奏**：每月第一個週日＝**全掃**（重定價 + 觸發/否證 + 催化劑 + 新標的獵殺）；其餘週日 + 每個週三＝**輕量**（跳過新標的獵殺，省 credits）
+**輸出**：dated digest + 更新 watchlist + 更新 `docs/serenity/data.json`（含 🟣 holding 層）+ commit/push；**有燈號翻轉 / 🟢🔴觸發 / 🟣持倉賣訊 / >15% 跳動才推 Telegram+LINE，無變化靜默**（`serenity_alert.py`）
 **框架**：`skills/serenity/SKILL.md`；名單：`skills/serenity/watchlist.md`
 
 > **核心紀律（本輪反覆踩到的教訓）**：資料幾週就過時（Seikoh 9 天 +30%、MEC 15×→33×、santec 衝破 $2B）。**第一步永遠先重拉現價市值，不靠記憶。**
@@ -33,7 +33,7 @@
 - 掃各檔的**財報日、有価証券報告書日、指數調整、政策日期、IPO/上市日**
 - 列出未來 14 天內事件 + 該盯的具體資訊（如客戶集中度、sandbag 是否延續）
 
-### Phase 4 — 新標的獵殺（全掃，使用者選了每週全掃）
+### Phase 4 — 新標的獵殺（僅全掃模式＝每月第一個週日；輕量日跳過）
 - 輕掃 **US / 日本 / 台灣 / 韓國** 四市場，找任何新浮現的小型（<$2B）卡口
 - 聚焦追蹤層：HBM/探針卡/先進封裝、光通訊/CPO/FAU、記憶體全鏈（DRAM/NAND/RCD/控制器）、玻璃基板/TGV、CoPoS/COUPE
 - 只浮出「plausibly 過 4 條硬門檻」的名字 → 標記為待深掘（不在週報做完整 Step 1–9，只 flag）
@@ -96,8 +96,8 @@
 
 ## 自動執行
 
-- **GitHub Actions**（真·每週自動）：`.github/workflows/serenity-weekly.yml`，週六排程，需 repo secret `ANTHROPIC_API_KEY`
-- **Claude Code web 排程 session**：在 web UI 設每週六排程、prompt =「依 skills/serenity/weekly-screen.md 跑 Serenity 週報」
+- **GitHub Actions**（真·自動）：`.github/workflows/serenity-weekly.yml`，**週日 + 週三**排程（每月第一個週日全掃、其餘輕量）；需 repo secret `ANTHROPIC_API_KEY`。變化警報經 `projects/avi-v5/scripts/serenity_alert.py` → Telegram + LINE（跟 ACT 每日訊號同頻道），無變化靜默
+- **Claude Code web 排程 session**：在 web UI 設週日+週三排程、prompt =「依 skills/serenity/weekly-screen.md 跑 Serenity 週報」
 - **session 內 cron**：僅本 session 活著時有效、7 天後過期（僅作即時橋接）
 
 *非投資建議。每週快照，價格易變，行動前重新確認。*
