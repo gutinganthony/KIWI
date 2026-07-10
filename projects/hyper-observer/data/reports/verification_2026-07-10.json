@@ -1,12 +1,12 @@
 {
   "date": "2026-07-10",
-  "generated_at": "2026-07-10T11:21:12.994208+00:00",
+  "generated_at": "2026-07-10T11:57:30.378673+00:00",
   "snapshot_dir": "/home/runner/work/KIWI/KIWI/projects/hyper-observer/data/snapshots/2026-07-10",
   "verdict": "未發現（本日樣本內沒有符合 consistent_winner 條件的錢包）",
   "classification_counts": {
-    "wash_suspect": 24,
+    "wash_suspect": 26,
     "choppy": 4,
-    "blowup_risk": 31,
+    "blowup_risk": 29,
     "one_hit": 1
   },
   "wallets": {
@@ -17,7 +17,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 46162320.02,
+        "total_pnl": 46159560.49,
         "peak_pnl": 47993686.31,
         "monthly_pnl": {
           "2024-05": 43365581.77,
@@ -46,7 +46,7 @@
           "2026-04": 45854.39,
           "2026-05": -600395.11,
           "2026-06": -316755.21,
-          "2026-07": -89472.24
+          "2026-07": -92231.77
         },
         "active_months": 27,
         "positive_month_ratio": 0.704,
@@ -54,21 +54,21 @@
         "max_drawdown_pct": 0.1678,
         "current_drawdown_pct": 0.0382,
         "max_single_day_crash_pct": 0.0565,
-        "span_days": 799.5,
+        "span_days": 799.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 0.644,
-        "avg_win": 0.73,
-        "avg_loss": 1.24,
-        "realized_win_rate": 0.523,
-        "avg_hold_hours": 0.05,
-        "net_direction_ratio": 0.014,
+        "profit_factor": 1.008,
+        "avg_win": 0.72,
+        "avg_loss": 0.66,
+        "realized_win_rate": 0.48,
+        "avg_hold_hours": 0.055,
+        "net_direction_ratio": 0.088,
         "n_fills_truncated": true,
         "had_liquidation": false,
         "n_liquidations": 0,
         "top_coin": "LIT",
-        "vlm": 191941639673.26,
-        "vlm_to_pnl_ratio": 4157.97,
+        "vlm": 191942205457.78,
+        "vlm_to_pnl_ratio": 4158.23,
         "funding_total": 14.02,
         "n_open_positions": 175,
         "current_max_leverage": 20.0,
@@ -76,12 +76,12 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 2997647.0,
+        "account_value": 2994890.49,
         "fetch_errors": []
       },
       "classification": "wash_suspect",
       "reasons": [
-        "量 $191,941,639,673 >= $100,000,000 且 量/PnL 比 4,158 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
+        "量 $191,942,205,458 >= $100,000,000 且 量/PnL 比 4,158 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
       ]
     },
     "0x01d734e9e7847248864c2c7bbab16c4d5e04a990": {
@@ -153,7 +153,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 65512427.46,
+        "total_pnl": 65590749.06,
         "peak_pnl": 66678246.88,
         "monthly_pnl": {
           "2024-05": 18.79,
@@ -182,29 +182,29 @@
           "2026-04": 1697287.44,
           "2026-05": 101752.13,
           "2026-06": -1189068.45,
-          "2026-07": 85540.0
+          "2026-07": 163861.59
         },
         "active_months": 27,
         "positive_month_ratio": 0.63,
         "best_month_pnl": 18258828.81,
         "max_drawdown_pct": 0.2441,
-        "current_drawdown_pct": 0.0175,
+        "current_drawdown_pct": 0.0163,
         "max_single_day_crash_pct": 0.1999,
         "span_days": 771.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 0.756,
-        "avg_win": 34.83,
-        "avg_loss": 33.04,
-        "realized_win_rate": 0.418,
-        "avg_hold_hours": 0.178,
-        "net_direction_ratio": 0.6885,
+        "profit_factor": 0.676,
+        "avg_win": 34.51,
+        "avg_loss": 39.91,
+        "realized_win_rate": 0.439,
+        "avg_hold_hours": 0.44,
+        "net_direction_ratio": 0.4216,
         "n_fills_truncated": true,
-        "had_liquidation": true,
-        "n_liquidations": 3,
+        "had_liquidation": false,
+        "n_liquidations": 0,
         "top_coin": "BTC",
-        "vlm": 230095352677.78,
-        "vlm_to_pnl_ratio": 3512.24,
+        "vlm": 230096756573.68,
+        "vlm_to_pnl_ratio": 3508.07,
         "funding_total": 10331.59,
         "n_open_positions": 94,
         "current_max_leverage": 40.0,
@@ -212,12 +212,12 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 11724494.13,
+        "account_value": 11805503.45,
         "fetch_errors": []
       },
-      "classification": "blowup_risk",
+      "classification": "wash_suspect",
       "reasons": [
-        "userFills 出現 3 次強平 >= 3（反覆爆倉，真高風險）"
+        "量 $230,096,756,574 >= $100,000,000 且 量/PnL 比 3,508 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
       ]
     },
     "0x04dbde5c9d1e6a3239c8ff8ee3fca386a4a3c605": {
@@ -227,7 +227,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 27785.6,
+        "total_pnl": 27547.09,
         "peak_pnl": 30273.39,
         "monthly_pnl": {
           "2026-01": -701.52,
@@ -236,29 +236,29 @@
           "2026-04": -91.96,
           "2026-05": 26881.56,
           "2026-06": -5297.34,
-          "2026-07": 9091.04
+          "2026-07": 8852.53
         },
         "active_months": 7,
         "positive_month_ratio": 0.286,
         "best_month_pnl": 26881.56,
         "max_drawdown_pct": 0.5969,
-        "current_drawdown_pct": 0.0822,
+        "current_drawdown_pct": 0.0901,
         "max_single_day_crash_pct": 0.5969,
         "span_days": 169.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 1.063,
-        "avg_win": 3.87,
-        "avg_loss": 6.56,
-        "realized_win_rate": 0.643,
-        "avg_hold_hours": 0.687,
-        "net_direction_ratio": 0.018,
+        "profit_factor": 1.065,
+        "avg_win": 3.82,
+        "avg_loss": 6.36,
+        "realized_win_rate": 0.639,
+        "avg_hold_hours": 0.703,
+        "net_direction_ratio": 0.0053,
         "n_fills_truncated": true,
         "had_liquidation": true,
         "n_liquidations": 7,
         "top_coin": "xyz:CL",
-        "vlm": 830225029.42,
-        "vlm_to_pnl_ratio": 29879.69,
+        "vlm": 830447660.81,
+        "vlm_to_pnl_ratio": 30146.47,
         "funding_total": 409.83,
         "n_open_positions": 0,
         "current_max_leverage": null,
@@ -279,7 +279,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 289307.77,
+        "total_pnl": 289528.61,
         "peak_pnl": 289958.25,
         "monthly_pnl": {
           "2026-01": 0.0,
@@ -288,29 +288,29 @@
           "2026-04": -31919.1,
           "2026-05": 51863.74,
           "2026-06": 132538.34,
-          "2026-07": 40823.82
+          "2026-07": 41044.66
         },
         "active_months": 6,
         "positive_month_ratio": 0.833,
         "best_month_pnl": 132538.34,
         "max_drawdown_pct": 0.4883,
-        "current_drawdown_pct": 0.0022,
+        "current_drawdown_pct": 0.0015,
         "max_single_day_crash_pct": 0.2707,
         "span_days": 162.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 0.292,
-        "avg_win": 1.7,
-        "avg_loss": 4.93,
-        "realized_win_rate": 0.459,
-        "avg_hold_hours": 0.444,
-        "net_direction_ratio": 0.0777,
+        "profit_factor": 0.362,
+        "avg_win": 1.77,
+        "avg_loss": 4.46,
+        "realized_win_rate": 0.477,
+        "avg_hold_hours": 0.358,
+        "net_direction_ratio": 0.104,
         "n_fills_truncated": true,
-        "had_liquidation": true,
-        "n_liquidations": 1,
+        "had_liquidation": false,
+        "n_liquidations": 0,
         "top_coin": "xyz:MSFT",
-        "vlm": 2792517273.35,
-        "vlm_to_pnl_ratio": 9652.41,
+        "vlm": 2792982770.3,
+        "vlm_to_pnl_ratio": 9646.66,
         "funding_total": 538.08,
         "n_open_positions": 2,
         "current_max_leverage": 20.0,
@@ -318,12 +318,12 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 17786.24,
+        "account_value": 17772.35,
         "fetch_errors": []
       },
       "classification": "wash_suspect",
       "reasons": [
-        "量 $2,792,517,273 >= $100,000,000 且 量/PnL 比 9,652 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
+        "量 $2,792,982,770 >= $100,000,000 且 量/PnL 比 9,647 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
       ]
     },
     "0x0b8aa35c28b7c6ab18f11dc168f437a8a69fd4f8": {
@@ -333,7 +333,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": -3384824.26,
+        "total_pnl": -3346522.34,
         "peak_pnl": 512703.56,
         "monthly_pnl": {
           "2025-07": 24539.4,
@@ -348,7 +348,7 @@
           "2026-04": 37787.29,
           "2026-05": -1929120.55,
           "2026-06": -419286.11,
-          "2026-07": -428503.38
+          "2026-07": -390201.47
         },
         "active_months": 13,
         "positive_month_ratio": 0.538,
@@ -370,7 +370,7 @@
         "n_liquidations": 0,
         "top_coin": "HYPE",
         "vlm": 4181665.98,
-        "vlm_to_pnl_ratio": 1.24,
+        "vlm_to_pnl_ratio": 1.25,
         "funding_total": 200003.53,
         "n_open_positions": 1,
         "current_max_leverage": 10.0,
@@ -378,7 +378,7 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 564270.33,
+        "account_value": 602572.25,
         "fetch_errors": []
       },
       "classification": "blowup_risk",
@@ -393,7 +393,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": -15599043.07,
+        "total_pnl": -15599043.06,
         "peak_pnl": 103930.51,
         "monthly_pnl": {
           "2024-12": 0.0,
@@ -415,7 +415,7 @@
           "2026-04": 0.0,
           "2026-05": 0.0,
           "2026-06": -3826846.38,
-          "2026-07": -856061.0
+          "2026-07": -856060.99
         },
         "active_months": 11,
         "positive_month_ratio": 0.0,
@@ -423,7 +423,7 @@
         "max_drawdown_pct": 1.0,
         "current_drawdown_pct": 1.0,
         "max_single_day_crash_pct": 1.0,
-        "span_days": 582.5,
+        "span_days": 582.6,
         "days_idle": 0.5,
         "n_fills": 2000,
         "profit_factor": 0.451,
@@ -492,7 +492,7 @@
         "max_drawdown_pct": 0.09,
         "current_drawdown_pct": 0.0084,
         "max_single_day_crash_pct": 0.0625,
-        "span_days": 617.5,
+        "span_days": 617.6,
         "days_idle": 0.5,
         "n_fills": 2000,
         "profit_factor": 2.81,
@@ -527,7 +527,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 22640.18,
+        "total_pnl": 23105.57,
         "peak_pnl": 246049.56,
         "monthly_pnl": {
           "2025-06": -24.18,
@@ -543,29 +543,29 @@
           "2026-04": -26218.98,
           "2026-05": 7706.54,
           "2026-06": -17304.23,
-          "2026-07": -93131.93
+          "2026-07": -92666.54
         },
         "active_months": 14,
         "positive_month_ratio": 0.429,
         "best_month_pnl": 104015.33,
         "max_drawdown_pct": 0.9917,
-        "current_drawdown_pct": 0.908,
+        "current_drawdown_pct": 0.9061,
         "max_single_day_crash_pct": 0.2695,
         "span_days": 379.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 0.553,
-        "avg_win": 0.19,
-        "avg_loss": 0.32,
-        "realized_win_rate": 0.485,
-        "avg_hold_hours": 0.012,
-        "net_direction_ratio": 0.0153,
+        "profit_factor": 0.846,
+        "avg_win": 0.23,
+        "avg_loss": 0.37,
+        "realized_win_rate": 0.572,
+        "avg_hold_hours": 0.015,
+        "net_direction_ratio": 0.0088,
         "n_fills_truncated": true,
         "had_liquidation": false,
         "n_liquidations": 0,
         "top_coin": "xyz:SKHX",
-        "vlm": 11664963998.3,
-        "vlm_to_pnl_ratio": 515232.78,
+        "vlm": 11666408644.07,
+        "vlm_to_pnl_ratio": 504917.63,
         "funding_total": 13051.42,
         "n_open_positions": 2,
         "current_max_leverage": 25.0,
@@ -573,7 +573,7 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 160679.45,
+        "account_value": 161116.84,
         "fetch_errors": []
       },
       "classification": "blowup_risk",
@@ -588,7 +588,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": -4209948.02,
+        "total_pnl": -4203205.89,
         "peak_pnl": 0.0,
         "monthly_pnl": {
           "2025-09": -104091.66,
@@ -601,7 +601,7 @@
           "2026-04": -1127357.76,
           "2026-05": 3226382.28,
           "2026-06": -3171370.41,
-          "2026-07": 2929075.45
+          "2026-07": 2935817.58
         },
         "active_months": 11,
         "positive_month_ratio": 0.182,
@@ -612,18 +612,18 @@
         "span_days": 288.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 999.0,
-        "avg_win": 187.74,
-        "avg_loss": null,
-        "realized_win_rate": 1.0,
-        "avg_hold_hours": 1.293,
-        "net_direction_ratio": 0.1174,
+        "profit_factor": 15.714,
+        "avg_win": 202.4,
+        "avg_loss": 78.43,
+        "realized_win_rate": 0.859,
+        "avg_hold_hours": 3.875,
+        "net_direction_ratio": 0.1948,
         "n_fills_truncated": true,
         "had_liquidation": false,
         "n_liquidations": 0,
         "top_coin": "ETH",
-        "vlm": 3922793412.28,
-        "vlm_to_pnl_ratio": 931.79,
+        "vlm": 3927432274.08,
+        "vlm_to_pnl_ratio": 934.39,
         "funding_total": -338665.14,
         "n_open_positions": 3,
         "current_max_leverage": 25.0,
@@ -631,12 +631,12 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 3549429.97,
+        "account_value": 3021063.69,
         "fetch_errors": []
       },
       "classification": "wash_suspect",
       "reasons": [
-        "量 $3,922,793,412 >= $100,000,000 且 量/PnL 比 932 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
+        "量 $3,927,432,274 >= $100,000,000 且 量/PnL 比 934 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
       ]
     },
     "0x31ca8395cf837de08b24da3f660e77761dfb974b": {
@@ -646,7 +646,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 37189584.86,
+        "total_pnl": 37193609.57,
         "peak_pnl": 44659973.56,
         "monthly_pnl": {
           "2024-05": 38038574.41,
@@ -675,29 +675,29 @@
           "2026-04": -409095.95,
           "2026-05": 331126.83,
           "2026-06": -52148.86,
-          "2026-07": -166836.22
+          "2026-07": -162811.51
         },
         "active_months": 27,
         "positive_month_ratio": 0.444,
         "best_month_pnl": 38038574.41,
         "max_drawdown_pct": 0.1724,
-        "current_drawdown_pct": 0.1673,
+        "current_drawdown_pct": 0.1672,
         "max_single_day_crash_pct": 0.0614,
         "span_days": 799.5,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 0.938,
-        "avg_win": 1.85,
-        "avg_loss": 1.41,
-        "realized_win_rate": 0.417,
-        "avg_hold_hours": 0.068,
-        "net_direction_ratio": 0.0281,
+        "profit_factor": 0.48,
+        "avg_win": 0.77,
+        "avg_loss": 1.25,
+        "realized_win_rate": 0.439,
+        "avg_hold_hours": 0.057,
+        "net_direction_ratio": 0.1557,
         "n_fills_truncated": true,
         "had_liquidation": false,
         "n_liquidations": 0,
         "top_coin": "LIT",
-        "vlm": 187776370284.18,
-        "vlm_to_pnl_ratio": 5049.17,
+        "vlm": 187776959790.22,
+        "vlm_to_pnl_ratio": 5048.64,
         "funding_total": 249.46,
         "n_open_positions": 175,
         "current_max_leverage": 20.0,
@@ -705,12 +705,12 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 3013878.0,
+        "account_value": 3017930.81,
         "fetch_errors": []
       },
       "classification": "wash_suspect",
       "reasons": [
-        "量 $187,776,370,284 >= $100,000,000 且 量/PnL 比 5,049 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
+        "量 $187,776,959,790 >= $100,000,000 且 量/PnL 比 5,049 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
       ]
     },
     "0x31dea2516beee92135b96f464eeec3cf292a13f2": {
@@ -720,7 +720,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 15043497.3,
+        "total_pnl": 15038966.18,
         "peak_pnl": 15564381.63,
         "monthly_pnl": {
           "2024-05": -5555.36,
@@ -749,42 +749,42 @@
           "2026-04": 21207.58,
           "2026-05": 1944.68,
           "2026-06": 116463.49,
-          "2026-07": -367264.0
+          "2026-07": -371795.12
         },
         "active_months": 27,
         "positive_month_ratio": 0.889,
         "best_month_pnl": 4290346.99,
         "max_drawdown_pct": 0.3604,
-        "current_drawdown_pct": 0.0335,
+        "current_drawdown_pct": 0.0338,
         "max_single_day_crash_pct": 0.3237,
         "span_days": 771.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 0.179,
-        "avg_win": 3.8,
-        "avg_loss": 20.09,
-        "realized_win_rate": 0.486,
-        "avg_hold_hours": 0.113,
-        "net_direction_ratio": 0.2411,
+        "profit_factor": 0.131,
+        "avg_win": 3.78,
+        "avg_loss": 26.18,
+        "realized_win_rate": 0.475,
+        "avg_hold_hours": 0.094,
+        "net_direction_ratio": 0.218,
         "n_fills_truncated": true,
         "had_liquidation": true,
         "n_liquidations": 2,
         "top_coin": "HYPE",
-        "vlm": 29925293989.78,
-        "vlm_to_pnl_ratio": 1989.25,
+        "vlm": 29926191723.43,
+        "vlm_to_pnl_ratio": 1989.91,
         "funding_total": 63803.26,
-        "n_open_positions": 0,
-        "current_max_leverage": null,
+        "n_open_positions": 7,
+        "current_max_leverage": 20.0,
         "has_extreme_leverage": false,
-        "margin_types": [],
-        "account_value": null,
-        "fetch_errors": [
-          "clearinghouseState: request failed"
-        ]
+        "margin_types": [
+          "cross"
+        ],
+        "account_value": 11972483.18,
+        "fetch_errors": []
       },
       "classification": "wash_suspect",
       "reasons": [
-        "量 $29,925,293,990 >= $100,000,000 且 量/PnL 比 1,989 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
+        "量 $29,926,191,723 >= $100,000,000 且 量/PnL 比 1,990 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
       ]
     },
     "0x399965e15d4e61ec3529cc98b7f7ebb93b733336": {
@@ -794,8 +794,8 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 797560.85,
-        "peak_pnl": 797560.85,
+        "total_pnl": 797554.31,
+        "peak_pnl": 797554.31,
         "monthly_pnl": {
           "2024-06": -10.28,
           "2024-07": -576.05,
@@ -822,7 +822,7 @@
           "2026-04": 195698.8,
           "2026-05": 175516.57,
           "2026-06": 151953.16,
-          "2026-07": 57020.61
+          "2026-07": 57014.07
         },
         "active_months": 21,
         "positive_month_ratio": 0.857,
@@ -830,21 +830,21 @@
         "max_drawdown_pct": 0.0021,
         "current_drawdown_pct": 0.0,
         "max_single_day_crash_pct": 0.0021,
-        "span_days": 743.5,
+        "span_days": 743.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 1.496,
-        "avg_win": 0.83,
-        "avg_loss": 0.88,
-        "realized_win_rate": 0.613,
-        "avg_hold_hours": 0.051,
-        "net_direction_ratio": 0.0047,
+        "profit_factor": 1.079,
+        "avg_win": 0.73,
+        "avg_loss": 0.86,
+        "realized_win_rate": 0.562,
+        "avg_hold_hours": 0.049,
+        "net_direction_ratio": 0.0036,
         "n_fills_truncated": true,
-        "had_liquidation": true,
-        "n_liquidations": 1,
+        "had_liquidation": false,
+        "n_liquidations": 0,
         "top_coin": "xyz:MU",
-        "vlm": 16865386782.6,
-        "vlm_to_pnl_ratio": 21146.21,
+        "vlm": 16867697440.31,
+        "vlm_to_pnl_ratio": 21149.28,
         "funding_total": 92.88,
         "n_open_positions": 0,
         "current_max_leverage": null,
@@ -855,7 +855,7 @@
       },
       "classification": "wash_suspect",
       "reasons": [
-        "量 $16,865,386,783 >= $100,000,000 且 量/PnL 比 21,146 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
+        "量 $16,867,697,440 >= $100,000,000 且 量/PnL 比 21,149 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
       ]
     },
     "0x3bcae23e8c380dab4732e9a159c0456f12d866f3": {
@@ -865,7 +865,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 983300.82,
+        "total_pnl": 997763.65,
         "peak_pnl": 4093487.97,
         "monthly_pnl": {
           "2024-08": 102075.09,
@@ -891,29 +891,29 @@
           "2026-04": -1450354.26,
           "2026-05": -402299.79,
           "2026-06": 657761.89,
-          "2026-07": -197922.42
+          "2026-07": -183459.59
         },
         "active_months": 24,
         "positive_month_ratio": 0.583,
         "best_month_pnl": 1767577.49,
         "max_drawdown_pct": 1.0,
-        "current_drawdown_pct": 0.7598,
+        "current_drawdown_pct": 0.7563,
         "max_single_day_crash_pct": 0.5537,
         "span_days": 687.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 1.098,
-        "avg_win": 111.94,
-        "avg_loss": 43.26,
-        "realized_win_rate": 0.298,
-        "avg_hold_hours": 0.479,
-        "net_direction_ratio": 0.3068,
+        "profit_factor": 1.131,
+        "avg_win": 112.6,
+        "avg_loss": 42.77,
+        "realized_win_rate": 0.3,
+        "avg_hold_hours": 0.545,
+        "net_direction_ratio": 0.2666,
         "n_fills_truncated": true,
         "had_liquidation": true,
         "n_liquidations": 20,
         "top_coin": "BTC",
-        "vlm": 35593938268.61,
-        "vlm_to_pnl_ratio": 36198.42,
+        "vlm": 35594800258.83,
+        "vlm_to_pnl_ratio": 35674.58,
         "funding_total": -2658.61,
         "n_open_positions": 3,
         "current_max_leverage": 40.0,
@@ -921,59 +921,12 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 602574.69,
+        "account_value": 692053.63,
         "fetch_errors": []
       },
       "classification": "blowup_risk",
       "reasons": [
         "userFills 出現 20 次強平 >= 3（反覆爆倉，真高風險）"
-      ]
-    },
-    "0x3e7a0eca8b624b75034ad820fa291425f21f1589": {
-      "metrics": {
-        "address": "0x3e7a0eca8b624b75034ad820fa291425f21f1589",
-        "snapshot_date": "2026-07-10",
-        "pnl_source": "portfolio_curve",
-        "portfolio_window": "perpAllTime",
-        "low_confidence": false,
-        "total_pnl": -31799.48,
-        "peak_pnl": 2358690.37,
-        "monthly_pnl": {
-          "2026-06": 1296054.56,
-          "2026-07": -1327854.04
-        },
-        "active_months": 2,
-        "positive_month_ratio": 0.5,
-        "best_month_pnl": 1296054.56,
-        "max_drawdown_pct": 1.0,
-        "current_drawdown_pct": 1.0,
-        "max_single_day_crash_pct": 0.6114,
-        "span_days": 24.6,
-        "days_idle": 0.5,
-        "n_fills": 2000,
-        "profit_factor": 0.644,
-        "avg_win": 87.23,
-        "avg_loss": 129.51,
-        "realized_win_rate": 0.489,
-        "avg_hold_hours": 13.189,
-        "net_direction_ratio": 0.8337,
-        "n_fills_truncated": true,
-        "had_liquidation": false,
-        "n_liquidations": 0,
-        "top_coin": "xyz:XYZ100",
-        "vlm": 723478508.54,
-        "vlm_to_pnl_ratio": 22751.27,
-        "funding_total": -9712.06,
-        "n_open_positions": 0,
-        "current_max_leverage": null,
-        "has_extreme_leverage": false,
-        "margin_types": [],
-        "account_value": 0.0,
-        "fetch_errors": []
-      },
-      "classification": "blowup_risk",
-      "reasons": [
-        "峰值回撤 100% >= 60% 且現值較峰值回落 100% >= 60%（近全損、未復原）"
       ]
     },
     "0x469e9a7f624b04c24f0e64edf8d8a277e6bf58a5": {
@@ -983,8 +936,8 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 13051437.36,
-        "peak_pnl": 13051437.36,
+        "total_pnl": 13149880.7,
+        "peak_pnl": 13149880.7,
         "monthly_pnl": {
           "2024-12": 8038.82,
           "2025-01": 299211.01,
@@ -1005,7 +958,7 @@
           "2026-04": 4977262.05,
           "2026-05": -119040.48,
           "2026-06": 845078.22,
-          "2026-07": 1179918.34
+          "2026-07": 1278361.67
         },
         "active_months": 20,
         "positive_month_ratio": 0.65,
@@ -1026,8 +979,8 @@
         "had_liquidation": true,
         "n_liquidations": 88,
         "top_coin": "ZEC",
-        "vlm": 9946658058.81,
-        "vlm_to_pnl_ratio": 762.11,
+        "vlm": 9946775024.04,
+        "vlm_to_pnl_ratio": 756.42,
         "funding_total": -25164.58,
         "n_open_positions": 3,
         "current_max_leverage": 25.0,
@@ -1035,7 +988,7 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 3409773.69,
+        "account_value": 3404831.15,
         "fetch_errors": []
       },
       "classification": "blowup_risk",
@@ -1050,7 +1003,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 3293304.67,
+        "total_pnl": 3498449.71,
         "peak_pnl": 6499701.84,
         "monthly_pnl": {
           "2024-10": 0.0,
@@ -1074,29 +1027,29 @@
           "2026-04": 0.0,
           "2026-05": 0.0,
           "2026-06": 804501.5,
-          "2026-07": -485605.86
+          "2026-07": -280460.82
         },
         "active_months": 13,
         "positive_month_ratio": 0.615,
         "best_month_pnl": 1475005.13,
         "max_drawdown_pct": 0.6395,
-        "current_drawdown_pct": 0.4933,
+        "current_drawdown_pct": 0.4618,
         "max_single_day_crash_pct": 0.4137,
-        "span_days": 638.5,
+        "span_days": 638.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 0.017,
-        "avg_win": 13.12,
-        "avg_loss": 124.94,
-        "realized_win_rate": 0.142,
-        "avg_hold_hours": 0.932,
-        "net_direction_ratio": 0.5427,
+        "profit_factor": 0.014,
+        "avg_win": 10.47,
+        "avg_loss": 138.62,
+        "realized_win_rate": 0.157,
+        "avg_hold_hours": 0.966,
+        "net_direction_ratio": 0.5176,
         "n_fills_truncated": true,
         "had_liquidation": false,
         "n_liquidations": 0,
         "top_coin": "xyz:META",
-        "vlm": 1888727272.28,
-        "vlm_to_pnl_ratio": 573.51,
+        "vlm": 1890753700.12,
+        "vlm_to_pnl_ratio": 540.45,
         "funding_total": 67271.2,
         "n_open_positions": 0,
         "current_max_leverage": null,
@@ -1107,7 +1060,7 @@
       },
       "classification": "wash_suspect",
       "reasons": [
-        "量 $1,888,727,272 >= $100,000,000 且 量/PnL 比 574 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
+        "量 $1,890,753,700 >= $100,000,000 且 量/PnL 比 540 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
       ]
     },
     "0x4e23288cee4960f9f962195c22948e4bc7ae20c3": {
@@ -1117,35 +1070,35 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 17201108.47,
-        "peak_pnl": 17201108.47,
+        "total_pnl": 17468661.75,
+        "peak_pnl": 17468661.75,
         "monthly_pnl": {
           "2026-04": 248454.02,
           "2026-05": 6504520.8,
           "2026-06": 618968.76,
-          "2026-07": 9829164.9
+          "2026-07": 10096718.17
         },
         "active_months": 4,
         "positive_month_ratio": 1.0,
-        "best_month_pnl": 9829164.9,
+        "best_month_pnl": 10096718.17,
         "max_drawdown_pct": 0.7184,
         "current_drawdown_pct": 0.0,
         "max_single_day_crash_pct": 0.7027,
-        "span_days": 92.5,
+        "span_days": 92.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 19.89,
-        "avg_win": 101.44,
-        "avg_loss": 20.48,
-        "realized_win_rate": 0.801,
-        "avg_hold_hours": 3.733,
-        "net_direction_ratio": 0.0114,
+        "profit_factor": 52.712,
+        "avg_win": 110.12,
+        "avg_loss": 19.99,
+        "realized_win_rate": 0.905,
+        "avg_hold_hours": 4.08,
+        "net_direction_ratio": 0.6014,
         "n_fills_truncated": true,
         "had_liquidation": false,
         "n_liquidations": 0,
-        "top_coin": "xyz:DRAM",
-        "vlm": 3968183836.56,
-        "vlm_to_pnl_ratio": 230.69,
+        "top_coin": "xyz:SNDK",
+        "vlm": 3972520850.92,
+        "vlm_to_pnl_ratio": 227.41,
         "funding_total": 12836.01,
         "n_open_positions": 7,
         "current_max_leverage": 20.0,
@@ -1153,12 +1106,12 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 938869.06,
+        "account_value": 939104.12,
         "fetch_errors": []
       },
       "classification": "wash_suspect",
       "reasons": [
-        "量 $3,968,183,837 >= $100,000,000 且 量/PnL 比 231 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
+        "量 $3,972,520,851 >= $100,000,000 且 量/PnL 比 227 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
       ]
     },
     "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6": {
@@ -1168,7 +1121,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": -23374732.54,
+        "total_pnl": -23373643.84,
         "peak_pnl": 75743085.19,
         "monthly_pnl": {
           "2025-03": 1744509.83,
@@ -1187,7 +1140,7 @@
           "2026-04": -1010.62,
           "2026-05": -5170.35,
           "2026-06": -33791.39,
-          "2026-07": -12783.64
+          "2026-07": -11694.95
         },
         "active_months": 17,
         "positive_month_ratio": 0.235,
@@ -1209,7 +1162,7 @@
         "n_liquidations": 592,
         "top_coin": "BTC",
         "vlm": 18928210549.87,
-        "vlm_to_pnl_ratio": 809.77,
+        "vlm_to_pnl_ratio": 809.81,
         "funding_total": -7759549.1,
         "n_open_positions": 0,
         "current_max_leverage": null,
@@ -1230,7 +1183,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": -2532955.7,
+        "total_pnl": -2536615.33,
         "peak_pnl": 6288632.23,
         "monthly_pnl": {
           "2025-07": -185730.78,
@@ -1245,7 +1198,7 @@
           "2026-04": 105245.62,
           "2026-05": 1480588.9,
           "2026-06": 3042757.26,
-          "2026-07": -5841557.19
+          "2026-07": -5845216.83
         },
         "active_months": 11,
         "positive_month_ratio": 0.455,
@@ -1267,7 +1220,7 @@
         "n_liquidations": 0,
         "top_coin": "ETH",
         "vlm": 40541693314.8,
-        "vlm_to_pnl_ratio": 16005.69,
+        "vlm_to_pnl_ratio": 15982.59,
         "funding_total": -240110.89,
         "n_open_positions": 1,
         "current_max_leverage": 20.0,
@@ -1275,7 +1228,7 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 1516651.05,
+        "account_value": 1512991.42,
         "fetch_errors": []
       },
       "classification": "blowup_risk",
@@ -1315,7 +1268,7 @@
         "max_drawdown_pct": 1.0,
         "current_drawdown_pct": 1.0,
         "max_single_day_crash_pct": 1.0,
-        "span_days": 407.5,
+        "span_days": 407.6,
         "days_idle": 0.5,
         "n_fills": 2000,
         "profit_factor": 0.02,
@@ -1350,7 +1303,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 181592760.4,
+        "total_pnl": 181716050.5,
         "peak_pnl": 185308032.45,
         "monthly_pnl": {
           "2025-02": -0.02,
@@ -1370,15 +1323,15 @@
           "2026-04": 937961.91,
           "2026-05": 611349.55,
           "2026-06": 2403537.1,
-          "2026-07": -1550635.85
+          "2026-07": -1427345.76
         },
         "active_months": 16,
         "positive_month_ratio": 0.625,
         "best_month_pnl": 119706104.36,
         "max_drawdown_pct": 1.0,
-        "current_drawdown_pct": 0.02,
+        "current_drawdown_pct": 0.0194,
         "max_single_day_crash_pct": 1.0,
-        "span_days": 498.5,
+        "span_days": 498.6,
         "days_idle": 0.5,
         "n_fills": 2000,
         "profit_factor": 13.198,
@@ -1392,7 +1345,7 @@
         "n_liquidations": 0,
         "top_coin": "SOL",
         "vlm": 4029664669.95,
-        "vlm_to_pnl_ratio": 22.19,
+        "vlm_to_pnl_ratio": 22.18,
         "funding_total": 71987.75,
         "n_open_positions": 7,
         "current_max_leverage": 20.0,
@@ -1400,7 +1353,7 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 5204644.08,
+        "account_value": 5327729.74,
         "fetch_errors": []
       },
       "classification": "choppy",
@@ -1473,7 +1426,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": -27334.13,
+        "total_pnl": -26980.13,
         "peak_pnl": 18213.39,
         "monthly_pnl": {
           "2025-05": -38.93,
@@ -1490,7 +1443,7 @@
           "2026-04": 530.85,
           "2026-05": -18068.78,
           "2026-06": -7597.87,
-          "2026-07": -2287.01
+          "2026-07": -1933.01
         },
         "active_months": 12,
         "positive_month_ratio": 0.417,
@@ -1512,7 +1465,7 @@
         "n_liquidations": 0,
         "top_coin": "BTC",
         "vlm": 279283.8,
-        "vlm_to_pnl_ratio": 10.22,
+        "vlm_to_pnl_ratio": 10.35,
         "funding_total": 2927.99,
         "n_open_positions": 1,
         "current_max_leverage": 10.0,
@@ -1520,7 +1473,7 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 18672.87,
+        "account_value": 58337.87,
         "fetch_errors": []
       },
       "classification": "blowup_risk",
@@ -1583,7 +1536,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 22044809.63,
+        "total_pnl": 22068053.89,
         "peak_pnl": 23096727.11,
         "monthly_pnl": {
           "2025-02": 126563.98,
@@ -1603,29 +1556,29 @@
           "2026-04": 105261.96,
           "2026-05": 12311.77,
           "2026-06": 2491308.12,
-          "2026-07": -1051917.48
+          "2026-07": -1028673.22
         },
         "active_months": 18,
         "positive_month_ratio": 0.778,
         "best_month_pnl": 8620221.89,
         "max_drawdown_pct": 1.0,
-        "current_drawdown_pct": 0.0455,
+        "current_drawdown_pct": 0.0445,
         "max_single_day_crash_pct": 1.0,
         "span_days": 519.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 0.26,
-        "avg_win": 3.93,
-        "avg_loss": 9.53,
-        "realized_win_rate": 0.387,
-        "avg_hold_hours": 0.403,
-        "net_direction_ratio": 0.2317,
+        "profit_factor": 0.203,
+        "avg_win": 3.73,
+        "avg_loss": 20.38,
+        "realized_win_rate": 0.526,
+        "avg_hold_hours": 0.201,
+        "net_direction_ratio": 0.0811,
         "n_fills_truncated": true,
         "had_liquidation": false,
         "n_liquidations": 0,
-        "top_coin": "SUI",
-        "vlm": 25573053532.97,
-        "vlm_to_pnl_ratio": 1160.05,
+        "top_coin": "ENA",
+        "vlm": 25573830193.64,
+        "vlm_to_pnl_ratio": 1158.86,
         "funding_total": 2949.04,
         "n_open_positions": 168,
         "current_max_leverage": 20.0,
@@ -1633,12 +1586,12 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 6601265.5,
+        "account_value": 6623636.62,
         "fetch_errors": []
       },
       "classification": "wash_suspect",
       "reasons": [
-        "量 $25,573,053,533 >= $100,000,000 且 量/PnL 比 1,160 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
+        "量 $25,573,830,194 >= $100,000,000 且 量/PnL 比 1,159 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
       ]
     },
     "0x7839e2f2c375dd2935193f2736167514efff9916": {
@@ -1648,7 +1601,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 291876.74,
+        "total_pnl": 291950.19,
         "peak_pnl": 374549.5,
         "monthly_pnl": {
           "2025-04": -343.49,
@@ -1666,13 +1619,13 @@
           "2026-04": 7.87,
           "2026-05": 3316.24,
           "2026-06": -581.93,
-          "2026-07": -87.25
+          "2026-07": -13.8
         },
         "active_months": 14,
         "positive_month_ratio": 0.571,
         "best_month_pnl": 175931.37,
         "max_drawdown_pct": 0.2743,
-        "current_drawdown_pct": 0.2207,
+        "current_drawdown_pct": 0.2205,
         "max_single_day_crash_pct": 0.2472,
         "span_days": 449.6,
         "days_idle": 0.5,
@@ -1688,7 +1641,7 @@
         "n_liquidations": 6,
         "top_coin": "@107",
         "vlm": 15026542078.07,
-        "vlm_to_pnl_ratio": 51482.49,
+        "vlm_to_pnl_ratio": 51469.54,
         "funding_total": 1367.01,
         "n_open_positions": 0,
         "current_max_leverage": null,
@@ -1709,7 +1662,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": -26303881.91,
+        "total_pnl": -26302352.27,
         "peak_pnl": 3982139.81,
         "monthly_pnl": {
           "2025-02": -54.05,
@@ -1729,7 +1682,7 @@
           "2026-04": 191941.52,
           "2026-05": 242996.67,
           "2026-06": -113411.82,
-          "2026-07": 117490.2
+          "2026-07": 119019.84
         },
         "active_months": 18,
         "positive_month_ratio": 0.333,
@@ -1740,18 +1693,18 @@
         "span_days": 505.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 0.433,
-        "avg_win": 2.56,
-        "avg_loss": 5.82,
-        "realized_win_rate": 0.496,
-        "avg_hold_hours": 0.098,
-        "net_direction_ratio": 0.0595,
+        "profit_factor": 2.184,
+        "avg_win": 3.52,
+        "avg_loss": 2.21,
+        "realized_win_rate": 0.578,
+        "avg_hold_hours": 0.062,
+        "net_direction_ratio": 0.0324,
         "n_fills_truncated": true,
-        "had_liquidation": true,
-        "n_liquidations": 2,
-        "top_coin": "xyz:MU",
-        "vlm": 168989929164.0,
-        "vlm_to_pnl_ratio": 6424.52,
+        "had_liquidation": false,
+        "n_liquidations": 0,
+        "top_coin": "xyz:SNDK",
+        "vlm": 168993139669.12,
+        "vlm_to_pnl_ratio": 6425.02,
         "funding_total": 11543.38,
         "n_open_positions": 5,
         "current_max_leverage": 20.0,
@@ -1759,7 +1712,7 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 2115161.21,
+        "account_value": 2116669.73,
         "fetch_errors": []
       },
       "classification": "blowup_risk",
@@ -1774,7 +1727,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 3408142.5,
+        "total_pnl": 3383890.54,
         "peak_pnl": 8013554.49,
         "monthly_pnl": {
           "2024-05": 73714.37,
@@ -1803,13 +1756,13 @@
           "2026-04": 1199281.5,
           "2026-05": 4086740.13,
           "2026-06": 182194.5,
-          "2026-07": -2443291.03
+          "2026-07": -2467542.99
         },
         "active_months": 27,
         "positive_month_ratio": 0.481,
         "best_month_pnl": 4086740.13,
         "max_drawdown_pct": 1.0,
-        "current_drawdown_pct": 0.5747,
+        "current_drawdown_pct": 0.5777,
         "max_single_day_crash_pct": 0.6042,
         "span_days": 799.5,
         "days_idle": 0.5,
@@ -1825,7 +1778,7 @@
         "n_liquidations": 0,
         "top_coin": "ETH",
         "vlm": 7526185932.95,
-        "vlm_to_pnl_ratio": 2208.3,
+        "vlm_to_pnl_ratio": 2224.12,
         "funding_total": 6878.68,
         "n_open_positions": 77,
         "current_max_leverage": 40.0,
@@ -1833,7 +1786,7 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 1078279.98,
+        "account_value": 1083905.42,
         "fetch_errors": []
       },
       "classification": "blowup_risk",
@@ -1848,7 +1801,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 168185333.09,
+        "total_pnl": 168123301.59,
         "peak_pnl": 174145237.83,
         "monthly_pnl": {
           "2024-10": -63760.79,
@@ -1872,29 +1825,29 @@
           "2026-04": -219657.78,
           "2026-05": 9143496.72,
           "2026-06": 13479430.63,
-          "2026-07": -4253974.02
+          "2026-07": -4316005.52
         },
         "active_months": 22,
         "positive_month_ratio": 0.5,
         "best_month_pnl": 49597857.74,
         "max_drawdown_pct": 1.0,
-        "current_drawdown_pct": 0.0342,
+        "current_drawdown_pct": 0.0346,
         "max_single_day_crash_pct": 0.8845,
         "span_days": 645.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 0.157,
-        "avg_win": 8.94,
-        "avg_loss": 15.41,
-        "realized_win_rate": 0.213,
-        "avg_hold_hours": 6.62,
-        "net_direction_ratio": 0.0858,
+        "profit_factor": 0.255,
+        "avg_win": 8.1,
+        "avg_loss": 18.75,
+        "realized_win_rate": 0.371,
+        "avg_hold_hours": 9.648,
+        "net_direction_ratio": 0.1075,
         "n_fills_truncated": true,
         "had_liquidation": false,
         "n_liquidations": 0,
         "top_coin": "HYPE",
-        "vlm": 14003300038.59,
-        "vlm_to_pnl_ratio": 83.26,
+        "vlm": 14003834229.01,
+        "vlm_to_pnl_ratio": 83.3,
         "funding_total": 88657.24,
         "n_open_positions": 27,
         "current_max_leverage": 20.0,
@@ -1902,12 +1855,12 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 23634425.56,
+        "account_value": 24819388.53,
         "fetch_errors": []
       },
       "classification": "wash_suspect",
       "reasons": [
-        "量 $14,003,300,039 >= $100,000,000 且 量/PnL 比 83 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
+        "量 $14,003,834,229 >= $100,000,000 且 量/PnL 比 83 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
       ]
     },
     "0x856c35038594767646266bc7fd68dc26480e910d": {
@@ -1917,7 +1870,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 28179018.94,
+        "total_pnl": 28209218.72,
         "peak_pnl": 43241737.66,
         "monthly_pnl": {
           "2024-12": 651725.4,
@@ -1939,29 +1892,29 @@
           "2026-04": 462143.37,
           "2026-05": -8902645.35,
           "2026-06": -2475460.28,
-          "2026-07": -1649177.72
+          "2026-07": -1618977.94
         },
         "active_months": 20,
         "positive_month_ratio": 0.6,
         "best_month_pnl": 16261182.54,
         "max_drawdown_pct": 0.5733,
-        "current_drawdown_pct": 0.3483,
+        "current_drawdown_pct": 0.3476,
         "max_single_day_crash_pct": 0.3999,
-        "span_days": 575.5,
+        "span_days": 575.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 0.013,
-        "avg_win": 28.55,
-        "avg_loss": 44.76,
-        "realized_win_rate": 0.02,
-        "avg_hold_hours": 3.403,
-        "net_direction_ratio": 0.4071,
+        "profit_factor": 0.002,
+        "avg_win": 4.73,
+        "avg_loss": 46.38,
+        "realized_win_rate": 0.016,
+        "avg_hold_hours": 0.031,
+        "net_direction_ratio": 0.6312,
         "n_fills_truncated": true,
         "had_liquidation": false,
         "n_liquidations": 0,
         "top_coin": "HYPE",
-        "vlm": 4587388071.52,
-        "vlm_to_pnl_ratio": 162.79,
+        "vlm": 4587565754.43,
+        "vlm_to_pnl_ratio": 162.63,
         "funding_total": 5497.42,
         "n_open_positions": 28,
         "current_max_leverage": 20.0,
@@ -1969,12 +1922,12 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 2726503.27,
+        "account_value": 2658267.98,
         "fetch_errors": []
       },
       "classification": "wash_suspect",
       "reasons": [
-        "量 $4,587,388,072 >= $100,000,000 且 量/PnL 比 163 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
+        "量 $4,587,565,754 >= $100,000,000 且 量/PnL 比 163 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
       ]
     },
     "0x85ecf584f25db6f146718b86d493e33c5af72052": {
@@ -2131,7 +2084,7 @@
         "max_drawdown_pct": null,
         "current_drawdown_pct": null,
         "max_single_day_crash_pct": 0.0,
-        "span_days": 391.7,
+        "span_days": 391.8,
         "days_idle": 0.5,
         "n_fills": 119,
         "profit_factor": 0.037,
@@ -2151,7 +2104,7 @@
         "current_max_leverage": null,
         "has_extreme_leverage": false,
         "margin_types": [],
-        "account_value": 2456.15,
+        "account_value": 553.15,
         "fetch_errors": []
       },
       "classification": "wash_suspect",
@@ -2166,14 +2119,14 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": -3256766.34,
+        "total_pnl": -3256788.06,
         "peak_pnl": 612534.87,
         "monthly_pnl": {
           "2026-03": -14658.84,
           "2026-04": 627193.71,
           "2026-05": -2582744.1,
           "2026-06": -1207517.01,
-          "2026-07": -79040.1
+          "2026-07": -79061.83
         },
         "active_months": 5,
         "positive_month_ratio": 0.2,
@@ -2195,7 +2148,7 @@
         "n_liquidations": 2,
         "top_coin": "BTC",
         "vlm": 3844760962.12,
-        "vlm_to_pnl_ratio": 1180.55,
+        "vlm_to_pnl_ratio": 1180.54,
         "funding_total": -69420.37,
         "n_open_positions": 1,
         "current_max_leverage": 18.0,
@@ -2203,7 +2156,7 @@
         "margin_types": [
           "isolated"
         ],
-        "account_value": 46512.11,
+        "account_value": 46555.55,
         "fetch_errors": []
       },
       "classification": "blowup_risk",
@@ -2218,48 +2171,46 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": -1019121.75,
+        "total_pnl": -1034923.14,
         "peak_pnl": 270051.83,
         "monthly_pnl": {
           "2026-04": 192819.17,
           "2026-05": -1268805.78,
           "2026-06": -281403.27,
-          "2026-07": 338268.13
+          "2026-07": 322466.74
         },
         "active_months": 4,
         "positive_month_ratio": 0.5,
-        "best_month_pnl": 338268.13,
+        "best_month_pnl": 322466.74,
         "max_drawdown_pct": 1.0,
         "current_drawdown_pct": 1.0,
         "max_single_day_crash_pct": 1.0,
-        "span_days": 78.5,
+        "span_days": 78.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 0.0,
-        "avg_win": null,
-        "avg_loss": 90.0,
-        "realized_win_rate": 0.0,
-        "avg_hold_hours": 2.682,
-        "net_direction_ratio": 0.6943,
+        "profit_factor": 0.122,
+        "avg_win": 30.5,
+        "avg_loss": 61.32,
+        "realized_win_rate": 0.197,
+        "avg_hold_hours": 5.471,
+        "net_direction_ratio": 0.8427,
         "n_fills_truncated": true,
         "had_liquidation": false,
         "n_liquidations": 0,
-        "top_coin": "HYPE",
-        "vlm": 3173459031.28,
-        "vlm_to_pnl_ratio": 3113.92,
+        "top_coin": "ETH",
+        "vlm": 3181470235.19,
+        "vlm_to_pnl_ratio": 3074.11,
         "funding_total": -23092.19,
-        "n_open_positions": 6,
-        "current_max_leverage": 40.0,
-        "has_extreme_leverage": true,
-        "margin_types": [
-          "cross"
-        ],
-        "account_value": 463282.28,
+        "n_open_positions": 0,
+        "current_max_leverage": null,
+        "has_extreme_leverage": false,
+        "margin_types": [],
+        "account_value": 0.0,
         "fetch_errors": []
       },
       "classification": "blowup_risk",
       "reasons": [
-        "目前槓桿 40x >= 25x 且回撤 100% >= 60%"
+        "峰值回撤 100% >= 60% 且現值較峰值回落 100% >= 60%（近全損、未復原）"
       ]
     },
     "0x9b89b84179fb680d97c7b2ea80ad2e88e0811869": {
@@ -2269,35 +2220,35 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 148099.24,
+        "total_pnl": 140322.32,
         "peak_pnl": 255578.16,
         "monthly_pnl": {
           "2026-04": 22317.14,
           "2026-05": 102332.96,
           "2026-06": 89716.56,
-          "2026-07": -66267.41
+          "2026-07": -74044.33
         },
         "active_months": 4,
         "positive_month_ratio": 0.75,
         "best_month_pnl": 102332.96,
         "max_drawdown_pct": 1.0,
-        "current_drawdown_pct": 0.4205,
+        "current_drawdown_pct": 0.451,
         "max_single_day_crash_pct": 1.0,
         "span_days": 99.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 0.614,
-        "avg_win": 28.27,
-        "avg_loss": 25.96,
-        "realized_win_rate": 0.36,
-        "avg_hold_hours": 1.563,
-        "net_direction_ratio": 0.0383,
+        "profit_factor": 0.586,
+        "avg_win": 27.32,
+        "avg_loss": 26.96,
+        "realized_win_rate": 0.366,
+        "avg_hold_hours": 0.924,
+        "net_direction_ratio": 0.0336,
         "n_fills_truncated": true,
         "had_liquidation": true,
         "n_liquidations": 5,
         "top_coin": "xyz:AMD",
-        "vlm": 2648962734.24,
-        "vlm_to_pnl_ratio": 17886.4,
+        "vlm": 2650462343.76,
+        "vlm_to_pnl_ratio": 18888.39,
         "funding_total": -1377.93,
         "n_open_positions": 1,
         "current_max_leverage": 20.0,
@@ -2320,7 +2271,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": -11923518.75,
+        "total_pnl": -11917507.74,
         "peak_pnl": 16410320.56,
         "monthly_pnl": {
           "2024-05": 0.0,
@@ -2349,7 +2300,7 @@
           "2026-04": 4977106.65,
           "2026-05": -6503794.11,
           "2026-06": -4278673.88,
-          "2026-07": 1465861.5
+          "2026-07": 1471872.51
         },
         "active_months": 17,
         "positive_month_ratio": 0.529,
@@ -2371,7 +2322,7 @@
         "n_liquidations": 0,
         "top_coin": "SOL",
         "vlm": 1693170812.37,
-        "vlm_to_pnl_ratio": 142.0,
+        "vlm_to_pnl_ratio": 142.07,
         "funding_total": -7204471.82,
         "n_open_positions": 3,
         "current_max_leverage": 20.0,
@@ -2380,7 +2331,7 @@
           "cross",
           "isolated"
         ],
-        "account_value": 6970744.08,
+        "account_value": 6976755.09,
         "fetch_errors": []
       },
       "classification": "blowup_risk",
@@ -2442,7 +2393,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 2961323.22,
+        "total_pnl": 2902207.29,
         "peak_pnl": 3318932.93,
         "monthly_pnl": {
           "2026-01": -1313302.18,
@@ -2451,13 +2402,13 @@
           "2026-04": -536078.84,
           "2026-05": 2821880.38,
           "2026-06": 1101500.44,
-          "2026-07": 887323.42
+          "2026-07": 828207.49
         },
         "active_months": 5,
         "positive_month_ratio": 0.6,
         "best_month_pnl": 2821880.38,
         "max_drawdown_pct": 1.0,
-        "current_drawdown_pct": 0.1077,
+        "current_drawdown_pct": 0.1256,
         "max_single_day_crash_pct": 1.0,
         "span_days": 183.6,
         "days_idle": 0.5,
@@ -2473,7 +2424,7 @@
         "n_liquidations": 0,
         "top_coin": "SOL",
         "vlm": 3070704598.36,
-        "vlm_to_pnl_ratio": 1036.94,
+        "vlm_to_pnl_ratio": 1058.06,
         "funding_total": -62496.35,
         "n_open_positions": 4,
         "current_max_leverage": 40.0,
@@ -2481,7 +2432,7 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 3495893.21,
+        "account_value": 3437133.69,
         "fetch_errors": []
       },
       "classification": "blowup_risk",
@@ -2496,7 +2447,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 1834956.71,
+        "total_pnl": 1834930.76,
         "peak_pnl": 1916515.94,
         "monthly_pnl": {
           "2025-05": 2687.37,
@@ -2513,7 +2464,7 @@
           "2026-04": 2142085.39,
           "2026-05": 736258.86,
           "2026-06": 2085747.42,
-          "2026-07": 349353.4
+          "2026-07": 349327.44
         },
         "active_months": 11,
         "positive_month_ratio": 0.455,
@@ -2535,7 +2486,7 @@
         "n_liquidations": 0,
         "top_coin": "ETH",
         "vlm": 8206319066.81,
-        "vlm_to_pnl_ratio": 4472.21,
+        "vlm_to_pnl_ratio": 4472.28,
         "funding_total": -110628.97,
         "n_open_positions": 1,
         "current_max_leverage": 5.0,
@@ -2543,7 +2494,7 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 59741.87,
+        "account_value": 59806.76,
         "fetch_errors": []
       },
       "classification": "wash_suspect",
@@ -2630,7 +2581,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 63675.76,
+        "total_pnl": 61980.62,
         "peak_pnl": 84072.0,
         "monthly_pnl": {
           "2025-11": 0.0,
@@ -2641,29 +2592,29 @@
           "2026-04": -10470.0,
           "2026-05": -80101.14,
           "2026-06": 82142.89,
-          "2026-07": 70680.41
+          "2026-07": 68985.27
         },
         "active_months": 6,
         "positive_month_ratio": 0.5,
         "best_month_pnl": 82142.89,
         "max_drawdown_pct": 1.0,
-        "current_drawdown_pct": 0.2426,
+        "current_drawdown_pct": 0.2628,
         "max_single_day_crash_pct": 0.5943,
         "span_days": 246.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 6466.555,
-        "avg_win": 8.05,
-        "avg_loss": 0.29,
-        "realized_win_rate": 0.996,
-        "avg_hold_hours": 0.569,
-        "net_direction_ratio": 0.0502,
+        "profit_factor": 999.0,
+        "avg_win": 8.15,
+        "avg_loss": null,
+        "realized_win_rate": 1.0,
+        "avg_hold_hours": 0.634,
+        "net_direction_ratio": 0.0527,
         "n_fills_truncated": true,
         "had_liquidation": false,
         "n_liquidations": 0,
         "top_coin": "HYPE",
-        "vlm": 1518080133.41,
-        "vlm_to_pnl_ratio": 23840.78,
+        "vlm": 1518643161.65,
+        "vlm_to_pnl_ratio": 24501.9,
         "funding_total": 1217.12,
         "n_open_positions": 1,
         "current_max_leverage": 10.0,
@@ -2671,12 +2622,67 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 195852.8,
+        "account_value": 194157.66,
         "fetch_errors": []
       },
       "classification": "wash_suspect",
       "reasons": [
-        "量 $1,518,080,133 >= $100,000,000 且 量/PnL 比 23,841 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
+        "量 $1,518,643,162 >= $100,000,000 且 量/PnL 比 24,502 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
+      ]
+    },
+    "0xbeccae9ffcb69e9d42a1d4e744abf8056149562d": {
+      "metrics": {
+        "address": "0xbeccae9ffcb69e9d42a1d4e744abf8056149562d",
+        "snapshot_date": "2026-07-10",
+        "pnl_source": "portfolio_curve",
+        "portfolio_window": "perpAllTime",
+        "low_confidence": false,
+        "total_pnl": 268397.94,
+        "peak_pnl": 466966.23,
+        "monthly_pnl": {
+          "2026-01": 827.16,
+          "2026-02": 52807.39,
+          "2026-03": 23068.58,
+          "2026-04": 75607.08,
+          "2026-05": 55810.04,
+          "2026-06": 258845.98,
+          "2026-07": -198568.3
+        },
+        "active_months": 7,
+        "positive_month_ratio": 0.857,
+        "best_month_pnl": 258845.98,
+        "max_drawdown_pct": 0.5716,
+        "current_drawdown_pct": 0.4252,
+        "max_single_day_crash_pct": 0.332,
+        "span_days": 169.6,
+        "days_idle": 0.5,
+        "n_fills": 2000,
+        "profit_factor": 0.329,
+        "avg_win": 20.63,
+        "avg_loss": 32.43,
+        "realized_win_rate": 0.341,
+        "avg_hold_hours": 0.903,
+        "net_direction_ratio": 0.0077,
+        "n_fills_truncated": true,
+        "had_liquidation": false,
+        "n_liquidations": 0,
+        "top_coin": "ETH",
+        "vlm": 2031970852.23,
+        "vlm_to_pnl_ratio": 7570.74,
+        "funding_total": -2947.86,
+        "n_open_positions": 42,
+        "current_max_leverage": 40.0,
+        "has_extreme_leverage": true,
+        "margin_types": [
+          "cross",
+          "isolated"
+        ],
+        "account_value": 356985.35,
+        "fetch_errors": []
+      },
+      "classification": "wash_suspect",
+      "reasons": [
+        "量 $2,031,970,852 >= $100,000,000 且 量/PnL 比 7,571 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
       ]
     },
     "0xc5ed4501500fcbfb2b88fb7f0aa52f834ed44346": {
@@ -2686,8 +2692,8 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 560981.15,
-        "peak_pnl": 560981.15,
+        "total_pnl": 560701.23,
+        "peak_pnl": 560701.23,
         "monthly_pnl": {
           "2024-05": 566.38,
           "2024-06": -66.2,
@@ -2715,7 +2721,7 @@
           "2026-04": 57446.09,
           "2026-05": 51537.78,
           "2026-06": 161949.08,
-          "2026-07": 8014.84
+          "2026-07": 7734.92
         },
         "active_months": 25,
         "positive_month_ratio": 0.8,
@@ -2726,18 +2732,18 @@
         "span_days": 799.5,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 2.489,
-        "avg_win": 4.75,
-        "avg_loss": 2.49,
-        "realized_win_rate": 0.566,
-        "avg_hold_hours": 0.237,
-        "net_direction_ratio": 0.0023,
+        "profit_factor": 2.029,
+        "avg_win": 4.82,
+        "avg_loss": 2.69,
+        "realized_win_rate": 0.531,
+        "avg_hold_hours": 0.252,
+        "net_direction_ratio": 0.0167,
         "n_fills_truncated": true,
         "had_liquidation": false,
         "n_liquidations": 0,
         "top_coin": "xyz:CRCL",
-        "vlm": 7616493030.04,
-        "vlm_to_pnl_ratio": 13577.09,
+        "vlm": 7616936993.52,
+        "vlm_to_pnl_ratio": 13584.66,
         "funding_total": 30.29,
         "n_open_positions": 0,
         "current_max_leverage": null,
@@ -2748,7 +2754,7 @@
       },
       "classification": "wash_suspect",
       "reasons": [
-        "量 $7,616,493,030 >= $100,000,000 且 量/PnL 比 13,577 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
+        "量 $7,616,936,994 >= $100,000,000 且 量/PnL 比 13,585 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
       ]
     },
     "0xc926ddba8b7617dbc65712f20cf8e1b58b8598d3": {
@@ -2758,7 +2764,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 7866889.81,
+        "total_pnl": 7866821.25,
         "peak_pnl": 7894638.48,
         "monthly_pnl": {
           "2024-10": 0.0,
@@ -2782,7 +2788,7 @@
           "2026-04": -917344.2,
           "2026-05": 552874.04,
           "2026-06": 514323.39,
-          "2026-07": 1491.41
+          "2026-07": 1422.85
         },
         "active_months": 20,
         "positive_month_ratio": 0.7,
@@ -2790,7 +2796,7 @@
         "max_drawdown_pct": 0.2674,
         "current_drawdown_pct": 0.0035,
         "max_single_day_crash_pct": 0.1854,
-        "span_days": 638.5,
+        "span_days": 638.6,
         "days_idle": 0.5,
         "n_fills": 2000,
         "profit_factor": 0.969,
@@ -2804,7 +2810,7 @@
         "n_liquidations": 0,
         "top_coin": "#6651",
         "vlm": 45090675155.3,
-        "vlm_to_pnl_ratio": 5731.7,
+        "vlm_to_pnl_ratio": 5731.75,
         "funding_total": 13502.02,
         "n_open_positions": 1,
         "current_max_leverage": 10.0,
@@ -2812,7 +2818,7 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 31199.61,
+        "account_value": 31131.05,
         "fetch_errors": []
       },
       "classification": "wash_suspect",
@@ -2827,7 +2833,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": -4288490.85,
+        "total_pnl": -4274004.5,
         "peak_pnl": 312736.76,
         "monthly_pnl": {
           "2026-02": -756052.97,
@@ -2835,29 +2841,29 @@
           "2026-04": 175233.33,
           "2026-05": -1556439.85,
           "2026-06": -1565073.82,
-          "2026-07": 974058.38
+          "2026-07": 988544.72
         },
         "active_months": 6,
         "positive_month_ratio": 0.333,
-        "best_month_pnl": 974058.38,
+        "best_month_pnl": 988544.72,
         "max_drawdown_pct": 1.0,
         "current_drawdown_pct": 1.0,
         "max_single_day_crash_pct": 1.0,
-        "span_days": 155.5,
+        "span_days": 155.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 1.242,
+        "profit_factor": 2.557,
         "avg_win": 78.02,
-        "avg_loss": 109.28,
-        "realized_win_rate": 0.635,
+        "avg_loss": 146.66,
+        "realized_win_rate": 0.828,
         "avg_hold_hours": 22.464,
-        "net_direction_ratio": 0.2618,
+        "net_direction_ratio": 0.3861,
         "n_fills_truncated": true,
         "had_liquidation": false,
         "n_liquidations": 0,
         "top_coin": "ETH",
-        "vlm": 5636720935.39,
-        "vlm_to_pnl_ratio": 1314.38,
+        "vlm": 5638518609.0,
+        "vlm_to_pnl_ratio": 1319.26,
         "funding_total": -73222.1,
         "n_open_positions": 1,
         "current_max_leverage": 25.0,
@@ -2865,7 +2871,7 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 1150336.97,
+        "account_value": 1186458.53,
         "fetch_errors": []
       },
       "classification": "blowup_risk",
@@ -2952,7 +2958,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": -4544112.45,
+        "total_pnl": -4537912.44,
         "peak_pnl": 510902.23,
         "monthly_pnl": {
           "2024-05": 35426.34,
@@ -2981,7 +2987,7 @@
           "2026-04": 259878.69,
           "2026-05": -1913273.79,
           "2026-06": -1168249.04,
-          "2026-07": -39360.29
+          "2026-07": -33160.29
         },
         "active_months": 15,
         "positive_month_ratio": 0.4,
@@ -3003,7 +3009,7 @@
         "n_liquidations": 0,
         "top_coin": "HYPE",
         "vlm": 3947937987.46,
-        "vlm_to_pnl_ratio": 868.8,
+        "vlm_to_pnl_ratio": 869.99,
         "funding_total": 159219.67,
         "n_open_positions": 1,
         "current_max_leverage": 10.0,
@@ -3011,7 +3017,7 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 281793.87,
+        "account_value": 287993.88,
         "fetch_errors": []
       },
       "classification": "blowup_risk",
@@ -3091,7 +3097,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": -1473.16,
+        "total_pnl": -1473.17,
         "peak_pnl": 758.83,
         "monthly_pnl": {
           "2025-05": -573.46,
@@ -3108,7 +3114,7 @@
           "2026-04": 0.0,
           "2026-05": 0.0,
           "2026-06": -3.99,
-          "2026-07": 5.02
+          "2026-07": 5.01
         },
         "active_months": 12,
         "positive_month_ratio": 0.417,
@@ -3130,7 +3136,7 @@
         "n_liquidations": 0,
         "top_coin": "xyz:SILVER",
         "vlm": 60188274.6,
-        "vlm_to_pnl_ratio": 40856.55,
+        "vlm_to_pnl_ratio": 40856.16,
         "funding_total": 44.33,
         "n_open_positions": 1,
         "current_max_leverage": 40.0,
@@ -3138,12 +3144,12 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 126.99,
+        "account_value": 126.98,
         "fetch_errors": []
       },
       "classification": "wash_suspect",
       "reasons": [
-        "量 $60,188,275 巨大且 量/PnL 比 40,857 >= 500（巨量、PnL≈0）"
+        "量 $60,188,275 巨大且 量/PnL 比 40,856 >= 500（巨量、PnL≈0）"
       ]
     },
     "0xe4c6ae25959d7fc66cf2dd5965fb78c5e09c4048": {
@@ -3222,7 +3228,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": -4907657.61,
+        "total_pnl": -4923411.16,
         "peak_pnl": 230709.43,
         "monthly_pnl": {
           "2024-05": 121339.44,
@@ -3251,42 +3257,40 @@
           "2026-04": -488903.04,
           "2026-05": -1227134.34,
           "2026-06": 447932.37,
-          "2026-07": 662732.91
+          "2026-07": 646979.36
         },
         "active_months": 13,
         "positive_month_ratio": 0.538,
-        "best_month_pnl": 662732.91,
+        "best_month_pnl": 646979.36,
         "max_drawdown_pct": 1.0,
         "current_drawdown_pct": 1.0,
         "max_single_day_crash_pct": 1.0,
         "span_days": 799.5,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 24.636,
-        "avg_win": 183.68,
-        "avg_loss": 376.51,
-        "realized_win_rate": 0.981,
-        "avg_hold_hours": 6.281,
-        "net_direction_ratio": 0.308,
+        "profit_factor": 0.604,
+        "avg_win": 32.5,
+        "avg_loss": 76.06,
+        "realized_win_rate": 0.586,
+        "avg_hold_hours": 2.336,
+        "net_direction_ratio": 0.0613,
         "n_fills_truncated": true,
         "had_liquidation": false,
         "n_liquidations": 0,
         "top_coin": "ETH",
-        "vlm": 5208890811.71,
-        "vlm_to_pnl_ratio": 1061.38,
+        "vlm": 5227757956.15,
+        "vlm_to_pnl_ratio": 1061.82,
         "funding_total": -233291.74,
-        "n_open_positions": 1,
-        "current_max_leverage": 25.0,
-        "has_extreme_leverage": true,
-        "margin_types": [
-          "cross"
-        ],
-        "account_value": 880400.0,
+        "n_open_positions": 0,
+        "current_max_leverage": null,
+        "has_extreme_leverage": false,
+        "margin_types": [],
+        "account_value": 0.0,
         "fetch_errors": []
       },
       "classification": "blowup_risk",
       "reasons": [
-        "目前槓桿 25x >= 25x 且回撤 100% >= 60%"
+        "峰值回撤 100% >= 60% 且現值較峰值回落 100% >= 60%（近全損、未復原）"
       ]
     },
     "0xecb63caa47c7c4e77f60f1ce858cf28dc2b82b00": {
@@ -3296,7 +3300,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 192618588.14,
+        "total_pnl": 192752559.94,
         "peak_pnl": 199161708.98,
         "monthly_pnl": {
           "2024-05": 1449651.98,
@@ -3325,29 +3329,29 @@
           "2026-04": 2031344.51,
           "2026-05": 114009.01,
           "2026-06": 15059472.45,
-          "2026-07": -6391924.67
+          "2026-07": -6257952.87
         },
         "active_months": 27,
         "positive_month_ratio": 0.704,
         "best_month_pnl": 37491421.19,
         "max_drawdown_pct": 0.5933,
-        "current_drawdown_pct": 0.0329,
+        "current_drawdown_pct": 0.0322,
         "max_single_day_crash_pct": 0.4077,
         "span_days": 799.5,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 0.207,
-        "avg_win": 7.13,
-        "avg_loss": 28.67,
-        "realized_win_rate": 0.455,
-        "avg_hold_hours": 0.108,
-        "net_direction_ratio": 0.5042,
+        "profit_factor": 0.035,
+        "avg_win": 3.58,
+        "avg_loss": 40.97,
+        "realized_win_rate": 0.287,
+        "avg_hold_hours": 0.073,
+        "net_direction_ratio": 0.2492,
         "n_fills_truncated": true,
-        "had_liquidation": true,
-        "n_liquidations": 2,
-        "top_coin": "xyz:DRAM",
-        "vlm": 242002487510.52,
-        "vlm_to_pnl_ratio": 1256.38,
+        "had_liquidation": false,
+        "n_liquidations": 0,
+        "top_coin": "HYPE",
+        "vlm": 242009387638.92,
+        "vlm_to_pnl_ratio": 1255.54,
         "funding_total": 22032.79,
         "n_open_positions": 82,
         "current_max_leverage": 20.0,
@@ -3355,12 +3359,12 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 43691490.24,
+        "account_value": 43803119.07,
         "fetch_errors": []
       },
       "classification": "wash_suspect",
       "reasons": [
-        "量 $242,002,487,511 >= $100,000,000 且 量/PnL 比 1,256 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
+        "量 $242,009,387,639 >= $100,000,000 且 量/PnL 比 1,256 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
       ]
     },
     "0xeeb56331b6a250fe2dbc123f08bdb87aa9840464": {
@@ -3431,7 +3435,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 1397395.35,
+        "total_pnl": 1397298.77,
         "peak_pnl": 1502577.28,
         "monthly_pnl": {
           "2024-05": -36.9,
@@ -3460,29 +3464,29 @@
           "2026-04": 28649.37,
           "2026-05": 30664.46,
           "2026-06": 23760.28,
-          "2026-07": -29983.41
+          "2026-07": -30080.0
         },
         "active_months": 21,
         "positive_month_ratio": 0.667,
         "best_month_pnl": 476684.22,
         "max_drawdown_pct": 0.9638,
-        "current_drawdown_pct": 0.07,
+        "current_drawdown_pct": 0.0701,
         "max_single_day_crash_pct": 0.6903,
-        "span_days": 785.5,
+        "span_days": 785.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 0.331,
-        "avg_win": 4.11,
-        "avg_loss": 8.23,
-        "realized_win_rate": 0.398,
-        "avg_hold_hours": 0.333,
-        "net_direction_ratio": 0.0198,
+        "profit_factor": 0.256,
+        "avg_win": 3.9,
+        "avg_loss": 12.55,
+        "realized_win_rate": 0.452,
+        "avg_hold_hours": 0.326,
+        "net_direction_ratio": 0.0458,
         "n_fills_truncated": true,
         "had_liquidation": false,
         "n_liquidations": 0,
         "top_coin": "xyz:META",
-        "vlm": 8673470696.63,
-        "vlm_to_pnl_ratio": 6206.88,
+        "vlm": 8674310255.81,
+        "vlm_to_pnl_ratio": 6207.91,
         "funding_total": 51.16,
         "n_open_positions": 18,
         "current_max_leverage": 5.0,
@@ -3490,12 +3494,12 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 358877.58,
+        "account_value": 358309.76,
         "fetch_errors": []
       },
       "classification": "wash_suspect",
       "reasons": [
-        "量 $8,673,470,697 >= $100,000,000 且 量/PnL 比 6,207 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
+        "量 $8,674,310,256 >= $100,000,000 且 量/PnL 比 6,208 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
       ]
     },
     "0xf58b673c1633ccef0ac58263cdc95ed80f817fc7": {
@@ -3505,7 +3509,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 1422609.5,
+        "total_pnl": 1423970.63,
         "peak_pnl": 3262732.06,
         "monthly_pnl": {
           "2024-12": 0.79,
@@ -3527,29 +3531,29 @@
           "2026-04": -291619.14,
           "2026-05": -703158.21,
           "2026-06": 168927.82,
-          "2026-07": -586428.48
+          "2026-07": -585067.36
         },
         "active_months": 20,
         "positive_month_ratio": 0.5,
         "best_month_pnl": 2107999.12,
         "max_drawdown_pct": 1.0,
-        "current_drawdown_pct": 0.564,
+        "current_drawdown_pct": 0.5636,
         "max_single_day_crash_pct": 0.6895,
         "span_days": 568.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 0.879,
-        "avg_win": 50.08,
-        "avg_loss": 44.05,
-        "realized_win_rate": 0.436,
-        "avg_hold_hours": 0.79,
-        "net_direction_ratio": 0.125,
+        "profit_factor": 0.771,
+        "avg_win": 48.19,
+        "avg_loss": 45.22,
+        "realized_win_rate": 0.42,
+        "avg_hold_hours": 0.816,
+        "net_direction_ratio": 0.1181,
         "n_fills_truncated": true,
         "had_liquidation": true,
         "n_liquidations": 14,
         "top_coin": "BTC",
-        "vlm": 13345610708.14,
-        "vlm_to_pnl_ratio": 9381.08,
+        "vlm": 13345694474.49,
+        "vlm_to_pnl_ratio": 9372.17,
         "funding_total": 1048037.53,
         "n_open_positions": 1,
         "current_max_leverage": 40.0,
@@ -3557,7 +3561,7 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 801426.72,
+        "account_value": 802787.85,
         "fetch_errors": []
       },
       "classification": "blowup_risk",
@@ -3572,7 +3576,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": -116759.15,
+        "total_pnl": -114455.37,
         "peak_pnl": 58750.51,
         "monthly_pnl": {
           "2025-12": -11154.29,
@@ -3582,7 +3586,7 @@
           "2026-04": 27534.58,
           "2026-05": 78023.02,
           "2026-06": 113686.15,
-          "2026-07": -175509.66
+          "2026-07": -173205.88
         },
         "active_months": 8,
         "positive_month_ratio": 0.375,
@@ -3590,21 +3594,21 @@
         "max_drawdown_pct": 1.0,
         "current_drawdown_pct": 1.0,
         "max_single_day_crash_pct": 1.0,
-        "span_days": 204.5,
+        "span_days": 204.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 0.162,
-        "avg_win": 0.45,
-        "avg_loss": 1.39,
-        "realized_win_rate": 0.331,
-        "avg_hold_hours": 0.072,
-        "net_direction_ratio": 0.1951,
+        "profit_factor": 3.05,
+        "avg_win": 1.79,
+        "avg_loss": 0.98,
+        "realized_win_rate": 0.626,
+        "avg_hold_hours": 0.051,
+        "net_direction_ratio": 0.0511,
         "n_fills_truncated": true,
         "had_liquidation": false,
         "n_liquidations": 0,
         "top_coin": "HYPE",
-        "vlm": 32650153692.89,
-        "vlm_to_pnl_ratio": 279636.78,
+        "vlm": 32654215539.04,
+        "vlm_to_pnl_ratio": 285300.85,
         "funding_total": 3078.11,
         "n_open_positions": 18,
         "current_max_leverage": 3.0,
@@ -3612,7 +3616,7 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 2067813.96,
+        "account_value": 2070217.72,
         "fetch_errors": []
       },
       "classification": "blowup_risk",
@@ -3627,35 +3631,35 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 4758609.85,
+        "total_pnl": 4627699.29,
         "peak_pnl": 10506350.88,
         "monthly_pnl": {
           "2026-04": -17194.91,
           "2026-05": 11361.24,
           "2026-06": 7374993.86,
-          "2026-07": -2610550.35
+          "2026-07": -2741460.91
         },
         "active_months": 4,
         "positive_month_ratio": 0.5,
         "best_month_pnl": 7374993.86,
         "max_drawdown_pct": 0.8294,
-        "current_drawdown_pct": 0.5471,
+        "current_drawdown_pct": 0.5595,
         "max_single_day_crash_pct": 0.5722,
         "span_days": 92.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 0.911,
-        "avg_win": 33.45,
-        "avg_loss": 29.81,
-        "realized_win_rate": 0.448,
+        "profit_factor": 1.418,
+        "avg_win": 36.84,
+        "avg_loss": 30.38,
+        "realized_win_rate": 0.539,
         "avg_hold_hours": 0.725,
-        "net_direction_ratio": 0.2809,
+        "net_direction_ratio": 0.2193,
         "n_fills_truncated": true,
         "had_liquidation": true,
         "n_liquidations": 3,
         "top_coin": "SUI",
-        "vlm": 2586703427.18,
-        "vlm_to_pnl_ratio": 543.58,
+        "vlm": 2588119859.28,
+        "vlm_to_pnl_ratio": 559.27,
         "funding_total": 13739.84,
         "n_open_positions": 19,
         "current_max_leverage": 10.0,
@@ -3663,7 +3667,7 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 2184281.2,
+        "account_value": 2188222.91,
         "fetch_errors": []
       },
       "classification": "blowup_risk",
@@ -3678,7 +3682,7 @@
         "pnl_source": "portfolio_curve",
         "portfolio_window": "perpAllTime",
         "low_confidence": false,
-        "total_pnl": 24765149.41,
+        "total_pnl": 24822874.86,
         "peak_pnl": 27018439.83,
         "monthly_pnl": {
           "2025-10": -3.2,
@@ -3690,29 +3694,29 @@
           "2026-04": 5792564.53,
           "2026-05": -6208843.56,
           "2026-06": 12702084.21,
-          "2026-07": -2100624.08
+          "2026-07": -2042898.63
         },
         "active_months": 10,
         "positive_month_ratio": 0.5,
         "best_month_pnl": 16830385.79,
         "max_drawdown_pct": 1.0,
-        "current_drawdown_pct": 0.0834,
+        "current_drawdown_pct": 0.0813,
         "max_single_day_crash_pct": 1.0,
-        "span_days": 267.5,
+        "span_days": 267.6,
         "days_idle": 0.5,
         "n_fills": 2000,
-        "profit_factor": 0.046,
-        "avg_win": 10.38,
-        "avg_loss": 125.64,
-        "realized_win_rate": 0.36,
-        "avg_hold_hours": 0.538,
-        "net_direction_ratio": 0.1846,
+        "profit_factor": 0.055,
+        "avg_win": 17.38,
+        "avg_loss": 119.53,
+        "realized_win_rate": 0.275,
+        "avg_hold_hours": 0.534,
+        "net_direction_ratio": 0.2991,
         "n_fills_truncated": true,
         "had_liquidation": true,
         "n_liquidations": 1,
         "top_coin": "BTC",
-        "vlm": 37421910258.22,
-        "vlm_to_pnl_ratio": 1511.07,
+        "vlm": 37427763973.49,
+        "vlm_to_pnl_ratio": 1507.79,
         "funding_total": 72401.83,
         "n_open_positions": 6,
         "current_max_leverage": 20.0,
@@ -3720,12 +3724,12 @@
         "margin_types": [
           "cross"
         ],
-        "account_value": 16589720.48,
+        "account_value": 16602254.7,
         "fetch_errors": []
       },
       "classification": "wash_suspect",
       "reasons": [
-        "量 $37,421,910,258 >= $100,000,000 且 量/PnL 比 1,511 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
+        "量 $37,427,763,973 >= $100,000,000 且 量/PnL 比 1,508 >= 50（做市商/高量低效，非方向性贏家，不可跟）"
       ]
     },
     "0xff4cd3826ecee12acd4329aada4a2d3419fc463c": {
@@ -3815,9 +3819,9 @@
   "endpoint_health_summary": [
     {
       "endpoint": "clearinghouseState @ api.hyperliquid.xyz/info",
-      "ok": 59,
-      "failed": 1,
-      "sample_error": "status=429 HTTP 429; body=null"
+      "ok": 60,
+      "failed": 0,
+      "sample_error": null
     },
     {
       "endpoint": "leaderboard @ stats-data.hyperliquid.xyz/Mainnet/leaderboard",
