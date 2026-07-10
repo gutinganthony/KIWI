@@ -21,6 +21,7 @@ import classify  # noqa: E402
 import track_wallet  # noqa: E402
 import fetch  # noqa: E402
 import scan_universe  # noqa: E402
+import hyper_shadow  # noqa: E402
 
 FIXTURES = TESTS_DIR / "fixtures"
 SNAP_DATE = "2026-07-01"  # fixtures 的時間軸終點（idle 視窗右端）
@@ -743,6 +744,282 @@ def test_decision_frequency_dossier(tmp):
        "seeds.json 亦含 0x8bae35（永遠納入宇宙）")
 
 
+# ---------------------------------------------------------------------------
+# hyper_shadow（影子實測）離線測試：純函式＋注入式 http 的完整 session
+# ---------------------------------------------------------------------------
+
+# walk-the-book fixture：asks 檔名目 3000 / 7035 / 12120 / 10200 / 10300（cum 3000/10035/22155）
+SHADOW_ASKS = [(100.0, 30.0), (100.5, 70.0), (101.0, 120.0), (102.0, 100.0), (103.0, 100.0)]
+SHADOW_BIDS = [(99.5, 40.0), (99.0, 80.0), (98.5, 120.0), (98.0, 100.0), (97.5, 100.0)]
+
+
+def _l2book_raw(coin, bids, asks):
+    """官方 l2Book 格式 fixture：{coin, time, levels: [[bids],[asks]]}，px/sz/n 為字串。"""
+    return {"coin": coin, "time": 1720000000000, "levels": [
+        [{"px": str(p), "sz": str(s), "n": 2} for p, s in bids],
+        [{"px": str(p), "sz": str(s), "n": 3} for p, s in asks],
+    ]}
+
+
+def test_shadow_pure_functions():
+    print("[12] hyper_shadow 純函式：walk-the-book 滑點／l2Book 解析／info body 白名單／fills 去重")
+
+    # --- walk-the-book：$1k 吃 1 檔、$5k 吃 2 檔、$20k 吃 3 檔，均價正確 ---
+    r1 = hyper_shadow.walk_the_book(SHADOW_ASKS, 1000)
+    ok(r1["levels_used"] == 1 and abs(r1["avg_px"] - 100.0) < 1e-9,
+       f"$1k 吃 1 檔、均價 100（{r1['levels_used']} 檔、{r1['avg_px']}）")
+    ok(r1["exhausted"] is False and abs(r1["filled_usd"] - 1000.0) < 1e-6,
+       f"$1k 全數成交、未吃穿（filled={r1['filled_usd']}）")
+    r5 = hyper_shadow.walk_the_book(SHADOW_ASKS, 5000)
+    exp5 = 5000.0 / (30.0 + 2000.0 / 100.5)
+    ok(r5["levels_used"] == 2 and abs(r5["avg_px"] - exp5) < 1e-9,
+       f"$5k 吃 2 檔、均價 {exp5:.6f}（{r5['levels_used']} 檔、{r5['avg_px']:.6f}）")
+    r20 = hyper_shadow.walk_the_book(SHADOW_ASKS, 20000)
+    exp20 = 20000.0 / (30.0 + 70.0 + 9965.0 / 101.0)
+    ok(r20["levels_used"] == 3 and abs(r20["avg_px"] - exp20) < 1e-9,
+       f"$20k 吃 3 檔、均價 {exp20:.6f}（{r20['levels_used']} 檔、{r20['avg_px']:.6f}）")
+    total_book = sum(p * s for p, s in SHADOW_ASKS)  # 42655
+    rbig = hyper_shadow.walk_the_book(SHADOW_ASKS, 100000)
+    ok(rbig["exhausted"] is True and abs(rbig["filled_usd"] - total_book) < 1e-6
+       and rbig["levels_used"] == 5,
+       f"$100k 吃穿整本簿：exhausted、filled={rbig['filled_usd']}（簿總量 {total_book}）")
+    ok(hyper_shadow.walk_the_book([], 1000)["avg_px"] is None, "空簿 → avg_px None")
+
+    # --- l2Book 官方格式解析（builder 市場 coin 名原樣保留）---
+    raw = _l2book_raw("xyz:META", SHADOW_BIDS, SHADOW_ASKS)
+    book = hyper_shadow.parse_l2book(raw)
+    ok(book is not None and book["best_bid"] == 99.5 and book["best_ask"] == 100.0,
+       f"best bid/ask = 99.5/100.0（{book['best_bid']}/{book['best_ask']}）")
+    exp_spread = 0.5 / 99.75 * 100.0
+    ok(abs(book["spread_pct"] - round(exp_spread, 4)) < 1e-9,
+       f"spread% = {exp_spread:.4f}（{book['spread_pct']}）")
+    ok(book["top_bid_notional_usd"] == 43270.0 and book["top_ask_notional_usd"] == 42655.0,
+       f"前 5 檔累計名目 買 43270 / 賣 42655（{book['top_bid_notional_usd']}/"
+       f"{book['top_ask_notional_usd']}）")
+    ok(hyper_shadow.parse_l2book({"levels": "nope"}) is None
+       and hyper_shadow.parse_l2book(None) is None
+       and hyper_shadow.parse_l2book({"levels": [[], []]}) is None,
+       "壞形狀/空簿 l2Book → None（不 crash）")
+
+    # --- 滑點剖面：dev_vs_mid 正負與量值（mid=99.75）---
+    sl = hyper_shadow.slippage_profile(book)
+    exp_buy_1k = round((100.0 - 99.75) / 99.75 * 100.0, 4)
+    exp_sell_1k = round((99.75 - 99.5) / 99.75 * 100.0, 4)
+    ok(abs(sl["buy"]["1000"]["dev_vs_mid_pct"] - exp_buy_1k) < 1e-9,
+       f"$1k 買方偏離 mid = {exp_buy_1k}%（{sl['buy']['1000']['dev_vs_mid_pct']}%）")
+    ok(abs(sl["sell"]["1000"]["dev_vs_mid_pct"] - exp_sell_1k) < 1e-9,
+       f"$1k 賣方偏離 mid = {exp_sell_1k}%（{sl['sell']['1000']['dev_vs_mid_pct']}%）")
+    ok(sl["buy"]["20000"]["levels_used"] == 3 and sl["buy"]["20000"]["dev_vs_mid_pct"] > exp_buy_1k,
+       "$20k 買方吃 3 檔且偏離大於 $1k（名目越大滑點越深）")
+
+    # --- info body 白名單＋builder coin 名原樣傳遞（HIP-3 命名慣例）---
+    ok(hyper_shadow.info_body("l2Book", coin="xyz:META")
+       == {"type": "l2Book", "coin": "xyz:META"},
+       "l2Book 請求體對 'xyz:META' 原樣傳字串")
+    ok(hyper_shadow.info_body("l2Book", coin="@166") == {"type": "l2Book", "coin": "@166"},
+       "l2Book 請求體對 '@166' 原樣傳字串")
+    ok(hyper_shadow.info_body("userFills", address="0xabc")
+       == {"type": "userFills", "user": "0xabc"}, "userFills 請求體形狀正確")
+    try:
+        hyper_shadow.info_body("portfolio", address="0xabc")
+        whitelist_raised = False
+    except ValueError:
+        whitelist_raised = True
+    ok(whitelist_raised, "白名單外的 info type（portfolio）→ ValueError（唯讀邊界硬限）")
+
+    # --- fills 去重（tid 優先；hash 次之；欄位組合墊底）---
+    f_tid = {"tid": 111, "hash": "0xaaa", "coin": "@166", "side": "B", "sz": "10",
+             "px": "1.5", "time": 1720000000000}
+    f_hash = {"hash": "0xbbb", "coin": "@166", "side": "A", "sz": "5",
+              "px": "1.5", "time": 1720000001000}
+    f_fields = {"coin": "xyz:META", "side": "B", "sz": "3", "px": "9.9",
+                "time": 1720000002000}
+    seen = set()
+    new = hyper_shadow.detect_new_fills([f_tid, f_tid, f_hash, f_fields], seen)
+    ok(len(new) == 3, f"首輪去重：4 筆（含 1 重複）→ 3 筆新（{len(new)}）")
+    again = hyper_shadow.detect_new_fills([f_tid, f_hash, f_fields], seen)
+    ok(len(again) == 0, "次輪同批 fills → 0 筆新（tid/hash/欄位鍵皆命中）")
+    f_tid2 = dict(f_tid, tid=222)
+    ok(len(hyper_shadow.detect_new_fills([f_tid2], seen)) == 1, "新 tid → 偵測為新成交")
+
+    # --- 近 30 天活躍幣種統計（coin 字串原樣保留）---
+    now_ts = 1720000000.0
+    fills = ([{"coin": "@166", "time": (now_ts - 86400) * 1000}] * 3
+             + [{"coin": "xyz:META", "time": (now_ts - 5 * 86400) * 1000}] * 2
+             + [{"coin": "BTC", "time": (now_ts - 40 * 86400) * 1000}] * 9)
+    top, counter = hyper_shadow.active_coins(fills, now_ts)
+    ok(top and top[0] == ("@166", 3) and counter.get("xyz:META") == 2,
+       f"活躍 top：@166×3、xyz:META×2（{top}）")
+    ok("BTC" not in counter, "40 天前的 fills 不入 30 天窗（BTC 排除）")
+
+    # --- 預設地址解析（label 含 scan-best-candidate）---
+    ok(hyper_shadow.default_address() == "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+       f"預設 address = scan-best-candidate（{hyper_shadow.default_address()}）")
+
+
+class _FakeClock:
+    def __init__(self, start=1720000000.0):
+        self.t = start
+
+    def now(self):
+        return self.t
+
+    def sleep(self, sec):
+        self.t += max(0.0, float(sec))
+
+
+class _ScriptedInfoAPI:
+    """注入式 http_post：按 body['type'] 回應腳本資料；userFills 第 N 次呼叫起冒出新 fill。"""
+
+    def __init__(self, chs, base_fills, books, mids, new_fill=None, new_fill_from_call=3):
+        self.chs = chs
+        self.base_fills = base_fills
+        self.books = books
+        self.mids = mids
+        self.new_fill = new_fill
+        self.new_fill_from_call = new_fill_from_call
+        self.userfills_calls = 0
+        self.book_requests = []
+
+    def __call__(self, body):
+        t = body.get("type")
+        if t == "clearinghouseState":
+            return self.chs, None
+        if t == "allMids":
+            return self.mids, None
+        if t == "userFills":
+            self.userfills_calls += 1
+            fills = list(self.base_fills)
+            if self.new_fill is not None and self.userfills_calls >= self.new_fill_from_call:
+                fills = [self.new_fill] + fills
+            return fills, None
+        if t == "l2Book":
+            coin = body.get("coin")
+            self.book_requests.append(coin)  # 驗證 coin 原樣傳遞
+            book = self.books.get(coin)
+            return (book, None) if book is not None else (None, "HTTP 422; body=unknown coin")
+        return None, f"unexpected type {t}"
+
+
+def test_shadow_session_offline(tmp):
+    print("[13] hyper_shadow 離線 session：深度剖面（開/收班）＋新成交偵測延遲/劣化＋摘要落地")
+    clock = _FakeClock()
+    addr = "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d"
+    chs = {"assetPositions": [{"type": "oneWay", "position": {
+        "coin": "xyz:META", "szi": "100", "entryPx": "10", "positionValue": "1000",
+        "unrealizedPnl": "5", "leverage": {"type": "cross", "value": 3},
+        "liquidationPx": "5", "marginUsed": "300", "maxLeverage": 10,
+        "cumFunding": {"allTime": "1.0"}}}],
+        "marginSummary": {"accountValue": "50000"}}
+    base_ms = int((clock.t - 86400) * 1000)
+    base_fills = [
+        {"tid": 1, "coin": "@166", "side": "B", "px": "1.5", "sz": "100",
+         "time": base_ms, "dir": "Open Long", "closedPnl": "0.0"},
+        {"tid": 2, "coin": "@166", "side": "A", "px": "1.51", "sz": "100",
+         "time": base_ms + 60000, "dir": "Close Long", "closedPnl": "1.0"},
+    ]
+    # @166 簿面：mid=1.5，$1k 買方一檔就吃得下（1.501×5000≈$7.5k）
+    books = {
+        "xyz:META": _l2book_raw("xyz:META", SHADOW_BIDS, SHADOW_ASKS),
+        "@166": _l2book_raw("@166", [(1.499, 5000), (1.498, 10000)],
+                            [(1.501, 5000), (1.502, 10000)]),
+    }
+    # 新 fill：時間 = 開班 +2s，偵測應在其後幾秒內（lag 小而非負大）
+    new_fill = {"tid": 99, "coin": "@166", "side": "B", "px": "1.5", "sz": "666",
+                "time": int((clock.t + 2) * 1000), "dir": "Open Long", "closedPnl": "0.0"}
+    api = _ScriptedInfoAPI(chs, base_fills, books, {"BTC": "60000"},
+                           new_fill=new_fill, new_fill_from_call=3)
+
+    info = hyper_shadow.run_session(addr, duration_min=0.15, poll_sec=1.0,
+                                    out_root=tmp / "shadow-ok", http_post=api,
+                                    sleep_fn=clock.sleep, now_fn=clock.now)
+
+    coins = [t["coin"] for t in info["targets"]]
+    ok(set(coins) == {"xyz:META", "@166"},
+       f"目標市場 = 持倉 ∪ 活躍（{coins}）")
+    ok(info["main_market"] == "@166",
+       f"主力市場 = 30d fills 最多者 @166（{info['main_market']}）")
+    ok("xyz:META" in api.book_requests and "@166" in api.book_requests,
+       "l2Book 請求體對 builder coin 名（xyz:META／@166）原樣傳字串")
+    ok(info["baseline_seeded"] == 2, f"baseline 略過既有成交 2 筆（{info['baseline_seeded']}）")
+    ok(info["new_fills"]["n_detected"] == 1,
+       f"班內偵測 1 筆新成交（{info['new_fills']['n_detected']}）")
+
+    out_dir = tmp / "shadow-ok" / addr
+    jsonl = (out_dir / info["jsonl_file"]).read_text(encoding="utf-8").strip().splitlines()
+    rows = [json.loads(l) for l in jsonl]
+    depth_rows = [r for r in rows if r["kind"] == "depth_profile"]
+    fill_rows = [r for r in rows if r["kind"] == "fill_event"]
+    ok(len(depth_rows) == 4, f"深度剖面 2 市場 × 開/收班 = 4 列（{len(depth_rows)}）")
+    ok({(r["coin"], r["pass"]) for r in depth_rows}
+       == {("xyz:META", "open"), ("xyz:META", "close"), ("@166", "open"), ("@166", "close")},
+       "深度剖面覆蓋兩市場的 open/close 班次")
+    meta_open = next(r for r in depth_rows if r["coin"] == "xyz:META" and r["pass"] == "open")
+    ok(meta_open["slippage"]["buy"]["20000"]["levels_used"] == 3,
+       "深度列含 walk-the-book 剖面（xyz:META $20k 買 3 檔）")
+    ok(meta_open["mid_allmids"] is None,
+       "builder 市場不在預設 allMids 映射 → mid_allmids None（預期、不影響剖面）")
+
+    ok(len(fill_rows) == 1, f"新成交事件 1 列（{len(fill_rows)}）")
+    fr = fill_rows[0]
+    ok(fr["coin"] == "@166" and fr["follower_side"] == "buy",
+       f"fill 事件：@166 買方（{fr['coin']}/{fr['follower_side']}）")
+    ok(fr["detect_lag_sec"] is not None and -5 <= fr["detect_lag_sec"] <= 30,
+       f"detect_lag 合理（{fr['detect_lag_sec']}s）")
+    exp_deg = round((1.501 - 1.5) / 1.5 * 100.0, 4)
+    ok(fr["copy_1k"] and abs(fr["copy_1k"]["degradation_vs_fill_pct"] - exp_deg) < 1e-6,
+       f"$1k 跟單劣化 = {exp_deg}%（{fr['copy_1k']['degradation_vs_fill_pct']}%）")
+
+    exp_rt = round((1.501 - 1.5) / 1.5 * 100.0, 4) + round((1.5 - 1.499) / 1.5 * 100.0, 4)
+    ok(info["roundtrip_1k_pct"] and info["roundtrip_1k_pct"]["coin"] == "@166"
+       and abs(info["roundtrip_1k_pct"]["value"] - round(exp_rt, 4)) < 1e-6,
+       f"$1k 往返成本 = 買賣偏離 mid 之和 ≈ {exp_rt:.4f}%（{info['roundtrip_1k_pct']}）")
+
+    md = (out_dir / f"summary_{info['date']}.md").read_text(encoding="utf-8")
+    ok("誠實聲明" in md and "時點快照" in md and "不構成投資建議" in md,
+       "summary md 頂部含誠實聲明（快照非成交保證/不下單/非投資建議）")
+    ok("xyz:META" in md and "@166" in md and "深度剖面" in md,
+       "summary md 含兩市場的深度剖面表")
+    ok("往返成本估算" in md, "summary md 含 $1k 主力市場往返成本估算")
+    ok("新成交監測" in md and "1" in md, "summary md 含新成交監測節")
+
+
+def test_shadow_all_requests_fail(tmp):
+    print("[14] hyper_shadow 全請求失敗：優雅結束、summary 含錯誤計數、0 新成交標「預期內」")
+    clock = _FakeClock()
+    addr = "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d"
+
+    def dead_http(body):
+        return None, "HTTP 403; body=blocked by proxy"
+
+    info = hyper_shadow.run_session(addr, duration_min=0.05, poll_sec=1.0,
+                                    out_root=tmp / "shadow-dead", http_post=dead_http,
+                                    sleep_fn=clock.sleep, now_fn=clock.now)
+    ok(info["targets"] == [] and len(info["discovery_errors"]) == 2,
+       f"探索全失敗 → 無目標市場、錯誤 2 筆（{info['discovery_errors']}）")
+    ok(info["polls"] >= 1 and info["fills_poll_failures"] == info["polls"],
+       f"輪詢全數失敗被如實計數（{info['fills_poll_failures']}/{info['polls']}）")
+    ok(info["new_fills"]["n_detected"] == 0, "0 筆新成交")
+
+    out_dir = tmp / "shadow-dead" / addr
+    md_path = out_dir / f"summary_{info['date']}.md"
+    md = md_path.read_text(encoding="utf-8")
+    ok("預期內" in md, "0 新成交的 summary md 含「預期內」字樣（低頻常態，不算失敗）")
+    ok("輪詢全數失敗" in md, "輪詢全掛時 md 額外註明「抓不到 ≠ 沒有」")
+    ok("探索階段錯誤" in md and "403" in md, "summary md 含探索錯誤計錄")
+
+    # 同日第二個 session → json sessions append、md 段落 append
+    clock.sleep(60)
+    info2 = hyper_shadow.run_session(addr, duration_min=0.05, poll_sec=1.0,
+                                     out_root=tmp / "shadow-dead", http_post=dead_http,
+                                     sleep_fn=clock.sleep, now_fn=clock.now)
+    payload = json.loads((out_dir / f"summary_{info2['date']}.json").read_text(encoding="utf-8"))
+    ok(len(payload["sessions"]) == 2, f"同日兩 session → json append（{len(payload['sessions'])}）")
+    md2 = md_path.read_text(encoding="utf-8")
+    ok(md2.count("## Session") == 2, "同日兩 session → md append 兩段")
+    ok(any("誠實聲明" in c for c in payload["caveats"]), "summary json 含 caveats 誠實聲明")
+
+
 def main():
     with tempfile.TemporaryDirectory(prefix="hyper-observer-test-") as td:
         tmp = Path(td)
@@ -760,6 +1037,9 @@ def main():
         test_followability_events()
         test_truncation_extrapolation()
         test_decision_frequency_dossier(tmp)
+        test_shadow_pure_functions()
+        test_shadow_session_offline(tmp)
+        test_shadow_all_requests_fail(tmp)
     print(f"ALL TESTS PASSED ({checks} checks)")
     return 0
 

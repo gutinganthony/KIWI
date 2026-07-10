@@ -210,3 +210,25 @@ TRACKED_WALLETS = [
     {"address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
      "label": "scan-best-candidate-9M-lowdd"},
 ]
+
+# ---------------------------------------------------------------------------
+# 影子實測（hyper_shadow.py：候選錢包主戰場的訂單簿深度剖面＋新成交延遲/劣化）
+# 純唯讀：只 POST 公開 info API 的查詢 type（SHADOW_ALLOWED_INFO_TYPES 白名單硬限），
+# 絕不碰 exchange endpoint、簽章、私鑰。
+# ---------------------------------------------------------------------------
+
+SHADOW_DURATION_MIN = 30.0    # 預設 session 長度（分鐘）
+SHADOW_POLL_SEC = 5.0         # userFills 輪詢間隔（秒）
+# Rate limit 註：userFills 滿窗 2000 筆回應權重 ≈ 120（20 ＋ 每 20 筆加權），5s 輪詢
+# ≈ 1,440 權重/min，貼著每 IP 1200 上限——收到 429 時 code 以下列冷卻秒數退避自癒，
+# 深度剖面（l2Book 權重 2）只在開班/收班各掃一輪，佔比可忽略。
+SHADOW_RATE_LIMIT_COOLDOWN_SEC = 30.0
+SHADOW_BOOK_SLEEP_SEC = 0.3   # 每次 l2Book 請求後的間隔（秒）
+SHADOW_DEPTH_NOTIONALS = [1000, 5000, 20000]  # walk-the-book 名目階梯（USD）
+SHADOW_TOP_COINS = 5          # 近 30 天活躍幣種取 top N（∪ 當前持倉 = 目標市場集）
+SHADOW_ACTIVE_WINDOW_DAYS = 30
+SHADOW_BOOK_TOP_LEVELS = 5    # 兩側前 N 檔累計名目
+# info type 白名單（hyper_shadow.info_body 硬限；非查詢 type 一律 raise）
+SHADOW_ALLOWED_INFO_TYPES = ("l2Book", "userFills", "clearinghouseState", "allMids")
+# --address 預設：TRACKED_WALLETS 中 label 含此子字串者（掃描最佳候選 0x8bae35…）
+SHADOW_DEFAULT_LABEL_SUBSTR = "scan-best-candidate"
