@@ -28,16 +28,8 @@ last_updated: 2026-07-06
   - ✅ 現在已有失敗推播（`deploy-pages.yml` → Telegram），收到通知再去按即可，不用自己巡邏網站。
   - 位置：Actions 分頁 → Deploy Dashboard to GitHub Pages → Re-run failed jobs；或等下次自動 deploy。
 
-### 2026-07-11 session 產生的（Vibe-Trading——目前唯一的主動功課）
-- [ ] **路線 B：放寬雲端環境「Pallas」的網路政策（只有你本人能做；2026-07-11 二次核實版）**：
-  帳號目前只有一個環境，叫 **Pallas**（trusted network access）——目標就是改它，不用建新的。
-  1. **一定要用電腦瀏覽器**開 claude.ai → 左欄 **Code**。手機 App 和桌面 Cowork 只能開 session，**沒有**環境管理功能——這很可能就是你找不到的原因。
-  2. 點**輸入框下方**的 repo 選擇器，選 KIWI。環境選擇器在**選完 repo 之後才會出現**，就在同一列，會顯示「Pallas」或「Default」字樣。
-  3. 點「Pallas」展開選單 → 點名稱右側的**齒輪** → 對話框裡找 **Network access**。推薦：保持 Trusted 並在自訂 allowed domains 加：`query1.finance.yahoo.com`、`qt.gtimg.cn`、`stooq.com`、`www.okx.com`、`api.finmindtrade.com`（純主機名，不帶 https://）。省事版：改 Unrestricted（隔離性歸零）。
-  4. 存檔後**開新 session 才生效**。
-  5. 若選單裡**沒有齒輪**：這是 2026-04 起的已知 UI bug（claude-code issue #52729/#53029）——換無痕視窗或另一個瀏覽器再試；仍沒有就回報 session，屆時改用 Mac 終端機 Claude Code 的 `/web-setup` 或先靠路線 A（已可用）。
-  做完後在新 session 說一聲，就把 `vibe-trading-mcp` 登記進 repo `.mcp.json`。
-- [ ] **（可選）若要跑 Vibe-Trading 的 swarm（多空辯論委員會）**：提供一把 DeepSeek 或 OpenRouter API key → GitHub Secrets `DEEPSEEK_API_KEY`（vibe-lab workflow 已預留傳遞）。純資料層/回測/alpha bench **不需要任何 LLM key**——路線 A（vibe-lab workflow）已於 2026-07-11 建置，用法見 projects/vibe-lab/README.md。評估文：topics/technology/2026-07-11-vibe-trading-hkuds-evaluation.md
+### 2026-07-11 session 產生的（Vibe-Trading）
+- [ ] **（可選）若要跑 Vibe-Trading 的 swarm（多空辯論委員會）**：提供一把 DeepSeek 或 OpenRouter API key → GitHub Secrets `DEEPSEEK_API_KEY`（vibe-lab workflow 已預留傳遞）。純資料層/回測/alpha bench **不需要任何 LLM key**——路線 A（vibe-lab workflow）與路線 B（網路政策）都已完成，用法見 projects/vibe-lab/README.md。評估文：topics/technology/2026-07-11-vibe-trading-hkuds-evaluation.md
 
 ### 擱置（AIR TRF——等 Jake 讀完說明決定要不要做；屬 avi-v5 報告 §8 否證②的驗證工作）
 - [ ] **AIR TRF 真實利差序列建檔**：AIR TRF = CME「調整利率型 S&P 500 總報酬期貨」，其隱含融資利差是市場槓桿需求的直接量測。此功課=註冊 CME DataMine（有免費日檔）→ 拉 CSV（欄位 `DLY_FUND` FID#10335、`ACC_FUND` #10337）→ 存進 `projects/avi-v5/data/ext/air_trf.csv` → 驗證 AVI 的 `lev_stress_proxy` 代理指標是否真的跟蹤實際融資壓力。備用免費儀表板：snippet.finance「S&P 500 Futures Financing」（2012 迄今）。
@@ -46,6 +38,7 @@ last_updated: 2026-07-06
 
 ## ✅ 已完成（做完從上面移下來，保留紀錄）
 
+- [x] ~~路線 B：放寬雲端環境「Pallas」的網路政策~~ → **2026-07-11 Jake 完成，當場驗證通過**：okx（BTC 即時報價 200）、qt.gtimg.cn（200）、yahoo（429=可達但限流，loader 會 fallback）、stooq（可達）。政策變更連既有 session 都立即生效（不需開新 session——比文件推測的更好）。同日已把 `vibe-trading-mcp` 登記進 repo `.mcp.json`（啟動器 projects/vibe-lab/mcp-launcher.sh 自帶安裝，新 session 自動載入，首次連上前有 1-3 分鐘安裝期屬正常）。
 - [x] ~~註冊 FinMind 免費帳號取得 API token → GitHub Secrets `FINMIND_TOKEN`~~ → **2026-07-11 確認已生效**：當日 tw-funnel CI 的 fetch_meta.json 顯示 FinMind 以 register 等級回應（股票清單 200、月營收 43 檔抓到 42）。法人買賣超/全市場股價兩個資料集回 400 是「需付費 sponsor 層」而非 token 缺失——管線已自動 fallback TWSE 且成功，**免費層即可，不需升級**。
 - [x] ~~本機 curl Polymarket data-api 複核範例錢包精確數字~~ → **2026-07-10 由 poly-observer CI（GitHub Actions runner 不受雲端封鎖）直查完成**，且推翻了媒體快照的「−$311k 爆倉」說法（實為終身 +$176,445、4/12 後停止交易、持倉 $0）。詳見 topics/business/2026-07-10-polymarket-copy-trading-guide-verification.md v1.1。
 
