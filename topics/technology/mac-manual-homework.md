@@ -29,13 +29,14 @@ last_updated: 2026-07-06
   - 位置：Actions 分頁 → Deploy Dashboard to GitHub Pages → Re-run failed jobs；或等下次自動 deploy。
 
 ### 2026-07-11 session 產生的（Vibe-Trading——目前唯一的主動功課）
-- [ ] **路線 B：放寬 claude.ai/code 環境網路政策（只有你本人能做；步驟已對官方文件核實 2026-07-11）**：
-  1. 開 claude.ai，左側欄點 **Code**。
-  2. 在「開新 session」的畫面選 KIWI repo 後，看 repo 旁邊的**環境選擇器**（environment 名稱那顆下拉），點它旁邊的**齒輪（設定）**。
-  3. 彈出的對話框裡找 **Network access**，目前應是 Trusted（只放行套件庫白名單）。兩個選擇：(a) 保持 Trusted，並在同一對話框的**自訂 allowed domains** 加上五個域名：`query1.finance.yahoo.com`、`qt.gtimg.cn`、`stooq.com`、`www.okx.com`、`api.finmindtrade.com`（純主機名，不要帶 https:// 或路徑）——推薦，隔離性最好；或 (b) 直接改成 **All**（全開，省事但隔離性歸零）。
-  4. 存檔後**開新 session 才生效**（既有 session 不會變）。
-  5. ⚠️ 別加錯地方：claude.ai/settings/capabilities 的「Additional allowed domains」是另一個設定，對 Code 雲端容器**無效**（GitHub issue #19087）。
-  做完後任何裝置開的雲端 session 都能即時抓行情；屆時下一個 session 說一聲，就把 `vibe-trading-mcp` 登記進 repo `.mcp.json` 讓每個 session 自動載入。
+- [ ] **路線 B：放寬雲端環境「Pallas」的網路政策（只有你本人能做；2026-07-11 二次核實版）**：
+  帳號目前只有一個環境，叫 **Pallas**（trusted network access）——目標就是改它，不用建新的。
+  1. **一定要用電腦瀏覽器**開 claude.ai → 左欄 **Code**。手機 App 和桌面 Cowork 只能開 session，**沒有**環境管理功能——這很可能就是你找不到的原因。
+  2. 點**輸入框下方**的 repo 選擇器，選 KIWI。環境選擇器在**選完 repo 之後才會出現**，就在同一列，會顯示「Pallas」或「Default」字樣。
+  3. 點「Pallas」展開選單 → 點名稱右側的**齒輪** → 對話框裡找 **Network access**。推薦：保持 Trusted 並在自訂 allowed domains 加：`query1.finance.yahoo.com`、`qt.gtimg.cn`、`stooq.com`、`www.okx.com`、`api.finmindtrade.com`（純主機名，不帶 https://）。省事版：改 Unrestricted（隔離性歸零）。
+  4. 存檔後**開新 session 才生效**。
+  5. 若選單裡**沒有齒輪**：這是 2026-04 起的已知 UI bug（claude-code issue #52729/#53029）——換無痕視窗或另一個瀏覽器再試；仍沒有就回報 session，屆時改用 Mac 終端機 Claude Code 的 `/web-setup` 或先靠路線 A（已可用）。
+  做完後在新 session 說一聲，就把 `vibe-trading-mcp` 登記進 repo `.mcp.json`。
 - [ ] **（可選）若要跑 Vibe-Trading 的 swarm（多空辯論委員會）**：提供一把 DeepSeek 或 OpenRouter API key → GitHub Secrets `DEEPSEEK_API_KEY`（vibe-lab workflow 已預留傳遞）。純資料層/回測/alpha bench **不需要任何 LLM key**——路線 A（vibe-lab workflow）已於 2026-07-11 建置，用法見 projects/vibe-lab/README.md。評估文：topics/technology/2026-07-11-vibe-trading-hkuds-evaluation.md
 
 ### 擱置（AIR TRF——等 Jake 讀完說明決定要不要做；屬 avi-v5 報告 §8 否證②的驗證工作）
