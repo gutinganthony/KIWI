@@ -58,11 +58,17 @@
 `catalysts[]{date,event}` · `candidates[]{name,note}`
 
 ### Phase 6 — 宏觀共同前提監控（每週檢查，任一出現 → 整體降權提示）
-- AI capex 大廠（NVIDIA/Google/AWS/MSFT）公開下修指引
+- AI capex 大廠（NVIDIA/Google/AWS/MSFT）公開下修指引【＝路線圖 T6 總否證】
 - JPY 急升 10%+（日系標的同步打折）
-- 記憶體週期轉過剩訊號：CXMT DDR5 擴產進度、TrendForce 合約價漲幅收斂、需求破壞（Gartner PC/手機出貨）
+- 記憶體週期轉過剩訊號：CXMT DDR5 擴產進度、TrendForce 合約價漲幅收斂、需求破壞（Gartner PC/手機出貨）【＝T1：合約價 QoQ 轉負＝記憶體出場鐘】
 - CXMT 實體清單是否公布（中國記憶體鏈頭號尾險）
 - 1.6T 光模組量產時程延後
+
+**路線圖轉折訊號 T1–T6（詳見 `topics/business/2026-07-10-serenity-2026-2030-sector-roadmap.md`；每週逐項評估並更新 data.json 對應宏觀燈的 state/note，燈翻轉會自動觸發 Telegram+LINE 警報）：**
+- **T2 CPO 滲透（光互連收場鐘）**：查 CPO 在新世代交換器滲透率（>20–30%＝翻 watch/alert）、1.6T 模組 ASP 年殺幅度、EML 交期是否正常化
+- **T3 記憶體反週期買點距離**：查 SKH/MU P/B（SKH <2.3× 或 MU 2–3×＝逼近）、有無大廠減產/砍 capex 公告、合約價是否連兩季下跌——「至少兩項同時」才翻 alert（＝2028 冬天買點開啟）
+- **T4 混合鍵合認證（封裝革命開關）**：查三星/SKH 16-hi hybrid bonding 是否過 NVIDIA 認證、TSMC 玻璃基板 roadmap、CoPoS 量產 PO——過關＝翻 alert（BESI 開跑＋Towa 喪鐘）
+- **T5 AI 電力確認**：Mersen DC 季銷售 ≥€15M（7/30 首驗）、NVIDIA 800VDC 機櫃出貨、變壓器交期
 
 ---
 
