@@ -35,7 +35,7 @@ last_updated: 2026-07-06
   - 三項全過 → JEM 首批建倉區 ¥6,400–6,800 紀律恢復有效（第二關 8/7 Q1 財報再定第二批）。
 
 ### 2026-07-08 session 產生的（工具鏈升級三件）
-- [ ] **Mac 實跑驗證 quote.py**：`cd ~/path/to/KIWI && python3 projects/avi-v5/scripts/quote.py AAPL 6758.T 2330.TW`——三個市場都要回到價格。結果回報給下一個雲端 session（它會把 skills/reprice 標為已驗證並記 LEARNINGS）。
+- [ ] **Mac 實跑驗證 quote.py**：`cd ~/path/to/KIWI && python3 projects/avi-v5/scripts/quote.py AAPL 6758.T 2330.TW`——三個市場都要回到價格；再跑 `python3 projects/avi-v5/scripts/quote.py --risk PLAB RMBS FORM PPIH` 驗證美股風險分級（若 Yahoo 回 401 屬已知情況，改用 Alpha Vantage key 或搜尋 beta 手動判級）。結果回報給下一個雲端 session（它會把 skills/reprice 標為已驗證並記 LEARNINGS）。
 - [ ] **裝 Claude in Chrome 清 403 站功課**：Mac 上把 Claude Code 升到最新版，跑 `claude --chrome`（首次會引導裝 Chrome 擴充）。之後上面 JEM 那三項（TDnet/EDINET/Yahoo!ファイナンス）可以叫 Claude 用你登入中的 Chrome 直接查——遇 CAPTCHA 它會暫停交還給你。按需開，不要常駐（吃 context）。
 - [ ] **（網頁設定，非 Mac）雲端環境開行情 API 白名單**：claude.ai/code → KIWI 的 environment → network policy，加入 `query1.finance.yahoo.com`、`stooq.com`、`api.finmindtrade.com`、`www.alphavantage.co`。開通後雲端 session 就能直接重定價，不用回 Mac。（選配：到 alphavantage.co 申請免費 API key，設成環境變數 `ALPHAVANTAGE_API_KEY` 當第三備援。）
 

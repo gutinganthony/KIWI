@@ -18,6 +18,7 @@
 ### Phase 1 — 重定價（鐵律）
 對 watchlist 每一檔（Serenity 候選 + 週期擇時大型股都要）：
 - WebSearch 重拉 **LIVE 現價 + 市值 + forward P/E**（財經網站常 403，用搜尋 snippet 交叉驗證；注意日圓億/兆、台幣億的單位陷阱與 10× 誤植）
+- **美股標的同時拉 beta**，依 `skills/serenity/SKILL.md` §美股風險分級（beta × 市值）判定 高/中/低（可用 `python3 projects/avi-v5/scripts/quote.py --risk TICKER` 自動判級；查無 beta＝高）
 - 計算 vs 上週變化 %
 - 🚩 標記任何**一週移動 >15%** 的（無論漲跌）
 - 更新 watchlist.md 的市值快照欄 + 「上次現價更新」日期
@@ -54,8 +55,9 @@
 
 **`docs/serenity/data.json` schema**（維持既有欄位，逐週覆蓋值）：
 `updated` `as_of_note` `headline` · `macro[]{signal,state(ok/watch/alert),note}` ·
-`tiers[]{key,label,color}` · `positions[]{tier,ticker,name,market,mcap,fwd_pe,price,wk,direction,trigger,note}` ·
+`tiers[]{key,label,color}` · `positions[]{tier,ticker,name,market,mcap,fwd_pe,price,wk,direction,trigger,note,risk}` ·
 `catalysts[]{date,event}` · `candidates[]{name,note}`
+（`risk` 僅美股填 `"high"/"mid"/"low"`，依 SKILL.md §美股風險分級；非美股省略此欄。儀表板會自動顯示風險徽章與分級法備註。）
 
 ### Phase 6 — 宏觀共同前提監控（每週檢查，任一出現 → 整體降權提示）
 - AI capex 大廠（NVIDIA/Google/AWS/MSFT）公開下修指引
@@ -75,7 +77,9 @@
 本週有無 actionable：🟢觸發命中 / 🔴否證命中 / ⏰本週催化劑 / 😴平靜週
 
 ## 1. 重定價表
-| 標的 | 現價 | 週變化 | vs 觸發價 | 備註 |
+| 標的 | 現價 | 週變化 | vs 觸發價 | 風險(美股) | 備註 |
+
+（表尾固定附一行：風險分級＝beta × 市值取較高者：beta ≤0.9 低／0.9–1.3 中／>1.3 或查無＝高；市值 ≥$10B 低／$2–10B 中／<$2B 高。詳見 SKILL.md。非美股標 —）
 
 ## 2. 🟢 觸發命中 / 🔴 否證命中（若有，逐檔說明動作）
 
