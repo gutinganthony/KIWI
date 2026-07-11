@@ -42,6 +42,9 @@ last_updated: 2026-07-06
 - [ ] 開 polymarketanalytics.com/traders 與 /pricing、docs.kreo.app 核對篩選器/價格/費率與返佣原文（站點被擋，僅搜尋摘要層取得）
 - [ ] 登入 X 核對 @waveking1314 粉絲數、開號日、歷史貼文主題（搜尋摘要顯示 ~42.8K 粉、2023-03 開號，未直接核對）
 
+### 2026-07-11 session 產生的（Vibe-Trading 實測——僅在你讀完評估文後想動手試才做）
+- [ ] **若要實測 HKUDS/Vibe-Trading**：雲端 session 沒有 LLM API key 可給它用。在 Mac 上 `pip install vibe-trading-ai`（Python ≥3.11）+ 一個 DeepSeek 或 OpenRouter key（無原生 Anthropic，用 Claude 須繞 OpenRouter），或本地 Ollama 免 key。建議首試：`vibe-trading-mcp`（免 key 的 read-only 資料工具）或 `vibe-trading alpha bench` 拿 Serenity watchlist 跑因子 IC。評估文：topics/technology/2026-07-11-vibe-trading-hkuds-evaluation.md
+
 ### 2026-07-07 session 產生的（AXW/AIR TRF 研究）
 - [ ] **AIR TRF 真實利差序列建檔（文獻查證：DataMine 有免費日檔！）**：註冊 CME DataMine → 拉 AIR TRF 免費 CSV（欄位 `DLY_FUND` FID#10335、`ACC_FUND` #10337）→ 建歷史序列存進 `projects/avi-v5/data/ext/air_trf.csv` → 跑與 `lev_stress_proxy` 的相關性（報告 §8 否證 ②）。備用免費儀表板：snippet.finance「S&P 500 Futures Financing」（2012 迄今）。每週順手記一次 CME 產品頁的近月 bps 與分位數。
 

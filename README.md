@@ -16,7 +16,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 
 | Topic | Entries |
 |-------|---------|
-| [Technology](./topics/technology/INDEX.md) | 2 |
+| [Technology](./topics/technology/INDEX.md) | 3 |
 | [Science](./topics/science/INDEX.md) | 0 |
 | [Business](./topics/business/INDEX.md) | 50 |
 | [Health](./topics/health/INDEX.md) | 0 |
@@ -32,6 +32,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-07-11 | [HKUDS Vibe-Trading 評估 — 港大 LLM 量化研究工作台能為 KIWI 做什麼](./topics/technology/2026-07-11-vibe-trading-hkuds-evaluation.md) | Technology |
 | 2026-07-10 | [台股／美股慢訊號篩選漏斗設計 — 三層架構](./topics/business/2026-07-10-us-tw-signal-funnel-design.md) | Business |
 | 2026-07-10 | [股票慢訊號價值評估 — 13F / Form 4 / 台股籌碼](./topics/business/2026-07-10-stock-slow-signal-value-assessment.md) | Business |
 | 2026-07-10 | [跟單聰明錢觀察器 — Polymarket + Hyperliquid 跨平台實證結論](./topics/business/2026-07-10-copy-trading-smart-money-observer-findings.md) | Business |
@@ -61,6 +62,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-04-20 | [AVI V4 — 美股市場風險指標](./topics/business/2026-04-20-avi-v4-market-risk-index.md) | Business |
 | 2026-07-09 | [Serenity Step 1–9：Coherent + Marvell（AAOI 換倉候選）](./topics/business/2026-07-09-serenity-step1-9-cohr-mrvl-aaoi-replacement.md) | Business |
 | 2026-07-10 | [Polymarket 跟單「月賺5萬美金」文查證 — 導流漏斗解剖 + 可行性評估](./topics/business/2026-07-10-polymarket-copy-trading-guide-verification.md) | Business |
+| 2026-07-11 | [HKUDS Vibe-Trading 評估 — 港大 LLM 量化研究工作台能為 KIWI 做什麼](./topics/technology/2026-07-11-vibe-trading-hkuds-evaluation.md) | Technology |
 <!-- ALL_ENTRIES_END -->
 
 ---
