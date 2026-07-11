@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jake — AI 投資研究工具箱｜使用說明</title>
+<meta name="description" content="ACT Index、Serenity 篩選器、聰明錢追蹤器：三個 AI 投資研究工具的方法論與判讀說明。教育與研究用途，非投資建議。">
+<style>
+  :root{
+    --bg:#1c2027; --card:#2a2e39; --card2:#22262f; --line:#363a45;
+    --text:#d1d4dc; --head:#ffffff; --sub:#787b86;
+    --teal:#26a69a; --amber:#f7c948; --orange:#ff9800; --red:#ef5350; --blue:#42a5f5;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',"PingFang TC","Noto Sans TC",Roboto,sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.7;
+    max-width:640px;margin:0 auto;padding:32px 18px 56px;
+    -webkit-font-smoothing:antialiased;
+  }
+  header{text-align:center;margin-bottom:24px}
+  .avatar{
+    width:56px;height:56px;border-radius:50%;margin:0 auto 14px;
+    background:linear-gradient(135deg,var(--teal),var(--blue));
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.5rem;font-weight:700;color:#fff;
+  }
+  header h1{font-size:1.4rem;color:var(--head);letter-spacing:.01em}
+  header .tag{color:var(--sub);font-size:.9rem;margin-top:6px}
+
+  .disclaimer{
+    background:var(--card2);border:1px solid var(--line);border-left:3px solid var(--amber);
+    border-radius:10px;padding:12px 14px;margin:20px 0 28px;
+    font-size:.82rem;color:var(--sub);line-height:1.6;
+  }
+  .disclaimer b{color:var(--amber)}
+
+  .intro{font-size:.95rem;margin-bottom:26px;color:var(--text)}
+
+  .tool{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:18px 18px 16px;margin-bottom:16px;
+  }
+  .tool .top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .tool h2{font-size:1.1rem;color:var(--head)}
+  .tool .pill{
+    font-size:.68rem;padding:2px 8px;border-radius:99px;border:1px solid;
+    white-space:nowrap;
+  }
+  .p-teal{color:var(--teal);border-color:var(--teal)}
+  .p-amber{color:var(--amber);border-color:var(--amber)}
+  .p-blue{color:var(--blue);border-color:var(--blue)}
+  .tool .what{font-size:.9rem;margin:8px 0 12px;color:var(--text)}
+  .tool .read{
+    background:var(--card2);border-radius:8px;padding:11px 13px;margin-bottom:14px;
+    font-size:.83rem;color:var(--sub);
+  }
+  .tool .read b{color:var(--text);font-weight:600}
+  .tool .read .row{margin:3px 0}
+  a.btn{
+    display:block;text-align:center;text-decoration:none;
+    background:var(--teal);color:#08110f;font-weight:600;font-size:.9rem;
+    padding:11px;border-radius:9px;transition:opacity .12s;
+  }
+  a.btn:active{opacity:.7}
+  a.btn.alt{background:transparent;color:var(--teal);border:1px solid var(--teal)}
+
+  .contact{
+    text-align:center;margin-top:30px;padding-top:22px;border-top:1px solid var(--line);
+  }
+  .contact a{color:var(--teal);text-decoration:none;font-weight:600}
+  .contact p{font-size:.85rem;color:var(--sub);margin-bottom:8px}
+
+  footer{margin-top:26px;font-size:.72rem;color:var(--sub);text-align:center;line-height:1.6}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="avatar">J</div>
+  <h1>Jake 的 AI 投資研究工具箱</h1>
+  <div class="tag">把投資研究流程，交給 AI 紀律執行</div>
+</header>
+
+<div class="disclaimer">
+  <b>先讀這段。</b> 以下三個工具是我個人的<b>研究方法論展示與學習筆記</b>，公開分享是為了記錄「如何用 AI 把投資判斷系統化」。
+  所有數字、訊號、標的都是<b>方法論的輸出範例，不構成任何投資建議、招攬或買賣要約</b>，也不保證準確或獲利。你的每一筆決定請自行判斷並自負盈虧。
+</div>
+
+<div class="intro">
+  這裡放三個我自己在用的工具。它們回答三個不同的問題：<b>市場現在冷還是熱？錢正流向哪個被忽略的供應鏈瓶頸？大戶的資金在動嗎？</b>
+  下面每個都附「怎麼讀」的說明，第一次看建議照順序點。
+</div>
+
+<!-- ① ACT -->
+<div class="tool">
+  <div class="top">
+    <h2>① ACT Index</h2>
+    <span class="pill p-teal">市場情緒溫度計</span>
+  </div>
+  <div class="what">用 3 個量化指標描述整體市場的「貴不貴、慌不慌、科技股有沒有壓力」，把情緒變成可追蹤的數字，而不是憑感覺。</div>
+  <div class="read">
+    <div class="row"><b>AVI</b>（估值）· 市場相對歷史貴不貴，高 = 昂貴</div>
+    <div class="row"><b>CRI</b>（崩盤機率）· 短期 30 天的下行風險</div>
+    <div class="row"><b>TSI</b>（科技壓力）· 科技股承受的利率/估值壓力</div>
+    <div class="row" style="margin-top:6px;color:var(--sub)">讀法：三個數字一起看，理解「現在是什麼市場環境」，不是拿來預測明天漲跌。</div>
+  </div>
+  <a class="btn" href="https://gutinganthony.github.io/KIWI/">開啟 ACT Index →</a>
+</div>
+
+<!-- ② Serenity -->
+<div class="tool">
+  <div class="top">
+    <h2>② Serenity 篩選器</h2>
+    <span class="pill p-amber">供應鏈瓶頸方法論</span>
+  </div>
+  <div class="what">一套選股「思考框架」的展示：不看財報好壞，而是逆向追蹤 AI 建設的錢最終流向哪個被市場忽略的上游瓶頸（記憶體、光通訊、先進封裝）。</div>
+  <div class="read">
+    <div class="row">每個標的展示的是<b>方法論如何評估它</b>：供給約束、市值 vs 終端市場、催化劑時間表、以及<b>否證條件</b>（什麼情況代表這個判斷錯了）。</div>
+    <div class="row" style="margin-top:6px;color:var(--sub)">讀法：重點看「推理過程」而非結論標籤。這是研究筆記，不是明牌清單。</div>
+  </div>
+  <a class="btn alt" href="https://gutinganthony.github.io/KIWI/serenity/">開啟 Serenity 篩選器 →</a>
+</div>
+
+<!-- ③ 聰明錢 -->
+<div class="tool">
+  <div class="top">
+    <h2>③ 聰明錢追蹤器</h2>
+    <span class="pill p-blue">資金流觀察</span>
+  </div>
+  <div class="what">觀察機構/大額資金的動向訊號，作為前面兩個工具的交叉參考——當方法論的判斷和資金流一致時，訊號的說服力較高。</div>
+  <div class="read">
+    <div class="row">讀法：把它當「第三個視角」，跟 ACT 的市場環境、Serenity 的個別標的<b>互相對照</b>，而不是單獨依賴任何一個。</div>
+  </div>
+  <a class="btn alt" href="https://gutinganthony.github.io/KIWI/monitor/">開啟 聰明錢追蹤器 →</a>
+</div>
+
+<div class="contact">
+  <p>對「用 AI 把專業判斷系統化」有興趣、想合作或提問？</p>
+  <a href="mailto:jake.cz.jian@gmail.com">jake.cz.jian@gmail.com</a>
+</div>
+
+<footer>
+  本頁及所連結之工具僅供教育與研究用途，為作者個人方法論之公開紀錄，<br>
+  不構成投資建議、招攬或任何買賣要約。投資有風險，決策請自負盈虧。
+</footer>
+
+</body>
+</html>
