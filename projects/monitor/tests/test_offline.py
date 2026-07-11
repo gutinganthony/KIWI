@@ -115,11 +115,63 @@ def test_missing_sources(tmp):
           "全缺失時頁面仍完整產出")
 
 
+def test_risk_rendering(tmp):
+    print("[4] 美股風險欄：含 risk 假數據透傳＋渲染字串；舊數據無 risk 欄不炸")
+    skel = os.path.join(tmp, "risk")
+    ddir = os.path.join(skel, "projects", "us-funnel", "data")
+    os.makedirs(ddir)
+    cands = {
+        "generated_at": "2026-07-11T03:45:00+00:00",
+        "scan_window_days": 7,
+        "funnel_stats": {"raw_filings": 100, "qualified_events": 5,
+                         "post_veto": 3, "final_candidates": 3},
+        "candidates": [
+            {"ticker": "AAA", "company": "Alpha", "score": 7,
+             "first_filing_date": "2026-07-08", "entry_price_ref": 10.0,
+             "risk": {"level": "high", "data_gap": True, "beta": None,
+                      "mcap_usd": None, "mcap_band": "unknown",
+                      "beta_band": "unknown"}},
+            {"ticker": "BBB", "company": "Beta Corp", "score": 5,
+             "first_filing_date": "2026-07-07", "entry_price_ref": 20.0,
+             "risk": {"level": "low", "data_gap": False, "beta": 0.55,
+                      "mcap_usd": 52000000000, "mcap_band": "large",
+                      "beta_band": "low"}},
+            {"ticker": "CCC", "company": "Legacy Inc", "score": 4,
+             "first_filing_date": "2026-07-06", "entry_price_ref": 5.0},
+        ],
+    }
+    with open(os.path.join(ddir, "candidates_latest.json"), "w",
+              encoding="utf-8") as f:
+        json.dump(cands, f, ensure_ascii=False)
+    out = os.path.join(skel, "index.html")
+    data, _ = build_monitor.render(skel, out)
+    html = open(out, encoding="utf-8").read()
+    d = extract_data(html)
+
+    us = d["us_funnel"]["candidates"]
+    check(us[0]["risk"]["level"] == "high" and us[0]["risk"]["data_gap"] is True,
+          "high(data_gap) 候選：risk 透傳完整")
+    check(us[1]["risk"]["level"] == "low" and us[1]["risk"]["beta"] == 0.55
+          and us[1]["risk"]["mcap_band"] == "large", "low 候選：beta/mcap_band 透傳")
+    check(set(us[0]["risk"].keys()) ==
+          {"level", "data_gap", "beta", "mcap_usd", "mcap_band", "beta_band"},
+          "risk 鍵集合與 us-funnel 契約一致")
+    check(us[2].get("risk") is None, "舊數據無 risk 欄 → None（build 不炸，前端顯示—）")
+    check("<th>風險</th>" in html, "美股候選表含「風險」欄表頭")
+    check("high:['高'" in html and "medium:['中'" in html and "low:['低'" in html,
+          "高/中/低標籤與 semantic 色映射存在（JS 渲染）")
+    check("風險分級劃分方法" in html, "含「風險分級劃分方法」備註標題")
+    check("非基本面/違約風險評估" in html, "備註含免責一句")
+    check("保守計分" in html and "加 <b>*</b>" in html,
+          "備註含「數據不足一律保守計分＋加*」規則")
+
+
 def main():
     tmp = tempfile.mkdtemp(prefix="monitor-test-")
     try:
         test_full_build(tmp)
         test_missing_sources(tmp)
+        test_risk_rendering(tmp)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     print(f"ALL TESTS PASSED ({CHECKS} checks)")

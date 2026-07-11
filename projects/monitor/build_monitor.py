@@ -247,6 +247,14 @@ def collect_poly(root):
 
 # ── 美股/台股漏斗 ──────────────────────────────────────────────────
 
+def clean_risk(r):
+    """候選的 risk 欄（us-funnel 風險分級）→ 淨化 dict；舊數據無此欄 → None（前端顯示—）。"""
+    if not isinstance(r, dict):
+        return None
+    return {k: clean(r.get(k)) for k in (
+        "level", "data_gap", "beta", "mcap_usd", "mcap_band", "beta_band")}
+
+
 def collect_funnel(root, project):
     base = os.path.join(root, "projects", project, "data")
     out = {"available": False,
@@ -263,8 +271,9 @@ def collect_funnel(root, project):
         "funnel_stats": {k: clean(fs.get(k)) for k in (
             "raw_filings", "qualified_events", "post_veto", "final_candidates")},
         "candidates": [
-            {k: clean(c.get(k)) for k in (
-                "ticker", "company", "score", "first_filing_date", "entry_price_ref")}
+            dict({k: clean(c.get(k)) for k in (
+                "ticker", "company", "score", "first_filing_date", "entry_price_ref")},
+                 risk=clean_risk(c.get("risk")))
             for c in (cand.get("candidates") or [])[:MAX_CANDIDATES]
         ],
     }

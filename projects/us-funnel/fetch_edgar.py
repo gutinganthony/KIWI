@@ -17,8 +17,10 @@
 4. meta（端點健康、成功/失敗計數、耗時）合併寫進 data/meta_latest.json 的 fetch 節。
 
 EDGAR 禮儀（SEC fair access policy——規定，不是建議；違反封鎖 10 分鐘）：
-- User-Agent 必須含可聯絡 email：config.EDGAR_USER_AGENT（"KIWI-research kiwi-observer@example.com"）
+- User-Agent 必須含可聯絡方式：config.EDGAR_USER_AGENT（GitHub repo＋noreply 信箱，
+  真實可聯絡——假信箱疑遭過濾致 403，見 config 註解）
 - 限速 ≤10 req/s：每請求後 sleep config.EDGAR_SLEEP_BETWEEN（0.15s），序列執行絕不並行
+- 403（AccessDenied，疑共享 IP 暫時封鎖）：重試前等 config.HTTP_403_BACKOFFS=[10,30]s
 
 防禦性設計：任何端點失敗→記進 meta（status code＋body 前 200 字），繼續跑其他部分，
 永不整體 crash（main 一律 exit 0，讓後續 funnel/track 與 commit-back 能落地）。
@@ -69,13 +71,22 @@ class Meta:
         self.requests_ok = 0
         self.requests_failed = 0
         self.errors = []
+        # 價格源健康（make_price_fetcher 填；fetch 腳本不用，恆為零/空）——
+        # 兩源各自成功/失敗計數＋per-ticker 使用源（stooq|yahoo|none），供 monitor 頁判讀
+        self.price_source_stats = {"stooq": {"ok": 0, "failed": 0},
+                                   "yahoo": {"ok": 0, "failed": 0}}
+        self.price_sources = {}     # ticker -> "stooq" | "yahoo" | "none"
+        # 市值來源計數（funnel 的 run_funnel 填；fetch/tracking 不用，恆為零）——
+        # edgar=company facts 股數×收盤、yahoo=quoteSummary/v7 批次備援、none=全敗保守
+        self.mcap_source_stats = {"edgar": 0, "yahoo": 0, "none": 0}
 
     def record(self, name, url, ok, status=None, error=None, elapsed=None,
-               record_ok=True):
-        if ok:
-            self.requests_ok += 1
-        else:
-            self.requests_failed += 1
+               record_ok=True, count=True):
+        if count:
+            if ok:
+                self.requests_ok += 1
+            else:
+                self.requests_failed += 1
         if ok and not record_ok:
             return  # 大量 filing 成功請求只計數不逐筆記錄，防 meta 膨脹
         self.endpoint_health.append({
@@ -130,25 +141,33 @@ def write_json(path, obj):
 # HTTP 層（GET 純文字；EDGAR 禮儀見模組 docstring）
 # ---------------------------------------------------------------------------
 
-def http_get_text(url, name, meta, record_ok=True, sleep=None):
-    """GET url 回傳 (text, status, ok)。重試 config.HTTP_RETRIES 次，永不 raise。
+def http_get_text(url, name, meta, record_ok=True, sleep=None, headers=None,
+                  retries=None):
+    """GET url 回傳 (text, status, ok)。重試 retries（預設 config.HTTP_RETRIES）次，永不 raise。
 
-    - User-Agent 一律 config.EDGAR_USER_AGENT（SEC 規定含聯絡 email；Stooq 亦沿用無害）。
+    - headers 預設 EDGAR 禮儀 UA（config.EDGAR_USER_AGENT，SEC 規定含可聯絡方式；
+      Stooq 亦沿用無害）；需要瀏覽器 UA 的源（Yahoo）由呼叫端覆蓋。
     - 每請求後 sleep（預設 config.EDGAR_SLEEP_BETWEEN=0.15s，≤10 req/s 規定的餘裕值）。
     - 404 視為「明確不存在」（假日索引），不重試。
+    - 403（EDGAR AccessDenied，疑共享 IP 暫時封鎖）：重試前改等
+      config.HTTP_403_BACKOFFS=[10,30]s；仍失敗 → 呼叫端既有優雅降級（吃快取/跳過檢查）。
     """
     sleep = config.EDGAR_SLEEP_BETWEEN if sleep is None else sleep
+    retries = config.HTTP_RETRIES if retries is None else retries
     if requests is None:
         meta.record(name, url, False, error=f"requests import failed: {_REQUESTS_IMPORT_ERROR}")
         return None, None, False
-    headers = {"User-Agent": config.EDGAR_USER_AGENT,
-               "Accept-Encoding": "gzip, deflate"}
+    if headers is None:
+        headers = {"User-Agent": config.EDGAR_USER_AGENT,
+                   "Accept-Encoding": "gzip, deflate"}
     last_error, last_status = None, None
     start = time.time()
-    for attempt in range(1 + config.HTTP_RETRIES):
+    for attempt in range(1 + retries):
         if attempt > 0:
-            backoff_idx = min(attempt - 1, len(config.HTTP_BACKOFFS) - 1)
-            time.sleep(config.HTTP_BACKOFFS[backoff_idx])
+            backoffs = (config.HTTP_403_BACKOFFS if last_status == 403
+                        else config.HTTP_BACKOFFS)
+            backoff_idx = min(attempt - 1, len(backoffs) - 1)
+            time.sleep(backoffs[backoff_idx])
         try:
             resp = requests.get(url, headers=headers, timeout=config.HTTP_TIMEOUT)
             last_status = resp.status_code
@@ -167,6 +186,62 @@ def http_get_text(url, name, meta, record_ok=True, sleep=None):
                 elapsed=time.time() - start)
     time.sleep(sleep)
     return None, last_status, False
+
+
+# ---------------------------------------------------------------------------
+# EDGAR company facts：流通股數（風險分級的市值來源；funnel.py import 使用）
+# ---------------------------------------------------------------------------
+
+def parse_shares_outstanding(text):
+    """company concept JSON → 最新一筆 units.shares 的 val；無效/缺 → None。純函式。
+
+    units.shares 條目按 end（期末日）取最新；缺 end 時退回列表最後一筆。
+    """
+    try:
+        data = json.loads(text)
+    except Exception:
+        return None
+    entries = (data.get("units") or {}).get("shares") or []
+    entries = [e for e in entries if isinstance(e, dict) and e.get("val") is not None]
+    if not entries:
+        return None
+    latest = max(entries, key=lambda e: str(e.get("end") or ""))
+    try:
+        val = float(latest["val"])
+    except (TypeError, ValueError):
+        return None
+    return val if val > 0 else None
+
+
+def fetch_shares_outstanding(cik, meta, get_fn=None):
+    """issuer CIK → 最新流通股數（shares）；全部來源失敗 → None（呼叫端保守分級）。
+
+    依序試 config.SHARES_OUTSTANDING_CONCEPTS 的 (taxonomy, tag)：404 或缺數據換下一個。
+    沿用 EDGAR UA 禮儀與 sleep（http_get_text 預設值）；只對否決關 survivors 呼叫。
+    回 None 時必記一筆 company-facts 失敗進 meta.endpoint_health（count=False 不重複
+    計數）——mcap unknown 在 meta 必須有痕跡，供 monitor 頁健康判讀。
+    """
+    get_fn = get_fn or http_get_text
+    cik10 = str(cik or "").strip().lstrip("0")
+    if not cik10.isdigit():
+        meta.record(f"company-facts {cik or '?'}", None, False,
+                    error="CIK 無效，未發請求（mcap → None 保守分級）", count=False)
+        return None
+    url = None
+    for taxonomy, tag in config.SHARES_OUTSTANDING_CONCEPTS:
+        url = config.EDGAR_COMPANY_CONCEPT_URL.format(
+            cik10=cik10.zfill(10), taxonomy=taxonomy, tag=tag)
+        text, _, ok = get_fn(url, f"company-concept {cik10} {taxonomy}/{tag}", meta,
+                             record_ok=False)
+        if not ok:
+            continue
+        shares = parse_shares_outstanding(text)
+        if shares is not None:
+            return shares
+    meta.record(f"company-facts {cik10}", url, False,
+                error="所有 concept 皆失敗或缺 units.shares（mcap → None 保守分級）",
+                count=False)
+    return None
 
 
 # ---------------------------------------------------------------------------

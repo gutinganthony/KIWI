@@ -1,50 +1,46 @@
 {
- "generated_at": "2026-07-10T19:19:06.846264+00:00",
+ "generated_at": "2026-07-11T11:56:07.182724+00:00",
  "scan_window_days": 7,
  "funnel_stats": {
   "raw_filings": 4822,
   "qualified_events": 18,
-  "post_veto": 9,
-  "final_candidates": 9
+  "post_veto": 6,
+  "final_candidates": 6
  },
  "candidates": [
   {
-   "ticker": "EWSB",
-   "company": "EWSB Bancorp, Inc. /MD/",
-   "cluster_size": 5,
+   "ticker": "UUUU",
+   "company": "ENERGY FUELS INC",
+   "cluster_size": 2,
    "insiders": [
     {
-     "name": "Schmalz Charles D",
-     "title": "President & CEO"
+     "name": "Bhappu Ross R.",
+     "title": "President and CEO"
     },
     {
-     "name": "Mangold James E",
-     "title": "VP - Lending"
-    },
-    {
-     "name": "Schneider Kory J",
-     "title": "VP - Member Experience"
-    },
-    {
-     "name": "Vander Loop Kailee",
-     "title": "VP HR Technology"
-    },
-    {
-     "name": "Haen Steven",
+     "name": "HANSEN BRUCE D",
      "title": "Director"
     }
    ],
-   "total_buy_usd": 3433420.0,
-   "score": 5,
+   "total_buy_usd": 2037400.0,
+   "score": 6,
    "score_breakdown": {
-    "cluster": 2,
+    "cluster": 1,
     "buy_usd": 2,
     "title": 1,
     "mcap": 0,
-    "dip": 0
+    "dip": 2
    },
-   "first_filing_date": "2026-07-08",
-   "entry_price_ref": 10.0
+   "first_filing_date": "2026-07-09",
+   "entry_price_ref": 13.0603,
+   "risk": {
+    "level": "high",
+    "data_gap": true,
+    "beta": 2.66,
+    "mcap_usd": null,
+    "mcap_band": "unknown",
+    "beta_band": "high"
+   }
   },
   {
    "ticker": "ENR",
@@ -77,16 +73,92 @@
     }
    ],
    "total_buy_usd": 11495568.0,
-   "score": 4,
+   "score": 5,
    "score_breakdown": {
     "cluster": 2,
     "buy_usd": 2,
     "title": 0,
     "mcap": 0,
-    "dip": 0
+    "dip": 1
    },
    "first_filing_date": "2026-07-09",
-   "entry_price_ref": 20.5278
+   "entry_price_ref": 20.5278,
+   "risk": {
+    "level": "high",
+    "data_gap": true,
+    "beta": 0.9,
+    "mcap_usd": null,
+    "mcap_band": "unknown",
+    "beta_band": "mid"
+   }
+  },
+  {
+   "ticker": "YPF",
+   "company": "YPF SOCIEDAD ANONIMA",
+   "cluster_size": 2,
+   "insiders": [
+    {
+     "name": "Farina Matias Osvaldo",
+     "title": "VP Upstream"
+    },
+    {
+     "name": "Marin Horacio Daniel",
+     "title": "Chairman of the Board/ CEO"
+    }
+   ],
+   "total_buy_usd": 1065859.2,
+   "score": 5,
+   "score_breakdown": {
+    "cluster": 1,
+    "buy_usd": 2,
+    "title": 1,
+    "mcap": 0,
+    "dip": 1
+   },
+   "first_filing_date": "2026-07-06",
+   "entry_price_ref": 45.4912,
+   "risk": {
+    "level": "medium",
+    "data_gap": true,
+    "beta": 0.36,
+    "mcap_usd": null,
+    "mcap_band": "unknown",
+    "beta_band": "low"
+   }
+  },
+  {
+   "ticker": "WRAP",
+   "company": "WRAP TECHNOLOGIES, INC.",
+   "cluster_size": 2,
+   "insiders": [
+    {
+     "name": "Cohen Scot",
+     "title": "Executive Chairman and CEO"
+    },
+    {
+     "name": "SHULMAN JOHN D",
+     "title": "Director"
+    }
+   ],
+   "total_buy_usd": 267828.0,
+   "score": 5,
+   "score_breakdown": {
+    "cluster": 1,
+    "buy_usd": 1,
+    "title": 1,
+    "mcap": 0,
+    "dip": 2
+   },
+   "first_filing_date": "2026-07-09",
+   "entry_price_ref": 1.1,
+   "risk": {
+    "level": "high",
+    "data_gap": true,
+    "beta": 2.52,
+    "mcap_usd": null,
+    "mcap_band": "unknown",
+    "beta_band": "high"
+   }
   },
   {
    "ticker": "VII",
@@ -112,59 +184,15 @@
     "dip": 0
    },
    "first_filing_date": "2026-07-08",
-   "entry_price_ref": 10.0
-  },
-  {
-   "ticker": "UUUU",
-   "company": "ENERGY FUELS INC",
-   "cluster_size": 2,
-   "insiders": [
-    {
-     "name": "Bhappu Ross R.",
-     "title": "President and CEO"
-    },
-    {
-     "name": "HANSEN BRUCE D",
-     "title": "Director"
-    }
-   ],
-   "total_buy_usd": 2037400.0,
-   "score": 4,
-   "score_breakdown": {
-    "cluster": 1,
-    "buy_usd": 2,
-    "title": 1,
-    "mcap": 0,
-    "dip": 0
-   },
-   "first_filing_date": "2026-07-09",
-   "entry_price_ref": 13.0603
-  },
-  {
-   "ticker": "YPF",
-   "company": "YPF SOCIEDAD ANONIMA",
-   "cluster_size": 2,
-   "insiders": [
-    {
-     "name": "Farina Matias Osvaldo",
-     "title": "VP Upstream"
-    },
-    {
-     "name": "Marin Horacio Daniel",
-     "title": "Chairman of the Board/ CEO"
-    }
-   ],
-   "total_buy_usd": 1065859.2,
-   "score": 4,
-   "score_breakdown": {
-    "cluster": 1,
-    "buy_usd": 2,
-    "title": 1,
-    "mcap": 0,
-    "dip": 0
-   },
-   "first_filing_date": "2026-07-06",
-   "entry_price_ref": 45.4912
+   "entry_price_ref": 10.0,
+   "risk": {
+    "level": "high",
+    "data_gap": true,
+    "beta": null,
+    "mcap_usd": null,
+    "mcap_band": "unknown",
+    "beta_band": "unknown"
+   }
   },
   {
    "ticker": "HTO",
@@ -190,105 +218,15 @@
     "dip": 0
    },
    "first_filing_date": "2026-07-08",
-   "entry_price_ref": 62.03
-  },
-  {
-   "ticker": "JCTC",
-   "company": "JEWETT CAMERON TRADING CO LTD",
-   "cluster_size": 4,
-   "insiders": [
-    {
-     "name": "AJB Investment Fund II, LP",
-     "title": "10% Owner"
-    },
-    {
-     "name": "AJB Capital, LLC",
-     "title": "10% Owner"
-    },
-    {
-     "name": "Bradley Adam James",
-     "title": "10% Owner"
-    },
-    {
-     "name": "Bradley Melinda Hodges",
-     "title": "10% Owner"
-    }
-   ],
-   "total_buy_usd": 432052.0,
-   "score": 3,
-   "score_breakdown": {
-    "cluster": 2,
-    "buy_usd": 1,
-    "title": 0,
-    "mcap": 0,
-    "dip": 0
-   },
-   "first_filing_date": "2026-07-08",
-   "entry_price_ref": 2.5128
-  },
-  {
-   "ticker": "PFBX",
-   "company": "PEOPLES FINANCIAL CORP /MS/",
-   "cluster_size": 5,
-   "insiders": [
-    {
-     "name": "Stilwell Joseph",
-     "title": "10% Owner"
-    },
-    {
-     "name": "Stilwell Value LLC",
-     "title": "10% Owner"
-    },
-    {
-     "name": "Stilwell Value Partners VII, L.P.",
-     "title": "10% Owner"
-    },
-    {
-     "name": "Stilwell Activist Fund, L.P.",
-     "title": "10% Owner"
-    },
-    {
-     "name": "Stilwell Activist Investments, L.P.",
-     "title": "10% Owner"
-    }
-   ],
-   "total_buy_usd": 338767.5,
-   "score": 3,
-   "score_breakdown": {
-    "cluster": 2,
-    "buy_usd": 1,
-    "title": 0,
-    "mcap": 0,
-    "dip": 0
-   },
-   "first_filing_date": "2026-07-06",
-   "entry_price_ref": 21.25
-  },
-  {
-   "ticker": "WRAP",
-   "company": "WRAP TECHNOLOGIES, INC.",
-   "cluster_size": 2,
-   "insiders": [
-    {
-     "name": "Cohen Scot",
-     "title": "Executive Chairman and CEO"
-    },
-    {
-     "name": "SHULMAN JOHN D",
-     "title": "Director"
-    }
-   ],
-   "total_buy_usd": 267828.0,
-   "score": 3,
-   "score_breakdown": {
-    "cluster": 1,
-    "buy_usd": 1,
-    "title": 1,
-    "mcap": 0,
-    "dip": 0
-   },
-   "first_filing_date": "2026-07-09",
-   "entry_price_ref": 1.1
+   "entry_price_ref": 62.03,
+   "risk": {
+    "level": "medium",
+    "data_gap": true,
+    "beta": -0.23,
+    "mcap_usd": null,
+    "mcap_band": "unknown",
+    "beta_band": "low"
+   }
   }
  ]
 }

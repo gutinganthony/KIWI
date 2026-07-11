@@ -185,12 +185,14 @@ def make_price_fn(dlta_volume=100000.0, dlta_rows=True):
     return price_fn
 
 
-def run_fixture_funnel(price_fn):
+def run_fixture_funnel(price_fn, shares_fn=None, mcap_backup_fn=None, meta=None):
     day1, day2, day3 = build_fixture_events()
     syn_buys, syn_sells = synthetic_events()
     buys = day1["buys"] + day2["buys"] + syn_buys
     sells = day3["sells"] + syn_sells
-    return funnel.run_funnel(buys, sells, raw_filings=4, price_fn=price_fn)
+    return funnel.run_funnel(buys, sells, raw_filings=4, price_fn=price_fn,
+                             shares_fn=shares_fn, mcap_backup_fn=mcap_backup_fn,
+                             meta=meta)
 
 
 def test_funnel():
@@ -220,8 +222,14 @@ def test_funnel():
        f"first_filing_date 取最早申報日（{acme['first_filing_date']}）")
     bd = acme["score_breakdown"]
     ok(bd == {"cluster": 1, "buy_usd": 2, "title": 2, "mcap": 0, "dip": 2},
-       f"ACME 分項：2人=1/≥500k=2/CFO=2/mcap N-A=0/深折=2（{bd}）")
+       f"ACME 分項：2人=1/≥500k=2/CFO=2/mcap 無數據=0/深折=2（{bd}）")
     ok(acme["score"] == 7, f"ACME 總分 7（{acme['score']}）")
+    risk = acme["risk"]
+    ok(risk["level"] == "high" and risk["data_gap"] is True,
+       f"無 shares_fn/SPY → mcap/beta 皆 None → 保守 high(data_gap)（{risk['level']}）")
+    ok(risk["beta"] is None and risk["mcap_usd"] is None
+       and risk["mcap_band"] == "unknown" and risk["beta_band"] == "unknown",
+       "None 維度 → band=unknown、數值=null")
 
     dlta = output["candidates"][1]
     ok(dlta["score_breakdown"] == {"cluster": 2, "buy_usd": 1, "title": 0,
@@ -258,7 +266,9 @@ def test_funnel_liquidity_and_degradation():
 CANDIDATES_TOP_KEYS = {"generated_at", "scan_window_days", "funnel_stats", "candidates"}
 FUNNEL_STATS_KEYS = {"raw_filings", "qualified_events", "post_veto", "final_candidates"}
 CANDIDATE_KEYS = {"ticker", "company", "cluster_size", "insiders", "total_buy_usd",
-                  "score", "score_breakdown", "first_filing_date", "entry_price_ref"}
+                  "score", "score_breakdown", "first_filing_date", "entry_price_ref",
+                  "risk"}
+RISK_KEYS = {"level", "data_gap", "beta", "mcap_usd", "mcap_band", "beta_band"}
 INSIDER_KEYS = {"name", "title"}
 TRACKING_TOP_KEYS = {"updated_at", "positions"}
 POSITION_KEYS = {"ticker", "signal_date", "entry_price_ref", "current_price",
@@ -276,6 +286,10 @@ def test_output_schema():
     ok(output["scan_window_days"] == 7, "scan_window_days=7")
     for c in output["candidates"]:
         ok(set(c.keys()) == CANDIDATE_KEYS, f"candidate 鍵（{c['ticker']}）")
+        ok(set(c["risk"].keys()) == RISK_KEYS, f"risk 鍵（{c['ticker']}）")
+        ok(c["risk"]["level"] in ("high", "medium", "low")
+           and isinstance(c["risk"]["data_gap"], bool),
+           f"risk.level 枚舉值＋data_gap 布林（{c['ticker']}）")
         for i in c["insiders"]:
             ok(set(i.keys()) == INSIDER_KEYS, f"insider 鍵（{i['name']}）")
 
@@ -467,11 +481,697 @@ def test_load_events():
         ok(len(buys) == 3 and len(sells) == 1, f"buys=3 sells=1（{len(buys)}/{len(sells)}）")
 
 
+# ---------------------------------------------------------------------------
+# [12] 風險分級：beta 計算（OLS 斜率、對齊、重疊門檻、退化路徑）
+# ---------------------------------------------------------------------------
+
+def _beta_series(start, n_days, base, multiplier, spy_base=100.0, spy_step=0.01):
+    """造 (stock_rows, spy_rows)：SPY 日報酬 ±spy_step 交替，個股報酬＝multiplier×SPY。"""
+    stock_rows, spy_rows = [], []
+    c_stock, c_spy = base, spy_base
+    for i in range(n_days):
+        d = (start + timedelta(days=i)).strftime("%Y-%m-%d")
+        stock_rows.append((d, c_stock, 100000.0))
+        spy_rows.append((d, c_spy, 1000000.0))
+        r_spy = spy_step if i % 2 == 0 else -spy_step
+        c_spy *= (1 + r_spy)
+        c_stock *= (1 + multiplier * r_spy)
+    return stock_rows, spy_rows
+
+
+def test_beta():
+    print("[12] beta 計算：OLS 斜率手算對照 / 日期對齊 / 重疊門檻 / 退化路徑")
+    start = date(2026, 3, 2)
+    stock, spy = _beta_series(start, 128, base=14.0, multiplier=1.5)
+    b = funnel.compute_beta(stock, spy)
+    ok(b is not None and abs(b - 1.5) < 1e-9,
+       f"128 日、個股報酬＝1.5×SPY → beta=1.5（{b}）")
+    stock05, spy2 = _beta_series(start, 128, base=10.0, multiplier=0.5)
+    b05 = funnel.compute_beta(stock05, spy2)
+    ok(b05 is not None and abs(b05 - 0.5) < 1e-9, f"0.5× 序列 → beta=0.5（{b05}）")
+
+    # 日期對齊：個股多出 SPY 沒有的前置日期 → 只用共同交易日，beta 不變
+    extra = [((start - timedelta(days=i)).strftime("%Y-%m-%d"), 14.0, 100000.0)
+             for i in range(5, 0, -1)]
+    b_align = funnel.compute_beta(extra + stock, spy)
+    ok(b_align is not None and abs(b_align - 1.5) < 1e-9,
+       f"非共同日期忽略、對齊後 beta 不變（{b_align}）")
+
+    # 重疊門檻：61 個共同日=60 對報酬 → 剛好可算；60 日=59 對 → None
+    stock61, spy61 = _beta_series(start, 61, base=14.0, multiplier=1.5)
+    ok(funnel.compute_beta(stock61, spy61) is not None, "61 日（60 對報酬）→ 可算")
+    stock60, spy60 = _beta_series(start, 60, base=14.0, multiplier=1.5)
+    ok(funnel.compute_beta(stock60, spy60) is None, "60 日（59 對報酬 <60）→ None")
+
+    flat = _daily_rows(start, start + timedelta(days=127), lambda d: 100.0)
+    ok(funnel.compute_beta(stock, flat) is None, "SPY 零變異 → None（防除零）")
+    zero_var_stock = _daily_rows(start, start + timedelta(days=127), lambda d: 14.0)
+    b0 = funnel.compute_beta(zero_var_stock, spy)
+    ok(b0 is not None and abs(b0) < 1e-9, f"個股零變異 → beta=0（{b0}）")
+    ok(funnel.compute_beta(None, spy) is None and funnel.compute_beta(stock, None) is None,
+       "任一序列缺 → None")
+
+
+# ---------------------------------------------------------------------------
+# [13] 風險分級：檔分矩陣逐格驗、None 保守路徑、邊界值、市值帶評分
+# ---------------------------------------------------------------------------
+
+def test_risk_matrix():
+    print("[13] 風險分級矩陣：市值×beta 逐格驗（4×3）＋None 保守＋邊界＋市值帶評分")
+    # (mcap, beta, 期望 mcap_band, 期望 beta_band, 期望總分, 期望 level)
+    grid = [
+        (1e8,  1.5, "micro", "high", 5, "high"),
+        (1e8,  1.0, "micro", "mid",  4, "high"),
+        (1e8,  0.5, "micro", "low",  3, "medium"),
+        (1e9,  1.5, "small", "high", 4, "high"),
+        (1e9,  1.0, "small", "mid",  3, "medium"),
+        (1e9,  0.5, "small", "low",  2, "medium"),
+        (5e9,  1.5, "mid",   "high", 3, "medium"),
+        (5e9,  1.0, "mid",   "mid",  2, "medium"),
+        (5e9,  0.5, "mid",   "low",  1, "low"),
+        (5e10, 1.5, "large", "high", 2, "medium"),
+        (5e10, 1.0, "large", "mid",  1, "low"),
+        (5e10, 0.5, "large", "low",  0, "low"),
+    ]
+    for mcap, beta, mband, bband, total, level in grid:
+        r = funnel.assess_risk(mcap, beta)
+        pts = funnel.mcap_risk_points(mcap) + funnel.beta_risk_points(beta)
+        ok(r["mcap_band"] == mband and r["beta_band"] == bband
+           and pts == total and r["level"] == level and r["data_gap"] is False,
+           f"{mband}×{bband}：{pts} 分 → {level}")
+
+    r = funnel.assess_risk(None, None)
+    ok(r["level"] == "high" and r["data_gap"] is True
+       and r["mcap_band"] == "unknown" and r["beta_band"] == "unknown",
+       "雙 None → 3+2=5 → high(data_gap)（全保守）")
+    r = funnel.assess_risk(None, 0.5)
+    ok(r["level"] == "medium" and r["data_gap"] is True,
+       "mcap None → 保守 3 分＋低 beta 0 → medium(data_gap)")
+    r = funnel.assess_risk(5e10, None)
+    ok(r["level"] == "medium" and r["data_gap"] is True,
+       "beta None → 保守 2 分＋大型股 0 → medium(data_gap)")
+
+    ok(funnel.mcap_risk_points(300e6) == 2 and funnel.mcap_risk_band(300e6) == "small",
+       "邊界：$300M 落 small（=2 分，非 micro）")
+    ok(funnel.mcap_risk_points(2e9) == 1 and funnel.mcap_risk_band(2e9) == "mid",
+       "邊界：$2B 落 mid（=1 分）")
+    ok(funnel.mcap_risk_points(10e9) == 0 and funnel.mcap_risk_band(10e9) == "large",
+       "邊界：$10B 落 large（=0 分）")
+    ok(funnel.beta_risk_points(1.3) == 1 and funnel.beta_risk_points(1.31) == 2,
+       "邊界：beta 1.3 落 mid、1.31 落 high")
+    ok(funnel.beta_risk_points(0.8) == 1 and funnel.beta_risk_points(0.79) == 0,
+       "邊界：beta 0.8 落 mid、0.79 落 low")
+
+    # 市值帶評分（第三層，自此版啟用）：micro/small=2、mid=1、large=0、None=0
+    ok([funnel.score_mcap(v) for v in (1e8, 1e9, 5e9, 5e10, None)] == [2, 2, 1, 0, 0],
+       "score_mcap：micro/small=2、mid=1、large=0、None=0")
+
+
+# ---------------------------------------------------------------------------
+# [14] 流通股數抓取（company facts 注入測試）＋漏斗整合（真實 beta/mcap 路徑）
+# ---------------------------------------------------------------------------
+
+DEI_CONCEPT = json.dumps({"units": {"shares": [
+    {"end": "2026-03-31", "val": 900000},
+    {"end": "2026-06-30", "val": 1000000},
+]}})
+GAAP_CONCEPT = json.dumps({"units": {"shares": [{"end": "2026-06-30", "val": 2000000}]}})
+
+
+def test_shares_outstanding():
+    print("[14] 流通股數：dei 概念 / us-gaap fallback / 全缺 None / CIK 補零")
+    calls = []
+
+    def fake_dei(url, name, meta, record_ok=True, sleep=None):
+        calls.append(url)
+        if "dei/EntityCommonStockSharesOutstanding" in url:
+            return DEI_CONCEPT, 200, True
+        return None, 404, False
+
+    val = fetch_edgar.fetch_shares_outstanding("1111111", fetch_edgar.Meta(),
+                                               get_fn=fake_dei)
+    ok(val == 1000000.0, f"dei 命中 → 取 end 最新一筆 val（{val}）")
+    ok("CIK0001111111" in calls[0], f"CIK 10 位補零（{calls[0]}）")
+
+    def fake_gaap(url, name, meta, record_ok=True, sleep=None):
+        if "us-gaap/CommonStockSharesOutstanding" in url:
+            return GAAP_CONCEPT, 200, True
+        return None, 404, False
+
+    ok(fetch_edgar.fetch_shares_outstanding("2018222", fetch_edgar.Meta(),
+                                            get_fn=fake_gaap) == 2000000.0,
+       "dei 404 → fallback us-gaap 概念")
+
+    def fake_404(url, name, meta, record_ok=True, sleep=None):
+        return None, 404, False
+
+    ok(fetch_edgar.fetch_shares_outstanding("123", fetch_edgar.Meta(),
+                                            get_fn=fake_404) is None,
+       "兩概念皆 404 → None（保守分級路徑）")
+    ok(fetch_edgar.fetch_shares_outstanding("acme", fetch_edgar.Meta(),
+                                            get_fn=fake_dei) is None,
+       "非數字 CIK → None 不發請求")
+    ok(fetch_edgar.parse_shares_outstanding("not json") is None, "壞 JSON → None")
+    ok(fetch_edgar.parse_shares_outstanding(json.dumps({"units": {}})) is None,
+       "缺 units.shares → None")
+
+
+def test_funnel_risk_integration():
+    print("[15] 漏斗整合：SPY＋shares_fn 注入 → 真實 beta/mcap 分級與市值帶評分")
+    start = date(2026, 3, 2)
+    acme, spy = _beta_series(start, 128, base=14.0, multiplier=1.2)
+    dlta, _ = _beta_series(start, 128, base=9.5, multiplier=0.5)
+    table = {"ACME": acme, "DLTA": dlta, "SPY": spy}
+    shares = {"1111111": 10_000_000.0}  # ACME issuer CIK（fixtures）；DLTA 無數據
+
+    output, _, _ = run_fixture_funnel(
+        table.get, shares_fn=lambda cik: shares.get(cik))
+    by_ticker = {c["ticker"]: c for c in output["candidates"]}
+    a, d = by_ticker["ACME"], by_ticker["DLTA"]
+
+    exp_mcap = round(10_000_000.0 * acme[-1][1])
+    ok(a["risk"]["mcap_usd"] == exp_mcap and a["risk"]["mcap_band"] == "micro",
+       f"ACME mcap＝股數×最新收盤≈$140M → micro（{a['risk']['mcap_usd']}）")
+    ok(a["risk"]["beta"] == 1.2 and a["risk"]["beta_band"] == "mid",
+       f"ACME beta=1.2（mid）（{a['risk']['beta']}）")
+    ok(a["risk"]["level"] == "high" and a["risk"]["data_gap"] is False,
+       f"ACME micro(3)+mid(1)=4 → high、無 data_gap（{a['risk']['level']}）")
+    ok(a["score_breakdown"]["mcap"] == 2,
+       f"ACME micro → 市值帶評分 2（{a['score_breakdown']['mcap']}）")
+    ok(a["score"] == sum(a["score_breakdown"].values()),
+       f"ACME 總分＝分項和（{a['score']}）")
+
+    ok(d["risk"]["mcap_usd"] is None and d["risk"]["beta"] == 0.5,
+       f"DLTA 無股數 → mcap null；beta=0.5（{d['risk']['beta']}）")
+    ok(d["risk"]["level"] == "medium" and d["risk"]["data_gap"] is True,
+       f"DLTA unknown(3)+low(0)=3 → medium(data_gap)（{d['risk']['level']}）")
+    ok(d["score_breakdown"]["mcap"] == 0, "DLTA mcap 無數據 → 評分維持 0")
+
+    # --no-network 等效路徑：全體候選 high(data_gap)（CI 之外的本地預期）
+    output_off, _, _ = run_fixture_funnel(None)
+    ok(all(c["risk"]["level"] == "high" and c["risk"]["data_gap"] is True
+           for c in output_off["candidates"]),
+       "無網路 → 全候選保守 high(data_gap)")
+
+
+# ---------------------------------------------------------------------------
+# [16-18] Yahoo chart 備援：解析（null 成對過濾）、fallback 順序、429 退避
+# ---------------------------------------------------------------------------
+
+def _yahoo_fixture(n_days=8, null_idx=(2, 5), start=date(2026, 7, 1), base=20.0):
+    """造 Yahoo v8 chart JSON：n_days 根日線，null_idx 位置 close=null（需成對過濾）。"""
+    timestamps, closes, volumes = [], [], []
+    for i in range(n_days):
+        d = start + timedelta(days=i)
+        ts = int(datetime(d.year, d.month, d.day, 13, 30,
+                          tzinfo=timezone.utc).timestamp())
+        timestamps.append(ts)
+        closes.append(None if i in null_idx else base + i)
+        volumes.append(None if i == 0 else 50000 + i)
+    return json.dumps({"chart": {"result": [{
+        "meta": {"symbol": "TEST", "currency": "USD"},
+        "timestamp": timestamps,
+        "indicators": {"quote": [{"close": closes, "volume": volumes}]},
+    }], "error": None}})
+
+
+def test_yahoo_parse():
+    print("[16] Yahoo chart 解析：null 成對過濾 / 無效回應 / rows 契約 / symbol 轉換")
+    rows = track.parse_yahoo_chart(_yahoo_fixture())
+    ok(rows is not None and len(rows) == 6,
+       f"8 根日線、2 個 null close → 6 行（{len(rows or [])}）")
+    ok(rows[0] == ("2026-07-01", 20.0, 0.0),
+       f"首行：epoch→UTC 日期、volume null→0.0（{rows[0]}）")
+    ok(rows[-1] == ("2026-07-08", 27.0, 50007.0),
+       f"尾行 close/volume（{rows[-1]}）")
+    dates = [r[0] for r in rows]
+    ok("2026-07-03" not in dates and "2026-07-06" not in dates,
+       "null close 的 timestamp 成對剔除（不留半殘行）")
+    ok(dates == sorted(dates), "輸出升冪（與 Stooq rows 契約一致，上游零改動）")
+    ok(track.parse_yahoo_chart("Not Found") is None, "非 JSON 回應 → None")
+    ok(track.parse_yahoo_chart(json.dumps(
+        {"chart": {"result": None, "error": {"code": "Not Found"}}})) is None,
+       "chart.result=null（查無代號）→ None")
+    ok(track.parse_yahoo_chart(_yahoo_fixture(n_days=6, null_idx=(0, 1))) is None,
+       f"有效行 4 < PRICE_HISTORY_MIN_ROWS={config.PRICE_HISTORY_MIN_ROWS} → None")
+    ok(track.yahoo_symbol("aapl") == "AAPL", "aapl → AAPL")
+    ok(track.yahoo_symbol("BRK.B") == "BRK-B", "BRK.B → BRK-B（class 股轉換）")
+
+
+def test_price_fallback():
+    print("[17] 價格源 fallback：Stooq 無效→Yahoo 接手；兩敗→None；快取與 meta 記錄")
+    yahoo_json = _yahoo_fixture()
+    calls = []
+
+    def fake_get(url, name, meta_, record_ok=True, sleep=None, **kwargs):
+        calls.append(url)
+        if "stooq.com" in url:
+            meta_.record(name, url, True, status=200, record_ok=record_ok)
+            if "goodstq" in url:
+                return STOOQ_SAMPLE, 200, True
+            return "No data", 200, True   # 2026-07-11 CI 實證：微型股回應
+        if "BOTHBAD" in url:
+            meta_.record(name, url, False, status=500, error="HTTP 500")
+            return None, 500, False
+        meta_.record(name, url, True, status=200, record_ok=record_ok)
+        return yahoo_json, 200, True
+
+    meta = fetch_edgar.Meta()
+    price_fn = track.make_price_fetcher(meta, get_fn=fake_get)
+
+    rows = price_fn("EWSB")   # Stooq 'No data' → Yahoo 接手
+    ok(rows is not None and len(rows) == 6, "Stooq 無效 → Yahoo 備援接手（rows 有效）")
+    ok(meta.price_sources.get("EWSB") == "yahoo",
+       f"per-ticker 使用源記 yahoo（{meta.price_sources.get('EWSB')}）")
+    ok("stooq.com" in calls[0] and "query1.finance.yahoo.com" in calls[1],
+       "順序：先試 Stooq 再試 Yahoo")
+
+    rows2 = price_fn("GOODSTQ")
+    ok(rows2 is not None and meta.price_sources.get("GOODSTQ") == "stooq",
+       "Stooq 有效 → 源記 stooq")
+    ok(not any("yahoo" in u and "GOODSTQ" in u for u in calls),
+       "Stooq 成功時 Yahoo 零請求")
+
+    rows3 = price_fn("BOTHBAD")
+    ok(rows3 is None and meta.price_sources.get("BOTHBAD") == "none",
+       "兩源皆敗 → None（既有降級路徑不變）、源記 none")
+
+    n_calls = len(calls)
+    ok(price_fn("EWSB") is not None and len(calls) == n_calls,
+       "快取：同 ticker 第二次呼叫零請求（每源每 ticker 只試一次）")
+
+    stats = meta.price_source_stats
+    ok(stats["stooq"] == {"ok": 1, "failed": 2}
+       and stats["yahoo"] == {"ok": 1, "failed": 1},
+       f"兩源各自成功/失敗計數（{stats}）")
+
+
+def test_yahoo_429():
+    print("[18] Yahoo 429 限流：退避一次重試、再敗即棄")
+    yahoo_json = _yahoo_fixture()
+    sleeps = []
+
+    class FakeTime:
+        @staticmethod
+        def sleep(s):
+            sleeps.append(s)
+
+        @staticmethod
+        def time():
+            return 0.0
+
+    def make_429_get(fail_times):
+        state = {"n": 0}
+
+        def get(url, name, meta_, record_ok=True, sleep=None, **kwargs):
+            state["n"] += 1
+            if state["n"] <= fail_times:
+                return None, 429, False
+            return yahoo_json, 200, True
+        get.state = state
+        return get
+
+    real_time = track.time
+    track.time = FakeTime
+    try:
+        get1 = make_429_get(1)
+        rows = track.fetch_price_history_yahoo("EWSB", fetch_edgar.Meta(), get_fn=get1)
+        ok(rows is not None and get1.state["n"] == 2, "429 → 退避一次重試成功")
+        ok(sleeps == [config.YAHOO_429_BACKOFF],
+           f"退避秒數＝YAHOO_429_BACKOFF（{sleeps}）")
+        get2 = make_429_get(99)
+        rows2 = track.fetch_price_history_yahoo("EWSB", fetch_edgar.Meta(), get_fn=get2)
+        ok(rows2 is None and get2.state["n"] == 2,
+           "退避後仍 429 → 棄（共 2 次請求，不無限重試）")
+    finally:
+        track.time = real_time
+
+
+# ---------------------------------------------------------------------------
+# [19-20] EDGAR 403 韌性：UA 字串、403 專屬 backoff、company facts 失敗留痕
+# ---------------------------------------------------------------------------
+
+def test_edgar_ua_and_403_backoff():
+    print("[19] EDGAR UA 與 403 韌性：真實可聯絡 UA / 403 專屬 backoff / UA 覆蓋")
+    ua = config.EDGAR_USER_AGENT
+    ok("github.com/gutinganthony/KIWI" in ua
+       and "gutinganthony@users.noreply.github.com" in ua,
+       f"UA 含 repo 與真實可聯絡信箱（{ua}）")
+    ok("example.com" not in ua, "UA 不含假信箱（example.com 疑遭 SEC 過濾）")
+    ok(config.HTTP_403_BACKOFFS == [10, 30],
+       f"403 專屬 backoff=[10,30]（{config.HTTP_403_BACKOFFS}）")
+
+    sleeps, seen_headers = [], []
+
+    class FakeTime:
+        @staticmethod
+        def sleep(s):
+            sleeps.append(s)
+
+        @staticmethod
+        def time():
+            return 0.0
+
+    class Resp403:
+        status_code = 403
+        text = ('<?xml version="1.0" encoding="UTF-8"?><Error>'
+                '<Code>AccessDenied</Code><Message>Access Denied</Message></Error>')
+
+    class FakeRequests:
+        @staticmethod
+        def get(url, headers=None, timeout=None):
+            seen_headers.append(headers)
+            return Resp403()
+
+    real_time, real_requests = fetch_edgar.time, fetch_edgar.requests
+    fetch_edgar.time, fetch_edgar.requests = FakeTime, FakeRequests
+    try:
+        meta = fetch_edgar.Meta()
+        _, status, ok_flag = fetch_edgar.http_get_text(
+            "https://www.sec.gov/Archives/edgar/daily-index/x.idx",
+            "daily-index test", meta)
+        ok(status == 403 and ok_flag is False,
+           "403 重試全敗 → ok=False（呼叫端既有優雅降級：吃快取）")
+        ok(sleeps[:config.HTTP_RETRIES] == config.HTTP_403_BACKOFFS[:config.HTTP_RETRIES],
+           f"403 重試前等待用專屬 backoff（{sleeps[:config.HTTP_RETRIES]}）")
+        ok(len(seen_headers) == 1 + config.HTTP_RETRIES,
+           f"重試次數不變（{len(seen_headers)} 次請求）")
+        ok(seen_headers[0]["User-Agent"] == config.EDGAR_USER_AGENT,
+           "預設 headers 用 EDGAR 禮儀 UA")
+        ok(meta.endpoint_health[-1]["status"] == 403
+           and "AccessDenied" in meta.endpoint_health[-1]["error"],
+           "403 失敗記 endpoint_health（status＋body 片段）")
+        fetch_edgar.http_get_text(
+            "https://query1.finance.yahoo.com/v8/finance/chart/T",
+            "yahoo test", fetch_edgar.Meta(),
+            headers={"User-Agent": config.YAHOO_USER_AGENT}, retries=0)
+        ok(seen_headers[-1]["User-Agent"] == config.YAHOO_USER_AGENT,
+           "headers 覆蓋：Yahoo 走瀏覽器 UA")
+    finally:
+        fetch_edgar.time, fetch_edgar.requests = real_time, real_requests
+
+
+def test_company_facts_meta():
+    print("[20] company facts 失敗留痕：mcap unknown 必在 meta.endpoint_health 有痕跡")
+
+    def fake_404(url, name, meta, record_ok=True, sleep=None):
+        meta.record(name, url, False, status=404, error="HTTP 404")
+        return None, 404, False
+
+    meta = fetch_edgar.Meta()
+    val = fetch_edgar.fetch_shares_outstanding("123", meta, get_fn=fake_404)
+    entries = [e for e in meta.endpoint_health
+               if str(e.get("name", "")).startswith("company-facts")]
+    ok(val is None and len(entries) == 1 and entries[0]["ok"] is False,
+       "全 concept 失敗 → 記一筆 company-facts 進 endpoint_health")
+    ok(meta.requests_failed == 2,
+       f"彙總條目 count=False 不重複計數（failed={meta.requests_failed}＝2 次 HTTP）")
+
+    meta2 = fetch_edgar.Meta()
+    fetch_edgar.fetch_shares_outstanding("acme", meta2, get_fn=fake_404)
+    ok(any(str(e.get("name", "")).startswith("company-facts")
+           for e in meta2.endpoint_health) and meta2.requests_failed == 0,
+       "無效 CIK（未發請求）也留痕、不計 HTTP 失敗")
+
+    def fake_empty(url, name, meta, record_ok=True, sleep=None):
+        meta.record(name, url, True, status=200, record_ok=record_ok)
+        return json.dumps({"units": {}}), 200, True
+
+    meta3 = fetch_edgar.Meta()
+    ok(fetch_edgar.fetch_shares_outstanding("123", meta3, get_fn=fake_empty) is None
+       and any(str(e.get("name", "")).startswith("company-facts")
+               for e in meta3.endpoint_health),
+       "200 但缺 units.shares → 亦留痕（先前 mcap unknown 無跡可循的洞）")
+
+    def fake_dei_ok(url, name, meta, record_ok=True, sleep=None):
+        if "dei/EntityCommonStockSharesOutstanding" in url:
+            return DEI_CONCEPT, 200, True
+        return None, 404, False
+
+    meta4 = fetch_edgar.Meta()
+    ok(fetch_edgar.fetch_shares_outstanding("1111111", meta4, get_fn=fake_dei_ok)
+       == 1000000.0 and not any(str(e.get("name", "")).startswith("company-facts")
+                                for e in meta4.endpoint_health),
+       "成功路徑不多記彙總條目")
+
+
+# ---------------------------------------------------------------------------
+# [21-24] 市值 Yahoo 備援：quoteSummary/v7 解析、備援鏈順序、429 退避、meta 計數
+# ---------------------------------------------------------------------------
+
+def _quotesummary_fixture(mcap=1_500_000_000):
+    """Yahoo v10 quoteSummary（modules=price）JSON fixture。"""
+    return json.dumps({"quoteSummary": {"result": [{"price": {
+        "symbol": "TEST", "marketCap": {"raw": mcap, "fmt": "1.5B"}}}],
+        "error": None}})
+
+
+def _v7_quote_fixture(mcaps):
+    """Yahoo v7 批次 quote JSON fixture：{symbol: marketCap|None（None=缺欄位）}。"""
+    return json.dumps({"quoteResponse": {"result": [
+        ({"symbol": s, "marketCap": v} if v is not None else {"symbol": s})
+        for s, v in mcaps.items()], "error": None}})
+
+
+def test_yahoo_mcap_parse():
+    print("[21] 市值備援解析：quoteSummary price.marketCap.raw / v7 批次 marketCap")
+    ok(funnel.parse_yahoo_quotesummary_mcap(_quotesummary_fixture())
+       == 1_500_000_000.0, "quoteSummary → price.marketCap.raw")
+    ok(funnel.parse_yahoo_quotesummary_mcap(json.dumps(
+        {"quoteSummary": {"result": [{"price": {"symbol": "T"}}],
+                          "error": None}})) is None,
+       "price 缺 marketCap → None（不猜、交下一級）")
+    ok(funnel.parse_yahoo_quotesummary_mcap(json.dumps(
+        {"quoteSummary": {"result": [{"price": {"marketCap": {"fmt": "1.5B"}}}],
+                          "error": None}})) is None,
+       "marketCap 缺 raw → None（不猜 fmt 字串）")
+    ok(funnel.parse_yahoo_quotesummary_mcap(json.dumps(
+        {"quoteSummary": {"result": None,
+                          "error": {"code": "Not Found"}}})) is None,
+       "result=null（查無代號）→ None")
+    ok(funnel.parse_yahoo_quotesummary_mcap("Not Found") is None, "非 JSON → None")
+    ok(funnel.parse_yahoo_quotesummary_mcap(_quotesummary_fixture(mcap=0)) is None,
+       "raw=0（非正數）→ None")
+
+    got = funnel.parse_yahoo_v7_quote_mcaps(_v7_quote_fixture(
+        {"AAA": 5e8, "BBB": 2.5e9, "CCC": None}))
+    ok(got == {"AAA": 5e8, "BBB": 2.5e9},
+       f"v7 批次：有 marketCap 的收、缺欄位的跳過（{got}）")
+    ok(funnel.parse_yahoo_v7_quote_mcaps(_v7_quote_fixture({"ddd": 1e9}))
+       == {"DDD": 1e9}, "symbol 統一大寫（對齊 yahoo_symbol 輸出）")
+    ok(funnel.parse_yahoo_v7_quote_mcaps(json.dumps(
+        {"quoteResponse": {"result": None, "error": {"code": "x"}}})) == {},
+       "result=null → {}")
+    ok(funnel.parse_yahoo_v7_quote_mcaps("<html>") == {}, "非 JSON → {}")
+
+
+def test_yahoo_mcap_fetch_chain():
+    print("[22] 市值 Yahoo 備援鏈：quoteSummary 逐檔 → 缺漏 v7 批次 1 請求 → 皆敗缺鍵")
+    calls, seen_ua = [], []
+
+    def fake_get(url, name, meta_, record_ok=True, sleep=None, **kwargs):
+        calls.append(url)
+        seen_ua.append((kwargs.get("headers") or {}).get("User-Agent"))
+        if "quoteSummary" in url:
+            if "/AAA?" in url:
+                meta_.record(name, url, True, status=200, record_ok=record_ok)
+                return _quotesummary_fixture(5e8), 200, True
+            meta_.record(name, url, False, status=404, error="HTTP 404")
+            return None, 404, False
+        meta_.record(name, url, True, status=200, record_ok=record_ok)
+        return _v7_quote_fixture({"BBB": 2.5e9}), 200, True
+
+    meta = fetch_edgar.Meta()
+    out = funnel.fetch_mcaps_yahoo(["AAA", "BBB", "CCC"], meta, get_fn=fake_get)
+    ok(out == {"AAA": 5e8, "BBB": 2.5e9},
+       f"quoteSummary 接 AAA、v7 批次接 BBB、CCC 兩級皆敗不入鍵（{out}）")
+    qs = [u for u in calls if "quoteSummary" in u]
+    v7 = [u for u in calls if "v7/finance/quote?" in u]
+    ok(len(qs) == 3 and all("modules=price" in u for u in qs),
+       f"quoteSummary 逐檔各 1 請求、modules=price（{len(qs)}）")
+    ok(len(v7) == 1 and "symbols=BBB,CCC" in v7[0],
+       f"v7 一次批次只發 1 請求、只帶 quoteSummary 缺漏檔（{v7}）")
+    ok(all(ua == config.YAHOO_USER_AGENT for ua in seen_ua),
+       "兩級皆用瀏覽器 UA（YAHOO_USER_AGENT）")
+    ok(any("yahoo-quote batch" in e and "CCC" in e for e in meta.errors),
+       f"兩級皆敗檔記 meta.errors 留痕（{meta.errors}）")
+
+    n = len(calls)
+    ok(funnel.fetch_mcaps_yahoo([], fetch_edgar.Meta(), get_fn=fake_get) == {}
+       and len(calls) == n, "空清單 → {} 且零請求")
+
+    # class 股 symbol 轉換：query 用 BRK-B，回傳鍵映回原 ticker BRK.B
+    calls2 = []
+
+    def fake_get_class(url, name, meta_, record_ok=True, sleep=None, **kwargs):
+        calls2.append(url)
+        if "quoteSummary" in url:
+            return None, 404, False
+        return _v7_quote_fixture({"BRK-B": 9e11}), 200, True
+
+    out2 = funnel.fetch_mcaps_yahoo(["BRK.B"], fetch_edgar.Meta(),
+                                    get_fn=fake_get_class)
+    ok(out2 == {"BRK.B": 9e11}, f"class 股：v7 回 BRK-B → 鍵映回 BRK.B（{out2}）")
+    ok(any("/BRK-B?" in u for u in calls2 if "quoteSummary" in u)
+       and any("symbols=BRK-B" in u for u in calls2),
+       "query 皆用 Yahoo symbol（BRK.B → BRK-B）")
+
+    # 兩級全 HTTP 失敗 → {}（呼叫端走 None 保守路徑）＋endpoint_health 留痕
+    def fake_all_fail(url, name, meta_, record_ok=True, sleep=None, **kwargs):
+        meta_.record(name, url, False, status=500, error="HTTP 500")
+        return None, 500, False
+
+    meta_fail = fetch_edgar.Meta()
+    ok(funnel.fetch_mcaps_yahoo(["ZZZ"], meta_fail, get_fn=fake_all_fail) == {},
+       "兩級皆 HTTP 失敗 → {}（不 raise）")
+    ok(any(e["ok"] is False for e in meta_fail.endpoint_health),
+       "HTTP 失敗記 endpoint_health（留痕）")
+
+    # 200 但兩級皆缺 marketCap → {} ＋ 兩級各記 errors
+    def fake_empty(url, name, meta_, record_ok=True, sleep=None, **kwargs):
+        meta_.record(name, url, True, status=200, record_ok=record_ok)
+        if "quoteSummary" in url:
+            return json.dumps({"quoteSummary": {"result": [{"price": {}}],
+                               "error": None}}), 200, True
+        return _v7_quote_fixture({}), 200, True
+
+    meta_empty = fetch_edgar.Meta()
+    ok(funnel.fetch_mcaps_yahoo(["QQQ"], meta_empty, get_fn=fake_empty) == {},
+       "200 但兩級皆缺 marketCap → {}")
+    ok(any("yahoo-quotesummary QQQ" in e for e in meta_empty.errors)
+       and any("yahoo-quote batch" in e for e in meta_empty.errors),
+       f"缺 marketCap 兩級各記 meta.errors（{meta_empty.errors}）")
+
+
+def test_yahoo_mcap_429():
+    print("[23] 市值備援 429 限流：退避一次重試、再敗即棄（沿用 chart 備援模式）")
+    sleeps = []
+
+    class FakeTime:
+        @staticmethod
+        def sleep(s):
+            sleeps.append(s)
+
+        @staticmethod
+        def time():
+            return 0.0
+
+    def make_429_get(fail_times, payload):
+        state = {"n": 0}
+
+        def get(url, name, meta_, record_ok=True, sleep=None, **kwargs):
+            state["n"] += 1
+            if state["n"] <= fail_times:
+                return None, 429, False
+            return payload, 200, True
+        get.state = state
+        return get
+
+    real_time = funnel.time
+    funnel.time = FakeTime
+    try:
+        get1 = make_429_get(1, _quotesummary_fixture(7e8))
+        val = funnel.fetch_mcap_yahoo_quotesummary("EWSB", fetch_edgar.Meta(),
+                                                   get_fn=get1)
+        ok(val == 7e8 and get1.state["n"] == 2, "quoteSummary 429 → 退避一次重試成功")
+        ok(sleeps == [config.YAHOO_429_BACKOFF],
+           f"退避秒數＝YAHOO_429_BACKOFF（{sleeps}）")
+        get2 = make_429_get(99, "")
+        ok(funnel.fetch_mcap_yahoo_quotesummary("EWSB", fetch_edgar.Meta(),
+                                                get_fn=get2) is None
+           and get2.state["n"] == 2, "退避後仍 429 → 棄（共 2 次請求，不無限重試）")
+        get3 = make_429_get(1, _v7_quote_fixture({"EWSB": 6e7}))
+        out = funnel.fetch_mcaps_yahoo_v7(["EWSB"], fetch_edgar.Meta(), get_fn=get3)
+        ok(out == {"EWSB": 6e7} and get3.state["n"] == 2,
+           "v7 批次 429 → 退避一次重試成功")
+    finally:
+        funnel.time = real_time
+
+
+def test_mcap_fallback_integration():
+    print("[24] 漏斗整合：市值 edgar→yahoo→none 逐級接手＋meta.mcap_source_stats 計數")
+    start = date(2026, 3, 2)
+    acme, spy = _beta_series(start, 128, base=14.0, multiplier=1.2)
+    dlta, _ = _beta_series(start, 128, base=9.5, multiplier=0.5)
+    table = {"ACME": acme, "DLTA": dlta, "SPY": spy}
+    shares = {"1111111": 10_000_000.0}  # ACME 有 EDGAR 股數；DLTA 缺 → 走 Yahoo 備援
+
+    backup_calls = []
+
+    def backup_fn(tickers):
+        backup_calls.append(sorted(tickers))
+        return {"DLTA": 5_000_000_000.0}
+
+    meta = fetch_edgar.Meta()
+    output, _, _ = run_fixture_funnel(table.get,
+                                      shares_fn=lambda cik: shares.get(cik),
+                                      mcap_backup_fn=backup_fn, meta=meta)
+    by_ticker = {c["ticker"]: c for c in output["candidates"]}
+    a, d = by_ticker["ACME"], by_ticker["DLTA"]
+    ok(backup_calls == [["DLTA"]],
+       f"備援只對 EDGAR 失敗檔呼叫、每輪一次（{backup_calls}）")
+    ok(a["risk"]["mcap_usd"] == round(10_000_000.0 * acme[-1][1]),
+       f"ACME 走 EDGAR 主源不變（{a['risk']['mcap_usd']}）")
+    ok(d["risk"]["mcap_usd"] == 5_000_000_000
+       and d["risk"]["mcap_band"] == "mid",
+       f"DLTA 由 Yahoo 備援補上 $5B → mid（{d['risk']['mcap_usd']}）")
+    ok(d["risk"]["data_gap"] is False and d["risk"]["level"] == "low",
+       f"DLTA mid(1)+low beta(0)=1 → low、data_gap 解除（{d['risk']['level']}）")
+    ok(d["score_breakdown"]["mcap"] == 1,
+       f"備援市值同步餵第三層評分（mid → 1 分）（{d['score_breakdown']['mcap']}）")
+    ok(meta.mcap_source_stats == {"edgar": 1, "yahoo": 1, "none": 0},
+       f"mcap_source_stats 計數 edgar/yahoo（{meta.mcap_source_stats}）")
+
+    # 備援也敗 → 既有 None 保守路徑不變
+    meta2 = fetch_edgar.Meta()
+    output2, _, _ = run_fixture_funnel(table.get,
+                                       shares_fn=lambda cik: shares.get(cik),
+                                       mcap_backup_fn=lambda tickers: {},
+                                       meta=meta2)
+    d2 = {c["ticker"]: c for c in output2["candidates"]}["DLTA"]
+    ok(d2["risk"]["mcap_usd"] is None and d2["risk"]["data_gap"] is True
+       and d2["risk"]["mcap_band"] == "unknown",
+       "備援也敗 → None 保守路徑不變（unknown + data_gap）")
+    ok(meta2.mcap_source_stats == {"edgar": 1, "yahoo": 0, "none": 1},
+       f"皆敗計 none（{meta2.mcap_source_stats}）")
+
+    # EDGAR 全敗（shares_fn=None）→ 備援一次收到全部 survivors
+    backup_calls2 = []
+
+    def backup_all(tickers):
+        backup_calls2.append(sorted(tickers))
+        return {t: 1_000_000_000.0 for t in tickers}
+
+    meta3 = fetch_edgar.Meta()
+    output3, _, _ = run_fixture_funnel(table.get, shares_fn=None,
+                                       mcap_backup_fn=backup_all, meta=meta3)
+    ok(backup_calls2 == [["ACME", "DLTA"]],
+       f"EDGAR 全敗 → 備援一次收全部 survivors（{backup_calls2}）")
+    ok(meta3.mcap_source_stats == {"edgar": 0, "yahoo": 2, "none": 0},
+       f"全走 yahoo（{meta3.mcap_source_stats}）")
+    ok(all(c["risk"]["mcap_usd"] == 1_000_000_000 for c in output3["candidates"]),
+       "備援市值進輸出契約 risk.mcap_usd")
+
+    # --no-network 等效：無主源無備援 → 全 none、既有保守路徑不變
+    meta4 = fetch_edgar.Meta()
+    output4, _, _ = run_fixture_funnel(None, meta=meta4)
+    ok(meta4.mcap_source_stats == {"edgar": 0, "yahoo": 0, "none": 2},
+       f"--no-network：全 none（{meta4.mcap_source_stats}）")
+    ok(all(c["risk"]["mcap_usd"] is None and c["risk"]["data_gap"] is True
+           for c in output4["candidates"]),
+       "--no-network 保守路徑不變（全 None + data_gap）")
+
+
 def main():
     tests = [test_daily_index, test_parse_form4, test_build_events, test_funnel,
              test_funnel_liquidity_and_degradation, test_output_schema,
              test_tracking_backfill, test_tracking_dedup, test_price_source,
-             test_fetch_day_and_meta, test_load_events]
+             test_fetch_day_and_meta, test_load_events, test_beta,
+             test_risk_matrix, test_shares_outstanding,
+             test_funnel_risk_integration, test_yahoo_parse, test_price_fallback,
+             test_yahoo_429, test_edgar_ua_and_403_backoff, test_company_facts_meta,
+             test_yahoo_mcap_parse, test_yahoo_mcap_fetch_chain, test_yahoo_mcap_429,
+             test_mcap_fallback_integration]
     for t in tests:
         t()
     print(f"\nALL TESTS PASSED ({checks} checks)")
