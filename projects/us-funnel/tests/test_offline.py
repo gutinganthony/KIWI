@@ -673,13 +673,255 @@ def test_funnel_risk_integration():
        "無網路 → 全候選保守 high(data_gap)")
 
 
+# ---------------------------------------------------------------------------
+# [16-18] Yahoo chart 備援：解析（null 成對過濾）、fallback 順序、429 退避
+# ---------------------------------------------------------------------------
+
+def _yahoo_fixture(n_days=8, null_idx=(2, 5), start=date(2026, 7, 1), base=20.0):
+    """造 Yahoo v8 chart JSON：n_days 根日線，null_idx 位置 close=null（需成對過濾）。"""
+    timestamps, closes, volumes = [], [], []
+    for i in range(n_days):
+        d = start + timedelta(days=i)
+        ts = int(datetime(d.year, d.month, d.day, 13, 30,
+                          tzinfo=timezone.utc).timestamp())
+        timestamps.append(ts)
+        closes.append(None if i in null_idx else base + i)
+        volumes.append(None if i == 0 else 50000 + i)
+    return json.dumps({"chart": {"result": [{
+        "meta": {"symbol": "TEST", "currency": "USD"},
+        "timestamp": timestamps,
+        "indicators": {"quote": [{"close": closes, "volume": volumes}]},
+    }], "error": None}})
+
+
+def test_yahoo_parse():
+    print("[16] Yahoo chart 解析：null 成對過濾 / 無效回應 / rows 契約 / symbol 轉換")
+    rows = track.parse_yahoo_chart(_yahoo_fixture())
+    ok(rows is not None and len(rows) == 6,
+       f"8 根日線、2 個 null close → 6 行（{len(rows or [])}）")
+    ok(rows[0] == ("2026-07-01", 20.0, 0.0),
+       f"首行：epoch→UTC 日期、volume null→0.0（{rows[0]}）")
+    ok(rows[-1] == ("2026-07-08", 27.0, 50007.0),
+       f"尾行 close/volume（{rows[-1]}）")
+    dates = [r[0] for r in rows]
+    ok("2026-07-03" not in dates and "2026-07-06" not in dates,
+       "null close 的 timestamp 成對剔除（不留半殘行）")
+    ok(dates == sorted(dates), "輸出升冪（與 Stooq rows 契約一致，上游零改動）")
+    ok(track.parse_yahoo_chart("Not Found") is None, "非 JSON 回應 → None")
+    ok(track.parse_yahoo_chart(json.dumps(
+        {"chart": {"result": None, "error": {"code": "Not Found"}}})) is None,
+       "chart.result=null（查無代號）→ None")
+    ok(track.parse_yahoo_chart(_yahoo_fixture(n_days=6, null_idx=(0, 1))) is None,
+       f"有效行 4 < PRICE_HISTORY_MIN_ROWS={config.PRICE_HISTORY_MIN_ROWS} → None")
+    ok(track.yahoo_symbol("aapl") == "AAPL", "aapl → AAPL")
+    ok(track.yahoo_symbol("BRK.B") == "BRK-B", "BRK.B → BRK-B（class 股轉換）")
+
+
+def test_price_fallback():
+    print("[17] 價格源 fallback：Stooq 無效→Yahoo 接手；兩敗→None；快取與 meta 記錄")
+    yahoo_json = _yahoo_fixture()
+    calls = []
+
+    def fake_get(url, name, meta_, record_ok=True, sleep=None, **kwargs):
+        calls.append(url)
+        if "stooq.com" in url:
+            meta_.record(name, url, True, status=200, record_ok=record_ok)
+            if "goodstq" in url:
+                return STOOQ_SAMPLE, 200, True
+            return "No data", 200, True   # 2026-07-11 CI 實證：微型股回應
+        if "BOTHBAD" in url:
+            meta_.record(name, url, False, status=500, error="HTTP 500")
+            return None, 500, False
+        meta_.record(name, url, True, status=200, record_ok=record_ok)
+        return yahoo_json, 200, True
+
+    meta = fetch_edgar.Meta()
+    price_fn = track.make_price_fetcher(meta, get_fn=fake_get)
+
+    rows = price_fn("EWSB")   # Stooq 'No data' → Yahoo 接手
+    ok(rows is not None and len(rows) == 6, "Stooq 無效 → Yahoo 備援接手（rows 有效）")
+    ok(meta.price_sources.get("EWSB") == "yahoo",
+       f"per-ticker 使用源記 yahoo（{meta.price_sources.get('EWSB')}）")
+    ok("stooq.com" in calls[0] and "query1.finance.yahoo.com" in calls[1],
+       "順序：先試 Stooq 再試 Yahoo")
+
+    rows2 = price_fn("GOODSTQ")
+    ok(rows2 is not None and meta.price_sources.get("GOODSTQ") == "stooq",
+       "Stooq 有效 → 源記 stooq")
+    ok(not any("yahoo" in u and "GOODSTQ" in u for u in calls),
+       "Stooq 成功時 Yahoo 零請求")
+
+    rows3 = price_fn("BOTHBAD")
+    ok(rows3 is None and meta.price_sources.get("BOTHBAD") == "none",
+       "兩源皆敗 → None（既有降級路徑不變）、源記 none")
+
+    n_calls = len(calls)
+    ok(price_fn("EWSB") is not None and len(calls) == n_calls,
+       "快取：同 ticker 第二次呼叫零請求（每源每 ticker 只試一次）")
+
+    stats = meta.price_source_stats
+    ok(stats["stooq"] == {"ok": 1, "failed": 2}
+       and stats["yahoo"] == {"ok": 1, "failed": 1},
+       f"兩源各自成功/失敗計數（{stats}）")
+
+
+def test_yahoo_429():
+    print("[18] Yahoo 429 限流：退避一次重試、再敗即棄")
+    yahoo_json = _yahoo_fixture()
+    sleeps = []
+
+    class FakeTime:
+        @staticmethod
+        def sleep(s):
+            sleeps.append(s)
+
+        @staticmethod
+        def time():
+            return 0.0
+
+    def make_429_get(fail_times):
+        state = {"n": 0}
+
+        def get(url, name, meta_, record_ok=True, sleep=None, **kwargs):
+            state["n"] += 1
+            if state["n"] <= fail_times:
+                return None, 429, False
+            return yahoo_json, 200, True
+        get.state = state
+        return get
+
+    real_time = track.time
+    track.time = FakeTime
+    try:
+        get1 = make_429_get(1)
+        rows = track.fetch_price_history_yahoo("EWSB", fetch_edgar.Meta(), get_fn=get1)
+        ok(rows is not None and get1.state["n"] == 2, "429 → 退避一次重試成功")
+        ok(sleeps == [config.YAHOO_429_BACKOFF],
+           f"退避秒數＝YAHOO_429_BACKOFF（{sleeps}）")
+        get2 = make_429_get(99)
+        rows2 = track.fetch_price_history_yahoo("EWSB", fetch_edgar.Meta(), get_fn=get2)
+        ok(rows2 is None and get2.state["n"] == 2,
+           "退避後仍 429 → 棄（共 2 次請求，不無限重試）")
+    finally:
+        track.time = real_time
+
+
+# ---------------------------------------------------------------------------
+# [19-20] EDGAR 403 韌性：UA 字串、403 專屬 backoff、company facts 失敗留痕
+# ---------------------------------------------------------------------------
+
+def test_edgar_ua_and_403_backoff():
+    print("[19] EDGAR UA 與 403 韌性：真實可聯絡 UA / 403 專屬 backoff / UA 覆蓋")
+    ua = config.EDGAR_USER_AGENT
+    ok("github.com/gutinganthony/KIWI" in ua
+       and "gutinganthony@users.noreply.github.com" in ua,
+       f"UA 含 repo 與真實可聯絡信箱（{ua}）")
+    ok("example.com" not in ua, "UA 不含假信箱（example.com 疑遭 SEC 過濾）")
+    ok(config.HTTP_403_BACKOFFS == [10, 30],
+       f"403 專屬 backoff=[10,30]（{config.HTTP_403_BACKOFFS}）")
+
+    sleeps, seen_headers = [], []
+
+    class FakeTime:
+        @staticmethod
+        def sleep(s):
+            sleeps.append(s)
+
+        @staticmethod
+        def time():
+            return 0.0
+
+    class Resp403:
+        status_code = 403
+        text = ('<?xml version="1.0" encoding="UTF-8"?><Error>'
+                '<Code>AccessDenied</Code><Message>Access Denied</Message></Error>')
+
+    class FakeRequests:
+        @staticmethod
+        def get(url, headers=None, timeout=None):
+            seen_headers.append(headers)
+            return Resp403()
+
+    real_time, real_requests = fetch_edgar.time, fetch_edgar.requests
+    fetch_edgar.time, fetch_edgar.requests = FakeTime, FakeRequests
+    try:
+        meta = fetch_edgar.Meta()
+        _, status, ok_flag = fetch_edgar.http_get_text(
+            "https://www.sec.gov/Archives/edgar/daily-index/x.idx",
+            "daily-index test", meta)
+        ok(status == 403 and ok_flag is False,
+           "403 重試全敗 → ok=False（呼叫端既有優雅降級：吃快取）")
+        ok(sleeps[:config.HTTP_RETRIES] == config.HTTP_403_BACKOFFS[:config.HTTP_RETRIES],
+           f"403 重試前等待用專屬 backoff（{sleeps[:config.HTTP_RETRIES]}）")
+        ok(len(seen_headers) == 1 + config.HTTP_RETRIES,
+           f"重試次數不變（{len(seen_headers)} 次請求）")
+        ok(seen_headers[0]["User-Agent"] == config.EDGAR_USER_AGENT,
+           "預設 headers 用 EDGAR 禮儀 UA")
+        ok(meta.endpoint_health[-1]["status"] == 403
+           and "AccessDenied" in meta.endpoint_health[-1]["error"],
+           "403 失敗記 endpoint_health（status＋body 片段）")
+        fetch_edgar.http_get_text(
+            "https://query1.finance.yahoo.com/v8/finance/chart/T",
+            "yahoo test", fetch_edgar.Meta(),
+            headers={"User-Agent": config.YAHOO_USER_AGENT}, retries=0)
+        ok(seen_headers[-1]["User-Agent"] == config.YAHOO_USER_AGENT,
+           "headers 覆蓋：Yahoo 走瀏覽器 UA")
+    finally:
+        fetch_edgar.time, fetch_edgar.requests = real_time, real_requests
+
+
+def test_company_facts_meta():
+    print("[20] company facts 失敗留痕：mcap unknown 必在 meta.endpoint_health 有痕跡")
+
+    def fake_404(url, name, meta, record_ok=True, sleep=None):
+        meta.record(name, url, False, status=404, error="HTTP 404")
+        return None, 404, False
+
+    meta = fetch_edgar.Meta()
+    val = fetch_edgar.fetch_shares_outstanding("123", meta, get_fn=fake_404)
+    entries = [e for e in meta.endpoint_health
+               if str(e.get("name", "")).startswith("company-facts")]
+    ok(val is None and len(entries) == 1 and entries[0]["ok"] is False,
+       "全 concept 失敗 → 記一筆 company-facts 進 endpoint_health")
+    ok(meta.requests_failed == 2,
+       f"彙總條目 count=False 不重複計數（failed={meta.requests_failed}＝2 次 HTTP）")
+
+    meta2 = fetch_edgar.Meta()
+    fetch_edgar.fetch_shares_outstanding("acme", meta2, get_fn=fake_404)
+    ok(any(str(e.get("name", "")).startswith("company-facts")
+           for e in meta2.endpoint_health) and meta2.requests_failed == 0,
+       "無效 CIK（未發請求）也留痕、不計 HTTP 失敗")
+
+    def fake_empty(url, name, meta, record_ok=True, sleep=None):
+        meta.record(name, url, True, status=200, record_ok=record_ok)
+        return json.dumps({"units": {}}), 200, True
+
+    meta3 = fetch_edgar.Meta()
+    ok(fetch_edgar.fetch_shares_outstanding("123", meta3, get_fn=fake_empty) is None
+       and any(str(e.get("name", "")).startswith("company-facts")
+               for e in meta3.endpoint_health),
+       "200 但缺 units.shares → 亦留痕（先前 mcap unknown 無跡可循的洞）")
+
+    def fake_dei_ok(url, name, meta, record_ok=True, sleep=None):
+        if "dei/EntityCommonStockSharesOutstanding" in url:
+            return DEI_CONCEPT, 200, True
+        return None, 404, False
+
+    meta4 = fetch_edgar.Meta()
+    ok(fetch_edgar.fetch_shares_outstanding("1111111", meta4, get_fn=fake_dei_ok)
+       == 1000000.0 and not any(str(e.get("name", "")).startswith("company-facts")
+                                for e in meta4.endpoint_health),
+       "成功路徑不多記彙總條目")
+
+
 def main():
     tests = [test_daily_index, test_parse_form4, test_build_events, test_funnel,
              test_funnel_liquidity_and_degradation, test_output_schema,
              test_tracking_backfill, test_tracking_dedup, test_price_source,
              test_fetch_day_and_meta, test_load_events, test_beta,
              test_risk_matrix, test_shares_outstanding,
-             test_funnel_risk_integration]
+             test_funnel_risk_integration, test_yahoo_parse, test_price_fallback,
+             test_yahoo_429, test_edgar_ua_and_403_backoff, test_company_facts_meta]
     for t in tests:
         t()
     print(f"\nALL TESTS PASSED ({checks} checks)")

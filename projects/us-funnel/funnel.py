@@ -26,9 +26,10 @@ data/candidates_latest.json =
      "first_filing_date","entry_price_ref",
      "risk":{"level","data_gap","beta","mcap_usd","mcap_band","beta_band"}}]}
 
-網路使用：只對「已通過資格關卡」的少數 issuer 抓 Stooq 日線（流動性否決＋dip 評分＋
-beta）、對 survivors 抓 EDGAR company facts（市值），價格源/EDGAR 故障→優雅降級
-（跳過相應檢查、走 None 保守分級、記 meta），不 crash。純唯讀，無任何下單。
+網路使用：只對「已通過資格關卡」的少數 issuer 抓價格日線（主 Stooq → 備 Yahoo chart，
+供流動性否決＋dip 評分＋beta）、對 survivors 抓 EDGAR company facts（市值），
+價格源/EDGAR 故障→優雅降級（跳過相應檢查、走 None 保守分級、記 meta），不 crash。
+純唯讀，無任何下單。
 """
 
 import argparse
@@ -468,6 +469,8 @@ def main(argv=None):
         "skipped_checks": skipped_checks[:config.META_ERRORS_MAX],
         "requests_ok": meta.requests_ok,
         "requests_failed": meta.requests_failed,
+        "price_source_stats": meta.price_source_stats,
+        "price_sources": meta.price_sources,
         "elapsed_sec": round(time.time() - started, 1),
         "endpoint_health": meta.endpoint_health,
         "errors": meta.errors,
