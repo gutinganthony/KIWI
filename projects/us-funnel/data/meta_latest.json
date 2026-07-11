@@ -1,0 +1,107 @@
+{
+ "fetch": {
+  "ran_at": "2026-07-10T19:18:46.904650+00:00",
+  "days_scanned": 8,
+  "days_fetched": 0,
+  "days_skipped_cached": 6,
+  "raw_filings": 0,
+  "parse_failed": 0,
+  "requests_ok": 0,
+  "requests_failed": 2,
+  "elapsed_sec": 9.7,
+  "endpoint_health": [
+   {
+    "name": "daily-index 2026-07-10",
+    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260710.idx",
+    "ok": false,
+    "status": 403,
+    "error": "HTTP 403; body=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>NZEJNHPD244EPGS9</RequestId><HostId>uUWjh7O6PKY0quVwGJlFfJuXOmCKQWvYI6v",
+    "elapsed_sec": 4.7
+   },
+   {
+    "name": "daily-index 2026-07-03",
+    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260703.idx",
+    "ok": false,
+    "status": 403,
+    "error": "HTTP 403; body=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>RS2W7Y8PCKHRFA6N</RequestId><HostId>rbkMmeCr8JB0c9x0o4SoJSJy7WUBXhHwIWl",
+    "elapsed_sec": 4.65
+   }
+  ],
+  "errors": [
+   "2026-07-10 索引抓取失敗（status=403）",
+   "2026-07-03 索引抓取失敗（status=403）"
+  ]
+ },
+ "updated_at": "2026-07-10T19:19:22.652150+00:00",
+ "funnel": {
+  "ran_at": "2026-07-10T19:19:06.846967+00:00",
+  "days_loaded": 4,
+  "funnel_stats": {
+   "raw_filings": 4822,
+   "qualified_events": 18,
+   "post_veto": 9,
+   "final_candidates": 9
+  },
+  "veto_counts": {
+   "penny": 0,
+   "sell_offset": 1,
+   "illiquid": 0,
+   "fund_issuer": 4,
+   "routine_wave": 4
+  },
+  "skipped_checks": [
+   "liquidity:YPF",
+   "liquidity:PFBX",
+   "liquidity:JCTC",
+   "liquidity:HTO",
+   "liquidity:EWSB",
+   "liquidity:VII",
+   "liquidity:ENR",
+   "liquidity:UUUU",
+   "liquidity:WRAP"
+  ],
+  "requests_ok": 9,
+  "requests_failed": 0,
+  "elapsed_sec": 10.2,
+  "endpoint_health": [],
+  "errors": [
+   "stooq YPF: 回應非有效 CSV（No data？）",
+   "stooq PFBX: 回應非有效 CSV（No data？）",
+   "stooq JCTC: 回應非有效 CSV（No data？）",
+   "stooq HTO: 回應非有效 CSV（No data？）",
+   "stooq EWSB: 回應非有效 CSV（No data？）",
+   "stooq VII: 回應非有效 CSV（No data？）",
+   "stooq ENR: 回應非有效 CSV（No data？）",
+   "stooq UUUU: 回應非有效 CSV（No data？）",
+   "stooq WRAP: 回應非有效 CSV（No data？）"
+  ]
+ },
+ "tracking": {
+  "ran_at": "2026-07-10T19:19:22.652027+00:00",
+  "positions_total": 15,
+  "positions_new": 0,
+  "positions_updated": 0,
+  "price_failed": 15,
+  "requests_ok": 15,
+  "requests_failed": 0,
+  "elapsed_sec": 15.7,
+  "endpoint_health": [],
+  "errors": [
+   "stooq EWSB: 回應非有效 CSV（No data？）",
+   "stooq TSM: 回應非有效 CSV（No data？）",
+   "stooq ENR: 回應非有效 CSV（No data？）",
+   "stooq VII: 回應非有效 CSV（No data？）",
+   "stooq UUUU: 回應非有效 CSV（No data？）",
+   "stooq YPF: 回應非有效 CSV（No data？）",
+   "stooq TURB: 回應非有效 CSV（No data？）",
+   "stooq VFLEX: 回應非有效 CSV（No data？）",
+   "stooq BBASX: 回應非有效 CSV（No data？）",
+   "stooq FTECX: 回應非有效 CSV（No data？）",
+   "stooq HTO: 回應非有效 CSV（No data？）",
+   "stooq JCTC: 回應非有效 CSV（No data？）",
+   "stooq PFBX: 回應非有效 CSV（No data？）",
+   "stooq WRAP: 回應非有效 CSV（No data？）",
+   "stooq SWZ: 回應非有效 CSV（No data？）"
+  ]
+ }
+}

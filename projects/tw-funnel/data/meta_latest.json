@@ -1,0 +1,100 @@
+{
+ "generated_at": "2026-07-10T19:09:03Z",
+ "market": "TW",
+ "pipeline": "tw-funnel",
+ "as_of_trading_day": "2026-07-09",
+ "endpoint_health": {
+  "finmind_stock_info": {
+   "ok": true,
+   "status": 200,
+   "source": "finmind",
+   "dataset": "TaiwanStockInfo",
+   "rows": 4276
+  },
+  "finmind_institutional": {
+   "ok": false,
+   "status": 400,
+   "source": "finmind",
+   "dataset": "TaiwanStockInstitutionalInvestorsBuySell",
+   "error": "{\"msg\":\"Your level is free. Please update your user level. Detail information:https://finmindtrade.com/analysis/#/Sponsor/sponsor\",\"status\":400,\"token"
+  },
+  "t86_openapi": {
+   "ok": false,
+   "status": 200,
+   "error": "Expecting value: line 1 column 1 (char 0)",
+   "url": "https://openapi.twse.com.tw/v1/fund/T86"
+  },
+  "t86_rwd": {
+   "ok": true,
+   "status": 200,
+   "url": "https://www.twse.com.tw/rwd/zh/fund/T86"
+  },
+  "finmind_price": {
+   "ok": false,
+   "status": 400,
+   "source": "finmind",
+   "dataset": "TaiwanStockPrice",
+   "error": "{\"msg\":\"Your level is free. Please update your user level. Detail information:https://finmindtrade.com/analysis/#/Sponsor/sponsor\",\"status\":400,\"token"
+  },
+  "stock_day_all": {
+   "ok": true,
+   "status": 200,
+   "url": "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL"
+  },
+  "finmind_month_revenue": {
+   "ok": true,
+   "source": "finmind",
+   "dataset": "TaiwanStockMonthRevenue",
+   "pool": 43,
+   "fetched": 42,
+   "errors": 0
+  },
+  "company_basic": {
+   "ok": true,
+   "status": 200,
+   "url": "https://openapi.twse.com.tw/v1/opendata/t187ap03_L"
+  },
+  "punish_list": {
+   "ok": true,
+   "status": 200,
+   "url": "https://openapi.twse.com.tw/v1/announcement/punish"
+  },
+  "attention_list": {
+   "ok": true,
+   "status": 200,
+   "url": "https://openapi.twse.com.tw/v1/announcement/notice"
+  },
+  "pledge_t187ap11_L": {
+   "ok": false,
+   "status": 200,
+   "url": "https://openapi.twse.com.tw/v1/opendata/t187ap11_L",
+   "error": "回應可取但無設質/持股欄位——欄位假設不成立，質押否決不生效"
+  }
+ },
+ "funnel_stats": {
+  "raw_filings": 320,
+  "qualified_events": 27,
+  "post_veto": 0,
+  "final_candidates": 0
+ },
+ "veto_reasons": {
+  "turnover_unknown": 26,
+  "punish_list": 1
+ },
+ "january_window_active": false,
+ "degradations": [
+  "pledge_data_unavailable: 董監質押比取數失敗/欄位不符，質押否決不生效",
+  "revenue_prev_month_missing: 1 檔通過籌碼關但無上月 YoY（月營收史料未累積滿 2 期），無法判加速，誠實不入池"
+ ],
+ "todo_not_wired": [
+  "tpex_otc_not_wired: v0 只做上市（TWSE），上櫃 TPEx 未接線",
+  "director_transfer_not_wired: 董監申讓申報無 OpenAPI dataset（MOPS 無官方 API），否決關卡此項未接線"
+ ],
+ "warnings": [
+  "funnel_starved: 否決後候選 0 < 10（設計文件§3：考慮放寬資格關卡、靠評分消化）"
+ ],
+ "notes": [
+  "純唯讀觀察，無下單；不構成投資建議",
+  "組合條件（投信買超×營收動能）唯一公開回測為 FinLab 樣本內 +33.9%/yr、MDD -45.5%——期望值不可直接引用，Phase 2 需 walk-forward 樣本外驗證"
+ ]
+}

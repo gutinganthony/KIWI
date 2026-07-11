@@ -48,3 +48,7 @@
 | 2026-07-07 | [AXW（AIR TRF 融資利差）能不能預判大盤？＋短線領先指標全面回測（FDR 校正）](./2026-07-07-air-trf-funding-spread-leading-indicators-backtest.md) | AIR-TRF, funding-spread, leverage, leading-indicators, backtest, VIX, VVIX, credit, CRI, market-timing, FDR |
 | 2026-07-08 | [Serenity 週報 2026-07-08（全掃）— IQE 否證命中 + santec 摔進回檔買進區](./serenity-weekly/2026-07-08.md) | serenity-weekly, watchlist, reprice, IQE, santec, IQE-falsification, memory-selloff, catalysts, macro-monitor |
 | 2026-07-09 | [Serenity Step 1–9：Coherent + Marvell（AAOI 換倉候選）](./2026-07-09-serenity-step1-9-cohr-mrvl-aaoi-replacement.md) | investment, serenity-chokepoint, deep-dive, COHR, MRVL, AVGO, optical-DSP, InP-EML, custom-ASIC, AAOI-replacement, valuation |
+| 2026-07-10 | [Polymarket 跟單「月賺5萬美金」文查證 — 導流漏斗解剖 + 跟單策略可行性評估](./2026-07-10-polymarket-copy-trading-guide-verification.md) | polymarket, copy-trading, prediction-markets, due-diligence, scam-analysis, kol-funnel, verification, taiwan-compliance |
+| 2026-07-10 | [跟單聰明錢觀察器 — Polymarket + Hyperliquid 跨平台實證結論](./2026-07-10-copy-trading-smart-money-observer-findings.md) | copy-trading, smart-money, polymarket, hyperliquid, perps, on-chain, wallet-tracking, read-only, quant |
+| 2026-07-10 | [股票慢訊號價值評估 — 13F / Form 4 / 台股籌碼](./2026-07-10-stock-slow-signal-value-assessment.md) | 13f, form4, insider-trading, taiwan-stocks, institutional-flow, slow-signal, evidence-based |
+| 2026-07-10 | [台股／美股慢訊號篩選漏斗設計 — 三層架構（實證定稿）](./2026-07-10-us-tw-signal-funnel-design.md) | funnel-design, form4, 13f, taiwan-stocks, screening, composite-score, piotroski, aqr |

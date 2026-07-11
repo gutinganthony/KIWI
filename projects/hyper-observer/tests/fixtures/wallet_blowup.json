@@ -1,0 +1,52 @@
+{
+  "address": "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6",
+  "fetched_at": "2026-07-01T06:45:00+00:00",
+  "_note": "James Wynn ground-truth 反例：40x BTC 高槓桿、曾被強平、$100M → $900 崩塌。分類器必須判 blowup_risk。",
+  "clearinghouseState": {
+    "assetPositions": [
+      {
+        "type": "oneWay",
+        "position": {
+          "coin": "BTC",
+          "szi": "5",
+          "entryPx": "100000",
+          "positionValue": "500000",
+          "unrealizedPnl": "-495000",
+          "leverage": {"type": "isolated", "value": 40, "rawUsd": "12500"},
+          "liquidationPx": "98000",
+          "marginUsed": "12500",
+          "maxLeverage": 40,
+          "cumFunding": {"allTime": "8000.0", "sinceChange": "0.0", "sinceOpen": "0.0"}
+        }
+      }
+    ],
+    "crossMarginSummary": {"accountValue": "900", "totalNtlPos": "0.0", "totalRawUsd": "900", "totalMarginUsed": "0.0"},
+    "marginSummary": {"accountValue": "900", "totalNtlPos": "500000", "totalRawUsd": "-499100", "totalMarginUsed": "12500"},
+    "crossMaintenanceMarginUsed": "0.0",
+    "withdrawable": "0",
+    "time": 1781481600000
+  },
+  "portfolio": [
+    ["allTime", {"accountValueHistory": [[1777593600000, "1000000"], [1781481600000, "900"]], "pnlHistory": [[1777593600000, "0"], [1781481600000, "900"]], "vlm": "3000000000"}],
+    ["perpAllTime", {
+      "accountValueHistory": [
+        [1777593600000, "1000000"], [1778803200000, "51000000"],
+        [1780272000000, "101000000"], [1781481600000, "900"]
+      ],
+      "pnlHistory": [
+        [1777593600000, "0"], [1778803200000, "50000000"],
+        [1780272000000, "100000000"], [1781481600000, "900"]
+      ],
+      "vlm": "3000000000"
+    }]
+  ],
+  "userFills": [
+    {"coin": "BTC", "px": "108000", "sz": "10", "side": "B", "time": 1780272000000, "closedPnl": "0.0", "fee": "540.0", "dir": "Open Long", "hash": "0xw001"},
+    {"coin": "BTC", "px": "95000", "sz": "10", "side": "A", "time": 1781481600000, "closedPnl": "-130000.0", "fee": "0.0", "dir": "Close Long", "hash": "0xw002",
+     "liquidation": {"liquidatedUser": "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6", "markPx": "95000", "method": "market"}}
+  ],
+  "userFunding": [
+    {"time": 1780272000000, "delta": {"type": "funding", "coin": "BTC", "usdc": "-8000.0", "szi": "10", "fundingRate": "0.0001"}}
+  ],
+  "errors": []
+}

@@ -1,0 +1,22 @@
+{
+  "address": "0x4444444444444444444444444444444444444444",
+  "fetched_at": "2026-07-01T06:45:00+00:00",
+  "_note": "資料不足樣本：無 portfolio PnL 曲線、成交僅 2 筆。分類器應判 insufficient_data。",
+  "clearinghouseState": {
+    "assetPositions": [],
+    "crossMarginSummary": {"accountValue": "1200", "totalNtlPos": "0.0", "totalRawUsd": "1200", "totalMarginUsed": "0.0"},
+    "marginSummary": {"accountValue": "1200", "totalNtlPos": "0.0", "totalRawUsd": "1200", "totalMarginUsed": "0.0"},
+    "withdrawable": "1200",
+    "time": 1782345600000
+  },
+  "portfolio": [
+    ["perpAllTime", {"accountValueHistory": [], "pnlHistory": [], "vlm": "0"}],
+    ["allTime", {"accountValueHistory": [], "pnlHistory": [], "vlm": "0"}]
+  ],
+  "userFills": [
+    {"coin": "SOL", "px": "150", "sz": "2", "side": "B", "time": 1781913600000, "closedPnl": "0.0", "fee": "0.6", "dir": "Open Long", "hash": "0xi001"},
+    {"coin": "SOL", "px": "155", "sz": "2", "side": "A", "time": 1782000000000, "closedPnl": "10.0", "fee": "0.62", "dir": "Close Long", "hash": "0xi002"}
+  ],
+  "userFunding": [],
+  "errors": []
+}

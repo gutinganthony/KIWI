@@ -1,0 +1,38 @@
+{
+  "address": "0x3333333333333333333333333333333333333333",
+  "fetched_at": "2026-07-01T06:45:00+00:00",
+  "_note": "刷量/對敲樣本：巨量 vlm（$80M）、總 PnL≈0、來回自成交無淨方向、極短持倉。分類器應判 wash_suspect。",
+  "clearinghouseState": {
+    "assetPositions": [],
+    "crossMarginSummary": {"accountValue": "500", "totalNtlPos": "0.0", "totalRawUsd": "500", "totalMarginUsed": "0.0"},
+    "marginSummary": {"accountValue": "500", "totalNtlPos": "0.0", "totalRawUsd": "500", "totalMarginUsed": "0.0"},
+    "crossMaintenanceMarginUsed": "0.0",
+    "withdrawable": "500",
+    "time": 1782345600000
+  },
+  "portfolio": [
+    ["perpAllTime", {
+      "accountValueHistory": [
+        [1777593600000, "500"], [1778803200000, "520"], [1780272000000, "510"],
+        [1781481600000, "530"], [1782345600000, "525"]
+      ],
+      "pnlHistory": [
+        [1777593600000, "0"], [1778803200000, "20"], [1780272000000, "10"],
+        [1781481600000, "30"], [1782345600000, "25"]
+      ],
+      "vlm": "80000000"
+    }]
+  ],
+  "userFills": [
+    {"coin": "BTC", "px": "50000", "sz": "1", "side": "B", "time": 1781913600000, "closedPnl": "0.0", "fee": "20.0", "dir": "Open Long", "hash": "0xa001"},
+    {"coin": "BTC", "px": "50010", "sz": "1", "side": "A", "time": 1781913660000, "closedPnl": "10.0", "fee": "20.0", "dir": "Close Long", "hash": "0xa002"},
+    {"coin": "BTC", "px": "50010", "sz": "1", "side": "A", "time": 1781913720000, "closedPnl": "0.0", "fee": "20.0", "dir": "Open Short", "hash": "0xa003"},
+    {"coin": "BTC", "px": "50000", "sz": "1", "side": "B", "time": 1781913780000, "closedPnl": "10.0", "fee": "20.0", "dir": "Close Short", "hash": "0xa004"},
+    {"coin": "BTC", "px": "50000", "sz": "1", "side": "B", "time": 1781913840000, "closedPnl": "0.0", "fee": "20.0", "dir": "Open Long", "hash": "0xa005"},
+    {"coin": "BTC", "px": "49990", "sz": "1", "side": "A", "time": 1781913900000, "closedPnl": "-10.0", "fee": "20.0", "dir": "Close Long", "hash": "0xa006"},
+    {"coin": "BTC", "px": "49990", "sz": "1", "side": "A", "time": 1781913960000, "closedPnl": "0.0", "fee": "20.0", "dir": "Open Short", "hash": "0xa007"},
+    {"coin": "BTC", "px": "50000", "sz": "1", "side": "B", "time": 1781914020000, "closedPnl": "-10.0", "fee": "20.0", "dir": "Close Short", "hash": "0xa008"}
+  ],
+  "userFunding": [],
+  "errors": []
+}
