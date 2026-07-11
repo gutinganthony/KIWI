@@ -19,7 +19,7 @@
 
 | 檔期 | 內容 | 狀態與素材 |
 |------|------|-----------|
-| **7/12–13（週末）** | **SKHY 掛牌首日復盤**（形式視戲劇性：平淡→Notes 2-3 則；戲劇性→800 字番外） | ✅ Jake 拍板。素材：Kenji roadshow（1.779 億 ADS × $158.14 = $281.33 億，定價比初版下修 4%）＋**大叔美股 MU FQ3 podcast**（「由價格而非數量驅動的超級循環」，Jake 指定加入）＋App Economy「AI Broke the Cycle」對手觀點。**等 Jake 提供首日開盤/收盤價** |
+| **7/12–13（週末）** | **SKHY 掛牌首日復盤**（形式視戲劇性：平淡→Notes 2-3 則；戲劇性→800 字番外） | ✅ Jake 拍板。素材：Kenji roadshow（最終定價 $149、1.779 億份 ADS、募資約 $265 億（指標價 158.14 經下修））＋**大叔美股 MU FQ3 podcast**（「由價格而非數量驅動的超級循環」，Jake 指定加入）＋App Economy「AI Broke the Cycle」對手觀點。**等 Jake 提供首日開盤/收盤價** |
 | **7 月中（CPI 落地後）** | **W6 三關驗證正篇**（台積電除息＋CPI＋Fed 事件） | 劇本：`drafts/2026-W6_signal-tracking-playbook.md`（決策樹已寫死）。**新增：capitalcycle〈灰色地帶〉入總經段**（美元三段論：短期被動寬鬆／中期政策風險／長期 American exceptionalism 重新定價，Jake 拍板） |
 | **W8** | **1999 持倉指南**（泡沫裡的人怎麼活），吸收「AI broke the cycle?」命題 | 研究檔：`research/bubble-1999-survival-research.md`（Robertson 20 天、三種策略下場）。缺：Nasdaq 200 日線回測（我可寫 Python 算） |
 | **W9** | **國安基金九場戰役** | 研究檔：`research/nsf-nine-battles-research.md`（出手線 -25%~-44%、唯一敗仗）。缺：第 1–3 役精確指數 TWSE 核實 |
