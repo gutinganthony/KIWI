@@ -14,7 +14,8 @@
    集群人數 / 買入總額帶 / CFO>CEO 職稱 / 市值帶（micro/small=2、mid=1、large=0、
    無數據=0）/ 下跌後買入。
 4. 風險分級（beta × 市值雙維度，只對否決關 survivors 計算）：
-   市值＝EDGAR company facts 流通股數 × 最新收盤；beta＝對 SPY 近 1 年日報酬 OLS 斜率。
+   市值＝EDGAR company facts 流通股數 × 最新收盤（EDGAR 敗——CI IP 403 封鎖——→
+   Yahoo quoteSummary 逐檔 → v7 批次 quote 備援）；beta＝對 SPY 近 1 年日報酬 OLS 斜率。
    檔分與加總規則見 config「風險分級」節；任一維無數據 → 保守計分＋data_gap=True。
 
 輸入：data/events/form4_*.json（fetch_edgar.py 產出）。
@@ -27,9 +28,9 @@ data/candidates_latest.json =
      "risk":{"level","data_gap","beta","mcap_usd","mcap_band","beta_band"}}]}
 
 網路使用：只對「已通過資格關卡」的少數 issuer 抓價格日線（主 Stooq → 備 Yahoo chart，
-供流動性否決＋dip 評分＋beta）、對 survivors 抓 EDGAR company facts（市值），
-價格源/EDGAR 故障→優雅降級（跳過相應檢查、走 None 保守分級、記 meta），不 crash。
-純唯讀，無任何下單。
+供流動性否決＋dip 評分＋beta）、對 survivors 抓 EDGAR company facts（市值；
+敗→Yahoo quoteSummary→v7 批次備援），價格源/EDGAR 故障→優雅降級
+（跳過相應檢查、走 None 保守分級、記 meta），不 crash。純唯讀，無任何下單。
 """
 
 import argparse
@@ -40,8 +41,9 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import config
-from fetch_edgar import Meta, fetch_shares_outstanding, update_meta, write_json
-from track_performance import make_price_fetcher
+from fetch_edgar import (Meta, fetch_shares_outstanding, http_get_text, update_meta,
+                         write_json)
+from track_performance import make_price_fetcher, yahoo_symbol
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -366,6 +368,127 @@ def assess_risk(mcap_usd, beta):
 
 
 # ---------------------------------------------------------------------------
+# 市值 Yahoo 備援（EDGAR company facts 遭 403 封鎖時接手；常數見 config
+# 「市值 Yahoo 備援二級」註解）。鏈：EDGAR 股數×收盤（cluster_mcap）→
+# quoteSummary 逐檔 → v7 批次 → None（既有保守路徑不變）
+# ---------------------------------------------------------------------------
+
+def parse_yahoo_quotesummary_mcap(text):
+    """Yahoo v10 quoteSummary JSON → price.marketCap.raw（float）；缺/無效 → None。純函式。
+
+    只認 modules=price 的 marketCap.raw；缺 raw / result=null（查無代號）/ 非 JSON /
+    非正數 → None（不猜 fmt 字串、不退 summaryDetail——缺就交給下一級 v7 批次）。
+    """
+    try:
+        data = json.loads(text)
+        r0 = data["quoteSummary"]["result"][0]
+        raw = ((r0.get("price") or {}).get("marketCap") or {}).get("raw")
+        val = float(raw)
+    except (KeyError, IndexError, TypeError, ValueError, AttributeError):
+        return None
+    return val if val > 0 else None
+
+
+def parse_yahoo_v7_quote_mcaps(text):
+    """Yahoo v7 批次 quote JSON → {SYMBOL: marketCap float}；無效/缺 → {}。純函式。
+
+    只收 marketCap 為正數的條目；symbol 統一大寫（與 yahoo_symbol() 輸出對齊）。
+    """
+    try:
+        data = json.loads(text)
+        results = data["quoteResponse"]["result"] or []
+    except (KeyError, TypeError, ValueError):
+        return {}
+    out = {}
+    for r in results:
+        if not isinstance(r, dict):
+            continue
+        symbol = str(r.get("symbol") or "").strip().upper()
+        try:
+            val = float(r.get("marketCap"))
+        except (TypeError, ValueError):
+            continue
+        if symbol and val > 0:
+            out[symbol] = val
+    return out
+
+
+def _yahoo_get_once(url, name, meta, get_fn):
+    """Yahoo 端點 GET（瀏覽器 UA、retries=0）→ (text, ok)。
+
+    429 → 退避 config.YAHOO_429_BACKOFF 秒再試一次，仍敗即棄——與
+    track_performance.fetch_price_history_yahoo 同一套限流禮儀（沿用既有模式）。
+    """
+    headers = {"User-Agent": config.YAHOO_USER_AGENT}
+    text, status, ok = get_fn(url, name, meta, record_ok=False,
+                              sleep=config.YAHOO_SLEEP_BETWEEN, headers=headers,
+                              retries=0)
+    if not ok and status == 429:
+        time.sleep(config.YAHOO_429_BACKOFF)
+        text, status, ok = get_fn(url, f"{name} retry", meta, record_ok=False,
+                                  sleep=config.YAHOO_SLEEP_BETWEEN, headers=headers,
+                                  retries=0)
+    return text, ok
+
+
+def fetch_mcap_yahoo_quotesummary(ticker, meta, get_fn=None):
+    """備援一：quoteSummary 逐檔市值 → float|None（不 raise）。
+
+    HTTP 失敗由 get_fn 記 endpoint_health；200 但缺 marketCap 記 meta.errors 留痕。
+    """
+    get_fn = get_fn or http_get_text
+    url = config.YAHOO_QUOTESUMMARY_URL.format(symbol=yahoo_symbol(ticker))
+    text, ok = _yahoo_get_once(url, f"yahoo-quotesummary {ticker}", meta, get_fn)
+    if not ok:
+        return None
+    mcap = parse_yahoo_quotesummary_mcap(text)
+    if mcap is None:
+        meta.error(f"yahoo-quotesummary {ticker}: 回應缺 price.marketCap.raw"
+                   "（交 v7 批次接手）")
+    return mcap
+
+
+def fetch_mcaps_yahoo_v7(tickers, meta, get_fn=None):
+    """備援二：v7 批次 quote（全部 tickers 一次 1 請求）→ {原 ticker: marketCap}。
+
+    query 用 Yahoo symbol（class 股 BRK.B → BRK-B），回傳鍵映回原 ticker。
+    失敗/查無回 {}；仍缺漏的 ticker 記 meta.errors（呼叫端走 None 保守路徑）。
+    """
+    if not tickers:
+        return {}
+    get_fn = get_fn or http_get_text
+    symbols = {t: yahoo_symbol(t) for t in tickers}
+    url = config.YAHOO_QUOTE_URL.format(symbols=",".join(symbols.values()))
+    text, ok = _yahoo_get_once(url, f"yahoo-quote batch x{len(tickers)}", meta, get_fn)
+    if not ok:
+        return {}
+    by_symbol = parse_yahoo_v7_quote_mcaps(text)
+    out = {t: by_symbol[s] for t, s in symbols.items() if s in by_symbol}
+    if len(out) < len(tickers):
+        missed = sorted(set(tickers) - set(out))
+        meta.error(f"yahoo-quote batch: {len(missed)} 檔缺 marketCap"
+                   f"（{','.join(missed)}）→ None 保守分級")
+    return out
+
+
+def fetch_mcaps_yahoo(tickers, meta, get_fn=None):
+    """市值 Yahoo 備援鏈（只對 EDGAR 市值失敗的 tickers 呼叫，~個位數/日）。
+
+    逐檔 quoteSummary → 仍缺者 v7 批次一發 → {ticker: mcap}；兩級皆敗的 ticker
+    不出現在回傳鍵中（呼叫端走既有 None 保守路徑）。
+    """
+    out = {}
+    for ticker in tickers:
+        mcap = fetch_mcap_yahoo_quotesummary(ticker, meta, get_fn=get_fn)
+        if mcap is not None:
+            out[ticker] = mcap
+    missing = [t for t in tickers if t not in out]
+    if missing:
+        out.update(fetch_mcaps_yahoo_v7(missing, meta, get_fn=get_fn))
+    return out
+
+
+# ---------------------------------------------------------------------------
 # 漏斗主流程（純函式；network 全部在注入的 price_fn 內）
 # ---------------------------------------------------------------------------
 
@@ -399,11 +522,15 @@ def cluster_mcap(cluster, shares_fn):
     return shares * last_close
 
 
-def run_funnel(buys, sells, raw_filings, price_fn, top_n=None, shares_fn=None):
+def run_funnel(buys, sells, raw_filings, price_fn, top_n=None, shares_fn=None,
+               mcap_backup_fn=None, meta=None):
     """三層漏斗核心。回傳 (輸出 dict, veto_counts, skipped_checks)。
 
-    shares_fn(cik) -> 流通股數|None：風險分級的市值來源，只對 survivors 呼叫；
-    None（--no-network 等）→ 市值走 None 保守路徑。
+    shares_fn(cik) -> 流通股數|None：風險分級的市值主源（EDGAR company facts），
+    只對 survivors 呼叫。mcap_backup_fn(tickers) -> {ticker: mcap}：主源失敗檔的
+    Yahoo 備援（quoteSummary→v7 批次，見 fetch_mcaps_yahoo），只收到失敗檔清單。
+    兩者 None（--no-network 等）→ 市值走 None 保守路徑。meta 給時把
+    edgar/yahoo/none 計數記進 meta.mcap_source_stats（monitor 健康判讀用）。
     """
     top_n = config.TOP_N_CANDIDATES if top_n is None else top_n
     skipped_checks = []
@@ -412,9 +539,25 @@ def run_funnel(buys, sells, raw_filings, price_fn, top_n=None, shares_fn=None):
     # SPY 基準只抓一次（make_price_fetcher 有快取；無 survivors 時不抓）
     spy_rows = (price_fn(config.BETA_BENCHMARK_TICKER)
                 if price_fn and survivors else None)
+    # 市值備援鏈：EDGAR 股數×收盤 → Yahoo（quoteSummary→v7 批次）→ None（保守分級）
+    mcaps = {t: cluster_mcap(c, shares_fn) for t, c in survivors.items()}
+    missing = [t for t, v in mcaps.items() if v is None]
+    backup = mcap_backup_fn(missing) if (missing and mcap_backup_fn) else {}
+    mcap_stats = {"edgar": 0, "yahoo": 0, "none": 0}
+    for t in mcaps:
+        if mcaps[t] is not None:
+            mcap_stats["edgar"] += 1
+        elif backup.get(t):
+            mcaps[t] = backup[t]
+            mcap_stats["yahoo"] += 1
+        else:
+            mcap_stats["none"] += 1
+    if meta is not None:
+        for k, v in mcap_stats.items():
+            meta.mcap_source_stats[k] += v
     scored = []
     for c in survivors.values():
-        mcap = cluster_mcap(c, shares_fn)
+        mcap = mcaps[c["ticker"]]
         beta = compute_beta(c.get("price_rows"), spy_rows)
         total, breakdown = score(c, mcap_usd=mcap)
         scored.append(to_candidate(c, total, breakdown, assess_risk(mcap, beta)))
@@ -454,8 +597,11 @@ def main(argv=None):
     price_fn = None if args.no_network else make_price_fetcher(meta)
     shares_fn = (None if args.no_network
                  else (lambda cik: fetch_shares_outstanding(cik, meta)))
+    mcap_backup_fn = (None if args.no_network
+                      else (lambda tickers: fetch_mcaps_yahoo(tickers, meta)))
     output, veto_counts, skipped_checks = run_funnel(
-        buys, sells, raw_filings, price_fn, shares_fn=shares_fn)
+        buys, sells, raw_filings, price_fn, shares_fn=shares_fn,
+        mcap_backup_fn=mcap_backup_fn, meta=meta)
     try:
         write_json(data_dir / "candidates_latest.json", output)
     except Exception as exc:
@@ -471,6 +617,7 @@ def main(argv=None):
         "requests_failed": meta.requests_failed,
         "price_source_stats": meta.price_source_stats,
         "price_sources": meta.price_sources,
+        "mcap_source_stats": meta.mcap_source_stats,
         "elapsed_sec": round(time.time() - started, 1),
         "endpoint_health": meta.endpoint_health,
         "errors": meta.errors,
@@ -489,6 +636,7 @@ def main(argv=None):
                                 "veto_counts": veto_counts,
                                 "skipped_checks": len(skipped_checks),
                                 "risk_levels": risk_summary,
+                                "mcap_sources": meta.mcap_source_stats,
                                 "elapsed_sec": payload["elapsed_sec"]},
                                ensure_ascii=False))
     return 0

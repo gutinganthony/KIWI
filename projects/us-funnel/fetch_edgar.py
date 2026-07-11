@@ -76,6 +76,9 @@ class Meta:
         self.price_source_stats = {"stooq": {"ok": 0, "failed": 0},
                                    "yahoo": {"ok": 0, "failed": 0}}
         self.price_sources = {}     # ticker -> "stooq" | "yahoo" | "none"
+        # 市值來源計數（funnel 的 run_funnel 填；fetch/tracking 不用，恆為零）——
+        # edgar=company facts 股數×收盤、yahoo=quoteSummary/v7 批次備援、none=全敗保守
+        self.mcap_source_stats = {"edgar": 0, "yahoo": 0, "none": 0}
 
     def record(self, name, url, ok, status=None, error=None, elapsed=None,
                record_ok=True, count=True):

@@ -185,13 +185,14 @@ def make_price_fn(dlta_volume=100000.0, dlta_rows=True):
     return price_fn
 
 
-def run_fixture_funnel(price_fn, shares_fn=None):
+def run_fixture_funnel(price_fn, shares_fn=None, mcap_backup_fn=None, meta=None):
     day1, day2, day3 = build_fixture_events()
     syn_buys, syn_sells = synthetic_events()
     buys = day1["buys"] + day2["buys"] + syn_buys
     sells = day3["sells"] + syn_sells
     return funnel.run_funnel(buys, sells, raw_filings=4, price_fn=price_fn,
-                             shares_fn=shares_fn)
+                             shares_fn=shares_fn, mcap_backup_fn=mcap_backup_fn,
+                             meta=meta)
 
 
 def test_funnel():
@@ -914,6 +915,253 @@ def test_company_facts_meta():
        "成功路徑不多記彙總條目")
 
 
+# ---------------------------------------------------------------------------
+# [21-24] 市值 Yahoo 備援：quoteSummary/v7 解析、備援鏈順序、429 退避、meta 計數
+# ---------------------------------------------------------------------------
+
+def _quotesummary_fixture(mcap=1_500_000_000):
+    """Yahoo v10 quoteSummary（modules=price）JSON fixture。"""
+    return json.dumps({"quoteSummary": {"result": [{"price": {
+        "symbol": "TEST", "marketCap": {"raw": mcap, "fmt": "1.5B"}}}],
+        "error": None}})
+
+
+def _v7_quote_fixture(mcaps):
+    """Yahoo v7 批次 quote JSON fixture：{symbol: marketCap|None（None=缺欄位）}。"""
+    return json.dumps({"quoteResponse": {"result": [
+        ({"symbol": s, "marketCap": v} if v is not None else {"symbol": s})
+        for s, v in mcaps.items()], "error": None}})
+
+
+def test_yahoo_mcap_parse():
+    print("[21] 市值備援解析：quoteSummary price.marketCap.raw / v7 批次 marketCap")
+    ok(funnel.parse_yahoo_quotesummary_mcap(_quotesummary_fixture())
+       == 1_500_000_000.0, "quoteSummary → price.marketCap.raw")
+    ok(funnel.parse_yahoo_quotesummary_mcap(json.dumps(
+        {"quoteSummary": {"result": [{"price": {"symbol": "T"}}],
+                          "error": None}})) is None,
+       "price 缺 marketCap → None（不猜、交下一級）")
+    ok(funnel.parse_yahoo_quotesummary_mcap(json.dumps(
+        {"quoteSummary": {"result": [{"price": {"marketCap": {"fmt": "1.5B"}}}],
+                          "error": None}})) is None,
+       "marketCap 缺 raw → None（不猜 fmt 字串）")
+    ok(funnel.parse_yahoo_quotesummary_mcap(json.dumps(
+        {"quoteSummary": {"result": None,
+                          "error": {"code": "Not Found"}}})) is None,
+       "result=null（查無代號）→ None")
+    ok(funnel.parse_yahoo_quotesummary_mcap("Not Found") is None, "非 JSON → None")
+    ok(funnel.parse_yahoo_quotesummary_mcap(_quotesummary_fixture(mcap=0)) is None,
+       "raw=0（非正數）→ None")
+
+    got = funnel.parse_yahoo_v7_quote_mcaps(_v7_quote_fixture(
+        {"AAA": 5e8, "BBB": 2.5e9, "CCC": None}))
+    ok(got == {"AAA": 5e8, "BBB": 2.5e9},
+       f"v7 批次：有 marketCap 的收、缺欄位的跳過（{got}）")
+    ok(funnel.parse_yahoo_v7_quote_mcaps(_v7_quote_fixture({"ddd": 1e9}))
+       == {"DDD": 1e9}, "symbol 統一大寫（對齊 yahoo_symbol 輸出）")
+    ok(funnel.parse_yahoo_v7_quote_mcaps(json.dumps(
+        {"quoteResponse": {"result": None, "error": {"code": "x"}}})) == {},
+       "result=null → {}")
+    ok(funnel.parse_yahoo_v7_quote_mcaps("<html>") == {}, "非 JSON → {}")
+
+
+def test_yahoo_mcap_fetch_chain():
+    print("[22] 市值 Yahoo 備援鏈：quoteSummary 逐檔 → 缺漏 v7 批次 1 請求 → 皆敗缺鍵")
+    calls, seen_ua = [], []
+
+    def fake_get(url, name, meta_, record_ok=True, sleep=None, **kwargs):
+        calls.append(url)
+        seen_ua.append((kwargs.get("headers") or {}).get("User-Agent"))
+        if "quoteSummary" in url:
+            if "/AAA?" in url:
+                meta_.record(name, url, True, status=200, record_ok=record_ok)
+                return _quotesummary_fixture(5e8), 200, True
+            meta_.record(name, url, False, status=404, error="HTTP 404")
+            return None, 404, False
+        meta_.record(name, url, True, status=200, record_ok=record_ok)
+        return _v7_quote_fixture({"BBB": 2.5e9}), 200, True
+
+    meta = fetch_edgar.Meta()
+    out = funnel.fetch_mcaps_yahoo(["AAA", "BBB", "CCC"], meta, get_fn=fake_get)
+    ok(out == {"AAA": 5e8, "BBB": 2.5e9},
+       f"quoteSummary 接 AAA、v7 批次接 BBB、CCC 兩級皆敗不入鍵（{out}）")
+    qs = [u for u in calls if "quoteSummary" in u]
+    v7 = [u for u in calls if "v7/finance/quote?" in u]
+    ok(len(qs) == 3 and all("modules=price" in u for u in qs),
+       f"quoteSummary 逐檔各 1 請求、modules=price（{len(qs)}）")
+    ok(len(v7) == 1 and "symbols=BBB,CCC" in v7[0],
+       f"v7 一次批次只發 1 請求、只帶 quoteSummary 缺漏檔（{v7}）")
+    ok(all(ua == config.YAHOO_USER_AGENT for ua in seen_ua),
+       "兩級皆用瀏覽器 UA（YAHOO_USER_AGENT）")
+    ok(any("yahoo-quote batch" in e and "CCC" in e for e in meta.errors),
+       f"兩級皆敗檔記 meta.errors 留痕（{meta.errors}）")
+
+    n = len(calls)
+    ok(funnel.fetch_mcaps_yahoo([], fetch_edgar.Meta(), get_fn=fake_get) == {}
+       and len(calls) == n, "空清單 → {} 且零請求")
+
+    # class 股 symbol 轉換：query 用 BRK-B，回傳鍵映回原 ticker BRK.B
+    calls2 = []
+
+    def fake_get_class(url, name, meta_, record_ok=True, sleep=None, **kwargs):
+        calls2.append(url)
+        if "quoteSummary" in url:
+            return None, 404, False
+        return _v7_quote_fixture({"BRK-B": 9e11}), 200, True
+
+    out2 = funnel.fetch_mcaps_yahoo(["BRK.B"], fetch_edgar.Meta(),
+                                    get_fn=fake_get_class)
+    ok(out2 == {"BRK.B": 9e11}, f"class 股：v7 回 BRK-B → 鍵映回 BRK.B（{out2}）")
+    ok(any("/BRK-B?" in u for u in calls2 if "quoteSummary" in u)
+       and any("symbols=BRK-B" in u for u in calls2),
+       "query 皆用 Yahoo symbol（BRK.B → BRK-B）")
+
+    # 兩級全 HTTP 失敗 → {}（呼叫端走 None 保守路徑）＋endpoint_health 留痕
+    def fake_all_fail(url, name, meta_, record_ok=True, sleep=None, **kwargs):
+        meta_.record(name, url, False, status=500, error="HTTP 500")
+        return None, 500, False
+
+    meta_fail = fetch_edgar.Meta()
+    ok(funnel.fetch_mcaps_yahoo(["ZZZ"], meta_fail, get_fn=fake_all_fail) == {},
+       "兩級皆 HTTP 失敗 → {}（不 raise）")
+    ok(any(e["ok"] is False for e in meta_fail.endpoint_health),
+       "HTTP 失敗記 endpoint_health（留痕）")
+
+    # 200 但兩級皆缺 marketCap → {} ＋ 兩級各記 errors
+    def fake_empty(url, name, meta_, record_ok=True, sleep=None, **kwargs):
+        meta_.record(name, url, True, status=200, record_ok=record_ok)
+        if "quoteSummary" in url:
+            return json.dumps({"quoteSummary": {"result": [{"price": {}}],
+                               "error": None}}), 200, True
+        return _v7_quote_fixture({}), 200, True
+
+    meta_empty = fetch_edgar.Meta()
+    ok(funnel.fetch_mcaps_yahoo(["QQQ"], meta_empty, get_fn=fake_empty) == {},
+       "200 但兩級皆缺 marketCap → {}")
+    ok(any("yahoo-quotesummary QQQ" in e for e in meta_empty.errors)
+       and any("yahoo-quote batch" in e for e in meta_empty.errors),
+       f"缺 marketCap 兩級各記 meta.errors（{meta_empty.errors}）")
+
+
+def test_yahoo_mcap_429():
+    print("[23] 市值備援 429 限流：退避一次重試、再敗即棄（沿用 chart 備援模式）")
+    sleeps = []
+
+    class FakeTime:
+        @staticmethod
+        def sleep(s):
+            sleeps.append(s)
+
+        @staticmethod
+        def time():
+            return 0.0
+
+    def make_429_get(fail_times, payload):
+        state = {"n": 0}
+
+        def get(url, name, meta_, record_ok=True, sleep=None, **kwargs):
+            state["n"] += 1
+            if state["n"] <= fail_times:
+                return None, 429, False
+            return payload, 200, True
+        get.state = state
+        return get
+
+    real_time = funnel.time
+    funnel.time = FakeTime
+    try:
+        get1 = make_429_get(1, _quotesummary_fixture(7e8))
+        val = funnel.fetch_mcap_yahoo_quotesummary("EWSB", fetch_edgar.Meta(),
+                                                   get_fn=get1)
+        ok(val == 7e8 and get1.state["n"] == 2, "quoteSummary 429 → 退避一次重試成功")
+        ok(sleeps == [config.YAHOO_429_BACKOFF],
+           f"退避秒數＝YAHOO_429_BACKOFF（{sleeps}）")
+        get2 = make_429_get(99, "")
+        ok(funnel.fetch_mcap_yahoo_quotesummary("EWSB", fetch_edgar.Meta(),
+                                                get_fn=get2) is None
+           and get2.state["n"] == 2, "退避後仍 429 → 棄（共 2 次請求，不無限重試）")
+        get3 = make_429_get(1, _v7_quote_fixture({"EWSB": 6e7}))
+        out = funnel.fetch_mcaps_yahoo_v7(["EWSB"], fetch_edgar.Meta(), get_fn=get3)
+        ok(out == {"EWSB": 6e7} and get3.state["n"] == 2,
+           "v7 批次 429 → 退避一次重試成功")
+    finally:
+        funnel.time = real_time
+
+
+def test_mcap_fallback_integration():
+    print("[24] 漏斗整合：市值 edgar→yahoo→none 逐級接手＋meta.mcap_source_stats 計數")
+    start = date(2026, 3, 2)
+    acme, spy = _beta_series(start, 128, base=14.0, multiplier=1.2)
+    dlta, _ = _beta_series(start, 128, base=9.5, multiplier=0.5)
+    table = {"ACME": acme, "DLTA": dlta, "SPY": spy}
+    shares = {"1111111": 10_000_000.0}  # ACME 有 EDGAR 股數；DLTA 缺 → 走 Yahoo 備援
+
+    backup_calls = []
+
+    def backup_fn(tickers):
+        backup_calls.append(sorted(tickers))
+        return {"DLTA": 5_000_000_000.0}
+
+    meta = fetch_edgar.Meta()
+    output, _, _ = run_fixture_funnel(table.get,
+                                      shares_fn=lambda cik: shares.get(cik),
+                                      mcap_backup_fn=backup_fn, meta=meta)
+    by_ticker = {c["ticker"]: c for c in output["candidates"]}
+    a, d = by_ticker["ACME"], by_ticker["DLTA"]
+    ok(backup_calls == [["DLTA"]],
+       f"備援只對 EDGAR 失敗檔呼叫、每輪一次（{backup_calls}）")
+    ok(a["risk"]["mcap_usd"] == round(10_000_000.0 * acme[-1][1]),
+       f"ACME 走 EDGAR 主源不變（{a['risk']['mcap_usd']}）")
+    ok(d["risk"]["mcap_usd"] == 5_000_000_000
+       and d["risk"]["mcap_band"] == "mid",
+       f"DLTA 由 Yahoo 備援補上 $5B → mid（{d['risk']['mcap_usd']}）")
+    ok(d["risk"]["data_gap"] is False and d["risk"]["level"] == "low",
+       f"DLTA mid(1)+low beta(0)=1 → low、data_gap 解除（{d['risk']['level']}）")
+    ok(d["score_breakdown"]["mcap"] == 1,
+       f"備援市值同步餵第三層評分（mid → 1 分）（{d['score_breakdown']['mcap']}）")
+    ok(meta.mcap_source_stats == {"edgar": 1, "yahoo": 1, "none": 0},
+       f"mcap_source_stats 計數 edgar/yahoo（{meta.mcap_source_stats}）")
+
+    # 備援也敗 → 既有 None 保守路徑不變
+    meta2 = fetch_edgar.Meta()
+    output2, _, _ = run_fixture_funnel(table.get,
+                                       shares_fn=lambda cik: shares.get(cik),
+                                       mcap_backup_fn=lambda tickers: {},
+                                       meta=meta2)
+    d2 = {c["ticker"]: c for c in output2["candidates"]}["DLTA"]
+    ok(d2["risk"]["mcap_usd"] is None and d2["risk"]["data_gap"] is True
+       and d2["risk"]["mcap_band"] == "unknown",
+       "備援也敗 → None 保守路徑不變（unknown + data_gap）")
+    ok(meta2.mcap_source_stats == {"edgar": 1, "yahoo": 0, "none": 1},
+       f"皆敗計 none（{meta2.mcap_source_stats}）")
+
+    # EDGAR 全敗（shares_fn=None）→ 備援一次收到全部 survivors
+    backup_calls2 = []
+
+    def backup_all(tickers):
+        backup_calls2.append(sorted(tickers))
+        return {t: 1_000_000_000.0 for t in tickers}
+
+    meta3 = fetch_edgar.Meta()
+    output3, _, _ = run_fixture_funnel(table.get, shares_fn=None,
+                                       mcap_backup_fn=backup_all, meta=meta3)
+    ok(backup_calls2 == [["ACME", "DLTA"]],
+       f"EDGAR 全敗 → 備援一次收全部 survivors（{backup_calls2}）")
+    ok(meta3.mcap_source_stats == {"edgar": 0, "yahoo": 2, "none": 0},
+       f"全走 yahoo（{meta3.mcap_source_stats}）")
+    ok(all(c["risk"]["mcap_usd"] == 1_000_000_000 for c in output3["candidates"]),
+       "備援市值進輸出契約 risk.mcap_usd")
+
+    # --no-network 等效：無主源無備援 → 全 none、既有保守路徑不變
+    meta4 = fetch_edgar.Meta()
+    output4, _, _ = run_fixture_funnel(None, meta=meta4)
+    ok(meta4.mcap_source_stats == {"edgar": 0, "yahoo": 0, "none": 2},
+       f"--no-network：全 none（{meta4.mcap_source_stats}）")
+    ok(all(c["risk"]["mcap_usd"] is None and c["risk"]["data_gap"] is True
+           for c in output4["candidates"]),
+       "--no-network 保守路徑不變（全 None + data_gap）")
+
+
 def main():
     tests = [test_daily_index, test_parse_form4, test_build_events, test_funnel,
              test_funnel_liquidity_and_degradation, test_output_schema,
@@ -921,7 +1169,9 @@ def main():
              test_fetch_day_and_meta, test_load_events, test_beta,
              test_risk_matrix, test_shares_outstanding,
              test_funnel_risk_integration, test_yahoo_parse, test_price_fallback,
-             test_yahoo_429, test_edgar_ua_and_403_backoff, test_company_facts_meta]
+             test_yahoo_429, test_edgar_ua_and_403_backoff, test_company_facts_meta,
+             test_yahoo_mcap_parse, test_yahoo_mcap_fetch_chain, test_yahoo_mcap_429,
+             test_mcap_fallback_integration]
     for t in tests:
         t()
     print(f"\nALL TESTS PASSED ({checks} checks)")
