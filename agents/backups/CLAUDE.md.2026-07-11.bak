@@ -9,7 +9,7 @@
 - 遠端 session **沒有 `gh` CLI**：GitHub 操作一律用 `mcp__github__*` MCP 工具（先用 ToolSearch 載入 schema）。
 - **`docs/` 會被整包部署到公開 GitHub Pages**（見 .github/workflows/deploy-pages.yml）。私人筆記、內部規則、金鑰、個人資料嚴禁寫入 docs/。
 - git log 每天被 `auto: update dashboard data` commit 洗版。查人為變更：`git log --oneline --invert-grep --grep='auto: update dashboard'`
-- `.github/workflows/` 是真實生產管線（每日 dashboard 更新、平日警報＋週六 weekend-bridge 警報、每週六 Serenity 週報、Pages 部署、vibe-lab 隨需量化運算等共 7 支——確切清單以目錄內容為準）。**改 workflows 前先問使用者。**
+- `.github/workflows/` 是真實生產管線（每日 dashboard 更新、平日警報＋週六 weekend-bridge 警報、每週六 Serenity 週報、Pages 部署等共 6 支——確切清單以目錄內容為準）。**改 workflows 前先問使用者。**
 - session 開始時讀兩個小檔（若存在）：`agents/LEARNINGS.md`（歷任 session 踩坑紀錄）與 `topics/technology/mac-manual-homework.md`（🖥️ Mac 手動功課清單，~3KB）——後者掃「待辦」區，有積欠就在開場提醒使用者。session 結束時把新的「雲端做不到」項（被 403 擋的站、需 actions:write 的操作等）append 進該檔「待辦」區。除此之外**不要**在 session 開始預讀任何分析檔——見 §3 路由。
 
 ## 1. gstack（必要，全域安裝）
