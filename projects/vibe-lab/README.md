@@ -19,7 +19,7 @@
 {
   "type": "alpha-bench",          // v1 支援:alpha-bench ・ alpha-list
   "zoo": "academic",              // alpha-bench 必填:academic/qlib158/alpha101/gtja191/fundamental
-  "universe": "csi300",           // alpha-bench 必填:csi300/sp500/btc-usdt(CLI 目前僅此三個預設)
+  "universe": "sp500",            // alpha-bench 必填:sp500/btc-usdt 免 token;csi300 需 repo Secret TUSHARE_TOKEN(run #1 實測,成分股清單非免費行情)
   "period": "2024-2025",          // YYYY-YYYY 或 YYYY-MM-DD/YYYY-MM-DD
   "top": 10,                      // 保留前 N 名
   "note": "人看的說明,程式不讀"
