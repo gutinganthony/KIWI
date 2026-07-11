@@ -185,12 +185,13 @@ def make_price_fn(dlta_volume=100000.0, dlta_rows=True):
     return price_fn
 
 
-def run_fixture_funnel(price_fn):
+def run_fixture_funnel(price_fn, shares_fn=None):
     day1, day2, day3 = build_fixture_events()
     syn_buys, syn_sells = synthetic_events()
     buys = day1["buys"] + day2["buys"] + syn_buys
     sells = day3["sells"] + syn_sells
-    return funnel.run_funnel(buys, sells, raw_filings=4, price_fn=price_fn)
+    return funnel.run_funnel(buys, sells, raw_filings=4, price_fn=price_fn,
+                             shares_fn=shares_fn)
 
 
 def test_funnel():
@@ -220,8 +221,14 @@ def test_funnel():
        f"first_filing_date 取最早申報日（{acme['first_filing_date']}）")
     bd = acme["score_breakdown"]
     ok(bd == {"cluster": 1, "buy_usd": 2, "title": 2, "mcap": 0, "dip": 2},
-       f"ACME 分項：2人=1/≥500k=2/CFO=2/mcap N-A=0/深折=2（{bd}）")
+       f"ACME 分項：2人=1/≥500k=2/CFO=2/mcap 無數據=0/深折=2（{bd}）")
     ok(acme["score"] == 7, f"ACME 總分 7（{acme['score']}）")
+    risk = acme["risk"]
+    ok(risk["level"] == "high" and risk["data_gap"] is True,
+       f"無 shares_fn/SPY → mcap/beta 皆 None → 保守 high(data_gap)（{risk['level']}）")
+    ok(risk["beta"] is None and risk["mcap_usd"] is None
+       and risk["mcap_band"] == "unknown" and risk["beta_band"] == "unknown",
+       "None 維度 → band=unknown、數值=null")
 
     dlta = output["candidates"][1]
     ok(dlta["score_breakdown"] == {"cluster": 2, "buy_usd": 1, "title": 0,
@@ -258,7 +265,9 @@ def test_funnel_liquidity_and_degradation():
 CANDIDATES_TOP_KEYS = {"generated_at", "scan_window_days", "funnel_stats", "candidates"}
 FUNNEL_STATS_KEYS = {"raw_filings", "qualified_events", "post_veto", "final_candidates"}
 CANDIDATE_KEYS = {"ticker", "company", "cluster_size", "insiders", "total_buy_usd",
-                  "score", "score_breakdown", "first_filing_date", "entry_price_ref"}
+                  "score", "score_breakdown", "first_filing_date", "entry_price_ref",
+                  "risk"}
+RISK_KEYS = {"level", "data_gap", "beta", "mcap_usd", "mcap_band", "beta_band"}
 INSIDER_KEYS = {"name", "title"}
 TRACKING_TOP_KEYS = {"updated_at", "positions"}
 POSITION_KEYS = {"ticker", "signal_date", "entry_price_ref", "current_price",
@@ -276,6 +285,10 @@ def test_output_schema():
     ok(output["scan_window_days"] == 7, "scan_window_days=7")
     for c in output["candidates"]:
         ok(set(c.keys()) == CANDIDATE_KEYS, f"candidate 鍵（{c['ticker']}）")
+        ok(set(c["risk"].keys()) == RISK_KEYS, f"risk 鍵（{c['ticker']}）")
+        ok(c["risk"]["level"] in ("high", "medium", "low")
+           and isinstance(c["risk"]["data_gap"], bool),
+           f"risk.level 枚舉值＋data_gap 布林（{c['ticker']}）")
         for i in c["insiders"]:
             ok(set(i.keys()) == INSIDER_KEYS, f"insider 鍵（{i['name']}）")
 
@@ -467,11 +480,206 @@ def test_load_events():
         ok(len(buys) == 3 and len(sells) == 1, f"buys=3 sells=1（{len(buys)}/{len(sells)}）")
 
 
+# ---------------------------------------------------------------------------
+# [12] 風險分級：beta 計算（OLS 斜率、對齊、重疊門檻、退化路徑）
+# ---------------------------------------------------------------------------
+
+def _beta_series(start, n_days, base, multiplier, spy_base=100.0, spy_step=0.01):
+    """造 (stock_rows, spy_rows)：SPY 日報酬 ±spy_step 交替，個股報酬＝multiplier×SPY。"""
+    stock_rows, spy_rows = [], []
+    c_stock, c_spy = base, spy_base
+    for i in range(n_days):
+        d = (start + timedelta(days=i)).strftime("%Y-%m-%d")
+        stock_rows.append((d, c_stock, 100000.0))
+        spy_rows.append((d, c_spy, 1000000.0))
+        r_spy = spy_step if i % 2 == 0 else -spy_step
+        c_spy *= (1 + r_spy)
+        c_stock *= (1 + multiplier * r_spy)
+    return stock_rows, spy_rows
+
+
+def test_beta():
+    print("[12] beta 計算：OLS 斜率手算對照 / 日期對齊 / 重疊門檻 / 退化路徑")
+    start = date(2026, 3, 2)
+    stock, spy = _beta_series(start, 128, base=14.0, multiplier=1.5)
+    b = funnel.compute_beta(stock, spy)
+    ok(b is not None and abs(b - 1.5) < 1e-9,
+       f"128 日、個股報酬＝1.5×SPY → beta=1.5（{b}）")
+    stock05, spy2 = _beta_series(start, 128, base=10.0, multiplier=0.5)
+    b05 = funnel.compute_beta(stock05, spy2)
+    ok(b05 is not None and abs(b05 - 0.5) < 1e-9, f"0.5× 序列 → beta=0.5（{b05}）")
+
+    # 日期對齊：個股多出 SPY 沒有的前置日期 → 只用共同交易日，beta 不變
+    extra = [((start - timedelta(days=i)).strftime("%Y-%m-%d"), 14.0, 100000.0)
+             for i in range(5, 0, -1)]
+    b_align = funnel.compute_beta(extra + stock, spy)
+    ok(b_align is not None and abs(b_align - 1.5) < 1e-9,
+       f"非共同日期忽略、對齊後 beta 不變（{b_align}）")
+
+    # 重疊門檻：61 個共同日=60 對報酬 → 剛好可算；60 日=59 對 → None
+    stock61, spy61 = _beta_series(start, 61, base=14.0, multiplier=1.5)
+    ok(funnel.compute_beta(stock61, spy61) is not None, "61 日（60 對報酬）→ 可算")
+    stock60, spy60 = _beta_series(start, 60, base=14.0, multiplier=1.5)
+    ok(funnel.compute_beta(stock60, spy60) is None, "60 日（59 對報酬 <60）→ None")
+
+    flat = _daily_rows(start, start + timedelta(days=127), lambda d: 100.0)
+    ok(funnel.compute_beta(stock, flat) is None, "SPY 零變異 → None（防除零）")
+    zero_var_stock = _daily_rows(start, start + timedelta(days=127), lambda d: 14.0)
+    b0 = funnel.compute_beta(zero_var_stock, spy)
+    ok(b0 is not None and abs(b0) < 1e-9, f"個股零變異 → beta=0（{b0}）")
+    ok(funnel.compute_beta(None, spy) is None and funnel.compute_beta(stock, None) is None,
+       "任一序列缺 → None")
+
+
+# ---------------------------------------------------------------------------
+# [13] 風險分級：檔分矩陣逐格驗、None 保守路徑、邊界值、市值帶評分
+# ---------------------------------------------------------------------------
+
+def test_risk_matrix():
+    print("[13] 風險分級矩陣：市值×beta 逐格驗（4×3）＋None 保守＋邊界＋市值帶評分")
+    # (mcap, beta, 期望 mcap_band, 期望 beta_band, 期望總分, 期望 level)
+    grid = [
+        (1e8,  1.5, "micro", "high", 5, "high"),
+        (1e8,  1.0, "micro", "mid",  4, "high"),
+        (1e8,  0.5, "micro", "low",  3, "medium"),
+        (1e9,  1.5, "small", "high", 4, "high"),
+        (1e9,  1.0, "small", "mid",  3, "medium"),
+        (1e9,  0.5, "small", "low",  2, "medium"),
+        (5e9,  1.5, "mid",   "high", 3, "medium"),
+        (5e9,  1.0, "mid",   "mid",  2, "medium"),
+        (5e9,  0.5, "mid",   "low",  1, "low"),
+        (5e10, 1.5, "large", "high", 2, "medium"),
+        (5e10, 1.0, "large", "mid",  1, "low"),
+        (5e10, 0.5, "large", "low",  0, "low"),
+    ]
+    for mcap, beta, mband, bband, total, level in grid:
+        r = funnel.assess_risk(mcap, beta)
+        pts = funnel.mcap_risk_points(mcap) + funnel.beta_risk_points(beta)
+        ok(r["mcap_band"] == mband and r["beta_band"] == bband
+           and pts == total and r["level"] == level and r["data_gap"] is False,
+           f"{mband}×{bband}：{pts} 分 → {level}")
+
+    r = funnel.assess_risk(None, None)
+    ok(r["level"] == "high" and r["data_gap"] is True
+       and r["mcap_band"] == "unknown" and r["beta_band"] == "unknown",
+       "雙 None → 3+2=5 → high(data_gap)（全保守）")
+    r = funnel.assess_risk(None, 0.5)
+    ok(r["level"] == "medium" and r["data_gap"] is True,
+       "mcap None → 保守 3 分＋低 beta 0 → medium(data_gap)")
+    r = funnel.assess_risk(5e10, None)
+    ok(r["level"] == "medium" and r["data_gap"] is True,
+       "beta None → 保守 2 分＋大型股 0 → medium(data_gap)")
+
+    ok(funnel.mcap_risk_points(300e6) == 2 and funnel.mcap_risk_band(300e6) == "small",
+       "邊界：$300M 落 small（=2 分，非 micro）")
+    ok(funnel.mcap_risk_points(2e9) == 1 and funnel.mcap_risk_band(2e9) == "mid",
+       "邊界：$2B 落 mid（=1 分）")
+    ok(funnel.mcap_risk_points(10e9) == 0 and funnel.mcap_risk_band(10e9) == "large",
+       "邊界：$10B 落 large（=0 分）")
+    ok(funnel.beta_risk_points(1.3) == 1 and funnel.beta_risk_points(1.31) == 2,
+       "邊界：beta 1.3 落 mid、1.31 落 high")
+    ok(funnel.beta_risk_points(0.8) == 1 and funnel.beta_risk_points(0.79) == 0,
+       "邊界：beta 0.8 落 mid、0.79 落 low")
+
+    # 市值帶評分（第三層，自此版啟用）：micro/small=2、mid=1、large=0、None=0
+    ok([funnel.score_mcap(v) for v in (1e8, 1e9, 5e9, 5e10, None)] == [2, 2, 1, 0, 0],
+       "score_mcap：micro/small=2、mid=1、large=0、None=0")
+
+
+# ---------------------------------------------------------------------------
+# [14] 流通股數抓取（company facts 注入測試）＋漏斗整合（真實 beta/mcap 路徑）
+# ---------------------------------------------------------------------------
+
+DEI_CONCEPT = json.dumps({"units": {"shares": [
+    {"end": "2026-03-31", "val": 900000},
+    {"end": "2026-06-30", "val": 1000000},
+]}})
+GAAP_CONCEPT = json.dumps({"units": {"shares": [{"end": "2026-06-30", "val": 2000000}]}})
+
+
+def test_shares_outstanding():
+    print("[14] 流通股數：dei 概念 / us-gaap fallback / 全缺 None / CIK 補零")
+    calls = []
+
+    def fake_dei(url, name, meta, record_ok=True, sleep=None):
+        calls.append(url)
+        if "dei/EntityCommonStockSharesOutstanding" in url:
+            return DEI_CONCEPT, 200, True
+        return None, 404, False
+
+    val = fetch_edgar.fetch_shares_outstanding("1111111", fetch_edgar.Meta(),
+                                               get_fn=fake_dei)
+    ok(val == 1000000.0, f"dei 命中 → 取 end 最新一筆 val（{val}）")
+    ok("CIK0001111111" in calls[0], f"CIK 10 位補零（{calls[0]}）")
+
+    def fake_gaap(url, name, meta, record_ok=True, sleep=None):
+        if "us-gaap/CommonStockSharesOutstanding" in url:
+            return GAAP_CONCEPT, 200, True
+        return None, 404, False
+
+    ok(fetch_edgar.fetch_shares_outstanding("2018222", fetch_edgar.Meta(),
+                                            get_fn=fake_gaap) == 2000000.0,
+       "dei 404 → fallback us-gaap 概念")
+
+    def fake_404(url, name, meta, record_ok=True, sleep=None):
+        return None, 404, False
+
+    ok(fetch_edgar.fetch_shares_outstanding("123", fetch_edgar.Meta(),
+                                            get_fn=fake_404) is None,
+       "兩概念皆 404 → None（保守分級路徑）")
+    ok(fetch_edgar.fetch_shares_outstanding("acme", fetch_edgar.Meta(),
+                                            get_fn=fake_dei) is None,
+       "非數字 CIK → None 不發請求")
+    ok(fetch_edgar.parse_shares_outstanding("not json") is None, "壞 JSON → None")
+    ok(fetch_edgar.parse_shares_outstanding(json.dumps({"units": {}})) is None,
+       "缺 units.shares → None")
+
+
+def test_funnel_risk_integration():
+    print("[15] 漏斗整合：SPY＋shares_fn 注入 → 真實 beta/mcap 分級與市值帶評分")
+    start = date(2026, 3, 2)
+    acme, spy = _beta_series(start, 128, base=14.0, multiplier=1.2)
+    dlta, _ = _beta_series(start, 128, base=9.5, multiplier=0.5)
+    table = {"ACME": acme, "DLTA": dlta, "SPY": spy}
+    shares = {"1111111": 10_000_000.0}  # ACME issuer CIK（fixtures）；DLTA 無數據
+
+    output, _, _ = run_fixture_funnel(
+        table.get, shares_fn=lambda cik: shares.get(cik))
+    by_ticker = {c["ticker"]: c for c in output["candidates"]}
+    a, d = by_ticker["ACME"], by_ticker["DLTA"]
+
+    exp_mcap = round(10_000_000.0 * acme[-1][1])
+    ok(a["risk"]["mcap_usd"] == exp_mcap and a["risk"]["mcap_band"] == "micro",
+       f"ACME mcap＝股數×最新收盤≈$140M → micro（{a['risk']['mcap_usd']}）")
+    ok(a["risk"]["beta"] == 1.2 and a["risk"]["beta_band"] == "mid",
+       f"ACME beta=1.2（mid）（{a['risk']['beta']}）")
+    ok(a["risk"]["level"] == "high" and a["risk"]["data_gap"] is False,
+       f"ACME micro(3)+mid(1)=4 → high、無 data_gap（{a['risk']['level']}）")
+    ok(a["score_breakdown"]["mcap"] == 2,
+       f"ACME micro → 市值帶評分 2（{a['score_breakdown']['mcap']}）")
+    ok(a["score"] == sum(a["score_breakdown"].values()),
+       f"ACME 總分＝分項和（{a['score']}）")
+
+    ok(d["risk"]["mcap_usd"] is None and d["risk"]["beta"] == 0.5,
+       f"DLTA 無股數 → mcap null；beta=0.5（{d['risk']['beta']}）")
+    ok(d["risk"]["level"] == "medium" and d["risk"]["data_gap"] is True,
+       f"DLTA unknown(3)+low(0)=3 → medium(data_gap)（{d['risk']['level']}）")
+    ok(d["score_breakdown"]["mcap"] == 0, "DLTA mcap 無數據 → 評分維持 0")
+
+    # --no-network 等效路徑：全體候選 high(data_gap)（CI 之外的本地預期）
+    output_off, _, _ = run_fixture_funnel(None)
+    ok(all(c["risk"]["level"] == "high" and c["risk"]["data_gap"] is True
+           for c in output_off["candidates"]),
+       "無網路 → 全候選保守 high(data_gap)")
+
+
 def main():
     tests = [test_daily_index, test_parse_form4, test_build_events, test_funnel,
              test_funnel_liquidity_and_degradation, test_output_schema,
              test_tracking_backfill, test_tracking_dedup, test_price_source,
-             test_fetch_day_and_meta, test_load_events]
+             test_fetch_day_and_meta, test_load_events, test_beta,
+             test_risk_matrix, test_shares_outstanding,
+             test_funnel_risk_integration]
     for t in tests:
         t()
     print(f"\nALL TESTS PASSED ({checks} checks)")

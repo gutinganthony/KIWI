@@ -455,7 +455,44 @@ function renderMonthly(chartId, tipId, tableId, monthly){
 }
 
 /* ── §2/§3 漏斗數據區 ────────────────────────────────────── */
-function renderFunnel(mountId, f, marketName){
+/* 風險欄（us-funnel 風險分級；顏色沿用頁面 semantic 色 token）。
+   舊數據無 risk 欄 → 顯示「—」；data_gap（beta/市值任一缺數據，保守計分）→ 加 *。 */
+var RISK_LABELS = {high:['高','var(--neg-text)'], medium:['中','var(--st-warn)'],
+                   low:['低','var(--pos-text)']};
+function riskCell(c){
+  var r = c && c.risk;
+  if(!r || !r.level) return '<td>—</td>';
+  var m = RISK_LABELS[r.level];
+  if(!m) return '<td>'+esc(r.level)+'</td>';
+  var tip = '市值帶 '+(r.mcap_band||'—')+'・beta '+(r.beta==null?'—':r.beta)
+          + (r.data_gap ? '・數據不足，保守計分' : '');
+  return '<td style="color:'+m[1]+';font-weight:600" title="'+esc(tip)+'">'
+       + m[0]+(r.data_gap?'*':'')+'</td>';
+}
+/* 劃分規則備註（須與 us-funnel config.py「風險分級」節一致） */
+function riskNote(){
+  function tbl(title, rows){
+    var h = '<table style="width:auto"><thead><tr><th>'+title
+          + '</th><th class="num">檔分</th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      h += '<tr><td>'+r[0]+'</td><td class="num">'+r[1]+'</td></tr>'; });
+    return h + '</tbody></table>';
+  }
+  return '<div class="note" style="margin-top:10px"><b>風險分級劃分方法（beta × 市值雙維度）</b>'
+    + '<div style="display:flex;gap:28px;flex-wrap:wrap;margin-top:6px">'
+    + tbl('市值', [['&lt;$300M（micro）','3'],['$300M–2B（small）','2'],
+                   ['$2B–10B（mid）','1'],['&gt;$10B（large）','0'],['無數據','3（保守）']])
+    + tbl('Beta（對 SPY 近 1 年日報酬 OLS）',
+          [['&gt;1.3','2'],['0.8–1.3','1'],['&lt;0.8','0'],['無數據','2（保守）']])
+    + '</div>'
+    + '<div style="margin-top:6px">兩檔分加總：≥4 →'
+    + ' <span style="color:var(--neg-text);font-weight:600">高</span>、2–3 →'
+    + ' <span style="color:var(--st-warn);font-weight:600">中</span>、≤1 →'
+    + ' <span style="color:var(--pos-text);font-weight:600">低</span>。'
+    + '數據不足的維度一律保守計分（偏向歸「高」）並在風險欄加 <b>*</b>。'
+    + '免責：風險分級是價格波動（beta）與規模（市值）的代理指標，非基本面/違約風險評估。</div></div>';
+}
+function renderFunnel(mountId, f, marketName, withRisk){
   var el = document.getElementById(mountId);
   var html = '<h3>管線即時數據</h3>';
   if(!f || !f.available){
@@ -488,17 +525,22 @@ function renderFunnel(mountId, f, marketName){
   html += '<h3>最新候選'+(cands.length?'（前 '+cands.length+' 檔）':'')+'</h3>';
   if(cands.length){
     html += '<div class="table-scroll"><table><thead><tr>'
-      + '<th>代號</th><th>公司</th><th class="num">評分</th><th>首次申報日</th><th class="num">參考進場價</th>'
+      + '<th>代號</th><th>公司</th><th class="num">評分</th>'
+      + (withRisk ? '<th>風險</th>' : '')
+      + '<th>首次申報日</th><th class="num">參考進場價</th>'
       + '</tr></thead><tbody>';
     cands.forEach(function(c){
       html += '<tr><td>'+esc(c.ticker)+'</td><td>'+esc(c.company)+'</td>'
-        + '<td class="num">'+esc(c.score)+'</td><td>'+esc(c.first_filing_date)+'</td>'
+        + '<td class="num">'+esc(c.score)+'</td>'
+        + (withRisk ? riskCell(c) : '')
+        + '<td>'+esc(c.first_filing_date)+'</td>'
         + '<td class="num">'+esc(c.entry_price_ref)+'</td></tr>';
     });
     html += '</tbody></table></div>';
   } else {
     html += '<div class="small" style="color:var(--muted)">本次掃描無最終候選。</div>';
   }
+  if(withRisk) html += riskNote();
   /* 前瞻表現表 */
   html += '<h3>前瞻表現追蹤</h3>';
   var pos = (f.performance && f.performance.positions) || [];
@@ -523,8 +565,8 @@ function renderFunnel(mountId, f, marketName){
   }
   el.innerHTML = html;
 }
-renderFunnel('us-data', D.us_funnel, '美股');
-renderFunnel('tw-data', D.tw_funnel, '台股');
+renderFunnel('us-data', D.us_funnel, '美股', true);
+renderFunnel('tw-data', D.tw_funnel, '台股', false);
 
 /* ── §4 系統狀態板 ───────────────────────────────────────── */
 (function(){

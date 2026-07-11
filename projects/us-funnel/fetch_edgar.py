@@ -170,6 +170,54 @@ def http_get_text(url, name, meta, record_ok=True, sleep=None):
 
 
 # ---------------------------------------------------------------------------
+# EDGAR company facts：流通股數（風險分級的市值來源；funnel.py import 使用）
+# ---------------------------------------------------------------------------
+
+def parse_shares_outstanding(text):
+    """company concept JSON → 最新一筆 units.shares 的 val；無效/缺 → None。純函式。
+
+    units.shares 條目按 end（期末日）取最新；缺 end 時退回列表最後一筆。
+    """
+    try:
+        data = json.loads(text)
+    except Exception:
+        return None
+    entries = (data.get("units") or {}).get("shares") or []
+    entries = [e for e in entries if isinstance(e, dict) and e.get("val") is not None]
+    if not entries:
+        return None
+    latest = max(entries, key=lambda e: str(e.get("end") or ""))
+    try:
+        val = float(latest["val"])
+    except (TypeError, ValueError):
+        return None
+    return val if val > 0 else None
+
+
+def fetch_shares_outstanding(cik, meta, get_fn=None):
+    """issuer CIK → 最新流通股數（shares）；全部來源失敗 → None（呼叫端保守分級）。
+
+    依序試 config.SHARES_OUTSTANDING_CONCEPTS 的 (taxonomy, tag)：404 或缺數據換下一個。
+    沿用 EDGAR UA 禮儀與 sleep（http_get_text 預設值）；只對否決關 survivors 呼叫。
+    """
+    get_fn = get_fn or http_get_text
+    cik10 = str(cik or "").strip().lstrip("0")
+    if not cik10.isdigit():
+        return None
+    for taxonomy, tag in config.SHARES_OUTSTANDING_CONCEPTS:
+        url = config.EDGAR_COMPANY_CONCEPT_URL.format(
+            cik10=cik10.zfill(10), taxonomy=taxonomy, tag=tag)
+        text, _, ok = get_fn(url, f"company-concept {cik10} {taxonomy}/{tag}", meta,
+                             record_ok=False)
+        if not ok:
+            continue
+        shares = parse_shares_outstanding(text)
+        if shares is not None:
+            return shares
+    return None
+
+
+# ---------------------------------------------------------------------------
 # 每日索引
 # ---------------------------------------------------------------------------
 

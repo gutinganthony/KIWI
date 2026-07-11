@@ -96,13 +96,53 @@ SCORE_BUY_USD_BAND_2 = 500_000.0     # ≥ $500k → 2 分
 # 職稱加分：CFO > CEO（Wang-Shin-Francis 2012 JFQA：CFO 買入 12 個月超額比 CEO 高 ~5pp）
 CFO_TITLE_KEYWORDS = ("CFO", "CHIEF FINANCIAL")   # 命中 → 2 分
 CEO_TITLE_KEYWORDS = ("CEO", "CHIEF EXECUTIVE")   # 命中（無 CFO）→ 1 分
-# 市值帶：v0 無流通股數來源，一律 N/A → 0 分（Phase 2 接 company facts API 後補）
-MCAP_SMALL_CAP_MAX = 2_000_000_000.0  # 預留：市值 < $2B 視為小型（目前未啟用）
+# 市值帶評分（自此版啟用；市值來源見下方「風險分級」節的 company facts API）：
+# micro/small（<$2B）=2 分、mid（$2B–10B）=1 分、large（>$10B）=0 分；None（無數據）=0 分
+MCAP_SMALL_CAP_MAX = 2_000_000_000.0  # 市值 < $2B 視為小型（micro/small 帶上界）
 # 下跌後買入：買入 VWAP < 20 日均價 → 1 分；< 均價 × DIP_DEEP_DISCOUNT → 2 分
 DIP_MA_DAYS = 20
 DIP_DEEP_DISCOUNT = 0.90
 
 TOP_N_CANDIDATES = 15         # 評分排序後輸出前 N 名
+
+# ---------------------------------------------------------------------------
+# 風險分級（beta × 市值雙維度）——monitor 頁「風險分級劃分方法」備註須與此節一致
+# 只對通過否決關的 survivors 計算（~9–15 檔/日，EDGAR 請求數微增）。
+# ---------------------------------------------------------------------------
+
+# 流通股數來源：EDGAR company facts（company concept API，免金鑰；沿用 EDGAR UA 禮儀）
+# 依序嘗試下列 (taxonomy, tag)：404/缺 units.shares → 換下一個；全缺 → None（保守分級）
+EDGAR_COMPANY_CONCEPT_URL = (
+    "https://data.sec.gov/api/xbrl/companyconcept/CIK{cik10}/{taxonomy}/{tag}.json"
+)
+SHARES_OUTSTANDING_CONCEPTS = (
+    ("dei", "EntityCommonStockSharesOutstanding"),
+    ("us-gaap", "CommonStockSharesOutstanding"),
+)
+
+# Beta：候選 vs SPY 近 1 年日報酬的 OLS 斜率 cov(r_i, r_spy)/var(r_spy)
+BETA_BENCHMARK_TICKER = "SPY"   # Stooq symbol 由 stooq_symbol() 轉（spy.us）
+BETA_LOOKBACK_ROWS = 252        # 近 1 年交易日
+BETA_MIN_OVERLAP_DAYS = 60      # 有效重疊（成對日報酬數）低於此 → beta=None
+
+# 市值檔分：<$300M=3、$300M–2B=2、$2B–10B=1、>$10B=0；None=3（保守）
+# 帶名供輸出契約 mcap_band 使用（低於門檻即命中；超過最後一檔 → large=0）
+MCAP_RISK_BANDS = (
+    (300_000_000.0, 3, "micro"),
+    (2_000_000_000.0, 2, "small"),
+    (10_000_000_000.0, 1, "mid"),
+)
+MCAP_LARGE_BAND = "large"       # >$10B
+MCAP_NONE_POINTS = 3            # 無市值數據 → 保守視同 micro
+
+# Beta 檔分：>1.3=2、0.8–1.3=1、<0.8=0；None=2（保守）
+BETA_HIGH_MIN = 1.3             # beta > 1.3 → 2 分（band=high）
+BETA_MID_MIN = 0.8              # 0.8 ≤ beta ≤ 1.3 → 1 分（band=mid）；<0.8 → 0（band=low）
+BETA_NONE_POINTS = 2            # 無 beta 數據 → 保守視同 high
+
+# 總分 → level：≥4 → high、2–3 → medium、≤1 → low；任一維 None → data_gap=True
+RISK_HIGH_MIN_POINTS = 4
+RISK_MEDIUM_MIN_POINTS = 2
 
 # ---------------------------------------------------------------------------
 # 價格源（Stooq 為主；免金鑰、CI 可直連。刻意不用 yfinance——避免限流坑，擇穩）

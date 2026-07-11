@@ -32,9 +32,9 @@
    "2026-07-03 索引抓取失敗（status=403）"
   ]
  },
- "updated_at": "2026-07-10T19:19:22.652150+00:00",
+ "updated_at": "2026-07-11T08:14:14.018169+00:00",
  "funnel": {
-  "ran_at": "2026-07-10T19:19:06.846967+00:00",
+  "ran_at": "2026-07-11T08:14:14.017972+00:00",
   "days_loaded": 4,
   "funnel_stats": {
    "raw_filings": 4822,
@@ -60,21 +60,92 @@
    "liquidity:UUUU",
    "liquidity:WRAP"
   ],
-  "requests_ok": 9,
-  "requests_failed": 0,
-  "elapsed_sec": 10.2,
-  "endpoint_health": [],
-  "errors": [
-   "stooq YPF: 回應非有效 CSV（No data？）",
-   "stooq PFBX: 回應非有效 CSV（No data？）",
-   "stooq JCTC: 回應非有效 CSV（No data？）",
-   "stooq HTO: 回應非有效 CSV（No data？）",
-   "stooq EWSB: 回應非有效 CSV（No data？）",
-   "stooq VII: 回應非有效 CSV（No data？）",
-   "stooq ENR: 回應非有效 CSV（No data？）",
-   "stooq UUUU: 回應非有效 CSV（No data？）",
-   "stooq WRAP: 回應非有效 CSV（No data？）"
-  ]
+  "requests_ok": 0,
+  "requests_failed": 10,
+  "elapsed_sec": 55.3,
+  "endpoint_health": [
+   {
+    "name": "stooq YPF",
+    "url": "https://stooq.com/q/d/l/?s=ypf.us&i=d",
+    "ok": false,
+    "status": null,
+    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=ypf.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: ",
+    "elapsed_sec": 5.02
+   },
+   {
+    "name": "stooq PFBX",
+    "url": "https://stooq.com/q/d/l/?s=pfbx.us&i=d",
+    "ok": false,
+    "status": null,
+    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=pfbx.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed:",
+    "elapsed_sec": 5.06
+   },
+   {
+    "name": "stooq JCTC",
+    "url": "https://stooq.com/q/d/l/?s=jctc.us&i=d",
+    "ok": false,
+    "status": null,
+    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=jctc.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed:",
+    "elapsed_sec": 4.98
+   },
+   {
+    "name": "stooq HTO",
+    "url": "https://stooq.com/q/d/l/?s=hto.us&i=d",
+    "ok": false,
+    "status": null,
+    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=hto.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: ",
+    "elapsed_sec": 5.15
+   },
+   {
+    "name": "stooq EWSB",
+    "url": "https://stooq.com/q/d/l/?s=ewsb.us&i=d",
+    "ok": false,
+    "status": null,
+    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=ewsb.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed:",
+    "elapsed_sec": 4.96
+   },
+   {
+    "name": "stooq VII",
+    "url": "https://stooq.com/q/d/l/?s=vii.us&i=d",
+    "ok": false,
+    "status": null,
+    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=vii.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: ",
+    "elapsed_sec": 5.01
+   },
+   {
+    "name": "stooq ENR",
+    "url": "https://stooq.com/q/d/l/?s=enr.us&i=d",
+    "ok": false,
+    "status": null,
+    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=enr.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: ",
+    "elapsed_sec": 5.08
+   },
+   {
+    "name": "stooq UUUU",
+    "url": "https://stooq.com/q/d/l/?s=uuuu.us&i=d",
+    "ok": false,
+    "status": null,
+    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=uuuu.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed:",
+    "elapsed_sec": 5.03
+   },
+   {
+    "name": "stooq WRAP",
+    "url": "https://stooq.com/q/d/l/?s=wrap.us&i=d",
+    "ok": false,
+    "status": null,
+    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=wrap.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed:",
+    "elapsed_sec": 5.06
+   },
+   {
+    "name": "stooq SPY",
+    "url": "https://stooq.com/q/d/l/?s=spy.us&i=d",
+    "ok": false,
+    "status": null,
+    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=spy.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: ",
+    "elapsed_sec": 4.97
+   }
+  ],
+  "errors": []
  },
  "tracking": {
   "ran_at": "2026-07-10T19:19:22.652027+00:00",
