@@ -1,6 +1,6 @@
 {
  "fetch": {
-  "ran_at": "2026-07-11T11:36:19.647067+00:00",
+  "ran_at": "2026-07-11T11:47:40.700595+00:00",
   "days_scanned": 7,
   "days_fetched": 0,
   "days_skipped_cached": 5,
@@ -8,7 +8,7 @@
   "parse_failed": 0,
   "requests_ok": 0,
   "requests_failed": 2,
-  "elapsed_sec": 81.0,
+  "elapsed_sec": 80.6,
   "endpoint_health": [
    {
     "name": "daily-index 2026-07-10",
@@ -16,7 +16,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.43
+    "elapsed_sec": 40.14
    },
    {
     "name": "daily-index 2026-07-03",
@@ -24,7 +24,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.29
+    "elapsed_sec": 40.13
    }
   ],
   "errors": [
@@ -32,9 +32,9 @@
    "2026-07-03 索引抓取失敗（status=403）"
   ]
  },
- "updated_at": "2026-07-11T11:45:12.098679+00:00",
+ "updated_at": "2026-07-11T11:56:34.452987+00:00",
  "funnel": {
-  "ran_at": "2026-07-11T11:44:44.270553+00:00",
+  "ran_at": "2026-07-11T11:56:07.183255+00:00",
   "days_loaded": 4,
   "funnel_stats": {
    "raw_filings": 4822,
@@ -53,7 +53,7 @@
    "liquidity:VII"
   ],
   "requests_ok": 19,
-  "requests_failed": 11,
+  "requests_failed": 18,
   "price_source_stats": {
    "stooq": {
     "ok": 0,
@@ -76,7 +76,12 @@
    "WRAP": "yahoo",
    "SPY": "yahoo"
   },
-  "elapsed_sec": 423.5,
+  "mcap_source_stats": {
+   "edgar": 0,
+   "yahoo": 0,
+   "none": 6
+  },
+  "elapsed_sec": 425.7,
   "endpoint_health": [
    {
     "name": "yahoo VII",
@@ -84,7 +89,7 @@
     "ok": false,
     "status": 404,
     "error": "HTTP 404",
-    "elapsed_sec": 0.16
+    "elapsed_sec": 0.07
    },
    {
     "name": "company-concept 904851 dei/EntityCommonStockSharesOutstanding",
@@ -92,7 +97,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.36
+    "elapsed_sec": 40.19
    },
    {
     "name": "company-concept 904851 us-gaap/CommonStockSharesOutstanding",
@@ -100,7 +105,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.33
+    "elapsed_sec": 40.17
    },
    {
     "name": "company-facts 904851",
@@ -116,7 +121,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.35
+    "elapsed_sec": 40.13
    },
    {
     "name": "company-concept 766829 us-gaap/CommonStockSharesOutstanding",
@@ -124,7 +129,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.35
+    "elapsed_sec": 40.21
    },
    {
     "name": "company-facts 766829",
@@ -140,7 +145,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.35
+    "elapsed_sec": 40.18
    },
    {
     "name": "company-concept 1632790 us-gaap/CommonStockSharesOutstanding",
@@ -148,7 +153,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.33
+    "elapsed_sec": 40.12
    },
    {
     "name": "company-facts 1632790",
@@ -164,7 +169,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.39
+    "elapsed_sec": 40.12
    },
    {
     "name": "company-concept 1385849 us-gaap/CommonStockSharesOutstanding",
@@ -172,7 +177,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.28
+    "elapsed_sec": 40.19
    },
    {
     "name": "company-facts 1385849",
@@ -188,7 +193,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.35
+    "elapsed_sec": 40.11
    },
    {
     "name": "company-concept 1702924 us-gaap/CommonStockSharesOutstanding",
@@ -196,7 +201,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.41
+    "elapsed_sec": 40.16
    },
    {
     "name": "company-facts 1702924",
@@ -205,6 +210,62 @@
     "status": null,
     "error": "所有 concept 皆失敗或缺 units.shares（mcap → None 保守分級）",
     "elapsed_sec": null
+   },
+   {
+    "name": "yahoo-quotesummary YPF",
+    "url": "https://query1.finance.yahoo.com/v10/finance/quoteSummary/YPF?modules=price",
+    "ok": false,
+    "status": 401,
+    "error": "HTTP 401; body={\"finance\":{\"result\":null,\"error\":{\"code\":\"Unauthorized\",\"description\":\"Invalid Crumb\"}}}",
+    "elapsed_sec": 0.07
+   },
+   {
+    "name": "yahoo-quotesummary HTO",
+    "url": "https://query1.finance.yahoo.com/v10/finance/quoteSummary/HTO?modules=price",
+    "ok": false,
+    "status": 401,
+    "error": "HTTP 401; body={\"finance\":{\"result\":null,\"error\":{\"code\":\"Unauthorized\",\"description\":\"Invalid Crumb\"}}}",
+    "elapsed_sec": 0.06
+   },
+   {
+    "name": "yahoo-quotesummary VII",
+    "url": "https://query1.finance.yahoo.com/v10/finance/quoteSummary/VII?modules=price",
+    "ok": false,
+    "status": 401,
+    "error": "HTTP 401; body={\"finance\":{\"result\":null,\"error\":{\"code\":\"Unauthorized\",\"description\":\"Invalid Crumb\"}}}",
+    "elapsed_sec": 0.06
+   },
+   {
+    "name": "yahoo-quotesummary ENR",
+    "url": "https://query1.finance.yahoo.com/v10/finance/quoteSummary/ENR?modules=price",
+    "ok": false,
+    "status": 401,
+    "error": "HTTP 401; body={\"finance\":{\"result\":null,\"error\":{\"code\":\"Unauthorized\",\"description\":\"Invalid Crumb\"}}}",
+    "elapsed_sec": 0.06
+   },
+   {
+    "name": "yahoo-quotesummary UUUU",
+    "url": "https://query1.finance.yahoo.com/v10/finance/quoteSummary/UUUU?modules=price",
+    "ok": false,
+    "status": 401,
+    "error": "HTTP 401; body={\"finance\":{\"result\":null,\"error\":{\"code\":\"Unauthorized\",\"description\":\"Invalid Crumb\"}}}",
+    "elapsed_sec": 0.08
+   },
+   {
+    "name": "yahoo-quotesummary WRAP",
+    "url": "https://query1.finance.yahoo.com/v10/finance/quoteSummary/WRAP?modules=price",
+    "ok": false,
+    "status": 401,
+    "error": "HTTP 401; body={\"finance\":{\"result\":null,\"error\":{\"code\":\"Unauthorized\",\"description\":\"Invalid Crumb\"}}}",
+    "elapsed_sec": 0.06
+   },
+   {
+    "name": "yahoo-quote batch x6",
+    "url": "https://query1.finance.yahoo.com/v7/finance/quote?symbols=YPF,HTO,VII,ENR,UUUU,WRAP",
+    "ok": false,
+    "status": 401,
+    "error": "HTTP 401; body={\"finance\":{\"result\":null,\"error\":{\"code\":\"Unauthorized\",\"description\":\"User is unable to access this feature - https://bit.ly/yahoo-finance-api-feedback\"}}}",
+    "elapsed_sec": 0.11
    }
   ],
   "errors": [
@@ -221,7 +282,7 @@
   ]
  },
  "tracking": {
-  "ran_at": "2026-07-11T11:45:12.098449+00:00",
+  "ran_at": "2026-07-11T11:56:34.452787+00:00",
   "positions_total": 15,
   "positions_new": 0,
   "positions_updated": 12,
@@ -255,7 +316,7 @@
    "WRAP": "yahoo",
    "SWZ": "yahoo"
   },
-  "elapsed_sec": 27.7,
+  "elapsed_sec": 27.1,
   "endpoint_health": [
    {
     "name": "yahoo VII",
@@ -263,7 +324,7 @@
     "ok": false,
     "status": 404,
     "error": "HTTP 404",
-    "elapsed_sec": 0.17
+    "elapsed_sec": 0.06
    },
    {
     "name": "yahoo BBASX",
@@ -271,7 +332,7 @@
     "ok": false,
     "status": 404,
     "error": "HTTP 404",
-    "elapsed_sec": 0.15
+    "elapsed_sec": 0.06
    }
   ],
   "errors": [
