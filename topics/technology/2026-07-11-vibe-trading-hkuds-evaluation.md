@@ -53,10 +53,19 @@ version: 1.0
 - coverage 門檻 = 0（測試多但不設覆蓋率底線）。
 - 實驗室多線作戰（AI-Trader 同賽道並存），長期維護是最大問號。
 
+## 雲端實測補充(2026-07-11,claude.ai/code session 容器內)
+
+- **安裝可行**:Python 3.11.15 滿足需求;`pip install --user vibe-trading-ai` 成功(需先 `pip install --user -U setuptools wheel` 繞過 Debian setuptools 的 install_layout bug,肇因是 akshare 的傳依賴 jsonpath)。
+- **零 key 離線功能實測通過**:`vibe-trading alpha list`(460 因子完整列出)、`vibe-trading-mcp --help`(stdio/sse 兩種 transport)都不需要 LLM key。
+- **行情源在雲端 session 全被擋**:yahoo/tencent/stooq 經 agent proxy 全部連不上(僅 PyPI 通)。→ 雲端 session 內只能跑離線功能與 `local:` CSV 回測;**線上資料抓取必須走 GitHub Actions runner(不受封鎖,poly-observer/tw-funnel 已證實)或本機**。或者在 claude.ai/code 環境設定放寬網路政策。
+- **CLI bench 的 universe 限制**:`alpha bench --universe` 只有 csi300/sp500/btc-usdt 三個預設;要拿自訂 watchlist(如 Serenity 池)跑因子 IC,得走它的 Python API 或 agent 路線,不是一行 CLI。
+- **LLM key 需求釐清**:方向 1(資料層/回測)與方向 2(alpha bench)完全不需要 LLM key——Claude 自己當大腦、它當工具箱。只有方向 3(swarm 多空辯論)需要一把它自己的 key(預設 DeepSeek;無原生 Anthropic,用 Claude 須繞 OpenRouter;Claude 訂閱不能供它使用)。
+
 ## 詳細分析檔案
 
 本篇是彙整版。逐項證據（檔案:行號）見 session 產出的兩份完整報告（scratchpad，未入版控）：程式碼分析涵蓋 57 tools/460 因子逐一點數、風控層程式碼位置；背景調查含全部來源 URL 與同類專案即時 star 對照。
 
 ## Update Log
 
+- 2026-07-11 v1.1：新增雲端實測補充（安裝成功、零 key 功能驗證、行情源封鎖實測、CLI universe 限制修正）。
 - 2026-07-11 v1.0：建檔。基於 v0.1.11（HEAD d456025）靜態分析 + 背景查證，未實際安裝執行。

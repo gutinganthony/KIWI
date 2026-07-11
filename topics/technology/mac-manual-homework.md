@@ -28,31 +28,23 @@ last_updated: 2026-07-06
   - ✅ 現在已有失敗推播（`deploy-pages.yml` → Telegram），收到通知再去按即可，不用自己巡邏網站。
   - 位置：Actions 分頁 → Deploy Dashboard to GitHub Pages → Re-run failed jobs；或等下次自動 deploy。
 
-### 2026-07-06 session 產生的（JEM 第一關收尾，加碼前必做）
-- [ ] **TDnet 7/3–7/6 適時開示清單**：確認 JEM（6855）這幾天沒有任何未被媒體報導的公告（增資/CB/下修）。→ 排除否證 #1 的殘餘不確定性。
-- [ ] **JEM FY3/26 有価証券報告書「主な相手先別販売実績」表**（EDINET 或 JEM 官網 PDF）：查 NAND 單一客戶（Kioxia/Flash Forward 系）占比未失控、**Micron 系是否回到 >10%（=最強確認訊號）**。→ 補齊否證 #2 的資料缺口。
-- [ ] **Yahoo!ファイナンス 6855 時系列**：核對 7/3 與 7/6 兩日收盤，判別 7/6 單日跌幅是 -10.4% 還是 -14.3%（兩快照矛盾，複核 agent 無法裁決）。
-  - 三項全過 → JEM 首批建倉區 ¥6,400–6,800 紀律恢復有效（第二關 8/7 Q1 財報再定第二批）。
+### 2026-07-11 session 產生的（Vibe-Trading——目前唯一的主動功課）
+- [ ] **若要跑 Vibe-Trading 的 swarm（多空辯論委員會）**：提供一把 DeepSeek 或 OpenRouter API key → GitHub Secrets。純資料層/回測/alpha bench **不需要任何 LLM key**（Claude 本身就是大腦），且雲端 session 已實測可安裝——真正的雲端阻礙是行情源被 proxy 封鎖，解法是走 GitHub Actions（詳見評估文與 2026-07-11 session 對話）。Mac 本機安裝只在你想要「即時互動 TUI」時才需要。評估文：topics/technology/2026-07-11-vibe-trading-hkuds-evaluation.md
 
-### 2026-07-11 session 產生的（台股漏斗數據源）
-- [ ] **註冊 FinMind 免費帳號取得 API token**（finmindtrade.com）→ 放進 GitHub repo Settings → Secrets → `FINMIND_TOKEN`。無 token 時台股管線走 TWSE 次源可運作；FinMind 主源（更穩、可歷史回補）的全市場查詢需 token 解鎖（匿名層回 400）。
-
-### 2026-07-10 session 產生的（Polymarket 跟單文查證——優先度低：雲端查證結論已足夠明確〔判定為導流文，不建議執行〕，以下僅在你想二次確認時做）
-- [ ] 開 t.me/KreoPolyBot 預覽確認 bot 真偽；開 t.me/polymarketsig、t.me/duanlang1000x、t.me/polyalpha1 查群人數與付費層級（t.me 被擋）
-- [ ] 開 polymarketanalytics.com/traders 與 /pricing、docs.kreo.app 核對篩選器/價格/費率與返佣原文（站點被擋，僅搜尋摘要層取得）
-- [ ] 登入 X 核對 @waveking1314 粉絲數、開號日、歷史貼文主題（搜尋摘要顯示 ~42.8K 粉、2023-03 開號，未直接核對）
-
-### 2026-07-11 session 產生的（Vibe-Trading 實測——僅在你讀完評估文後想動手試才做）
-- [ ] **若要實測 HKUDS/Vibe-Trading**：雲端 session 沒有 LLM API key 可給它用。在 Mac 上 `pip install vibe-trading-ai`（Python ≥3.11）+ 一個 DeepSeek 或 OpenRouter key（無原生 Anthropic，用 Claude 須繞 OpenRouter），或本地 Ollama 免 key。建議首試：`vibe-trading-mcp`（免 key 的 read-only 資料工具）或 `vibe-trading alpha bench` 拿 Serenity watchlist 跑因子 IC。評估文：topics/technology/2026-07-11-vibe-trading-hkuds-evaluation.md
-
-### 2026-07-07 session 產生的（AXW/AIR TRF 研究）
-- [ ] **AIR TRF 真實利差序列建檔（文獻查證：DataMine 有免費日檔！）**：註冊 CME DataMine → 拉 AIR TRF 免費 CSV（欄位 `DLY_FUND` FID#10335、`ACC_FUND` #10337）→ 建歷史序列存進 `projects/avi-v5/data/ext/air_trf.csv` → 跑與 `lev_stress_proxy` 的相關性（報告 §8 否證 ②）。備用免費儀表板：snippet.finance「S&P 500 Futures Financing」（2012 迄今）。每週順手記一次 CME 產品頁的近月 bps 與分位數。
+### 擱置（AIR TRF——等 Jake 讀完說明決定要不要做；屬 avi-v5 報告 §8 否證②的驗證工作）
+- [ ] **AIR TRF 真實利差序列建檔**：AIR TRF = CME「調整利率型 S&P 500 總報酬期貨」，其隱含融資利差是市場槓桿需求的直接量測。此功課=註冊 CME DataMine（有免費日檔）→ 拉 CSV（欄位 `DLY_FUND` FID#10335、`ACC_FUND` #10337）→ 存進 `projects/avi-v5/data/ext/air_trf.csv` → 驗證 AVI 的 `lev_stress_proxy` 代理指標是否真的跟蹤實際融資壓力。備用免費儀表板：snippet.finance「S&P 500 Futures Financing」（2012 迄今）。
 
 ---
 
 ## ✅ 已完成（做完從上面移下來，保留紀錄）
 
+- [x] ~~註冊 FinMind 免費帳號取得 API token → GitHub Secrets `FINMIND_TOKEN`~~ → **2026-07-11 確認已生效**：當日 tw-funnel CI 的 fetch_meta.json 顯示 FinMind 以 register 等級回應（股票清單 200、月營收 43 檔抓到 42）。法人買賣超/全市場股價兩個資料集回 400 是「需付費 sponsor 層」而非 token 缺失——管線已自動 fallback TWSE 且成功，**免費層即可，不需升級**。
 - [x] ~~本機 curl Polymarket data-api 複核範例錢包精確數字~~ → **2026-07-10 由 poly-observer CI（GitHub Actions runner 不受雲端封鎖）直查完成**，且推翻了媒體快照的「−$311k 爆倉」說法（實為終身 +$176,445、4/12 後停止交易、持倉 $0）。詳見 topics/business/2026-07-10-polymarket-copy-trading-guide-verification.md v1.1。
+
+## 🗄️ 已取消（2026-07-11 Jake 指示：手動功課只留 Vibe-Trading；以下項目取消，保留紀錄以便日後想撿回）
+
+- ~~JEM 第一關收尾三項（TDnet 7/3–7/6 開示清單、FY3/26 有報「主な相手先別販売実績」表、Yahoo!ファイナンス 6855 時系列核對）~~——原目的：JEM 加碼前排除否證 #1/#2 殘餘不確定性。取消＝若未做就加碼，承擔對應資訊缺口。
+- ~~Polymarket 導流文二次確認三項（t.me 群組核對、polymarketanalytics/kreo 原文核對、@waveking1314 X 帳號核對）~~——雲端查證結論已明確（導流文、不建議執行），本就標記為可選。
 
 ---
 
