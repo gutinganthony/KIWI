@@ -42,6 +42,9 @@ last_updated: 2026-07-06
 - [ ] 開 polymarketanalytics.com/traders 與 /pricing、docs.kreo.app 核對篩選器/價格/費率與返佣原文（站點被擋，僅搜尋摘要層取得）
 - [ ] 登入 X 核對 @waveking1314 粉絲數、開號日、歷史貼文主題（搜尋摘要顯示 ~42.8K 粉、2023-03 開號，未直接核對）
 
+### 2026-07-11 session 產生的（playground plugin——可選，僅在你看完介紹想採用時做）
+- [ ] **在 Mac 的 Claude Code 安裝 playground plugin**：跑 `/plugin` 瀏覽官方 marketplace（anthropics/claude-plugins-official）→ 安裝 `playground`。之後在本機對 Claude 說「幫我做一個 XX 的 playground」即可。雲端 session 不需裝——直接請 session 照同樣模式生 HTML 並以 Artifact 連結交付。
+
 ### 2026-07-07 session 產生的（AXW/AIR TRF 研究）
 - [ ] **AIR TRF 真實利差序列建檔（文獻查證：DataMine 有免費日檔！）**：註冊 CME DataMine → 拉 AIR TRF 免費 CSV（欄位 `DLY_FUND` FID#10335、`ACC_FUND` #10337）→ 建歷史序列存進 `projects/avi-v5/data/ext/air_trf.csv` → 跑與 `lev_stress_proxy` 的相關性（報告 §8 否證 ②）。備用免費儀表板：snippet.finance「S&P 500 Futures Financing」（2012 迄今）。每週順手記一次 CME 產品頁的近月 bps 與分位數。
 
