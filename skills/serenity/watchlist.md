@@ -16,7 +16,8 @@
 | **DRAM**（Roundhill Memory ETF）| 記憶體週期籃子（73% Samsung/SKH/Micron + Kioxia/SanDisk/WD/Nanya/Winbond）| ~$62（NAV $59.8）、AUM $24.6B、ER 0.65%、2026 +100%。**2026-07-09 由 AAOI 全數換入**（成本~$170→出~$108，實現~-36%）| DRAM 合約價季轉跌 / 量價背離 / CXMT DDR5 擴產+實體清單 / hyperscaler capex 下修（＝上方「記憶體週期」宏觀燈號）|
 | **6981 村田製作所**（JP）| MLCC 全球 ~40%／AI 伺服器 45–70%（定價權已證實）| ¥9,475（~¥14.5T/$95B、fwd ~45×、自 ATH ¥12,895 −27%）| AI 伺服器 MLCC 訂單跌回產能以下 / 漲價被撤 / AI capex 下修 |
 | **6857 Advantest**（JP）| ATE 測試雙寡占、GPU/AI SoC 測試 ~70%（測試界 ASML）| ~¥30,660（~¥22T/$145B、fwd ~40×、自 ATH −15%）| Teradyne 搶 SoC/GPU 份額 / 毛利率反轉 / NVIDIA 週期暫停；7/29 財報 |
-| **INTC Intel**（US）| 代工/18A 轉機股（非 Serenity 卡口）| $112.5（~$565B、2026 $19→$142 後回檔、52週 $19–142）| 18A/foundry 良率跳票 / 大客戶未落袋 / 再增資稀釋 |
+| ~~INTC Intel~~（**已出場**：2027/3 $47 買權於 7/10 換至 DRAM ETF）| 原代工/18A 轉機（Serenity 評 0/10：份額輸家非卡口）| 出場時 ~$112.5；轉為 framework_out 參考觀察 | 重新關注需：18A 獲利級良率 + 外部代工大客戶投產（H2'26 分水嶺）|
+| **MU Micron**（US，直接持倉 ~10%）| DRAM 三寡占 + HBM 整體 #2（21%，NVIDIA HBM4 配額僅 ~20%）| ~$974（fwd 6.4×＝峰值幻覺、P/B 11–14× vs 中位 1.9×）| DRAM 合約價季轉跌 / 量價背離 / CXMT DDR5 良率達標（2026 底）/ HBM4 配額 <20%。⚠️ 與 DRAM ETF 重疊 |
 
 > 單一股風險已消除，但為**純記憶體週期曝險**、與直接持有的 MU 重疊、且買在合約價漲幅收斂（3Q26 +13–18% vs 1Q26 +81%）的早期轉折上。**週報 Phase 1 需重拉 DRAM 現價、Phase 5 需以 `holding` 層寫回 data.json（勿與 Serenity 候選混淆）。**
 
