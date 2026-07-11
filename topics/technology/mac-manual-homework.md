@@ -29,7 +29,8 @@ last_updated: 2026-07-06
   - 位置：Actions 分頁 → Deploy Dashboard to GitHub Pages → Re-run failed jobs；或等下次自動 deploy。
 
 ### 2026-07-11 session 產生的（Vibe-Trading——目前唯一的主動功課）
-- [ ] **若要跑 Vibe-Trading 的 swarm（多空辯論委員會）**：提供一把 DeepSeek 或 OpenRouter API key → GitHub Secrets。純資料層/回測/alpha bench **不需要任何 LLM key**（Claude 本身就是大腦），且雲端 session 已實測可安裝——真正的雲端阻礙是行情源被 proxy 封鎖，解法是走 GitHub Actions（詳見評估文與 2026-07-11 session 對話）。Mac 本機安裝只在你想要「即時互動 TUI」時才需要。評估文：topics/technology/2026-07-11-vibe-trading-hkuds-evaluation.md
+- [ ] **路線 B：放寬 claude.ai/code 環境網路政策（只有你本人能做）**：到 claude.ai/code → 這個 repo 所屬 Environment 的設定 → Network access，把政策放寬到允許行情域名（至少：`query1.finance.yahoo.com`、`qt.gtimg.cn`、`stooq.com`、`www.okx.com`、`api.finmindtrade.com`）或改 full access（隔離性代價自行權衡；政策選項說明見 https://code.claude.com/docs/en/claude-code-on-the-web ）。做完後任何裝置開的雲端 session 都能即時抓行情，vibe-trading 的 MCP/CLI 全功能可用；屆時可考慮把 `vibe-trading-mcp` 登記進 repo 的 `.mcp.json` 讓每個 session 自動載入。
+- [ ] **（可選）若要跑 Vibe-Trading 的 swarm（多空辯論委員會）**：提供一把 DeepSeek 或 OpenRouter API key → GitHub Secrets `DEEPSEEK_API_KEY`（vibe-lab workflow 已預留傳遞）。純資料層/回測/alpha bench **不需要任何 LLM key**——路線 A（vibe-lab workflow）已於 2026-07-11 建置，用法見 projects/vibe-lab/README.md。評估文：topics/technology/2026-07-11-vibe-trading-hkuds-evaluation.md
 
 ### 擱置（AIR TRF——等 Jake 讀完說明決定要不要做；屬 avi-v5 報告 §8 否證②的驗證工作）
 - [ ] **AIR TRF 真實利差序列建檔**：AIR TRF = CME「調整利率型 S&P 500 總報酬期貨」，其隱含融資利差是市場槓桿需求的直接量測。此功課=註冊 CME DataMine（有免費日檔）→ 拉 CSV（欄位 `DLY_FUND` FID#10335、`ACC_FUND` #10337）→ 存進 `projects/avi-v5/data/ext/air_trf.csv` → 驗證 AVI 的 `lev_stress_proxy` 代理指標是否真的跟蹤實際融資壓力。備用免費儀表板：snippet.finance「S&P 500 Futures Financing」（2012 迄今）。

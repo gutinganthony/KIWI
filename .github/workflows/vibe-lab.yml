@@ -1,0 +1,63 @@
+name: Vibe Lab (on-demand vibe-trading bench/backtest)
+# 用途:把 Vibe-Trading 的確定性功能搬到 Actions 跑(session 端行情源被封鎖)。
+# 觸發:push 改動 job.json 或本檔(paths 過濾;結果 commit-back 不含這兩檔,不會自我觸發)。
+# 詳見 projects/vibe-lab/README.md。2026-07-11 經 Jake 核准新增。
+on:
+  push:
+    branches: [claude/vibe-trading-exploration-lnlrcl]
+    paths:
+      - 'projects/vibe-lab/job.json'
+      - '.github/workflows/vibe-lab.yml'
+  workflow_dispatch:
+
+jobs:
+  vibe-lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install vibe-trading (PyPI latest, 0.1.x Beta — breaking change 時先 pin 版本)
+        run: |
+          pip install -U pip setuptools wheel
+          pip install vibe-trading-ai
+
+      # DEEPSEEK_API_KEY 為可選:repo 未設 secret 時展開為空,v1 的確定性 job 用不到;
+      # 未來加 swarm 類 job 時放入 Secrets 即生效。
+      - name: Run job from spec
+        working-directory: projects/vibe-lab
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: python3 run_job.py
+
+      # repo 體積控制(LEARNINGS 2026-07-10:CI 產物落地前先瘦身,>1MB 不入版控)
+      - name: Size guard on results
+        if: always()
+        run: |
+          find projects/vibe-lab/results -type f -size +900k -print -delete 2>/dev/null || true
+          du -sh projects/vibe-lab/results 2>/dev/null || true
+
+      # 失敗也 commit(結果檔含錯誤輸出,session 端才讀得到診斷);rebase-then-push
+      # (LEARNINGS 2026-07-10:多 workflow 寫同分支必 rebase)。訊息不含 skip-ci 方括號字樣。
+      - name: Commit results back
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add projects/vibe-lab/results/ 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No results to commit."
+          else
+            git commit -m "auto: vibe-lab results $(date -u +%FT%H:%M)Z"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push
+          fi
