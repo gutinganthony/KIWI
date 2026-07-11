@@ -1,30 +1,30 @@
 {
  "fetch": {
-  "ran_at": "2026-07-10T19:18:46.904650+00:00",
-  "days_scanned": 8,
+  "ran_at": "2026-07-11T11:36:19.647067+00:00",
+  "days_scanned": 7,
   "days_fetched": 0,
-  "days_skipped_cached": 6,
+  "days_skipped_cached": 5,
   "raw_filings": 0,
   "parse_failed": 0,
   "requests_ok": 0,
   "requests_failed": 2,
-  "elapsed_sec": 9.7,
+  "elapsed_sec": 81.0,
   "endpoint_health": [
    {
     "name": "daily-index 2026-07-10",
     "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260710.idx",
     "ok": false,
     "status": 403,
-    "error": "HTTP 403; body=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>NZEJNHPD244EPGS9</RequestId><HostId>uUWjh7O6PKY0quVwGJlFfJuXOmCKQWvYI6v",
-    "elapsed_sec": 4.7
+    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
+    "elapsed_sec": 40.43
    },
    {
     "name": "daily-index 2026-07-03",
     "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260703.idx",
     "ok": false,
     "status": 403,
-    "error": "HTTP 403; body=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>RS2W7Y8PCKHRFA6N</RequestId><HostId>rbkMmeCr8JB0c9x0o4SoJSJy7WUBXhHwIWl",
-    "elapsed_sec": 4.65
+    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
+    "elapsed_sec": 40.29
    }
   ],
   "errors": [
@@ -32,131 +32,248 @@
    "2026-07-03 索引抓取失敗（status=403）"
   ]
  },
- "updated_at": "2026-07-11T08:14:14.018169+00:00",
+ "updated_at": "2026-07-11T11:45:12.098679+00:00",
  "funnel": {
-  "ran_at": "2026-07-11T08:14:14.017972+00:00",
+  "ran_at": "2026-07-11T11:44:44.270553+00:00",
   "days_loaded": 4,
   "funnel_stats": {
    "raw_filings": 4822,
    "qualified_events": 18,
-   "post_veto": 9,
-   "final_candidates": 9
+   "post_veto": 6,
+   "final_candidates": 6
   },
   "veto_counts": {
    "penny": 0,
    "sell_offset": 1,
-   "illiquid": 0,
+   "illiquid": 3,
    "fund_issuer": 4,
    "routine_wave": 4
   },
   "skipped_checks": [
-   "liquidity:YPF",
-   "liquidity:PFBX",
-   "liquidity:JCTC",
-   "liquidity:HTO",
-   "liquidity:EWSB",
-   "liquidity:VII",
-   "liquidity:ENR",
-   "liquidity:UUUU",
-   "liquidity:WRAP"
+   "liquidity:VII"
   ],
-  "requests_ok": 0,
-  "requests_failed": 10,
-  "elapsed_sec": 55.3,
+  "requests_ok": 19,
+  "requests_failed": 11,
+  "price_source_stats": {
+   "stooq": {
+    "ok": 0,
+    "failed": 10
+   },
+   "yahoo": {
+    "ok": 9,
+    "failed": 1
+   }
+  },
+  "price_sources": {
+   "YPF": "yahoo",
+   "PFBX": "yahoo",
+   "JCTC": "yahoo",
+   "HTO": "yahoo",
+   "EWSB": "yahoo",
+   "VII": "none",
+   "ENR": "yahoo",
+   "UUUU": "yahoo",
+   "WRAP": "yahoo",
+   "SPY": "yahoo"
+  },
+  "elapsed_sec": 423.5,
   "endpoint_health": [
    {
-    "name": "stooq YPF",
-    "url": "https://stooq.com/q/d/l/?s=ypf.us&i=d",
+    "name": "yahoo VII",
+    "url": "https://query1.finance.yahoo.com/v8/finance/chart/VII?range=1y&interval=1d",
     "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=ypf.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: ",
-    "elapsed_sec": 5.02
+    "status": 404,
+    "error": "HTTP 404",
+    "elapsed_sec": 0.16
    },
    {
-    "name": "stooq PFBX",
-    "url": "https://stooq.com/q/d/l/?s=pfbx.us&i=d",
+    "name": "company-concept 904851 dei/EntityCommonStockSharesOutstanding",
+    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0000904851/dei/EntityCommonStockSharesOutstanding.json",
     "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=pfbx.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed:",
-    "elapsed_sec": 5.06
+    "status": 403,
+    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
+    "elapsed_sec": 40.36
    },
    {
-    "name": "stooq JCTC",
-    "url": "https://stooq.com/q/d/l/?s=jctc.us&i=d",
+    "name": "company-concept 904851 us-gaap/CommonStockSharesOutstanding",
+    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0000904851/us-gaap/CommonStockSharesOutstanding.json",
     "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=jctc.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed:",
-    "elapsed_sec": 4.98
+    "status": 403,
+    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
+    "elapsed_sec": 40.33
    },
    {
-    "name": "stooq HTO",
-    "url": "https://stooq.com/q/d/l/?s=hto.us&i=d",
+    "name": "company-facts 904851",
+    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0000904851/us-gaap/CommonStockSharesOutstanding.json",
     "ok": false,
     "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=hto.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: ",
-    "elapsed_sec": 5.15
+    "error": "所有 concept 皆失敗或缺 units.shares（mcap → None 保守分級）",
+    "elapsed_sec": null
    },
    {
-    "name": "stooq EWSB",
-    "url": "https://stooq.com/q/d/l/?s=ewsb.us&i=d",
+    "name": "company-concept 766829 dei/EntityCommonStockSharesOutstanding",
+    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0000766829/dei/EntityCommonStockSharesOutstanding.json",
     "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=ewsb.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed:",
-    "elapsed_sec": 4.96
+    "status": 403,
+    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
+    "elapsed_sec": 40.35
    },
    {
-    "name": "stooq VII",
-    "url": "https://stooq.com/q/d/l/?s=vii.us&i=d",
+    "name": "company-concept 766829 us-gaap/CommonStockSharesOutstanding",
+    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0000766829/us-gaap/CommonStockSharesOutstanding.json",
     "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=vii.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: ",
-    "elapsed_sec": 5.01
+    "status": 403,
+    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
+    "elapsed_sec": 40.35
    },
    {
-    "name": "stooq ENR",
-    "url": "https://stooq.com/q/d/l/?s=enr.us&i=d",
+    "name": "company-facts 766829",
+    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0000766829/us-gaap/CommonStockSharesOutstanding.json",
     "ok": false,
     "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=enr.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: ",
-    "elapsed_sec": 5.08
+    "error": "所有 concept 皆失敗或缺 units.shares（mcap → None 保守分級）",
+    "elapsed_sec": null
    },
    {
-    "name": "stooq UUUU",
-    "url": "https://stooq.com/q/d/l/?s=uuuu.us&i=d",
+    "name": "company-concept 1632790 dei/EntityCommonStockSharesOutstanding",
+    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0001632790/dei/EntityCommonStockSharesOutstanding.json",
     "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=uuuu.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed:",
-    "elapsed_sec": 5.03
+    "status": 403,
+    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
+    "elapsed_sec": 40.35
    },
    {
-    "name": "stooq WRAP",
-    "url": "https://stooq.com/q/d/l/?s=wrap.us&i=d",
+    "name": "company-concept 1632790 us-gaap/CommonStockSharesOutstanding",
+    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0001632790/us-gaap/CommonStockSharesOutstanding.json",
     "ok": false,
-    "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=wrap.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed:",
-    "elapsed_sec": 5.06
+    "status": 403,
+    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
+    "elapsed_sec": 40.33
    },
    {
-    "name": "stooq SPY",
-    "url": "https://stooq.com/q/d/l/?s=spy.us&i=d",
+    "name": "company-facts 1632790",
+    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0001632790/us-gaap/CommonStockSharesOutstanding.json",
     "ok": false,
     "status": null,
-    "error": "ProxyError: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=spy.us&i=d (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: ",
-    "elapsed_sec": 4.97
+    "error": "所有 concept 皆失敗或缺 units.shares（mcap → None 保守分級）",
+    "elapsed_sec": null
+   },
+   {
+    "name": "company-concept 1385849 dei/EntityCommonStockSharesOutstanding",
+    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0001385849/dei/EntityCommonStockSharesOutstanding.json",
+    "ok": false,
+    "status": 403,
+    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
+    "elapsed_sec": 40.39
+   },
+   {
+    "name": "company-concept 1385849 us-gaap/CommonStockSharesOutstanding",
+    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0001385849/us-gaap/CommonStockSharesOutstanding.json",
+    "ok": false,
+    "status": 403,
+    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
+    "elapsed_sec": 40.28
+   },
+   {
+    "name": "company-facts 1385849",
+    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0001385849/us-gaap/CommonStockSharesOutstanding.json",
+    "ok": false,
+    "status": null,
+    "error": "所有 concept 皆失敗或缺 units.shares（mcap → None 保守分級）",
+    "elapsed_sec": null
+   },
+   {
+    "name": "company-concept 1702924 dei/EntityCommonStockSharesOutstanding",
+    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0001702924/dei/EntityCommonStockSharesOutstanding.json",
+    "ok": false,
+    "status": 403,
+    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
+    "elapsed_sec": 40.35
+   },
+   {
+    "name": "company-concept 1702924 us-gaap/CommonStockSharesOutstanding",
+    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0001702924/us-gaap/CommonStockSharesOutstanding.json",
+    "ok": false,
+    "status": 403,
+    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
+    "elapsed_sec": 40.41
+   },
+   {
+    "name": "company-facts 1702924",
+    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0001702924/us-gaap/CommonStockSharesOutstanding.json",
+    "ok": false,
+    "status": null,
+    "error": "所有 concept 皆失敗或缺 units.shares（mcap → None 保守分級）",
+    "elapsed_sec": null
    }
   ],
-  "errors": []
+  "errors": [
+   "stooq YPF: 回應非有效 CSV（No data？）",
+   "stooq PFBX: 回應非有效 CSV（No data？）",
+   "stooq JCTC: 回應非有效 CSV（No data？）",
+   "stooq HTO: 回應非有效 CSV（No data？）",
+   "stooq EWSB: 回應非有效 CSV（No data？）",
+   "stooq VII: 回應非有效 CSV（No data？）",
+   "stooq ENR: 回應非有效 CSV（No data？）",
+   "stooq UUUU: 回應非有效 CSV（No data？）",
+   "stooq WRAP: 回應非有效 CSV（No data？）",
+   "stooq SPY: 回應非有效 CSV（No data？）"
+  ]
  },
  "tracking": {
-  "ran_at": "2026-07-10T19:19:22.652027+00:00",
+  "ran_at": "2026-07-11T11:45:12.098449+00:00",
   "positions_total": 15,
   "positions_new": 0,
-  "positions_updated": 0,
-  "price_failed": 15,
-  "requests_ok": 15,
-  "requests_failed": 0,
-  "elapsed_sec": 15.7,
-  "endpoint_health": [],
+  "positions_updated": 12,
+  "price_failed": 3,
+  "requests_ok": 28,
+  "requests_failed": 2,
+  "price_source_stats": {
+   "stooq": {
+    "ok": 0,
+    "failed": 15
+   },
+   "yahoo": {
+    "ok": 12,
+    "failed": 3
+   }
+  },
+  "price_sources": {
+   "EWSB": "yahoo",
+   "TSM": "yahoo",
+   "ENR": "yahoo",
+   "VII": "none",
+   "UUUU": "yahoo",
+   "YPF": "yahoo",
+   "TURB": "yahoo",
+   "VFLEX": "yahoo",
+   "BBASX": "none",
+   "FTECX": "none",
+   "HTO": "yahoo",
+   "JCTC": "yahoo",
+   "PFBX": "yahoo",
+   "WRAP": "yahoo",
+   "SWZ": "yahoo"
+  },
+  "elapsed_sec": 27.7,
+  "endpoint_health": [
+   {
+    "name": "yahoo VII",
+    "url": "https://query1.finance.yahoo.com/v8/finance/chart/VII?range=1y&interval=1d",
+    "ok": false,
+    "status": 404,
+    "error": "HTTP 404",
+    "elapsed_sec": 0.17
+   },
+   {
+    "name": "yahoo BBASX",
+    "url": "https://query1.finance.yahoo.com/v8/finance/chart/BBASX?range=1y&interval=1d",
+    "ok": false,
+    "status": 404,
+    "error": "HTTP 404",
+    "elapsed_sec": 0.15
+   }
+  ],
   "errors": [
    "stooq EWSB: 回應非有效 CSV（No data？）",
    "stooq TSM: 回應非有效 CSV（No data？）",
@@ -168,6 +285,7 @@
    "stooq VFLEX: 回應非有效 CSV（No data？）",
    "stooq BBASX: 回應非有效 CSV（No data？）",
    "stooq FTECX: 回應非有效 CSV（No data？）",
+   "yahoo FTECX: 回應非有效 chart JSON",
    "stooq HTO: 回應非有效 CSV（No data？）",
    "stooq JCTC: 回應非有效 CSV（No data？）",
    "stooq PFBX: 回應非有效 CSV（No data？）",
