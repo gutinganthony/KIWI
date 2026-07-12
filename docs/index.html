@@ -102,9 +102,12 @@ body {
 /* ── Three Gauges Row ── */
 .gauges-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
   margin-bottom: 12px;
+}
+@media (max-width: 900px) {
+  .gauges-row { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 620px) {
   .gauges-row { grid-template-columns: 1fr; gap: 10px; }
@@ -512,6 +515,28 @@ var KIWI_HISTORY = {"d":["2021-06-14","2021-06-15","2021-06-16","2021-06-17","20
       <div class="gc-name" data-i18n="tsi_name">Tech Stress Index</div>
       <div class="gc-level lvl-cautious" data-i18n="tsi_level">CAUTIOUS</div>
       <div class="gc-desc" data-i18n="tsi_desc">Tech sector stress. 7/7 events detected. Yield shock + 30Y at 5.12% driving current signal.</div>
+    </div>
+
+    <!-- LFI -->
+    <div class="gauge-card">
+      <span class="gc-tag">LFI</span>
+      <span class="gc-tag-freq" data-i18n="daily">Daily</span>
+      <div class="ring-wrap">
+        <svg viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#2a2e39" stroke-width="9"/>
+          <circle id="lfi-ring" cx="60" cy="60" r="50" fill="none"
+            stroke="#9575cd" stroke-width="9" stroke-linecap="round"
+            stroke-dasharray="314.16" stroke-dashoffset="314.16"
+            transform="rotate(-90 60 60)"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-score" id="lfi-score" style="color:#9575cd">--</div>
+          <div class="ring-max">/ 100</div>
+        </div>
+      </div>
+      <div class="gc-name" data-i18n="lfi_name">Leverage / Funding Index</div>
+      <div class="gc-level lvl-elevated" data-i18n="lfi_level">NORMAL</div>
+      <div class="gc-desc" data-i18n="lfi_desc">Market leverage crowding (AIR-TRF funding-spread proxy). High = everyone levered long, fragile. Low = deleveraged, rebound-prone.</div>
     </div>
 
   </div><!-- /gauges-row -->
@@ -1020,6 +1045,9 @@ var KIWI_HISTORY = {"d":["2021-06-14","2021-06-15","2021-06-16","2021-06-17","20
     tsi_name: 'TSI 科技壓力指數',
     tsi_level: '謹慎',
     tsi_desc: '科技板塊壓力。7/7 事件全數偵測。殖利率衝擊 + 30Y 至 5.12% 是當前主要驅動。',
+    lfi_name: 'LFI 槓桿融資指標',
+    lfi_level: '正常',
+    lfi_desc: '市場借錢買股的擁擠度（AIR-TRF 融資利差 proxy）。高＝大家都滿槓桿、脆弱；低＝去槓桿完成、易反彈。1996-2020 回測為最強短線領先訊號。',
     alert_title: '科技板塊謹慎 — TSI 升高',
     alert_desc: 'TSI = 45（謹慎）：10Y 殖利率急升 9bps 至 4.55%；30Y 達 5.12%（2007 年以來最高）。科技估值面臨殖利率曲線熊市陡化壓力。Capital Context 4 週 +20% 信號（百年第 3 次）已觸發。',
     combined_signal: '三系統綜合信號',
@@ -1186,6 +1214,7 @@ var KIWI_HISTORY = {"d":["2021-06-14","2021-06-15","2021-06-16","2021-06-17","20
       { ringId: 'avi-ring', scoreId: 'avi-score', score: data.avi && data.avi.score, max: 10  },
       { ringId: 'cpi-ring', scoreId: 'cpi-score', score: data.cri && data.cri.score, max: 100 },
       { ringId: 'tsi-ring', scoreId: 'tsi-score', score: data.tsi && data.tsi.score, max: 100 },
+      { ringId: 'lfi-ring', scoreId: 'lfi-score', score: data.lfi && data.lfi.score, max: 100 },
     ];
 
     // Score → ring color
@@ -1258,6 +1287,17 @@ var KIWI_HISTORY = {"d":["2021-06-14","2021-06-15","2021-06-16","2021-06-17","20
       // TSI score badge in breakdown header
       var tsiBadge = document.querySelector('.breakdown-score-badge[style*="orange"]');
       if (tsiBadge) tsiBadge.textContent = Math.round(data.tsi.score) + ' / 100';
+    }
+
+    if (data.lfi && data.lfi.level) {
+      var lfiLvlEl = document.querySelector('.gauge-card .gc-level[data-i18n="lfi_level"]');
+      if (lfiLvlEl) {
+        var ll = data.lfi.level;  // HIGH / NORMAL / LOW / ──
+        lfiLvlEl.textContent = (currentLang === 'zh')
+          ? (ll === 'HIGH' ? '偏高（勿加槓桿）' : ll === 'LOW' ? '偏低（去槓桿完成）' : ll === 'NORMAL' ? '正常' : '──')
+          : ll;
+        lfiLvlEl.className = 'gc-level lvl-' + (ll === 'HIGH' ? 'critical' : ll === 'LOW' ? 'low' : 'elevated');
+      }
     }
 
     // ── AVI dimension bars ────────────────────────────────────────────────
