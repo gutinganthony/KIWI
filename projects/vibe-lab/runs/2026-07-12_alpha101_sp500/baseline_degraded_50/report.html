@@ -1,0 +1,1198 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'none'">
+<title>Alpha Bench Report</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 2em;
+       color: #222; background: #fafafa; }
+h1, h2 { color: #111; }
+table { border-collapse: collapse; width: 100%; background: #fff; }
+th, td { padding: .5em .75em; border-bottom: 1px solid #e5e5e5; text-align: left; }
+th { background: #f0f0f0; }
+.meta { color: #666; font-size: .9em; margin-bottom: 1.5em; }
+.formula { font-family: monospace; background: #f4f4f4; padding: .25em .5em; }
+.skipped { color: #a33; font-size: .9em; }
+</style>
+</head><body>
+<h1>Alpha Bench Report</h1>
+<div class="meta">
+  Generated 2026-07-12T18:34:27+00:00 &middot; Universe sp500 &middot;
+  Period 2020-01-01/2026-07-10 &middot; 81 tested, 20 skipped
+</div>
+
+<h2>Top 81 by IR</h2>
+<table>
+<tr><th>#</th><th>Alpha ID</th><th>Zoo</th><th>Theme</th>
+    <th>IC mean</th><th>IC std</th><th>IR</th><th>IC+ ratio</th><th>N</th></tr>
+
+<tr>
+  <td>1</td>
+  <td>alpha101_053</td>
+  <td>alpha101</td>
+  <td>reversal</td>
+  <td>0.0098</td>
+  <td>0.2166</td>
+  <td>0.0452</td>
+  <td>0.5313</td>
+  <td>1628</td>
+</tr>
+
+<tr>
+  <td>2</td>
+  <td>alpha101_024</td>
+  <td>alpha101</td>
+  <td>momentum</td>
+  <td>0.0096</td>
+  <td>0.2221</td>
+  <td>0.0432</td>
+  <td>0.5306</td>
+  <td>1634</td>
+</tr>
+
+<tr>
+  <td>3</td>
+  <td>alpha101_043</td>
+  <td>alpha101</td>
+  <td>volume, momentum</td>
+  <td>0.0082</td>
+  <td>0.2036</td>
+  <td>0.0402</td>
+  <td>0.5047</td>
+  <td>1599</td>
+</tr>
+
+<tr>
+  <td>4</td>
+  <td>alpha101_013</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>0.0054</td>
+  <td>0.1491</td>
+  <td>0.0364</td>
+  <td>0.5242</td>
+  <td>1633</td>
+</tr>
+
+<tr>
+  <td>5</td>
+  <td>alpha101_041</td>
+  <td>alpha101</td>
+  <td>reversal</td>
+  <td>0.0072</td>
+  <td>0.2056</td>
+  <td>0.0350</td>
+  <td>0.5162</td>
+  <td>1637</td>
+</tr>
+
+<tr>
+  <td>6</td>
+  <td>alpha101_026</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>0.0066</td>
+  <td>0.1947</td>
+  <td>0.0341</td>
+  <td>0.5095</td>
+  <td>1627</td>
+</tr>
+
+<tr>
+  <td>7</td>
+  <td>alpha101_004</td>
+  <td>alpha101</td>
+  <td>reversal</td>
+  <td>0.0067</td>
+  <td>0.1982</td>
+  <td>0.0337</td>
+  <td>0.5083</td>
+  <td>1629</td>
+</tr>
+
+<tr>
+  <td>8</td>
+  <td>alpha101_054</td>
+  <td>alpha101</td>
+  <td>reversal</td>
+  <td>0.0075</td>
+  <td>0.2209</td>
+  <td>0.0337</td>
+  <td>0.5119</td>
+  <td>1637</td>
+</tr>
+
+<tr>
+  <td>9</td>
+  <td>alpha101_007</td>
+  <td>alpha101</td>
+  <td>momentum, volume</td>
+  <td>0.0061</td>
+  <td>0.1826</td>
+  <td>0.0336</td>
+  <td>0.5158</td>
+  <td>1553</td>
+</tr>
+
+<tr>
+  <td>10</td>
+  <td>alpha101_030</td>
+  <td>alpha101</td>
+  <td>momentum, volume</td>
+  <td>0.0060</td>
+  <td>0.2165</td>
+  <td>0.0277</td>
+  <td>0.4883</td>
+  <td>1618</td>
+</tr>
+
+<tr>
+  <td>11</td>
+  <td>alpha101_047</td>
+  <td>alpha101</td>
+  <td>volume, momentum</td>
+  <td>0.0063</td>
+  <td>0.2439</td>
+  <td>0.0257</td>
+  <td>0.5173</td>
+  <td>1618</td>
+</tr>
+
+<tr>
+  <td>12</td>
+  <td>alpha101_044</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>0.0041</td>
+  <td>0.1621</td>
+  <td>0.0253</td>
+  <td>0.5107</td>
+  <td>1633</td>
+</tr>
+
+<tr>
+  <td>13</td>
+  <td>alpha101_083</td>
+  <td>alpha101</td>
+  <td>volume, volatility</td>
+  <td>0.0061</td>
+  <td>0.2471</td>
+  <td>0.0248</td>
+  <td>0.5015</td>
+  <td>1631</td>
+</tr>
+
+<tr>
+  <td>14</td>
+  <td>alpha101_036</td>
+  <td>alpha101</td>
+  <td>momentum, volume</td>
+  <td>0.0044</td>
+  <td>0.1772</td>
+  <td>0.0247</td>
+  <td>0.5125</td>
+  <td>1438</td>
+</tr>
+
+<tr>
+  <td>15</td>
+  <td>alpha101_052</td>
+  <td>alpha101</td>
+  <td>momentum</td>
+  <td>0.0056</td>
+  <td>0.2367</td>
+  <td>0.0236</td>
+  <td>0.4968</td>
+  <td>1397</td>
+</tr>
+
+<tr>
+  <td>16</td>
+  <td>alpha101_021</td>
+  <td>alpha101</td>
+  <td>momentum, volatility</td>
+  <td>0.0039</td>
+  <td>0.1915</td>
+  <td>0.0205</td>
+  <td>0.4984</td>
+  <td>1605</td>
+</tr>
+
+<tr>
+  <td>17</td>
+  <td>alpha101_032</td>
+  <td>alpha101</td>
+  <td>momentum</td>
+  <td>0.0043</td>
+  <td>0.2165</td>
+  <td>0.0201</td>
+  <td>0.5160</td>
+  <td>1403</td>
+</tr>
+
+<tr>
+  <td>18</td>
+  <td>alpha101_068</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>0.0029</td>
+  <td>0.1473</td>
+  <td>0.0197</td>
+  <td>0.5102</td>
+  <td>1576</td>
+</tr>
+
+<tr>
+  <td>19</td>
+  <td>alpha101_011</td>
+  <td>alpha101</td>
+  <td>volume, reversal</td>
+  <td>0.0037</td>
+  <td>0.1878</td>
+  <td>0.0196</td>
+  <td>0.5037</td>
+  <td>1634</td>
+</tr>
+
+<tr>
+  <td>20</td>
+  <td>alpha101_002</td>
+  <td>alpha101</td>
+  <td>volume, reversal</td>
+  <td>0.0029</td>
+  <td>0.1567</td>
+  <td>0.0183</td>
+  <td>0.5092</td>
+  <td>1630</td>
+</tr>
+
+<tr>
+  <td>21</td>
+  <td>alpha101_060</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>0.0039</td>
+  <td>0.2227</td>
+  <td>0.0173</td>
+  <td>0.5074</td>
+  <td>1628</td>
+</tr>
+
+<tr>
+  <td>22</td>
+  <td>alpha101_023</td>
+  <td>alpha101</td>
+  <td>momentum</td>
+  <td>0.0036</td>
+  <td>0.2144</td>
+  <td>0.0168</td>
+  <td>0.4984</td>
+  <td>1611</td>
+</tr>
+
+<tr>
+  <td>23</td>
+  <td>alpha101_038</td>
+  <td>alpha101</td>
+  <td>reversal</td>
+  <td>0.0039</td>
+  <td>0.2472</td>
+  <td>0.0158</td>
+  <td>0.5012</td>
+  <td>1628</td>
+</tr>
+
+<tr>
+  <td>24</td>
+  <td>alpha101_033</td>
+  <td>alpha101</td>
+  <td>reversal</td>
+  <td>0.0038</td>
+  <td>0.2530</td>
+  <td>0.0151</td>
+  <td>0.5046</td>
+  <td>1637</td>
+</tr>
+
+<tr>
+  <td>25</td>
+  <td>alpha101_029</td>
+  <td>alpha101</td>
+  <td>reversal, volume</td>
+  <td>0.0033</td>
+  <td>0.2230</td>
+  <td>0.0148</td>
+  <td>0.5148</td>
+  <td>1626</td>
+</tr>
+
+<tr>
+  <td>26</td>
+  <td>alpha101_050</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>0.0046</td>
+  <td>0.3305</td>
+  <td>0.0138</td>
+  <td>0.4968</td>
+  <td>1566</td>
+</tr>
+
+<tr>
+  <td>27</td>
+  <td>alpha101_073</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>0.0029</td>
+  <td>0.2139</td>
+  <td>0.0134</td>
+  <td>0.5055</td>
+  <td>1630</td>
+</tr>
+
+<tr>
+  <td>28</td>
+  <td>alpha101_016</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>0.0019</td>
+  <td>0.1464</td>
+  <td>0.0130</td>
+  <td>0.5126</td>
+  <td>1633</td>
+</tr>
+
+<tr>
+  <td>29</td>
+  <td>alpha101_072</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>0.0022</td>
+  <td>0.1744</td>
+  <td>0.0125</td>
+  <td>0.5060</td>
+  <td>1581</td>
+</tr>
+
+<tr>
+  <td>30</td>
+  <td>alpha101_005</td>
+  <td>alpha101</td>
+  <td>reversal</td>
+  <td>0.0027</td>
+  <td>0.2315</td>
+  <td>0.0118</td>
+  <td>0.5061</td>
+  <td>1628</td>
+</tr>
+
+<tr>
+  <td>31</td>
+  <td>alpha101_001</td>
+  <td>alpha101</td>
+  <td>reversal, volatility</td>
+  <td>0.0022</td>
+  <td>0.2206</td>
+  <td>0.0100</td>
+  <td>0.5121</td>
+  <td>1613</td>
+</tr>
+
+<tr>
+  <td>32</td>
+  <td>alpha101_035</td>
+  <td>alpha101</td>
+  <td>volume, momentum</td>
+  <td>0.0022</td>
+  <td>0.2341</td>
+  <td>0.0093</td>
+  <td>0.5028</td>
+  <td>1605</td>
+</tr>
+
+<tr>
+  <td>33</td>
+  <td>alpha101_015</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>0.0035</td>
+  <td>0.3932</td>
+  <td>0.0090</td>
+  <td>0.4891</td>
+  <td>1188</td>
+</tr>
+
+<tr>
+  <td>34</td>
+  <td>alpha101_099</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>0.0015</td>
+  <td>0.1760</td>
+  <td>0.0087</td>
+  <td>0.5055</td>
+  <td>1551</td>
+</tr>
+
+<tr>
+  <td>35</td>
+  <td>alpha101_055</td>
+  <td>alpha101</td>
+  <td>volume, reversal</td>
+  <td>0.0012</td>
+  <td>0.1574</td>
+  <td>0.0074</td>
+  <td>0.5028</td>
+  <td>1621</td>
+</tr>
+
+<tr>
+  <td>36</td>
+  <td>alpha101_025</td>
+  <td>alpha101</td>
+  <td>momentum, volume</td>
+  <td>0.0018</td>
+  <td>0.2578</td>
+  <td>0.0068</td>
+  <td>0.4901</td>
+  <td>1618</td>
+</tr>
+
+<tr>
+  <td>37</td>
+  <td>alpha101_057</td>
+  <td>alpha101</td>
+  <td>reversal</td>
+  <td>0.0015</td>
+  <td>0.2331</td>
+  <td>0.0066</td>
+  <td>0.4972</td>
+  <td>1607</td>
+</tr>
+
+<tr>
+  <td>38</td>
+  <td>alpha101_014</td>
+  <td>alpha101</td>
+  <td>volume, momentum</td>
+  <td>0.0013</td>
+  <td>0.1958</td>
+  <td>0.0065</td>
+  <td>0.5025</td>
+  <td>1628</td>
+</tr>
+
+<tr>
+  <td>39</td>
+  <td>alpha101_034</td>
+  <td>alpha101</td>
+  <td>volatility</td>
+  <td>0.0012</td>
+  <td>0.2046</td>
+  <td>0.0057</td>
+  <td>0.4963</td>
+  <td>1632</td>
+</tr>
+
+<tr>
+  <td>40</td>
+  <td>alpha101_008</td>
+  <td>alpha101</td>
+  <td>reversal</td>
+  <td>0.0012</td>
+  <td>0.2345</td>
+  <td>0.0052</td>
+  <td>0.5012</td>
+  <td>1622</td>
+</tr>
+
+<tr>
+  <td>41</td>
+  <td>alpha101_027</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>0.0008</td>
+  <td>0.1493</td>
+  <td>0.0052</td>
+  <td>0.4972</td>
+  <td>1631</td>
+</tr>
+
+<tr>
+  <td>42</td>
+  <td>alpha101_019</td>
+  <td>alpha101</td>
+  <td>momentum</td>
+  <td>0.0012</td>
+  <td>0.2407</td>
+  <td>0.0050</td>
+  <td>0.5025</td>
+  <td>1387</td>
+</tr>
+
+<tr>
+  <td>43</td>
+  <td>alpha101_066</td>
+  <td>alpha101</td>
+  <td>momentum</td>
+  <td>0.0008</td>
+  <td>0.1947</td>
+  <td>0.0042</td>
+  <td>0.4929</td>
+  <td>1621</td>
+</tr>
+
+<tr>
+  <td>44</td>
+  <td>alpha101_045</td>
+  <td>alpha101</td>
+  <td>momentum, volume</td>
+  <td>0.0006</td>
+  <td>0.1630</td>
+  <td>0.0034</td>
+  <td>0.4972</td>
+  <td>1613</td>
+</tr>
+
+<tr>
+  <td>45</td>
+  <td>alpha101_084</td>
+  <td>alpha101</td>
+  <td>momentum</td>
+  <td>0.0003</td>
+  <td>0.2425</td>
+  <td>0.0012</td>
+  <td>0.4959</td>
+  <td>1603</td>
+</tr>
+
+<tr>
+  <td>46</td>
+  <td>alpha101_020</td>
+  <td>alpha101</td>
+  <td>reversal</td>
+  <td>0.0001</td>
+  <td>0.2324</td>
+  <td>0.0005</td>
+  <td>0.5043</td>
+  <td>1636</td>
+</tr>
+
+<tr>
+  <td>47</td>
+  <td>alpha101_006</td>
+  <td>alpha101</td>
+  <td>volume, reversal</td>
+  <td>0.0001</td>
+  <td>0.1975</td>
+  <td>0.0004</td>
+  <td>0.5104</td>
+  <td>1628</td>
+</tr>
+
+<tr>
+  <td>48</td>
+  <td>alpha101_037</td>
+  <td>alpha101</td>
+  <td>momentum</td>
+  <td>0.0001</td>
+  <td>0.2235</td>
+  <td>0.0004</td>
+  <td>0.5045</td>
+  <td>1437</td>
+</tr>
+
+<tr>
+  <td>49</td>
+  <td>alpha101_051</td>
+  <td>alpha101</td>
+  <td>momentum</td>
+  <td>-0.0000</td>
+  <td>0.2088</td>
+  <td>-0.0000</td>
+  <td>0.5049</td>
+  <td>1630</td>
+</tr>
+
+<tr>
+  <td>50</td>
+  <td>alpha101_028</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>-0.0007</td>
+  <td>0.2125</td>
+  <td>-0.0034</td>
+  <td>0.5000</td>
+  <td>1614</td>
+</tr>
+
+<tr>
+  <td>51</td>
+  <td>alpha101_086</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>-0.0007</td>
+  <td>0.1905</td>
+  <td>-0.0039</td>
+  <td>0.4880</td>
+  <td>1580</td>
+</tr>
+
+<tr>
+  <td>52</td>
+  <td>alpha101_018</td>
+  <td>alpha101</td>
+  <td>volatility</td>
+  <td>-0.0012</td>
+  <td>0.2269</td>
+  <td>-0.0054</td>
+  <td>0.5055</td>
+  <td>1628</td>
+</tr>
+
+<tr>
+  <td>53</td>
+  <td>alpha101_040</td>
+  <td>alpha101</td>
+  <td>volatility, volume</td>
+  <td>-0.0013</td>
+  <td>0.1970</td>
+  <td>-0.0068</td>
+  <td>0.4939</td>
+  <td>1628</td>
+</tr>
+
+<tr>
+  <td>54</td>
+  <td>alpha101_094</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>-0.0017</td>
+  <td>0.2201</td>
+  <td>-0.0078</td>
+  <td>0.4936</td>
+  <td>1556</td>
+</tr>
+
+<tr>
+  <td>55</td>
+  <td>alpha101_092</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>-0.0021</td>
+  <td>0.1899</td>
+  <td>-0.0111</td>
+  <td>0.4991</td>
+  <td>1605</td>
+</tr>
+
+<tr>
+  <td>56</td>
+  <td>alpha101_017</td>
+  <td>alpha101</td>
+  <td>volume, reversal</td>
+  <td>-0.0025</td>
+  <td>0.2122</td>
+  <td>-0.0119</td>
+  <td>0.4777</td>
+  <td>1614</td>
+</tr>
+
+<tr>
+  <td>57</td>
+  <td>alpha101_039</td>
+  <td>alpha101</td>
+  <td>momentum, volume</td>
+  <td>-0.0031</td>
+  <td>0.2433</td>
+  <td>-0.0129</td>
+  <td>0.4903</td>
+  <td>1387</td>
+</tr>
+
+<tr>
+  <td>58</td>
+  <td>alpha101_009</td>
+  <td>alpha101</td>
+  <td>momentum</td>
+  <td>-0.0031</td>
+  <td>0.2258</td>
+  <td>-0.0138</td>
+  <td>0.4982</td>
+  <td>1636</td>
+</tr>
+
+<tr>
+  <td>59</td>
+  <td>alpha101_049</td>
+  <td>alpha101</td>
+  <td>momentum</td>
+  <td>-0.0031</td>
+  <td>0.2106</td>
+  <td>-0.0145</td>
+  <td>0.4911</td>
+  <td>1633</td>
+</tr>
+
+<tr>
+  <td>60</td>
+  <td>alpha101_101</td>
+  <td>alpha101</td>
+  <td>reversal</td>
+  <td>-0.0035</td>
+  <td>0.2377</td>
+  <td>-0.0147</td>
+  <td>0.4979</td>
+  <td>1637</td>
+</tr>
+
+<tr>
+  <td>61</td>
+  <td>alpha101_042</td>
+  <td>alpha101</td>
+  <td>reversal</td>
+  <td>-0.0032</td>
+  <td>0.2113</td>
+  <td>-0.0149</td>
+  <td>0.4985</td>
+  <td>1637</td>
+</tr>
+
+<tr>
+  <td>62</td>
+  <td>alpha101_081</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>-0.0024</td>
+  <td>0.1530</td>
+  <td>-0.0157</td>
+  <td>0.5071</td>
+  <td>1558</td>
+</tr>
+
+<tr>
+  <td>63</td>
+  <td>alpha101_075</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>-0.0024</td>
+  <td>0.1427</td>
+  <td>-0.0167</td>
+  <td>0.4965</td>
+  <td>1577</td>
+</tr>
+
+<tr>
+  <td>64</td>
+  <td>alpha101_071</td>
+  <td>alpha101</td>
+  <td>volume, reversal</td>
+  <td>-0.0033</td>
+  <td>0.1846</td>
+  <td>-0.0179</td>
+  <td>0.4910</td>
+  <td>1619</td>
+</tr>
+
+<tr>
+  <td>65</td>
+  <td>alpha101_088</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>-0.0035</td>
+  <td>0.1850</td>
+  <td>-0.0189</td>
+  <td>0.4988</td>
+  <td>1630</td>
+</tr>
+
+<tr>
+  <td>66</td>
+  <td>alpha101_012</td>
+  <td>alpha101</td>
+  <td>volume, reversal</td>
+  <td>-0.0034</td>
+  <td>0.1777</td>
+  <td>-0.0190</td>
+  <td>0.4853</td>
+  <td>1636</td>
+</tr>
+
+<tr>
+  <td>67</td>
+  <td>alpha101_003</td>
+  <td>alpha101</td>
+  <td>volume, reversal</td>
+  <td>-0.0035</td>
+  <td>0.1855</td>
+  <td>-0.0191</td>
+  <td>0.4908</td>
+  <td>1628</td>
+</tr>
+
+<tr>
+  <td>68</td>
+  <td>alpha101_046</td>
+  <td>alpha101</td>
+  <td>momentum</td>
+  <td>-0.0048</td>
+  <td>0.2073</td>
+  <td>-0.0234</td>
+  <td>0.4997</td>
+  <td>1627</td>
+</tr>
+
+<tr>
+  <td>69</td>
+  <td>alpha101_065</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>-0.0045</td>
+  <td>0.1875</td>
+  <td>-0.0238</td>
+  <td>0.4965</td>
+  <td>1565</td>
+</tr>
+
+<tr>
+  <td>70</td>
+  <td>alpha101_078</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>-0.0059</td>
+  <td>0.2282</td>
+  <td>-0.0259</td>
+  <td>0.4844</td>
+  <td>1573</td>
+</tr>
+
+<tr>
+  <td>71</td>
+  <td>alpha101_064</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>-0.0052</td>
+  <td>0.1889</td>
+  <td>-0.0275</td>
+  <td>0.4812</td>
+  <td>1490</td>
+</tr>
+
+<tr>
+  <td>72</td>
+  <td>alpha101_022</td>
+  <td>alpha101</td>
+  <td>volume, volatility</td>
+  <td>-0.0054</td>
+  <td>0.1778</td>
+  <td>-0.0305</td>
+  <td>0.4901</td>
+  <td>1618</td>
+</tr>
+
+<tr>
+  <td>73</td>
+  <td>alpha101_077</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>-0.0057</td>
+  <td>0.1859</td>
+  <td>-0.0309</td>
+  <td>0.4740</td>
+  <td>1618</td>
+</tr>
+
+<tr>
+  <td>74</td>
+  <td>alpha101_010</td>
+  <td>alpha101</td>
+  <td>momentum</td>
+  <td>-0.0070</td>
+  <td>0.2176</td>
+  <td>-0.0322</td>
+  <td>0.4976</td>
+  <td>1636</td>
+</tr>
+
+<tr>
+  <td>75</td>
+  <td>alpha101_031</td>
+  <td>alpha101</td>
+  <td>momentum</td>
+  <td>-0.0061</td>
+  <td>0.1897</td>
+  <td>-0.0323</td>
+  <td>0.4922</td>
+  <td>1607</td>
+</tr>
+
+<tr>
+  <td>76</td>
+  <td>alpha101_062</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>-0.0064</td>
+  <td>0.1674</td>
+  <td>-0.0384</td>
+  <td>0.4868</td>
+  <td>1588</td>
+</tr>
+
+<tr>
+  <td>77</td>
+  <td>alpha101_061</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>-0.0082</td>
+  <td>0.1848</td>
+  <td>-0.0442</td>
+  <td>0.4656</td>
+  <td>1441</td>
+</tr>
+
+<tr>
+  <td>78</td>
+  <td>alpha101_098</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>-0.0095</td>
+  <td>0.2005</td>
+  <td>-0.0473</td>
+  <td>0.4785</td>
+  <td>1582</td>
+</tr>
+
+<tr>
+  <td>79</td>
+  <td>alpha101_095</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>-0.0088</td>
+  <td>0.1744</td>
+  <td>-0.0503</td>
+  <td>0.4843</td>
+  <td>1557</td>
+</tr>
+
+<tr>
+  <td>80</td>
+  <td>alpha101_085</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>-0.0126</td>
+  <td>0.1900</td>
+  <td>-0.0663</td>
+  <td>0.4847</td>
+  <td>1599</td>
+</tr>
+
+<tr>
+  <td>81</td>
+  <td>alpha101_074</td>
+  <td>alpha101</td>
+  <td>volume</td>
+  <td>-0.0113</td>
+  <td>0.1511</td>
+  <td>-0.0750</td>
+  <td>0.4692</td>
+  <td>1558</td>
+</tr>
+
+</table>
+
+<h2>Formulas</h2>
+<table>
+<tr><th>Alpha ID</th><th>Formula (LaTeX source)</th></tr>
+
+<tr><td>alpha101_053</td><td class="formula">-1 * delta(((close-low) - (high-close))/(close-low), 9)</td></tr>
+
+<tr><td>alpha101_024</td><td class="formula">complex piecewise; see paper</td></tr>
+
+<tr><td>alpha101_043</td><td class="formula">ts_rank(volume/adv20,20) * ts_rank(-1*delta(close,7),8)</td></tr>
+
+<tr><td>alpha101_013</td><td class="formula">-1 * rank(covariance(rank(close), rank(volume), 5))</td></tr>
+
+<tr><td>alpha101_041</td><td class="formula">(high*low)^0.5 - vwap</td></tr>
+
+<tr><td>alpha101_026</td><td class="formula">-1 * ts_max(correlation(ts_rank(volume,5),ts_rank(high,5),5),3)</td></tr>
+
+<tr><td>alpha101_004</td><td class="formula">-1 * Ts_Rank(rank(low), 9)</td></tr>
+
+<tr><td>alpha101_054</td><td class="formula">-1 * ((low-close)*(open^5)) / ((low-high)*(close^5))</td></tr>
+
+<tr><td>alpha101_007</td><td class="formula">(adv20&lt;volume)?((-1*ts_rank(abs(delta(close,7)),60))*sign(delta(close,7))):(-1)</td></tr>
+
+<tr><td>alpha101_030</td><td class="formula">((1-rank(sign(d1)+sign(d2)+sign(d3))) * sum(volume,5)) / sum(volume,20)</td></tr>
+
+<tr><td>alpha101_047</td><td class="formula">((rank(1/close)*volume/adv20) * (high*rank(high-close)/(sum(high,5)/5))) - rank(vwap-delay(vwap,5))</td></tr>
+
+<tr><td>alpha101_044</td><td class="formula">-1 * correlation(high, rank(volume), 5)</td></tr>
+
+<tr><td>alpha101_083</td><td class="formula">(rank(delay((high-low)/(sum(close,5)/5), 2)) * rank(rank(volume))) / (((high-low)/(sum(close,5)/5)) / (vwap-close))</td></tr>
+
+<tr><td>alpha101_036</td><td class="formula">weighted sum; see paper</td></tr>
+
+<tr><td>alpha101_052</td><td class="formula">((-1*ts_min(low,5)+delay(ts_min(low,5),5)) * rank((sum(returns,240)-sum(returns,20))/220)) * ts_rank(volume,5)</td></tr>
+
+<tr><td>alpha101_021</td><td class="formula">complex piecewise; see paper</td></tr>
+
+<tr><td>alpha101_032</td><td class="formula">scale(sum(close,7)/7 - close) + 20*scale(correlation(vwap, delay(close,5), 230))</td></tr>
+
+<tr><td>alpha101_068</td><td class="formula">(Ts_Rank(correlation(rank(high), rank(adv15), 9), 14) &lt; rank(delta(0.518*close+0.482*low, 1))) * -1</td></tr>
+
+<tr><td>alpha101_011</td><td class="formula">(rank(ts_max(vwap-close,3))+rank(ts_min(vwap-close,3)))*rank(delta(volume,3))</td></tr>
+
+<tr><td>alpha101_002</td><td class="formula">-1 * correlation(rank(delta(log(volume), 2)), rank(((close-open)/open)), 6)</td></tr>
+
+<tr><td>alpha101_060</td><td class="formula">0 - (2*scale(rank((((close-low)-(high-close))/(high-low))*volume)) - scale(rank(ts_argmax(close,10))))</td></tr>
+
+<tr><td>alpha101_023</td><td class="formula">((sum(high,20)/20) &lt; high) ? (-1*delta(high,2)) : 0</td></tr>
+
+<tr><td>alpha101_038</td><td class="formula">(-1*rank(ts_rank(close,10))) * rank(close/open)</td></tr>
+
+<tr><td>alpha101_033</td><td class="formula">rank(-1*(1-open/close))</td></tr>
+
+<tr><td>alpha101_029</td><td class="formula">min(product(rank(rank(scale(log(sum(ts_min(rank(rank(-1*rank(delta(close-1,5)))),2),1))))),1),5) + ts_rank(delay(-1*returns,6),5)</td></tr>
+
+<tr><td>alpha101_050</td><td class="formula">-1 * ts_max(rank(correlation(rank(volume), rank(vwap), 5)), 5)</td></tr>
+
+<tr><td>alpha101_073</td><td class="formula">max(rank(decay_linear(delta(vwap,5), 3)), Ts_Rank(decay_linear(-1*(delta(0.147*open+0.853*low,2)/(0.147*open+0.853*low)), 3), 17)) * -1</td></tr>
+
+<tr><td>alpha101_016</td><td class="formula">-1 * rank(covariance(rank(high), rank(volume), 5))</td></tr>
+
+<tr><td>alpha101_072</td><td class="formula">rank(decay_linear(correlation((high+low)/2, adv40, 9), 10)) / rank(decay_linear(correlation(Ts_Rank(vwap,4), Ts_Rank(volume,19), 7), 3))</td></tr>
+
+<tr><td>alpha101_005</td><td class="formula">rank((open - sum(vwap,10)/10)) * (-1 * abs(rank((close - vwap))))</td></tr>
+
+<tr><td>alpha101_001</td><td class="formula">rank(ts_argmax(SignedPower((returns&lt;0)?stddev(returns,20):close, 2.), 5)) - 0.5</td></tr>
+
+<tr><td>alpha101_035</td><td class="formula">ts_rank(volume,32) * (1 - ts_rank((close+high-low),16)) * (1 - ts_rank(returns,32))</td></tr>
+
+<tr><td>alpha101_015</td><td class="formula">-1 * sum(rank(correlation(rank(high), rank(volume), 3)), 3)</td></tr>
+
+<tr><td>alpha101_099</td><td class="formula">(rank(correlation(sum((high+low)/2, 20), sum(adv60, 20), 9)) &lt; rank(correlation(low, volume, 6))) * -1</td></tr>
+
+<tr><td>alpha101_055</td><td class="formula">-1 * correlation(rank((close-ts_min(low,12))/(ts_max(high,12)-ts_min(low,12))), rank(volume), 6)</td></tr>
+
+<tr><td>alpha101_025</td><td class="formula">rank((((-1*returns)*adv20)*vwap)*(high-close))</td></tr>
+
+<tr><td>alpha101_057</td><td class="formula">0 - 1 * ((close-vwap) / decay_linear(rank(ts_argmax(close,30)), 2))</td></tr>
+
+<tr><td>alpha101_014</td><td class="formula">(-1*rank(delta(returns,3))) * correlation(open, volume, 10)</td></tr>
+
+<tr><td>alpha101_034</td><td class="formula">rank((1-rank(stddev(returns,2)/stddev(returns,5))) + (1-rank(delta(close,1))))</td></tr>
+
+<tr><td>alpha101_008</td><td class="formula">-1 * rank((sum(open,5)*sum(returns,5)) - delay(sum(open,5)*sum(returns,5),10))</td></tr>
+
+<tr><td>alpha101_027</td><td class="formula">(0.5&lt;rank((sum(correlation(rank(volume),rank(vwap),6),2)/2.0)))?(-1):1</td></tr>
+
+<tr><td>alpha101_019</td><td class="formula">(-1*sign((close-delay(close,7))+delta(close,7))) * (1+rank(1+sum(returns,250)))</td></tr>
+
+<tr><td>alpha101_066</td><td class="formula">(rank(decay_linear(delta(vwap,4), 7)) + Ts_Rank(decay_linear(((0.966*low+0.034*low - vwap)/(open-(high+low)/2)), 11), 7)) * -1</td></tr>
+
+<tr><td>alpha101_045</td><td class="formula">-1 * (rank(sum(delay(close,5),20)/20)*correlation(close,volume,2)*rank(correlation(sum(close,5),sum(close,20),2)))</td></tr>
+
+<tr><td>alpha101_084</td><td class="formula">SignedPower(Ts_Rank(vwap-ts_max(vwap,15), 21), delta(close,5))</td></tr>
+
+<tr><td>alpha101_020</td><td class="formula">(((-1*rank(open-delay(high,1)))*rank(open-delay(close,1)))*rank(open-delay(low,1)))</td></tr>
+
+<tr><td>alpha101_006</td><td class="formula">-1 * correlation(open, volume, 10)</td></tr>
+
+<tr><td>alpha101_037</td><td class="formula">rank(correlation(delay(open-close,1),close,200)) + rank(open-close)</td></tr>
+
+<tr><td>alpha101_051</td><td class="formula">(...&lt; -0.05) ? 1 : -1*(close-delay(close,1))</td></tr>
+
+<tr><td>alpha101_028</td><td class="formula">scale((correlation(adv20,low,5) + (high+low)/2) - close)</td></tr>
+
+<tr><td>alpha101_086</td><td class="formula">(Ts_Rank(correlation(close, sum(adv20,15), 6), 20) &lt; rank((open+close) - (vwap+open))) * -1</td></tr>
+
+<tr><td>alpha101_018</td><td class="formula">-1 * rank(stddev(abs(close-open),5) + (close-open) + correlation(close,open,10))</td></tr>
+
+<tr><td>alpha101_040</td><td class="formula">(-1*rank(stddev(high,10))) * correlation(high,volume,10)</td></tr>
+
+<tr><td>alpha101_094</td><td class="formula">(rank(vwap-ts_min(vwap,12))^Ts_Rank(correlation(Ts_Rank(vwap,20), Ts_Rank(adv60,4), 18), 3)) * -1</td></tr>
+
+<tr><td>alpha101_092</td><td class="formula">min(Ts_Rank(decay_linear(((high+low)/2 + close &lt; low+open), 15), 19), Ts_Rank(decay_linear(correlation(rank(low), rank(adv30), 8), 7), 7))</td></tr>
+
+<tr><td>alpha101_017</td><td class="formula">((-1*rank(ts_rank(close,10)))*rank(delta(delta(close,1),1)))*rank(ts_rank(volume/adv20,5))</td></tr>
+
+<tr><td>alpha101_039</td><td class="formula">(-1*rank(delta(close,7)*(1-rank(decay_linear(volume/adv20,9))))) * (1+rank(sum(returns,250)))</td></tr>
+
+<tr><td>alpha101_009</td><td class="formula">(0&lt;ts_min(delta(close,1),5))?delta(close,1):((ts_max(delta(close,1),5)&lt;0)?delta(close,1):(-1*delta(close,1)))</td></tr>
+
+<tr><td>alpha101_049</td><td class="formula">(((delay(close,20)-delay(close,10))/10 - (delay(close,10)-close)/10) &lt; -0.1) ? 1 : -1*(close-delay(close,1))</td></tr>
+
+<tr><td>alpha101_101</td><td class="formula">(close - open) / ((high - low) + 0.001)</td></tr>
+
+<tr><td>alpha101_042</td><td class="formula">rank(vwap-close) / rank(vwap+close)</td></tr>
+
+<tr><td>alpha101_081</td><td class="formula">(rank(Log(product(rank((rank(correlation(vwap, sum(adv10,50), 8))^4)), 15))) &lt; rank(correlation(rank(vwap), rank(volume), 5))) * -1</td></tr>
+
+<tr><td>alpha101_075</td><td class="formula">rank(correlation(vwap, volume, 4)) &lt; rank(correlation(rank(low), rank(adv50), 12))</td></tr>
+
+<tr><td>alpha101_071</td><td class="formula">max(Ts_Rank(decay_linear(correlation(Ts_Rank(close,3), Ts_Rank(adv180,12), 18), 4), 16), Ts_Rank(decay_linear((rank((low+open)-(2*vwap))^2, 16), 4))</td></tr>
+
+<tr><td>alpha101_088</td><td class="formula">min(rank(decay_linear((rank(open)+rank(low))-(rank(high)+rank(close)),8)), Ts_Rank(decay_linear(correlation(Ts_Rank(close,8),Ts_Rank(adv60,20),8),7),3))</td></tr>
+
+<tr><td>alpha101_012</td><td class="formula">sign(delta(volume,1)) * (-1 * delta(close,1))</td></tr>
+
+<tr><td>alpha101_003</td><td class="formula">-1 * correlation(rank(open), rank(volume), 10)</td></tr>
+
+<tr><td>alpha101_046</td><td class="formula">complex piecewise; see paper</td></tr>
+
+<tr><td>alpha101_065</td><td class="formula">(rank(correlation(0.008*open+0.992*vwap, sum(adv60,9), 6)) &lt; rank(open-ts_min(open,14))) * -1</td></tr>
+
+<tr><td>alpha101_078</td><td class="formula">rank(correlation(sum(0.352*low+0.648*vwap, 20), sum(adv40,20), 7))^rank(correlation(rank(vwap), rank(volume), 6))</td></tr>
+
+<tr><td>alpha101_064</td><td class="formula">(rank(correlation(sum(0.178*open+0.822*low,13), sum(adv120,13), 17)) &lt; rank(delta(0.178*((high+low)/2)+0.822*vwap, 4))) * -1</td></tr>
+
+<tr><td>alpha101_022</td><td class="formula">-1 * (delta(correlation(high,volume,5),5) * rank(stddev(close,20)))</td></tr>
+
+<tr><td>alpha101_077</td><td class="formula">min(rank(decay_linear((high+low)/2 + high - (vwap+high), 20)), rank(decay_linear(correlation((high+low)/2, adv40, 3), 6)))</td></tr>
+
+<tr><td>alpha101_010</td><td class="formula">rank((0&lt;ts_min(delta(close,1),4))?delta(close,1):((ts_max(delta(close,1),4)&lt;0)?delta(close,1):(-1*delta(close,1))))</td></tr>
+
+<tr><td>alpha101_031</td><td class="formula">rank(rank(rank(decay_linear(-1*rank(rank(delta(close,10))),10)))) + rank(-1*delta(close,3)) + sign(scale(correlation(adv20,low,12)))</td></tr>
+
+<tr><td>alpha101_062</td><td class="formula">(rank(correlation(vwap, sum(adv20,22), 10)) &lt; rank(((rank(open)+rank(open)) &lt; (rank((high+low)/2)+rank(high))))) * -1</td></tr>
+
+<tr><td>alpha101_061</td><td class="formula">rank(vwap - ts_min(vwap,16)) &lt; rank(correlation(vwap, adv180, 18))</td></tr>
+
+<tr><td>alpha101_098</td><td class="formula">rank(decay_linear(correlation(vwap, sum(adv5,26), 5), 7)) - rank(decay_linear(Ts_Rank(Ts_ArgMin(correlation(rank(open), rank(adv15), 21), 9), 7), 8))</td></tr>
+
+<tr><td>alpha101_095</td><td class="formula">rank(open-ts_min(open,13)) &lt; Ts_Rank((rank(correlation(sum((high+low)/2,19), sum(adv40,19),13))^5), 12)</td></tr>
+
+<tr><td>alpha101_085</td><td class="formula">rank(correlation(0.877*high+0.123*close, adv30, 10))^rank(correlation(Ts_Rank((high+low)/2,4), Ts_Rank(volume,10), 7))</td></tr>
+
+<tr><td>alpha101_074</td><td class="formula">(rank(correlation(close, sum(adv30,37), 15)) &lt; rank(correlation(rank(0.026*high+0.974*vwap), rank(volume), 11))) * -1</td></tr>
+
+</table>
+
+
+<h2 class="skipped">Skipped / Failed (10 shown)</h2>
+<table>
+<tr><th>Alpha ID</th><th>Reason</th></tr>
+
+<tr><td>alpha101_048</td><td>alpha101_048: panel missing sector tag</td></tr>
+
+<tr><td>alpha101_056</td><td>alpha101_056: panel missing sector tag</td></tr>
+
+<tr><td>alpha101_058</td><td>alpha101_058: panel missing sector tag</td></tr>
+
+<tr><td>alpha101_059</td><td>alpha101_059: panel missing sector tag</td></tr>
+
+<tr><td>alpha101_063</td><td>alpha101_063: panel missing sector tag</td></tr>
+
+<tr><td>alpha101_067</td><td>alpha101_067: panel missing sector tag</td></tr>
+
+<tr><td>alpha101_069</td><td>alpha101_069: panel missing sector tag</td></tr>
+
+<tr><td>alpha101_070</td><td>alpha101_070: panel missing sector tag</td></tr>
+
+<tr><td>alpha101_076</td><td>alpha101_076: panel missing sector tag</td></tr>
+
+<tr><td>alpha101_079</td><td>alpha101_079: panel missing sector tag</td></tr>
+
+</table>
+
+</body></html>
