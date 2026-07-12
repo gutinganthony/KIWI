@@ -1,0 +1,291 @@
+{
+  "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+  "label": "scan-best-candidate-9M-lowdd",
+  "snapshot_date": "2026-07-12",
+  "classification": "consistent_winner",
+  "classification_reasons": [
+    "活動跨度 361.0 天 >= 60",
+    "總 PnL 9609116.37 > 10,000",
+    "回撤 0.0554 < 40% peak",
+    "目前槓桿 3.0 <= 20x",
+    "正月比率 0.692 >= 0.5",
+    "（fills 截斷 n>=2000，profit factor 16.711 樣本偏誤大，僅供低信心參考，不硬否決）"
+  ],
+  "followable": {
+    "ok": true,
+    "reasons": []
+  },
+  "metrics": {
+    "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+    "snapshot_date": "2026-07-12",
+    "pnl_source": "portfolio_curve",
+    "portfolio_window": "perpAllTime",
+    "low_confidence": false,
+    "total_pnl": 9609116.37,
+    "peak_pnl": 9621586.5,
+    "monthly_pnl": {
+      "2025-07": -73180.55,
+      "2025-08": -34288.37,
+      "2025-09": -8212.34,
+      "2025-10": 1435708.48,
+      "2025-11": 2045437.87,
+      "2025-12": 930544.52,
+      "2026-01": 638177.85,
+      "2026-02": 519822.91,
+      "2026-03": 1413004.59,
+      "2026-04": 1924051.99,
+      "2026-05": 106203.52,
+      "2026-06": -143411.3,
+      "2026-07": 855257.21
+    },
+    "active_months": 13,
+    "positive_month_ratio": 0.692,
+    "best_month_pnl": 2045437.87,
+    "max_drawdown_pct": 0.0554,
+    "current_drawdown_pct": 0.0013,
+    "max_single_day_crash_pct": 0.0331,
+    "span_days": 361.0,
+    "days_idle": 0.0,
+    "n_fills": 2000,
+    "profit_factor": 16.711,
+    "avg_win": 2294.95,
+    "avg_loss": 125.73,
+    "realized_win_rate": 0.478,
+    "avg_hold_hours": 221.531,
+    "net_direction_ratio": 0.1471,
+    "n_fills_truncated": true,
+    "n_fills_last_30d": 1024,
+    "n_events": 65,
+    "n_events_last_30d": 39,
+    "n_events_last_30d_est": 39,
+    "events_30d_coverage_days": 30.0,
+    "median_fills_per_event": 10,
+    "median_event_notional": 180008.4,
+    "median_gap_between_events_hours": 3.57,
+    "p90_gap_between_events_hours": 75.93,
+    "had_liquidation": false,
+    "n_liquidations": 0,
+    "top_coin": "@166",
+    "vlm": 269213081.2,
+    "vlm_to_pnl_ratio": 28.02,
+    "funding_total": -144164.69,
+    "n_open_positions": 1,
+    "current_max_leverage": 3.0,
+    "has_extreme_leverage": false,
+    "margin_types": [
+      "cross"
+    ],
+    "account_value": 1404784.18,
+    "fetch_errors": []
+  },
+  "position_value": 34142.98,
+  "unrealized_pnl": 4973.64,
+  "n_open_positions": 1,
+  "open_positions": [
+    {
+      "coin": "MINA",
+      "szi": 792107.0,
+      "side": "long",
+      "entry_px": 0.036825,
+      "position_value": 34142.980128,
+      "unrealized_pnl": 4973.639853,
+      "leverage_value": 3.0,
+      "leverage_type": "cross",
+      "liquidation_px": null,
+      "margin_used": 11380.993376,
+      "max_leverage": 3.0,
+      "cum_funding_all_time": 228.308694
+    }
+  ],
+  "recent_fills": [
+    {
+      "time": "2026-07-11T14:20:17.003000+00:00",
+      "coin": "xyz:AMZN",
+      "dir": "Open Long",
+      "px": 245.9,
+      "sz": 21.356,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-11T14:20:17.003000+00:00",
+      "coin": "xyz:AMZN",
+      "dir": "Open Long",
+      "px": 245.9,
+      "sz": 20.206,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-11T14:20:17.072000+00:00",
+      "coin": "xyz:AMZN",
+      "dir": "Open Long",
+      "px": 245.9,
+      "sz": 7.061,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-11T14:20:17.072000+00:00",
+      "coin": "xyz:AMZN",
+      "dir": "Open Long",
+      "px": 245.9,
+      "sz": 15.169,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-11T14:20:17.139000+00:00",
+      "coin": "xyz:AMZN",
+      "dir": "Open Long",
+      "px": 245.9,
+      "sz": 72.407,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-11T14:20:17.139000+00:00",
+      "coin": "xyz:AMZN",
+      "dir": "Open Long",
+      "px": 245.9,
+      "sz": 1.349,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-11T14:20:17.139000+00:00",
+      "coin": "xyz:AMZN",
+      "dir": "Open Long",
+      "px": 245.9,
+      "sz": 2.708,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-11T14:20:17.205000+00:00",
+      "coin": "xyz:AMZN",
+      "dir": "Open Long",
+      "px": 245.9,
+      "sz": 33.585,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-12T02:19:11.194000+00:00",
+      "coin": "MINA",
+      "dir": "Close Long",
+      "px": 0.04485,
+      "sz": 23647811.0,
+      "closed_pnl": 189773.68,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-12T02:20:28.002000+00:00",
+      "coin": "SAGA",
+      "dir": "Close Long",
+      "px": 0.01284,
+      "sz": 12177.7,
+      "closed_pnl": 16.44,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-12T02:20:28.002000+00:00",
+      "coin": "SAGA",
+      "dir": "Close Long",
+      "px": 0.01284,
+      "sz": 24369.0,
+      "closed_pnl": 32.9,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-12T02:20:28.002000+00:00",
+      "coin": "SAGA",
+      "dir": "Close Long",
+      "px": 0.01284,
+      "sz": 23328.1,
+      "closed_pnl": 31.49,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-12T02:20:28.002000+00:00",
+      "coin": "SAGA",
+      "dir": "Close Long",
+      "px": 0.01285,
+      "sz": 3168841.2,
+      "closed_pnl": 4309.62,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-12T02:20:28.002000+00:00",
+      "coin": "SAGA",
+      "dir": "Close Long",
+      "px": 0.01285,
+      "sz": 23346.3,
+      "closed_pnl": 31.75,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-12T02:23:54.239000+00:00",
+      "coin": "@166",
+      "dir": "Sell",
+      "px": 0.99921,
+      "sz": 95639.67,
+      "closed_pnl": 36.33,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-12T02:23:54.239000+00:00",
+      "coin": "@166",
+      "dir": "Sell",
+      "px": 0.99927,
+      "sz": 8000.0,
+      "closed_pnl": 3.52,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-12T02:23:54.239000+00:00",
+      "coin": "@166",
+      "dir": "Sell",
+      "px": 0.99928,
+      "sz": 8000.0,
+      "closed_pnl": 3.6,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-12T02:23:54.239000+00:00",
+      "coin": "@166",
+      "dir": "Sell",
+      "px": 0.99929,
+      "sz": 8000.0,
+      "closed_pnl": 3.68,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-12T02:23:54.239000+00:00",
+      "coin": "@166",
+      "dir": "Sell",
+      "px": 0.99929,
+      "sz": 52504.44,
+      "closed_pnl": 24.14,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-12T02:23:54.239000+00:00",
+      "coin": "@166",
+      "dir": "Sell",
+      "px": 0.9993,
+      "sz": 8000.0,
+      "closed_pnl": 3.76,
+      "is_liquidation": false
+    }
+  ],
+  "new_positions": [],
+  "disappeared_positions": [
+    {
+      "key": "SAGA:long",
+      "coin": "SAGA"
+    }
+  ],
+  "initialized": false,
+  "raw_source": "snapshot"
+}
