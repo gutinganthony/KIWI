@@ -749,7 +749,8 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val, lfi_resu
         },
         "lfi": lfi_result if lfi_result else {
             "score": None, "level": "──", "z": None,
-            "vvix_vix": None, "credit_rel_5d": None, "rising": None, "as_of": "",
+            "vvix_vix": None, "credit_rel_5d": None, "rising": None,
+            "days_ge_80": None, "days_ge_90": None, "days_ge_95": None, "as_of": "",
         },
         "market": {
             "sp500": sp500,

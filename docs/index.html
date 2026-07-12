@@ -170,6 +170,11 @@ body {
 .lvl-critical { color: #fff; background: var(--red); }
 
 .gc-desc { font-size: 11px; color: var(--text2); margin-top: 8px; line-height: 1.4; max-width: 160px; }
+.gc-streak { font-size: 10.5px; color: var(--text2); margin-top: 7px; line-height: 1.5; max-width: 160px;
+  border-top: 1px solid #2a2e39; padding-top: 6px; }
+.gc-streak .sk-hd { font-weight: 600; color: var(--text); }
+.gc-streak b { color: #9575cd; font-variant-numeric: tabular-nums; }
+.gc-streak .sk-hot b { color: #ef5350; }
 
 /* ── Signal Matrix ── */
 .section-title {
@@ -537,6 +542,10 @@ var KIWI_HISTORY = {"d":["2021-06-14","2021-06-15","2021-06-16","2021-06-17","20
       <div class="gc-name" data-i18n="lfi_name">Leverage / Funding Index</div>
       <div class="gc-level lvl-elevated" data-i18n="lfi_level">NORMAL</div>
       <div class="gc-desc" data-i18n="lfi_desc">Market leverage crowding (AIR-TRF funding-spread proxy). High = everyone levered long, fragile. Low = deleveraged, rebound-prone.</div>
+      <div class="gc-streak" id="lfi-streak" style="display:none">
+        <div class="sk-hd" data-i18n="lfi_streak_hd">Consecutive trading days at level</div>
+        <div>≥80 <b id="lfi-d80">–</b> · ≥90 <b id="lfi-d90">–</b> · <span class="sk-hot">≥95 <b id="lfi-d95">–</b></span> <span data-i18n="lfi_streak_unit">d</span></div>
+      </div>
     </div>
 
   </div><!-- /gauges-row -->
@@ -1048,6 +1057,8 @@ var KIWI_HISTORY = {"d":["2021-06-14","2021-06-15","2021-06-16","2021-06-17","20
     lfi_name: 'LFI 槓桿融資指標',
     lfi_level: '正常',
     lfi_desc: '市場借錢買股的擁擠度（AIR-TRF 融資利差 proxy）。高＝大家都滿槓桿、脆弱；低＝去槓桿完成、易反彈。1996-2020 回測為最強短線領先訊號。',
+    lfi_streak_hd: '目前水位已連續維持',
+    lfi_streak_unit: '交易日',
     alert_title: '科技板塊謹慎 — TSI 升高',
     alert_desc: 'TSI = 45（謹慎）：10Y 殖利率急升 9bps 至 4.55%；30Y 達 5.12%（2007 年以來最高）。科技估值面臨殖利率曲線熊市陡化壓力。Capital Context 4 週 +20% 信號（百年第 3 次）已觸發。',
     combined_signal: '三系統綜合信號',
@@ -1297,6 +1308,19 @@ var KIWI_HISTORY = {"d":["2021-06-14","2021-06-15","2021-06-16","2021-06-17","20
           ? (ll === 'HIGH' ? '偏高（勿加槓桿）' : ll === 'LOW' ? '偏低（去槓桿完成）' : ll === 'NORMAL' ? '正常' : '──')
           : ll;
         lfiLvlEl.className = 'gc-level lvl-' + (ll === 'HIGH' ? 'critical' : ll === 'LOW' ? 'low' : 'elevated');
+      }
+      // 目前水位已連續維持幾個交易日（≥80 / ≥90 / ≥95）——只在有讀數時顯示
+      var skEl = document.getElementById('lfi-streak');
+      if (skEl) {
+        var d80 = data.lfi.days_ge_80, d90 = data.lfi.days_ge_90, d95 = data.lfi.days_ge_95;
+        if (d80 === null || d80 === undefined) {
+          skEl.style.display = 'none';
+        } else {
+          skEl.style.display = '';
+          document.getElementById('lfi-d80').textContent = d80;
+          document.getElementById('lfi-d90').textContent = d90;
+          document.getElementById('lfi-d95').textContent = d95;
+        }
       }
     }
 
