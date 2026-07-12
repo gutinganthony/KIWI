@@ -38,6 +38,9 @@ last_updated: 2026-07-06
 - [ ] **上線驗證 LFI 第四錶**：bot 下次跑 update-dashboard 後，開 https://gutinganthony.github.io/KIWI/ 看第四張紫色錶卡（LFI）有沒有出現真讀數（不是「--」）；失敗會有 Telegram 推播。
 - [ ] **上線驗證「連續維持天數」標注**：同一張 LFI 卡片底部應出現「目前水位已連續維持 ≥80 X · ≥90 Y · ≥95 Z 交易日」那一行（bot 下次跑才會帶出 `days_ge_*`，在那之前該行隱藏是正常的）。07-10 讀數已到 84.8，若持續 ≥80，X 應該 ≥1 且逐日遞增。
 - [ ] **（可選）真標的驗證節流閥**：資料橋補齊 JEM/Towa/Kokusai 等真股歷史後（~1 週），重跑 `scripts/serenity_throttle_validation.py` 改用真標的，確認「節流閥別硬加」的結論在真標的上也成立。
+### 2026-07-12 session 產生的（llm-council-skill 評估）
+- [ ] **安裝 gcpdev/llm-council-skill 到 Mac 本機 Claude Code**（雲端跑不了：容器 proxy 會擋 OpenAI/Gemini 的 API 呼叫）。雲端已做背景查證：作者可信（萊比錫大學語意網研究者）、334★、MIT 授權、無安全疑慮紀錄，但程式碼本身**未逐行審查**（`add_repo` 核准流程本 session 沒跑通）。步驟：clone repo → 把 `llm-council/` 資料夾放進 `~/.claude/skills/` → `.env` 填 `OPENAI_API_KEY`/`GEMINI_API_KEY` → 裝之前先看一眼 `scripts/query_llms.py` 確認只打 OpenAI/Google 官方端點、沒有第三方轉發。用法：對話裡打「Consult the council: ＜問題＞」。**⚠️ 只拿它問技術/通用問題，別把 KIWI 持倉、部位、fund 細節餵給它**——內容會送到 OpenAI 和 Google。ChatGPT 本來就是 council 兩席之一，免額外設定。
+
 ### 2026-07-11 session 產生的（台股漏斗數據源）
 - [ ] **註冊 FinMind 免費帳號取得 API token**（finmindtrade.com）→ 放進 GitHub repo Settings → Secrets → `FINMIND_TOKEN`。無 token 時台股管線走 TWSE 次源可運作；FinMind 主源（更穩、可歷史回補）的全市場查詢需 token 解鎖（匿名層回 400）。
 - [ ] （低優先）雲端 WebFetch 被 403 擋的站 +1：`stockanalysis.com`（TSM 估值頁）。雲端已用 WebSearch 摘要繞過，僅在需要精確 P/B 等單一指標時在 Mac 上手動查。

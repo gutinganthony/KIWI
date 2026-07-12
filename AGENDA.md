@@ -13,6 +13,7 @@
 
 ## 📌 任務（有到期日，bot 會盯）
 
+- [ ] 2026-07-13 | 安裝 llm-council-skill | Mac 本機裝 gcpdev/llm-council-skill（步驟＋安全提醒詳 mac-manual-homework.md；send_later 主動推播本 session 排不了，這是第二層保險）
 - [ ] 2026-07-19 | JEM 手動功課 | TDnet 7/3–7/6 清單＋FY3/26 有報客戶表＋Yahoo 收盤複核（首批 1/3 執行前必做，詳 mac-manual-homework）
 - [ ] 2026-07-26 | 出場手冊 v1 | 每筆持倉的減倉條件全部綁訊號（M1 結論：綁訊號執行率 100%、不綁 0%）
 - [ ] 2026-07-26 | FinMind token | 註冊 finmindtrade.com → repo Secrets `FINMIND_TOKEN`（台股漏斗主源解鎖）
