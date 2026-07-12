@@ -1,0 +1,1443 @@
+{
+ "status": "ok",
+ "zoo": "alpha101",
+ "universe": "sp500",
+ "period": "2020-01-01/2026-07-10",
+ "n_alphas_tested": 100,
+ "n_skipped": 1,
+ "top": [
+  {
+   "id": "alpha101_007",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum",
+    "volume"
+   ],
+   "formula_latex": "(adv20<volume)?((-1*ts_rank(abs(delta(close,7)),60))*sign(delta(close,7))):(-1)",
+   "ic_mean": 0.011097,
+   "ic_std": 0.092765,
+   "ir": 0.1196,
+   "ic_positive_ratio": 0.5446,
+   "ic_count": 1570,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_021",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum",
+    "volatility"
+   ],
+   "formula_latex": "complex piecewise; see paper",
+   "ic_mean": 0.011808,
+   "ic_std": 0.116368,
+   "ir": 0.1015,
+   "ic_positive_ratio": 0.5301,
+   "ic_count": 1630,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_043",
+   "zoo": "alpha101",
+   "theme": [
+    "volume",
+    "momentum"
+   ],
+   "formula_latex": "ts_rank(volume/adv20,20) * ts_rank(-1*delta(close,7),8)",
+   "ic_mean": 0.012981,
+   "ic_std": 0.129688,
+   "ir": 0.1001,
+   "ic_positive_ratio": 0.5303,
+   "ic_count": 1599,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_054",
+   "zoo": "alpha101",
+   "theme": [
+    "reversal"
+   ],
+   "formula_latex": "-1 * ((low-close)*(open^5)) / ((low-high)*(close^5))",
+   "ic_mean": 0.013188,
+   "ic_std": 0.144498,
+   "ir": 0.0913,
+   "ic_positive_ratio": 0.5486,
+   "ic_count": 1637,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_024",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum"
+   ],
+   "formula_latex": "complex piecewise; see paper",
+   "ic_mean": 0.01448,
+   "ic_std": 0.159447,
+   "ir": 0.0908,
+   "ic_positive_ratio": 0.5398,
+   "ic_count": 1634,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_011",
+   "zoo": "alpha101",
+   "theme": [
+    "volume",
+    "reversal"
+   ],
+   "formula_latex": "(rank(ts_max(vwap-close,3))+rank(ts_min(vwap-close,3)))*rank(delta(volume,3))",
+   "ic_mean": 0.009195,
+   "ic_std": 0.103184,
+   "ir": 0.0891,
+   "ic_positive_ratio": 0.5165,
+   "ic_count": 1634,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_057",
+   "zoo": "alpha101",
+   "theme": [
+    "reversal"
+   ],
+   "formula_latex": "0 - 1 * ((close-vwap) / decay_linear(rank(ts_argmax(close,30)), 2))",
+   "ic_mean": 0.013763,
+   "ic_std": 0.155439,
+   "ir": 0.0885,
+   "ic_positive_ratio": 0.5364,
+   "ic_count": 1607,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_034",
+   "zoo": "alpha101",
+   "theme": [
+    "volatility"
+   ],
+   "formula_latex": "rank((1-rank(stddev(returns,2)/stddev(returns,5))) + (1-rank(delta(close,1))))",
+   "ic_mean": 0.012115,
+   "ic_std": 0.139854,
+   "ir": 0.0866,
+   "ic_positive_ratio": 0.5227,
+   "ic_count": 1632,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_035",
+   "zoo": "alpha101",
+   "theme": [
+    "volume",
+    "momentum"
+   ],
+   "formula_latex": "ts_rank(volume,32) * (1 - ts_rank((close+high-low),16)) * (1 - ts_rank(returns,32))",
+   "ic_mean": 0.014317,
+   "ic_std": 0.167417,
+   "ir": 0.0855,
+   "ic_positive_ratio": 0.5227,
+   "ic_count": 1605,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_038",
+   "zoo": "alpha101",
+   "theme": [
+    "reversal"
+   ],
+   "formula_latex": "(-1*rank(ts_rank(close,10))) * rank(close/open)",
+   "ic_mean": 0.015645,
+   "ic_std": 0.185189,
+   "ir": 0.0845,
+   "ic_positive_ratio": 0.5301,
+   "ic_count": 1628,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_032",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum"
+   ],
+   "formula_latex": "scale(sum(close,7)/7 - close) + 20*scale(correlation(vwap, delay(close,5), 230))",
+   "ic_mean": 0.012242,
+   "ic_std": 0.14716,
+   "ir": 0.0832,
+   "ic_positive_ratio": 0.5367,
+   "ic_count": 1403,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_030",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum",
+    "volume"
+   ],
+   "formula_latex": "((1-rank(sign(d1)+sign(d2)+sign(d3))) * sum(volume,5)) / sum(volume,20)",
+   "ic_mean": 0.012213,
+   "ic_std": 0.148009,
+   "ir": 0.0825,
+   "ic_positive_ratio": 0.5247,
+   "ic_count": 1618,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_090",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "(rank(close-ts_max(close,5))^Ts_Rank(correlation(IndNeutralize(adv40, subindustry), low, 5), 3)) * -1",
+   "ic_mean": 0.011442,
+   "ic_std": 0.140642,
+   "ir": 0.0814,
+   "ic_positive_ratio": 0.5302,
+   "ic_count": 1592,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_005",
+   "zoo": "alpha101",
+   "theme": [
+    "reversal"
+   ],
+   "formula_latex": "rank((open - sum(vwap,10)/10)) * (-1 * abs(rank((close - vwap))))",
+   "ic_mean": 0.013369,
+   "ic_std": 0.164674,
+   "ir": 0.0812,
+   "ic_positive_ratio": 0.5295,
+   "ic_count": 1628,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_083",
+   "zoo": "alpha101",
+   "theme": [
+    "volume",
+    "volatility"
+   ],
+   "formula_latex": "(rank(delay((high-low)/(sum(close,5)/5), 2)) * rank(rank(volume))) / (((high-low)/(sum(close,5)/5)) / (vwap-close))",
+   "ic_mean": 0.012104,
+   "ic_std": 0.157449,
+   "ir": 0.0769,
+   "ic_positive_ratio": 0.5261,
+   "ic_count": 1631,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_037",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum"
+   ],
+   "formula_latex": "rank(correlation(delay(open-close,1),close,200)) + rank(open-close)",
+   "ic_mean": 0.011301,
+   "ic_std": 0.150901,
+   "ir": 0.0749,
+   "ic_positive_ratio": 0.5331,
+   "ic_count": 1437,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_053",
+   "zoo": "alpha101",
+   "theme": [
+    "reversal"
+   ],
+   "formula_latex": "-1 * delta(((close-low) - (high-close))/(close-low), 9)",
+   "ic_mean": 0.010081,
+   "ic_std": 0.140347,
+   "ir": 0.0718,
+   "ic_positive_ratio": 0.5375,
+   "ic_count": 1628,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_068",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "(Ts_Rank(correlation(rank(high), rank(adv15), 9), 14) < rank(delta(0.518*close+0.482*low, 1))) * -1",
+   "ic_mean": 0.006543,
+   "ic_std": 0.093008,
+   "ir": 0.0704,
+   "ic_positive_ratio": 0.5181,
+   "ic_count": 1602,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_100",
+   "zoo": "alpha101",
+   "theme": [
+    "volume",
+    "momentum"
+   ],
+   "formula_latex": "0 - 1*((1.5*scale(IN(IN(rank(((close-low)-(high-close))/(high-low)*volume), subind), subind)) - scale(IN(correlation(close, rank(adv20), 5) - rank(ts_argmin(close,30)), subind))) * (volume/adv20))",
+   "ic_mean": 0.006575,
+   "ic_std": 0.094135,
+   "ir": 0.0699,
+   "ic_positive_ratio": 0.5224,
+   "ic_count": 1608,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_025",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum",
+    "volume"
+   ],
+   "formula_latex": "rank((((-1*returns)*adv20)*vwap)*(high-close))",
+   "ic_mean": 0.011875,
+   "ic_std": 0.170795,
+   "ir": 0.0695,
+   "ic_positive_ratio": 0.5198,
+   "ic_count": 1618,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_009",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum"
+   ],
+   "formula_latex": "(0<ts_min(delta(close,1),5))?delta(close,1):((ts_max(delta(close,1),5)<0)?delta(close,1):(-1*delta(close,1)))",
+   "ic_mean": 0.010892,
+   "ic_std": 0.156883,
+   "ir": 0.0694,
+   "ic_positive_ratio": 0.533,
+   "ic_count": 1636,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_033",
+   "zoo": "alpha101",
+   "theme": [
+    "reversal"
+   ],
+   "formula_latex": "rank(-1*(1-open/close))",
+   "ic_mean": 0.012888,
+   "ic_std": 0.185703,
+   "ir": 0.0694,
+   "ic_positive_ratio": 0.5254,
+   "ic_count": 1637,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_059",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "-1 * Ts_Rank(decay_linear(correlation(IndNeutralize(vwap*0.728+vwap*0.272, industry), volume, 4), 16), 8)",
+   "ic_mean": 0.004412,
+   "ic_std": 0.068861,
+   "ir": 0.0641,
+   "ic_positive_ratio": 0.5372,
+   "ic_count": 1612,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_047",
+   "zoo": "alpha101",
+   "theme": [
+    "volume",
+    "momentum"
+   ],
+   "formula_latex": "((rank(1/close)*volume/adv20) * (high*rank(high-close)/(sum(high,5)/5))) - rank(vwap-delay(vwap,5))",
+   "ic_mean": 0.011274,
+   "ic_std": 0.176905,
+   "ir": 0.0637,
+   "ic_positive_ratio": 0.5179,
+   "ic_count": 1618,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_049",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum"
+   ],
+   "formula_latex": "(((delay(close,20)-delay(close,10))/10 - (delay(close,10)-close)/10) < -0.1) ? 1 : -1*(close-delay(close,1))",
+   "ic_mean": 0.008984,
+   "ic_std": 0.141428,
+   "ir": 0.0635,
+   "ic_positive_ratio": 0.5306,
+   "ic_count": 1636,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_056",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum"
+   ],
+   "formula_latex": "0 - 1*(rank(sum(returns,10)/sum(sum(returns,2),3)) * rank((returns * cap)))  [cap unavailable -> 1]",
+   "ic_mean": 0.009571,
+   "ic_std": 0.152295,
+   "ir": 0.0628,
+   "ic_positive_ratio": 0.5108,
+   "ic_count": 1627,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_036",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum",
+    "volume"
+   ],
+   "formula_latex": "weighted sum; see paper",
+   "ic_mean": 0.006332,
+   "ic_std": 0.102906,
+   "ir": 0.0615,
+   "ic_positive_ratio": 0.5334,
+   "ic_count": 1438,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_004",
+   "zoo": "alpha101",
+   "theme": [
+    "reversal"
+   ],
+   "formula_latex": "-1 * Ts_Rank(rank(low), 9)",
+   "ic_mean": 0.010554,
+   "ic_std": 0.172228,
+   "ir": 0.0613,
+   "ic_positive_ratio": 0.5114,
+   "ic_count": 1629,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_094",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "(rank(vwap-ts_min(vwap,12))^Ts_Rank(correlation(Ts_Rank(vwap,20), Ts_Rank(adv60,4), 18), 3)) * -1",
+   "ic_mean": 0.00863,
+   "ic_std": 0.141765,
+   "ir": 0.0609,
+   "ic_positive_ratio": 0.5019,
+   "ic_count": 1556,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_051",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum"
+   ],
+   "formula_latex": "(...< -0.05) ? 1 : -1*(close-delay(close,1))",
+   "ic_mean": 0.008506,
+   "ic_std": 0.140074,
+   "ir": 0.0607,
+   "ic_positive_ratio": 0.5306,
+   "ic_count": 1636,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_079",
+   "zoo": "alpha101",
+   "theme": [
+    "volume",
+    "momentum"
+   ],
+   "formula_latex": "rank(delta(IndNeutralize(0.607*close+0.393*open, sector), 1)) < rank(correlation(Ts_Rank(vwap,4), Ts_Rank(adv150,9), 15))",
+   "ic_mean": 0.004752,
+   "ic_std": 0.080611,
+   "ir": 0.059,
+   "ic_positive_ratio": 0.5157,
+   "ic_count": 1466,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_018",
+   "zoo": "alpha101",
+   "theme": [
+    "volatility"
+   ],
+   "formula_latex": "-1 * rank(stddev(abs(close-open),5) + (close-open) + correlation(close,open,10))",
+   "ic_mean": 0.00877,
+   "ic_std": 0.15422,
+   "ir": 0.0569,
+   "ic_positive_ratio": 0.5135,
+   "ic_count": 1628,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_055",
+   "zoo": "alpha101",
+   "theme": [
+    "volume",
+    "reversal"
+   ],
+   "formula_latex": "-1 * correlation(rank((close-ts_min(low,12))/(ts_max(high,12)-ts_min(low,12))), rank(volume), 6)",
+   "ic_mean": 0.003576,
+   "ic_std": 0.063681,
+   "ir": 0.0561,
+   "ic_positive_ratio": 0.5238,
+   "ic_count": 1621,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_017",
+   "zoo": "alpha101",
+   "theme": [
+    "volume",
+    "reversal"
+   ],
+   "formula_latex": "((-1*rank(ts_rank(close,10)))*rank(delta(delta(close,1),1)))*rank(ts_rank(volume/adv20,5))",
+   "ic_mean": 0.008001,
+   "ic_std": 0.144185,
+   "ir": 0.0555,
+   "ic_positive_ratio": 0.5204,
+   "ic_count": 1614,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_046",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum"
+   ],
+   "formula_latex": "complex piecewise; see paper",
+   "ic_mean": 0.007495,
+   "ic_std": 0.13937,
+   "ir": 0.0538,
+   "ic_positive_ratio": 0.5214,
+   "ic_count": 1636,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_008",
+   "zoo": "alpha101",
+   "theme": [
+    "reversal"
+   ],
+   "formula_latex": "-1 * rank((sum(open,5)*sum(returns,5)) - delay(sum(open,5)*sum(returns,5),10))",
+   "ic_mean": 0.008616,
+   "ic_std": 0.16237,
+   "ir": 0.0531,
+   "ic_positive_ratio": 0.5185,
+   "ic_count": 1622,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_028",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "scale((correlation(adv20,low,5) + (high+low)/2) - close)",
+   "ic_mean": 0.006809,
+   "ic_std": 0.129695,
+   "ir": 0.0525,
+   "ic_positive_ratio": 0.5198,
+   "ic_count": 1614,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_070",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum",
+    "volume"
+   ],
+   "formula_latex": "(rank(delta(vwap,1))^Ts_Rank(correlation(IndNeutralize(close,industry), adv50, 18), 18)) * -1",
+   "ic_mean": 0.006174,
+   "ic_std": 0.118962,
+   "ir": 0.0519,
+   "ic_positive_ratio": 0.5129,
+   "ic_count": 1554,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_026",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "-1 * ts_max(correlation(ts_rank(volume,5),ts_rank(high,5),5),3)",
+   "ic_mean": 0.005229,
+   "ic_std": 0.101296,
+   "ir": 0.0516,
+   "ic_positive_ratio": 0.5255,
+   "ic_count": 1627,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_010",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum"
+   ],
+   "formula_latex": "rank((0<ts_min(delta(close,1),4))?delta(close,1):((ts_max(delta(close,1),4)<0)?delta(close,1):(-1*delta(close,1))))",
+   "ic_mean": 0.007513,
+   "ic_std": 0.147714,
+   "ir": 0.0509,
+   "ic_positive_ratio": 0.5189,
+   "ic_count": 1636,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_044",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "-1 * correlation(high, rank(volume), 5)",
+   "ic_mean": 0.003632,
+   "ic_std": 0.073399,
+   "ir": 0.0495,
+   "ic_positive_ratio": 0.5248,
+   "ic_count": 1633,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_087",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum"
+   ],
+   "formula_latex": "max(rank(decay_linear(delta(0.37*close+0.63*vwap, 2), 3)), Ts_Rank(decay_linear(abs(correlation(IndNeutralize(adv81, industry), close, 13)), 5), 14)) * -1",
+   "ic_mean": 0.005598,
+   "ic_std": 0.11579,
+   "ir": 0.0483,
+   "ic_positive_ratio": 0.5101,
+   "ic_count": 1633,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_002",
+   "zoo": "alpha101",
+   "theme": [
+    "volume",
+    "reversal"
+   ],
+   "formula_latex": "-1 * correlation(rank(delta(log(volume), 2)), rank(((close-open)/open)), 6)",
+   "ic_mean": 0.003091,
+   "ic_std": 0.064731,
+   "ir": 0.0478,
+   "ic_positive_ratio": 0.5092,
+   "ic_count": 1630,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_012",
+   "zoo": "alpha101",
+   "theme": [
+    "volume",
+    "reversal"
+   ],
+   "formula_latex": "sign(delta(volume,1)) * (-1 * delta(close,1))",
+   "ic_mean": 0.004226,
+   "ic_std": 0.089621,
+   "ir": 0.0472,
+   "ic_positive_ratio": 0.5122,
+   "ic_count": 1636,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_045",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum",
+    "volume"
+   ],
+   "formula_latex": "-1 * (rank(sum(delay(close,5),20)/20)*correlation(close,volume,2)*rank(correlation(sum(close,5),sum(close,20),2)))",
+   "ic_mean": 0.003349,
+   "ic_std": 0.07384,
+   "ir": 0.0454,
+   "ic_positive_ratio": 0.5152,
+   "ic_count": 1613,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_042",
+   "zoo": "alpha101",
+   "theme": [
+    "reversal"
+   ],
+   "formula_latex": "rank(vwap-close) / rank(vwap+close)",
+   "ic_mean": 0.006941,
+   "ic_std": 0.155831,
+   "ir": 0.0445,
+   "ic_positive_ratio": 0.4979,
+   "ic_count": 1637,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_027",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "(0.5<rank((sum(correlation(rank(volume),rank(vwap),6),2)/2.0)))?(-1):1",
+   "ic_mean": 0.002546,
+   "ic_std": 0.058574,
+   "ir": 0.0435,
+   "ic_positive_ratio": 0.5175,
+   "ic_count": 1631,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_086",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "(Ts_Rank(correlation(close, sum(adv20,15), 6), 20) < rank((open+close) - (vwap+open))) * -1",
+   "ic_mean": 0.004641,
+   "ic_std": 0.109027,
+   "ir": 0.0426,
+   "ic_positive_ratio": 0.5139,
+   "ic_count": 1580,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_084",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum"
+   ],
+   "formula_latex": "SignedPower(Ts_Rank(vwap-ts_max(vwap,15), 21), delta(close,5))",
+   "ic_mean": 0.00707,
+   "ic_std": 0.170335,
+   "ir": 0.0415,
+   "ic_positive_ratio": 0.5003,
+   "ic_count": 1603,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_060",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "0 - (2*scale(rank((((close-low)-(high-close))/(high-low))*volume)) - scale(rank(ts_argmax(close,10))))",
+   "ic_mean": 0.00545,
+   "ic_std": 0.137596,
+   "ir": 0.0396,
+   "ic_positive_ratio": 0.5215,
+   "ic_count": 1628,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_075",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "rank(correlation(vwap, volume, 4)) < rank(correlation(rank(low), rank(adv50), 12))",
+   "ic_mean": 0.002671,
+   "ic_std": 0.069682,
+   "ir": 0.0383,
+   "ic_positive_ratio": 0.5149,
+   "ic_count": 1577,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_013",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "-1 * rank(covariance(rank(close), rank(volume), 5))",
+   "ic_mean": 0.002528,
+   "ic_std": 0.067248,
+   "ir": 0.0376,
+   "ic_positive_ratio": 0.5168,
+   "ic_count": 1633,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_016",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "-1 * rank(covariance(rank(high), rank(volume), 5))",
+   "ic_mean": 0.002436,
+   "ic_std": 0.065383,
+   "ir": 0.0373,
+   "ic_positive_ratio": 0.5205,
+   "ic_count": 1633,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_019",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum"
+   ],
+   "formula_latex": "(-1*sign((close-delay(close,7))+delta(close,7))) * (1+rank(1+sum(returns,250)))",
+   "ic_mean": 0.005831,
+   "ic_std": 0.171835,
+   "ir": 0.0339,
+   "ic_positive_ratio": 0.5112,
+   "ic_count": 1387,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_023",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum"
+   ],
+   "formula_latex": "((sum(high,20)/20) < high) ? (-1*delta(high,2)) : 0",
+   "ic_mean": 0.004834,
+   "ic_std": 0.143078,
+   "ir": 0.0338,
+   "ic_positive_ratio": 0.4926,
+   "ic_count": 1618,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_052",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum"
+   ],
+   "formula_latex": "((-1*ts_min(low,5)+delay(ts_min(low,5),5)) * rank((sum(returns,240)-sum(returns,20))/220)) * ts_rank(volume,5)",
+   "ic_mean": 0.005554,
+   "ic_std": 0.169498,
+   "ir": 0.0328,
+   "ic_positive_ratio": 0.5047,
+   "ic_count": 1397,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_020",
+   "zoo": "alpha101",
+   "theme": [
+    "reversal"
+   ],
+   "formula_latex": "(((-1*rank(open-delay(high,1)))*rank(open-delay(close,1)))*rank(open-delay(low,1)))",
+   "ic_mean": 0.004713,
+   "ic_std": 0.164876,
+   "ir": 0.0286,
+   "ic_positive_ratio": 0.5079,
+   "ic_count": 1636,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_050",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "-1 * ts_max(rank(correlation(rank(volume), rank(vwap), 5)), 5)",
+   "ic_mean": 0.001835,
+   "ic_std": 0.06491,
+   "ir": 0.0283,
+   "ic_positive_ratio": 0.5255,
+   "ic_count": 1629,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_041",
+   "zoo": "alpha101",
+   "theme": [
+    "reversal"
+   ],
+   "formula_latex": "(high*low)^0.5 - vwap",
+   "ic_mean": 0.003573,
+   "ic_std": 0.127437,
+   "ir": 0.028,
+   "ic_positive_ratio": 0.507,
+   "ic_count": 1637,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_066",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum"
+   ],
+   "formula_latex": "(rank(decay_linear(delta(vwap,4), 7)) + Ts_Rank(decay_linear(((0.966*low+0.034*low - vwap)/(open-(high+low)/2)), 11), 7)) * -1",
+   "ic_mean": 0.003037,
+   "ic_std": 0.12235,
+   "ir": 0.0248,
+   "ic_positive_ratio": 0.512,
+   "ic_count": 1621,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_029",
+   "zoo": "alpha101",
+   "theme": [
+    "reversal",
+    "volume"
+   ],
+   "formula_latex": "min(product(rank(rank(scale(log(sum(ts_min(rank(rank(-1*rank(delta(close-1,5)))),2),1))))),1),5) + ts_rank(delay(-1*returns,6),5)",
+   "ic_mean": 0.003736,
+   "ic_std": 0.160504,
+   "ir": 0.0233,
+   "ic_positive_ratio": 0.4877,
+   "ic_count": 1626,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_003",
+   "zoo": "alpha101",
+   "theme": [
+    "volume",
+    "reversal"
+   ],
+   "formula_latex": "-1 * correlation(rank(open), rank(volume), 10)",
+   "ic_mean": 0.001488,
+   "ic_std": 0.064767,
+   "ir": 0.023,
+   "ic_positive_ratio": 0.5031,
+   "ic_count": 1628,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_064",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "(rank(correlation(sum(0.178*open+0.822*low,13), sum(adv120,13), 17)) < rank(delta(0.178*((high+low)/2)+0.822*vwap, 4))) * -1",
+   "ic_mean": 0.00263,
+   "ic_std": 0.118934,
+   "ir": 0.0221,
+   "ic_positive_ratio": 0.4953,
+   "ic_count": 1490,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_080",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum",
+    "volume"
+   ],
+   "formula_latex": "(rank(Sign(delta(IndNeutralize(0.868*open+0.132*high, subindustry),4)))^Ts_Rank(correlation(high,adv10,5),6)) * -1",
+   "ic_mean": 0.002082,
+   "ic_std": 0.095608,
+   "ir": 0.0218,
+   "ic_positive_ratio": 0.4985,
+   "ic_count": 1619,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_039",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum",
+    "volume"
+   ],
+   "formula_latex": "(-1*rank(delta(close,7)*(1-rank(decay_linear(volume/adv20,9))))) * (1+rank(sum(returns,250)))",
+   "ic_mean": 0.003659,
+   "ic_std": 0.178132,
+   "ir": 0.0205,
+   "ic_positive_ratio": 0.4953,
+   "ic_count": 1387,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_040",
+   "zoo": "alpha101",
+   "theme": [
+    "volatility",
+    "volume"
+   ],
+   "formula_latex": "(-1*rank(stddev(high,10))) * correlation(high,volume,10)",
+   "ic_mean": 0.002318,
+   "ic_std": 0.116696,
+   "ir": 0.0199,
+   "ic_positive_ratio": 0.5006,
+   "ic_count": 1628,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_015",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "-1 * sum(rank(correlation(rank(high), rank(volume), 3)), 3)",
+   "ic_mean": 0.001078,
+   "ic_std": 0.067298,
+   "ir": 0.016,
+   "ic_positive_ratio": 0.5058,
+   "ic_count": 1633,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_031",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum"
+   ],
+   "formula_latex": "rank(rank(rank(decay_linear(-1*rank(rank(delta(close,10))),10)))) + rank(-1*delta(close,3)) + sign(scale(correlation(adv20,low,12)))",
+   "ic_mean": 0.001511,
+   "ic_std": 0.115558,
+   "ir": 0.0131,
+   "ic_positive_ratio": 0.491,
+   "ic_count": 1607,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_022",
+   "zoo": "alpha101",
+   "theme": [
+    "volume",
+    "volatility"
+   ],
+   "formula_latex": "-1 * (delta(correlation(high,volume,5),5) * rank(stddev(close,20)))",
+   "ic_mean": 0.001205,
+   "ic_std": 0.093136,
+   "ir": 0.0129,
+   "ic_positive_ratio": 0.4981,
+   "ic_count": 1618,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_082",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "min(rank(decay_linear(delta(open,1),15)), Ts_Rank(decay_linear(correlation(IndNeutralize(volume, sector), 0.634*open+0.366*open, 17), 7), 13)) * -1",
+   "ic_mean": 0.001335,
+   "ic_std": 0.111861,
+   "ir": 0.0119,
+   "ic_positive_ratio": 0.4988,
+   "ic_count": 1622,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_069",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "(rank(ts_max(delta(IndNeutralize(vwap, industry), 3), 5))^Ts_Rank(correlation(0.49*close+0.51*vwap, adv20, 5), 9)) * -1",
+   "ic_mean": 0.000933,
+   "ic_std": 0.101681,
+   "ir": 0.0092,
+   "ic_positive_ratio": 0.4838,
+   "ic_count": 1606,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_089",
+   "zoo": "alpha101",
+   "theme": [
+    "volume",
+    "momentum"
+   ],
+   "formula_latex": "Ts_Rank(decay_linear(correlation(low, adv10, 7), 6), 4) - Ts_Rank(decay_linear(delta(IndNeutralize(vwap, industry),3),10),15)",
+   "ic_mean": 0.000658,
+   "ic_std": 0.090686,
+   "ir": 0.0073,
+   "ic_positive_ratio": 0.5028,
+   "ic_count": 1611,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_076",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "max(rank(decay_linear(delta(vwap,1),12)), Ts_Rank(decay_linear(Ts_Rank(correlation(IndNeutralize(low, sector), adv81, 8), 20), 17), 19)) * -1",
+   "ic_mean": 0.000525,
+   "ic_std": 0.112185,
+   "ir": 0.0047,
+   "ic_positive_ratio": 0.4972,
+   "ic_count": 1625,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_072",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "rank(decay_linear(correlation((high+low)/2, adv40, 9), 10)) / rank(decay_linear(correlation(Ts_Rank(vwap,4), Ts_Rank(volume,19), 7), 3))",
+   "ic_mean": 0.000324,
+   "ic_std": 0.096309,
+   "ir": 0.0034,
+   "ic_positive_ratio": 0.5041,
+   "ic_count": 1581,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_067",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "(rank(high-ts_min(high,2))^rank(correlation(IndNeutralize(vwap,sector), IndNeutralize(adv20,subindustry), 6))) * -1",
+   "ic_mean": 0.00036,
+   "ic_std": 0.107803,
+   "ir": 0.0033,
+   "ic_positive_ratio": 0.5053,
+   "ic_count": 1613,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_006",
+   "zoo": "alpha101",
+   "theme": [
+    "volume",
+    "reversal"
+   ],
+   "formula_latex": "-1 * correlation(open, volume, 10)",
+   "ic_mean": 0.000136,
+   "ic_std": 0.112584,
+   "ir": 0.0012,
+   "ic_positive_ratio": 0.4957,
+   "ic_count": 1628,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_061",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "rank(vwap - ts_min(vwap,16)) < rank(correlation(vwap, adv180, 18))",
+   "ic_mean": -1.1e-05,
+   "ic_std": 0.110522,
+   "ir": -0.0001,
+   "ic_positive_ratio": 0.4774,
+   "ic_count": 1441,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_093",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "Ts_Rank(decay_linear(correlation(IndNeutralize(vwap, industry), adv81, 17), 20), 8) / rank(decay_linear(delta(0.524*close+0.476*vwap, 3), 16))",
+   "ic_mean": -0.000119,
+   "ic_std": 0.121194,
+   "ir": -0.001,
+   "ic_positive_ratio": 0.4917,
+   "ic_count": 1515,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_092",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "min(Ts_Rank(decay_linear(((high+low)/2 + close < low+open), 15), 19), Ts_Rank(decay_linear(correlation(rank(low), rank(adv30), 8), 7), 7))",
+   "ic_mean": -9.6e-05,
+   "ic_std": 0.080088,
+   "ir": -0.0012,
+   "ic_positive_ratio": 0.4953,
+   "ic_count": 1605,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_058",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "-1 * Ts_Rank(decay_linear(correlation(IndNeutralize(vwap, sector), volume, 4), 8), 6)",
+   "ic_mean": -0.000106,
+   "ic_std": 0.066799,
+   "ir": -0.0016,
+   "ic_positive_ratio": 0.521,
+   "ic_count": 1622,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_096",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "max(Ts_Rank(decay_linear(correlation(rank(vwap), rank(volume), 4), 4), 8), Ts_Rank(decay_linear(Ts_ArgMax(correlation(Ts_Rank(close,7), Ts_Rank(adv60,4), 4), 13), 14), 13)) * -1",
+   "ic_mean": -0.000152,
+   "ic_std": 0.05946,
+   "ir": -0.0026,
+   "ic_positive_ratio": 0.5043,
+   "ic_count": 1624,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_014",
+   "zoo": "alpha101",
+   "theme": [
+    "volume",
+    "momentum"
+   ],
+   "formula_latex": "(-1*rank(delta(returns,3))) * correlation(open, volume, 10)",
+   "ic_mean": -0.00034,
+   "ic_std": 0.110904,
+   "ir": -0.0031,
+   "ic_positive_ratio": 0.4963,
+   "ic_count": 1628,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_074",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "(rank(correlation(close, sum(adv30,37), 15)) < rank(correlation(rank(0.026*high+0.974*vwap), rank(volume), 11))) * -1",
+   "ic_mean": -0.000277,
+   "ic_std": 0.068845,
+   "ir": -0.004,
+   "ic_positive_ratio": 0.5064,
+   "ic_count": 1558,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_088",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "min(rank(decay_linear((rank(open)+rank(low))-(rank(high)+rank(close)),8)), Ts_Rank(decay_linear(correlation(Ts_Rank(close,8),Ts_Rank(adv60,20),8),7),3))",
+   "ic_mean": -0.000893,
+   "ic_std": 0.152825,
+   "ir": -0.0058,
+   "ic_positive_ratio": 0.4883,
+   "ic_count": 1630,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_081",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "(rank(Log(product(rank((rank(correlation(vwap, sum(adv10,50), 8))^4)), 15))) < rank(correlation(rank(vwap), rank(volume), 5))) * -1",
+   "ic_mean": -0.000619,
+   "ic_std": 0.068559,
+   "ir": -0.009,
+   "ic_positive_ratio": 0.509,
+   "ic_count": 1558,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_062",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "(rank(correlation(vwap, sum(adv20,22), 10)) < rank(((rank(open)+rank(open)) < (rank((high+low)/2)+rank(high))))) * -1",
+   "ic_mean": -0.000868,
+   "ic_std": 0.090773,
+   "ir": -0.0096,
+   "ic_positive_ratio": 0.4893,
+   "ic_count": 1588,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_099",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "(rank(correlation(sum((high+low)/2, 20), sum(adv60, 20), 9)) < rank(correlation(low, volume, 6))) * -1",
+   "ic_mean": -0.000868,
+   "ic_std": 0.086817,
+   "ir": -0.01,
+   "ic_positive_ratio": 0.4874,
+   "ic_count": 1551,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_063",
+   "zoo": "alpha101",
+   "theme": [
+    "volume",
+    "momentum"
+   ],
+   "formula_latex": "(rank(decay_linear(delta(IndNeutralize(close, industry), 2), 8)) - rank(decay_linear(correlation(0.318*vwap+0.682*open, sum(adv180,37), 14), 12))) * -1",
+   "ic_mean": -0.001276,
+   "ic_std": 0.107058,
+   "ir": -0.0119,
+   "ic_positive_ratio": 0.4886,
+   "ic_count": 1398,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_095",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "rank(open-ts_min(open,13)) < Ts_Rank((rank(correlation(sum((high+low)/2,19), sum(adv40,19),13))^5), 12)",
+   "ic_mean": -0.001476,
+   "ic_std": 0.091447,
+   "ir": -0.0161,
+   "ic_positive_ratio": 0.4894,
+   "ic_count": 1557,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_073",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "max(rank(decay_linear(delta(vwap,5), 3)), Ts_Rank(decay_linear(-1*(delta(0.147*open+0.853*low,2)/(0.147*open+0.853*low)), 3), 17)) * -1",
+   "ic_mean": -0.002584,
+   "ic_std": 0.146609,
+   "ir": -0.0176,
+   "ic_positive_ratio": 0.4853,
+   "ic_count": 1630,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_065",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "(rank(correlation(0.008*open+0.992*vwap, sum(adv60,9), 6)) < rank(open-ts_min(open,14))) * -1",
+   "ic_mean": -0.002507,
+   "ic_std": 0.110987,
+   "ir": -0.0226,
+   "ic_positive_ratio": 0.4812,
+   "ic_count": 1565,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_048",
+   "zoo": "alpha101",
+   "theme": [
+    "momentum",
+    "volatility"
+   ],
+   "formula_latex": "indneutralize(...subindustry...) / sum((delta(close,1)/delay(close,1))^2, 250)",
+   "ic_mean": -0.002056,
+   "ic_std": 0.076277,
+   "ir": -0.027,
+   "ic_positive_ratio": 0.4978,
+   "ic_count": 1386,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_071",
+   "zoo": "alpha101",
+   "theme": [
+    "volume",
+    "reversal"
+   ],
+   "formula_latex": "max(Ts_Rank(decay_linear(correlation(Ts_Rank(close,3), Ts_Rank(adv180,12), 18), 4), 16), Ts_Rank(decay_linear((rank((low+open)-(2*vwap))^2, 16), 4))",
+   "ic_mean": -0.004029,
+   "ic_std": 0.103589,
+   "ir": -0.0389,
+   "ic_positive_ratio": 0.4861,
+   "ic_count": 1619,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_091",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "(Ts_Rank(decay_linear(decay_linear(correlation(IndNeutralize(close, industry), volume, 10), 16), 4), 5) - rank(decay_linear(correlation(vwap, adv30, 4), 3))) * -1",
+   "ic_mean": -0.003332,
+   "ic_std": 0.081412,
+   "ir": -0.0409,
+   "ic_positive_ratio": 0.4822,
+   "ic_count": 1603,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_078",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "rank(correlation(sum(0.352*low+0.648*vwap, 20), sum(adv40,20), 7))^rank(correlation(rank(vwap), rank(volume), 6))",
+   "ic_mean": -0.003772,
+   "ic_std": 0.08806,
+   "ir": -0.0428,
+   "ic_positive_ratio": 0.4927,
+   "ic_count": 1573,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_098",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "rank(decay_linear(correlation(vwap, sum(adv5,26), 5), 7)) - rank(decay_linear(Ts_Rank(Ts_ArgMin(correlation(rank(open), rank(adv15), 21), 9), 7), 8))",
+   "ic_mean": -0.004342,
+   "ic_std": 0.076265,
+   "ir": -0.0569,
+   "ic_positive_ratio": 0.4753,
+   "ic_count": 1582,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_001",
+   "zoo": "alpha101",
+   "theme": [
+    "reversal",
+    "volatility"
+   ],
+   "formula_latex": "rank(ts_argmax(SignedPower((returns<0)?stddev(returns,20):close, 2.), 5)) - 0.5",
+   "ic_mean": -0.00943,
+   "ic_std": 0.151688,
+   "ir": -0.0622,
+   "ic_positive_ratio": 0.4774,
+   "ic_count": 1613,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_077",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "min(rank(decay_linear((high+low)/2 + high - (vwap+high), 20)), rank(decay_linear(correlation((high+low)/2, adv40, 3), 6)))",
+   "ic_mean": -0.006987,
+   "ic_std": 0.109761,
+   "ir": -0.0637,
+   "ic_positive_ratio": 0.453,
+   "ic_count": 1618,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_101",
+   "zoo": "alpha101",
+   "theme": [
+    "reversal"
+   ],
+   "formula_latex": "(close - open) / ((high - low) + 0.001)",
+   "ic_mean": -0.01117,
+   "ic_std": 0.171908,
+   "ir": -0.065,
+   "ic_positive_ratio": 0.4716,
+   "ic_count": 1637,
+   "category": "dead"
+  },
+  {
+   "id": "alpha101_085",
+   "zoo": "alpha101",
+   "theme": [
+    "volume"
+   ],
+   "formula_latex": "rank(correlation(0.877*high+0.123*close, adv30, 10))^rank(correlation(Ts_Rank((high+low)/2,4), Ts_Rank(volume,10), 7))",
+   "ic_mean": -0.008441,
+   "ic_std": 0.111617,
+   "ir": -0.0756,
+   "ic_positive_ratio": 0.4678,
+   "ic_count": 1599,
+   "category": "dead"
+  }
+ ],
+ "wall_seconds": 486.3,
+ "report_path": "/root/.vibe-trading/reports/alpha_bench_20260712T185639Z.html"
+}
