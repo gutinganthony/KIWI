@@ -37,6 +37,12 @@ Use ~/.claude/skills/gstack/... for gstack file paths (the global path).
 
 新增分析模組時，在 `skills/` 下建新資料夾並寫 SKILL.md，然後在此處加一行載入路徑即可。
 
+## 健身 check-in（Jake 每週五）
+
+當使用者訊息包含「健身 check-in」（通常附三個數字：腰圍 cm、肌力 x/2、9 點後進食次數）：
+讀取 `fitness/checkin-log.md`，依檔內協議記錄本週數據、與上週比較、更新連續紀錄，
+然後 commit + push。滿 8 週（自 2026-07-17 起算）生成驗收報告。
+
 ## Skill routing
 
 When the user's request matches an available skill, invoke it via the Skill tool. When in doubt, invoke the skill.
