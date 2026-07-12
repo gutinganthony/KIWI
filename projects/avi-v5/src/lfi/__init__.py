@@ -86,6 +86,19 @@ def level_of(pctl: float) -> str:
     return "NORMAL"
 
 
+def _trailing_streak(pctl_series: pd.Series, threshold: float) -> int:
+    """從最新一日往回數：LFI 分位連續 >= threshold 的交易日數（含最新日）。
+    最新日就 < threshold → 回傳 0。用於 dashboard「目前在此水位已維持幾天」。"""
+    vals = pctl_series.dropna().values
+    n = 0
+    for v in vals[::-1]:
+        if v >= threshold:
+            n += 1
+        else:
+            break
+    return n
+
+
 def latest_reading(spy, hyg, vvix, vix) -> dict:
     """回傳最新一日 LFI 讀數 dict（供 dashboard payload）。失敗時由呼叫端接例外。"""
     ser = compute_lfi_series(spy, hyg, vvix, vix)
@@ -102,5 +115,9 @@ def latest_reading(spy, hyg, vvix, vix) -> dict:
         "vvix_vix": round(float(last["vvix_vix"]), 3),
         "credit_rel_5d": round(float(last["credit_rel_5d"]) * 100, 2),  # %
         "rising": rising,
+        # 目前水位已連續維持幾個交易日（見頂特徵驗證：≥95 才有一點統計味道）
+        "days_ge_80": _trailing_streak(tail, 80),
+        "days_ge_90": _trailing_streak(tail, 90),
+        "days_ge_95": _trailing_streak(tail, 95),
         "as_of": ser.index[-1].strftime("%Y-%m-%d") if hasattr(ser.index[-1], "strftime") else str(ser.index[-1]),
     }
