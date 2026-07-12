@@ -1,0 +1,36 @@
+name: Agenda Reminder
+
+# 週六進度盯梢（2026-07-12 Jake 授權新增）：解析 AGENDA.md，推播逾期/14天內到期任務、
+# Mac 手動功課積欠數；每月第一個週六附「每月自檢清單」。
+# 排在 weekend-bridge（08:00 TST）之後 15 分鐘，避免同時打 Telegram。
+
+on:
+  schedule:
+    - cron: '15 0 * * 6'  # 週六 08:15 TST (00:15 UTC Sat)
+  workflow_dispatch:
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Send agenda reminder
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python3 scripts/agenda_reminder.py
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python3 projects/avi-v5/scripts/notify_ops.py \
+            --title "❌ KIWI 週六進度盯梢失敗" \
+            --body "agenda_reminder.py 執行失敗（AGENDA.md 格式或通道問題）。查 log。" \
+            --url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true
