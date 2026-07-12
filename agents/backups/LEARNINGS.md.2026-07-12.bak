@@ -15,5 +15,3 @@
 - [2026-07-10] 情境：使用者明確要求回覆語言｜事實：Jake 要求**所有對他的回覆一律用繁體中文**（除非他特別指定其他語言）；工作中曾漂移成英文回覆被糾正｜正解：每個 session 全程繁體中文回覆，程式碼/指令/專有名詞可保留英文｜規則：對使用者的所有訊息以繁體中文撰寫，不得因模型切換或上下文語言而漂移。
 - [2026-07-10] 情境：CI commit-back 把 36MB 的 leaderboard 原始回應整包 commit 進 repo（且每日排程會重複發生）｜錯誤：fetch 落地原始 API 回應前沒檢查大小｜正解：大型原始回應在 CI 工作區就地消化成衍生摘要，版控只收 <1MB 的摘要/報告；已發生的肥 commit 在分支未合併前用 reset+重組提交移除｜規則：任何 CI 會自動 commit 的產物，落地前先估大小；>1MB 就先瘦身再入版控。
 - [2026-07-10] 情境：兩支 CI workflow 各自 commit-back 到同一分支｜錯誤：hyper 掃描跑 14 分鐘期間 poly-shadow 先推了 commit，hyper 的裸 git push 被拒→整份掃描報告隨 runner 回收消失｜正解：所有 commit-back 段在 push 前加 `git pull --rebase origin "${GITHUB_REF_NAME}"`｜規則：多 workflow 寫同分支，commit-back 一律 rebase-then-push。
-- [2026-07-12] 情境：新增 GitHub Actions workflow 檔｜事實：遠端 session 的整合 token **可以**直接 git push 含 .github/workflows/ 新檔的 commit（實證成功，agenda-reminder.yml）；但 cron schedule 只在 default branch 生效｜規則：feature branch 上新增的排程 workflow，要明白提醒使用者「合併 main 才會開始跑」。
-- [2026-07-12] 情境：使用者要求盯進度/新增任務的機制｜事實：已建 AGENDA.md（root）＝使用者任務板，格式 `- [ ] YYYY-MM-DD | 標題 | 摘要`，週六 08:15 TST 由 agenda-reminder.yml 推播；每月第一個週六附自檢清單｜規則：涉及使用者目標/待辦的更新優先寫 AGENDA.md（📌 任務區），不要另建新機制。
