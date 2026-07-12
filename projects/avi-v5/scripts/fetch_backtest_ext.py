@@ -23,11 +23,20 @@ ROOT = Path(__file__).resolve().parent.parent
 EXT = ROOT / "data" / "ext"
 
 TICKERS = {
+    # 大盤/信用/vol（LFI 第四錶 + 領先指標回測用）
     "SPY": "SPY",
     "QQQ": "QQQ",
     "HYG": "HYG",
     "SMH": "SMH",
     "^VVIX": "VVIX",   # extends local VVIX.csv beyond 2025-02
+    "^VIX": "VIX",     # 讓 LFI 用完整 3 年校準（否則受限於 yfinance 2 年窗）
+    # 真實 Serenity 標的（供未來用真標的驗證節流閥/擇時，取代高beta代理籃）
+    "6855.T": "JEM",         # 記憶體探針卡
+    "6315.T": "Towa",        # HBM molding
+    "6525.T": "Kokusai",     # 批次 ALD
+    "6857.T": "Advantest",   # AI/HBM 測試
+    "6777.T": "santec",      # 光通訊測試
+    "8035.T": "TokyoElectron",
 }
 START = "2019-01-01"
 FRESH_SECONDS = 6 * 86400

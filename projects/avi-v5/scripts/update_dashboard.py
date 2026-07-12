@@ -312,6 +312,74 @@ def compute_tsi(yf_data, fred_data):
         return None
 
 
+def _load_ext_series(name):
+    """讀 data/ext/{name}.csv 的收盤序列（資料橋每週更新）。任何失敗回 None。"""
+    try:
+        path = os.path.join(_PROJECT_DIR, "data", "ext", f"{name}.csv")
+        if not os.path.exists(path):
+            return None
+        df = pd.read_csv(path)
+        dc = next((c for c in df.columns if c.lower() == "date"), None)
+        if dc is None:
+            return None
+        df[dc] = pd.to_datetime(df[dc])
+        df = df.set_index(dc).sort_index()
+        for c in ("Adj Close", "Close"):
+            if c in df.columns:
+                return df[c].astype(float)
+        return df.iloc[:, 0].astype(float)
+    except Exception as e:
+        log.warning(f"load ext {name} failed: {e}")
+        return None
+
+
+def _merge_hist(live, ext):
+    """用 data/ext 長歷史補在 live（yfinance 2 年）之前，重疊期以 live 為準（較新）。"""
+    if ext is None or len(ext) == 0:
+        return live
+    if live is None or len(live) == 0:
+        return ext
+    older = ext[ext.index < live.index[0]]
+    return pd.concat([older, live]).sort_index()
+
+
+def compute_lfi(yf_data):
+    """LFI（槓桿融資指標，ACT 第四錶）。回傳 payload dict 或 None（呼叫端降級）。
+
+    優先用 data/ext 的長歷史（~7 年，驗證過的校準）＋ yfinance 的最新尾段；
+    data/ext 缺失時退回純 yfinance 2 年窗（分位數改為「vs 近 2 年」）。
+    """
+    try:
+        from src.lfi import latest_reading
+
+        def close(df):
+            if df is None or df.empty:
+                return None
+            col = "Close" if "Close" in df.columns else df.columns[0]
+            return df[col].astype(float)
+
+        spy = close(yf_data.get("SPY")) if yf_data.get("SPY") is not None else close(yf_data.get("^GSPC"))
+        vix = close(yf_data.get("^VIX"))
+        vvix = close(yf_data.get("^VVIX"))
+        hyg = close(yf_data.get("HYG"))
+        if any(x is None or len(x) < 30 for x in (spy, vix, vvix, hyg)):
+            log.warning("LFI: 缺 SPY/VIX/VVIX/HYG 其一，跳過")
+            return None
+
+        # 用 data/ext 長歷史延伸校準窗（best-effort）
+        spy = _merge_hist(spy, _load_ext_series("SPY"))
+        hyg = _merge_hist(hyg, _load_ext_series("HYG"))
+        vvix = _merge_hist(vvix, _load_ext_series("VVIX"))
+        vix = _merge_hist(vix, _load_ext_series("VIX"))  # VIX ext 若有則升級為長校準
+
+        reading = latest_reading(spy, hyg, vvix, vix)
+        log.info(f"LFI computed: {reading['score']} / {reading['level']} (z={reading['z']})")
+        return reading
+    except Exception as e:
+        log.warning(f"LFI computation failed: {e}", exc_info=True)
+        return None
+
+
 def compute_avi_dimensions(yf_data, fred_data, cape_val):
     """
     Compute approximate AVI V5 dimension percentiles from available data.
@@ -587,7 +655,7 @@ def compute_avi_from_v5():
         return None
 
 
-def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
+def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val, lfi_result=None):
     """Assemble the full JSON payload."""
     # 日期戳用台北時區：GitHub runner 是 UTC，21:00 UTC 跑的時候台北已是隔天早上。
     # 用 UTC 日期會讓台灣使用者覺得「資料是昨天的」。
@@ -678,6 +746,10 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val):
             "bias":       tsi_bias,
             "flash":      tsi_flash,
             "indicators": tsi_inds,
+        },
+        "lfi": lfi_result if lfi_result else {
+            "score": None, "level": "──", "z": None,
+            "vvix_vix": None, "credit_rel_5d": None, "rising": None, "as_of": "",
         },
         "market": {
             "sp500": sp500,
@@ -855,9 +927,10 @@ def main():
     # 2. Compute engines
     cpi_result = compute_cpi(yf_data, fred_data)
     tsi_result = compute_tsi(yf_data, fred_data)
+    lfi_result = compute_lfi(yf_data)
 
     # 3. Build payload
-    payload = build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val)
+    payload = build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val, lfi_result)
 
     log.info("=== Computed Payload ===")
     log.info(f"  AVI  : {payload['avi']['score']:.2f} / {payload['avi']['level']}")
