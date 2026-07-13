@@ -1,0 +1,63 @@
+{
+  "date": "2026-07-13",
+  "address": "0x2005d16a84ceefa912d4e380cd32e7ff827875ea",
+  "caveats": [
+    "⚠️ 誠實聲明：本工具只測「進場價劣化與延遲」，**不測完整損益**（出場價與市場結局未知），",
+    "不能由本資料推論跟單能否獲利。本工具不執行任何交易：不下單、不簽章、無私鑰，",
+    "只對公開 read-only 端點發 HTTP GET。detect_lag 受輪詢間隔下限影響——真 bot 可用",
+    "websocket 更快，故本測值是實際可達延遲的**上界**。不構成投資建議。",
+    "⚠️ 時鐘註記：activity 的 timestamp 是鏈上/伺服器時間，本機（runner）時鐘可能有偏移，",
+    "detect_lag 可能含 ±數秒的系統時鐘差，數值請當量級參考、不要當精確值。"
+  ],
+  "sessions": [
+    {
+      "address": "0x2005d16a84ceefa912d4e380cd32e7ff827875ea",
+      "session_stamp": "20260713T001508Z",
+      "date": "2026-07-13",
+      "started_utc": "2026-07-13T00:15:08+00:00",
+      "duration_min": 40.0,
+      "poll_sec": 4.0,
+      "polls": 587,
+      "activity_failures": 0,
+      "book_failures": 0,
+      "baseline_seeded": 40,
+      "jsonl_file": "session_20260713T001508Z.jsonl",
+      "stats": {
+        "n_detected": 0,
+        "n_book_ok": 0,
+        "n_book_unavailable": 0,
+        "detect_lag_sec": {
+          "median": null,
+          "p90": null,
+          "n": 0
+        },
+        "adverse_drift": {
+          "BUY": {
+            "median": null,
+            "p90": null,
+            "n": 0
+          },
+          "SELL": {
+            "median": null,
+            "p90": null,
+            "n": 0
+          }
+        },
+        "spread": {
+          "median": null,
+          "n": 0
+        },
+        "depth_at_best_usd": {
+          "median": null,
+          "n": 0
+        },
+        "fixed_copy_usd": 50.0,
+        "fillable_at_best_ratio": null,
+        "fillable_at_best_counts": {
+          "fillable": 0,
+          "with_depth": 0
+        }
+      }
+    }
+  ]
+}
