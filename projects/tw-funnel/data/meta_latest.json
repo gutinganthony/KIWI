@@ -1,15 +1,15 @@
 {
- "generated_at": "2026-07-11T10:46:10Z",
+ "generated_at": "2026-07-13T12:23:51Z",
  "market": "TW",
  "pipeline": "tw-funnel",
- "as_of_trading_day": "2026-07-09",
+ "as_of_trading_day": "2026-07-13",
  "endpoint_health": {
   "finmind_stock_info": {
    "ok": true,
    "status": 200,
    "source": "finmind",
    "dataset": "TaiwanStockInfo",
-   "rows": 4276
+   "rows": 4277
   },
   "finmind_institutional": {
    "ok": false,
@@ -45,8 +45,8 @@
    "ok": true,
    "source": "finmind",
    "dataset": "TaiwanStockMonthRevenue",
-   "pool": 43,
-   "fetched": 42,
+   "pool": 58,
+   "fetched": 55,
    "errors": 0
   },
   "company_basic": {
@@ -72,15 +72,12 @@
   }
  },
  "funnel_stats": {
-  "raw_filings": 320,
-  "qualified_events": 27,
-  "post_veto": 0,
-  "final_candidates": 0
+  "raw_filings": 213,
+  "qualified_events": 34,
+  "post_veto": 34,
+  "final_candidates": 15
  },
- "veto_reasons": {
-  "turnover_unknown": 26,
-  "punish_list": 1
- },
+ "veto_reasons": {},
  "january_window_active": false,
  "degradations": [
   "pledge_data_unavailable: 董監質押比取數失敗/欄位不符，質押否決不生效",
@@ -90,9 +87,7 @@
   "tpex_otc_not_wired: v0 只做上市（TWSE），上櫃 TPEx 未接線",
   "director_transfer_not_wired: 董監申讓申報無 OpenAPI dataset（MOPS 無官方 API），否決關卡此項未接線"
  ],
- "warnings": [
-  "funnel_starved: 否決後候選 0 < 10（設計文件§3：考慮放寬資格關卡、靠評分消化）"
- ],
+ "warnings": [],
  "notes": [
   "純唯讀觀察，無下單；不構成投資建議",
   "組合條件（投信買超×營收動能）唯一公開回測為 FinLab 樣本內 +33.9%/yr、MDD -45.5%——期望值不可直接引用，Phase 2 需 walk-forward 樣本外驗證"
