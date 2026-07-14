@@ -265,3 +265,7 @@
 2. [02-aviation-hotel-gifting.md](./2026-07-14-graziat-b2b-appendix/02-aviation-hotel-gifting.md) — 航空/飯店/企業禮贈品B2B研究
 3. [03-b2b-b2c-ratio.md](./2026-07-14-graziat-b2b-appendix/03-b2b-b2c-ratio.md) — B2B vs B2C收入比重研究
 4. [04-other-demand-sources.md](./2026-07-14-graziat-b2b-appendix/04-other-demand-sources.md) — 其他B2B需求來源研究（代工、政府標案、批發平台等）
+
+### 對外版行動指南（可直接轉傳）
+
+[`./assets/graziat-b2b-action-guide/graziat-b2b-action-guide.pdf`](./assets/graziat-b2b-action-guide/graziat-b2b-action-guide.pdf)（來源 markdown 同資料夾）——2026-07-14 產出的 13 頁對外版：已抹去委託脈絡與對品牌的主觀描述，品牌現況全部改以公開媒體聲量（The Shoe Snob／Permanent Style／Styleforum／ETtoday）與可查證缺口呈現，行動清單置前，適合直接給品牌方或第三方閱讀。
