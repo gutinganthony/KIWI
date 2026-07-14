@@ -15,6 +15,7 @@
 
 - [ ] 2026-07-13 | 安裝 llm-council-skill | Mac 本機裝 gcpdev/llm-council-skill（步驟＋安全提醒詳 mac-manual-homework.md；send_later 主動推播本 session 排不了，這是第二層保險）
 - [ ] 2026-07-19 | JEM 手動功課 | TDnet 7/3–7/6 清單＋FY3/26 有報客戶表＋Yahoo 收盤複核（首批 1/3 執行前必做，詳 mac-manual-homework）
+- [ ] 2026-07-19 | Graziat B2B 報告轉交 | 報告在 topics/business/2026-07-14-graziat-leather-b2b-opportunities.md：轉給朋友＋約一次對焦，先挑 2–3 管道起手（交屋禮貿易商／企業客製／歐美品牌代工）
 - [ ] 2026-07-26 | 出場手冊 v1 | 每筆持倉的減倉條件全部綁訊號（M1 結論：綁訊號執行率 100%、不綁 0%）
 - [ ] 2026-07-26 | FinMind token | 註冊 finmindtrade.com → repo Secrets `FINMIND_TOKEN`（台股漏斗主源解鎖）
 - [ ] 2026-08-07 | JEM Q1 裁判日 | 事前寫好「結果 X → 動作 Y」預案；指引未上修＝sandbag 失效
@@ -27,6 +28,7 @@
 - 組合去集中化：AI/半導體以外部位 ≥1 檔（90 天計畫第 7–10 週）
 - `docs/SERETINY_STOCK_PICKING.md` 從空模板變成自己的方法論（≥1,500 字，含「我什麼時候會錯」）
 - 2027 記憶體減倉（T1）：出場手冊完成後，把減倉綁上機械訊號＋條件單
+- Graziat（朋友的手工皮鞋品牌）穩定 B2B 客源鏈：研究報告 ✅ 2026-07-14 → 轉交對焦 → 2–3 管道試打 → 首張 pilot 訂單 → 集中度守門（單一客戶 ≤25% 營收）
 
 ## 🗓 每月自檢清單（每月第一個週六隨提醒附上；出自 topics/other/2026-07-12-decision-quality-self-audit.md §D2）
 
@@ -48,3 +50,4 @@
 
 ## Update Log
 - 2026-07-12 v1.0：建檔（週六 bot＋任務格式慣例＋seed 六任務四目標＋每月自檢清單）。
+- 2026-07-14：新增 Graziat B2B 任務＋目標（研究報告落地 topics/business/2026-07-14-graziat-leather-b2b-opportunities.md）。

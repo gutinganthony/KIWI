@@ -53,6 +53,11 @@ last_updated: 2026-07-06
 ### 2026-07-07 session 產生的（AXW/AIR TRF 研究）
 - [ ] **AIR TRF 真實利差序列建檔（文獻查證：DataMine 有免費日檔！）**：註冊 CME DataMine → 拉 AIR TRF 免費 CSV（欄位 `DLY_FUND` FID#10335、`ACC_FUND` #10337）→ 建歷史序列存進 `projects/avi-v5/data/ext/air_trf.csv` → 跑與 `lev_stress_proxy` 的相關性（報告 §8 否證 ②）。備用免費儀表板：snippet.finance「S&P 500 Futures Financing」（2012 迄今）。每週順手記一次 CME 產品頁的近月 bps 與分位數。
 
+### 2026-07-14 session 產生的（Graziat B2B 客源研究——雲端 WebFetch 403，以下需人工開頁核對）
+- [ ] **開 https://graziat.com/ 與 https://www.graziat.com/index_en.php**：確認官網是否真的癱瘓（雲端直測 403、搜尋快照顯示「維護中」4 年以上）。若屬實，這就是報告裡「零號工程＝官網復活」的證據，轉交朋友時一併說。
+- [ ] **核對 B2B 入口原頁**（雲端只拿到搜尋快照）：worldtravelcateringexpo.com 參展頁、expo2026.apex.aero/exhibitors、wessco.net/contact（整合商，自述在台灣有代工廠關係）、starlux-airlines.com Partnership 頁、evacsr.com 供應鏈頁。
+- [ ] （轉交朋友後才做）**faire.com/brands 實跑一次申請流程**確認台灣賣家現況；**web.pcc.gov.tw 原站**查「皮鞋」決標紀錄（雲端靠民間鏡像 pcc.mlwmlw.org 代查，原站需人工）。
+
 ---
 
 ## ✅ 已完成（做完從上面移下來，保留紀錄）

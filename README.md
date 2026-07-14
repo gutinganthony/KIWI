@@ -18,7 +18,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |-------|---------|
 | [Technology](./topics/technology/INDEX.md) | 2 |
 | [Science](./topics/science/INDEX.md) | 0 |
-| [Business](./topics/business/INDEX.md) | 55 |
+| [Business](./topics/business/INDEX.md) | 56 |
 | [Health](./topics/health/INDEX.md) | 0 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Other](./topics/other/INDEX.md) | 1 |
@@ -32,6 +32,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-07-14 | [Graziat 皮件 B2B 客源開發地圖——四份研究彙整報告](./topics/business/2026-07-14-graziat-leather-b2b-opportunities.md) | Business |
 | 2026-07-14 | [「Future Economy」九層圖譜 — 推文解讀 × Serenity 對照 × 瓶頸遷移時間軸](./topics/business/2026-07-14-future-economy-nine-layer-map.md) | Business |
 | 2026-07-14 | [反向資訊悖論 — Nadella 論 AI 時代的企業知識主權](./topics/business/2026-07-14-nadella-reverse-information-paradox.md) | Business |
 | 2026-07-14 | [像量化交易台一樣做模擬 — MC/粒子濾波/copula 尾部相依](./topics/business/2026-07-14-quant-desk-simulation-stack.md) | Business |
@@ -41,7 +42,6 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-07-10 | [股票慢訊號價值評估 — 13F / Form 4 / 台股籌碼](./topics/business/2026-07-10-stock-slow-signal-value-assessment.md) | Business |
 | 2026-07-10 | [跟單聰明錢觀察器 — Polymarket + Hyperliquid 跨平台實證結論](./topics/business/2026-07-10-copy-trading-smart-money-observer-findings.md) | Business |
 | 2026-07-10 | [Polymarket 跟單「月賺5萬美金」文查證 — 導流漏斗解剖 + 可行性評估](./topics/business/2026-07-10-polymarket-copy-trading-guide-verification.md) | Business |
-| 2026-07-09 | [Serenity Step 1–9：Coherent + Marvell（AAOI 換倉候選）](./topics/business/2026-07-09-serenity-step1-9-cohr-mrvl-aaoi-replacement.md) | Business |
 <!-- RECENT_ENTRIES_END -->
 
 ---
@@ -67,6 +67,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-07-14 | [反向資訊悖論 — Nadella 論 AI 時代的企業知識主權](./topics/business/2026-07-14-nadella-reverse-information-paradox.md) | Business |
 | 2026-07-14 | [像量化交易台一樣做模擬 — MC/粒子濾波/copula 尾部相依](./topics/business/2026-07-14-quant-desk-simulation-stack.md) | Business |
 | 2026-07-14 | [「Future Economy」九層圖譜 — 推文解讀 × Serenity 對照 × 瓶頸遷移時間軸](./topics/business/2026-07-14-future-economy-nine-layer-map.md) | Business |
+| 2026-07-14 | [Graziat 皮件 B2B 客源開發地圖——四份研究彙整報告](./topics/business/2026-07-14-graziat-leather-b2b-opportunities.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
