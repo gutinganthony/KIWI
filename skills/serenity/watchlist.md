@@ -242,7 +242,13 @@
 | **MRVL**（Nasdaq）| 光學 DSP 雙頭 ~70%（最深護城河）+ 自訂 ASIC（弱二哥）| fwd ~60×（=AVGO 2 倍）、trailing 84× | 回 **$175–195**；🔴盯微軟 Maia 是否被 Broadcom 搶走、Amazon 集中度 |
 | **AVGO**（Nasdaq，比較用）| 交換器矽 + 自訂 ASIC >70% + CPO 領導（更強一哥）| fwd ~32×（MRVL 一半）、AI 營收 9 倍 | 若換倉目標＝互連矽，風險報酬可能優於 MRVL |
 
-### GHM — 框架不適用
+### 🆕 Future Economy 圖譜候選（2026-07-14 新增，**待第一關**——下次週報跑 gate-1）
+> 來源與完整推演見 `topics/business/2026-07-14-future-economy-nine-layer-map.md`。九層圖上唯二值得進漏斗的名字；其餘（ASTS/EOSE/AMPG/UAMY 等）判定為故事股/微型股促銷，不開檔案。
+
+| 標的 | 假設卡口 | 第一關要驗什麼 |
+|---|---|---|
+| **AMBA**（Nasdaq）| edge 視覺 SoC（實體 AI 第二階段 2028-31 的感測瓶頸候選；CV flow 低功耗推論護城河？）| 市值 vs $2B 門檻（超框→轉品質+循環軌）、edge AI 營收占比與成長、競爭格局（vs 高通/NVIDIA Orin 蠶食）、稀釋/內部人 |
+| **GLW**（NYSE）| CPO 玻璃基板＋光纖（呼應 roadmap 玻璃基板線；「光的基板」層）| 大型股必超框→走**週期擇時大型股**軌（比照 COHR/MRVL 格式）：光通訊/enterprise 部門營收占比是否夠大到驅動整體、估值 vs 歷史、AI 相關 backlog |
 - 零 AI 供應鏈文件連結、法人持股 81%（>40% 門檻）、trailing P/E ~77×
 - 海軍瓶頸真實，但屬於另一個框架（國防供應鏈）
 
