@@ -1,74 +1,82 @@
 {
  "fetch": {
-  "ran_at": "2026-07-11T11:47:40.700595+00:00",
+  "ran_at": "2026-07-14T05:45:00.165591+00:00",
   "days_scanned": 7,
   "days_fetched": 0,
-  "days_skipped_cached": 5,
+  "days_skipped_cached": 4,
   "raw_filings": 0,
   "parse_failed": 0,
   "requests_ok": 0,
-  "requests_failed": 2,
-  "elapsed_sec": 80.6,
+  "requests_failed": 3,
+  "elapsed_sec": 121.1,
   "endpoint_health": [
+   {
+    "name": "daily-index 2026-07-14",
+    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260714.idx",
+    "ok": false,
+    "status": 403,
+    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
+    "elapsed_sec": 40.21
+   },
+   {
+    "name": "daily-index 2026-07-13",
+    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260713.idx",
+    "ok": false,
+    "status": 403,
+    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
+    "elapsed_sec": 40.25
+   },
    {
     "name": "daily-index 2026-07-10",
     "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260710.idx",
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.14
-   },
-   {
-    "name": "daily-index 2026-07-03",
-    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260703.idx",
-    "ok": false,
-    "status": 403,
-    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.13
+    "elapsed_sec": 40.16
    }
   ],
   "errors": [
-   "2026-07-10 索引抓取失敗（status=403）",
-   "2026-07-03 索引抓取失敗（status=403）"
+   "2026-07-14 索引抓取失敗（status=403）",
+   "2026-07-13 索引抓取失敗（status=403）",
+   "2026-07-10 索引抓取失敗（status=403）"
   ]
  },
- "updated_at": "2026-07-11T11:56:34.452987+00:00",
+ "updated_at": "2026-07-14T05:54:33.922655+00:00",
  "funnel": {
-  "ran_at": "2026-07-11T11:56:07.183255+00:00",
-  "days_loaded": 4,
+  "ran_at": "2026-07-14T05:54:05.378709+00:00",
+  "days_loaded": 3,
   "funnel_stats": {
-   "raw_filings": 4822,
-   "qualified_events": 18,
+   "raw_filings": 2357,
+   "qualified_events": 15,
    "post_veto": 6,
    "final_candidates": 6
   },
   "veto_counts": {
    "penny": 0,
-   "sell_offset": 1,
-   "illiquid": 3,
+   "sell_offset": 0,
+   "illiquid": 2,
    "fund_issuer": 4,
-   "routine_wave": 4
+   "routine_wave": 3
   },
   "skipped_checks": [
    "liquidity:VII"
   ],
-  "requests_ok": 19,
+  "requests_ok": 17,
   "requests_failed": 18,
   "price_source_stats": {
    "stooq": {
     "ok": 0,
-    "failed": 10
+    "failed": 9
    },
    "yahoo": {
-    "ok": 9,
+    "ok": 8,
     "failed": 1
    }
   },
   "price_sources": {
-   "YPF": "yahoo",
-   "PFBX": "yahoo",
    "JCTC": "yahoo",
    "HTO": "yahoo",
+   "BOLD": "yahoo",
    "EWSB": "yahoo",
    "VII": "none",
    "ENR": "yahoo",
@@ -81,7 +89,7 @@
    "yahoo": 0,
    "none": 6
   },
-  "elapsed_sec": 425.7,
+  "elapsed_sec": 424.0,
   "endpoint_health": [
    {
     "name": "yahoo VII",
@@ -89,31 +97,7 @@
     "ok": false,
     "status": 404,
     "error": "HTTP 404",
-    "elapsed_sec": 0.07
-   },
-   {
-    "name": "company-concept 904851 dei/EntityCommonStockSharesOutstanding",
-    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0000904851/dei/EntityCommonStockSharesOutstanding.json",
-    "ok": false,
-    "status": 403,
-    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.19
-   },
-   {
-    "name": "company-concept 904851 us-gaap/CommonStockSharesOutstanding",
-    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0000904851/us-gaap/CommonStockSharesOutstanding.json",
-    "ok": false,
-    "status": 403,
-    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.17
-   },
-   {
-    "name": "company-facts 904851",
-    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0000904851/us-gaap/CommonStockSharesOutstanding.json",
-    "ok": false,
-    "status": null,
-    "error": "所有 concept 皆失敗或缺 units.shares（mcap → None 保守分級）",
-    "elapsed_sec": null
+    "elapsed_sec": 0.06
    },
    {
     "name": "company-concept 766829 dei/EntityCommonStockSharesOutstanding",
@@ -121,7 +105,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.13
+    "elapsed_sec": 40.22
    },
    {
     "name": "company-concept 766829 us-gaap/CommonStockSharesOutstanding",
@@ -129,11 +113,35 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.21
+    "elapsed_sec": 40.17
    },
    {
     "name": "company-facts 766829",
     "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0000766829/us-gaap/CommonStockSharesOutstanding.json",
+    "ok": false,
+    "status": null,
+    "error": "所有 concept 皆失敗或缺 units.shares（mcap → None 保守分級）",
+    "elapsed_sec": null
+   },
+   {
+    "name": "company-concept 1782303 dei/EntityCommonStockSharesOutstanding",
+    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0001782303/dei/EntityCommonStockSharesOutstanding.json",
+    "ok": false,
+    "status": 403,
+    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
+    "elapsed_sec": 40.11
+   },
+   {
+    "name": "company-concept 1782303 us-gaap/CommonStockSharesOutstanding",
+    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0001782303/us-gaap/CommonStockSharesOutstanding.json",
+    "ok": false,
+    "status": 403,
+    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
+    "elapsed_sec": 40.13
+   },
+   {
+    "name": "company-facts 1782303",
+    "url": "https://data.sec.gov/api/xbrl/companyconcept/CIK0001782303/us-gaap/CommonStockSharesOutstanding.json",
     "ok": false,
     "status": null,
     "error": "所有 concept 皆失敗或缺 units.shares（mcap → None 保守分級）",
@@ -145,7 +153,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.18
+    "elapsed_sec": 40.27
    },
    {
     "name": "company-concept 1632790 us-gaap/CommonStockSharesOutstanding",
@@ -153,7 +161,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.12
+    "elapsed_sec": 40.11
    },
    {
     "name": "company-facts 1632790",
@@ -169,7 +177,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.12
+    "elapsed_sec": 40.13
    },
    {
     "name": "company-concept 1385849 us-gaap/CommonStockSharesOutstanding",
@@ -177,7 +185,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.19
+    "elapsed_sec": 40.18
    },
    {
     "name": "company-facts 1385849",
@@ -193,7 +201,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.11
+    "elapsed_sec": 40.13
    },
    {
     "name": "company-concept 1702924 us-gaap/CommonStockSharesOutstanding",
@@ -212,20 +220,20 @@
     "elapsed_sec": null
    },
    {
-    "name": "yahoo-quotesummary YPF",
-    "url": "https://query1.finance.yahoo.com/v10/finance/quoteSummary/YPF?modules=price",
-    "ok": false,
-    "status": 401,
-    "error": "HTTP 401; body={\"finance\":{\"result\":null,\"error\":{\"code\":\"Unauthorized\",\"description\":\"Invalid Crumb\"}}}",
-    "elapsed_sec": 0.07
-   },
-   {
     "name": "yahoo-quotesummary HTO",
     "url": "https://query1.finance.yahoo.com/v10/finance/quoteSummary/HTO?modules=price",
     "ok": false,
     "status": 401,
     "error": "HTTP 401; body={\"finance\":{\"result\":null,\"error\":{\"code\":\"Unauthorized\",\"description\":\"Invalid Crumb\"}}}",
     "elapsed_sec": 0.06
+   },
+   {
+    "name": "yahoo-quotesummary BOLD",
+    "url": "https://query1.finance.yahoo.com/v10/finance/quoteSummary/BOLD?modules=price",
+    "ok": false,
+    "status": 401,
+    "error": "HTTP 401; body={\"finance\":{\"result\":null,\"error\":{\"code\":\"Unauthorized\",\"description\":\"Invalid Crumb\"}}}",
+    "elapsed_sec": 0.09
    },
    {
     "name": "yahoo-quotesummary VII",
@@ -249,7 +257,7 @@
     "ok": false,
     "status": 401,
     "error": "HTTP 401; body={\"finance\":{\"result\":null,\"error\":{\"code\":\"Unauthorized\",\"description\":\"Invalid Crumb\"}}}",
-    "elapsed_sec": 0.08
+    "elapsed_sec": 0.06
    },
    {
     "name": "yahoo-quotesummary WRAP",
@@ -261,18 +269,17 @@
    },
    {
     "name": "yahoo-quote batch x6",
-    "url": "https://query1.finance.yahoo.com/v7/finance/quote?symbols=YPF,HTO,VII,ENR,UUUU,WRAP",
+    "url": "https://query1.finance.yahoo.com/v7/finance/quote?symbols=HTO,BOLD,VII,ENR,UUUU,WRAP",
     "ok": false,
     "status": 401,
     "error": "HTTP 401; body={\"finance\":{\"result\":null,\"error\":{\"code\":\"Unauthorized\",\"description\":\"User is unable to access this feature - https://bit.ly/yahoo-finance-api-feedback\"}}}",
-    "elapsed_sec": 0.11
+    "elapsed_sec": 0.06
    }
   ],
   "errors": [
-   "stooq YPF: 回應非有效 CSV（No data？）",
-   "stooq PFBX: 回應非有效 CSV（No data？）",
    "stooq JCTC: 回應非有效 CSV（No data？）",
    "stooq HTO: 回應非有效 CSV（No data？）",
+   "stooq BOLD: 回應非有效 CSV（No data？）",
    "stooq EWSB: 回應非有效 CSV（No data？）",
    "stooq VII: 回應非有效 CSV（No data？）",
    "stooq ENR: 回應非有效 CSV（No data？）",
@@ -282,20 +289,20 @@
   ]
  },
  "tracking": {
-  "ran_at": "2026-07-11T11:56:34.452787+00:00",
-  "positions_total": 15,
-  "positions_new": 0,
-  "positions_updated": 12,
+  "ran_at": "2026-07-14T05:54:33.922412+00:00",
+  "positions_total": 16,
+  "positions_new": 1,
+  "positions_updated": 13,
   "price_failed": 3,
-  "requests_ok": 28,
+  "requests_ok": 30,
   "requests_failed": 2,
   "price_source_stats": {
    "stooq": {
     "ok": 0,
-    "failed": 15
+    "failed": 16
    },
    "yahoo": {
-    "ok": 12,
+    "ok": 13,
     "failed": 3
    }
   },
@@ -314,9 +321,10 @@
    "JCTC": "yahoo",
    "PFBX": "yahoo",
    "WRAP": "yahoo",
-   "SWZ": "yahoo"
+   "SWZ": "yahoo",
+   "BOLD": "yahoo"
   },
-  "elapsed_sec": 27.1,
+  "elapsed_sec": 28.4,
   "endpoint_health": [
    {
     "name": "yahoo VII",
@@ -351,7 +359,8 @@
    "stooq JCTC: 回應非有效 CSV（No data？）",
    "stooq PFBX: 回應非有效 CSV（No data？）",
    "stooq WRAP: 回應非有效 CSV（No data？）",
-   "stooq SWZ: 回應非有效 CSV（No data？）"
+   "stooq SWZ: 回應非有效 CSV（No data？）",
+   "stooq BOLD: 回應非有效 CSV（No data？）"
   ]
  }
 }
