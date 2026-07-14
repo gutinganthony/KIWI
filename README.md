@@ -18,7 +18,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |-------|---------|
 | [Technology](./topics/technology/INDEX.md) | 2 |
 | [Science](./topics/science/INDEX.md) | 0 |
-| [Business](./topics/business/INDEX.md) | 50 |
+| [Business](./topics/business/INDEX.md) | 54 |
 | [Health](./topics/health/INDEX.md) | 0 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Other](./topics/other/INDEX.md) | 0 |
@@ -32,14 +32,14 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-07-14 | [反向資訊悖論 — Nadella 論 AI 時代的企業知識主權](./topics/business/2026-07-14-nadella-reverse-information-paradox.md) | Business |
+| 2026-07-14 | [像量化交易台一樣做模擬 — MC/粒子濾波/copula 尾部相依](./topics/business/2026-07-14-quant-desk-simulation-stack.md) | Business |
+| 2026-07-12 | [ACT 第四錶 LFI 完整說明 + 四錶判讀指南 + 節流閥驗證](./topics/business/2026-07-12-act-fourth-meter-lfi-and-serenity-throttle-validation.md) | Business |
 | 2026-07-10 | [台股／美股慢訊號篩選漏斗設計 — 三層架構](./topics/business/2026-07-10-us-tw-signal-funnel-design.md) | Business |
 | 2026-07-10 | [股票慢訊號價值評估 — 13F / Form 4 / 台股籌碼](./topics/business/2026-07-10-stock-slow-signal-value-assessment.md) | Business |
 | 2026-07-10 | [跟單聰明錢觀察器 — Polymarket + Hyperliquid 跨平台實證結論](./topics/business/2026-07-10-copy-trading-smart-money-observer-findings.md) | Business |
 | 2026-07-10 | [Polymarket 跟單「月賺5萬美金」文查證 — 導流漏斗解剖 + 可行性評估](./topics/business/2026-07-10-polymarket-copy-trading-guide-verification.md) | Business |
 | 2026-07-09 | [Serenity Step 1–9：Coherent + Marvell（AAOI 換倉候選）](./topics/business/2026-07-09-serenity-step1-9-cohr-mrvl-aaoi-replacement.md) | Business |
-| 2026-06-03 | [Redefine Fund — Jake × Vince 共同基金專案](./topics/business/2026-06-03-redefine-fund-project.md) | Business |
-| 2026-06-02 | [AI 投資研究副駕駛 — 可測試假設 + 客戶訪談訪綱](./topics/business/2026-06-02-ai-investment-copilot-hypothesis.md) | Business |
-| 2026-05-29 | [Serenity Chokepoint 三市場隱藏壟斷供應商掃描](./topics/business/2026-05-29-serenity-chokepoint-three-market-scan.md) | Business |
 <!-- RECENT_ENTRIES_END -->
 
 ---
@@ -61,6 +61,8 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-04-20 | [AVI V4 — 美股市場風險指標](./topics/business/2026-04-20-avi-v4-market-risk-index.md) | Business |
 | 2026-07-09 | [Serenity Step 1–9：Coherent + Marvell（AAOI 換倉候選）](./topics/business/2026-07-09-serenity-step1-9-cohr-mrvl-aaoi-replacement.md) | Business |
 | 2026-07-10 | [Polymarket 跟單「月賺5萬美金」文查證 — 導流漏斗解剖 + 可行性評估](./topics/business/2026-07-10-polymarket-copy-trading-guide-verification.md) | Business |
+| 2026-07-14 | [反向資訊悖論 — Nadella 論 AI 時代的企業知識主權](./topics/business/2026-07-14-nadella-reverse-information-paradox.md) | Business |
+| 2026-07-14 | [像量化交易台一樣做模擬 — MC/粒子濾波/copula 尾部相依](./topics/business/2026-07-14-quant-desk-simulation-stack.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
