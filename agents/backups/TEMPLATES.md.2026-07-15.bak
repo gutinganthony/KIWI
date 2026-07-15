@@ -96,8 +96,6 @@ projects/avi-v5/backtest/signals.py，權重定義在 projects/avi-v5/config/avi
 ```
 受驗產出：【檔案路徑或 diff 範圍】。
 產出目標的一句話描述：【它應該做到什麼】。
-唯讀約束：你的審查是唯讀的——不得改動任何檔案，也不得動 git index/HEAD/branch。
-要看別的 revision 用 `git worktree add /tmp/review-<SHA>`，絕不移動 HEAD。發現問題只回報。
 （注意：不要附上產出者的推理過程或你期望的結論——讓審查者獨立判斷。）
 
 驗收條件（逐條判定 通過/不通過/無法驗證）：
@@ -106,10 +104,8 @@ projects/avi-v5/backtest/signals.py，權重定義在 projects/avi-v5/config/avi
 3.【…每條都要具體到審查者知道「怎麼查」】
 
 回報格式（≤20 行）：
-總判定：可交付？是／否（擋交付項 N 個）／修 N 項後可交付。
+總判定：通過／不通過（N 條未過）／部分無法驗證。
 逐條：條件 → 判定 — 證據（檔案:行號 或 指令輸出 ≤2 行）。
-問題分級（每項附 檔案:行號＋錯在哪／為何重要／怎麼修）：
-  Critical（擋交付，必修）／Important（該修）／Minor（可延後）；某級別沒有就寫「無」。
 未涵蓋風險：驗收條件沒問到但你注意到的問題（≤3 條）。
 ```
 

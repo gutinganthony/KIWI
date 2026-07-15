@@ -22,8 +22,6 @@
 
 互不相依的派工，**在同一則訊息一次全發**（多個 Agent 呼叫並列），讓它們並行。
 已派出去的搜尋不要自己再做一遍。
-**並行僅限互相獨立的問題域**（不同檔案/子系統、無 shared state）：唯讀搜尋/研究可放心並行；
-但**會寫到同一批檔案的實作或 applier subagent 必須串行**——兩個同時改同檔會互相覆蓋。
 
 ## §2 可用兵力（本環境實測，2026-07-07）
 
@@ -58,11 +56,6 @@
 2. **驗收條件**：可核對的清單，逐條寫。「做好」「高品質」不是驗收條件；
    「pytest 全過」「回報含 檔案:行號」「每個數字附來源」才是。
 3. **回報格式**：明確規定回什麼、多長、什麼結構。
-
-**輸入端衛生（和 §4 產出交接對稱）**：一個 dispatch 只描述「這一個子任務」，不是 session 的歷史。
-派工 prompt 只放這個子任務要用的事實與 `檔案:行號`，不要把累積的前置摘要、對話歷史、其他任務的脈絡
-整段貼進去。大量既有內容（現成報告、長資料）走檔案交接——寫成檔、prompt 只給路徑。
-（反例：見過 42k 字的派工 prompt，九成是貼上的 session 歷史——那會直接汙染被派 agent 的 context。）
 
 **壞派工**：「幫我看看 avi-v5 的訊號邏輯有沒有問題」
 **好派工**：「目標：找出 projects/avi-v5/backtest/signals.py 中訊號計算與
@@ -160,11 +153,6 @@ jq -r '(.d | index("2026-07-01")) as $i
 | 內容品質／正確性 | 派 fresh-context verifier：給它驗收條件清單，不給你的結論，讓它獨立核對 |
 | 程式碼 | 實跑驗證。**avi-v5 沒有可用的 pytest 套件**（tests/test_cpi_validation.py 是直接執行的驗證腳本，pytest 只會誤收一個名叫 test_event 的 helper 函式）。驗證配方（已實跑驗證）：`cd projects/avi-v5 && pip install -q --user -r requirements.txt`（首次需要，系統 python 沒裝依賴；直接 pip install 會撞 debian 套件衝突，必須 --user）→ `python3 tests/test_cpi_validation.py`（碰過 CPI/訊號邏輯時）＋實跑你改動的腳本。「驗證過」的唯一證據是貼出的執行輸出，不是推測 |
 | 高風險判斷（投資結論、刪除、對外發布、改 workflows） | 第二意見：派一個 opus agent，prompt 明說「找出這個結論錯的理由」（對抗立場）；或生 3 個獨立答案、派評審比對選優。二選一，不可跳過 |
-
-**驗收員唯讀鐵律**：任何驗收/審查 subagent 對受驗 checkout 是**唯讀**的——不得改動任何檔案，
-也不得動 git index/HEAD/branch。要比對別的 revision 用 `git worktree add /tmp/review-<SHA>`，絕不移動 HEAD。
-自訂 verifier agent 已內建此約束（.claude/agents/verifier.md rule 5）；**但退回用 general-purpose 當驗收員時
-（T5 模板路徑），那個 agent 帶完整寫入權，必須在 prompt 裡明講唯讀**，否則它可能手滑改壞受驗物、讓驗收失去獨立性。
 
 verifier 的 prompt 只給：驗收條件、受驗檔案路徑、回報格式。
 **不要**把你的推理過程或期望結論塞給它——那會把它變成橡皮圖章。
