@@ -20,7 +20,7 @@
 
 | 檔期 | 內容 | 狀態與素材 |
 |------|------|-----------|
-| **7 月中（CPI 落地後）** | **W6 三週對帳正篇**（儀表板四燈重讀＋CPI＋韓國熔斷外溢；⚠️台積電除息=9/16 非本週，Fed=7月底，原三關架構已重整） | 劇本：`drafts/2026-W6_signal-tracking-playbook.md`（見 7/14 架構重整節）。capitalcycle〈灰色地帶〉入 CPI/Fed 段 |
+| **7/16（週四晚）** | **W6「恐慌週遇上裁判週」**：CPI 3.5% 大降溫＋台積電法說（7/16 14:00，AI 需求證人）＋三週試單對帳＋韓國熔斷快檢 | 劇本：`drafts/2026-W6_signal-tracking-playbook.md`（7/15 定版）。等法說會結果＋台股四燈數據即可成稿 |
 | **W8** | **1999 持倉指南**（泡沫裡的人怎麼活），吸收「AI broke the cycle?」命題 | 研究檔：`research/bubble-1999-survival-research.md`（Robertson 20 天、三種策略下場）。缺：Nasdaq 200 日線回測（我可寫 Python 算） |
 | **W9** | **國安基金九場戰役** | 研究檔：`research/nsf-nine-battles-research.md`（出手線 -25%~-44%、唯一敗仗）。缺：第 1–3 役精確指數 TWSE 核實 |
 | **W10** | **「輝達之外，錢正在流向誰」ASIC 定制晶片** | ✅ Jake 拍板。素材：Kenji Marvell 10 倍股三部曲＋BI 報告（ASIC 份額 2030 至 45–50%、GPU+ASIC 出貨 800 萬→2,800 萬顆、台積電 AI 訂單占比 90%+）。動工前需做定制晶片賽道研究（博通/Marvell/世芯/創意） |
