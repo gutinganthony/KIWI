@@ -64,9 +64,6 @@ for i, (name, v0, v1, note, c) in enumerate(rows):
     if i < 3:
         axL.plot([0, 10], [y - 0.54, y - 0.54], color=LGRID, lw=0.7)
 
-axL.text(0, -0.06, "判斷驗收：兩盞燈＝可試單 ✓（恐慌自極端區退回，三、四盞的世代大底沒有來）",
-         transform=axL.transAxes, color=INK, fontsize=10, fontproperties=serif_b, va='top')
-
 # ══ 右欄：台積電證詞 ══
 axR = fig.add_axes([0.575, 0.14, 0.39, 0.63])
 axR.set_facecolor(BG)
@@ -88,10 +85,6 @@ for i, (big, small) in enumerate(stats):
     axR.text(0.0, y - 0.45, small, ha='left', va='center', color=INK, fontsize=10)
     if i < 2:
         axR.plot([0, 1], [y - 0.72, y - 0.72], color=LGRID, lw=0.7)
-
-axR.text(0, -0.06, "韓國吵「供給過剩」的三天後：\n恐慌是用喊的，證據是用錢投的。",
-         transform=axR.transAxes, color=INK, fontsize=10.5,
-         fontproperties=serif_b, va='top', linespacing=1.7)
 
 fig.text(0.052, 0.045,
          "資料來源：TWSE／期交所／WantGoo（16/07/26 收盤，融資維持率為 Jake 提供讀數）、台積電法說會（16/07/26）、BLS（美國 6 月 CPI 3.5%）。\n"
