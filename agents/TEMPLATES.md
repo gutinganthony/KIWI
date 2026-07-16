@@ -75,6 +75,8 @@ projects/avi-v5/backtest/signals.py，權重定義在 projects/avi-v5/config/avi
 ```
 研究問題：【一句話，可回答的形式，不要開放式「了解一下」】。
 動機：【答案會被拿去做什麼決定】。
+工具白名單（研究 session repo scope 外的 GitHub repo 時**必寫**）：只准 WebSearch／WebFetch，
+禁用 mcp__github__* 搜尋類工具，避免 subagent 跨 scope 查詢。
 來源要求：優先【官方文件/財報/一手來源】；每個關鍵事實附 網址＋查詢日期；
 社群貼文與轉述當線索不當證據。網頁瀏覽用 /browse 或 WebFetch。
 截止思考：查不到的就標「查無」，禁止用訓練記憶補財務數字或日期。
