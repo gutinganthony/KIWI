@@ -39,7 +39,7 @@ axL = fig.add_axes([0.055, 0.14, 0.46, 0.63])
 axL.set_facecolor(BG)
 axL.set_title("成績單一：三週前說「可以試單」，對帳", loc='left',
               color=INK, fontsize=12.5, fontproperties=serif_b, pad=40)
-axL.text(0, 1.055, "6/26（試單日）→ 7/16（今天）", transform=axL.transAxes,
+axL.text(0, 1.055, "6/26（試單日）→ 7/16（週四收盤）", transform=axL.transAxes,
          color=GREY, fontsize=9.5)
 axL.set_xlim(0, 10)
 axL.set_ylim(0, 4.6)
@@ -47,9 +47,9 @@ axL.axis('off')
 
 rows = [
     ("加權指數",   "44,571.76", "45,624.98", "+2.4%，盤中低點未破 6/26", GREEN),
-    ("VIXTWN",     "44.27",     "34.74",     "恐慌大退潮",               GREEN),
+    ("VIXTWN",     "44.27",     "34.74",     "自極端區回落，仍在恐慌區（>30）", SLATE),
     ("外資單日賣超", ">1,700 億", "483 億",   "還在賣，力道剩 1/3",       SLATE),
-    ("融資維持率", "174.57%",   "182.88%",   "散戶層更穩",               GREEN),
+    ("融資維持率", "174.57%",   "182.88%",   "離斷頭區（130–140%）更遠", SLATE),
 ]
 for i, (name, v0, v1, note, c) in enumerate(rows):
     y = 4.0 - i * 1.08
@@ -64,7 +64,7 @@ for i, (name, v0, v1, note, c) in enumerate(rows):
     if i < 3:
         axL.plot([0, 10], [y - 0.54, y - 0.54], color=LGRID, lw=0.7)
 
-axL.text(0, -0.06, "判斷驗收：兩盞燈＝可試單 ✓（恐慌燈自己退了，三、四盞的世代大底沒有來）",
+axL.text(0, -0.06, "判斷驗收：兩盞燈＝可試單 ✓（恐慌自極端區退回，三、四盞的世代大底沒有來）",
          transform=axL.transAxes, color=INK, fontsize=10, fontproperties=serif_b, va='top')
 
 # ══ 右欄：台積電證詞 ══
