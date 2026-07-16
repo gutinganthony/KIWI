@@ -41,6 +41,11 @@ last_updated: 2026-07-06
 ### 2026-07-12 session 產生的（llm-council-skill 評估）
 - [ ] **安裝 gcpdev/llm-council-skill 到 Mac 本機 Claude Code**（雲端跑不了：容器 proxy 會擋 OpenAI/Gemini 的 API 呼叫）。雲端已做背景查證：作者可信（萊比錫大學語意網研究者）、334★、MIT 授權、無安全疑慮紀錄，但程式碼本身**未逐行審查**（`add_repo` 核准流程本 session 沒跑通）。步驟：clone repo → 把 `llm-council/` 資料夾放進 `~/.claude/skills/` → `.env` 填 `OPENAI_API_KEY`/`GEMINI_API_KEY` → 裝之前先看一眼 `scripts/query_llms.py` 確認只打 OpenAI/Google 官方端點、沒有第三方轉發。用法：對話裡打「Consult the council: ＜問題＞」。**⚠️ 只拿它問技術/通用問題，別把 KIWI 持倉、部位、fund 細節餵給它**——內容會送到 OpenAI 和 Google。ChatGPT 本來就是 council 兩席之一，免額外設定。
 
+### 2026-07-16 session 產生的（幫朋友代管資金研究——僅在你決定要做時才需核對）
+- [ ] **核對 Bitget 託管子帳戶門檻**（bitget.com/support 被雲端擋）：「>50,000 USDT 或 VIP2 可申請委託交易員、投資人保留出入金權、無建立費」——這是唯一個人可行的正式代管路徑，數字全來自搜尋摘要未直接核對。
+- [ ] **核對 Binance/Bybit/Bitget 帶單門檻與台灣可用性**（官網全被雲端擋；OKX 已直接核對免查）：Binance 合約帶單 1,000 USDT＋服務清單含台灣；Bybit 100 USDT＋Pro 版台灣可用性；Bitget 帶單台灣可用性（查無官方證據）。待核頁面清單見 `topics/business/2026-07-16-crypto-managed-trading-research/research_copytrading.md` 附錄。
+- [ ] **（決定行動前必做）law.moj.gov.tw 核對法條原文**：銀行法 5-1/29/29-1/125（雲端僅 GitHub 鏡像間接核對）、《虛擬資產服務法》三讀條文與總統公布日、期交法 §3/§112——法規線報告所有判決字號皆為轉述，引用前須 law.judicial.gov.tw 複核。＋諮詢熟悉虛擬資產的執業律師。
+
 ### 2026-07-11 session 產生的（台股漏斗數據源）
 - [ ] **註冊 FinMind 免費帳號取得 API token**（finmindtrade.com）→ 放進 GitHub repo Settings → Secrets → `FINMIND_TOKEN`。無 token 時台股管線走 TWSE 次源可運作；FinMind 主源（更穩、可歷史回補）的全市場查詢需 token 解鎖（匿名層回 400）。
 - [ ] （低優先）雲端 WebFetch 被 403 擋的站 +1：`stockanalysis.com`（TSM 估值頁）。雲端已用 WebSearch 摘要繞過，僅在需要精確 P/B 等單一指標時在 Mac 上手動查。

@@ -18,7 +18,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |-------|---------|
 | [Technology](./topics/technology/INDEX.md) | 2 |
 | [Science](./topics/science/INDEX.md) | 0 |
-| [Business](./topics/business/INDEX.md) | 55 |
+| [Business](./topics/business/INDEX.md) | 56 |
 | [Health](./topics/health/INDEX.md) | 0 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Other](./topics/other/INDEX.md) | 1 |
@@ -32,6 +32,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-07-16 | [幫朋友代管資金 × 加密交易所託管服務 — 路徑/資格/成本/台灣法律紅線](./topics/business/2026-07-16-crypto-exchange-managed-trading-for-friend.md) | Business |
 | 2026-07-14 | [「Future Economy」九層圖譜 — 推文解讀 × Serenity 對照 × 瓶頸遷移時間軸](./topics/business/2026-07-14-future-economy-nine-layer-map.md) | Business |
 | 2026-07-14 | [反向資訊悖論 — Nadella 論 AI 時代的企業知識主權](./topics/business/2026-07-14-nadella-reverse-information-paradox.md) | Business |
 | 2026-07-14 | [像量化交易台一樣做模擬 — MC/粒子濾波/copula 尾部相依](./topics/business/2026-07-14-quant-desk-simulation-stack.md) | Business |
@@ -67,6 +68,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-07-14 | [反向資訊悖論 — Nadella 論 AI 時代的企業知識主權](./topics/business/2026-07-14-nadella-reverse-information-paradox.md) | Business |
 | 2026-07-14 | [像量化交易台一樣做模擬 — MC/粒子濾波/copula 尾部相依](./topics/business/2026-07-14-quant-desk-simulation-stack.md) | Business |
 | 2026-07-14 | [「Future Economy」九層圖譜 — 推文解讀 × Serenity 對照 × 瓶頸遷移時間軸](./topics/business/2026-07-14-future-economy-nine-layer-map.md) | Business |
+| 2026-07-16 | [幫朋友代管資金 × 加密交易所託管服務 — 路徑/資格/成本/台灣法律紅線](./topics/business/2026-07-16-crypto-exchange-managed-trading-for-friend.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
