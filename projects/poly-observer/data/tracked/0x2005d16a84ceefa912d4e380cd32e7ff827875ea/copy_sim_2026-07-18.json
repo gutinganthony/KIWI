@@ -1,0 +1,135 @@
+{
+  "address": "0x2005d16a84ceefa912d4e380cd32e7ff827875ea",
+  "snapshot_date": "2026-07-18",
+  "bankroll": 10000.0,
+  "reliable": false,
+  "unreliable_reasons": [
+    "activity 截斷且視窗僅 1 小時 < 72 小時",
+    "結算-only 市場 8 遠多於完整 round-trip 7，幽靈利潤主導",
+    "重建 PnL 與 pnl 曲線同窗變動落差超容忍",
+    "結算事件全為贏家（輸家不產生 REDEEM），重建已實現 PnL 為上界、不可信"
+  ],
+  "coverage": {
+    "first_date": "2026-07-18",
+    "last_date": "2026-07-18",
+    "n_events": 1500,
+    "n_trades": 1415,
+    "n_redeems": 15,
+    "window_hours": 0.75,
+    "trades_per_hour": 1885.27,
+    "n_markets_roundtrip": 7,
+    "n_markets_settle_only": 8,
+    "n_markets_open_only": 39,
+    "losing_redeem_count": 0,
+    "activity_truncated": true
+  },
+  "wallet_window": {
+    "cost": 101427.51,
+    "recovered": 144396.57,
+    "realized_pnl": 42969.06,
+    "realized_is_upper_bound": true,
+    "roi": 0.4236,
+    "curve_delta": 90382.0,
+    "curve_divergence_warning": "重建已實現 PnL $42,969 與曲線同窗變動 $90,382 落差 $47,413，超出容忍；可能因開倉未結算部位、部分平倉或 REDEEM 未涵蓋，解讀從嚴。",
+    "excluded_settle_only_proceeds": 31027.84
+  },
+  "matrix": {
+    "optimistic": {
+      "fixed": {
+        "scenario": "optimistic",
+        "mode": "fixed",
+        "friction_per_side": 0.03,
+        "follower_net_pnl": 19714.9,
+        "follower_invested": 2650.0,
+        "follower_roi": 7.4396,
+        "avg_friction_per_trade": 3.3547,
+        "missed_buys": 1215,
+        "copied_buys": 200,
+        "n_markets_copied": 3,
+        "win_rate": 1.0,
+        "capture_rate": 17.561,
+        "capture_biased": true
+      },
+      "proportional": {
+        "scenario": "optimistic",
+        "mode": "proportional",
+        "friction_per_side": 0.03,
+        "follower_net_pnl": 3126.7,
+        "follower_invested": 1400.0,
+        "follower_roi": 2.2334,
+        "avg_friction_per_trade": 2.716,
+        "missed_buys": 1365,
+        "copied_buys": 50,
+        "n_markets_copied": 1,
+        "win_rate": 1.0,
+        "capture_rate": 5.272,
+        "capture_biased": true
+      }
+    },
+    "realistic": {
+      "fixed": {
+        "scenario": "realistic",
+        "mode": "fixed",
+        "friction_per_side": 0.06,
+        "follower_net_pnl": 19084.17,
+        "follower_invested": 2650.0,
+        "follower_roi": 7.2016,
+        "avg_friction_per_trade": 6.5084,
+        "missed_buys": 1215,
+        "copied_buys": 200,
+        "n_markets_copied": 3,
+        "win_rate": 1.0,
+        "capture_rate": 16.999,
+        "capture_biased": true
+      },
+      "proportional": {
+        "scenario": "realistic",
+        "mode": "proportional",
+        "friction_per_side": 0.06,
+        "follower_net_pnl": 2998.59,
+        "follower_invested": 1400.0,
+        "follower_roi": 2.1418,
+        "avg_friction_per_trade": 5.2783,
+        "missed_buys": 1365,
+        "copied_buys": 50,
+        "n_markets_copied": 1,
+        "win_rate": 1.0,
+        "capture_rate": 5.056,
+        "capture_biased": true
+      }
+    },
+    "pessimistic": {
+      "fixed": {
+        "scenario": "pessimistic",
+        "mode": "fixed",
+        "friction_per_side": 0.09,
+        "follower_net_pnl": 18504.39,
+        "follower_invested": 2650.0,
+        "follower_roi": 6.9828,
+        "avg_friction_per_trade": 9.4073,
+        "missed_buys": 1215,
+        "copied_buys": 200,
+        "n_markets_copied": 3,
+        "win_rate": 1.0,
+        "capture_rate": 16.483,
+        "capture_biased": true
+      },
+      "proportional": {
+        "scenario": "pessimistic",
+        "mode": "proportional",
+        "friction_per_side": 0.09,
+        "follower_net_pnl": 2877.53,
+        "follower_invested": 1400.0,
+        "follower_roi": 2.0554,
+        "avg_friction_per_trade": 7.6995,
+        "missed_buys": 1365,
+        "copied_buys": 50,
+        "n_markets_copied": 1,
+        "win_rate": 1.0,
+        "capture_rate": 4.852,
+        "capture_biased": true
+      }
+    }
+  },
+  "raw_source": "snapshot"
+}
