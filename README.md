@@ -18,7 +18,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |-------|---------|
 | [Technology](./topics/technology/INDEX.md) | 2 |
 | [Science](./topics/science/INDEX.md) | 0 |
-| [Business](./topics/business/INDEX.md) | 56 |
+| [Business](./topics/business/INDEX.md) | 57 |
 | [Health](./topics/health/INDEX.md) | 0 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Other](./topics/other/INDEX.md) | 2 |
@@ -32,6 +32,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-07-21 | [被動元件×記憶體 7 月重挫解剖 — 一台機器的 de-rate 與持倉 read-through](./topics/business/2026-07-21-passives-memory-selloff-analysis.md) | Business |
 | 2026-07-16 | [人生設計書 — 45 歲前一億台幣的三引擎路線](./topics/other/2026-07-16-life-design-100m-by-45.md) | Other |
 | 2026-07-16 | [幫朋友代管資金 × 加密交易所託管服務 — 路徑/資格/成本/台灣法律紅線](./topics/business/2026-07-16-crypto-exchange-managed-trading-for-friend.md) | Business |
 | 2026-07-14 | [「Future Economy」九層圖譜 — 推文解讀 × Serenity 對照 × 瓶頸遷移時間軸](./topics/business/2026-07-14-future-economy-nine-layer-map.md) | Business |
@@ -71,6 +72,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-07-14 | [「Future Economy」九層圖譜 — 推文解讀 × Serenity 對照 × 瓶頸遷移時間軸](./topics/business/2026-07-14-future-economy-nine-layer-map.md) | Business |
 | 2026-07-16 | [幫朋友代管資金 × 加密交易所託管服務 — 路徑/資格/成本/台灣法律紅線](./topics/business/2026-07-16-crypto-exchange-managed-trading-for-friend.md) | Business |
 | 2026-07-16 | [人生設計書 — 45 歲前一億台幣的三引擎路線](./topics/other/2026-07-16-life-design-100m-by-45.md) | Other |
+| 2026-07-21 | [被動元件×記憶體 7 月重挫解剖 — 一台機器的 de-rate 與持倉 read-through](./topics/business/2026-07-21-passives-memory-selloff-analysis.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
