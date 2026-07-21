@@ -1,0 +1,269 @@
+{
+  "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+  "label": "scan-best-candidate-9M-lowdd",
+  "snapshot_date": "2026-07-21",
+  "classification": "consistent_winner",
+  "classification_reasons": [
+    "活動跨度 370.0 天 >= 60",
+    "總 PnL 9508326.3 > 10,000",
+    "回撤 0.0554 < 40% peak",
+    "目前槓桿 None <= 20x",
+    "正月比率 0.692 >= 0.5",
+    "（fills 截斷 n>=2000，profit factor 2.185 樣本偏誤大，僅供低信心參考，不硬否決）"
+  ],
+  "followable": {
+    "ok": true,
+    "reasons": []
+  },
+  "metrics": {
+    "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+    "snapshot_date": "2026-07-21",
+    "pnl_source": "portfolio_curve",
+    "portfolio_window": "perpAllTime",
+    "low_confidence": false,
+    "total_pnl": 9508326.3,
+    "peak_pnl": 9746829.92,
+    "monthly_pnl": {
+      "2025-07": -73180.55,
+      "2025-08": -34288.37,
+      "2025-09": -8212.34,
+      "2025-10": 1435708.48,
+      "2025-11": 2045437.87,
+      "2025-12": 930544.52,
+      "2026-01": 638177.85,
+      "2026-02": 519822.91,
+      "2026-03": 1413004.59,
+      "2026-04": 1924051.99,
+      "2026-05": 106203.52,
+      "2026-06": -143411.3,
+      "2026-07": 754467.14
+    },
+    "active_months": 13,
+    "positive_month_ratio": 0.692,
+    "best_month_pnl": 2045437.87,
+    "max_drawdown_pct": 0.0554,
+    "current_drawdown_pct": 0.0245,
+    "max_single_day_crash_pct": 0.0331,
+    "span_days": 370.0,
+    "days_idle": 0.0,
+    "n_fills": 2000,
+    "profit_factor": 2.185,
+    "avg_win": 480.26,
+    "avg_loss": 293.9,
+    "realized_win_rate": 0.572,
+    "avg_hold_hours": 76.733,
+    "net_direction_ratio": 0.0622,
+    "n_fills_truncated": true,
+    "n_fills_last_30d": 2000,
+    "n_events": 43,
+    "n_events_last_30d": 43,
+    "n_events_last_30d_est": 90,
+    "events_30d_coverage_days": 14.3,
+    "median_fills_per_event": 17,
+    "median_event_notional": 83391.18,
+    "median_gap_between_events_hours": 1.39,
+    "p90_gap_between_events_hours": 23.96,
+    "had_liquidation": false,
+    "n_liquidations": 0,
+    "top_coin": "xyz:SNDK",
+    "vlm": 282554116.36,
+    "vlm_to_pnl_ratio": 29.72,
+    "funding_total": -185627.43,
+    "n_open_positions": 0,
+    "current_max_leverage": null,
+    "has_extreme_leverage": false,
+    "margin_types": [],
+    "account_value": 0.0,
+    "fetch_errors": []
+  },
+  "position_value": 0,
+  "unrealized_pnl": 0,
+  "n_open_positions": 0,
+  "open_positions": [],
+  "recent_fills": [
+    {
+      "time": "2026-07-21T06:49:20.491000+00:00",
+      "coin": "xyz:SNDK",
+      "dir": "Close Long",
+      "px": 1476.9,
+      "sz": 1.801,
+      "closed_pnl": 5.22,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-21T06:49:20.491000+00:00",
+      "coin": "xyz:SNDK",
+      "dir": "Close Long",
+      "px": 1476.9,
+      "sz": 0.113,
+      "closed_pnl": 0.33,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-21T06:49:20.491000+00:00",
+      "coin": "xyz:SNDK",
+      "dir": "Close Long",
+      "px": 1476.9,
+      "sz": 1.0,
+      "closed_pnl": 2.9,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-21T06:49:20.491000+00:00",
+      "coin": "xyz:SNDK",
+      "dir": "Close Long",
+      "px": 1476.9,
+      "sz": 0.992,
+      "closed_pnl": 2.88,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-21T06:49:20.491000+00:00",
+      "coin": "xyz:SNDK",
+      "dir": "Close Long",
+      "px": 1476.9,
+      "sz": 0.141,
+      "closed_pnl": 0.41,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-21T06:49:20.491000+00:00",
+      "coin": "xyz:SNDK",
+      "dir": "Close Long",
+      "px": 1476.9,
+      "sz": 0.079,
+      "closed_pnl": 0.23,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-21T06:49:20.491000+00:00",
+      "coin": "xyz:SNDK",
+      "dir": "Close Long",
+      "px": 1476.9,
+      "sz": 1.005,
+      "closed_pnl": 2.91,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-21T06:49:20.491000+00:00",
+      "coin": "xyz:SNDK",
+      "dir": "Close Long",
+      "px": 1476.9,
+      "sz": 0.583,
+      "closed_pnl": 1.69,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-21T06:49:20.491000+00:00",
+      "coin": "xyz:SNDK",
+      "dir": "Close Long",
+      "px": 1476.9,
+      "sz": 0.335,
+      "closed_pnl": 0.97,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-21T06:49:20.491000+00:00",
+      "coin": "xyz:SNDK",
+      "dir": "Close Long",
+      "px": 1476.9,
+      "sz": 0.445,
+      "closed_pnl": 1.29,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-21T06:49:20.491000+00:00",
+      "coin": "xyz:SNDK",
+      "dir": "Close Long",
+      "px": 1476.9,
+      "sz": 0.086,
+      "closed_pnl": 0.25,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-21T06:49:20.491000+00:00",
+      "coin": "xyz:SNDK",
+      "dir": "Close Long",
+      "px": 1476.9,
+      "sz": 0.723,
+      "closed_pnl": 2.1,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-21T06:49:20.491000+00:00",
+      "coin": "xyz:SNDK",
+      "dir": "Close Long",
+      "px": 1476.9,
+      "sz": 1.945,
+      "closed_pnl": 5.64,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-21T06:49:20.491000+00:00",
+      "coin": "xyz:SNDK",
+      "dir": "Close Long",
+      "px": 1476.9,
+      "sz": 0.076,
+      "closed_pnl": 0.22,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-21T06:49:20.491000+00:00",
+      "coin": "xyz:SNDK",
+      "dir": "Close Long",
+      "px": 1476.9,
+      "sz": 0.125,
+      "closed_pnl": 0.36,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-21T06:49:20.491000+00:00",
+      "coin": "xyz:SNDK",
+      "dir": "Close Long",
+      "px": 1476.9,
+      "sz": 0.66,
+      "closed_pnl": 1.91,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-21T06:49:20.491000+00:00",
+      "coin": "xyz:SNDK",
+      "dir": "Close Long",
+      "px": 1476.9,
+      "sz": 0.207,
+      "closed_pnl": 0.6,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-21T06:49:20.491000+00:00",
+      "coin": "xyz:SNDK",
+      "dir": "Close Long",
+      "px": 1476.9,
+      "sz": 0.115,
+      "closed_pnl": 0.33,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-21T06:49:20.560000+00:00",
+      "coin": "xyz:SNDK",
+      "dir": "Close Long",
+      "px": 1476.9,
+      "sz": 11.366,
+      "closed_pnl": 32.96,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-21T06:49:20.560000+00:00",
+      "coin": "xyz:SNDK",
+      "dir": "Close Long",
+      "px": 1476.9,
+      "sz": 0.078,
+      "closed_pnl": 0.23,
+      "is_liquidation": false
+    }
+  ],
+  "new_positions": [],
+  "disappeared_positions": [],
+  "initialized": false,
+  "raw_source": "snapshot"
+}
