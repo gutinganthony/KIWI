@@ -18,7 +18,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |-------|---------|
 | [Technology](./topics/technology/INDEX.md) | 2 |
 | [Science](./topics/science/INDEX.md) | 0 |
-| [Business](./topics/business/INDEX.md) | 59 |
+| [Business](./topics/business/INDEX.md) | 60 |
 | [Health](./topics/health/INDEX.md) | 0 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Other](./topics/other/INDEX.md) | 2 |
@@ -32,6 +32,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-07-22 | [Clip 遊戲題材機會掃描 × 商業框架的創業延伸](./topics/business/2026-07-22-clip-game-theme-scan-and-startup-lens.md) | Business |
 | 2026-07-22 | [MECCHA CHAMELEON 商業模式全解剖 — 2 人團隊 25 天 1,500 萬套的鏡像案例](./topics/business/2026-07-22-meccha-chameleon-business-model-analysis.md) | Business |
 | 2026-07-22 | [Last War: Survival 商業模式全解剖 — 「空虛遊戲」為何是印鈔機 × 可複製性評估](./topics/business/2026-07-22-last-war-business-model-analysis.md) | Business |
 | 2026-07-21 | [被動元件×記憶體 7 月重挫解剖 — 一台機器的 de-rate 與持倉 read-through](./topics/business/2026-07-21-passives-memory-selloff-analysis.md) | Business |
@@ -44,7 +45,6 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-07-12 | [ACT 第四錶 LFI 完整說明 + 四錶判讀指南 + 節流閥驗證](./topics/business/2026-07-12-act-fourth-meter-lfi-and-serenity-throttle-validation.md) | Business |
 | 2026-07-10 | [台股／美股慢訊號篩選漏斗設計 — 三層架構](./topics/business/2026-07-10-us-tw-signal-funnel-design.md) | Business |
 | 2026-07-10 | [股票慢訊號價值評估 — 13F / Form 4 / 台股籌碼](./topics/business/2026-07-10-stock-slow-signal-value-assessment.md) | Business |
-| 2026-07-10 | [跟單聰明錢觀察器 — Polymarket + Hyperliquid 跨平台實證結論](./topics/business/2026-07-10-copy-trading-smart-money-observer-findings.md) | Business |
 <!-- RECENT_ENTRIES_END -->
 
 ---
@@ -75,6 +75,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-07-21 | [被動元件×記憶體 7 月重挫解剖 — 一台機器的 de-rate 與持倉 read-through](./topics/business/2026-07-21-passives-memory-selloff-analysis.md) | Business |
 | 2026-07-22 | [Last War: Survival 商業模式全解剖 — 「空虛遊戲」為何是印鈔機 × 可複製性評估](./topics/business/2026-07-22-last-war-business-model-analysis.md) | Business |
 | 2026-07-22 | [MECCHA CHAMELEON 商業模式全解剖 — 2 人團隊 25 天 1,500 萬套的鏡像案例](./topics/business/2026-07-22-meccha-chameleon-business-model-analysis.md) | Business |
+| 2026-07-22 | [Clip 遊戲題材機會掃描 × 商業框架的創業延伸](./topics/business/2026-07-22-clip-game-theme-scan-and-startup-lens.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
