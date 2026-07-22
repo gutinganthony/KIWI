@@ -46,6 +46,13 @@ last_updated: 2026-07-06
 - [ ] **核對 Binance/Bybit/Bitget 帶單門檻與台灣可用性**（官網全被雲端擋；OKX 已直接核對免查）：Binance 合約帶單 1,000 USDT＋服務清單含台灣；Bybit 100 USDT＋Pro 版台灣可用性；Bitget 帶單台灣可用性（查無官方證據）。待核頁面清單見 `topics/business/2026-07-16-crypto-managed-trading-research/research_copytrading.md` 附錄。
 - [ ] **（決定行動前必做）law.moj.gov.tw 核對法條原文**：銀行法 5-1/29/29-1/125（雲端僅 GitHub 鏡像間接核對）、《虛擬資產服務法》三讀條文與總統公布日、期交法 §3/§112——法規線報告所有判決字號皆為轉述，引用前須 law.judicial.gov.tw 複核。＋諮詢熟悉虛擬資產的執業律師。
 
+### 2026-07-22 session 產生的（Serenity 週報查無 live、需盤中複核的價）
+> 雲端 WebSearch 對數檔查無本週 live（財經站 403 或 snippet 過時），週報已依鐵律維持上週值並標 [推測]/[推論]；下輪盤中或在 Mac 上補 live 定稿即可，非急迫。
+- [ ] **Seikoh 6834 現價複核（最要緊）**：kabutan/Yahoo!ファイナンス 時系列查 7/22 收盤。研究 agent 浮出「6 月 ¥30,750–31,100」與上週 ¥22,140 嚴重衝突，週報研判前者為回檔前過時回聲、維持 ¥22,140——但這檔是 🟢 <¥24,000 觸發，價位真偽直接影響觸發判定，優先複核。
+- [ ] **Towa 6315 / Yamaichi 6941 / MEC 4971 / 東京精密 7729 補 7/22 live**：本輪查無（Towa 浮出 7/9 ¥2,993、MEC 僅 7/14 ¥8,720 皆非 live），維持上週值。
+- [ ] **Intekplus 064290 讀數裁決**：兩源衝突（₩16,750 vs ₩9,760），維持上週 ₩16,750 待確認正確者。
+- [ ] **群翊 6664 七月營收**（8 月初公布後）：查 TWSE/Goodinfo 月營收 YoY，否證線＝連兩月 <10%（5 月 +7.92% 已 <10%，若 7 月再 <10% 且 6 月被推翻則觸發）。
+
 ### 2026-07-11 session 產生的（台股漏斗數據源）
 - [ ] **註冊 FinMind 免費帳號取得 API token**（finmindtrade.com）→ 放進 GitHub repo Settings → Secrets → `FINMIND_TOKEN`。無 token 時台股管線走 TWSE 次源可運作；FinMind 主源（更穩、可歷史回補）的全市場查詢需 token 解鎖（匿名層回 400）。
 - [ ] （低優先）雲端 WebFetch 被 403 擋的站 +1：`stockanalysis.com`（TSM 估值頁）。雲端已用 WebSearch 摘要繞過，僅在需要精確 P/B 等單一指標時在 Mac 上手動查。
