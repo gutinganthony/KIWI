@@ -1,22 +1,30 @@
 {
  "fetch": {
-  "ran_at": "2026-07-21T06:10:44.430523+00:00",
-  "days_scanned": 7,
+  "ran_at": "2026-07-22T06:09:11.257196+00:00",
+  "days_scanned": 8,
   "days_fetched": 0,
   "days_skipped_cached": 0,
   "raw_filings": 0,
   "parse_failed": 0,
   "requests_ok": 0,
-  "requests_failed": 7,
-  "elapsed_sec": 282.0,
+  "requests_failed": 8,
+  "elapsed_sec": 323.1,
   "endpoint_health": [
+   {
+    "name": "daily-index 2026-07-22",
+    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260722.idx",
+    "ok": false,
+    "status": 403,
+    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
+    "elapsed_sec": 40.25
+   },
    {
     "name": "daily-index 2026-07-21",
     "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260721.idx",
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.15
+    "elapsed_sec": 40.18
    },
    {
     "name": "daily-index 2026-07-20",
@@ -24,7 +32,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.12
+    "elapsed_sec": 40.21
    },
    {
     "name": "daily-index 2026-07-17",
@@ -32,7 +40,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.13
+    "elapsed_sec": 40.56
    },
    {
     "name": "daily-index 2026-07-16",
@@ -40,7 +48,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.13
+    "elapsed_sec": 40.19
    },
    {
     "name": "daily-index 2026-07-15",
@@ -48,7 +56,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.15
+    "elapsed_sec": 40.17
    },
    {
     "name": "daily-index 2026-07-14",
@@ -56,7 +64,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.13
+    "elapsed_sec": 40.18
    },
    {
     "name": "daily-index 2026-07-13",
@@ -64,10 +72,11 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.14
+    "elapsed_sec": 40.19
    }
   ],
   "errors": [
+   "2026-07-22 索引抓取失敗（status=403）",
    "2026-07-21 索引抓取失敗（status=403）",
    "2026-07-20 索引抓取失敗（status=403）",
    "2026-07-17 索引抓取失敗（status=403）",
@@ -77,9 +86,9 @@
    "2026-07-13 索引抓取失敗（status=403）"
   ]
  },
- "updated_at": "2026-07-21T06:15:56.385107+00:00",
+ "updated_at": "2026-07-22T06:15:05.356509+00:00",
  "funnel": {
-  "ran_at": "2026-07-21T06:15:26.609698+00:00",
+  "ran_at": "2026-07-22T06:14:34.536072+00:00",
   "days_loaded": 0,
   "funnel_stats": {
    "raw_filings": 0,
@@ -118,11 +127,11 @@
   "errors": []
  },
  "tracking": {
-  "ran_at": "2026-07-21T06:15:56.384954+00:00",
+  "ran_at": "2026-07-22T06:15:05.356290+00:00",
   "positions_total": 16,
   "positions_new": 0,
-  "positions_updated": 13,
-  "price_failed": 3,
+  "positions_updated": 14,
+  "price_failed": 2,
   "requests_ok": 32,
   "requests_failed": 0,
   "price_source_stats": {
@@ -131,8 +140,8 @@
     "failed": 16
    },
    "yahoo": {
-    "ok": 13,
-    "failed": 3
+    "ok": 14,
+    "failed": 2
    }
   },
   "price_sources": {
@@ -144,7 +153,7 @@
    "YPF": "yahoo",
    "TURB": "yahoo",
    "VFLEX": "yahoo",
-   "BBASX": "none",
+   "BBASX": "yahoo",
    "FTECX": "none",
    "HTO": "yahoo",
    "JCTC": "yahoo",
@@ -153,7 +162,7 @@
    "SWZ": "yahoo",
    "BOLD": "yahoo"
   },
-  "elapsed_sec": 29.6,
+  "elapsed_sec": 30.7,
   "endpoint_health": [],
   "errors": [
    "stooq EWSB: 回應非有效 CSV（No data？）",
@@ -166,7 +175,6 @@
    "stooq TURB: 回應非有效 CSV（No data？）",
    "stooq VFLEX: 回應非有效 CSV（No data？）",
    "stooq BBASX: 回應非有效 CSV（No data？）",
-   "yahoo BBASX: 回應非有效 chart JSON",
    "stooq FTECX: 回應非有效 CSV（No data？）",
    "yahoo FTECX: 回應非有效 chart JSON",
    "stooq HTO: 回應非有效 CSV（No data？）",
