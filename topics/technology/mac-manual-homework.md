@@ -54,6 +54,7 @@ last_updated: 2026-07-06
   4. appgrowing.net/blog/last_war_survival/（「30 萬條素材」數字原始出處）
   5. reddit.com/r/LastWarMobileGame（玩家一手聲音完全沒讀到，搜「boring/quit/refund」高讚串）
 - [ ] （同場加映）web.archive.org 在雲端被工具層整體封鎖——上述頁面若直連仍擋，用 Wayback Machine 讀存檔版。
+- [ ] **（同日追加）MECCHA CHAMELEON 研究的複查頁**（附錄在 `topics/business/2026-07-22-meccha-chameleon-business-model-analysis/`）：①Steam 商店頁原文（售價/評論數核對）②news.denfaminicogamer.jp/interview/260630w（開發者訪談——「剪輯素材製造機」關鍵引述的逐字稿）③steamdb.info/app/4704690/（完整同接歷史）④gamebiz.jp/news/428108（日本區週榜措辭）。
 
 ### 2026-07-11 session 產生的（台股漏斗數據源）
 - [ ] **註冊 FinMind 免費帳號取得 API token**（finmindtrade.com）→ 放進 GitHub repo Settings → Secrets → `FINMIND_TOKEN`。無 token 時台股管線走 TWSE 次源可運作；FinMind 主源（更穩、可歷史回補）的全市場查詢需 token 解鎖（匿名層回 400）。
