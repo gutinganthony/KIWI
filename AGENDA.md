@@ -20,6 +20,7 @@
 - [ ] 2026-08-07 | JEM Q1 裁判日 | 事前寫好「結果 X → 動作 Y」預案；指引未上修＝sandbag 失效
 - [ ] 2026-08-13 | Seikoh Q1 裁判日 | sandbag vs 真弱開獎；試探倉預案事前寫好
 - [ ] 2026-08-31 | Fund 架構決策 | BVI incubator vs 其他：定案＋理由入庫（track record 帳戶依此開設）
+- [ ] 2026-07-29 | Recovery camp 本週四件 | 鎖 pilot 日期＋名單 8-10 人＋粗 P&L＋法遵四項啟動（計畫 T1-T4，topics/business/2026-07-22-recovery-camp-mvp-plan.md）
 
 ## 🎯 目標（里程碑，無硬到期日）
 
