@@ -18,7 +18,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |-------|---------|
 | [Technology](./topics/technology/INDEX.md) | 2 |
 | [Science](./topics/science/INDEX.md) | 0 |
-| [Business](./topics/business/INDEX.md) | 57 |
+| [Business](./topics/business/INDEX.md) | 58 |
 | [Health](./topics/health/INDEX.md) | 0 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Other](./topics/other/INDEX.md) | 2 |
@@ -32,6 +32,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-07-22 | [Last War: Survival 商業模式全解剖 — 「空虛遊戲」為何是印鈔機 × 可複製性評估](./topics/business/2026-07-22-last-war-business-model-analysis.md) | Business |
 | 2026-07-21 | [被動元件×記憶體 7 月重挫解剖 — 一台機器的 de-rate 與持倉 read-through](./topics/business/2026-07-21-passives-memory-selloff-analysis.md) | Business |
 | 2026-07-16 | [人生設計書 — 45 歲前一億台幣的三引擎路線](./topics/other/2026-07-16-life-design-100m-by-45.md) | Other |
 | 2026-07-16 | [幫朋友代管資金 × 加密交易所託管服務 — 路徑/資格/成本/台灣法律紅線](./topics/business/2026-07-16-crypto-exchange-managed-trading-for-friend.md) | Business |
@@ -44,7 +45,6 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-07-10 | [股票慢訊號價值評估 — 13F / Form 4 / 台股籌碼](./topics/business/2026-07-10-stock-slow-signal-value-assessment.md) | Business |
 | 2026-07-10 | [跟單聰明錢觀察器 — Polymarket + Hyperliquid 跨平台實證結論](./topics/business/2026-07-10-copy-trading-smart-money-observer-findings.md) | Business |
 | 2026-07-10 | [Polymarket 跟單「月賺5萬美金」文查證 — 導流漏斗解剖 + 可行性評估](./topics/business/2026-07-10-polymarket-copy-trading-guide-verification.md) | Business |
-| 2026-07-09 | [Serenity Step 1–9：Coherent + Marvell（AAOI 換倉候選）](./topics/business/2026-07-09-serenity-step1-9-cohr-mrvl-aaoi-replacement.md) | Business |
 <!-- RECENT_ENTRIES_END -->
 
 ---
@@ -73,6 +73,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-07-16 | [幫朋友代管資金 × 加密交易所託管服務 — 路徑/資格/成本/台灣法律紅線](./topics/business/2026-07-16-crypto-exchange-managed-trading-for-friend.md) | Business |
 | 2026-07-16 | [人生設計書 — 45 歲前一億台幣的三引擎路線](./topics/other/2026-07-16-life-design-100m-by-45.md) | Other |
 | 2026-07-21 | [被動元件×記憶體 7 月重挫解剖 — 一台機器的 de-rate 與持倉 read-through](./topics/business/2026-07-21-passives-memory-selloff-analysis.md) | Business |
+| 2026-07-22 | [Last War: Survival 商業模式全解剖 — 「空虛遊戲」為何是印鈔機 × 可複製性評估](./topics/business/2026-07-22-last-war-business-model-analysis.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---

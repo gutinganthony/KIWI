@@ -46,6 +46,15 @@ last_updated: 2026-07-06
 - [ ] **核對 Binance/Bybit/Bitget 帶單門檻與台灣可用性**（官網全被雲端擋；OKX 已直接核對免查）：Binance 合約帶單 1,000 USDT＋服務清單含台灣；Bybit 100 USDT＋Pro 版台灣可用性；Bitget 帶單台灣可用性（查無官方證據）。待核頁面清單見 `topics/business/2026-07-16-crypto-managed-trading-research/research_copytrading.md` 附錄。
 - [ ] **（決定行動前必做）law.moj.gov.tw 核對法條原文**：銀行法 5-1/29/29-1/125（雲端僅 GitHub 鏡像間接核對）、《虛擬資產服務法》三讀條文與總統公布日、期交法 §3/§112——法規線報告所有判決字號皆為轉述，引用前須 law.judicial.gov.tw 複核。＋諮詢熟悉虛擬資產的執業律師。
 
+### 2026-07-22 session 產生的（Last War 商業模式研究 403 複查——低優先，僅在 Jake 決定認真評估做遊戲時才需做）
+- [ ] **複查 Last War 研究的五個關鍵被擋頁面**（雲端 WebFetch 對外站近乎 100% 403，六份子報告合計 90+ 網域被擋，全清單見 `topics/business/2026-07-22-last-war-business-model-analysis/` 各附錄末節）。優先順序：
+  1. naavik.co/digest/how-last-war-is-winning-the-4x-game/（留存率 34/11/4 與 UA 拆解的源頭）
+  2. thinkingdata.io/customer-stories/last-war-survival-case-study/（bait-and-switch 轉化漏斗一手數據）
+  3. xueqiu.com/4146035274/385810587（「2026-04 全球停買量」唯一細節信源，需核原文與留言區）
+  4. appgrowing.net/blog/last_war_survival/（「30 萬條素材」數字原始出處）
+  5. reddit.com/r/LastWarMobileGame（玩家一手聲音完全沒讀到，搜「boring/quit/refund」高讚串）
+- [ ] （同場加映）web.archive.org 在雲端被工具層整體封鎖——上述頁面若直連仍擋，用 Wayback Machine 讀存檔版。
+
 ### 2026-07-11 session 產生的（台股漏斗數據源）
 - [ ] **註冊 FinMind 免費帳號取得 API token**（finmindtrade.com）→ 放進 GitHub repo Settings → Secrets → `FINMIND_TOKEN`。無 token 時台股管線走 TWSE 次源可運作；FinMind 主源（更穩、可歷史回補）的全市場查詢需 token 解鎖（匿名層回 400）。
 - [ ] （低優先）雲端 WebFetch 被 403 擋的站 +1：`stockanalysis.com`（TSM 估值頁）。雲端已用 WebSearch 摘要繞過，僅在需要精確 P/B 等單一指標時在 Mac 上手動查。

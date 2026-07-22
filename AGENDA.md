@@ -27,6 +27,7 @@
 - 組合去集中化：AI/半導體以外部位 ≥1 檔（90 天計畫第 7–10 週）
 - `docs/SERETINY_STOCK_PICKING.md` 從空模板變成自己的方法論（≥1,500 字，含「我什麼時候會錯」）
 - 2027 記憶體減倉（T1）：出場手冊完成後，把減倉綁上機械訊號＋條件單
+- 遊戲創業評估（2026-07-22 起）：Last War 研究已定調「1:1 不可複製、公式縮小 100 倍可行」——若要做，走微信/抖音小遊戲低成本試錯路線；動手前先讀 topics/business/2026-07-22-last-war-business-model-analysis.md §11.3 的四步驟
 
 ## 🗓 每月自檢清單（每月第一個週六隨提醒附上；出自 topics/other/2026-07-12-decision-quality-self-audit.md §D2）
 
