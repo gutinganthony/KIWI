@@ -1,6 +1,6 @@
 # 摸魚記 內容日曆（living document）
 
-> 最後更新：2026-07-21
+> 最後更新：2026-07-22
 > 這是唯一的排程總表。所有選題決定都更新在這裡，其他檔案只放素材與草稿。
 > 檔案位置：repo 分支 `claude/evaluate-business-opportunities-mJXMo` → `personal/content-calendar.md`
 
@@ -23,7 +23,8 @@
 |------|------|-----------|
 
 | **7/21–22（本週主打）** | **世界盃賽後復盤「人類史上最大的一場賭，剛剛結算完」**：西班牙 1:0 阿根廷收官＋$60B 資金＋市場影響兩論文＋三案例＋賭球為生的數學（台灣運彩 78% 殺手圖） | ✅ Jake 拍板、W8 順延。研究檔：`research/worldcup-betting-research.md`（賽後復盤版框架） |
-| **W8（順延一週）** | **1999 持倉指南**（泡沫裡的人怎麼活） | 研究檔＋回測程式已備（`drafts/gen_W8_backtest.py`），**等 Jake 上傳 Nasdaq CSV** |
+| **本週後半** | **反彈定性篇「人道走廊還是死貓跳」**（7/21 費半+5.5%/美光+12% 反彈的鑑定） | 框架＋數據：`research/rebound-deadcat-research.md`（五工具鑑定表、熊市反彈統計已查證）。等第二根證據（合約價/FOMC）可更完整 |
+| **W8（順延中）** | **1999 持倉指南**（泡沫裡的人怎麼活） | 研究檔＋回測程式已備（`drafts/gen_W8_backtest.py`），**等 Jake 上傳 Nasdaq CSV** |
 | **W9** | **國安基金九場戰役** | 研究檔：`research/nsf-nine-battles-research.md`（出手線 -25%~-44%、唯一敗仗）。缺：第 1–3 役精確指數 TWSE 核實 |
 | **W10** | **「輝達之外，錢正在流向誰」ASIC 定制晶片** | ✅ Jake 拍板。素材：Kenji Marvell 10 倍股三部曲＋BI 報告（ASIC 份額 2030 至 45–50%、GPU+ASIC 出貨 800 萬→2,800 萬顆、台積電 AI 訂單占比 90%+）。動工前需做定制晶片賽道研究（博通/Marvell/世芯/創意） |
 
