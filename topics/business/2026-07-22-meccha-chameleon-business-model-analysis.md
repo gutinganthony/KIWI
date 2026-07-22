@@ -200,4 +200,5 @@ Jake 目前檯面上三條路（前兩條來自 Last War 報告 §11，本節新
 Mac 複查優先頁（已併入 mac-manual-homework 07-22 段）：Steam 商店頁原文（售價/評論數核對）、電ファミ開發者訪談逐字稿（「剪輯素材製造機」關鍵引述）、SteamDB 完整同接歷史、PC Gamer/Kotaku 評測全文、gamebiz 日本區週榜原文。
 
 ## Update Log
-- 2026-07-22 v1.0：建檔。5 subagent 並行研究（其中 psychology、macro_replication 兩個 agent 在完成報告寫入後因帳號月度 spend limit 被中斷，檔案完整救回）＋主對話彙整。**未過獨立 verifier**（同一 spend limit 無法再派 agent）；替代驗證：主對話對關鍵數字逐一 grep 附錄複核＋索引三處人工核對。下個 session 若額度恢復，可補派 verifier 複驗本篇。
+- 2026-07-22 v1.1：spend limit 解除後補派獨立 verifier，8 項驗收條件全數通過（10+ 抽查數字全數溯源至附錄、矛盾清單完整、索引三處一致），零修正項。
+- 2026-07-22 v1.0：建檔。5 subagent 並行研究（其中 psychology、macro_replication 兩個 agent 在完成報告寫入後因帳號月度 spend limit 被中斷，檔案完整救回）＋主對話彙整。v1.0 當下未過獨立 verifier（同一 spend limit 無法派 agent），替代驗證為主對話 grep 複核。
