@@ -1,15 +1,15 @@
 {
- "generated_at": "2026-07-23T11:33:50Z",
+ "generated_at": "2026-07-24T11:26:17Z",
  "market": "TW",
  "pipeline": "tw-funnel",
- "as_of_trading_day": "2026-07-23",
+ "as_of_trading_day": "2026-07-24",
  "endpoint_health": {
   "finmind_stock_info": {
    "ok": true,
    "status": 200,
    "source": "finmind",
    "dataset": "TaiwanStockInfo",
-   "rows": 4287
+   "rows": 4291
   },
   "finmind_institutional": {
    "ok": false,
@@ -45,8 +45,8 @@
    "ok": true,
    "source": "finmind",
    "dataset": "TaiwanStockMonthRevenue",
-   "pool": 72,
-   "fetched": 70,
+   "pool": 69,
+   "fetched": 68,
    "errors": 0
   },
   "company_basic": {
@@ -72,19 +72,17 @@
   }
  },
  "funnel_stats": {
-  "raw_filings": 291,
-  "qualified_events": 38,
-  "post_veto": 36,
+  "raw_filings": 294,
+  "qualified_events": 35,
+  "post_veto": 34,
   "final_candidates": 15
  },
  "veto_reasons": {
-  "turnover_floor": 1,
-  "punish_list": 1
+  "turnover_floor": 1
  },
  "january_window_active": false,
  "degradations": [
-  "pledge_data_unavailable: 董監質押比取數失敗/欄位不符，質押否決不生效",
-  "revenue_prev_month_missing: 1 檔通過籌碼關但無上月 YoY（月營收史料未累積滿 2 期），無法判加速，誠實不入池"
+  "pledge_data_unavailable: 董監質押比取數失敗/欄位不符，質押否決不生效"
  ],
  "todo_not_wired": [
   "tpex_otc_not_wired: v0 只做上市（TWSE），上櫃 TPEx 未接線",
