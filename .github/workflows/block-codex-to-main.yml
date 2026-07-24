@@ -1,0 +1,26 @@
+name: Block Codex branches from main
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, reopened, synchronize, edited]
+
+permissions:
+  contents: read
+
+jobs:
+  codex-origin-gate:
+    name: Reject codex/** PRs to main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify source branch
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        shell: bash
+        run: |
+          if [[ "$HEAD_REF" == codex/* ]]; then
+            echo "::error::Codex branches cannot target main. Claude Code must review and re-apply accepted work on a claude/** branch."
+            exit 1
+          fi
+          echo "Allowed source branch: $HEAD_REF"
