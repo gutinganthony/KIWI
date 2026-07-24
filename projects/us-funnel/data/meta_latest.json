@@ -1,6 +1,6 @@
 {
  "fetch": {
-  "ran_at": "2026-07-23T06:14:39.715197+00:00",
+  "ran_at": "2026-07-24T06:08:09.185891+00:00",
   "days_scanned": 8,
   "days_fetched": 0,
   "days_skipped_cached": 0,
@@ -8,15 +8,23 @@
   "parse_failed": 0,
   "requests_ok": 0,
   "requests_failed": 8,
-  "elapsed_sec": 322.9,
+  "elapsed_sec": 322.8,
   "endpoint_health": [
+   {
+    "name": "daily-index 2026-07-24",
+    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260724.idx",
+    "ok": false,
+    "status": 403,
+    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
+    "elapsed_sec": 40.27
+   },
    {
     "name": "daily-index 2026-07-23",
     "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260723.idx",
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.26
+    "elapsed_sec": 40.22
    },
    {
     "name": "daily-index 2026-07-22",
@@ -24,7 +32,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.24
+    "elapsed_sec": 40.2
    },
    {
     "name": "daily-index 2026-07-21",
@@ -32,7 +40,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.2
+    "elapsed_sec": 40.18
    },
    {
     "name": "daily-index 2026-07-20",
@@ -40,7 +48,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.14
+    "elapsed_sec": 40.2
    },
    {
     "name": "daily-index 2026-07-17",
@@ -48,7 +56,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.26
+    "elapsed_sec": 40.18
    },
    {
     "name": "daily-index 2026-07-16",
@@ -64,31 +72,23 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.18
-   },
-   {
-    "name": "daily-index 2026-07-14",
-    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR3/form.20260714.idx",
-    "ok": false,
-    "status": 403,
-    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.23
+    "elapsed_sec": 40.17
    }
   ],
   "errors": [
+   "2026-07-24 索引抓取失敗（status=403）",
    "2026-07-23 索引抓取失敗（status=403）",
    "2026-07-22 索引抓取失敗（status=403）",
    "2026-07-21 索引抓取失敗（status=403）",
    "2026-07-20 索引抓取失敗（status=403）",
    "2026-07-17 索引抓取失敗（status=403）",
    "2026-07-16 索引抓取失敗（status=403）",
-   "2026-07-15 索引抓取失敗（status=403）",
-   "2026-07-14 索引抓取失敗（status=403）"
+   "2026-07-15 索引抓取失敗（status=403）"
   ]
  },
- "updated_at": "2026-07-23T06:20:33.200058+00:00",
+ "updated_at": "2026-07-24T06:14:02.753497+00:00",
  "funnel": {
-  "ran_at": "2026-07-23T06:20:02.743136+00:00",
+  "ran_at": "2026-07-24T06:13:32.117449+00:00",
   "days_loaded": 0,
   "funnel_stats": {
    "raw_filings": 0,
@@ -127,7 +127,7 @@
   "errors": []
  },
  "tracking": {
-  "ran_at": "2026-07-23T06:20:33.199832+00:00",
+  "ran_at": "2026-07-24T06:14:02.753326+00:00",
   "positions_total": 16,
   "positions_new": 0,
   "positions_updated": 14,
@@ -162,7 +162,7 @@
    "SWZ": "yahoo",
    "BOLD": "yahoo"
   },
-  "elapsed_sec": 30.3,
+  "elapsed_sec": 30.5,
   "endpoint_health": [],
   "errors": [
    "stooq EWSB: 回應非有效 CSV（No data？）",
