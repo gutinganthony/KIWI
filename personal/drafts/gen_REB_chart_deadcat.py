@@ -23,7 +23,7 @@ GOLD="#b8954a"; RED="#b23b32"; GREEN="#2e7d4f"; SLATE="#4a5d7a"
 fig = plt.figure(figsize=(13, 7.6), facecolor=BG)
 
 fig.text(0.052, 0.93, "■", color=GOLD, fontsize=13)
-fig.text(0.075, 0.923, "這根反彈，是逃命窗還是回程票？",
+fig.text(0.075, 0.923, "反彈只活了三天",
          color=INK, fontsize=18.5, fontproperties=serif_b)
 fig.lines.append(plt.Line2D([0.052, 0.965], [0.888, 0.888],
                              transform=fig.transFigure, color=INK, lw=0.8))
@@ -38,7 +38,7 @@ axL.set_xlim(0, 1); axL.set_ylim(0, 4.6); axL.axis('off')
 stats = [
     ("42%", "過去 20 年 S&P 最強上漲日\n發生在熊市裡的比例"),
     ("+25% / 108 天", "2000–02 熊市中段的最大反彈\n之後市場掉頭續跌"),
-    ("10 次", "2008 金融海嘯期間的熊市反彈次數\n最大一次 +24%、46 天"),
+    ("+24% / 46 天", "2008 金融海嘯裡最大的熊市反彈\n多數反彈之後仍創更低的低點"),
 ]
 for i, (big, small) in enumerate(stats):
     y = 3.95 - i * 1.35
@@ -56,16 +56,16 @@ axL.text(0, -0.07, "平靜的牛市，不需要一天 +5% 的日子",
 # ══ 右欄：五工具鑑定 ══
 axR = fig.add_axes([0.52, 0.14, 0.445, 0.63])
 axR.set_facecolor(BG)
-axR.set_title("五工具鑑定這一次（7/21 反彈）", loc='left',
+axR.set_title("五工具鑑定這一次（7/24 收盤重讀）", loc='left',
               color=INK, fontsize=12.5, fontproperties=serif_b, pad=18)
 axR.set_xlim(0, 10); axR.set_ylim(0, 5.6); axR.axis('off')
 
 rows = [
-    ("① 領漲者",   "美光+12%/SNDK+14% 有軋空味；費半+5.5% 廣度不差", "混合", SLATE),
-    ("② 慢層證據", "台韓出口數據強＝AI 需求的海關背書",             "加分", GREEN),
-    ("③ 觸發器",   "外資千億級賣超／VIXTWN 回 40：都沒響",          "加分", GREEN),
-    ("④ 量能廣度", "台股量價與騰落，待確認",                        "待補", GREY),
-    ("⑤ 事件位置", "FOMC＋月底合約價都還沒開獎：考前搶跑",          "打折", RED),
+    ("① 領漲者",   "記憶體守住（美光三天累計約+14%）、AI 大盤吐光", "分化", SLATE),
+    ("② 慢層證據", "台韓出口強＋Alphabet capex 上修：實體層變強",   "加分", GREEN),
+    ("③ 觸發器",   "外資千億 7/17 響過；VIXTWN 盤中 40.02 未收上",  "響過", RED),
+    ("④ 量能廣度", "量縮至恐慌日 2/3、346 家上漲：調節非逃難",      "混合", SLATE),
+    ("⑤ 事件位置", "FOMC＋月底合約價＋油價 100：考試全在前面",      "打折", RED),
 ]
 for i, (name, desc, tag, c) in enumerate(rows):
     y = 5.1 - i * 1.05
@@ -77,12 +77,12 @@ for i, (name, desc, tag, c) in enumerate(rows):
     if i < 4:
         axR.plot([0, 10], [y - 0.52, y - 0.52], color=LGRID, lw=0.7)
 
-axR.text(0, -0.07, "初判：比較像「修正尾聲的第一次確認」，但要等第二根證據（合約價、FOMC）",
-         transform=axR.transAxes, color=INK, fontsize=10,
+axR.text(0, -0.07, "判定：人道走廊，門正在關。死貓跳完成鈴：台股 42,449.70；第二警報：VIXTWN 收盤站上 40",
+         transform=axR.transAxes, color=INK, fontsize=9.6,
          fontproperties=serif_b, va='top')
 
 fig.text(0.052, 0.045,
-         "資料來源：Hartford Funds（熊市最佳日統計）、Morningstar（2000–02 反彈）、Modern Wealth Management（2008 反彈次數）、Nasdaq/費半 21/07/26 收盤，摸魚記整理。\n"
+         "資料來源：Hartford Funds（熊市最佳日統計）、Forbes/Morningstar（2000–02 反彈）、Modern Wealth Management（2008 反彈）、TWSE／玩股網（台股至 24/07/26 收盤）、美股至 23/07/26 收盤，摸魚記整理。\n"
          "過往表現並非未來結果的保證。",
          color=GREY, fontsize=7.8, linespacing=1.7, va='top')
 
