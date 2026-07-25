@@ -41,3 +41,4 @@
 
 ## Update Log
 - 2026-07-14 v1.0：收錄原文摘要＋5C＋弦外之音＋KIWI/投資借鏡。
+- 2026-07-24 v1.1：**觀察訊號兌現 #1**——§4.2 的「反蒸餾條款攻防」訊號應驗：Microsoft 站上發布 34 家聯署〈Open Weights and American AI Leadership〉，把本文的蒸餾權利/模型解耦論述政策化（Anthropic/Google 缺席）。詳見 `./2026-07-24-open-weights-coalition-statement.md`。
