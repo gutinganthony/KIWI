@@ -56,16 +56,16 @@ axL.text(0, -0.07, "平靜的牛市，不需要一天 +5% 的日子",
 # ══ 右欄：五工具鑑定 ══
 axR = fig.add_axes([0.52, 0.14, 0.445, 0.63])
 axR.set_facecolor(BG)
-axR.set_title("五工具鑑定這一次（7/24 收盤重讀）", loc='left',
+axR.set_title("五工具鑑定這一次（7/24 美股收盤重讀）", loc='left',
               color=INK, fontsize=12.5, fontproperties=serif_b, pad=18)
 axR.set_xlim(0, 10); axR.set_ylim(0, 5.6); axR.axis('off')
 
 rows = [
-    ("① 領漲者",   "記憶體守住（美光三天累計約+14%）、AI 大盤吐光", "分化", SLATE),
+    ("① 領漲者",   "週二領漲的記憶體，週五跌最重：原路退回",       "扣分", RED),
     ("② 慢層證據", "台韓出口強＋Alphabet capex 上修：實體層變強",   "加分", GREEN),
     ("③ 觸發器",   "外資千億 7/17 響過；VIXTWN 盤中 40.02 未收上",  "響過", RED),
     ("④ 量能廣度", "量縮至恐慌日 2/3、346 家上漲：調節非逃難",      "混合", SLATE),
-    ("⑤ 事件位置", "FOMC＋月底合約價＋油價 100：考試全在前面",      "打折", RED),
+    ("⑤ 事件位置", "FOMC＋月底合約價＋油價 100 拉鋸：考試在前面",   "打折", RED),
 ]
 for i, (name, desc, tag, c) in enumerate(rows):
     y = 5.1 - i * 1.05
@@ -82,7 +82,7 @@ axR.text(0, -0.07, "判定：人道走廊，門正在關。死貓跳完成鈴：
          fontproperties=serif_b, va='top')
 
 fig.text(0.052, 0.045,
-         "資料來源：Hartford Funds（熊市最佳日統計）、Forbes/Morningstar（2000–02 反彈）、Modern Wealth Management（2008 反彈）、TWSE／玩股網（台股至 24/07/26 收盤）、美股至 23/07/26 收盤，摸魚記整理。\n"
+         "資料來源：Hartford Funds（熊市最佳日統計）、Forbes/Morningstar（2000–02 反彈）、Modern Wealth Management（2008 反彈）、TWSE／玩股網（台股至 24/07/26 收盤）、美股至 24/07/26 收盤，摸魚記整理。\n"
          "過往表現並非未來結果的保證。",
          color=GREY, fontsize=7.8, linespacing=1.7, va='top')
 
