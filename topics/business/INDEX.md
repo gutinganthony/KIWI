@@ -65,3 +65,5 @@
 | 2026-07-22 | [Recovery Camp MVP 計畫 — 週末身心靈復元營（宜蘭），autoplan 全審查版](./2026-07-22-recovery-camp-mvp-plan.md) | recovery-camp, wellness-retreat, startup, mvp, customer-discovery, yilan, autoplan, personal-project |
 | 2026-07-22 | [Recovery Camp 顧客訪談訪綱 — Mom Test × 真 Offer 收尾](./2026-07-22-recovery-camp-interview-guide.md) | recovery-camp, interview-guide, customer-discovery, mom-test, van-westendorp, presale |
 | 2026-07-22 | [Recovery Camp 市場研究 — 台灣行情/國際參照/法規紅線](./2026-07-22-recovery-camp-market-research.md) | recovery-camp, market-research, pricing, taiwan-cases, regulation, wellness-retreat |
+| 2026-07-22 | [C 案評估 — 精品級供應鏈接入服務（合作案）](./2026-07-22-luxury-sourcing-service-evaluation.md) | sourcing-as-a-service, luxury-supply-chain, partnership, startup-evaluation, personal-project |
+| 2026-07-22 | [C 案占位查證 — Pietra/Italic/費率/MOQ/關稅](./2026-07-22-sourcing-c-case-research.md) | sourcing-as-a-service, occupancy-check, pietra, italic, moq, tariff, research |
