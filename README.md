@@ -18,7 +18,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |-------|---------|
 | [Technology](./topics/technology/INDEX.md) | 2 |
 | [Science](./topics/science/INDEX.md) | 0 |
-| [Business](./topics/business/INDEX.md) | 59 |
+| [Business](./topics/business/INDEX.md) | 60 |
 | [Health](./topics/health/INDEX.md) | 0 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Other](./topics/other/INDEX.md) | 2 |
@@ -32,6 +32,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-07-24 | [〈Open Weights〉34 家聯合聲明 — 來龍去脈與影響](./topics/business/2026-07-24-open-weights-coalition-statement.md) | Business |
 | 2026-07-24 | [物理 AI 假設驗證 × 發展週期 × 投資地圖](./topics/business/2026-07-24-physical-ai-thesis-cycle-investment-map.md) | Business |
 | 2026-07-24 | [YC RFS（2026 夏）× Jake 資產對照 — 商業機會路徑推演](./topics/business/2026-07-24-yc-rfs-summer-2026-jake-mapping.md) | Business |
 | 2026-07-21 | [被動元件×記憶體 7 月重挫解剖 — 一台機器的 de-rate 與持倉 read-through](./topics/business/2026-07-21-passives-memory-selloff-analysis.md) | Business |
@@ -77,6 +78,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-07-21 | [被動元件×記憶體 7 月重挫解剖 — 一台機器的 de-rate 與持倉 read-through](./topics/business/2026-07-21-passives-memory-selloff-analysis.md) | Business |
 | 2026-07-24 | [YC RFS（2026 夏）× Jake 資產對照 — 商業機會路徑推演](./topics/business/2026-07-24-yc-rfs-summer-2026-jake-mapping.md) | Business |
 | 2026-07-24 | [物理 AI 假設驗證 × 發展週期 × 投資地圖](./topics/business/2026-07-24-physical-ai-thesis-cycle-investment-map.md) | Business |
+| 2026-07-24 | [〈Open Weights〉34 家聯合聲明 — 來龍去脈與影響](./topics/business/2026-07-24-open-weights-coalition-statement.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
