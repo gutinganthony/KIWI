@@ -53,3 +53,4 @@
 | 2026-07-10 | [股票慢訊號價值評估 — 13F / Form 4 / 台股籌碼](./2026-07-10-stock-slow-signal-value-assessment.md) | 13f, form4, insider-trading, taiwan-stocks, institutional-flow, slow-signal, evidence-based |
 | 2026-07-10 | [台股／美股慢訊號篩選漏斗設計 — 三層架構（實證定稿）](./2026-07-10-us-tw-signal-funnel-design.md) | funnel-design, form4, 13f, taiwan-stocks, screening, composite-score, piotroski, aqr |
 | 2026-07-10 | [Serenity 瓶頸邏輯推演：2026→2030 板塊與建倉時序路線圖](./2026-07-10-serenity-2026-2030-sector-roadmap.md) | investment, serenity-chokepoint, roadmap, 2026-2030, CPO, hybrid-bonding, glass-substrate, memory-cycle, counter-cyclical, custom-ASIC, TSM, timing |
+| 2026-07-12 | [海關數據選股法・台灣版設計（三脈衝法）](./2026-07-12-taiwan-customs-data-stock-method.md) | investment, customs-data, trade-statistics, HS-code, monthly-revenue, taiwan-stocks, method-design, three-pulse |
