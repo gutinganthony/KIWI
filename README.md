@@ -18,7 +18,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |-------|---------|
 | [Technology](./topics/technology/INDEX.md) | 2 |
 | [Science](./topics/science/INDEX.md) | 0 |
-| [Business](./topics/business/INDEX.md) | 62 |
+| [Business](./topics/business/INDEX.md) | 63 |
 | [Health](./topics/health/INDEX.md) | 0 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Other](./topics/other/INDEX.md) | 2 |
@@ -32,6 +32,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-07-22 | [Recovery Camp 市場研究 — 台灣行情/國際參照/法規紅線](./topics/business/2026-07-22-recovery-camp-market-research.md) | Business |
 | 2026-07-22 | [Recovery Camp MVP 計畫 — 週末身心靈復元營（autoplan 全審查版）](./topics/business/2026-07-22-recovery-camp-mvp-plan.md) | Business |
 | 2026-07-22 | [Recovery Camp 顧客訪談訪綱 — Mom Test × 真 Offer 收尾](./topics/business/2026-07-22-recovery-camp-interview-guide.md) | Business |
 | 2026-07-22 | [Clip 遊戲題材機會掃描 × 商業框架的創業延伸](./topics/business/2026-07-22-clip-game-theme-scan-and-startup-lens.md) | Business |
@@ -78,6 +79,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-07-22 | [Clip 遊戲題材機會掃描 × 商業框架的創業延伸](./topics/business/2026-07-22-clip-game-theme-scan-and-startup-lens.md) | Business |
 | 2026-07-22 | [Recovery Camp MVP 計畫 — 週末身心靈復元營（autoplan 全審查版）](./topics/business/2026-07-22-recovery-camp-mvp-plan.md) | Business |
 | 2026-07-22 | [Recovery Camp 顧客訪談訪綱 — Mom Test × 真 Offer 收尾](./topics/business/2026-07-22-recovery-camp-interview-guide.md) | Business |
+| 2026-07-22 | [Recovery Camp 市場研究 — 台灣行情/國際參照/法規紅線](./topics/business/2026-07-22-recovery-camp-market-research.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---

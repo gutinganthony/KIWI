@@ -64,3 +64,4 @@
 | 2026-07-22 | [Clip 遊戲題材機會掃描 × 商業框架的創業延伸](./2026-07-22-clip-game-theme-scan-and-startup-lens.md) | game-ideation, theme-scan, occupancy-check, clip-games, friendslop, startup-lens, bottleneck-migration, serenity-crossover |
 | 2026-07-22 | [Recovery Camp MVP 計畫 — 週末身心靈復元營（宜蘭），autoplan 全審查版](./2026-07-22-recovery-camp-mvp-plan.md) | recovery-camp, wellness-retreat, startup, mvp, customer-discovery, yilan, autoplan, personal-project |
 | 2026-07-22 | [Recovery Camp 顧客訪談訪綱 — Mom Test × 真 Offer 收尾](./2026-07-22-recovery-camp-interview-guide.md) | recovery-camp, interview-guide, customer-discovery, mom-test, van-westendorp, presale |
+| 2026-07-22 | [Recovery Camp 市場研究 — 台灣行情/國際參照/法規紅線](./2026-07-22-recovery-camp-market-research.md) | recovery-camp, market-research, pricing, taiwan-cases, regulation, wellness-retreat |
