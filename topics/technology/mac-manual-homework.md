@@ -43,6 +43,11 @@ last_updated: 2026-07-06
 - [ ] 開 polymarketanalytics.com/traders 與 /pricing、docs.kreo.app 核對篩選器/價格/費率與返佣原文（站點被擋，僅搜尋摘要層取得）
 - [ ] 登入 X 核對 @waveking1314 粉絲數、開號日、歷史貼文主題（搜尋摘要顯示 ~42.8K 粉、2023-03 開號，未直接核對）
 
+### 2026-07-12 session 產生的（台灣海關出口統計可行性測試）
+- [ ] **雲端 WebFetch/curl 被 egress 403 擋的站（整批，皆為台灣官方統計源）**：`data.gov.tw`、`portal.sw.nat.gov.tw`（關港貿 GA03/GA30）、`www.mof.gov.tw`、`web02.mof.gov.tw`、`service.mof.gov.tw`、`publicinfo.trade.gov.tw`（貿易署 cuswebo）、`scidm.nchc.org.tw`；連 `example.com`、`cna.com.tw` 都 403 → **證實是本環境 egress allowlist（只放行 GitHub＋套件庫），不是台灣站方擋**。繞法＝GitHub Actions runner（poly-observer 前例已證可行）。
+- [ ] **在 Mac（或先在 Actions runner 試）驗證 GA03 程式化查詢配方**：`POST https://portal.sw.nat.gov.tw/APGA/GA03_LIST`，參數 `searchInfo.TypePort=4`（出口）、`searchInfo.goodsType=8`、`searchInfo.goodsCodeGroup=8542.32,8471.50,…`（≤80 碼/批）、`searchInfo.StartYear/StartMonth/EndMonth`、`searchInfo.Type=rbMoney1`、`searchInfo.GroupType=rbByGood`（配方源自 g0v ronnywang/portal.sw.nat.gov.tw 的 crawler_stats.php，2013 年版，**需驗證現今是否仍有效／有無 CSRF token**）。順便看 GA35「統計資料下載」有無按稅則碼的整包月檔（bulk 下載比逐碼查更穩）。
+- [ ] 若配方有效 → 評估建一支月排程 GitHub Actions workflow（每月 10 日抓上月碼級出口值/量 → commit JSON 進 repo，雲端 session 讀 repo 即可）。**改 workflows 前先問 Jake**（CLAUDE.md §0）。
+
 ### 2026-07-07 session 產生的（AXW/AIR TRF 研究）
 - [ ] **AIR TRF 真實利差序列建檔（文獻查證：DataMine 有免費日檔！）**：註冊 CME DataMine → 拉 AIR TRF 免費 CSV（欄位 `DLY_FUND` FID#10335、`ACC_FUND` #10337）→ 建歷史序列存進 `projects/avi-v5/data/ext/air_trf.csv` → 跑與 `lev_stress_proxy` 的相關性（報告 §8 否證 ②）。備用免費儀表板：snippet.finance「S&P 500 Futures Financing」（2012 迄今）。每週順手記一次 CME 產品頁的近月 bps 與分位數。
 
