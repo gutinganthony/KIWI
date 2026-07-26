@@ -46,6 +46,24 @@ def is_fresh(path):
     return path.exists() and (time.time() - path.stat().st_mtime) < FRESH_SECONDS
 
 
+def run_jp_bridge(force=False):
+    """側掛：日本開示資料橋（雲端 session 對日本站一律 403，只有 runner 抓得到）。
+    放在本檔是為了共用既有的 workflow step，不必動 .github/workflows/。
+    **必須在所有 return 路徑上都被呼叫**——價格檔新鮮時本檔會提前 return，
+    若只掛在末段，開示橋會被連帶跳過（2026-07-26 修正的 bug）。"""
+    try:
+        import fetch_jp_disclosures
+        print("--- jp_disclosures bridge ---")
+        saved = sys.argv
+        sys.argv = [saved[0]] + (["--force"] if force else [])
+        try:
+            fetch_jp_disclosures.main()
+        finally:
+            sys.argv = saved
+    except Exception as e:  # noqa: BLE001 — never break the host job
+        print(f"⚠️ jp_disclosures bridge failed: {e}")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--force", action="store_true")
@@ -54,13 +72,15 @@ def main():
     EXT.mkdir(parents=True, exist_ok=True)
     targets = {t: EXT / f"{name}.csv" for t, name in TICKERS.items()}
     if not args.force and all(is_fresh(p) for p in targets.values()):
-        print("ext data fresh (<6d) — skip fetch")
+        print("ext data fresh (<6d) — skip price fetch")
+        run_jp_bridge(args.force)   # 開示橋有自己的新鮮度判定（3 天），不受價格檔影響
         return 0
 
     try:
         import yfinance as yf
     except ImportError:
-        print("yfinance unavailable — skip (best-effort)")
+        print("yfinance unavailable — skip price fetch (best-effort)")
+        run_jp_bridge(args.force)
         return 0
 
     ok = 0
@@ -81,16 +101,7 @@ def main():
         except Exception as e:  # noqa: BLE001 — never break the host job
             print(f"⚠️ {ticker} failed: {e}")
     print(f"fetched {ok}/{len(targets)} at {datetime.now(timezone.utc).isoformat()}")
-
-    # 側掛：日本開示資料橋（雲端 session 對日本站一律 403，只有 runner 抓得到）。
-    # 放這裡是為了共用既有的 workflow step，不必動 .github/workflows/。
-    try:
-        import fetch_jp_disclosures
-        print("--- jp_disclosures bridge ---")
-        sys.argv = [sys.argv[0]] + (["--force"] if args.force else [])
-        fetch_jp_disclosures.main()
-    except Exception as e:  # noqa: BLE001 — never break the host job
-        print(f"⚠️ jp_disclosures bridge failed: {e}")
+    run_jp_bridge(args.force)
     return 0
 
 
