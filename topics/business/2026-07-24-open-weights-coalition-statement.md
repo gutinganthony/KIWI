@@ -37,5 +37,21 @@
 
 Sources: [官方頁](https://www.microsoft.com/en-us/corporate-responsibility/topics/open-weight/)、[CNBC](https://www.cnbc.com/2026/07/24/nvidia-microsoft-meta-open-weight-ai-models.html)、[Decrypt](https://decrypt.co/374282/nvidia-meta-microsoft-washington-dont-kill-open-source-ai)、[TNW](https://thenextweb.com/news/open-weights-american-ai-leadership-letter-huang-nvidia-openai-absent)、[Benzinga](https://www.benzinga.com/markets/tech/26/07/60673099/meta-microsoft-palantir-nvidia-and-21-others-sign-letter-backing-open-weight-ai-models)、[Unite.AI](https://www.unite.ai/nvidia-and-microsoft-back-open-weight-ai-in-joint-letter/)
 
+## 5. 後續追蹤（2026-07-24/25 更新）
+
+### 黃仁勳 X 首貼事件
+- **黃仁勳 7/24 開通 X 帳號，人生首貼就是推這封信**：「AI will transform every industry, power every company, and be built by every country」＋「Open models strengthen safety and cybersecurity, accelerate innovation and diffusion, and enable sovereignty」——並警告業界別犯 1980 年代軟體業「差點鎖死專有化」的錯誤（[Fortune](https://fortune.com/2026/07/24/jensen-huang-open-source-letter-nvidia-kimi/)、[The New Stack](https://thenewstack.io/nvidia-open-weight-letter/)）。
+- **Musk 即刻回覆：「I fully support it. Huang is right.」**（台媒標題「他是對的」出處）並轉發力挺——但 SpaceX（其 AI 業務所在）**未正式簽署**。Nadella 立即現身支持。
+- **Altman 的外交式不背書**：「I hope the U.S. wins on both open-source and closed-source fronts」——證實 OpenAI 發布當日未簽（§1 的名單出入偏向「官方頁後續擴充或摘要誤植」，媒體口徑一致：OpenAI/Anthropic/Google 三缺席，且 OpenAI/Anthropic 正向華府警告中國開放模型的風險＝**對立遊說方**）。
+
+### 觸發背景補全
+華府辯論的直接導火線：**Moonshot AI 的 Kimi K3（7/16 發布）躋身全球最強模型之列**——中國開放模型逼近前沿，政策圈分裂成兩案：限制中國開放模型 vs 連美國開放權重一起管。這封信與黃仁勳的個人參戰，就是要把政策推向「只管非法提取、不管開放本身」。
+
+### 追蹤影響
+1. **遊說格局公開化**：開放聯盟（硬體/基礎設施/工具）vs 封閉實驗室（OpenAI/Anthropic/Google）兩軍對壘，Musk 站開放側。後續盯：白宮/國會正式文件、兩邊的下一步動作。
+2. **NVDA 的訊號**：黃仁勳打破多年沉默親自下場＝開放生態對 NVDA 需求廣度論述（開放模型→推論無處不在→GPU 需求分散於千家企業而非三家實驗室）是存亡級議題。犬儒解讀也成立（Yahoo Finance 標題：「Preaches Open-Weight Openness to Sell More Chips」）——兩種解讀對投資結論同向。
+3. **對 KIWI 論述**：模型層商品化→硬體收費的三線合流（BI 藍圖/Nadella/本聲明）新增第四線（黃仁勳個人背書）。風險側新增：若政策反向走「中美 AI 雙棧分裂」，台灣供應鏈的地緣風險雙向暴露——列入宏觀監控。
+
 ## Update Log
 - 2026-07-24 v1.0：發布當日收錄（內容摘錄/陣營地圖/政策與投資影響/名單出入標注）。
+- 2026-07-24 v1.1：**§5 後續追蹤**——黃仁勳 X 首貼推信＋Musk「Huang is right」＋Altman 外交式不背書（證實三缺席）＋觸發背景＝Kimi K3（7/16）逼近前沿引發華府辯論。
