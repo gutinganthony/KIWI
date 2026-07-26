@@ -58,6 +58,11 @@ last_updated: 2026-07-06
 - [ ] **Seikoh 6834 中國 SINY 合資的曝險評估（需讀一手 TDnet PDF）**：`https://www.release.tdnet.info/inbs/140120260716595447.pdf`（7/17 公告）——查合資公司出資比例、是否可能推升中國營收占比、有無技術授權條款。**這是 🟢 觸發名單裡首次出現中國曝險**，Serenity 對中國是原則性排除，權益法不立即否決但要定性。
 - [ ] **（低優先）Intekplus 064290 券商目標價時效確認**：查到的 TP ₩18,000 遠低於現價 ₩30,500，疑為 2026/3 舊報告。若確為舊件則不構成降評理由，本週報已暫降為觀察待重評。
 
+### 2026-07-26 session 產生的（研究環境封鎖清單擴大 — 只在需要一手核對時才做）
+> 本 session 實測：**雲端對台股/日股/韓股的公開資訊站幾乎全滅**（curl、WebFetch、browse 三條路皆 403），且 WebSearch 有 session 上限 200 次（本 session 用罄）。診斷指令：`curl -sS --cacert /root/.ccr/ca-bundle.crt "$HTTPS_PROXY/__agentproxy/status"` 看 recentRelayFailures。
+- [ ] **群翊 6664 下單前必核 5 項**（僅在你決定要買時才需要；複核結論是暫緩至 8/14）：①CB 群翊二 66642 最新流通餘額（已轉換多少→剩餘稀釋真實%）②內部人近三月申報轉讓 ③現金流量表與合約負債拆解（訂單能見度硬證據）④中國營收占比最新值（否證線 45%）與單一客戶占比 ⑤群翊一 66641 是否仍有餘額。被擋站台完整清單見 `topics/business/2026-07-26-groupup-research/research_groupup.md` §附錄 C（18 站）。
+- [ ] **（可選）記憶體判定的一手核對**：八因子判定全部數字皆二手（信心僅 45–55%）。若要提升信心，在 Mac 上核對 TrendForce 4Q26 合約價預估、Samsung/SKH 存貨（7/28–30 公布）、Micron SCA 條款（FY26Q3 10-Q）。
+
 ### 2026-07-11 session 產生的（台股漏斗數據源）
 - [ ] **註冊 FinMind 免費帳號取得 API token**（finmindtrade.com）→ 放進 GitHub repo Settings → Secrets → `FINMIND_TOKEN`。無 token 時台股管線走 TWSE 次源可運作；FinMind 主源（更穩、可歷史回補）的全市場查詢需 token 解鎖（匿名層回 400）。
 - [ ] （低優先）雲端 WebFetch 被 403 擋的站 +1：`stockanalysis.com`（TSM 估值頁）。雲端已用 WebSearch 摘要繞過，僅在需要精確 P/B 等單一指標時在 Mac 上手動查。
