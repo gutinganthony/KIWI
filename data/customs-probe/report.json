@@ -1,0 +1,59 @@
+{
+  "generated_utc": "2026-07-26T10:49:33.771598Z",
+  "steps": [
+    {
+      "name": "GET ga03_form",
+      "url": "https://portal.sw.nat.gov.tw/APGA/GA03",
+      "status": 200,
+      "bytes": 27989
+    },
+    {
+      "name": "GET ga35_download",
+      "url": "https://portal.sw.nat.gov.tw/APGA/GA35",
+      "status": 200,
+      "bytes": 30431
+    },
+    {
+      "name": "GET cuswebo_home",
+      "url": "https://publicinfo.trade.gov.tw/cuswebo/",
+      "status": 403,
+      "bytes": 5758
+    },
+    {
+      "name": "POST GA03 probe_roc",
+      "status": 200,
+      "bytes": 25727,
+      "code_hits": [],
+      "has_numbers": false,
+      "ok": [],
+      "params_year": 115
+    },
+    {
+      "name": "POST GA03 probe_west",
+      "status": 200,
+      "bytes": 25727,
+      "code_hits": [],
+      "has_numbers": false,
+      "ok": [],
+      "params_year": 2026
+    },
+    {
+      "name": "POST GA03 probe_roc_endyear",
+      "status": 200,
+      "bytes": 25727,
+      "code_hits": [],
+      "has_numbers": false,
+      "ok": [],
+      "params_year": 115
+    },
+    {
+      "name": "GA03 all variants failed",
+      "note": "診斷靠 ga03_form.html + ga03_try_*.html；下一步：從表單 dump 讀真實欄位名重寫參數，或改走 cuswebo/GA35"
+    }
+  ],
+  "verdict": {
+    "ga03_working_variant": null,
+    "series_rows": 0,
+    "next": "series.csv 有料＝細碼自動化可行，進入回測；無料＝讀 dump 迭代參數"
+  }
+}
