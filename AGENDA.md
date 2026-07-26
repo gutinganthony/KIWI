@@ -16,6 +16,8 @@
 - [ ] 2026-07-13 | 安裝 llm-council-skill | Mac 本機裝 gcpdev/llm-council-skill（步驟＋安全提醒詳 mac-manual-homework.md；send_later 主動推播本 session 排不了，這是第二層保險）
 - [ ] 2026-07-19 | JEM 手動功課 | TDnet 7/3–7/6 清單＋FY3/26 有報客戶表＋Yahoo 收盤複核（首批 1/3 執行前必做，詳 mac-manual-homework）
 - [ ] 2026-07-26 | 出場手冊 v1 | 每筆持倉的減倉條件全部綁訊號（M1 結論：綁訊號執行率 100%、不綁 0%）
+- [ ] 2026-07-30 | 記憶體判定重跑 | 7/28–30 出 Samsung/SKH 存貨＋MSFT/Meta(7/29)/Amazon(7/30) capex＝八因子判定的最大缺口補齊點，數字一出立刻重跑（詳 topics/business/2026-07-26-memory-bear-market-multifactor-verdict.md §6）
+- [ ] 2026-08-14 | 群翊 6664 否證判決 | Q2 毛利率 <50%＝否證定讞（Q1 已 48.23%）；8/10 七月營收先看。複核結論＝暫緩第一筆至此日，勿提前建倉
 - [ ] 2026-07-26 | FinMind token | 註冊 finmindtrade.com → repo Secrets `FINMIND_TOKEN`（台股漏斗主源解鎖）
 - [ ] 2026-08-07 | JEM Q1 裁判日 | 事前寫好「結果 X → 動作 Y」預案；指引未上修＝sandbag 失效
 - [ ] 2026-08-13 | Seikoh Q1 裁判日 | sandbag vs 真弱開獎；試探倉預案事前寫好
@@ -26,7 +28,7 @@
 - Fund track record 鏈：架構定案 → 設立公司 → 開戶 → 首月對帳單歸檔（2026-07-12 拍板：以公司架構帳戶跑才有意義）
 - 組合去集中化：AI/半導體以外部位 ≥1 檔（90 天計畫第 7–10 週）
 - `docs/SERETINY_STOCK_PICKING.md` 從空模板變成自己的方法論（≥1,500 字，含「我什麼時候會錯」）
-- 2027 記憶體減倉（T1）：出場手冊完成後，把減倉綁上機械訊號＋條件單
+- **記憶體減倉（T1）：日曆式「2027」已作廢 → 改事件驅動**（2026-07-26 八因子判定：股價歷史領先實體見頂 5–7 個月、合約價見頂估 2026Q4–2027H1 ⇒ 等 2027 大概率太晚）。四條機械條件：①4Q26 合約價預估走平/轉負 ②DDR5/HBM 現貨跟進 DDR4 下跌 ③Samsung/SKH 存貨連兩季回升 ④任一 hyperscaler capex 指引下修。**減碼順序寫死：先 DRAM ETF（無合約下檔保護）、後 MU（有 take-or-pay 地板）**
 
 ## 🗓 每月自檢清單（每月第一個週六隨提醒附上；出自 topics/other/2026-07-12-decision-quality-self-audit.md §D2）
 
