@@ -1,0 +1,1108 @@
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="zh-Hant-TW">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Language" content="zh-tw">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+<title>海關進出口統計</title>
+
+
+
+
+
+	<script type="text/javascript" src="/APGA/struts/js/base/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="/APGA/struts/js/base/jquery.ui.core.min.js?s2j=3.3.1"></script>
+  <script type="text/javascript" src="/APGA/struts/js/plugins/jquery.subscribe.min.js"></script>
+
+  <script type="text/javascript" src="/APGA/struts/js/struts2/jquery.struts2-3.3.1.min.js"></script>
+
+<script type="text/javascript">
+$(function() {
+	jQuery.struts2_jquery.version="3.3.1";
+	jQuery.struts2_jquery.debug = true;
+  	jQuery.scriptPath = "/APGA/struts/";
+	jQuery.struts2_jquery.defaults.indicator="myDefaultIndicator";
+	jQuery.struts2_jquery.defaults.loadingText="Please wait ...";
+	jQuery.ajaxSettings.traditional = true;
+
+	jQuery.ajaxSetup ({
+		cache: false
+	});
+	
+	jQuery.struts2_jquery.require("js/struts2/jquery.ui.struts2-3.3.1.min.js");
+	
+});
+</script>
+
+        	<link id="jquery_theme_link" rel="stylesheet" href="/APGA/struts/themes/start/jquery-ui.css?s2j=3.3.1" type="text/css"/>
+
+	
+<link rel="stylesheet" type="text/css" href="/APGA/inc/css/cpt-theme/jquery-ui.css" />
+<link rel="stylesheet" type="text/css" href="/APGA/inc/css/fontawesome-all.min.css" />
+<link rel="stylesheet" type="text/css" href="/APGA/inc/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="/APGA/inc/css/bootstrap-theme.min.css" />
+<link rel="stylesheet" type="text/css" href="/APGA/inc/css/bootstrap-datepicker3.min.css" />
+<link rel="stylesheet" type="text/css" href="/APGA/css/ui.jqgrid.css" />
+<link rel="stylesheet" type="text/css" href="/APGA/inc/css/ga.css?v=20251001" />
+
+<script type="text/javascript" src="/APGA/inc/js/purify.min.js"></script>
+<script type="text/javascript" language="Javascript1.2" src="/APGA/js/commons.js"></script>
+<script type="text/javascript" language="javascript" src="/APGA/js/ajax.js"></script>
+<script type="text/javascript" language="javascript" src="/APGA/js/validate.js"></script>
+<script type="text/javascript" language="javascript" src="/APGA/js/string.js"></script>
+<script type="text/javascript" language="javascript" src="/APGA/js/dialog.js"></script>
+<script type="text/javascript" language="javascript" src="/APGA/js/dhtml.js"></script>
+<script type="text/javascript" language="javascript" src="/APGA/js/date.js"></script>
+<script type="text/javascript" language="javascript" src="/APGA/js/number.js"></script>
+
+<script type="text/javascript" src="/APGA/inc/js/fontawesome_all.js"></script>
+<script type="text/javascript" src="/APGA/inc/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/APGA/inc/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/APGA/inc/js/bootstrap-datepicker_tw.js"></script>
+<script type="text/javascript" src="/APGA/inc/js/jquery.twbsPagination.min.js"></script>
+<!--Go Back-->
+<script type="text/javascript" src="/APGA/inc/js/goback.js"></script>
+<script type="text/javascript" src="/APGA/inc/js/cpt_menu.js"></script>
+<!--Base-->
+<script type="text/javascript" src="/APGA/inc/js/base.js"></script>
+<!-- iframe 高度 -->
+<script type="text/javascript" src="/APGA/inc/js/iframeResizer.min.js"></script>
+<script type="text/javascript">
+iFrameResize({
+    log: true, // Enable console logging
+    enablePublicMethods: true, // Enable methods within iframe hosted page
+});
+</script>
+<!-- iframe 高度 END -->
+
+<script type="text/javascript" src="/APGA/js/jquery/grid.locale-en.js"></script>
+<script type="text/javascript" src="/APGA/js/jquery/jquery.jqGrid.min.js"></script>
+
+
+<style type="text/css">
+
+.ui-jqgrid .ui-jqgrid-bdiv {
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+</style>
+
+<script type="text/javascript">
+	$( document ).ready(function(){
+	    /*
+	     * Replace all SVG images with inline SVG
+	     */
+	    $('img.svg').each(function(){
+	        var $img = jQuery(this);
+	        var imgID = $img.attr('id');
+	        var imgClass = $img.attr('class');
+	        var imgURL = $img.attr('src');
+
+	        jQuery.get(imgURL, function(data) {
+	            // Get the SVG tag, ignore the rest
+	            var $svg = jQuery(data).find('svg');
+
+	            // Add replaced image's ID to the new SVG
+	            if(typeof imgID !== 'undefined') {
+	                $svg = $svg.attr('id', imgID);
+	            }
+	            // Add replaced image's classes to the new SVG
+	            if(typeof imgClass !== 'undefined') {
+	                $svg = $svg.attr('class', imgClass+' replaced-svg');
+	            }
+
+	            // Remove any invalid XML tags as per http://validator.w3.org
+	            $svg = $svg.removeAttr('xmlns:a');
+
+	            // Check if the viewport is set, if the viewport is not set the SVG wont't scale.
+	            if(!$svg.attr('viewBox') && $svg.attr('height') && $svg.attr('width')) {
+	                $svg.attr('viewBox', '0 0 ' + $svg.attr('height') + ' ' + $svg.attr('width'))
+	            }
+
+	            // Replace image with new SVG
+	            $img.replaceWith($svg);
+
+	        }, 'xml');
+
+	    });
+	});
+	
+	$(function(){
+	    var goToTopButton = "<div alt='回到頂端' title='回到頂端' id='goToTop'><a href='#'>&ZeroWidthSpace;</a></div>";
+        $("#CONTENT").append(goToTopButton);
+        if($(window).scrollTop() < 400) {
+            $("#goToTop").hide();
+        }
+        $("#goToTop").goToTop({
+            min:300,
+            fadeSpeed: 500
+        });
+        $("#goToTop").click(function(e){
+            e.preventDefault();
+            $("html,body").animate({scrollTop:0},"slow");
+            //$('a[tabindex=1]').focus();
+        });
+	});
+	
+        function openMenu(url,data){
+        	if(typeof(data)=="undefined"){
+        		data={};
+        	}
+            $('#content').load(url,data);
+        }
+        
+        function WLOpenMenu(url){
+			var index ='https://'+  window.location.host + "/" +url;
+			window.location = index;
+        }     
+
+        function logoutCPT(){
+            if(confirm("是否要登出系統？")){
+				document.forms[0].action="Logout";
+				document.forms[0].target="_parent";
+				document.forms[0].submit();
+			}
+        }
+
+        function home(){
+        	var index = location.protocol + "//" +  window.location.host + "/PPL/";
+        	if(false){
+        		index+= "/eng/";
+        	}
+        	window.location = index;
+        }         
+        
+        function getUserMenu(data){
+			$('#userMenu_2').val(data.menuKey);
+        	return openMenu('/APGA/menuBody');
+        }
+        
+        function cptDomainName(url){
+        	var index = location.protocol + "//" +  window.location.host + "/PPL/";
+        	//window.location = index+url;
+        	window.open(index+url, '_blank');
+        }  
+        
+		function loadCptBody(url, type) {
+        	if(type=="news"){
+        	    $('.content_info').load(url, function(){
+            	    $('html, body').animate({ scrollTop: 0 }, 'fast');
+                	$('#crumb').remove();
+            		$(".title span")[0].innerText="最新消息及新聞稿";
+            	});
+        	}
+        	else{
+        	    $('.content_info').load(url, function(){
+            	    $('html, body').animate({ scrollTop: 0 }, 'fast');
+            	    $("#MENU").remove();
+                	$('.agreement').remove();
+            	});
+        	}
+        }
+        
+        function CHandEnChange(language,login){
+        	var index = location.protocol + "//" +  window.location.host + "/";
+        	
+        	if(language == 'EN'){
+        		index += '/APGQ/LoginFree?request_locale=en_US';
+        	}
+        	else if(login && language == 'CH'){
+        		index += '/APWO/Login';
+        	}
+        	else if(!login && language == 'CH'){
+        		index += '/APWO/LoginFree';
+        	}
+        	else{
+        		index += '/APGQ/LoginFree';
+        	}
+        	
+        	window.location = index;
+        } 
+    </script>  
+
+</head>
+<body leftmargin="0" topmargin="0" class="fontsize">
+
+
+ 
+ 
+
+
+
+    <div id="Header" class="wrapper index_header">
+        <div class="wsize">
+            <div class="logo">
+              <a href="javascript:home()"><img src="/APGA/inc/img/cpt_logo.png" alt="Logo"></img></a>
+            </div>
+            <a href="/APGA/" title='title'><span class="web_name">海關進出口統計</span></a>
+            
+            <ul class="gnav login_gnav">
+	                <li data-index="1"><a href="/APGA/" title="回首頁" alt="回首頁" target="_self">回首頁</a>
+	                </li>
+	                <li data-index="2"><a href="javascript:home()" title="單一窗口" alt="單一窗口">單一窗口</a>
+	                </li>
+	                <li data-index="3">
+	                	<a href="/PPL/index?loadUrl=/PPL/cptIntroduce&rightBody=0501" target="_blank" rel="noreferrer noopener" title="網站導覽" alt="網站導覽">網站導覽</a>
+	                </li>
+	                <!-- <li data-index="4">
+	                	<a href="mailto:cpt_helpdesk@mail.sw.nat.gov.tw" title="寄送電子郵件給&nbsp;cpt_helpdesk@mail.sw.nat.gov.tw" alt="聯絡我們" tabindex="7">聯絡我們</a>
+	                </li>
+	                <li data-index="5">
+	                	<a href="javascript:cptDomainName('?loadUrl=/PPL/fandq?loadUrl=/PPL/home/PortalFaq!queryForCategories?categoryNo=1376814055987" title="常見問題" alt="常見問題">常見問題</a>
+	                </li> -->
+	                <li data-index="6">
+	                	<a href="indexEn_execute" title="English" alt="English">English</a>
+	                </li>
+				
+				<li>
+                    <div class="font-size">
+                    <a href="javascript:void(0)" title="字級">字級</a>
+                    <ul data-index="1" data-child="3" style="margin-top: 0px; padding-left: 0px;">
+                      <li data-index="1" class="small">
+                        <span><a href="javascript:void(0)" title="小" alt="字級縮小" id="fontsize-minus" >小</a></span>
+                      </li>
+                      <li data-index="2" class="medium is-active">
+                        <span><a href="javascript:void(0)" title="中" alt="字級適中" id="fontsize-default">中</a></span>
+                      </li>
+                      <li data-index="3" class="large">
+                        <span><a href="javascript:void(0)" title="大" alt="字級放大" id="fontsize-plus">大</a></span>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+                
+            </ul>
+            <div class="clearfix"></div>
+            <!-- <div class="search_area">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="">搜尋</span>
+                </div>
+                <input type="text" class="form-control" placeholder="請輸入作業代碼" aria-label="請輸入作業代碼" title="查詢" id="search_pid" style="text-transform:uppercase;border-color:#000">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" type="button" id="query_show" onclick="javascript:searchPid()">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <br> -->
+	        <div style="float: right;padding: 5px;">
+	        	<span>
+	        	瀏覽人次 : 
+				<font color="#ed6f01">
+				
+				
+	9058549
+				
+				</font>
+				</span>
+	        </div>
+        </div>
+    </div>
+    
+     <div id="Nav">
+      <div class="wsize">
+        <ul class="nav_ul">
+          <li>
+            <a href="javascript:void(0)" title="公告訊息" alt="公告訊息">公告訊息</a>
+            <div class="submenu_area" style="overflow: hidden; display: block;">
+              <ul>
+                <li>
+                  <a href="GA01" title="最新消息及新聞稿" alt="最新消息及新聞稿" target="_self">
+                    <span>最新消息及新聞稿</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="GA34" title="資訊保護專區" alt="資訊保護專區" target="_self">
+                    <span>資訊保護專區</span>
+                  </a>
+                </li>
+                <!-- <li>
+                  <a href="GA01" title="新聞稿及其他" alt="新聞稿及其他" target="_self">
+                    <span>新聞稿及其他</span>
+                  </a>
+                </li> -->
+              </ul>
+            </div>
+          </li>
+          <li>
+		      <a href="javascript:void(0)" title="貿易統計" alt="貿易統計">貿易統計</a>         
+			  <div class="submenu_area" style="overflow: hidden; display: block;">
+	            <ul>
+                <li>
+                  <a href="GA02" title="資料庫說明" alt="資料庫說明" target="_self">
+                    <span>資料庫說明</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="GA28" title="互動式圖表" alt="互動式圖表" target="_self">
+                    <span>互動式圖表</span>
+                  </a>
+                </li>
+                <li class="submenu_multilayer">
+                  <a href="javascript:void(0)" title="資料庫查詢" alt="資料庫查詢">
+                    <span>資料庫查詢</span>
+                  </a>
+                  <ul class="submenu_list current" target="_self">
+                    <li>
+                      <a href="GA30" title="綜合查詢" alt="綜合查詢" target="_self">
+                        <span>綜合查詢</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="GA31" title="輔助查詢" alt="輔助查詢" target="_self">
+                        <span>輔助查詢</span>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+                <li class="submenu_multilayer">
+                  <a href="javascript:void(0)" title="統計資料下載" alt="統計資料下載">
+                    <span>統計資料下載</span>
+                  </a>
+                  <ul class="submenu_list current" target="_self">
+                    <li>
+                      <a href="GA29" title="統計表" alt="統計表" target="_self">
+                        <span>統計表</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="GA36" title="統計年刊" alt="統計年刊" target="_self">
+                        <span>統計年刊</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="https://web.customs.gov.tw/singlehtml/1207?cntId=cus1_93375_1207" 
+                      	title="進出口貿易統計資料訂購" alt="進出口貿易統計資料訂購" target="_blank" rel="noreferrer noopener">
+                        <span>進出口貿易統計資料訂購</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="https://web.customs.gov.tw/singlehtml/1207?cntId=cus1_93373_1207" 
+                      	title="申請廠商（個人）報關資料" alt="申請廠商（個人）報關資料" target="_blank" rel="noreferrer noopener">
+                        <span>申請廠商（個人）報關資料</span>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="GA17" title="其他參考資訊" alt="其他參考資訊" target="_self">
+                    <span>其他參考資訊</span>
+                  </a>
+                </li>
+	            </ul>
+	          </div>
+          </li>
+          <li>
+            <a href="javascript:void(0)" title="業務統計" alt="業務統計">業務統計</a>
+            <div class="submenu_area" style="overflow: hidden; display: block;">
+              <ul>
+                <li class="submenu_multilayer">
+                  <a href="javascript:void(0)" title="業務工作量" alt="業務工作量">
+                    <span>業務工作量</span>
+                  </a>
+                  <ul class="submenu_list current" target="_self">
+	                <li>
+	                  <a href="GA11" title="各關業務工作量" alt="各關業務工作量" target="_self">
+	                    <span>各關業務工作量</span>
+	                  </a>
+	                </li>
+	                <li>
+	                  <a href="GA22" title="公務統計表" alt="公務統計表" target="_self">
+	                    <span>公務統計表</span>
+	                  </a>
+	                </li>
+                  </ul>
+                </li>
+                <li class="submenu_multilayer">
+                  <a href="javascript:void(0)" title="海關徵收稅費" alt="海關徵收稅費">
+                    <span>海關徵收稅費</span>
+                  </a>
+                  <ul class="submenu_list current" target="_self">
+                    <li>
+	                  <a href="GA12" title="關稅收入(按稅則分)" alt="關稅收入(按稅則分)" target="_self">
+	                    <span>關稅收入(按稅則分)</span>
+	                  </a>
+	                </li>
+	                <li>
+	                  <a href="GA13" title="各關徵收稅費" alt="各關徵收稅費" target="_self">
+	                    <span>各關徵收稅費</span>
+	                  </a>
+	                </li>
+                  </ul>
+                </li>
+                
+                <li>
+                  <a href="GA14" title="關稅配額貨物量值" alt="關稅配額貨物量值" target="_self">
+                    <span>關稅配額貨物量值</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <a href="javascript:void(0)" title="FAQ" alt="FAQ">FAQ</a>
+            <div class="submenu_area" style="overflow: hidden; display: block;">
+              <ul>
+                <li>
+                  <a href="GA32" title="貿易統計資料問題" alt="貿易統計資料問題" target="_self">
+                    <span>貿易統計資料問題</span>
+                  </a>
+                </li>
+                <!-- <li>
+                  <a href="GA" title="業務統計問題" alt="業務統計問題" target="_self">
+                    <span>業務統計問題</span>
+                  </a>
+                </li> -->
+                <li>
+                  <a href="GA33" title="資料庫操作問題" alt="資料庫操作問題" target="_self">
+                    <span>資料庫操作問題</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+
+<div style="margin: 5px; width: 99%; display: table; background: #fff;">
+	<div id="MENU" style="height: 100%; width: 265px; display: table-cell; vertical-align: top;">
+		
+
+
+
+
+
+
+
+
+
+
+
+
+<html>
+<head>
+
+<script type="text/javascript"> 
+$( document ).ready(function(){
+	var pid='item_'+window.location.pathname.replace(/%3b/, ";").split("/").pop().split(";")[0].split("_")[0];
+
+	//$('.page-sidebar').hide();
+	$('#'+pid).parents(".page-sidebar").show();
+	
+	if(typeof $('#'+pid).parents(".accordion_multilayer") !== "undefined"){
+	    changeAriaEpanded($('#'+pid).parents(".accordion_multilayer").attr('id'));
+	}
+	
+	$('.accordion li').removeClass("active");
+	
+	$('#'+pid).addClass("active");
+});
+function changeAriaEpanded(item){
+    if($('#'+item).attr("aria-expanded")=="true"){
+        $('.accordion_multilayer').attr("aria-expanded","false");
+    	$('.accordion_multilayer ul').attr("style","overflow: hidden; display: none;");
+    }
+    else{
+        $('.accordion li').removeClass("active");
+    	$('.accordion_multilayer').attr("aria-expanded","false");
+    	$('.accordion_multilayer ul').attr("style","overflow: hidden; display: none;");
+    	
+    	$('#'+item).addClass("active");
+    	$('#'+item).attr("aria-expanded","true");
+    	$('#'+item+' ul').attr("style","overflow: hidden; display: block;");
+    }
+}
+
+</script>
+
+
+</head>
+<body>
+<div id="Contact" style="display: block;height: 100%;">
+	<div class="wsize">
+	<!-- 公告訊息 -->
+		<div class="page-sidebar" style="display: none;">
+          <ul class="accordion" data-accordion-menu>
+            <li id="item_GA01">
+              <a href="GA01" title="最新消息及新聞稿" alt="最新消息及新聞稿">最新消息及新聞稿</a>
+            </li>
+            <li id="item_GA34">
+              <a href="GA34" title="資訊保護專區" alt="資訊保護專區">資訊保護專區</a>
+            </li>
+          </ul>
+        </div>
+		
+		<!-- 貿易統計 -->
+		<div class="page-sidebar" style="display: none;">
+          <ul class="accordion" data-accordion-menu>
+            <li id="item_GA02">
+              <a href="GA02" title="資料庫說明" alt="資料庫說明">資料庫說明</a>
+            </li>
+            <li id="item_GA28">
+              <a href="GA28" title="互動式圖表" alt="互動式圖表">互動式圖表</a>
+            </li>
+            <li class="accordion_multilayer" id="item1" aria-expanded="false">
+              <a class="submenu" href="javascript:void(0)" title="資料庫查詢" alt="資料庫查詢" onclick="changeAriaEpanded('item1');">資料庫查詢</a>
+              <ul aria-hidden="true" style="overflow: hidden; display: none;">
+                <li id="item_GA30">
+                  <a href="GA30" class="is-submenu-item is-accordion-submenu-item" title="綜合查詢" alt="綜合查詢">綜合查詢</a>
+                </li>
+                <li id="item_GA31">
+                  <a href="GA31" class="is-submenu-item is-accordion-submenu-item" title="輔助查詢" alt="輔助查詢">輔助查詢</a>
+                </li>
+              </ul>
+            </li>
+            <li class="accordion_multilayer" id="item2" aria-expanded="false">
+              <a class="submenu" href="javascript:void(0)" title="統計資料下載" alt="統計資料下載" onclick="changeAriaEpanded('item2');">統計資料下載</a>
+              <ul aria-hidden="true" style="overflow: hidden; display: none;">
+                <li id="item_GA29">
+                  <a href="GA29" class="is-submenu-item is-accordion-submenu-item" title="統計表" alt="統計表">統計表</a>
+                </li>
+                <li id="item_GA36">
+                  <a href="GA36" class="is-submenu-item is-accordion-submenu-item" title="統計年刊" alt="統計年刊">統計年刊</a>
+                </li>
+                <li>
+                  <a href="https://web.customs.gov.tw/singlehtml/1207?cntId=cus1_93375_1207" 
+                  	class="is-submenu-item is-accordion-submenu-item" title="進出口貿易統計資料訂購" alt="進出口貿易統計資料訂購" target="_blank" rel="noreferrer noopener">進出口貿易統計資料訂購</a>
+                </li>
+                <li>
+                  <a href="https://web.customs.gov.tw/singlehtml/1207?cntId=cus1_93373_1207" 
+                  	class="is-submenu-item is-accordion-submenu-item" title="申請廠商（個人）報關資料" alt="申請廠商（個人）報關資料" target="_blank" rel="noreferrer noopener">申請廠商（個人）報關資料</a>
+                </li>
+              </ul>
+            </li>
+            <li id="item_GA17">
+              <a href="GA17" title="其他參考資訊" alt="其他參考資訊" >其他參考資訊</a>
+            </li>
+          </ul>
+        </div>
+        
+        <!-- 業務統計 -->
+		<div class="page-sidebar" style="display: none;">
+          <ul class="accordion" data-accordion-menu>
+          	<li class="accordion_multilayer" id="item3" aria-expanded="false">
+              <a class="submenu" href="javascript:void(0)" title="業務工作量" alt="業務工作量" onclick="changeAriaEpanded('item3');">業務工作量</a>
+              <ul aria-hidden="true" style="overflow: hidden; display: none;">
+                <li id="item_GA11">
+                  <a href="GA11" class="is-submenu-item is-accordion-submenu-item" title="各關業務工作量" alt="各關業務工作量">各關業務工作量</a>
+                </li>
+                <li id="item_GA22">
+                  <a href="GA22" class="is-submenu-item is-accordion-submenu-item" title="公務統計表" alt="公務統計表">公務統計表</a>
+                </li>
+              </ul>
+            </li>
+            <li class="accordion_multilayer" id="item4" aria-expanded="false">
+              <a class="submenu" href="javascript:void(0)" title="海關徵收稅費" alt="海關徵收稅費" onclick="changeAriaEpanded('item4');">海關徵收稅費</a>
+              <ul aria-hidden="true" style="overflow: hidden; display: none;">
+                <li id="item_GA12">
+                  <a href="GA12" class="is-submenu-item is-accordion-submenu-item" title="關稅收入(按稅則分)" alt="關稅收入(按稅則分)">關稅收入(按稅則分)</a>
+                </li>
+                <li id="item_GA13">
+                  <a href="GA13" class="is-submenu-item is-accordion-submenu-item" title="各關徵收稅費" alt="各關徵收稅費">各關徵收稅費</a>
+                </li>
+              </ul>
+            </li>
+            <li id="item_GA14">
+              <a href="GA14" title="關稅配額貨物量值" alt="關稅配額貨物量值">關稅配額貨物量值</a>
+            </li>
+          </ul>
+        </div>
+        
+        <!-- FAQ -->
+		<div class="page-sidebar" style="display: none;">
+          <ul class="accordion" data-accordion-menu>
+            <li id="item_GA32">
+              <a href="GA32" title="貿易統計資料問題" alt="貿易統計資料問題">貿易統計資料問題</a>
+            </li>
+            <!-- <li id="item_GA">
+              <a href="GA" title="業務統計問題" alt="業務統計問題">業務統計問題</a>
+            </li> -->
+            <li id="item_GA33">
+              <a href="GA33" title="資料庫操作問題" alt="資料庫操作問題">資料庫操作問題</a>
+            </li>
+          </ul>
+        </div>
+	</div>
+</div>
+
+</body>
+</html>
+	</div>
+	<div id="CONTENT" style="display: table-cell;">
+		
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="referrer" content="no-referrer" />
+<script type="text/javascript" src="js/ga/GACommonJS.js?v=20210721"></script>
+<script type="text/javascript" src="js/ga/GA30.js?v=202509021"></script>
+<style type="text/css">
+.modalBackground {
+	background-color: Gray;
+	filter: alpha(opacity = 70);
+	opacity: 0.7;
+}
+.hidePic {
+    display: none;
+}
+.showPic {
+    display: inherit;
+    position: absolute;
+    z-index: 10;
+    width: 400px;
+    border: 1px lightgray solid;
+}
+</style>
+
+</head>
+<body>
+   <div id="blocker" style="display:none;">
+       <div>資料讀取中……</div>
+   </div>
+   
+<div class="content_info">
+	<div id="crumb">
+		<dl id="path" class="path clearfix">
+			<dt>海關進出口統計</dt>
+			<dt>貿易統計</dt>
+			<dt>資料庫查詢</dt>
+			<dt>綜合查詢</dt>
+		</dl>
+	</div>
+   
+	<div style="display: flex; align-items: center;">
+		<h1 class="ga30_title"><span>綜合查詢</span></h1>
+		
+	</div>
+
+
+
+
+<form id="GA30_FORM" name="GA30_FORM" action="/APGA/GA30_LIST" method="post" class="yform">
+	<div class="abgne_tab" style="width: 100%;">
+	<div class="tab_container">
+	<table class="tb_sg" style="width: 100%;">
+ 	<tr>
+				<input type="hidden" name="minYear" value="92" id="MINYEAR"/>
+	<input type="hidden" name="maxYear" value="115" id="MAXYEAR"/>
+	<input type="hidden" name="maxMonth" value="6" id="MAXMONTH"/>
+	<input type="hidden" name="minMonth" value="1" id="MINMONTH"/>
+	<input type="hidden" name="maxYearByYear" value="115" id="MAXYEARBYYEAR"/>
+	
+		
+		<input type="text" style="display:none;" id="P_STARTYEAR" name="pStartyear" aria-label="起始年度" />
+		<input type="text" style="display:none;" id="P_ENDYEAR" name="pEndyer" aria-label="結束年度" />
+		<input type="text" style="display:none;" id="P_STARTMONTH" name="pStartmonth" aria-label="起始月份" />
+		<input type="text" style="display:none;" id="P_ENDMONTH" name="pEndmonth" aria-label="結束月份" />
+		<input type="text" style="display:none;" id="P_GTNOTE" name="pGtNote" aria-label="一般貿易制度註記" />
+		<input type="text" style="display:none;" id="P_COLSEQ" name="pColSeq" aria-label="欄位順序" />
+		<input type="text" style="display:none;" id="P_CNYLIST" name="pCnyList" aria-label="國家清單" />
+	</tr>  
+		<tr>
+			<td class="hd">進出口別</td>
+			<td align="left">
+				<div class="div_info">
+                    <fieldset>
+						<legend style="position:absolute;left:-9999px;">進出口別選擇</legend>
+					    <div class="checkbox checkbox-info checkbox-inline">
+					    	<input id="ImportTotal" type="checkbox" name="searchInfo.TypePort" value="3" />
+					    	<label for="ImportTotal">進口總值(含復進口)</label>
+					    </div>
+					    <div class="checkbox checkbox-info checkbox-inline">
+					    	<input id="ExportTotal" type="checkbox" name="searchInfo.TypePort" value="6" />
+					    	<label for="ExportTotal">出口總值(含復出口)</label>
+					    </div>
+                    </fieldset>
+                 </div>
+			</td>
+		</tr>
+
+		<tr>
+			<td class="hd">資料週期</td>
+            <td align="left">
+				<div class="div_info">
+                    <fieldset>
+						<legend style="position:absolute;left:-9999px;">資料週期選擇</legend>
+					    <div class="radio radio-info radio-inline">
+					    	<input id="REPORT_TYPE_1" type="radio" name="searchInfo.TypeTime" value="1" onchange="changeTimeRange(this)" checked="checked" />
+					    	<label for="REPORT_TYPE_1">按年</label>
+					    </div>
+					    <div class="radio radio-info radio-inline">
+					    	<input id="REPORT_TYPE_0" type="radio" name="searchInfo.TypeTime" value="0" onchange="changeTimeRange(this)" />
+					    	<label for="REPORT_TYPE_0">按月</label>
+					    </div>
+                    </fieldset>
+						<legend style="position:absolute;left:-9999px;">一般貿易制度回溯資料</legend>
+                 </div>
+            </td>
+		</tr>
+	
+        <tr>
+        	<td class="hd">資料期間</td>
+        	<td align="left">
+        	 <div id="timeRange" class="div_info"></div>
+        	 <div id="GENERAL_TRADE_INFO" class="div_info">
+        	 	(105年起按一般貿易制度編製，詳<a href="GA02" title="資料庫說明" alt="資料庫說明" target="_blank" rel="noreferrer noopener">說明</a>)
+        	 </div>
+        	 <div id="GENERAL_TRADE_NOTE" class="div_info" style="display: none;">
+        	 	<fieldset>
+					<legend style="position:absolute;left:-9999px;">一般貿易制度回溯資料</legend>
+        	 		<div class="checkbox checkbox-info checkbox-inline">
+        	 			<input id="GeneralTradeNote" type="checkbox" name="searchInfo.Notes" value="Y">
+        	 			<label for="GeneralTradeNote">103、104年採一般貿易制度回溯資料</label>
+        	 			<i class="fa fa-question-circle" onmouseenter="showPic()" onmouseleave="hidePic()"></i>
+        	 			<img id="info" src="/APGA/inc/img/GA/GA30_1.jpg" class="hidePic" alt="一般貿易制度說明">
+        	 		</div>
+        	 	</fieldset>
+        	 </div>
+        	</td>
+        </tr>
+
+		<tr>
+			<td align="left" class="hd">貨品別</td>
+			<td align="left">
+				<div class="div_info">
+                    <fieldset>
+						<legend style="position:absolute;left:-9999px;">貨品別選擇</legend>
+					    <div class="radio radio-info radio-inline">
+					    	<input id="HS_TYPE_0" type="radio" name="searchInfo.goodsType" value="0" checked="checked" onchange="changeColSeqList()" />
+					    	<label for="HS_TYPE_0">合計</label>
+					    </div>
+					    <div class="radio radio-info radio-inline">
+					    	<input id="HS_TYPE_1" type="radio" name="searchInfo.goodsType" value="1" onchange="changeColSeqList()"/>
+					    	<label for="HS_TYPE_1">全部貨品</label>
+					    	<select name="searchInfo.goodsName" id="goodsCodeType" aria-label="貨品名稱" onclick="changeRadio('HS_TYPE_1')">
+								<option value="21">21類</option>
+								<option value="2">2碼</option>
+							</select>
+					    </div><br/>
+					    <div class="radio radio-info radio-inline">
+					    	<input id="HS_TYPE_2" type="radio" name="searchInfo.goodsType" value="2" onchange="changeColSeqList()"/>
+					    	<label for="HS_TYPE_2">指定貨品號列</label>
+					    	<br/>
+							<input id="goodsCodeValue" name="searchInfo.goodsCodeGroup" aria-label="貨品號列" type="text"
+								placeholder="請輸入2/4/6/8/10(11)碼貨品號列，多項時以逗號分隔"
+								style="width: 500px; float: none;" onclick="changeRadio('HS_TYPE_2')"/>
+							<a id="anchor_706899477" href="javascript:void(0)" class="btn" onclick="changeRadio('HS_TYPE_2')">
+	貨品檢索
+	</a>
+<script type='text/javascript'>
+jQuery(document).ready(function () { 
+	var options_anchor_706899477 = {};
+	options_anchor_706899477.opendialog = "goodsSearch_dialog";
+	options_anchor_706899477.jqueryaction = "anchor";
+	options_anchor_706899477.id = "anchor_706899477";
+	options_anchor_706899477.href = "/APGA/GoodsSearch_searchGA30";
+	options_anchor_706899477.button = true;
+	options_anchor_706899477.bicon = "ui-icon-search";
+
+jQuery.struts2_jquery.bind(jQuery('#anchor_706899477'),options_anchor_706899477);
+
+ });  
+</script>
+					    </div>
+                    </fieldset>
+                 </div>
+			</td>
+		</tr>
+		<tr id="countries">
+			<td class="hd">國家(地區)別</td>
+			<td align="left">
+				<div class="div_info">
+                    <fieldset>
+						<legend style="position:absolute;left:-9999px;">國家(地區)別選擇</legend>
+					    <div class="radio radio-info radio-inline">
+					    	<input id=COUNTRY_TYPE_0 type="radio" name="searchInfo.groupType" value="0" checked="checked" onchange="changeColSeqList()" />
+					    	<label for="COUNTRY_TYPE_0">合計</label>
+					    </div>
+					    <div class="radio radio-info radio-inline">
+					    	<input id="COUNTRY_TYPE_1" type="radio" name="searchInfo.groupType" value="1" onchange="changeColSeqList()"/>
+					    	<label for="COUNTRY_TYPE_1">全部國家</label>
+					    </div><br/>
+					    <div class="radio radio-info radio-inline">
+					    	<input id="COUNTRY_TYPE_2" type="radio" name="searchInfo.groupType" value="2" onchange="changeColSeqList()" onclick="$('#CNY_BTN').click();"/>
+					    	<label for="COUNTRY_TYPE_2">指定國家(地區)</label>
+					    	<br/>
+							<input name="searchInfo.CountryName" type="text" aria-label="國家名稱" placeholder="請點選國家檢索"
+								readonly="readonly" id="nationalCodeValue" style="width: 500px;" onclick="$('#CNY_BTN').click();" />
+							<a id="CNY_BTN" href="javascript:void(0)" class="btn" onclick="changeRadio('COUNTRY_TYPE_2')">
+	國家檢索
+	</a>
+<script type='text/javascript'>
+jQuery(document).ready(function () { 
+	var options_CNY_BTN = {};
+	options_CNY_BTN.opendialog = "nationalCodeSearch_dialog";
+	options_CNY_BTN.jqueryaction = "anchor";
+	options_CNY_BTN.id = "CNY_BTN";
+	options_CNY_BTN.href = "/APGA/NationalCodeSearch";
+	options_CNY_BTN.button = true;
+	options_CNY_BTN.bicon = "ui-icon-search";
+
+jQuery.struts2_jquery.bind(jQuery('#CNY_BTN'),options_CNY_BTN);
+
+ });  
+</script>
+					    </div>
+                    </fieldset>
+                 </div>
+			</td>
+		</tr>
+
+		<tr>
+			<td class="hd">統計值</td>
+			<td align="left">
+				<div class="div_info">
+                    <fieldset>
+						<legend style="position:absolute;left:-9999px;">統計值選擇</legend>
+					    <div class="checkbox checkbox-info checkbox-inline">
+					    	<input id="Statistics1" type="checkbox" name="searchInfo.Type" value="1" checked="checked" />
+					    	<label for="Statistics1">金額(美元)</label>
+					    </div>
+					    <div class="checkbox checkbox-info checkbox-inline">
+					    	<input id="Statistics2" type="checkbox" name="searchInfo.Type" value="2" />
+					    	<label for="Statistics2">金額(新臺幣)</label>
+					    </div>
+					    <div class="checkbox checkbox-info checkbox-inline">
+					    	<input id="Statistics3" type="checkbox" name="searchInfo.Type" value="3" />
+					    	<label for="Statistics3">重量(公噸)</label>
+					    </div>
+					    <div class="checkbox checkbox-info checkbox-inline">
+					    	<input id="Statistics5" type="checkbox" name="searchInfo.Type" value="5" />
+					    	<label for="Statistics5">重量(公斤)</label>
+					    </div>
+					    <div class="checkbox checkbox-info checkbox-inline" id="CHECKBOX_QTY">
+					    	<input id="Statistics4" type="checkbox" name="searchInfo.Type" value="4" />
+					    	<label for="Statistics4">數量(限11碼貨品)</label>
+					    </div>
+                    </fieldset>
+                 </div>
+			</td>
+		</tr>
+
+		<tr id="rbBy">
+			<td class="hd">欄位順序</td>
+			<td align="left">
+				<div class="div_info">
+                    <span id="COLUMN_SEQ_LIST">進出口別 / 日期 / 貨品別 / 國家(地區)別</span>
+					<input type="hidden" name="searchInfo.OrderType" value="&#36914;&#20986;&#21475;&#21029; / &#26085;&#26399; / &#36008;&#21697;&#21029; / &#22283;&#23478;(&#22320;&#21312;)&#21029;" id="ORDER_TYPE"/>
+	<a id="anchor_1877419175" href="javascript:void(0)" class="btn">
+	順序調整
+	</a>
+<script type='text/javascript'>
+jQuery(document).ready(function () { 
+	var options_anchor_1877419175 = {};
+	options_anchor_1877419175.opendialog = "sequenceChange_dialog";
+	options_anchor_1877419175.jqueryaction = "anchor";
+	options_anchor_1877419175.id = "anchor_1877419175";
+	options_anchor_1877419175.href = "/APGA/GA30_changeSequence";
+	options_anchor_1877419175.button = true;
+	options_anchor_1877419175.bicon = "ui-icon-refresh";
+
+jQuery.struts2_jquery.bind(jQuery('#anchor_1877419175'),options_anchor_1877419175);
+
+ });  
+</script>
+                 </div>
+			</td>
+		</tr>
+
+		<tr>
+			<td class="hd">輸出模式</td>
+            <td align="left">
+				<div class="div_info">
+                    <fieldset>
+						<legend style="position:absolute;left:-9999px;">輸出模式選擇</legend>
+					    <div class="radio radio-info radio-inline">
+					    	<input id="EXPORT_TYPE_1" type="radio" name="searchInfo.ExportType" value="web" />
+					    	<label for="EXPORT_TYPE_1">網頁檢視</label>
+					    </div>
+					    <div class="radio radio-info radio-inline">
+					    	<input id="EXPORT_TYPE_2" type="radio" name="searchInfo.ExportType" value="excel" />
+					    	<label for="EXPORT_TYPE_2">下載Excel</label>
+					    </div>
+					    <div class="radio radio-info radio-inline">
+					    	<input id="EXPORT_TYPE_3" type="radio" name="searchInfo.ExportType" value="ods" />
+					    	<label for="EXPORT_TYPE_3">下載ODS</label>
+					    </div>
+					    <div class="radio radio-info radio-inline">
+					    	<input id="EXPORT_TYPE_4" type="radio" name="searchInfo.ExportType" value="csv" />
+					    	<label for="EXPORT_TYPE_4">下載CSV</label>
+					    </div>
+                    </fieldset>
+                 </div>
+            </td>
+		</tr>
+
+		<tr id="rbBy">
+			<td class="hd">驗證碼</td>
+			<td align="left">
+				<div class="div_info" style="display: flex; align-items: center;">
+                    <input type="text" name="searchInfo.Captcha" value="" id="checkNo" title="驗證碼" placeholder="請輸入驗證碼" oninput="$('#errorCaptcha').hide();" aria-label="請輸入驗證碼"/>&nbsp;
+					 <img src=""  id="captchaPic" alt="驗證碼圖片"/>&nbsp;
+					 <a class="tb_btn btn_icon_only" href="javascript:changeCaptchaPic()" style="min-width: inherit !important;" title="看不清楚，更新圖片" alt="看不清楚，更新圖片"><i class="fas fa-redo-alt"></i>&ZeroWidthSpace;</a>&nbsp;
+					 <a href="javascript:void(0)" id="getCaptchaCode" onclick="getCaptchaCode();" class="btn" title="語音撥放" alt="語音撥放"><i class="fas fa-volume-up"></i><span class="btn-txt">語音撥放</span></a>
+					<audio src="" id="audioCode" hidden ></audio>
+					<div id="errorCaptcha" style="color: red; display: none;">　驗證碼錯誤</div>
+                 </div>
+			</td>
+		</tr>
+		
+    </table>
+    </div></div>
+	
+	<div class="btnBox">
+		<button type="button" name="formCheck" value="開始查詢"  id="FORM_CHECK" class="btn" onclick="check();" >開始查詢</button>
+     	<button type="reset" name="Clear"  value="重新輸入"  id="CLEAR"  class="btn" onclick="onReset();" >重新輸入</button>
+     	<button type="submit" name="Search" value="開始查詢"  id="SEARCH" class="btn" style="display: none;">開始查詢</button>
+    </div>
+</form>
+
+
+
+
+
+	<div class="agreement mobile_hidden">
+	    <h2 class="useNoteTitle"><font>【查詢使用說明】</font></h2>
+	    <div class="agreement_con UseNote">
+	        
+		    <font color="blue">（一）資料週期與期間</font>
+		    <ul>
+		        <li>進出口報單經海關放行並審核，以審核日列入貿易統計，各月統計迄次月2日。</li>
+		        <li>點選「按年」─提供年度資料。資料期間如選擇當年度者，為該年度1月至最新資料月份之累計值。</li>
+				<li>點選「按月」─提供所選資料期間逐月資料，資料期間不限同一年度。</li>
+
+		    </ul>
+	        
+		    <font color="blue">（二）貨品別</font>
+		    <ul>
+		        <li>點選「合計」─將顯示貨品總值。</li>
+				<li>點選「全部貨品」─將詳列21類或2碼貨品。</li>
+				<li>點選「指定貨品號列」─可自行輸入稅號查詢，多稅號時請使用逗號(,)做為區隔。</li>
+				<li>「貨品檢索」功能，提供「按關鍵字」及「按貨品分類號列」兩種貨品稅號選取方式。</li>
+
+		    </ul>
+	        
+		    <font color="blue">（三）國家(地區)別</font>
+		    <ul>
+		        <li>進、出口國家(地區)別分別以生產國家(地區)、已知最終目的地國家(地區)為準。</li>
+				<li>點選「合計」─將顯示不分國別之總值。</li>
+				<li>點選「全部國家」─將詳列國別。</li>
+				<li>點選「指定國家(地區)」─提供「國家檢索」功能，可「按洲別」及「關鍵字」選取指定國家(地區)。</li>
+		    </ul>
+	        
+		    <font color="blue">（四）欄位順序</font>
+		    <ul>
+		        <li style="list-style: none !important;margin-left: 2.8em !important;">點選「順序調整」按鈕，可自行調整資料排列方式。</li>
+		    </ul>
+		    
+	    </div>
+	</div>
+</div>
+
+<div id="goodsSearch_dialog"
+>
+</div>
+<script type='text/javascript'>
+jQuery(document).ready(function () { 
+	var options_goodsSearch_dialog = {};
+	options_goodsSearch_dialog.width = 900;
+	options_goodsSearch_dialog.title = "稅則/貨品分類檢索";
+	options_goodsSearch_dialog.autoOpen = false;
+	options_goodsSearch_dialog.modal = true;
+	options_goodsSearch_dialog.jqueryaction = "dialog";
+	options_goodsSearch_dialog.id = "goodsSearch_dialog";
+	options_goodsSearch_dialog.href = "#";
+
+jQuery.struts2_jquery_ui.bind(jQuery('#goodsSearch_dialog'),options_goodsSearch_dialog);
+
+ });  
+</script>
+
+<div id="nationalCodeSearch_dialog"
+>
+</div>
+<script type='text/javascript'>
+jQuery(document).ready(function () { 
+	var options_nationalCodeSearch_dialog = {};
+	options_nationalCodeSearch_dialog.width = 750;
+	options_nationalCodeSearch_dialog.title = "國家別檢索";
+	options_nationalCodeSearch_dialog.autoOpen = false;
+	options_nationalCodeSearch_dialog.modal = true;
+	options_nationalCodeSearch_dialog.jqueryaction = "dialog";
+	options_nationalCodeSearch_dialog.id = "nationalCodeSearch_dialog";
+	options_nationalCodeSearch_dialog.href = "#";
+
+jQuery.struts2_jquery_ui.bind(jQuery('#nationalCodeSearch_dialog'),options_nationalCodeSearch_dialog);
+
+ });  
+</script>
+
+<div id="sequenceChange_dialog"
+>
+</div>
+<script type='text/javascript'>
+jQuery(document).ready(function () { 
+	var options_sequenceChange_dialog = {};
+	options_sequenceChange_dialog.width = 550;
+	options_sequenceChange_dialog.title = "欄位順序調整";
+	options_sequenceChange_dialog.autoOpen = false;
+	options_sequenceChange_dialog.modal = true;
+	options_sequenceChange_dialog.jqueryaction = "dialog";
+	options_sequenceChange_dialog.id = "sequenceChange_dialog";
+	options_sequenceChange_dialog.href = "#";
+
+jQuery.struts2_jquery_ui.bind(jQuery('#sequenceChange_dialog'),options_sequenceChange_dialog);
+
+ });  
+</script>
+
+</body>
+</html>
+	</div>
+</div>
+
+    
+<div id="Footer" class="cpt_Footer">
+    <div class="wsize">
+		<div class="index_copyright clearfix">
+        ©2013 財政部關務署版權所有，請尊重智慧財產權，未經允許請勿任意轉載、複製或做商業用途<br>
+	            機關地址：10341 臺北市大同區塔城街13號<br>
+	            上班時間：星期一至星期五 上午 08：30 ~ 12：30 下午 13：30 ~ 17：30 (服務台中午不休息)<br>
+	            統計資料諮詢電話： (02)25505500 分機 2815‧信箱：sta@customs.gov.tw<br>
+	            單一窗口服務中心 電話0800-299-889 ‧傳真：(02)25589601 ‧信箱：cpt_helpdesk@mail.sw.nat.gov.tw
+         </div>
+        <div class="footer_link">
+          <ul>
+            <li>
+              <a href="javascript:loadCptBody('/PPL/index!privacy', '')">隱私權宣告</a>
+            </li>
+            <li>
+              <a href="javascript:loadCptBody('/PPL/index!ifs', '')">資訊安全政策</a>
+            </li>
+            <li>
+              <a href="javascript:loadCptBody('/PPL/index!copy', '')">著作權聲明</a>
+            </li>
+          </ul>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

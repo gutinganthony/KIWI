@@ -1,0 +1,1154 @@
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="zh-Hant-TW">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Language" content="zh-tw">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+<title>海關進出口統計</title>
+
+
+
+
+
+	<script type="text/javascript" src="/APGA/struts/js/base/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="/APGA/struts/js/base/jquery.ui.core.min.js?s2j=3.3.1"></script>
+  <script type="text/javascript" src="/APGA/struts/js/plugins/jquery.subscribe.min.js"></script>
+
+  <script type="text/javascript" src="/APGA/struts/js/struts2/jquery.struts2-3.3.1.min.js"></script>
+
+<script type="text/javascript">
+$(function() {
+	jQuery.struts2_jquery.version="3.3.1";
+	jQuery.struts2_jquery.debug = true;
+  	jQuery.scriptPath = "/APGA/struts/";
+	jQuery.struts2_jquery.defaults.indicator="myDefaultIndicator";
+	jQuery.struts2_jquery.defaults.loadingText="Please wait ...";
+	jQuery.ajaxSettings.traditional = true;
+
+	jQuery.ajaxSetup ({
+		cache: false
+	});
+	
+	jQuery.struts2_jquery.require("js/struts2/jquery.ui.struts2-3.3.1.min.js");
+	
+});
+</script>
+
+        	<link id="jquery_theme_link" rel="stylesheet" href="/APGA/struts/themes/start/jquery-ui.css?s2j=3.3.1" type="text/css"/>
+
+	
+<link rel="stylesheet" type="text/css" href="/APGA/inc/css/cpt-theme/jquery-ui.css" />
+<link rel="stylesheet" type="text/css" href="/APGA/inc/css/fontawesome-all.min.css" />
+<link rel="stylesheet" type="text/css" href="/APGA/inc/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="/APGA/inc/css/bootstrap-theme.min.css" />
+<link rel="stylesheet" type="text/css" href="/APGA/inc/css/bootstrap-datepicker3.min.css" />
+<link rel="stylesheet" type="text/css" href="/APGA/css/ui.jqgrid.css" />
+<link rel="stylesheet" type="text/css" href="/APGA/inc/css/ga.css?v=20251001" />
+
+<script type="text/javascript" src="/APGA/inc/js/purify.min.js"></script>
+<script type="text/javascript" language="Javascript1.2" src="/APGA/js/commons.js"></script>
+<script type="text/javascript" language="javascript" src="/APGA/js/ajax.js"></script>
+<script type="text/javascript" language="javascript" src="/APGA/js/validate.js"></script>
+<script type="text/javascript" language="javascript" src="/APGA/js/string.js"></script>
+<script type="text/javascript" language="javascript" src="/APGA/js/dialog.js"></script>
+<script type="text/javascript" language="javascript" src="/APGA/js/dhtml.js"></script>
+<script type="text/javascript" language="javascript" src="/APGA/js/date.js"></script>
+<script type="text/javascript" language="javascript" src="/APGA/js/number.js"></script>
+
+<script type="text/javascript" src="/APGA/inc/js/fontawesome_all.js"></script>
+<script type="text/javascript" src="/APGA/inc/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/APGA/inc/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/APGA/inc/js/bootstrap-datepicker_tw.js"></script>
+<script type="text/javascript" src="/APGA/inc/js/jquery.twbsPagination.min.js"></script>
+<!--Go Back-->
+<script type="text/javascript" src="/APGA/inc/js/goback.js"></script>
+<script type="text/javascript" src="/APGA/inc/js/cpt_menu.js"></script>
+<!--Base-->
+<script type="text/javascript" src="/APGA/inc/js/base.js"></script>
+<!-- iframe 高度 -->
+<script type="text/javascript" src="/APGA/inc/js/iframeResizer.min.js"></script>
+<script type="text/javascript">
+iFrameResize({
+    log: true, // Enable console logging
+    enablePublicMethods: true, // Enable methods within iframe hosted page
+});
+</script>
+<!-- iframe 高度 END -->
+
+<script type="text/javascript" src="/APGA/js/jquery/grid.locale-en.js"></script>
+<script type="text/javascript" src="/APGA/js/jquery/jquery.jqGrid.min.js"></script>
+
+
+<style type="text/css">
+
+.ui-jqgrid .ui-jqgrid-bdiv {
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+</style>
+
+<script type="text/javascript">
+	$( document ).ready(function(){
+	    /*
+	     * Replace all SVG images with inline SVG
+	     */
+	    $('img.svg').each(function(){
+	        var $img = jQuery(this);
+	        var imgID = $img.attr('id');
+	        var imgClass = $img.attr('class');
+	        var imgURL = $img.attr('src');
+
+	        jQuery.get(imgURL, function(data) {
+	            // Get the SVG tag, ignore the rest
+	            var $svg = jQuery(data).find('svg');
+
+	            // Add replaced image's ID to the new SVG
+	            if(typeof imgID !== 'undefined') {
+	                $svg = $svg.attr('id', imgID);
+	            }
+	            // Add replaced image's classes to the new SVG
+	            if(typeof imgClass !== 'undefined') {
+	                $svg = $svg.attr('class', imgClass+' replaced-svg');
+	            }
+
+	            // Remove any invalid XML tags as per http://validator.w3.org
+	            $svg = $svg.removeAttr('xmlns:a');
+
+	            // Check if the viewport is set, if the viewport is not set the SVG wont't scale.
+	            if(!$svg.attr('viewBox') && $svg.attr('height') && $svg.attr('width')) {
+	                $svg.attr('viewBox', '0 0 ' + $svg.attr('height') + ' ' + $svg.attr('width'))
+	            }
+
+	            // Replace image with new SVG
+	            $img.replaceWith($svg);
+
+	        }, 'xml');
+
+	    });
+	});
+	
+	$(function(){
+	    var goToTopButton = "<div alt='回到頂端' title='回到頂端' id='goToTop'><a href='#'>&ZeroWidthSpace;</a></div>";
+        $("#CONTENT").append(goToTopButton);
+        if($(window).scrollTop() < 400) {
+            $("#goToTop").hide();
+        }
+        $("#goToTop").goToTop({
+            min:300,
+            fadeSpeed: 500
+        });
+        $("#goToTop").click(function(e){
+            e.preventDefault();
+            $("html,body").animate({scrollTop:0},"slow");
+            //$('a[tabindex=1]').focus();
+        });
+	});
+	
+        function openMenu(url,data){
+        	if(typeof(data)=="undefined"){
+        		data={};
+        	}
+            $('#content').load(url,data);
+        }
+        
+        function WLOpenMenu(url){
+			var index ='https://'+  window.location.host + "/" +url;
+			window.location = index;
+        }     
+
+        function logoutCPT(){
+            if(confirm("是否要登出系統？")){
+				document.forms[0].action="Logout";
+				document.forms[0].target="_parent";
+				document.forms[0].submit();
+			}
+        }
+
+        function home(){
+        	var index = location.protocol + "//" +  window.location.host + "/PPL/";
+        	if(false){
+        		index+= "/eng/";
+        	}
+        	window.location = index;
+        }         
+        
+        function getUserMenu(data){
+			$('#userMenu_2').val(data.menuKey);
+        	return openMenu('/APGA/menuBody');
+        }
+        
+        function cptDomainName(url){
+        	var index = location.protocol + "//" +  window.location.host + "/PPL/";
+        	//window.location = index+url;
+        	window.open(index+url, '_blank');
+        }  
+        
+		function loadCptBody(url, type) {
+        	if(type=="news"){
+        	    $('.content_info').load(url, function(){
+            	    $('html, body').animate({ scrollTop: 0 }, 'fast');
+                	$('#crumb').remove();
+            		$(".title span")[0].innerText="最新消息及新聞稿";
+            	});
+        	}
+        	else{
+        	    $('.content_info').load(url, function(){
+            	    $('html, body').animate({ scrollTop: 0 }, 'fast');
+            	    $("#MENU").remove();
+                	$('.agreement').remove();
+            	});
+        	}
+        }
+        
+        function CHandEnChange(language,login){
+        	var index = location.protocol + "//" +  window.location.host + "/";
+        	
+        	if(language == 'EN'){
+        		index += '/APGQ/LoginFree?request_locale=en_US';
+        	}
+        	else if(login && language == 'CH'){
+        		index += '/APWO/Login';
+        	}
+        	else if(!login && language == 'CH'){
+        		index += '/APWO/LoginFree';
+        	}
+        	else{
+        		index += '/APGQ/LoginFree';
+        	}
+        	
+        	window.location = index;
+        } 
+    </script>  
+
+</head>
+<body leftmargin="0" topmargin="0" class="fontsize">
+
+
+ 
+ 
+
+
+
+    <div id="Header" class="wrapper index_header">
+        <div class="wsize">
+            <div class="logo">
+              <a href="javascript:home()"><img src="/APGA/inc/img/cpt_logo.png" alt="Logo"></img></a>
+            </div>
+            <a href="/APGA/" title='title'><span class="web_name">海關進出口統計</span></a>
+            
+            <ul class="gnav login_gnav">
+	                <li data-index="1"><a href="/APGA/" title="回首頁" alt="回首頁" target="_self">回首頁</a>
+	                </li>
+	                <li data-index="2"><a href="javascript:home()" title="單一窗口" alt="單一窗口">單一窗口</a>
+	                </li>
+	                <li data-index="3">
+	                	<a href="/PPL/index?loadUrl=/PPL/cptIntroduce&rightBody=0501" target="_blank" rel="noreferrer noopener" title="網站導覽" alt="網站導覽">網站導覽</a>
+	                </li>
+	                <!-- <li data-index="4">
+	                	<a href="mailto:cpt_helpdesk@mail.sw.nat.gov.tw" title="寄送電子郵件給&nbsp;cpt_helpdesk@mail.sw.nat.gov.tw" alt="聯絡我們" tabindex="7">聯絡我們</a>
+	                </li>
+	                <li data-index="5">
+	                	<a href="javascript:cptDomainName('?loadUrl=/PPL/fandq?loadUrl=/PPL/home/PortalFaq!queryForCategories?categoryNo=1376814055987" title="常見問題" alt="常見問題">常見問題</a>
+	                </li> -->
+	                <li data-index="6">
+	                	<a href="indexEn_execute" title="English" alt="English">English</a>
+	                </li>
+				
+				<li>
+                    <div class="font-size">
+                    <a href="javascript:void(0)" title="字級">字級</a>
+                    <ul data-index="1" data-child="3" style="margin-top: 0px; padding-left: 0px;">
+                      <li data-index="1" class="small">
+                        <span><a href="javascript:void(0)" title="小" alt="字級縮小" id="fontsize-minus" >小</a></span>
+                      </li>
+                      <li data-index="2" class="medium is-active">
+                        <span><a href="javascript:void(0)" title="中" alt="字級適中" id="fontsize-default">中</a></span>
+                      </li>
+                      <li data-index="3" class="large">
+                        <span><a href="javascript:void(0)" title="大" alt="字級放大" id="fontsize-plus">大</a></span>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+                
+            </ul>
+            <div class="clearfix"></div>
+            <!-- <div class="search_area">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="">搜尋</span>
+                </div>
+                <input type="text" class="form-control" placeholder="請輸入作業代碼" aria-label="請輸入作業代碼" title="查詢" id="search_pid" style="text-transform:uppercase;border-color:#000">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" type="button" id="query_show" onclick="javascript:searchPid()">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <br> -->
+	        <div style="float: right;padding: 5px;">
+	        	<span>
+	        	瀏覽人次 : 
+				<font color="#ed6f01">
+				
+				
+	9058549
+				
+				</font>
+				</span>
+	        </div>
+        </div>
+    </div>
+    
+     <div id="Nav">
+      <div class="wsize">
+        <ul class="nav_ul">
+          <li>
+            <a href="javascript:void(0)" title="公告訊息" alt="公告訊息">公告訊息</a>
+            <div class="submenu_area" style="overflow: hidden; display: block;">
+              <ul>
+                <li>
+                  <a href="GA01" title="最新消息及新聞稿" alt="最新消息及新聞稿" target="_self">
+                    <span>最新消息及新聞稿</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="GA34" title="資訊保護專區" alt="資訊保護專區" target="_self">
+                    <span>資訊保護專區</span>
+                  </a>
+                </li>
+                <!-- <li>
+                  <a href="GA01" title="新聞稿及其他" alt="新聞稿及其他" target="_self">
+                    <span>新聞稿及其他</span>
+                  </a>
+                </li> -->
+              </ul>
+            </div>
+          </li>
+          <li>
+		      <a href="javascript:void(0)" title="貿易統計" alt="貿易統計">貿易統計</a>         
+			  <div class="submenu_area" style="overflow: hidden; display: block;">
+	            <ul>
+                <li>
+                  <a href="GA02" title="資料庫說明" alt="資料庫說明" target="_self">
+                    <span>資料庫說明</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="GA28" title="互動式圖表" alt="互動式圖表" target="_self">
+                    <span>互動式圖表</span>
+                  </a>
+                </li>
+                <li class="submenu_multilayer">
+                  <a href="javascript:void(0)" title="資料庫查詢" alt="資料庫查詢">
+                    <span>資料庫查詢</span>
+                  </a>
+                  <ul class="submenu_list current" target="_self">
+                    <li>
+                      <a href="GA30" title="綜合查詢" alt="綜合查詢" target="_self">
+                        <span>綜合查詢</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="GA31" title="輔助查詢" alt="輔助查詢" target="_self">
+                        <span>輔助查詢</span>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+                <li class="submenu_multilayer">
+                  <a href="javascript:void(0)" title="統計資料下載" alt="統計資料下載">
+                    <span>統計資料下載</span>
+                  </a>
+                  <ul class="submenu_list current" target="_self">
+                    <li>
+                      <a href="GA29" title="統計表" alt="統計表" target="_self">
+                        <span>統計表</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="GA36" title="統計年刊" alt="統計年刊" target="_self">
+                        <span>統計年刊</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="https://web.customs.gov.tw/singlehtml/1207?cntId=cus1_93375_1207" 
+                      	title="進出口貿易統計資料訂購" alt="進出口貿易統計資料訂購" target="_blank" rel="noreferrer noopener">
+                        <span>進出口貿易統計資料訂購</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="https://web.customs.gov.tw/singlehtml/1207?cntId=cus1_93373_1207" 
+                      	title="申請廠商（個人）報關資料" alt="申請廠商（個人）報關資料" target="_blank" rel="noreferrer noopener">
+                        <span>申請廠商（個人）報關資料</span>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="GA17" title="其他參考資訊" alt="其他參考資訊" target="_self">
+                    <span>其他參考資訊</span>
+                  </a>
+                </li>
+	            </ul>
+	          </div>
+          </li>
+          <li>
+            <a href="javascript:void(0)" title="業務統計" alt="業務統計">業務統計</a>
+            <div class="submenu_area" style="overflow: hidden; display: block;">
+              <ul>
+                <li class="submenu_multilayer">
+                  <a href="javascript:void(0)" title="業務工作量" alt="業務工作量">
+                    <span>業務工作量</span>
+                  </a>
+                  <ul class="submenu_list current" target="_self">
+	                <li>
+	                  <a href="GA11" title="各關業務工作量" alt="各關業務工作量" target="_self">
+	                    <span>各關業務工作量</span>
+	                  </a>
+	                </li>
+	                <li>
+	                  <a href="GA22" title="公務統計表" alt="公務統計表" target="_self">
+	                    <span>公務統計表</span>
+	                  </a>
+	                </li>
+                  </ul>
+                </li>
+                <li class="submenu_multilayer">
+                  <a href="javascript:void(0)" title="海關徵收稅費" alt="海關徵收稅費">
+                    <span>海關徵收稅費</span>
+                  </a>
+                  <ul class="submenu_list current" target="_self">
+                    <li>
+	                  <a href="GA12" title="關稅收入(按稅則分)" alt="關稅收入(按稅則分)" target="_self">
+	                    <span>關稅收入(按稅則分)</span>
+	                  </a>
+	                </li>
+	                <li>
+	                  <a href="GA13" title="各關徵收稅費" alt="各關徵收稅費" target="_self">
+	                    <span>各關徵收稅費</span>
+	                  </a>
+	                </li>
+                  </ul>
+                </li>
+                
+                <li>
+                  <a href="GA14" title="關稅配額貨物量值" alt="關稅配額貨物量值" target="_self">
+                    <span>關稅配額貨物量值</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <a href="javascript:void(0)" title="FAQ" alt="FAQ">FAQ</a>
+            <div class="submenu_area" style="overflow: hidden; display: block;">
+              <ul>
+                <li>
+                  <a href="GA32" title="貿易統計資料問題" alt="貿易統計資料問題" target="_self">
+                    <span>貿易統計資料問題</span>
+                  </a>
+                </li>
+                <!-- <li>
+                  <a href="GA" title="業務統計問題" alt="業務統計問題" target="_self">
+                    <span>業務統計問題</span>
+                  </a>
+                </li> -->
+                <li>
+                  <a href="GA33" title="資料庫操作問題" alt="資料庫操作問題" target="_self">
+                    <span>資料庫操作問題</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+
+<div style="margin: 5px; width: 99%; display: table; background: #fff;">
+	<div id="MENU" style="height: 100%; width: 265px; display: table-cell; vertical-align: top;">
+		
+
+
+
+
+
+
+
+
+
+
+
+
+<html>
+<head>
+
+<script type="text/javascript"> 
+$( document ).ready(function(){
+	var pid='item_'+window.location.pathname.replace(/%3b/, ";").split("/").pop().split(";")[0].split("_")[0];
+
+	//$('.page-sidebar').hide();
+	$('#'+pid).parents(".page-sidebar").show();
+	
+	if(typeof $('#'+pid).parents(".accordion_multilayer") !== "undefined"){
+	    changeAriaEpanded($('#'+pid).parents(".accordion_multilayer").attr('id'));
+	}
+	
+	$('.accordion li').removeClass("active");
+	
+	$('#'+pid).addClass("active");
+});
+function changeAriaEpanded(item){
+    if($('#'+item).attr("aria-expanded")=="true"){
+        $('.accordion_multilayer').attr("aria-expanded","false");
+    	$('.accordion_multilayer ul').attr("style","overflow: hidden; display: none;");
+    }
+    else{
+        $('.accordion li').removeClass("active");
+    	$('.accordion_multilayer').attr("aria-expanded","false");
+    	$('.accordion_multilayer ul').attr("style","overflow: hidden; display: none;");
+    	
+    	$('#'+item).addClass("active");
+    	$('#'+item).attr("aria-expanded","true");
+    	$('#'+item+' ul').attr("style","overflow: hidden; display: block;");
+    }
+}
+
+</script>
+
+
+</head>
+<body>
+<div id="Contact" style="display: block;height: 100%;">
+	<div class="wsize">
+	<!-- 公告訊息 -->
+		<div class="page-sidebar" style="display: none;">
+          <ul class="accordion" data-accordion-menu>
+            <li id="item_GA01">
+              <a href="GA01" title="最新消息及新聞稿" alt="最新消息及新聞稿">最新消息及新聞稿</a>
+            </li>
+            <li id="item_GA34">
+              <a href="GA34" title="資訊保護專區" alt="資訊保護專區">資訊保護專區</a>
+            </li>
+          </ul>
+        </div>
+		
+		<!-- 貿易統計 -->
+		<div class="page-sidebar" style="display: none;">
+          <ul class="accordion" data-accordion-menu>
+            <li id="item_GA02">
+              <a href="GA02" title="資料庫說明" alt="資料庫說明">資料庫說明</a>
+            </li>
+            <li id="item_GA28">
+              <a href="GA28" title="互動式圖表" alt="互動式圖表">互動式圖表</a>
+            </li>
+            <li class="accordion_multilayer" id="item1" aria-expanded="false">
+              <a class="submenu" href="javascript:void(0)" title="資料庫查詢" alt="資料庫查詢" onclick="changeAriaEpanded('item1');">資料庫查詢</a>
+              <ul aria-hidden="true" style="overflow: hidden; display: none;">
+                <li id="item_GA30">
+                  <a href="GA30" class="is-submenu-item is-accordion-submenu-item" title="綜合查詢" alt="綜合查詢">綜合查詢</a>
+                </li>
+                <li id="item_GA31">
+                  <a href="GA31" class="is-submenu-item is-accordion-submenu-item" title="輔助查詢" alt="輔助查詢">輔助查詢</a>
+                </li>
+              </ul>
+            </li>
+            <li class="accordion_multilayer" id="item2" aria-expanded="false">
+              <a class="submenu" href="javascript:void(0)" title="統計資料下載" alt="統計資料下載" onclick="changeAriaEpanded('item2');">統計資料下載</a>
+              <ul aria-hidden="true" style="overflow: hidden; display: none;">
+                <li id="item_GA29">
+                  <a href="GA29" class="is-submenu-item is-accordion-submenu-item" title="統計表" alt="統計表">統計表</a>
+                </li>
+                <li id="item_GA36">
+                  <a href="GA36" class="is-submenu-item is-accordion-submenu-item" title="統計年刊" alt="統計年刊">統計年刊</a>
+                </li>
+                <li>
+                  <a href="https://web.customs.gov.tw/singlehtml/1207?cntId=cus1_93375_1207" 
+                  	class="is-submenu-item is-accordion-submenu-item" title="進出口貿易統計資料訂購" alt="進出口貿易統計資料訂購" target="_blank" rel="noreferrer noopener">進出口貿易統計資料訂購</a>
+                </li>
+                <li>
+                  <a href="https://web.customs.gov.tw/singlehtml/1207?cntId=cus1_93373_1207" 
+                  	class="is-submenu-item is-accordion-submenu-item" title="申請廠商（個人）報關資料" alt="申請廠商（個人）報關資料" target="_blank" rel="noreferrer noopener">申請廠商（個人）報關資料</a>
+                </li>
+              </ul>
+            </li>
+            <li id="item_GA17">
+              <a href="GA17" title="其他參考資訊" alt="其他參考資訊" >其他參考資訊</a>
+            </li>
+          </ul>
+        </div>
+        
+        <!-- 業務統計 -->
+		<div class="page-sidebar" style="display: none;">
+          <ul class="accordion" data-accordion-menu>
+          	<li class="accordion_multilayer" id="item3" aria-expanded="false">
+              <a class="submenu" href="javascript:void(0)" title="業務工作量" alt="業務工作量" onclick="changeAriaEpanded('item3');">業務工作量</a>
+              <ul aria-hidden="true" style="overflow: hidden; display: none;">
+                <li id="item_GA11">
+                  <a href="GA11" class="is-submenu-item is-accordion-submenu-item" title="各關業務工作量" alt="各關業務工作量">各關業務工作量</a>
+                </li>
+                <li id="item_GA22">
+                  <a href="GA22" class="is-submenu-item is-accordion-submenu-item" title="公務統計表" alt="公務統計表">公務統計表</a>
+                </li>
+              </ul>
+            </li>
+            <li class="accordion_multilayer" id="item4" aria-expanded="false">
+              <a class="submenu" href="javascript:void(0)" title="海關徵收稅費" alt="海關徵收稅費" onclick="changeAriaEpanded('item4');">海關徵收稅費</a>
+              <ul aria-hidden="true" style="overflow: hidden; display: none;">
+                <li id="item_GA12">
+                  <a href="GA12" class="is-submenu-item is-accordion-submenu-item" title="關稅收入(按稅則分)" alt="關稅收入(按稅則分)">關稅收入(按稅則分)</a>
+                </li>
+                <li id="item_GA13">
+                  <a href="GA13" class="is-submenu-item is-accordion-submenu-item" title="各關徵收稅費" alt="各關徵收稅費">各關徵收稅費</a>
+                </li>
+              </ul>
+            </li>
+            <li id="item_GA14">
+              <a href="GA14" title="關稅配額貨物量值" alt="關稅配額貨物量值">關稅配額貨物量值</a>
+            </li>
+          </ul>
+        </div>
+        
+        <!-- FAQ -->
+		<div class="page-sidebar" style="display: none;">
+          <ul class="accordion" data-accordion-menu>
+            <li id="item_GA32">
+              <a href="GA32" title="貿易統計資料問題" alt="貿易統計資料問題">貿易統計資料問題</a>
+            </li>
+            <!-- <li id="item_GA">
+              <a href="GA" title="業務統計問題" alt="業務統計問題">業務統計問題</a>
+            </li> -->
+            <li id="item_GA33">
+              <a href="GA33" title="資料庫操作問題" alt="資料庫操作問題">資料庫操作問題</a>
+            </li>
+          </ul>
+        </div>
+	</div>
+</div>
+
+</body>
+</html>
+	</div>
+	<div id="CONTENT" style="display: table-cell;">
+		
+
+
+
+
+
+<script type="text/javascript" src="/APGA/inc/js/d3.min.js"></script>
+<script type="text/javascript" src="/APGA/inc/js/d3fc.js"></script>
+<script type="text/javascript" src="/APGA/inc/js/html2canvas.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/APGA/css/ga/GA28.css?v=20231108" />
+
+<div class="content_info">
+   <div id="crumb">
+       <dl id="path" class="path clearfix">
+           <dt>海關進出口統計</dt>
+           <dt>貿易統計</dt>
+           <dt>互動式圖表</dt>
+       </dl>
+   </div>
+   
+   <h1 class="title">
+       <span>互動式圖表</span>
+   </h1>
+
+	<div class="search_tags_area" style="margin-top: 25px;">
+		<ul>
+			<li>
+				<a class="search_tags active" href="#t1" title="進出口總值" alt="進出口總值" style="margin-left: 3px;">
+					進出口總值
+				</a>
+			</li>
+			<li>
+				<a class="search_tags active" href="#t2" title="貨品" alt="貨品" style="margin-left: 3px;">
+					貨品
+				</a>
+			</li>
+			<li>
+				<a class="search_tags active" href="#t3" title="貿易夥伴" alt="貿易夥伴" style="margin-left: 3px;">
+					貿易夥伴
+				</a>
+			</li>
+		</ul>
+		<ul style="margin-top: 10px;">
+			<li>
+				
+	
+	
+	<a href="GA28_link?fileName=S001.zip">統計表</a>
+			</li>
+		</ul>
+	</div>
+  <form action="GA28_LINK" method="post" >
+	<table id="ga28-list" style="table-layout:fixed; margin-top: 30px;">
+	  <tr>
+        <td colspan="2">
+          <h2 class="title"id="info-title">最新進出口摘要：</h2>
+          <span>(單位：億美元；％)</span>
+        </td>
+	  </tr>
+	  <tr class="info-tr">
+        <td style="width: 50%;">
+        	<table id="info">
+	        	<tr>
+			        <td style="width: 25%;"></td>
+			        <td class="title" style="width: 15%;">金額</td>
+			        <td class="title" style="width: 30%;">較上月</td>
+			        <td class="title" style="width: 30%;">較上年同月</td>
+		        </tr>
+	        	<tr>
+			        <td class="title">出口總值</td>
+			        <td class="content-center" id="this-month-ex"><span class=""></span></td>
+			        <td class="content" id="last-month-ex"><span class=""></span></td>
+			        <td class="content" id="last-year-ex"><span class=""></span></td>
+		        </tr>
+	        	<tr>
+			        <td class="title">進口總值</td>
+			        <td class="content-center" id="this-month-im"><span class=""></span></td>
+			        <td class="content" id="last-month-im"><span class=""></span></td>
+			        <td class="content" id="last-year-im"><span class=""></span></td>
+		        </tr>
+	        </table>
+        </td>
+        <td id="info-text" class="ch-word-break" style="width: 50%;"></td>
+	  </tr>
+	  <tr>
+        <td colspan="2">
+        	<hr>
+        	<h2 class="title" id="t1">進出口總值</h2>
+        </td>
+	  </tr>
+	  <tr>
+        <td colspan="2" style="overflow-x: auto;">
+        	<div class="chart-condition">
+				<fieldset>
+					<legend style="position:absolute;left:-9999px;">進出口總值查詢條件</legend>
+				    <div class="radio radio-info">
+					    <input id="c1Import" type="radio" name="c1TypePort" onchange="chart1()" value="import" />
+					    <label for="c1Import">進口總值</label>
+				    </div>
+				    <div class="radio radio-info">
+					    <input id="c1Export" type="radio" name="c1TypePort" onchange="chart1()" value="export" checked="checked" />
+					    <label for="c1Export">出口總值</label>
+				    </div>
+                </fieldset>
+        	</div>
+        	<div class="chart-condition">
+				<fieldset>
+					<legend style="position:absolute;left:-9999px;">進出口總值時間選擇</legend>
+				    <div class="radio radio-info">
+				    	<input id="c1Year" type="radio" name="c1TypeTime" value="year" onchange="chart1()" />
+				    	<label for="c1Year">按年</label>
+				    </div>
+				    <div class="radio radio-info">
+				    	<input id="c1Month" type="radio" name="c1TypeTime" value="month" onchange="chart1()" checked="checked" />
+				    	<label for="c1Month">按月</label>
+				    </div>
+                </fieldset>
+        	</div>
+        	<div class="chart" id="c1" style="min-width: 900px;">
+        		<span id="c1Title" class="chart-title"></span>
+        		<div class="chart-menu">
+        			<p><i class="fa fa-bars"></i></p>
+	        		<div class="chart-menu-option">
+					  <a href="javascript:printChart('#c1');" title="列印" alt="列印" target="_self">
+						  <span>列印</span>
+						</a><br>
+						<a href="javascript:downloadChart('#c1');" title="下載" alt="下載" target="_self">
+						  <span>下載</span>
+						</a>
+					</div>
+        		</div>
+        	</div>
+        </td>
+	  </tr>
+	  <tr>
+        <td colspan="2">
+        	<hr>
+        	<h2 class="title" id="t2">貨品</h2>
+        </td>
+      </tr>
+	  <tr>
+        <td colspan="2" style="overflow-x: auto;">
+        	<div class="chart-condition">
+				<fieldset>
+					<legend style="position:absolute;left:-9999px;">貨品查詢條件</legend>
+				    <div class="radio radio-info radio-inline">
+					    <input id="c2Import" type="radio" name="c2TypePort" onchange="chart2()" value="import" />
+					    <label for="c2Import">進口總值</label>
+				    </div>
+				    <br>
+				    <div class="radio radio-info radio-inline">
+					    <input id="c2Export" type="radio" name="c2TypePort" onchange="chart2()" value="export" checked="checked" />
+					    <label for="c2Export">出口總值</label>
+				    </div>
+                </fieldset>
+        	</div>
+        	<div class="chart-condition">
+				<fieldset>
+					<legend style="position:absolute;left:-9999px;">貨品時間選擇</legend>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c2Year" type="radio" name="c2TypeTime" value="year" onchange="chart2()" />
+				    	<label for="c2Year">按年</label>
+				    </div>
+				    <br>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c2Month" type="radio" name="c2TypeTime" value="month" onchange="chart2()" checked="checked" />
+				    	<label for="c2Month">按月</label>
+				    </div>
+                </fieldset>
+        	</div>
+        	<div class="chart-condition">
+				<fieldset>
+					<legend style="position:absolute;left:-9999px;">貨品類型選擇</legend>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c2Goods1" type="radio" name="c2GoodsType" value="1" onchange="chart2()" />
+				    	<label for="c2Goods1">動植物產品及調製食品</label>
+				    </div>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c2Goods2" type="radio" name="c2GoodsType" value="2" onchange="chart2()" />
+				    	<label for="c2Goods2">礦產品　</label>
+				    </div>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c2Goods3" type="radio" name="c2GoodsType" value="3" onchange="chart2()" />
+				    	<label for="c2Goods3">化學品　　　</label>
+				    </div>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c2Goods4" type="radio" name="c2GoodsType" value="4" onchange="chart2()" />
+				    	<label for="c2Goods4">塑橡膠及其製品</label>
+				    </div>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c2Goods5" type="radio" name="c2GoodsType" value="5" onchange="chart2()" />
+				    	<label for="c2Goods5">紡織品及其製品</label>
+				    </div>
+				    <br>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c2Goods6" type="radio" name="c2GoodsType" value="6" onchange="chart2()" />
+				    	<label for="c2Goods6">卑金屬及其製品　　　</label>
+				    </div>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c2Goods7" type="radio" name="c2GoodsType" value="7" onchange="chart2()" />
+				    	<label for="c2Goods7">機械器具</label>
+				    </div>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c2Goods8" type="radio" name="c2GoodsType" value="8" onchange="chart2()" checked="checked" />
+				    	<label for="c2Goods8">電子電機產品</label>
+				    </div>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c2Goods9" type="radio" name="c2GoodsType" value="9" onchange="chart2()" />
+				    	<label for="c2Goods9">運輸設備　　　</label>
+				    </div>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c2Goods10" type="radio" name="c2GoodsType" value="10" onchange="chart2()" />
+				    	<label for="c2Goods10">光學及精密儀器</label>
+				    </div>
+                </fieldset>
+        	</div>
+        	<div id="c2">
+        		<div class="chart-menu">
+        			<p><i class="fa fa-bars"></i></p>
+	        		<div class="chart-menu-option">
+					  <a href="javascript:printChart('#c2');" title="列印" alt="列印" target="_self">
+						  <span>列印</span>
+						</a><br>
+						<a href="javascript:downloadChart('#c2');" title="下載" alt="下載" target="_self">
+						  <span>下載</span>
+						</a>
+					</div>
+        		</div>
+        		<table class="chart" style="width: 100%; min-width: 860px;">
+        			<tr>
+        				<td id="c2Title" colspan=2>
+        					<span class="chart-title"></span><br>
+        					<span class="chart-subtitle">(單位：百萬美元；％)</span>
+        				</td>
+        			</tr>
+        			<tr>
+        				<td id="c2_1" style="width: 50%"></td>
+        				<td id="c2_2" style="width: 50%">
+							<table id="c2_2_legned" style="position: absolute; font-size: 0.93em;">
+	        					<tr>
+	        						<td><div class="legend-color" id="legend_A01"></div></td>
+	        						<td class="legend-text" id="legend_text_A01">中國大陸及香港</td>
+	        						<td class="legend-percent" id="legend_percent_A01"></td>
+	        						
+	        						<td><div class="legend-color" id="legend_A02"></div></td>
+	        						<td class="legend-text" id="legend_text_A02">東協11國</td>
+	        						<td class="legend-percent" id="legend_percent_A02"></td>
+	        						
+	        						<td><div class="legend-color" id="legend_A03"></div></td>
+	        						<td class="legend-text" id="legend_text_A03">美國</td>
+	        						<td class="legend-percent" id="legend_percent_A03"></td>
+	        						
+	        					</tr>
+	        					<tr>
+	        						<td><div class="legend-color" id="legend_A04"></div></td>
+	        						<td class="legend-text" id="legend_text_A04">日本</td>
+	        						<td class="legend-percent" id="legend_percent_A04"></td>
+	        						
+	        						<td><div class="legend-color" id="legend_A05"></div></td>
+	        						<td class="legend-text" id="legend_text_A05">歐盟27國</td>
+	        						<td class="legend-percent" id="legend_percent_A05"></td>
+	        						
+	        						<td><div class="legend-color" id="legend_A06"></div></td>
+	        						<td class="legend-text" id="legend_text_A06">南韓</td>
+	        						<td class="legend-percent" id="legend_percent_A06"></td>
+	        					</tr>
+	        					<tr>
+	        						<td><div class="legend-color" id="legend_A07"></div></td>
+	        						<td class="legend-text" id="legend_text_A07">中東</td>
+	        						<td class="legend-percent" id="legend_percent_A07"></td>
+	        						
+	        						<td><div class="legend-color" id="legend_A08"></div></td>
+	        						<td class="legend-text" id="legend_text_A08">大洋洲</td>
+	        						<td class="legend-percent" id="legend_percent_A08"></td>
+	        						
+	        						<td><div class="legend-color" id="legend_A09"></div></td>
+	        						<td class="legend-text" id="legend_text_A09">其他</td>
+	        						<td class="legend-percent" id="legend_percent_A09"></td>
+	        					</tr>
+	        				</table>
+        				</td>
+        			</tr>
+        			<tr>
+        				<td id="c2_3" colspan=2></td>
+        			</tr>
+        		</table>
+        	</div>
+        </td>
+      </tr>
+	  <tr>
+        <td colspan="2">
+        	<hr>
+        	<h2 class="title" id="t3">貿易夥伴</h2>
+        </td>
+      </tr>
+	  <tr>
+        <td colspan="2" style="overflow-x: auto;">
+        	<div class="chart-condition">
+				<fieldset>
+					<legend style="position:absolute;left:-9999px;">貿易夥伴時間選擇</legend>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c3Year" type="radio" name="c3TypeTime" value="year" onchange="chart3()" />
+				    	<label for="c3Year">按年</label>
+				    </div>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c3Month" type="radio" name="c3TypeTime" value="month" onchange="chart3()" checked="checked" />
+				    	<label for="c3Month">按月</label>
+				    </div>
+                </fieldset>
+        	</div>
+        	<div class="chart-condition">
+				<fieldset>
+					<legend style="position:absolute;left:-9999px;">貿易夥伴選擇</legend>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c3Partner3" type="radio" name="c3Partner" value="A01" onchange="chart3()" checked="checked" />
+				    	<label for="c3Partner3">中國大陸及香港</label>
+				    </div>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c3Partner5" type="radio" name="c3Partner" value="A02" onchange="chart3()" />
+				    	<label for="c3Partner5">東協11國</label>
+				    </div>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c3Partner7" type="radio" name="c3Partner" value="A03" onchange="chart3()" />
+				    	<label for="c3Partner7">美國</label>
+				    </div>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c3Partner4" type="radio" name="c3Partner" value="A04" onchange="chart3()" />
+				    	<label for="c3Partner4">日本</label>
+				    </div>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c3Partner8" type="radio" name="c3Partner" value="A05" onchange="chart3()" />
+				    	<label for="c3Partner8">歐盟27國</label>
+				    </div>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c3Partner6" type="radio" name="c3Partner" value="A06" onchange="chart3()" />
+				    	<label for="c3Partner6">南韓</label>
+				    </div>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c3Partner2" type="radio" name="c3Partner" value="A07" onchange="chart3()" />
+				    	<label for="c3Partner2">中東</label>
+				    </div>
+				    <div class="radio radio-info radio-inline">
+				    	<input id="c3Partner1" type="radio" name="c3Partner" value="A08" onchange="chart3()" />
+				    	<label for="c3Partner1">大洋洲</label>
+				    </div>
+                </fieldset>
+        	</div>
+        	<div id="c3">
+        		<div class="chart-menu">
+        			<p><i class="fa fa-bars"></i></p>
+	        		<div class="chart-menu-option">
+					  <a href="javascript:printChart('#c3');" title="列印" alt="列印" target="_self">
+						  <span>列印</span>
+						</a><br>
+						<a href="javascript:downloadChart('#c3');" title="下載" alt="下載" target="_self">
+						  <span>下載</span>
+						</a>
+					</div>
+        		</div>
+        		<table class="chart" style="width: 100%; min-width: 1005px;">
+        			<tr>
+        				<td id="c3Title" colspan=2>
+        					<span class="chart-title"></span><br>
+        					<span class="chart-subtitle">(單位：百萬美元；％)</span>
+        				</td>
+        			</tr>
+        			<tr>
+        				<td id="c3_1" style="width: 50%"></td>
+        				<td id="c3_2" style="width: 50%">
+	        				<table id="c3_2_legned">
+	        					<tr>
+	        						<td><div class="legend-color-imex" id="legend_1"></div></td>
+	        						<td class="legend-text-imex" id="legend_text_1">動植物產品及調製食品</td>
+	        						<td>出：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_1_ex"></td>
+	        						<td>進：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_1_im"></td>
+	        					</tr>
+	        					<tr>
+	        						<td><div class="legend-color-imex" id="legend_2"></div></td>
+	        						<td class="legend-text-imex" id="legend_text_2">礦產品</td>
+	        						<td>出：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_2_ex"></td>
+	        						<td>進：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_2_im"></td>
+	        					</tr>
+	        					<tr>
+	        						<td><div class="legend-color-imex" id="legend_3"></div></td>
+	        						<td class="legend-text-imex" id="legend_text_3">化學品</td>
+	        						<td>出：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_3_ex"></td>
+	        						<td>進：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_3_im"></td>
+	        					</tr>
+	        					<tr>
+	        						<td><div class="legend-color-imex" id="legend_4"></div></td>
+	        						<td class="legend-text-imex" id="legend_text_4">塑橡膠及其製品</td>
+	        						<td>出：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_4_ex"></td>
+	        						<td>進：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_4_im"></td>
+	        					</tr>
+	        					<tr>
+	        						<td><div class="legend-color-imex" id="legend_5"></div></td>
+	        						<td class="legend-text-imex" id="legend_text_5">紡織品及其製品</td>
+	        						<td>出：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_5_ex"></td>
+	        						<td>進：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_5_im"></td>
+	        					</tr>
+	        					<tr>
+	        						<td><div class="legend-color-imex" id="legend_6"></div></td>
+	        						<td class="legend-text-imex" id="legend_text_6">卑金屬及其製品</td>
+	        						<td>出：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_6_ex"></td>
+	        						<td>進：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_6_im"></td>
+	        					</tr>
+	        					<tr>
+	        						<td><div class="legend-color-imex" id="legend_7"></div></td>
+	        						<td class="legend-text-imex" id="legend_text_7">機械器具</td>
+	        						<td>出：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_7_ex"></td>
+	        						<td>進：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_7_im"></td>
+	        					</tr>
+	        					<tr>
+	        						<td><div class="legend-color-imex" id="legend_8"></div></td>
+	        						<td class="legend-text-imex" id="legend_text_8">電子電機產品</td>
+	        						<td>出：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_8_ex"></td>
+	        						<td>進：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_8_im"></td>
+	        					</tr>
+	        					<tr>
+	        						<td><div class="legend-color-imex" id="legend_9"></div></td>
+	        						<td class="legend-text-imex" id="legend_text_9">運輸設備</td>
+	        						<td>出：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_9_ex"></td>
+	        						<td>進：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_9_im"></td>
+	        					</tr>
+	        					<tr>
+	        						<td><div class="legend-color-imex" id="legend_10"></div></td>
+	        						<td class="legend-text-imex" id="legend_text_10">光學及精密儀器</td>
+	        						<td>出：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_10_ex"></td>
+	        						<td>進：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_10_im"></td>
+	        					</tr>
+	        					<tr>
+	        						<td><div class="legend-color-imex" id="legend_11"></div></td>
+	        						<td class="legend-text-imex" id="legend_text_11">其他</td>
+	        						<td>出：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_11_ex"></td>
+	        						<td>進：</td>
+	        						<td class="legend-percent-imex" id="legend_percent_11_im"></td>
+	        					</tr>
+	        				</table>
+        				</td>
+        			</tr>
+        			<tr>
+        				<td id="c3_3" colspan=2></td>
+        			</tr>
+        		</table>
+        	</div>
+        </td>
+      </tr>
+    </table>
+    <div class="note">
+	    <ul>
+	        <li>註1：本網頁圖表數值因四捨五入之故，細項與總合可能略有差異。</li>
+			<li>註2：本網頁圖表貨品分類按HS章別整併，其中「動植物產品及調製食品」包含HS1-24，「礦產品」包含HS25-27，「化學品」包含HS28-38，「塑橡膠及其製品」包含HS39-40，「紡織品及其製品」包含HS50-63，「卑金屬及其製品」包含HS72-83，「機械器具」包含HS84，「電子電機產品」包含HS85，「運輸設備」包含HS86-89，「光學及精密儀器」包含HS90-92。</li>
+	    </ul>
+	</div>
+  </form>
+</div>
+
+<script type="text/javascript" src="/APGA/js/ga/GA28.js"></script>
+
+	</div>
+</div>
+
+    
+<div id="Footer" class="cpt_Footer">
+    <div class="wsize">
+		<div class="index_copyright clearfix">
+        ©2013 財政部關務署版權所有，請尊重智慧財產權，未經允許請勿任意轉載、複製或做商業用途<br>
+	            機關地址：10341 臺北市大同區塔城街13號<br>
+	            上班時間：星期一至星期五 上午 08：30 ~ 12：30 下午 13：30 ~ 17：30 (服務台中午不休息)<br>
+	            統計資料諮詢電話： (02)25505500 分機 2815‧信箱：sta@customs.gov.tw<br>
+	            單一窗口服務中心 電話0800-299-889 ‧傳真：(02)25589601 ‧信箱：cpt_helpdesk@mail.sw.nat.gov.tw
+         </div>
+        <div class="footer_link">
+          <ul>
+            <li>
+              <a href="javascript:loadCptBody('/PPL/index!privacy', '')">隱私權宣告</a>
+            </li>
+            <li>
+              <a href="javascript:loadCptBody('/PPL/index!ifs', '')">資訊安全政策</a>
+            </li>
+            <li>
+              <a href="javascript:loadCptBody('/PPL/index!copy', '')">著作權聲明</a>
+            </li>
+          </ul>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,978 @@
+{
+  "generated_utc": "2026-07-26T19:09:46.350345Z",
+  "version": 2,
+  "steps": [
+    {
+      "name": "GET v2_home",
+      "url": "https://portal.sw.nat.gov.tw/APGA/",
+      "status": 200,
+      "bytes": 27989
+    },
+    {
+      "name": "GET v2_GA30",
+      "url": "https://portal.sw.nat.gov.tw/APGA/GA30",
+      "status": 200,
+      "bytes": 42114
+    },
+    {
+      "name": "DISSECT GA30",
+      "forms": 1,
+      "field_names": [
+        "minYear",
+        "maxYear",
+        "maxMonth",
+        "minMonth",
+        "maxYearByYear",
+        "pStartyear",
+        "pEndyer",
+        "pStartmonth",
+        "pEndmonth",
+        "pGtNote",
+        "pColSeq",
+        "pCnyList",
+        "searchInfo.TypePort",
+        "searchInfo.TypePort",
+        "searchInfo.TypeTime",
+        "searchInfo.TypeTime",
+        "searchInfo.Notes",
+        "searchInfo.goodsType",
+        "searchInfo.goodsType",
+        "searchInfo.goodsName",
+        "searchInfo.goodsType",
+        "searchInfo.goodsCodeGroup",
+        "searchInfo.groupType",
+        "searchInfo.groupType",
+        "searchInfo.groupType"
+      ],
+      "grid_urls": [
+        "/APGA/GA30_LIST"
+      ],
+      "actions": [
+        "/APGA/GA30_LIST",
+        "/APGA/GA30_changeSequence",
+        "/APGA/GoodsSearch_searchGA30",
+        "/APGA/NationalCodeSearch",
+        "/APGA/css",
+        "/APGA/inc",
+        "/APGA/js",
+        "/APGA/menuBody",
+        "/APGA/struts"
+      ]
+    },
+    {
+      "name": "GET v2_GA31",
+      "url": "https://portal.sw.nat.gov.tw/APGA/GA31",
+      "status": 200,
+      "bytes": 42443
+    },
+    {
+      "name": "DISSECT GA31",
+      "forms": 1,
+      "field_names": [
+        "minYear",
+        "maxYear",
+        "maxMonth",
+        "minMonth",
+        "maxYearByYear",
+        "pStartyear",
+        "pEndyer",
+        "pStartmonth",
+        "pEndmonth",
+        "pGtNote",
+        "pColSeq",
+        "pCnyList",
+        "searchInfo.TypePort",
+        "searchInfo.TypePort",
+        "searchInfo.TypePort",
+        "searchInfo.TypePort",
+        "searchInfo.TypeTime",
+        "searchInfo.TypeTime",
+        "searchInfo.Notes",
+        "searchInfo.goodsType",
+        "searchInfo.goodsType",
+        "searchInfo.goodsName",
+        "searchInfo.goodsType",
+        "searchInfo.goodsCodeGroup",
+        "searchInfo.groupType"
+      ],
+      "grid_urls": [
+        "/APGA/GA31_LIST"
+      ],
+      "actions": [
+        "/APGA/GA30_changeSequence",
+        "/APGA/GA31_LIST",
+        "/APGA/GoodsSearch_searchGA30",
+        "/APGA/NationalCodeSearch",
+        "/APGA/css",
+        "/APGA/inc",
+        "/APGA/js",
+        "/APGA/menuBody",
+        "/APGA/struts"
+      ]
+    },
+    {
+      "name": "GET v2_GA29",
+      "url": "https://portal.sw.nat.gov.tw/APGA/GA29",
+      "status": 200,
+      "bytes": 29067
+    },
+    {
+      "name": "DISSECT GA29",
+      "forms": 1,
+      "field_names": [
+        "fileYear",
+        "fileMonth"
+      ],
+      "grid_urls": [],
+      "actions": [
+        "/APGA/css",
+        "/APGA/inc",
+        "/APGA/js",
+        "/APGA/menuBody",
+        "/APGA/struts"
+      ]
+    },
+    {
+      "name": "GET v2_GA28",
+      "url": "https://portal.sw.nat.gov.tw/APGA/GA28",
+      "status": 200,
+      "bytes": 45151
+    },
+    {
+      "name": "DISSECT GA28",
+      "forms": 1,
+      "field_names": [
+        "c1TypePort",
+        "c1TypePort",
+        "c1TypeTime",
+        "c1TypeTime",
+        "c2TypePort",
+        "c2TypePort",
+        "c2TypeTime",
+        "c2TypeTime",
+        "c2GoodsType",
+        "c2GoodsType",
+        "c2GoodsType",
+        "c2GoodsType",
+        "c2GoodsType",
+        "c2GoodsType",
+        "c2GoodsType",
+        "c2GoodsType",
+        "c2GoodsType",
+        "c2GoodsType",
+        "c3TypeTime",
+        "c3TypeTime",
+        "c3Partner",
+        "c3Partner",
+        "c3Partner",
+        "c3Partner",
+        "c3Partner"
+      ],
+      "grid_urls": [],
+      "actions": [
+        "/APGA/css",
+        "/APGA/inc",
+        "/APGA/js",
+        "/APGA/menuBody",
+        "/APGA/struts"
+      ]
+    },
+    {
+      "name": "POST v2_GA30_ep0",
+      "url": "https://portal.sw.nat.gov.tw/APGA/GA30_LIST",
+      "status": 200,
+      "bytes": 32906,
+      "looks_json": false,
+      "sample": "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">\n<html lang=\"zh-Hant-TW\">\n\n<head>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-"
+    },
+    {
+      "name": "POST v2_GA31_ep1",
+      "url": "https://portal.sw.nat.gov.tw/APGA/GA31_LIST",
+      "status": 200,
+      "bytes": 32911,
+      "looks_json": false,
+      "sample": "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">\n<html lang=\"zh-Hant-TW\">\n\n<head>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-"
+    }
+  ],
+  "findings": {
+    "GA30": {
+      "forms": [
+        {
+          "action": "/APGA/GA30_LIST",
+          "method": "post",
+          "id": "GA30_FORM",
+          "fields": [
+            {
+              "tag": "input",
+              "type": "hidden",
+              "name": "minYear",
+              "value": "92"
+            },
+            {
+              "tag": "input",
+              "type": "hidden",
+              "name": "maxYear",
+              "value": "115"
+            },
+            {
+              "tag": "input",
+              "type": "hidden",
+              "name": "maxMonth",
+              "value": "6"
+            },
+            {
+              "tag": "input",
+              "type": "hidden",
+              "name": "minMonth",
+              "value": "1"
+            },
+            {
+              "tag": "input",
+              "type": "hidden",
+              "name": "maxYearByYear",
+              "value": "115"
+            },
+            {
+              "tag": "input",
+              "type": "text",
+              "name": "pStartyear",
+              "value": null
+            },
+            {
+              "tag": "input",
+              "type": "text",
+              "name": "pEndyer",
+              "value": null
+            },
+            {
+              "tag": "input",
+              "type": "text",
+              "name": "pStartmonth",
+              "value": null
+            },
+            {
+              "tag": "input",
+              "type": "text",
+              "name": "pEndmonth",
+              "value": null
+            },
+            {
+              "tag": "input",
+              "type": "text",
+              "name": "pGtNote",
+              "value": null
+            },
+            {
+              "tag": "input",
+              "type": "text",
+              "name": "pColSeq",
+              "value": null
+            },
+            {
+              "tag": "input",
+              "type": "text",
+              "name": "pCnyList",
+              "value": null
+            },
+            {
+              "tag": "input",
+              "type": "checkbox",
+              "name": "searchInfo.TypePort",
+              "value": "3"
+            },
+            {
+              "tag": "input",
+              "type": "checkbox",
+              "name": "searchInfo.TypePort",
+              "value": "6"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.TypeTime",
+              "value": "1"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.TypeTime",
+              "value": "0"
+            },
+            {
+              "tag": "input",
+              "type": "checkbox",
+              "name": "searchInfo.Notes",
+              "value": "Y"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.goodsType",
+              "value": "0"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.goodsType",
+              "value": "1"
+            },
+            {
+              "tag": "select",
+              "type": null,
+              "name": "searchInfo.goodsName",
+              "value": null,
+              "options": [
+                [
+                  "21",
+                  "21類"
+                ],
+                [
+                  "2",
+                  "2碼"
+                ]
+              ]
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.goodsType",
+              "value": "2"
+            },
+            {
+              "tag": "input",
+              "type": "text",
+              "name": "searchInfo.goodsCodeGroup",
+              "value": null
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.groupType",
+              "value": "0"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.groupType",
+              "value": "1"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.groupType",
+              "value": "2"
+            },
+            {
+              "tag": "input",
+              "type": "text",
+              "name": "searchInfo.CountryName",
+              "value": null
+            },
+            {
+              "tag": "input",
+              "type": "checkbox",
+              "name": "searchInfo.Type",
+              "value": "1"
+            },
+            {
+              "tag": "input",
+              "type": "checkbox",
+              "name": "searchInfo.Type",
+              "value": "2"
+            },
+            {
+              "tag": "input",
+              "type": "checkbox",
+              "name": "searchInfo.Type",
+              "value": "3"
+            },
+            {
+              "tag": "input",
+              "type": "checkbox",
+              "name": "searchInfo.Type",
+              "value": "5"
+            },
+            {
+              "tag": "input",
+              "type": "checkbox",
+              "name": "searchInfo.Type",
+              "value": "4"
+            },
+            {
+              "tag": "input",
+              "type": "hidden",
+              "name": "searchInfo.OrderType",
+              "value": "進出口別 / 日期 / 貨品別 / 國家(地區)別"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.ExportType",
+              "value": "web"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.ExportType",
+              "value": "excel"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.ExportType",
+              "value": "ods"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.ExportType",
+              "value": "csv"
+            },
+            {
+              "tag": "input",
+              "type": "text",
+              "name": "searchInfo.Captcha",
+              "value": ""
+            }
+          ]
+        }
+      ],
+      "grid_urls": [
+        "/APGA/GA30_LIST"
+      ],
+      "actions": [
+        "/APGA/menuBody",
+        "/APGA/NationalCodeSearch",
+        "/APGA/struts",
+        "/APGA/inc",
+        "/APGA/js",
+        "/APGA/GA30_LIST",
+        "/APGA/css",
+        "/APGA/GoodsSearch_searchGA30",
+        "/APGA/GA30_changeSequence"
+      ],
+      "selects": {
+        "searchInfo.goodsName": [
+          [
+            "21",
+            "21類"
+          ],
+          [
+            "2",
+            "2碼"
+          ]
+        ]
+      }
+    },
+    "GA31": {
+      "forms": [
+        {
+          "action": "/APGA/GA31_LIST",
+          "method": "post",
+          "id": "GA31_FORM",
+          "fields": [
+            {
+              "tag": "input",
+              "type": "hidden",
+              "name": "minYear",
+              "value": "92"
+            },
+            {
+              "tag": "input",
+              "type": "hidden",
+              "name": "maxYear",
+              "value": "115"
+            },
+            {
+              "tag": "input",
+              "type": "hidden",
+              "name": "maxMonth",
+              "value": "6"
+            },
+            {
+              "tag": "input",
+              "type": "hidden",
+              "name": "minMonth",
+              "value": "1"
+            },
+            {
+              "tag": "input",
+              "type": "hidden",
+              "name": "maxYearByYear",
+              "value": "115"
+            },
+            {
+              "tag": "input",
+              "type": "text",
+              "name": "pStartyear",
+              "value": null
+            },
+            {
+              "tag": "input",
+              "type": "text",
+              "name": "pEndyer",
+              "value": null
+            },
+            {
+              "tag": "input",
+              "type": "text",
+              "name": "pStartmonth",
+              "value": null
+            },
+            {
+              "tag": "input",
+              "type": "text",
+              "name": "pEndmonth",
+              "value": null
+            },
+            {
+              "tag": "input",
+              "type": "text",
+              "name": "pGtNote",
+              "value": null
+            },
+            {
+              "tag": "input",
+              "type": "text",
+              "name": "pColSeq",
+              "value": null
+            },
+            {
+              "tag": "input",
+              "type": "text",
+              "name": "pCnyList",
+              "value": null
+            },
+            {
+              "tag": "input",
+              "type": "checkbox",
+              "name": "searchInfo.TypePort",
+              "value": "2"
+            },
+            {
+              "tag": "input",
+              "type": "checkbox",
+              "name": "searchInfo.TypePort",
+              "value": "5"
+            },
+            {
+              "tag": "input",
+              "type": "checkbox",
+              "name": "searchInfo.TypePort",
+              "value": "1"
+            },
+            {
+              "tag": "input",
+              "type": "checkbox",
+              "name": "searchInfo.TypePort",
+              "value": "4"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.TypeTime",
+              "value": "1"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.TypeTime",
+              "value": "0"
+            },
+            {
+              "tag": "input",
+              "type": "checkbox",
+              "name": "searchInfo.Notes",
+              "value": "Y"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.goodsType",
+              "value": "0"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.goodsType",
+              "value": "1"
+            },
+            {
+              "tag": "select",
+              "type": null,
+              "name": "searchInfo.goodsName",
+              "value": null,
+              "options": [
+                [
+                  "21",
+                  "21類"
+                ],
+                [
+                  "2",
+                  "2碼"
+                ]
+              ]
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.goodsType",
+              "value": "2"
+            },
+            {
+              "tag": "input",
+              "type": "text",
+              "name": "searchInfo.goodsCodeGroup",
+              "value": null
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.groupType",
+              "value": "0"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.groupType",
+              "value": "1"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.groupType",
+              "value": "2"
+            },
+            {
+              "tag": "input",
+              "type": "text",
+              "name": "searchInfo.CountryName",
+              "value": null
+            },
+            {
+              "tag": "input",
+              "type": "checkbox",
+              "name": "searchInfo.Type",
+              "value": "1"
+            },
+            {
+              "tag": "input",
+              "type": "checkbox",
+              "name": "searchInfo.Type",
+              "value": "2"
+            },
+            {
+              "tag": "input",
+              "type": "checkbox",
+              "name": "searchInfo.Type",
+              "value": "3"
+            },
+            {
+              "tag": "input",
+              "type": "checkbox",
+              "name": "searchInfo.Type",
+              "value": "5"
+            },
+            {
+              "tag": "input",
+              "type": "checkbox",
+              "name": "searchInfo.Type",
+              "value": "4"
+            },
+            {
+              "tag": "input",
+              "type": "hidden",
+              "name": "searchInfo.OrderType",
+              "value": "進出口別 / 日期 / 貨品別 / 國家(地區)別"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.ExportType",
+              "value": "web"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.ExportType",
+              "value": "excel"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.ExportType",
+              "value": "ods"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "searchInfo.ExportType",
+              "value": "csv"
+            },
+            {
+              "tag": "input",
+              "type": "text",
+              "name": "searchInfo.Captcha",
+              "value": ""
+            }
+          ]
+        }
+      ],
+      "grid_urls": [
+        "/APGA/GA31_LIST"
+      ],
+      "actions": [
+        "/APGA/menuBody",
+        "/APGA/NationalCodeSearch",
+        "/APGA/struts",
+        "/APGA/inc",
+        "/APGA/js",
+        "/APGA/css",
+        "/APGA/GA31_LIST",
+        "/APGA/GoodsSearch_searchGA30",
+        "/APGA/GA30_changeSequence"
+      ],
+      "selects": {
+        "searchInfo.goodsName": [
+          [
+            "21",
+            "21類"
+          ],
+          [
+            "2",
+            "2碼"
+          ]
+        ]
+      }
+    },
+    "GA29": {
+      "forms": [
+        {
+          "action": "GA29_list",
+          "method": "post",
+          "id": "form_ga29_list",
+          "fields": [
+            {
+              "tag": "input",
+              "type": "hidden",
+              "name": "fileYear",
+              "value": ""
+            },
+            {
+              "tag": "input",
+              "type": "hidden",
+              "name": "fileMonth",
+              "value": ""
+            }
+          ]
+        }
+      ],
+      "grid_urls": [],
+      "actions": [
+        "/APGA/menuBody",
+        "/APGA/struts",
+        "/APGA/inc",
+        "/APGA/js",
+        "/APGA/css"
+      ],
+      "selects": {}
+    },
+    "GA28": {
+      "forms": [
+        {
+          "action": "GA28_LINK",
+          "method": "post",
+          "id": null,
+          "fields": [
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c1TypePort",
+              "value": "import"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c1TypePort",
+              "value": "export"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c1TypeTime",
+              "value": "year"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c1TypeTime",
+              "value": "month"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c2TypePort",
+              "value": "import"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c2TypePort",
+              "value": "export"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c2TypeTime",
+              "value": "year"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c2TypeTime",
+              "value": "month"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c2GoodsType",
+              "value": "1"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c2GoodsType",
+              "value": "2"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c2GoodsType",
+              "value": "3"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c2GoodsType",
+              "value": "4"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c2GoodsType",
+              "value": "5"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c2GoodsType",
+              "value": "6"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c2GoodsType",
+              "value": "7"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c2GoodsType",
+              "value": "8"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c2GoodsType",
+              "value": "9"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c2GoodsType",
+              "value": "10"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c3TypeTime",
+              "value": "year"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c3TypeTime",
+              "value": "month"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c3Partner",
+              "value": "A01"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c3Partner",
+              "value": "A02"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c3Partner",
+              "value": "A03"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c3Partner",
+              "value": "A04"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c3Partner",
+              "value": "A05"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c3Partner",
+              "value": "A06"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c3Partner",
+              "value": "A07"
+            },
+            {
+              "tag": "input",
+              "type": "radio",
+              "name": "c3Partner",
+              "value": "A08"
+            }
+          ]
+        }
+      ],
+      "grid_urls": [],
+      "actions": [
+        "/APGA/menuBody",
+        "/APGA/struts",
+        "/APGA/inc",
+        "/APGA/js",
+        "/APGA/css"
+      ],
+      "selects": {}
+    }
+  },
+  "verdict": {
+    "pages_ok": [
+      "GA30",
+      "GA31",
+      "GA29",
+      "GA28"
+    ],
+    "next": "看 findings 的 form 欄位與 grid_urls；確定端點+參數後 v3 正式拉 17 碼 × 13 月"
+  }
+}
