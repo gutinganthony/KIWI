@@ -81,6 +81,16 @@ def main():
         except Exception as e:  # noqa: BLE001 — never break the host job
             print(f"⚠️ {ticker} failed: {e}")
     print(f"fetched {ok}/{len(targets)} at {datetime.now(timezone.utc).isoformat()}")
+
+    # 側掛：日本開示資料橋（雲端 session 對日本站一律 403，只有 runner 抓得到）。
+    # 放這裡是為了共用既有的 workflow step，不必動 .github/workflows/。
+    try:
+        import fetch_jp_disclosures
+        print("--- jp_disclosures bridge ---")
+        sys.argv = [sys.argv[0]] + (["--force"] if args.force else [])
+        fetch_jp_disclosures.main()
+    except Exception as e:  # noqa: BLE001 — never break the host job
+        print(f"⚠️ jp_disclosures bridge failed: {e}")
     return 0
 
 

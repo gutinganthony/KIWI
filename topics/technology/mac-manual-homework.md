@@ -29,8 +29,9 @@ last_updated: 2026-07-06
   - 位置：Actions 分頁 → Deploy Dashboard to GitHub Pages → Re-run failed jobs；或等下次自動 deploy。
 
 ### 2026-07-06 session 產生的（JEM 第一關收尾，加碼前必做）
-- [ ] **TDnet 7/3–7/6 適時開示清單**：確認 JEM（6855）這幾天沒有任何未被媒體報導的公告（增資/CB/下修）。→ 排除否證 #1 的殘餘不確定性。
-- [ ] **JEM FY3/26 有価証券報告書「主な相手先別販売実績」表**（EDINET 或 JEM 官網 PDF）：查 NAND 單一客戶（Kioxia/Flash Forward 系）占比未失控、**Micron 系是否回到 >10%（=最強確認訊號）**。→ 補齊否證 #2 的資料缺口。
+> 🔄 **2026-07-26 狀態更新：已改由資料橋自動處理，先別自己做。** 本 session 實測雲端 agent proxy 對 **TDnet／EDINET／irbank／kabutan／minkabu／Yahoo!JP／JEM 官網 全部 CONNECT 403**（curl 與 WebFetch 皆然）→ 新增 `scripts/fetch_jp_disclosures.py` 掛在 dashboard workflow（一天 3 次）的 `fetch_backtest_ext.py` 後面，由 Actions runner 抓 irbank 的 `/ir`（開示一覽）與 `/customers`（有報 相手先別販売実績），落地 `data/ext/jp_disclosures/6855_JEM.md`。**下次 bot 跑完就有檔；若檔內是 403 錯誤訊息（代表 runner 也被擋），才需要你在 Mac 上手動做下面兩項。**
+- [ ] **TDnet 7 月適時開示清單**（等橋）：確認 JEM（6855）無再增資/CB/下修。→ 否證 #1。**搜尋層已知：7/11 與 7/24 各有一則開示（PDF 123KB／106KB），標題未取得**——多半是例行的自己株式取得狀況報告，但需確認。
+- [ ] **JEM FY3/26 有報「主な相手先別販売実績」**（等橋）：查 NAND 單一客戶占比、**Micron 系是否回到 >10%（＝最強確認）**。→ 否證 #2。**搜尋層已取得部分答案：有報註記「Micron Memory Japan 與 MICRON MEMORY TAIWAN 前事業年度合計未達總銷售 10%」——即 Micron 系在前一年度 <10%；當年度（FY3/26）數字未取得，最強確認訊號尚未成立也尚未推翻。**
 - [ ] **Yahoo!ファイナンス 6855 時系列**：核對 7/3 與 7/6 兩日收盤，判別 7/6 單日跌幅是 -10.4% 還是 -14.3%（兩快照矛盾，複核 agent 無法裁決）。
   - 三項全過 → JEM 首批建倉區 ¥6,400–6,800 紀律恢復有效（第二關 8/7 Q1 財報再定第二批）。
 
