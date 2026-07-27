@@ -23,7 +23,8 @@
 
 | 檔期 | 內容 | 狀態與素材 |
 |------|------|-----------|
-| **8/1（週六，建議下午）** | **月底開獎對帳篇「八月到了，人道走廊還能走嗎？」**：驗收 FOMC＋DRAM 合約價＋42,449.70／VIXTWN 40；加入 1950–2025 八至十月季節性、19 個中期選舉年，以及 NVIDIA×SK Group／NAVER 慢層證據 | 📝 初稿：`drafts/2026-AUG_corridor-verdict-draft.md`。不變段落已完成；待補 FOMC、月底 DRAM contract price、本週台股／VIXTWN／外資／融資與記憶體股週線、Jake 個人動作。圖建議 `AUG-chart-seasonality-verdict.png`。若 DRAM 7/31 尚未更新，延至 8/2 或明確標示尚有一張考卷未交，不用 spot price 代替。 |
+| **7/30（週四 16:30–18:30，條件式）** | **FOMC 快層對帳番外**：只處理 Fed 決議、兩年債／美元／Nasdaq／費半反應，以及 7/30 台股兩條警報 | 📝 骨架：`drafts/2026-FOMC_corridor-check-draft.md`。以下任一才寄完整電子報：Fed 明顯意外、2Y 約 ±10bp、Nasdaq／費半絕對漲跌約 1.5%+、42,449.70 跌破、VIXTWN 收 40+、外資千億賣超、利多不漲／利空不跌。全部未達則改發 150–250 字 Note。 |
+| **8/1（週六 15:00–18:00）** | **月底慢層與最終判定「八月到了，人道走廊還能走嗎？」**：DRAM 合約價＋季節性／中期選舉＋NVIDIA×SK Group／NAVER，最後驗收 42,449.70／VIXTWN 40 | 📝 拆篇版初稿：`drafts/2026-AUG_corridor-verdict-draft.md`。Fed 只引用週四短篇或 Note 的一句分數，不重複細節；待補 DRAM contract price、本週台股／外資／融資、記憶體股週線與 Jake 個人動作。若 DRAM 7/31 尚未更新，延至 8/2；不用 spot price 代替。圖建議 `AUG-chart-seasonality-verdict.png`。 |
 | **W8（順延中）** | **1999 持倉指南**（泡沫裡的人怎麼活） | 研究檔＋回測程式已備（`drafts/gen_W8_backtest.py`），**等 Jake 上傳 Nasdaq CSV** |
 | **W9** | **國安基金九場戰役** | 研究檔：`research/nsf-nine-battles-research.md`（出手線 -25%~-44%、唯一敗仗）。缺：第 1–3 役精確指數 TWSE 核實 |
 | **W10** | **「輝達之外，錢正在流向誰」ASIC 定制晶片** | ✅ Jake 拍板。素材：Kenji Marvell 10 倍股三部曲＋BI 報告（ASIC 份額 2030 至 45–50%、GPU+ASIC 出貨 800 萬→2,800 萬顆、台積電 AI 訂單占比 90%+）。動工前需做定制晶片賽道研究（博通/Marvell/世芯/創意） |
