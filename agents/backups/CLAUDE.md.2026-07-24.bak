@@ -46,7 +46,6 @@ gstack 檔案路徑一律用 `~/.claude/skills/gstack/...`（全域路徑）。
 | 「用 Serenity + WaveTrend 分析 $TICKER，搭配 ACT index 判讀」（三合一） | skills/serenity/SKILL.md + skills/serenity/watchlist.md + skills/wavetrend/SKILL.md + docs/KIWI_INDEX_FRAMEWORK.md（不含 weekly-screen.md） |
 | 新增文章/連結到知識庫 | README.md 看格式 → 寫入 topics/<主題>/ → 更新該主題 INDEX.md 與 README.md 的索引表 |
 | 改 avi-v5 程式 | projects/avi-v5/ARCHITECTURE.md（改 CPI 相關再加 CPI_ARCHITECTURE.md） |
-| 接收 Codex 提案或實作草稿 | handoffs/codex/<任務>/HANDOFF.md + agents/CODEX_COLLABORATION.md |
 
 其餘任務一律不讀上表檔案。新增分析模組：在 `skills/` 下建資料夾寫 SKILL.md，然後在上表加一列。
 
@@ -88,4 +87,3 @@ gstack 檔案路徑一律用 `~/.claude/skills/gstack/...`（全域路徑）。
 | MAINTENANCE.md | 制度檔案的修改權限與教訓回寫格式 | 要改制度檔或寫 LEARNINGS 前 |
 | LEARNINGS.md | 歷任 session 踩坑紀錄 | 每個 session 開始 |
 | LETTER.md | 制度建立 session 給未來 session 的信 | 接手大任務或制度出現退化跡象時 |
-| CODEX_COLLABORATION.md | Codex handoff 審核與整合規則 | 收到 Codex 提案或實作草稿時 |
