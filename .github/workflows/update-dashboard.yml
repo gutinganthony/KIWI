@@ -57,6 +57,9 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/index.html docs/taiwan_data.json docs/history.json
           git add projects/avi-v5/data/ext/*.csv 2>/dev/null || true
+          # 日本開示資料橋（fetch_jp_disclosures.py）的產出是 .md，不被上面的 *.csv glob 涵蓋。
+          # 2026-07-27 前這行不存在 → 橋有跑但產出從未入版控、隨 runner 回收消失。
+          git add projects/avi-v5/data/ext/jp_disclosures/*.md 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else

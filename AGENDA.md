@@ -13,12 +13,13 @@
 
 ## 📌 任務（有到期日，bot 會盯）
 
-- [ ] 2026-07-13 | 安裝 llm-council-skill | Mac 本機裝 gcpdev/llm-council-skill（步驟＋安全提醒詳 mac-manual-homework.md；send_later 主動推播本 session 排不了，這是第二層保險）
-- [ ] 2026-07-19 | JEM 手動功課 | TDnet 7/3–7/6 清單＋FY3/26 有報客戶表＋Yahoo 收盤複核（首批 1/3 執行前必做，詳 mac-manual-homework）
-- [ ] 2026-07-26 | 出場手冊 v1 | 每筆持倉的減倉條件全部綁訊號（M1 結論：綁訊號執行率 100%、不綁 0%）
+- [ ] 2026-08-03 | 安裝 llm-council-skill | ✅ 阻擋點已解除（2026-07-27 逐行原始碼審查完成＝有條件可安裝）→ 剩純安裝動作。**裝之前先做三件事**：修 `query_llms.py:128` 的 Gemini key 洩漏、`which gemini codex`、`.env` 進 .gitignore。全文詳 mac-manual-homework.md
+- [ ] 2026-08-03 | JEM 手動功課 | 🔄 **改為等橋，不要自己做**：2026-07-27 找到資料橋失效根因（`update-dashboard.yml` commit glob 只收 `*.csv`、漏掉 `.md` 產出）並修好。**動作改成：把本分支合併 main，然後看 `projects/avi-v5/data/ext/jp_disclosures/6855_JEM.md` 有沒有出現**。檔案出現且非 403 → 兩件功課自動結案
+- [ ] 2026-08-16 | 出場手冊 v2 | 補 v1 的三個缺口（詳 exit-playbook.md §7）：①`watchlist.md` 持倉表加「部位權重／平均成本」兩欄——沒有這個就算不出「減完剩多少現金」②決定要不要有統一停損線／追蹤停利／單一部位上限（這是價值判斷，v1 刻意不代你發明）③村田＋Advantest 的觸發條件目前無自動監控
 - [ ] 2026-07-30 | 記憶體判定重跑 | 7/28–30 出 Samsung/SKH 存貨＋MSFT/Meta(7/29)/Amazon(7/30) capex＝八因子判定的最大缺口補齊點，數字一出立刻重跑（詳 topics/business/2026-07-26-memory-bear-market-multifactor-verdict.md §6）
 - [ ] 2026-08-14 | 群翊 6664 否證判決 | Q2 毛利率 <50%＝否證定讞（Q1 已 48.23%）；8/10 七月營收先看。複核結論＝暫緩第一筆至此日，勿提前建倉
-- [ ] 2026-07-26 | FinMind token | 註冊 finmindtrade.com → repo Secrets `FINMIND_TOKEN`（台股漏斗主源解鎖）
+- [ ] 2026-08-03 | FinMind token | 註冊 finmindtrade.com → repo Secrets `FINMIND_TOKEN`。⚠️ **2026-07-27 下修預期**：實測免費註冊層對「法人買賣超」與「價格」兩個 dataset 仍回 400（需付費 Sponsor 層），token 真正買到的只有配額穩定性（月營收逐檔是吃配額大戶）。仍值得做（5 分鐘）但別期待解鎖新資料。逐步點擊步驟詳 mac-manual-homework.md
+- [ ] 2026-07-29 | tw-funnel 停更查修 | 🆕 2026-07-27 發現：`projects/tw-funnel/data/candidates_latest.json` 的 `generated_at` 停在 07-24（前兩天都正常）＝排程壞了或沒觸發，與 token 無關。去 Actions 看 tw-funnel 最近三次 run
 - [ ] 2026-08-07 | JEM Q1 裁判日 | 事前寫好「結果 X → 動作 Y」預案；指引未上修＝sandbag 失效
 - [ ] 2026-08-13 | Seikoh Q1 裁判日 | sandbag vs 真弱開獎；試探倉預案事前寫好
 - [ ] 2026-08-31 | Fund 架構決策 | BVI incubator vs 其他：定案＋理由入庫（track record 帳戶依此開設）
@@ -47,6 +48,8 @@
 ## ✅ 已完成（從上面移下來，保留紀錄）
 
 - [x] 2026-07-12 | ABCD 自我審計 v1.1 | 五個持倉黑箱結案（JEM 無部位/Pelosi 動機/宇瞻 TEL 出場）
+- [x] 2026-07-26 | 出場手冊 v1 | 2026-07-27 完成 → `skills/serenity/exit-playbook.md`。組合層 5 條（CRI/AVI/TSI/WT1）＋4 檔持倉 21 條機械出場條件＋T1 四條與減碼順序（先 DRAM ETF、後 MU）；廢止 4 組日曆式條款（含「2027 分批出場」）。未決項已轉為 8/16 的 v2
 
 ## Update Log
 - 2026-07-12 v1.0：建檔（週六 bot＋任務格式慣例＋seed 六任務四目標＋每月自檢清單）。
+- 2026-07-27：清一輪逾期。出場手冊 v1 結案；llm-council／JEM／FinMind 三項的**阻擋點**分別解除或降級（審查完成／改等資料橋／預期價值下修），到期日順延至 8/3；新增 tw-funnel 停更查修（7/29）與出場手冊 v2（8/16）。

@@ -30,6 +30,14 @@ last_updated: 2026-07-06
 
 ### 2026-07-06 session 產生的（JEM 第一關收尾，加碼前必做）
 > 🔄 **2026-07-26 狀態更新：已改由資料橋自動處理，先別自己做。** 本 session 實測雲端 agent proxy 對 **TDnet／EDINET／irbank／kabutan／minkabu／Yahoo!JP／JEM 官網 全部 CONNECT 403**（curl 與 WebFetch 皆然）→ 新增 `scripts/fetch_jp_disclosures.py` 掛在 dashboard workflow（一天 3 次）的 `fetch_backtest_ext.py` 後面，由 Actions runner 抓 irbank 的 `/ir`（開示一覽）與 `/customers`（有報 相手先別販売実績），落地 `data/ext/jp_disclosures/6855_JEM.md`。**下次 bot 跑完就有檔；若檔內是 403 錯誤訊息（代表 runner 也被擋），才需要你在 Mac 上手動做下面兩項。**
+>
+> 🔴 **2026-07-27 修正：上面那座橋一天都沒生效過，原因不是被擋，是產出從沒被 commit。**
+> `update-dashboard.yml` 的 commit 段只有 `git add projects/avi-v5/data/ext/*.csv`，
+> 而橋的產出是 `.md`，**不被那個 glob 涵蓋 → 每次抓完就隨 runner 回收消失**（＝ `agents/LEARNINGS.md` 2026-07-10 那個坑的翻版）。
+> 已在 `update-dashboard.yml` 補上 `git add projects/avi-v5/data/ext/jp_disclosures/*.md`。
+> ⚠️ **此修正在 feature branch 上，要合併 main 之後 bot 才會照新版跑**（cron 只認 default branch）。
+> 合併後下一次 dashboard 更新（一天 3 次）就會出現 `projects/avi-v5/data/ext/jp_disclosures/6855_JEM.md`。
+> **在那個檔出現之前，下面兩項都不必你動手。** 檔案出現後若內容是 403 錯誤訊息，才輪到你在 Mac 上手動做。
 - [ ] **TDnet 7 月適時開示清單**（等橋）：確認 JEM（6855）無再增資/CB/下修。→ 否證 #1。**搜尋層已知：7/11 與 7/24 各有一則開示（PDF 123KB／106KB），標題未取得**——多半是例行的自己株式取得狀況報告，但需確認。
 - [ ] **JEM FY3/26 有報「主な相手先別販売実績」**（等橋）：查 NAND 單一客戶占比、**Micron 系是否回到 >10%（＝最強確認）**。→ 否證 #2。**搜尋層已取得部分答案：有報註記「Micron Memory Japan 與 MICRON MEMORY TAIWAN 前事業年度合計未達總銷售 10%」——即 Micron 系在前一年度 <10%；當年度（FY3/26）數字未取得，最強確認訊號尚未成立也尚未推翻。**
 - [ ] **Yahoo!ファイナンス 6855 時系列**：核對 7/3 與 7/6 兩日收盤，判別 7/6 單日跌幅是 -10.4% 還是 -14.3%（兩快照矛盾，複核 agent 無法裁決）。
@@ -40,7 +48,35 @@ last_updated: 2026-07-06
 - [ ] **上線驗證「連續維持天數」標注**：同一張 LFI 卡片底部應出現「目前水位已連續維持 ≥80 X · ≥90 Y · ≥95 Z 交易日」那一行（bot 下次跑才會帶出 `days_ge_*`，在那之前該行隱藏是正常的）。07-10 讀數已到 84.8，若持續 ≥80，X 應該 ≥1 且逐日遞增。
 - [ ] **（可選）真標的驗證節流閥**：資料橋補齊 JEM/Towa/Kokusai 等真股歷史後（~1 週），重跑 `scripts/serenity_throttle_validation.py` 改用真標的，確認「節流閥別硬加」的結論在真標的上也成立。
 ### 2026-07-12 session 產生的（llm-council-skill 評估）
-- [ ] **安裝 gcpdev/llm-council-skill 到 Mac 本機 Claude Code**（雲端跑不了：容器 proxy 會擋 OpenAI/Gemini 的 API 呼叫）。雲端已做背景查證：作者可信（萊比錫大學語意網研究者）、334★、MIT 授權、無安全疑慮紀錄，但程式碼本身**未逐行審查**（`add_repo` 核准流程本 session 沒跑通）。步驟：clone repo → 把 `llm-council/` 資料夾放進 `~/.claude/skills/` → `.env` 填 `OPENAI_API_KEY`/`GEMINI_API_KEY` → 裝之前先看一眼 `scripts/query_llms.py` 確認只打 OpenAI/Google 官方端點、沒有第三方轉發。用法：對話裡打「Consult the council: ＜問題＞」。**⚠️ 只拿它問技術/通用問題，別把 KIWI 持倉、部位、fund 細節餵給它**——內容會送到 OpenAI 和 Google。ChatGPT 本來就是 council 兩席之一，免額外設定。
+- [ ] **安裝 gcpdev/llm-council-skill 到 Mac 本機 Claude Code**（雲端跑不了：容器 proxy 會擋 OpenAI/Gemini 的 API 呼叫）。
+  > ✅ **2026-07-27：擋住這項的「程式碼未逐行審查」已解除。判定＝有條件可安裝。**
+  > 全部可執行程式碼只有 212 行的 `llm-council/scripts/query_llms.py`，已逐行讀完；
+  > 發布的 `llm-council.skill` bundle 與 repo 原始碼 `diff` 結果 **IDENTICAL**（無夾帶）。
+  > - **網路端點乾淨**：全檔只有兩個 URL，都是官方——`:90` `api.openai.com/v1/chat/completions`、
+  >   `:114` `generativelanguage.googleapis.com/...`。無第三方轉發／telemetry／分析。唯一 HTTP 庫是 `requests`。
+  > - **資料外送範圍乾淨**：payload 只有 `:144` `" ".join(sys.argv[1:])` 拼出的 prompt。
+  >   不讀檔、不列目錄、不夾帶系統資訊或對話歷史——**夾帶什麼完全由主對話決定**（所以下面那條紅線還是要守）。
+  > - **本機副作用基本乾淨**：無 `eval`/`exec`/`pickle`/`curl|bash`、無寫檔、不碰 `~/.ssh`、不下載遠端程式碼。
+  > - **依賴乾淨**：無 requirements.txt/package.json，唯一第三方 import 是 `requests`，其餘全標準庫。
+  >
+  > ⚠️ **安裝前必須處理的三件事**：
+  > 1. **Gemini 金鑰會在 API 失敗時明文進逐字稿**（唯一實質風險）。`:114` 把 key 放在 URL query string，
+  >    而 `:128` `return f"Error querying Gemini ({model}): {str(e)}"` 會把 `raise_for_status()`（`:124`）
+  >    產生的**含完整 URL 的例外訊息原樣印到 stdout** → 任何 4xx/5xx 都會讓 `?key=AIza...` 進入
+  >    Claude context 與 `~/.claude/projects/*.jsonl`。
+  >    **修法**：把 `:128` 改成 `return f"Error querying Gemini ({model}): {str(e).split('?key=')[0]}"`。
+  >    不想改就接受它，並定期輪替該 key。
+  > 2. **它會執行 PATH 上叫 `gemini` / `codex` 的執行檔**（`:48-53`、`:70-75` 的 `subprocess.run`，
+  >    list 形式、`shell=False`，安全；但 README/SKILL.md 完全沒提這件事，只講 API）。
+  >    你的 gstack 有 `/codex`，PATH 上**很可能真的有 `codex`** → 它會走 CLI 而不是 API。
+  >    **安裝前先跑 `which gemini codex`**，確認跳出來的是你認得的工具。
+  > 3. `.env` 放在專案 CWD 並**列入 `.gitignore`**（`references/SETUP.md:87-89` 有提醒）。
+  >
+  > **步驟**：clone repo → 把 `llm-council/` 資料夾放進 `~/.claude/skills/` → `.env` 填
+  > `OPENAI_API_KEY`/`GEMINI_API_KEY` → 套用上面第 1 點的修改 → `which gemini codex` 確認。
+  > 用法：對話裡打「Consult the council: ＜問題＞」。
+  > **⚠️ 紅線不變：只拿它問技術/通用問題，別把 KIWI 持倉、部位、fund 細節餵給它**——內容會送到 OpenAI 和 Google。
+  > ChatGPT 本來就是 council 兩席之一，免額外設定。
 
 ### 2026-07-16 session 產生的（幫朋友代管資金研究——僅在你決定要做時才需核對）
 - [ ] **核對 Bitget 託管子帳戶門檻**（bitget.com/support 被雲端擋）：「>50,000 USDT 或 VIP2 可申請委託交易員、投資人保留出入金權、無建立費」——這是唯一個人可行的正式代管路徑，數字全來自搜尋摘要未直接核對。
@@ -54,6 +90,8 @@ last_updated: 2026-07-06
 ### 2026-07-26 session 產生的（Serenity 週報 — 只剩「雲端真的做不到」的項）
 > ✅ **上一批「補 live 現價」的功課全部由 2026-07-26 週報自動結案**——發現本 runner 可直連交易所級行情 API（見 `agents/LEARNINGS.md` 2026-07-26 條），全名單價格/市值/trailing P/E 已取得精確值，**不需要你在 Mac 上補價了**。以下是剩下真正需要你的：
 - [ ] **JEM 6855 兩件建倉前功課（仍未清，唯一擋住執行的東西）**：①TDnet 7 月適時開示清單確認無再增資/CB/下修；②FY3/26 有価証券報告書「主な相手先別販売実績」查 NAND 單一客戶占比與 **Micron 系是否 >10%（＝最強確認）**。現價 ¥6,280 已跌破首批區 ¥6,400–6,800 下緣、朝 <¥5,800 最大加碼區走，**功課清掉才有部位可談**。
+  > 🔄 **2026-07-27：不要自己做，等橋。** 橋沒生效的根因已找到並修好（是 commit glob 漏收 `.md`，不是被擋），
+  > 詳見本檔上方 2026-07-06 段的紅字。**合併 main 後下一次 dashboard 更新就會有檔**。
 - [ ] **群翊 6664 七月營收（~8/10 公布）＝否證線裁判**：查 TWSE/Goodinfo 月營收 YoY。<10% → 5 月(+7.92%)+7 月成立、六月(+19.32%)變孤點、否證壓力回來；≥10% → 買進條件續成立。**本週價格已進 NT$330–360 觸發區、六月營收 ≥10%＝兩條件成立，這是唯一未結的變數。**
 - [ ] **Seikoh 6834 中國 SINY 合資的曝險評估（需讀一手 TDnet PDF）**：`https://www.release.tdnet.info/inbs/140120260716595447.pdf`（7/17 公告）——查合資公司出資比例、是否可能推升中國營收占比、有無技術授權條款。**這是 🟢 觸發名單裡首次出現中國曝險**，Serenity 對中國是原則性排除，權益法不立即否決但要定性。
 - [ ] **（低優先）Intekplus 064290 券商目標價時效確認**：查到的 TP ₩18,000 遠低於現價 ₩30,500，疑為 2026/3 舊報告。若確為舊件則不構成降評理由，本週報已暫降為觀察待重評。
@@ -64,7 +102,32 @@ last_updated: 2026-07-06
 - [ ] **（可選）記憶體判定的一手核對**：八因子判定全部數字皆二手（信心僅 45–55%）。若要提升信心，在 Mac 上核對 TrendForce 4Q26 合約價預估、Samsung/SKH 存貨（7/28–30 公布）、Micron SCA 條款（FY26Q3 10-Q）。
 
 ### 2026-07-11 session 產生的（台股漏斗數據源）
-- [ ] **註冊 FinMind 免費帳號取得 API token**（finmindtrade.com）→ 放進 GitHub repo Settings → Secrets → `FINMIND_TOKEN`。無 token 時台股管線走 TWSE 次源可運作；FinMind 主源（更穩、可歷史回補）的全市場查詢需 token 解鎖（匿名層回 400）。
+- [ ] **註冊 FinMind 免費帳號取得 API token**（finmindtrade.com）→ 放進 GitHub repo Settings → Secrets → `FINMIND_TOKEN`。
+  > ⚠️ **2026-07-27 查核：這項的價值比原本以為的小很多，先看完再決定要不要花時間。**
+  > 實測證據在 `projects/tw-funnel/data/meta_latest.json:19,37`——最近一次 CI 跑，
+  > `TaiwanStockInstitutionalInvestorsBuySell` 與 `TaiwanStockPrice` 兩個 dataset 回 **400**，
+  > 訊息是 `"Your level is register. Please update your user level..."`＝**帳號層級不足，指向付費 Sponsor 層**。
+  > 也就是說**免費註冊層的 token 大概率仍然解不開這兩項**[推論——未實際拿 token 驗證]。
+  > **token 真正買到的是配額**：`projects/tw-funnel/config.py:41` 註記匿名額度低、註冊後 600 req/hr，
+  > 而管線常態 ~53 req/日、尖峰 ~107 req/日（`config.py:58-64`）。目前唯一成功的 FinMind 項目是
+  > **月營收逐檔（68/69 檔成功**，`meta_latest.json:44-51`）——那也是吃配額最兇的一項。
+  > **結論：註冊仍值得做（5 分鐘、保住月營收這條線的配額穩定性），但不要期待它解鎖法人買賣超與價格。**
+  > 沒有 token 也不會壞：`projects/tw-funnel/fetch_data.py:655,660,697,732` 都有 TWSE fallback
+  > （法人→T86 OpenAPI→RWD 回溯 7 個交易日；價格→STOCK_DAY_ALL；月營收→t187ap05_L 全市場），
+  > 兩源皆掛時沿用既有 state（`:688,715`），workflow 每步帶 `|| true`，永遠 exit 0。
+  >
+  > **照這個順序點（5 分鐘）**：
+  > 1. finmindtrade.com 註冊 → 登入後在會員頁複製 API token
+  > 2. GitHub → `gutinganthony/KIWI` → Settings → Secrets and variables → Actions → New repository secret
+  > 3. Name 填 **`FINMIND_TOKEN`**（大小寫需完全一致——注入點 `.github/workflows/tw-funnel.yml:43`，
+  >    程式讀取點 `projects/tw-funnel/fetch_data.py:195-197`，兩邊都用這個名字）
+  > 4. Value 貼 token → Add secret
+  > 5. 驗收：下一次 tw-funnel 跑完，看 `projects/tw-funnel/data/meta_latest.json` 裡
+  >    月營收那項的成功檔數是否維持 68–69/69，且沒有出現配額類錯誤
+- [ ] **（順帶發現，優先度高於上面那項）tw-funnel 資料已停更 3 天**：
+  `projects/tw-funnel/data/candidates_latest.json` 的 `generated_at` 停在 **2026-07-24T11:26:17Z**
+  （前兩次 07-23、07-22 都正常，＝每日排程原本是好的）。**這跟 token 無關**（沒 token 本來就走 TWSE 次源）。
+  請到 Actions 分頁看 `tw-funnel` 最近三次 run 是紅的還是根本沒觸發。
 - [ ] （低優先）雲端 WebFetch 被 403 擋的站 +1：`stockanalysis.com`（TSM 估值頁）。雲端已用 WebSearch 摘要繞過，僅在需要精確 P/B 等單一指標時在 Mac 上手動查。
 
 ### 2026-07-10 session 產生的（Polymarket 跟單文查證——優先度低：雲端查證結論已足夠明確〔判定為導流文，不建議執行〕，以下僅在你想二次確認時做）
@@ -85,6 +148,7 @@ last_updated: 2026-07-06
 
 ## Update Log
 - 2026-07-06 v1.0：建立慣例＋seed JEM 三項＋Pages re-run 站著的一項。搭配 `notify_ops.py` 失敗推播（建議 2）與 CLAUDE.md 開場指標。
+- 2026-07-27：清帳一輪（AGENDA 四項逾期任務）。**JEM 兩件**＝找到資料橋失效根因（`update-dashboard.yml` 的 commit glob 只收 `*.csv`、漏掉橋產出的 `.md`）並修好 → 從「你要做」降級為「等合併 main」。**llm-council** ＝逐行原始碼審查完成（212 行全讀＋bundle 與原始碼 diff 一致），判定有條件可安裝，補上三個安裝前條件（Gemini key 洩漏修法、`which gemini codex`、`.gitignore`）。**FinMind** ＝補上精確點擊步驟，並查出免費註冊層對法人買賣超/價格兩個 dataset 仍回 400（付費層才解），下修這項的預期價值。**新增**：tw-funnel 資料停更 3 天（07-24 之後）待你查 Actions。清帳方法論已固化成 `agents/loops/mac-homework-clearing.md`。
 
 ### 2026-07-26 session 產生的（海關細碼一次性驗證 SOP）
 - [ ] **（可選，5 分鐘）台灣海關細碼出口序列手動拉取**——自動化已確認被驗證碼擋死（不繞過），但**手動一次查詢就能拿全部資料**：

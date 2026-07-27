@@ -16,7 +16,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 
 | Topic | Entries |
 |-------|---------|
-| [Technology](./topics/technology/INDEX.md) | 2 |
+| [Technology](./topics/technology/INDEX.md) | 5 |
 | [Science](./topics/science/INDEX.md) | 0 |
 | [Business](./topics/business/INDEX.md) | 62 |
 | [Health](./topics/health/INDEX.md) | 0 |
@@ -32,6 +32,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-07-27 | [Loop Engineering — 從「下 prompt」到「寫迴圈」的工作方式轉換](./topics/technology/2026-07-27-loop-engineering.md) | Technology |
 | 2026-07-26 | [記憶體是否進入熊市？八因子實體面判定](./topics/business/2026-07-26-memory-bear-market-multifactor-verdict.md) | Business |
 | 2026-07-26 | [Serenity Step 1–9：群翊 6664 建倉前複核（建議暫緩至 8/14）](./topics/business/2026-07-26-serenity-step1-9-groupup-6664-pre-entry-review.md) | Business |
 | 2026-07-24 | [〈Open Weights〉34 家聯合聲明 — 來龍去脈與影響](./topics/business/2026-07-24-open-weights-coalition-statement.md) | Business |

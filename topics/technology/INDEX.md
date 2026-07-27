@@ -2,6 +2,7 @@
 
 | Date | Title | Tags |
 |------|-------|------|
+| 2026-07-27 | [Loop Engineering — 從「下 prompt」到「寫迴圈」的工作方式轉換](./2026-07-27-loop-engineering.md) | workflow, claude-code, loop-engineering, automation, verification, agent-design, kiwi-ops |
 | 2026-07-06 | [KIWI Session 交接 — 記憶體超級循環 + Dashboard 修復 + 抄底引擎](./2026-07-06-session-handoff-memory-supercycle-dashboard.md) | session-handoff, memory-supercycle, HBM, dashboard, act-system, dip-buying-backtest, serenity, portfolio |
 | 2026-07-06 | [🖥️ Mac 手動功課清單（雲端做不到、待本機清的事）](./mac-manual-homework.md) | workflow, convention, manual-homework, cloud-limitations, checklist |
 | 2026-04-07 | [为了让AI学会交易，我搭了一个量化交易系统](./2026-04-07-ai-quant-trading-system-tutorial.md) | AI, quant-trading, crypto, OKX, tutorial, LLM |
