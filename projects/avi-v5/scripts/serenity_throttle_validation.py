@@ -34,15 +34,20 @@ sys.path.insert(0, str(ROOT / "src"))
 from lfi import compute_lfi_series  # noqa: E402
 
 PROXY = ["SMH", "SOXX", "NVDA", "MU"]   # 高 beta AI-半導體代理籃
+# --real 模式：真 Serenity 標的（2026-07-26 起由 fetch_backtest_ext.py 資料橋落地，2019→今）
+EXT = ROOT / "data" / "ext"
+REAL = ["JEM", "Towa", "Kokusai", "Advantest", "santec", "TokyoElectron"]
 HORIZONS = [20, 60]
 HIGH_Q, LOW_Q = 80, 20
 DECLUSTER = 21
 OOS = "2012-12-31"
+# 真標的只有 2019 起的歷史，2012 切點會讓 IS 組為空 → 真標的模式改用 2023 切點
+OOS_REAL = "2023-06-30"
 SEED = 42
 
 
-def load_close(name):
-    df = pd.read_csv(DATA / f"{name}.csv")
+def load_close(name, base=None):
+    df = pd.read_csv((base or DATA) / f"{name}.csv")
     df.columns = [c.strip() for c in df.columns]
     dcol = next((c for c in df.columns if c.lower() == "date"), df.columns[0])
     df[dcol] = pd.to_datetime(df[dcol], format="mixed")
@@ -54,6 +59,24 @@ def load_close(name):
         if cand.upper() in up:
             return df[up[cand.upper()]].astype(float)
     return df.iloc[:, -1].astype(float)
+
+
+def load_macro(name, splice):
+    """LFI 的巨集輸入。
+
+    data/backtest 的 SPY/HYG 只到 2020-04-01，而真標的（data/ext）是 2019→今——
+    直接用 backtest 算 LFI，兩者只重疊 15 個月，事件數會塌到個位數（實測：0 個 HIGH、
+    12 個 LOW，且全落在 OOS 切點之前）。因此 --real 模式把兩段接起來：
+    2020-04 之前用 backtest（保住長歷史的分位數校準），之後接 data/ext（資料橋每 ~6 天更新）。
+    """
+    s = load_close(name, DATA)
+    if not splice:
+        return s
+    try:
+        e = load_close(name, EXT)
+    except FileNotFoundError:
+        return s
+    return pd.concat([s[s.index < e.index.min()], e]).sort_index()
 
 
 def decluster(idx, gap=DECLUSTER):
@@ -88,29 +111,38 @@ def event_excess(lfi_pctl, fwd, side, rng, n_boot):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--fast", action="store_true")
+    ap.add_argument("--real", action="store_true",
+                    help="改用真 Serenity 標的（data/ext，2019→今）取代高 beta 代理籃")
     ap.add_argument("--json-out", default="/tmp/serenity_throttle.json")
     args = ap.parse_args()
     n_boot = 400 if args.fast else 3000
     rng = np.random.default_rng(SEED)
 
-    spy = load_close("SPY"); hyg = load_close("HYG")
-    vvix = load_close("VVIX"); vix = load_close("VIX")
+    # LFI 的巨集輸入一律走 data/backtest（長歷史才有正確的分位數校準），
+    # 只有「被檢定的標的」在 --real 時換成 data/ext 的真標的。
+    spy = load_macro("SPY", args.real); hyg = load_macro("HYG", args.real)
+    vvix = load_macro("VVIX", args.real); vix = load_macro("VIX", args.real)
     lfi = compute_lfi_series(spy, hyg, vvix, vix)["lfi_pctl"].dropna()
+    print(f"[LFI] {lfi.index.min().date()} → {lfi.index.max().date()}（{len(lfi)} 個交易日）")
 
-    proxies = {t: load_close(t) for t in PROXY}
+    universe, base, oos = (REAL, EXT, OOS_REAL) if args.real else (PROXY, DATA, OOS)
+    globals()["OOS"] = oos
+    print(f"[模式] {'真 Serenity 標的' if args.real else '高 beta 代理籃'}："
+          f"{', '.join(universe)}｜IS/OOS 切點 {oos}")
+    proxies = {t: load_close(t, base) for t in universe}
     # 等權代理籃日報酬 → 累積價格（對齊 LFI 交易日）
     rets = pd.DataFrame({t: p.pct_change() for t, p in proxies.items()})
     basket_ret = rets.mean(axis=1)
     basket = (1 + basket_ret).cumprod()
 
     rows = []
-    for label, series in [("BASKET(等權)", basket)] + [(t, proxies[t]) for t in PROXY]:
+    for label, series in [("BASKET(等權)", basket)] + [(t, proxies[t]) for t in universe]:
         for h in HORIZONS:
             fwd = fwd_ret(series, h)
             common = lfi.index.intersection(fwd.index)
             l = lfi.loc[common]
             for side in ["high", "low"]:
-                for tag, mask in [("ALL", slice(None)), ("IS", l.index <= OOS), ("OOS", l.index > OOS)]:
+                for tag, mask in [("ALL", slice(None)), ("IS", l.index <= oos), ("OOS", l.index > oos)]:
                     ll = l[mask] if tag != "ALL" else l
                     ff = fwd.loc[ll.index]
                     es = event_excess(ll, ff, side, rng, n_boot if tag == "ALL" else max(400, n_boot // 3))

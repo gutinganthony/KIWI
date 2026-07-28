@@ -56,7 +56,14 @@ last_updated: 2026-07-06
   當初寫這條時的預期（「X 應該 ≥1 且逐日遞增」）建立在 LFI 續留 ≥80 的假設上，該假設已被推翻。
   **這個 −67 點的擺盪本身可能值得看一眼**（判讀依據在 `topics/business/2026-07-12-act-fourth-meter-lfi-and-serenity-throttle-validation.md`，
   不在 `docs/KIWI_INDEX_FRAMEWORK.md`——後者查無 LFI）。
-- [ ] **（可選）真標的驗證節流閥**：資料橋補齊 JEM/Towa/Kokusai 等真股歷史後（~1 週），重跑 `scripts/serenity_throttle_validation.py` 改用真標的，確認「節流閥別硬加」的結論在真標的上也成立。
+- [x] ~~**（可選）真標的驗證節流閥**~~ → **2026-07-28 結案：結論成立，不必你做。**
+  雲端就能跑（純 Python + repo 內 CSV，只需 `pip install --user numpy pandas`）。
+  已新增 `--real` 旗標並實跑：`python3 scripts/serenity_throttle_validation.py --real --fast`。
+  **結果：節流閥價值在真標的上更大（+1.75pp/20d、+3.14pp/60d，約代理籃的 1.3–2.1 倍），
+  但 p 值全部不顯著（0.18–0.98）→「別硬加」確認成立。**
+  ⚠️ 過程中修掉一個會讓結果失效的坑：`data/backtest` 的 SPY/HYG 只到 2020-04-01，
+  與真標的（2019→今）只重疊 15 個月，第一次跑出 0 個 HIGH 事件。已加 `load_macro()` 拼接。
+  完整記錄：`topics/business/2026-07-12-act-fourth-meter-lfi-and-serenity-throttle-validation.md` §8
 ### 2026-07-12 session 產生的（llm-council-skill 評估）
 - [ ] **安裝 gcpdev/llm-council-skill 到 Mac 本機 Claude Code**（雲端跑不了：容器 proxy 會擋 OpenAI/Gemini 的 API 呼叫）。
   > ✅ **2026-07-27：擋住這項的「程式碼未逐行審查」已解除。判定＝有條件可安裝。**
@@ -103,6 +110,7 @@ last_updated: 2026-07-06
   > 需走 quoteSummary + crumb 路徑（`agents/LEARNINGS.md` 2026-07-26），且 Yahoo 的 forwardPE
   > 對日本小型股嚴重失真、不可直接採信。**PER/PBR 這一半仍留在你的清單上。**
 - [ ] **和大 1536 Optimus 拉貨狀態查證**：Yahoo 股市有「Optimus 拉貨喊停」報導，與 Tesla 產線未啟動互相印證——確認和大是否已實際出貨/出貨中斷（月營收＋法說紀錄）。
+  - 🔒 **2026-07-28 確認為真 needs me**：已查 `projects/tw-funnel/data/` 的候選清單與 `state/revenue_history.json`，**1536 不在台股漏斗涵蓋範圍**（漏斗是篩選器不是自選股清單），且台股資訊站在雲端全滅。法說紀錄本來就沒有自動來源。
 
 ### 2026-07-26 session 產生的（Serenity 週報 — 只剩「雲端真的做不到」的項）
 > ✅ **上一批「補 live 現價」的功課全部由 2026-07-26 週報自動結案**——發現本 runner 可直連交易所級行情 API（見 `agents/LEARNINGS.md` 2026-07-26 條），全名單價格/市值/trailing P/E 已取得精確值，**不需要你在 Mac 上補價了**。以下是剩下真正需要你的：
@@ -117,6 +125,12 @@ last_updated: 2026-07-06
 > 本 session 實測：**雲端對台股/日股/韓股的公開資訊站幾乎全滅**（curl、WebFetch、browse 三條路皆 403），且 WebSearch 有 session 上限 200 次（本 session 用罄）。診斷指令：`curl -sS --cacert /root/.ccr/ca-bundle.crt "$HTTPS_PROXY/__agentproxy/status"` 看 recentRelayFailures。
 - [ ] **群翊 6664 下單前必核 5 項**（僅在你決定要買時才需要；複核結論是暫緩至 8/14）：①CB 群翊二 66642 最新流通餘額（已轉換多少→剩餘稀釋真實%）②內部人近三月申報轉讓 ③現金流量表與合約負債拆解（訂單能見度硬證據）④中國營收占比最新值（否證線 45%）與單一客戶占比 ⑤群翊一 66641 是否仍有餘額。被擋站台完整清單見 `topics/business/2026-07-26-groupup-research/research_groupup.md` §附錄 C（18 站）。
 - [ ] **（可選）記憶體判定的一手核對**：八因子判定全部數字皆二手（信心僅 45–55%）。若要提升信心，在 Mac 上核對 TrendForce 4Q26 合約價預估、Samsung/SKH 存貨（7/28–30 公布）、Micron SCA 條款（FY26Q3 10-Q）。
+  > 🔄 **2026-07-28：其中 Micron 10-Q 那項應該搬進資料橋，不是你的功課。**
+  > 實測 `data.sec.gov` 在雲端 session 回 `CONNECT tunnel failed, 403`，
+  > **但 SEC EDGAR 對 GitHub Actions runner 幾乎確定可達**（同 Yahoo/Polymarket 的既有實證）。
+  > 且「查某檔美股的最新申報」是**會重複發生**的需求 → 符合搬橋兩判準。
+  > **本輪未建**（要新寫 EDGAR 抓取邏輯，非一行改動）。建議列為下一座橋。
+  > TrendForce（付費牆）與 Samsung/SKH 存貨（韓文 IR）仍是真 needs me。
 
 ### 2026-07-11 session 產生的（台股漏斗數據源）
 - [ ] **註冊 FinMind 免費帳號取得 API token**（finmindtrade.com）→ 放進 GitHub repo Settings → Secrets → `FINMIND_TOKEN`。
@@ -192,7 +206,17 @@ last_updated: 2026-07-06
 
 ## Update Log
 - 2026-07-06 v1.0：建立慣例＋seed JEM 三項＋Pages re-run 站著的一項。搭配 `notify_ops.py` 失敗推播（建議 2）與 CLAUDE.md 開場指標。
-- **2026-07-28：第一次用 `agents/loops/mac-homework-clearing.md` 憲章跑清帳，本輪處理 8 項。**
+- **2026-07-28（第二輪）：本輪處理 8 項。**
+  B（已直接完成）1：**節流閥真標的驗證**——雲端就能跑，結論「別硬加」確認成立
+  （真標的節流閥價值 +1.75/+3.14pp 但 p 全不顯著），過程中修掉一個會讓結果失效的資料範圍坑。
+  A（應搬橋、本輪未建）2：Micron 10-Q（SEC EDGAR 雲端 403、runner 可達、需求會重複）、
+  Seikoh TDnet PDF（日本開示橋可擴充）。**兩者都要新寫抓取邏輯，非一行改動，誠實標為未完成。**
+  D（真 needs me，已補理由）4：海關細碼（驗證碼）、和大 1536（不在漏斗涵蓋＋台股站全滅）、
+  Intekplus 券商 TP、stockanalysis.com。
+  條件性 1：群翊下單前 5 項（複核結論是暫緩至 8/14，現在不是功課）。
+  **本輪教訓：「可選」標籤會掩蓋掉「其實 5 分鐘就能做完」的項目**——節流閥那項掛了 16 天，
+  實際成本是裝兩個 pip 套件加一個旗標。
+- **2026-07-28（第一輪）：第一次用 `agents/loops/mac-homework-clearing.md` 憲章跑清帳，本輪處理 8 項。**
   A（已自動化）1：日股估值三檔加進價格橋（`fetch_backtest_ext.py` TICKERS 15 檔），只解現價、PER/PBR 仍留清單。
   B（已直接完成）3：JEM 7/6 跌幅裁決（正解 −3.74%，兩個選項都不對，且揪出 watchlist 價格誤植）、
   LFI 第四錶有真讀數 17.9、連續維持天數欄位正常（值為 0 是對的，因 LFI 從 84.8 崩到 17.9）。
