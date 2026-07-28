@@ -21,7 +21,7 @@
 
 | 標的 | 類型 | 現價/註記 | 賣訊監控 |
 |---|---|---|---|
-| **DRAM**（Roundhill Memory ETF）| 記憶體週期籃子（73% Samsung/SKH/Micron + Kioxia/SanDisk/WD/Nanya/Winbond）| ~$62（NAV $59.8）、AUM $24.6B、ER 0.65%、2026 +100%。**2026-07-09 由 AAOI 全數換入**（成本~$170→出~$108，實現~-36%）| DRAM 合約價季轉跌 / 量價背離 / CXMT DDR5 擴產+實體清單 / hyperscaler capex 下修。**🔴 2026-07-26 八因子判定：減碼時「先減本檔、後減 MU」**——SK hynix 已拆除 LTA 價格上限、Samsung 無同等鎖價＝本 ETF **無合約下檔保護**，而 MU 有 take-or-pay 地板。詳 `topics/business/2026-07-26-memory-bear-market-multifactor-verdict.md` |
+| **DRAM**（Roundhill Memory ETF）| 記憶體週期籃子（73% Samsung/SKH/Micron + Kioxia/SanDisk/WD/Nanya/Winbond）| ~$62（NAV $59.8）、AUM $24.6B、ER 0.65%、2026 +100%。**2026-07-09 由 AAOI 全數換入**（成本~$170→出~$108，實現~-36%）| DRAM 合約價季轉跌 / 量價背離 / CXMT DDR5 擴產+實體清單 / hyperscaler capex 下修。**🔴 2026-07-26 八因子判定：減碼時「先減本檔、後減 MU」**——SK hynix 已拆除 LTA 價格上限、Samsung 無同等鎖價＝本 ETF **無合約下檔保護**，而 MU 有 take-or-pay 地板。詳 `topics/business/2026-07-26-memory-bear-market-multifactor-verdict.md`。**＋2026-07-28 新增賣訊：供應商融資擴散**（NVDA 替 OpenAI 擔保/融資 ⇒ 客戶信用風險傳導成全鏈共同因子、尾部相依上升）——ETF 成分對信用驅動需求曝險高於有 take-or-pay 地板的 MU。詳 `topics/business/2026-07-28-nvda-vendor-financing-two-sided-review.md` |
 | **6981 村田製作所**（JP）| MLCC 全球 ~40%／AI 伺服器 45–70%（定價權已證實）| ¥7,838（7/21，距高 −36%，因子回檔非基本面）| AI 伺服器 MLCC 訂單跌回產能以下 / 漲價被撤 / AI capex 下修。**✅ 2026-07-21 三條檢核均未觸發**（受注残比 1.27 破 2018 峰、7/1 漲價生效未撤、capex 指引無下修）——續抱；Q1 財報 ~7/30 前不加碼。詳 `topics/business/2026-07-21-passives-memory-selloff-analysis.md` |
 | **6857 Advantest**（JP）| ATE 測試雙寡占、GPU/AI SoC 測試 ~70%（測試界 ASML）| ~¥30,660（~¥22T/$145B、fwd ~40×、自 ATH −15%）| Teradyne 搶 SoC/GPU 份額 / 毛利率反轉 / NVIDIA 週期暫停；7/29 財報 |
 | ~~INTC Intel~~（**已出場**：2027/3 $47 買權於 7/10 換至 DRAM ETF）| 原代工/18A 轉機（Serenity 評 0/10：份額輸家非卡口）| 出場時 ~$112.5；轉為 framework_out 參考觀察 | 重新關注需：18A 獲利級良率 + 外部代工大客戶投產（H2'26 分水嶺）|

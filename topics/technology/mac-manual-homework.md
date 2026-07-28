@@ -63,6 +63,13 @@ last_updated: 2026-07-06
 - [ ] **群翊 6664 下單前必核 5 項**（僅在你決定要買時才需要；複核結論是暫緩至 8/14）：①CB 群翊二 66642 最新流通餘額（已轉換多少→剩餘稀釋真實%）②內部人近三月申報轉讓 ③現金流量表與合約負債拆解（訂單能見度硬證據）④中國營收占比最新值（否證線 45%）與單一客戶占比 ⑤群翊一 66641 是否仍有餘額。被擋站台完整清單見 `topics/business/2026-07-26-groupup-research/research_groupup.md` §附錄 C（18 站）。
 - [ ] **（可選）記憶體判定的一手核對**：八因子判定全部數字皆二手（信心僅 45–55%）。若要提升信心，在 Mac 上核對 TrendForce 4Q26 合約價預估、Samsung/SKH 存貨（7/28–30 公布）、Micron SCA 條款（FY26Q3 10-Q）。
 
+### 2026-07-28 session 產生的（NVDA 供應商融資——影響記憶體減倉時鐘，優先度中高）
+> 本 session 搜尋額度用罄＋Reuters/CNBC 全被 403，**「NVDA 對 OpenAI 擔保 2,500 億＋融資 3,500 億」與「NVDA CDS 走闊」皆未查證**。分析已完成但建立在假設上（`topics/business/2026-07-28-nvda-vendor-financing-two-sided-review.md`）。
+- [ ] **核實 NVDA–OpenAI 安排**：金額、形式（擔保／直接融資／認股權證／GPU 回購保障）、**會計處理是否表外或有負債**。
+- [ ] **NVDA CDS 利差**實際變化幅度與起點（判斷市場定價的強度）。
+- [ ] **NVDA 最近一季應收帳款／合約資產／DSO 對營收的相對變化**（供應商融資的財報足跡）。
+- [ ] AMD 等同業是否有等價安排（判斷是「戰略前瞻」還是「產業級爭客競賽」——後者意義相反）。
+
 ### 2026-07-11 session 產生的（台股漏斗數據源）
 - [ ] **註冊 FinMind 免費帳號取得 API token**（finmindtrade.com）→ 放進 GitHub repo Settings → Secrets → `FINMIND_TOKEN`。無 token 時台股管線走 TWSE 次源可運作；FinMind 主源（更穩、可歷史回補）的全市場查詢需 token 解鎖（匿名層回 400）。
 - [ ] （低優先）雲端 WebFetch 被 403 擋的站 +1：`stockanalysis.com`（TSM 估值頁）。雲端已用 WebSearch 摘要繞過，僅在需要精確 P/B 等單一指標時在 Mac 上手動查。
