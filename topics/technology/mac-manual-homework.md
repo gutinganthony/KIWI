@@ -129,7 +129,17 @@ last_updated: 2026-07-06
   > 實測 `data.sec.gov` 在雲端 session 回 `CONNECT tunnel failed, 403`，
   > **但 SEC EDGAR 對 GitHub Actions runner 幾乎確定可達**（同 Yahoo/Polymarket 的既有實證）。
   > 且「查某檔美股的最新申報」是**會重複發生**的需求 → 符合搬橋兩判準。
-  > **本輪未建**（要新寫 EDGAR 抓取邏輯，非一行改動）。建議列為下一座橋。
+  > ✅ **2026-07-28 已建**：`projects/avi-v5/scripts/fetch_sec_filings.py`，側掛在
+  > `fetch_backtest_ext.py` 的**全部 3 條 return 路徑**上。追蹤 MU/FORM/PLAB/RMBS/SNDK 的
+  > 10-Q/10-K/8-K，並對 MU 最新 10-Q/10-K 抓正文做關鍵詞節錄
+  > （take-or-pay／long-term agreement／capacity reservation／customer prepayment…）。
+  > 落地 `data/ext/sec_filings.csv` 與 `sec_excerpts.csv`——**刻意用 CSV**，
+  > 被既有 `git add data/ext/*.csv` 收走，不必動 workflow。
+  > 合併 main 後下次 dashboard 更新就有檔。
+  > ⚠️ **抓取本身在雲端無法驗證**（SEC 403），已用假回應做離線測試涵蓋解析邏輯：
+  > `python3 tests/test_sec_bridge.py`（CIK 解析／Form 4 過濾／URL 組裝／關鍵詞節錄／HTML 剝除，全過）。
+  > **第一次真跑後請看一眼 `sec_excerpts.csv` 是否真的有 take-or-pay 段落**——
+  > 若是空的，可能是正文抓取失敗而非條款不存在，兩者意義完全不同。
   > TrendForce（付費牆）與 Samsung/SKH 存貨（韓文 IR）仍是真 needs me。
 
 ### 2026-07-11 session 產生的（台股漏斗數據源）

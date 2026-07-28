@@ -70,6 +70,23 @@ def run_jp_bridge(force=False):
         print(f"⚠️ jp_disclosures bridge failed: {e}")
 
 
+def run_sec_bridge(force=False):
+    """側掛：SEC EDGAR 申報資料橋（雲端對 data.sec.gov 403，只有 runner 抓得到）。
+    與 run_jp_bridge 同樣的呼叫紀律：所有 return 路徑都要呼叫，否則價格檔新鮮時會被跳過。
+    產出是 .csv，被既有的 `git add data/ext/*.csv` 收走，不必動 workflow。"""
+    try:
+        import fetch_sec_filings
+        print("--- sec_filings bridge ---")
+        saved = sys.argv
+        sys.argv = [saved[0]] + (["--force"] if force else [])
+        try:
+            fetch_sec_filings.main()
+        finally:
+            sys.argv = saved
+    except Exception as e:  # noqa: BLE001 — never break the host job
+        print(f"⚠️ sec_filings bridge failed: {e}")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--force", action="store_true")
@@ -80,6 +97,7 @@ def main():
     if not args.force and all(is_fresh(p) for p in targets.values()):
         print("ext data fresh (<6d) — skip price fetch")
         run_jp_bridge(args.force)   # 開示橋有自己的新鮮度判定（3 天），不受價格檔影響
+        run_sec_bridge(args.force)
         return 0
 
     try:
@@ -87,6 +105,7 @@ def main():
     except ImportError:
         print("yfinance unavailable — skip price fetch (best-effort)")
         run_jp_bridge(args.force)
+        run_sec_bridge(args.force)
         return 0
 
     ok = 0
@@ -108,6 +127,7 @@ def main():
             print(f"⚠️ {ticker} failed: {e}")
     print(f"fetched {ok}/{len(targets)} at {datetime.now(timezone.utc).isoformat()}")
     run_jp_bridge(args.force)
+    run_sec_bridge(args.force)
     return 0
 
 
