@@ -37,6 +37,12 @@ TICKERS = {
     "6857.T": "Advantest",   # AI/HBM 測試
     "6777.T": "santec",      # 光通訊測試
     "8035.T": "TokyoElectron",
+    # 物理 AI 研究標的（2026-07-24 研究產生的估值複核功課：雲端對 kabutan/Yahoo!JP
+    # 全數 403，但 runner 抓得到 → 搬進本橋，價格/歷史自動落地。
+    # ⚠️ 只解「現價」那一問；預估 PER/PBR 需走 quoteSummary 路徑，見 agents/LEARNINGS.md 2026-07-26）
+    "6324.T": "HarmonicDrive",  # HDS 諧波減速機
+    "6481.T": "THK",            # 線性導軌
+    "6480.T": "IKO",            # 日本トムソン 直動軸承
 }
 START = "2019-01-01"
 FRESH_SECONDS = 6 * 86400

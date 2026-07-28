@@ -25,6 +25,7 @@ last_updated: 2026-07-06
 
 ### 站著的（長期）
 - [ ] **GitHub Pages deploy 卡住時去按 Re-run failed jobs**（自 2026-07-03 起偶發，Pages 後端暫時性錯誤、非程式問題）。
+  - 🔒 **真・needs me 的理由**：重跑 workflow 需要 `actions:write`，整合 token 無此權限（Claude 代按會 403）。**這條永遠不會自動化。**
   - ✅ 現在已有失敗推播（`deploy-pages.yml` → Telegram），收到通知再去按即可，不用自己巡邏網站。
   - 位置：Actions 分頁 → Deploy Dashboard to GitHub Pages → Re-run failed jobs；或等下次自動 deploy。
 
@@ -40,12 +41,21 @@ last_updated: 2026-07-06
 > **在那個檔出現之前，下面兩項都不必你動手。** 檔案出現後若內容是 403 錯誤訊息，才輪到你在 Mac 上手動做。
 - [ ] **TDnet 7 月適時開示清單**（等橋）：確認 JEM（6855）無再增資/CB/下修。→ 否證 #1。**搜尋層已知：7/11 與 7/24 各有一則開示（PDF 123KB／106KB），標題未取得**——多半是例行的自己株式取得狀況報告，但需確認。
 - [ ] **JEM FY3/26 有報「主な相手先別販売実績」**（等橋）：查 NAND 單一客戶占比、**Micron 系是否回到 >10%（＝最強確認）**。→ 否證 #2。**搜尋層已取得部分答案：有報註記「Micron Memory Japan 與 MICRON MEMORY TAIWAN 前事業年度合計未達總銷售 10%」——即 Micron 系在前一年度 <10%；當年度（FY3/26）數字未取得，最強確認訊號尚未成立也尚未推翻。**
-- [ ] **Yahoo!ファイナンス 6855 時系列**：核對 7/3 與 7/6 兩日收盤，判別 7/6 單日跌幅是 -10.4% 還是 -14.3%（兩快照矛盾，複核 agent 無法裁決）。
+- [x] ~~**Yahoo!ファイナンス 6855 時系列**：判別 7/6 單日跌幅是 -10.4% 還是 -14.3%~~
+  → **2026-07-28 結案：兩個都不對，正解 −3.74%。** 不必你查——資料早就在 repo 裡
+  （`projects/avi-v5/data/ext/JEM.csv`，由 runner 用 yfinance 抓的 6855.T 交易所日線，
+  ticker 對照見 `projects/avi-v5/scripts/fetch_backtest_ext.py:34`）。**詳見下方「已完成」區的完整數字與後續影響。**
   - 三項全過 → JEM 首批建倉區 ¥6,400–6,800 紀律恢復有效（第二關 8/7 Q1 財報再定第二批）。
 
 ### 2026-07-12 session 產生的（LFI 第四錶）
-- [ ] **上線驗證 LFI 第四錶**：bot 下次跑 update-dashboard 後，開 https://gutinganthony.github.io/KIWI/ 看第四張紫色錶卡（LFI）有沒有出現真讀數（不是「--」）；失敗會有 Telegram 推播。
-- [ ] **上線驗證「連續維持天數」標注**：同一張 LFI 卡片底部應出現「目前水位已連續維持 ≥80 X · ≥90 Y · ≥95 Z 交易日」那一行（bot 下次跑才會帶出 `days_ge_*`，在那之前該行隱藏是正常的）。07-10 讀數已到 84.8，若持續 ≥80，X 應該 ≥1 且逐日遞增。
+- [x] ~~**上線驗證 LFI 第四錶**~~ → **2026-07-28 結案：有真讀數，不是「--」**。
+  不必開網頁——`docs/index.html` 內嵌資料是 `"lfi":{"score":17.9`（`docs/history.json` 最新日期 2026-07-27）。第四錶正常運作。
+- [x] ~~**上線驗證「連續維持天數」標注**~~ → **2026-07-28 結案：欄位有正常帶出**，
+  實際值 `days_ge_80":0`、`days_ge_90":0`、`days_ge_95":0`。**「0」是正確的，不是壞掉**——
+  ⚠️ **因為 LFI 已從 07-10 的 84.8 崩到 17.9**，連續維持天數當然歸零。
+  當初寫這條時的預期（「X 應該 ≥1 且逐日遞增」）建立在 LFI 續留 ≥80 的假設上，該假設已被推翻。
+  **這個 −67 點的擺盪本身可能值得看一眼**（判讀依據在 `topics/business/2026-07-12-act-fourth-meter-lfi-and-serenity-throttle-validation.md`，
+  不在 `docs/KIWI_INDEX_FRAMEWORK.md`——後者查無 LFI）。
 - [ ] **（可選）真標的驗證節流閥**：資料橋補齊 JEM/Towa/Kokusai 等真股歷史後（~1 週），重跑 `scripts/serenity_throttle_validation.py` 改用真標的，確認「節流閥別硬加」的結論在真標的上也成立。
 ### 2026-07-12 session 產生的（llm-council-skill 評估）
 - [ ] **安裝 gcpdev/llm-council-skill 到 Mac 本機 Claude Code**（雲端跑不了：容器 proxy 會擋 OpenAI/Gemini 的 API 呼叫）。
@@ -84,7 +94,14 @@ last_updated: 2026-07-06
 - [ ] **（決定行動前必做）law.moj.gov.tw 核對法條原文**：銀行法 5-1/29/29-1/125（雲端僅 GitHub 鏡像間接核對）、《虛擬資產服務法》三讀條文與總統公布日、期交法 §3/§112——法規線報告所有判決字號皆為轉述，引用前須 law.judicial.gov.tw 複核。＋諮詢熟悉虛擬資產的執業律師。
 
 ### 2026-07-24 session 產生的（物理 AI 研究——低急迫，深掘/建倉前才需核）
-- [ ] **日股估值三檔複核**（quote 站被雲端 403，全為搜尋摘要層）：HDS 6324 預估 PER ~152/PBR 8.3、THK 6481 PER ~36.7、IKO 6480 現價 ~¥2,041（7/14）——kabutan/Yahoo!ファイナンス 各花 1 分鐘。
+- [ ] **日股估值三檔複核**（quote 站被雲端 403，全為搜尋摘要層）：HDS 6324 預估 PER ~152/PBR 8.3、THK 6481 PER ~36.7、IKO 6480 現價 ~¥2,041（7/14）。
+  > 🔄 **2026-07-28 部分自動化**：三檔已加進價格資料橋
+  > （`projects/avi-v5/scripts/fetch_backtest_ext.py` 的 TICKERS，共 15 檔）→ 下次 dashboard 更新後
+  > `projects/avi-v5/data/ext/HarmonicDrive.csv`、`THK.csv`、`IKO.csv` 會自動落地（2019 迄今日線）。
+  > 落地路徑已被 `update-dashboard.yml` 的 `git add ...data/ext/*.csv` 涵蓋 ✅。
+  > **這只解掉「現價」那一問**（IKO ¥2,041 可自動複核）；**預估 PER/PBR 仍未解**——
+  > 需走 quoteSummary + crumb 路徑（`agents/LEARNINGS.md` 2026-07-26），且 Yahoo 的 forwardPE
+  > 對日本小型股嚴重失真、不可直接採信。**PER/PBR 這一半仍留在你的清單上。**
 - [ ] **和大 1536 Optimus 拉貨狀態查證**：Yahoo 股市有「Optimus 拉貨喊停」報導，與 Tesla 產線未啟動互相印證——確認和大是否已實際出貨/出貨中斷（月營收＋法說紀錄）。
 
 ### 2026-07-26 session 產生的（Serenity 週報 — 只剩「雲端真的做不到」的項）
@@ -130,10 +147,12 @@ last_updated: 2026-07-06
   > **管線一直是好的。**
 - [ ] （低優先）雲端 WebFetch 被 403 擋的站 +1：`stockanalysis.com`（TSM 估值頁）。雲端已用 WebSearch 摘要繞過，僅在需要精確 P/B 等單一指標時在 Mac 上手動查。
 
-### 2026-07-10 session 產生的（Polymarket 跟單文查證——優先度低：雲端查證結論已足夠明確〔判定為導流文，不建議執行〕，以下僅在你想二次確認時做）
-- [ ] 開 t.me/KreoPolyBot 預覽確認 bot 真偽；開 t.me/polymarketsig、t.me/duanlang1000x、t.me/polyalpha1 查群人數與付費層級（t.me 被擋）
-- [ ] 開 polymarketanalytics.com/traders 與 /pricing、docs.kreo.app 核對篩選器/價格/費率與返佣原文（站點被擋，僅搜尋摘要層取得）
-- [ ] 登入 X 核對 @waveking1314 粉絲數、開號日、歷史貼文主題（搜尋摘要顯示 ~42.8K 粉、2023-03 開號，未直接核對）
+### ~~2026-07-10 session 產生的（Polymarket 跟單文查證）~~ → **2026-07-28 整組作廢**
+> 三項（t.me bot 真偽／polymarketanalytics 站點核對／X 帳號粉絲數）**全部刪除，不必做**。
+> 理由：前提已消失——這些是「二次確認」用的，而決策早已定讞
+> （判定為導流文、不建議執行；且 `topics/business/2026-07-10-polymarket-copy-trading-guide-verification.md` v1.1
+> 已由 poly-observer CI 直查推翻媒體的「−$311k 爆倉」說法）。
+> **沒有任何待決動作依賴這三項的答案**，做完也不會改變任何事。
 
 ### 2026-07-07 session 產生的（AXW/AIR TRF 研究）
 - [ ] **AIR TRF 真實利差序列建檔（文獻查證：DataMine 有免費日檔！）**：註冊 CME DataMine → 拉 AIR TRF 免費 CSV（欄位 `DLY_FUND` FID#10335、`ACC_FUND` #10337）→ 建歷史序列存進 `projects/avi-v5/data/ext/air_trf.csv` → 跑與 `lev_stress_proxy` 的相關性（報告 §8 否證 ②）。備用免費儀表板：snippet.finance「S&P 500 Futures Financing」（2012 迄今）。每週順手記一次 CME 產品頁的近月 bps 與分位數。
@@ -144,10 +163,42 @@ last_updated: 2026-07-06
 
 - [x] ~~本機 curl Polymarket data-api 複核範例錢包精確數字~~ → **2026-07-10 由 poly-observer CI（GitHub Actions runner 不受雲端封鎖）直查完成**，且推翻了媒體快照的「−$311k 爆倉」說法（實為終身 +$176,445、4/12 後停止交易、持倉 $0）。詳見 topics/business/2026-07-10-polymarket-copy-trading-guide-verification.md v1.1。
 
+- [x] ~~**JEM 6855 7/6 單日跌幅裁決（-10.4% vs -14.3%）**~~ → **2026-07-28 結案：兩個都不對。**
+  **正解：7/6 收盤 ¥7,460、單日 −3.74%。** 證據＝`projects/avi-v5/data/ext/JEM.csv`
+  （runner 用 yfinance 抓的 6855.T 交易所日線，2019-01-04 起共 1,833 個交易日；
+  ticker 對照 `projects/avi-v5/scripts/fetch_backtest_ext.py:34`）。7 月初完整日線：
+
+  | 日期 | 收盤 | 單日 |
+  |---|---|---|
+  | 7/1 | ¥8,280 | — |
+  | 7/2 | ¥7,520 | **−9.18%**（當週最大單日跌幅） |
+  | 7/3 | ¥7,750 | +3.06% |
+  | **7/6** | **¥7,460** | **−3.74%** |
+  | 7/7 | ¥6,970 | −6.57% |
+  | 7/8 | ¥6,770 | −2.87% |
+  | 7/9 | ¥6,930 | +2.36% |
+  | 7/10 | ¥7,330 | +5.77% |
+
+  **那兩個矛盾數字是怎麼來的**：−14.3% ＝ 拿 `watchlist.md` 記的 ¥6,640 去比 7/3 的 ¥7,750
+  （＝比較了非相鄰快照）；−10.4% 則兩邊都對不上。**7 月初沒有任何一天跌超過 10%。**
+
+  ⚠️ **後續影響（需要你看一眼）**：`skills/serenity/watchlist.md:44` 記的
+  「¥6,640（7/6 收，單日 -10.4%）**✅ 首批建倉區**」**價格是錯的**——
+  真實 7/6 收盤 ¥7,460 **高於首批區 ¥6,400–6,800 上緣 9.7%**，當天根本不在建倉區內。
+  **不影響目前決策**（7/24 現價 ¥6,280 由交易所級 API 取得、確實已跌破下緣），
+  但那條歷史註記與「✅ 首批建倉區」標記應更正。已於 watchlist 就地標註。
+
 ---
 
 ## Update Log
 - 2026-07-06 v1.0：建立慣例＋seed JEM 三項＋Pages re-run 站著的一項。搭配 `notify_ops.py` 失敗推播（建議 2）與 CLAUDE.md 開場指標。
+- **2026-07-28：第一次用 `agents/loops/mac-homework-clearing.md` 憲章跑清帳，本輪處理 8 項。**
+  A（已自動化）1：日股估值三檔加進價格橋（`fetch_backtest_ext.py` TICKERS 15 檔），只解現價、PER/PBR 仍留清單。
+  B（已直接完成）3：JEM 7/6 跌幅裁決（正解 −3.74%，兩個選項都不對，且揪出 watchlist 價格誤植）、
+  LFI 第四錶有真讀數 17.9、連續維持天數欄位正常（值為 0 是對的，因 LFI 從 84.8 崩到 17.9）。
+  C（作廢）3：Polymarket 三項二次確認全刪（決策已定讞，沒有動作依賴它們）。
+  D（真 needs me）1：Pages re-run（需 actions:write，永遠不會自動化）。
+  **關鍵發現：三項「等你做」的功課其實資料早就在 repo 裡**——沒人去看而已。
 - 2026-07-27：清帳一輪（AGENDA 四項逾期任務）。**JEM 兩件**＝找到資料橋失效根因（`update-dashboard.yml` 的 commit glob 只收 `*.csv`、漏掉橋產出的 `.md`）並修好 → 從「你要做」降級為「等合併 main」。**llm-council** ＝逐行原始碼審查完成（212 行全讀＋bundle 與原始碼 diff 一致），判定有條件可安裝，補上三個安裝前條件（Gemini key 洩漏修法、`which gemini codex`、`.gitignore`）。**FinMind** ＝補上精確點擊步驟，並查出免費註冊層對法人買賣超/價格兩個 dataset 仍回 400（付費層才解），下修這項的預期價值。**新增**：tw-funnel 資料停更 3 天（07-24 之後）待你查 Actions。清帳方法論已固化成 `agents/loops/mac-homework-clearing.md`。
 
 ### 2026-07-26 session 產生的（海關細碼一次性驗證 SOP）
