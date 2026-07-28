@@ -19,7 +19,6 @@
 - [ ] 2026-07-30 | 記憶體判定重跑 | 7/28–30 出 Samsung/SKH 存貨＋MSFT/Meta(7/29)/Amazon(7/30) capex＝八因子判定的最大缺口補齊點，數字一出立刻重跑（詳 topics/business/2026-07-26-memory-bear-market-multifactor-verdict.md §6）
 - [ ] 2026-08-14 | 群翊 6664 否證判決 | Q2 毛利率 <50%＝否證定讞（Q1 已 48.23%）；8/10 七月營收先看。複核結論＝暫緩第一筆至此日，勿提前建倉
 - [ ] 2026-08-03 | FinMind token | 註冊 finmindtrade.com → repo Secrets `FINMIND_TOKEN`。⚠️ **2026-07-27 下修預期**：實測免費註冊層對「法人買賣超」與「價格」兩個 dataset 仍回 400（需付費 Sponsor 層），token 真正買到的只有配額穩定性（月營收逐檔是吃配額大戶）。仍值得做（5 分鐘）但別期待解鎖新資料。逐步點擊步驟詳 mac-manual-homework.md
-- [ ] 2026-07-29 | tw-funnel 停更查修 | 🆕 2026-07-27 發現：`projects/tw-funnel/data/candidates_latest.json` 的 `generated_at` 停在 07-24（前兩天都正常）＝排程壞了或沒觸發，與 token 無關。去 Actions 看 tw-funnel 最近三次 run
 - [ ] 2026-08-07 | JEM Q1 裁判日 | 事前寫好「結果 X → 動作 Y」預案；指引未上修＝sandbag 失效
 - [ ] 2026-08-13 | Seikoh Q1 裁判日 | sandbag vs 真弱開獎；試探倉預案事前寫好
 - [ ] 2026-08-31 | Fund 架構決策 | BVI incubator vs 其他：定案＋理由入庫（track record 帳戶依此開設）

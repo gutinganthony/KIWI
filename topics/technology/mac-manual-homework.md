@@ -124,10 +124,10 @@ last_updated: 2026-07-06
   > 4. Value 貼 token → Add secret
   > 5. 驗收：下一次 tw-funnel 跑完，看 `projects/tw-funnel/data/meta_latest.json` 裡
   >    月營收那項的成功檔數是否維持 68–69/69，且沒有出現配額類錯誤
-- [ ] **（順帶發現，優先度高於上面那項）tw-funnel 資料已停更 3 天**：
-  `projects/tw-funnel/data/candidates_latest.json` 的 `generated_at` 停在 **2026-07-24T11:26:17Z**
-  （前兩次 07-23、07-22 都正常，＝每日排程原本是好的）。**這跟 token 無關**（沒 token 本來就走 TWSE 次源）。
-  請到 Actions 分頁看 `tw-funnel` 最近三次 run 是紅的還是根本沒觸發。
+  > ~~2026-07-27 曾誤報「tw-funnel 停更 3 天」~~ → **2026-07-28 撤回，是誤判、不需要你做任何事**。
+  > 當時看到的 `generated_at` 停在 07-24 是**分支基準點造成的假象**（工作分支比 main 舊 12 個 commit）。
+  > 合併 main 後實際值是 `2026-07-27T12:46:40Z`，且 07-24(五)→07-27(一) 的空檔正好是週末無台股交易日。
+  > **管線一直是好的。**
 - [ ] （低優先）雲端 WebFetch 被 403 擋的站 +1：`stockanalysis.com`（TSM 估值頁）。雲端已用 WebSearch 摘要繞過，僅在需要精確 P/B 等單一指標時在 Mac 上手動查。
 
 ### 2026-07-10 session 產生的（Polymarket 跟單文查證——優先度低：雲端查證結論已足夠明確〔判定為導流文，不建議執行〕，以下僅在你想二次確認時做）
