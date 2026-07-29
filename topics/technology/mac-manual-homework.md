@@ -108,6 +108,13 @@ last_updated: 2026-07-06
 - [ ] **NVDA 最近一季應收帳款／合約資產／DSO 對營收的相對變化**（供應商融資的財報足跡）。
 - [ ] AMD 等同業是否有等價安排（判斷是「戰略前瞻」還是「產業級爭客競賽」——後者意義相反）。
 
+### 2026-07-29 session 產生的（HBM 位元拆解——決定記憶體情境②/③，優先度高）
+> 雲端對 TrendForce／Micron IR／IDC／Counterpoint／SemiAnalysis 全數 403，搜尋額度用罄。模型已建好（`projects/avi-v5/scripts/hbm_bit_split.py`），**只缺輸入數據；拿到就改 ASSUMPTIONS 重跑，答案機械式掉出來**。
+- [ ] **① HBM 佔 DRAM「晶圓」比重的時間序列（決定性，優先做這個）**：TrendForce 或三大廠法說。⚠️ 多數公開資料給的是**位元或營收**佔比，要換算成晶圓佔比（需 trade ratio）——這是最容易出錯的一步。**要的是變化量（Δs），不是水位。**
+- [ ] ② trade ratio r：HBM 每位元消耗的晶圓面積是傳統 DRAM 的幾倍（業界常引用 2–3×，需確認）。
+- [ ] ③ 若能直接找到「分產品位元供給成長（HBM vs 傳統）」的數據，可跳過整個模型。
+- [ ] ④ 核實 IDC「2026 年 DRAM 位元供給 +16% YoY」這個錨點本身。
+
 ### 2026-07-11 session 產生的（台股漏斗數據源）
 - [ ] **註冊 FinMind 免費帳號取得 API token**（finmindtrade.com）→ 放進 GitHub repo Settings → Secrets → `FINMIND_TOKEN`。
   > ⚠️ **2026-07-27 查核：這項的價值比原本以為的小很多，先看完再決定要不要花時間。**
