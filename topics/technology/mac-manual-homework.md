@@ -115,6 +115,18 @@ last_updated: 2026-07-06
 - [ ] ③ 若能直接找到「分產品位元供給成長（HBM vs 傳統）」的數據，可跳過整個模型。
 - [ ] ④ 核實 IDC「2026 年 DRAM 位元供給 +16% YoY」這個錨點本身。
 
+### 2026-07-29 週報 session 產生的（行情 API 退化——優先度中，影響每週報告精度）
+> **Yahoo `quoteSummary` 端點本週起要求 crumb 驗證**（雲端 runner 直接吃 `HTTP 401 Invalid Crumb`），
+> 而 07-26 才剛把它訂為市值/P/E 的主源。**`chart` 端點不受影響、價格照常可抓**——退化的只有
+> 市值、trailing/forward P/E、P/B 這幾項「基本面欄位」。
+> 本週的因應：市值改用「7/24 精算值 × 價格變動 × 匯率變動」推導（股數不變前提下是恆等式，已標 [推論]），
+> **forward P/E 本週整個取不到，故 07-29 週報未用其做任何觸發判定**。
+- [ ] **在 Mac 上確認 `quoteSummary` 是否只擋雲端 IP**（本機瀏覽器 cookie 環境通常能過）。若能過，
+      考慮把「每週一次的市值/P-E 快照」變成 Mac 側的手動輸出，貼回 repo 給週報吃。
+- [ ] **或找替代源**：Stooq、FinMind（台股，見下方 07-11 項）、各交易所官方 API。
+      目標是恢復 **forward P/E**——它是 Serenity 觸發線（如 Seikoh 加碼 B ¥17,900＝fwd 25×、
+      Mersen fwd 13×、MEC fwd 20–22×）的直接輸入，缺了就只能用價格代理。
+
 ### 2026-07-11 session 產生的（台股漏斗數據源）
 - [ ] **註冊 FinMind 免費帳號取得 API token**（finmindtrade.com）→ 放進 GitHub repo Settings → Secrets → `FINMIND_TOKEN`。
   > ⚠️ **2026-07-27 查核：這項的價值比原本以為的小很多，先看完再決定要不要花時間。**
