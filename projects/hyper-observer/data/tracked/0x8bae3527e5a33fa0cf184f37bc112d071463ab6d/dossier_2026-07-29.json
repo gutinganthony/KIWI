@@ -1,0 +1,286 @@
+{
+  "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+  "label": "scan-best-candidate-9M-lowdd",
+  "snapshot_date": "2026-07-29",
+  "classification": "consistent_winner",
+  "classification_reasons": [
+    "活動跨度 378.0 天 >= 60",
+    "總 PnL 9710773.45 > 10,000",
+    "回撤 0.0554 < 40% peak",
+    "目前槓桿 3.0 <= 20x",
+    "正月比率 0.692 >= 0.5",
+    "（fills 截斷 n>=2000，profit factor 1.816 樣本偏誤大，僅供低信心參考，不硬否決）"
+  ],
+  "followable": {
+    "ok": true,
+    "reasons": []
+  },
+  "metrics": {
+    "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+    "snapshot_date": "2026-07-29",
+    "pnl_source": "portfolio_curve",
+    "portfolio_window": "perpAllTime",
+    "low_confidence": false,
+    "total_pnl": 9710773.45,
+    "peak_pnl": 9788586.9,
+    "monthly_pnl": {
+      "2025-07": -73180.55,
+      "2025-08": -34288.37,
+      "2025-09": -8212.34,
+      "2025-10": 1435708.48,
+      "2025-11": 2045437.87,
+      "2025-12": 930544.52,
+      "2026-01": 638177.85,
+      "2026-02": 519822.91,
+      "2026-03": 1413004.59,
+      "2026-04": 1924051.99,
+      "2026-05": 106203.52,
+      "2026-06": -147782.42,
+      "2026-07": 961285.41
+    },
+    "active_months": 13,
+    "positive_month_ratio": 0.692,
+    "best_month_pnl": 2045437.87,
+    "max_drawdown_pct": 0.0554,
+    "current_drawdown_pct": 0.0079,
+    "max_single_day_crash_pct": 0.0331,
+    "span_days": 378.0,
+    "days_idle": 0.0,
+    "n_fills": 2000,
+    "profit_factor": 1.816,
+    "avg_win": 490.92,
+    "avg_loss": 345.55,
+    "realized_win_rate": 0.561,
+    "avg_hold_hours": 61.551,
+    "net_direction_ratio": 0.1996,
+    "n_fills_truncated": true,
+    "n_fills_last_30d": 2000,
+    "n_events": 41,
+    "n_events_last_30d": 41,
+    "n_events_last_30d_est": 82,
+    "events_30d_coverage_days": 14.9,
+    "median_fills_per_event": 18,
+    "median_event_notional": 98394.3,
+    "median_gap_between_events_hours": 0.29,
+    "p90_gap_between_events_hours": 21.66,
+    "had_liquidation": true,
+    "n_liquidations": 1,
+    "top_coin": "xyz:SNDK",
+    "vlm": 291514873.56,
+    "vlm_to_pnl_ratio": 30.02,
+    "funding_total": -151949.79,
+    "n_open_positions": 1,
+    "current_max_leverage": 3.0,
+    "has_extreme_leverage": false,
+    "margin_types": [
+      "cross"
+    ],
+    "account_value": 7380.08,
+    "fetch_errors": []
+  },
+  "position_value": 21678.06,
+  "unrealized_pnl": 1017.38,
+  "n_open_positions": 1,
+  "open_positions": [
+    {
+      "coin": "AIXBT",
+      "szi": 1304336.0,
+      "side": "long",
+      "entry_px": 0.01584,
+      "position_value": 21678.06432,
+      "unrealized_pnl": 1017.38208,
+      "leverage_value": 3.0,
+      "leverage_type": "cross",
+      "liquidation_px": null,
+      "margin_used": 7226.02144,
+      "max_leverage": 3.0,
+      "cum_funding_all_time": -1109.219529
+    }
+  ],
+  "recent_fills": [
+    {
+      "time": "2026-07-27T20:05:01.293000+00:00",
+      "coin": "xyz:KIOXIA",
+      "dir": "Close Long",
+      "px": 299.0,
+      "sz": 0.33,
+      "closed_pnl": -36.11,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-27T20:05:01.825000+00:00",
+      "coin": "xyz:KIOXIA",
+      "dir": "Close Long",
+      "px": 299.0,
+      "sz": 0.63,
+      "closed_pnl": -68.93,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-27T20:05:03.851000+00:00",
+      "coin": "xyz:KIOXIA",
+      "dir": "Close Long",
+      "px": 299.0,
+      "sz": 2.95,
+      "closed_pnl": -322.78,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-27T20:05:13.308000+00:00",
+      "coin": "xyz:KIOXIA",
+      "dir": "Close Long",
+      "px": 299.0,
+      "sz": 0.501,
+      "closed_pnl": -54.82,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-27T20:05:13.308000+00:00",
+      "coin": "xyz:KIOXIA",
+      "dir": "Close Long",
+      "px": 299.0,
+      "sz": 0.864,
+      "closed_pnl": -94.54,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-27T20:05:14.104000+00:00",
+      "coin": "xyz:KIOXIA",
+      "dir": "Close Long",
+      "px": 299.0,
+      "sz": 1.615,
+      "closed_pnl": -176.71,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-27T20:05:14.172000+00:00",
+      "coin": "xyz:KIOXIA",
+      "dir": "Close Long",
+      "px": 299.0,
+      "sz": 0.501,
+      "closed_pnl": -54.82,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-27T20:05:15.040000+00:00",
+      "coin": "xyz:KIOXIA",
+      "dir": "Close Long",
+      "px": 299.0,
+      "sz": 0.501,
+      "closed_pnl": -54.82,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-27T20:05:15.917000+00:00",
+      "coin": "xyz:KIOXIA",
+      "dir": "Close Long",
+      "px": 299.0,
+      "sz": 0.501,
+      "closed_pnl": -54.82,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-27T20:05:16.700000+00:00",
+      "coin": "xyz:KIOXIA",
+      "dir": "Close Long",
+      "px": 299.0,
+      "sz": 0.501,
+      "closed_pnl": -54.82,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-27T20:05:16.700000+00:00",
+      "coin": "xyz:KIOXIA",
+      "dir": "Close Long",
+      "px": 299.0,
+      "sz": 0.039,
+      "closed_pnl": -4.27,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-27T20:05:17.526000+00:00",
+      "coin": "xyz:KIOXIA",
+      "dir": "Close Long",
+      "px": 299.0,
+      "sz": 1.66,
+      "closed_pnl": -181.63,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-27T20:05:29.982000+00:00",
+      "coin": "xyz:KIOXIA",
+      "dir": "Close Long",
+      "px": 299.0,
+      "sz": 3.41,
+      "closed_pnl": -373.12,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-27T20:05:38.486000+00:00",
+      "coin": "xyz:KIOXIA",
+      "dir": "Close Long",
+      "px": 299.0,
+      "sz": 0.07,
+      "closed_pnl": -7.66,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-27T20:05:39.153000+00:00",
+      "coin": "xyz:KIOXIA",
+      "dir": "Close Long",
+      "px": 299.0,
+      "sz": 0.07,
+      "closed_pnl": -7.66,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-27T20:05:39.971000+00:00",
+      "coin": "xyz:KIOXIA",
+      "dir": "Close Long",
+      "px": 299.0,
+      "sz": 0.07,
+      "closed_pnl": -7.66,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-27T20:05:41.391000+00:00",
+      "coin": "xyz:KIOXIA",
+      "dir": "Close Long",
+      "px": 299.0,
+      "sz": 0.04,
+      "closed_pnl": -4.38,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-27T20:05:42.508000+00:00",
+      "coin": "xyz:KIOXIA",
+      "dir": "Close Long",
+      "px": 299.0,
+      "sz": 0.063,
+      "closed_pnl": -6.89,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-28T11:14:53.695000+00:00",
+      "coin": "xyz:KIOXIA",
+      "dir": "Close Long",
+      "px": 264.46,
+      "sz": 0.18,
+      "closed_pnl": -25.91,
+      "is_liquidation": true
+    },
+    {
+      "time": "2026-07-29T04:13:59.063000+00:00",
+      "coin": "AIXBT",
+      "dir": "Close Long",
+      "px": 0.017,
+      "sz": 77023899.0,
+      "closed_pnl": 89347.72,
+      "is_liquidation": false
+    }
+  ],
+  "new_positions": [],
+  "disappeared_positions": [],
+  "initialized": false,
+  "raw_source": "snapshot"
+}
