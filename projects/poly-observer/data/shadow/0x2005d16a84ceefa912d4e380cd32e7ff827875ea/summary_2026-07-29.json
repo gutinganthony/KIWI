@@ -107,6 +107,55 @@
           "with_depth": 431
         }
       }
+    },
+    {
+      "address": "0x2005d16a84ceefa912d4e380cd32e7ff827875ea",
+      "session_stamp": "20260729T161344Z",
+      "date": "2026-07-29",
+      "started_utc": "2026-07-29T16:13:44+00:00",
+      "duration_min": 40.0,
+      "poll_sec": 4.0,
+      "polls": 518,
+      "activity_failures": 0,
+      "book_failures": 0,
+      "baseline_seeded": 49,
+      "jsonl_file": "session_20260729T161344Z.jsonl",
+      "stats": {
+        "n_detected": 939,
+        "n_book_ok": 939,
+        "n_book_unavailable": 0,
+        "detect_lag_sec": {
+          "median": 19.8,
+          "p90": 33.74,
+          "n": 939
+        },
+        "adverse_drift": {
+          "BUY": {
+            "median": 0.038462,
+            "p90": 0.288889,
+            "n": 939
+          },
+          "SELL": {
+            "median": null,
+            "p90": null,
+            "n": 0
+          }
+        },
+        "spread": {
+          "median": 0.01,
+          "n": 937
+        },
+        "depth_at_best_usd": {
+          "median": 204.22,
+          "n": 939
+        },
+        "fixed_copy_usd": 50.0,
+        "fillable_at_best_ratio": 0.6368477103301384,
+        "fillable_at_best_counts": {
+          "fillable": 598,
+          "with_depth": 939
+        }
+      }
     }
   ]
 }
