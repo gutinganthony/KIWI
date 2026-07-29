@@ -64,6 +64,21 @@ def run_jp_bridge(force=False):
         print(f"⚠️ jp_disclosures bridge failed: {e}")
 
 
+def run_memory_bridge(force=False):
+    """側掛：記憶體產業數據橋（trendforce/micron/SEC 在雲端 403，runner 或可通）。"""
+    try:
+        import fetch_memory_sources
+        print("--- memory_sources bridge ---")
+        saved = sys.argv
+        sys.argv = [saved[0]] + (["--force"] if force else [])
+        try:
+            fetch_memory_sources.main()
+        finally:
+            sys.argv = saved
+    except Exception as e:  # noqa: BLE001 — never break the host job
+        print(f"⚠️ memory_sources bridge failed: {e}")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--force", action="store_true")
@@ -74,6 +89,7 @@ def main():
     if not args.force and all(is_fresh(p) for p in targets.values()):
         print("ext data fresh (<6d) — skip price fetch")
         run_jp_bridge(args.force)   # 開示橋有自己的新鮮度判定（3 天），不受價格檔影響
+        run_memory_bridge(args.force)
         return 0
 
     try:
@@ -81,6 +97,7 @@ def main():
     except ImportError:
         print("yfinance unavailable — skip price fetch (best-effort)")
         run_jp_bridge(args.force)
+        run_memory_bridge(args.force)
         return 0
 
     ok = 0
@@ -102,6 +119,7 @@ def main():
             print(f"⚠️ {ticker} failed: {e}")
     print(f"fetched {ok}/{len(targets)} at {datetime.now(timezone.utc).isoformat()}")
     run_jp_bridge(args.force)
+    run_memory_bridge(args.force)
     return 0
 
 
