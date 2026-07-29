@@ -69,6 +69,41 @@ def growth(g_W, g_D, s0, s1, r):
     return g_conv, g_hbm, g_total, drag
 
 
+def bit_share_from_revenue_share(rho, k):
+    """HBM **位元**佔比 β ← HBM **營收**佔比 ρ 與 HBM 每位元 ASP 溢價 k。
+
+    為什麼需要這步：**「HBM 佔 DRAM 晶圓比重」沒有公司會直接揭露**，
+    但「HBM 佔 DRAM 營收比重」是法說會常態揭露項。兩者用 ASP 溢價換算。
+        ρ = βk / (βk + 1 − β)  →  β = ρ / [k(1−ρ) + ρ]
+    """
+    return rho / (k * (1 - rho) + rho)
+
+
+def wafer_share_from_bit_share(beta, r):
+    """HBM **晶圓**佔比 s ← 位元佔比 β 與 trade ratio r。
+        s = βr / (βr + 1 − β)
+    """
+    return beta * r / (beta * r + 1 - beta)
+
+
+def wafer_share_from_revenue_share(rho, k, r):
+    """一步到位：營收佔比 → 晶圓佔比（模型真正需要的輸入）。"""
+    return wafer_share_from_bit_share(bit_share_from_revenue_share(rho, k), r)
+
+
+def delta_s_from_growth_gap(g_hbm_bits, g_total_bits, s0, r):
+    """**最快的追蹤法**：用「HBM 位元成長率 − 總位元成長率」的差距推 Δs。
+
+    數學上 Δs → 0 的充要條件就是 HBM 位元成長率 = 總位元成長率。
+    因此**這個差距（gap）就是 s 的一階導數的直接代理**，
+    而 gap 的**縮小速度**就是我們要的二階導數——不必等三個季度算差分。
+    """
+    beta0 = s0 / (s0 + (1 - s0) * r)          # 由 s 反推 β
+    beta1 = beta0 * (1 + g_hbm_bits) / (1 + g_total_bits)
+    s1 = wafer_share_from_bit_share(beta1, r)
+    return s1 - s0, s1, (g_hbm_bits - g_total_bits)
+
+
 def conv_from_observed_total(g_total, s0, s1, r):
     """**最有用的模式**：用「已觀察到的總位元供給成長」反解傳統 DRAM 的成長。
 
@@ -186,6 +221,39 @@ def main():
           "\n  傳統 DRAM 的位元供給都還在正成長（多數落在 +8%~+14%）**——"
           "\n  它沒有被 HBM 餓死到『結構性短缺』的程度。要讓傳統 DRAM 掉到 <10%，"
           "\n  需要 HBM 晶圓佔比一年內跳升 ≥7-10 個百分點且 r 偏低。")
+    print()
+
+    # ── 追蹤模式：從「可揭露的數字」推導 s，並用 gap 追蹤 Δs ──
+    print("=" * 78)
+    print("★ 追蹤模式：s 不用等別人公布，用法說會揭露的數字推導")
+    print("=" * 78)
+    print("  鏈條：HBM 營收佔比 ρ ──(ASP 溢價 k)──> 位元佔比 β ──(trade ratio r)──> 晶圓佔比 s")
+    print(f"  {'ρ(營收佔比)':>12} {'k(ASP溢價)':>10} {'r':>5} │ {'β(位元佔比)':>12} {'s(晶圓佔比)':>12}")
+    print("  " + "-" * 62)
+    for rho in (0.30, 0.40, 0.50):
+        for k in (4.0, 6.0):
+            for r in (2.5,):
+                b = bit_share_from_revenue_share(rho, k)
+                sw = wafer_share_from_bit_share(b, r)
+                print(f"  {rho:>12.0%} {k:>10.1f}× {r:>5.1f} │ {b:>12.1%} {sw:>12.1%}")
+    print("  ⇒ 這解釋了為什麼 s 查不到卻算得出來：ρ 是法說常態揭露、k 來自報價機構、")
+    print("    r 是相對穩定的技術常數。**三個可得的數字就能推出模型要的 s。**")
+    print()
+
+    print("── 用『成長率差距』追蹤 Δs（不必等三季算差分）──")
+    print("  數學事實：Δs → 0 的充要條件 ＝ HBM 位元成長率 = 總位元成長率")
+    print("  ⇒ **gap ＝ (HBM 位元成長 − 總位元成長) 就是 Δs 的直接代理；**")
+    print("    **gap 的縮小速度 ＝ 我們要的二階導數。**")
+    print(f"\n  {'HBM位元成長':>12} {'總位元成長':>11} {'gap':>8} │ {'Δs':>8} {'→ s1':>8} │ 含義")
+    print("  " + "-" * 70)
+    s0_ref = 0.20
+    for g_h, g_t in ((0.60, 0.16), (0.40, 0.16), (0.25, 0.16), (0.18, 0.16)):
+        ds, s1v, gap = delta_s_from_growth_gap(g_h, g_t, s0_ref, 2.5)
+        gc = conv_from_observed_total(g_t, s0_ref, s1v, 2.5)
+        tag = "②爬升中" if ds > 0.03 else ("③將轉換" if ds < 0.01 else "轉換區")
+        print(f"  {g_h:>12.0%} {g_t:>11.0%} {gap:>8.0%} │ {ds:>+8.3f} {s1v:>8.1%} │ "
+              f"{tag}（傳統 DRAM {gc:+.1%}）")
+    print("  ⇒ **可操作門檻：gap < 10pp 且連兩季收斂 → s 進入走平區 → 情境③**")
     print()
 
     print("── 需要的真實數據（拿到就改 ASSUMPTIONS 重跑）──")
