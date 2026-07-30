@@ -24,6 +24,11 @@ last_updated: 2026-07-06
 ## 🔴 待辦（依急迫度）
 
 ### 站著的（長期）
+- [ ] **需要「手動觸發 workflow」時只能你按**（2026-07-30 確認）。雲端 session 的整合 token **沒有 `actions:write`**：`POST /actions/workflows/<file>/dispatches` 回 `403 Resource not accessible by integration`。能做的是「推 commit 觸發 push trigger」與「讀 run/log/artifact」，不能 dispatch、不能 re-run。
+  - 位置：Actions 分頁 → 選那支 workflow → 右上 **Run workflow**。
+  - 常用兩支：`Hyper Observer`（重抓錢包資料）→ 跑完再按 `Monitor Build`（重建公開頁）。
+  - 繞道：資料若已存在，我可以在本地離線重建產物並開 PR，你按一次 merge 即可（`deploy-pages` 會自動上線）。
+
 - [ ] **GitHub Pages deploy 卡住時去按 Re-run failed jobs**（自 2026-07-03 起偶發，Pages 後端暫時性錯誤、非程式問題）。
   - ✅ 現在已有失敗推播（`deploy-pages.yml` → Telegram），收到通知再去按即可，不用自己巡邏網站。
   - 位置：Actions 分頁 → Deploy Dashboard to GitHub Pages → Re-run failed jobs；或等下次自動 deploy。
