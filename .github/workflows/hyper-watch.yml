@@ -1,0 +1,127 @@
+name: Hyper Watch (追蹤錢包持倉哨兵)
+
+# 為什麼與 hyper-observer 分開一支
+#   hyper-observer 是重量級每日班（portfolio + userFills + userFunding + ledger，
+#   還要 commit 資料回 repo），一天只能跑一次。「他開新倉了」一天知道一次太慢。
+#   這支只查 clearinghouseState（原生＋builder dex），權重極低，且**完全不 commit**
+#   （狀態走 Actions cache），所以高頻執行不會製造 commit 洗版、不會與資料檔衝突。
+on:
+  push:
+    branches: [claude/polymarket-wallet-copy-trade-0l7v2z]
+    # 只有哨兵自己的檔案會觸發（刻意不含 projects/hyper-observer/*.py，
+    # 否則每次動到共用的 config/fetch/classify 就會多跑一次哨兵）
+    paths:
+      - 'projects/hyper-observer/watch/**'
+      - '.github/workflows/hyper-watch.yml'
+  workflow_dispatch:
+    inputs:
+      test_notify:
+        description: '送一則測試推播（不查 API）'
+        type: boolean
+        default: false
+  schedule:
+    # 每 10 分鐘（只在 default branch 生效）。GitHub 對高頻 cron 不保證準時，
+    # 尖峰可能延遲數分鐘甚至跳過一次；哨兵是「狀態比對」而非「事件串流」，
+    # 跳一次不會漏事件（下一次比對仍看得到部位變化），只是延遲變長。
+    - cron: '*/10 * * * *'
+
+# 同一時間只允許一個哨兵在跑：兩個並行的 run 會各自寫 cache，
+# 後寫的會把前一次的基準覆蓋掉，可能導致同一事件推播兩次。
+concurrency:
+  group: hyper-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read        # 唯讀：這支不 commit 任何東西
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: pip install --quiet requests
+
+      # 離線自我檢查（~1 秒）：哨兵壞掉時最糟的結果是「靜默漏報」，
+      # 所以寧可在推播前就讓 job 紅掉。
+      - name: Offline self-test
+        working-directory: projects/hyper-observer/watch
+        run: python3 tests/test_watch_offline.py
+
+      # 狀態走 cache 而非 commit：每 10 分鐘一個 commit = 一天 144 個 commit 洗掉 git log，
+      # 而且會與 main 的資料檔互相衝突。cache 遺失的代價只是「重建基準、少推一次」。
+      - name: Restore watcher state
+        id: restore
+        uses: actions/cache/restore@v4
+        with:
+          path: projects/hyper-observer/watch/state
+          key: hyper-watch-state-${{ github.run_id }}
+          restore-keys: |
+            hyper-watch-state-
+
+      # 訊息檔刻意寫在 RUNNER_TEMP（不在 state/ 內）：state/ 會被 cache 帶到下一輪，
+      # 舊訊息檔留在那裡會讓「這一輪其實沒事」的 run 又推一次舊通知。
+      - name: Poll positions
+        id: poll
+        working-directory: projects/hyper-observer/watch
+        run: |
+          python3 watch.py \
+            --state state/state.json \
+            --out-message "$RUNNER_TEMP/watch-message.txt"
+          if [ -s "$RUNNER_TEMP/watch-message.txt" ]; then
+            echo "alert=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "alert=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 每次都存新 key（cache 不可覆寫既有 key）；restore-keys 前綴會抓到最新的一份。
+      - name: Save watcher state
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: projects/hyper-observer/watch/state
+          key: hyper-watch-state-${{ github.run_id }}
+
+      - name: Push alert to Telegram
+        if: steps.poll.outputs.alert == 'true'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          TITLE=$(head -n 1 "$RUNNER_TEMP/watch-message.txt")
+          BODY=$(sed -n '/^---$/,$p' "$RUNNER_TEMP/watch-message.txt" | tail -n +2)
+          printf '%s\n' "$BODY" | python3 projects/avi-v5/scripts/notify_ops.py \
+            --title "$TITLE" \
+            --url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+      # 一次性通道測試：push 到本分支時（罕見）或手動勾 test_notify 時各送一則。
+      # 刻意不在 schedule 執行，否則每 10 分鐘吵一次。
+      - name: Telegram channel test
+        if: github.event_name == 'push' || github.event.inputs.test_notify == 'true'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        working-directory: projects/hyper-observer/watch
+        run: |
+          python3 watch.py --test-notify --out-message "$RUNNER_TEMP/test-message.txt"
+          TITLE=$(head -n 1 "$RUNNER_TEMP/test-message.txt")
+          BODY=$(sed -n '/^---$/,$p' "$RUNNER_TEMP/test-message.txt" | tail -n +2)
+          printf '%s\n' "$BODY" | python3 "$GITHUB_WORKSPACE/projects/avi-v5/scripts/notify_ops.py" \
+            --title "$TITLE" \
+            --url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+      # 哨兵靜默失效是最壞的情況（以為在盯，其實沒在跑），所以失敗要出聲。
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python3 projects/avi-v5/scripts/notify_ops.py \
+            --title "❌ hyper-watch 哨兵執行失敗" \
+            --body "持倉哨兵這一輪掛了，可能漏掉開/平倉通知。查 log。" \
+            --url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true
