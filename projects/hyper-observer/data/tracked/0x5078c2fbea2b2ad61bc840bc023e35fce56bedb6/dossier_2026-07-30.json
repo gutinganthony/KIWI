@@ -18,7 +18,7 @@
     "pnl_source": "portfolio_curve",
     "portfolio_window": "perpAllTime",
     "low_confidence": false,
-    "total_pnl": -23350630.88,
+    "total_pnl": -23371198.47,
     "peak_pnl": 75743085.19,
     "monthly_pnl": {
       "2025-03": 1744509.83,
@@ -37,16 +37,16 @@
       "2026-04": -1010.62,
       "2026-05": -5170.35,
       "2026-06": -33791.39,
-      "2026-07": 11318.02
+      "2026-07": -9249.57
     },
     "active_months": 17,
-    "positive_month_ratio": 0.294,
+    "positive_month_ratio": 0.235,
     "best_month_pnl": 12568380.69,
     "max_drawdown_pct": 1.0,
     "current_drawdown_pct": 1.0,
     "max_single_day_crash_pct": 1.0,
-    "span_days": 497.6,
-    "days_idle": 0.6,
+    "span_days": 498.1,
+    "days_idle": 0.0,
     "n_fills": 2000,
     "profit_factor": 0.476,
     "avg_win": 369.94,
@@ -68,8 +68,8 @@
     "n_liquidations": 520,
     "top_coin": "xyz:SP500",
     "vlm": 18930353091.6,
-    "vlm_to_pnl_ratio": 810.7,
-    "funding_total": -7759996.13,
+    "vlm_to_pnl_ratio": 809.99,
+    "funding_total": -7760046.32,
     "n_open_positions": 1,
     "n_open_positions_native": 0,
     "dexs_with_positions": [
@@ -86,14 +86,14 @@
       "mkts": 0.0,
       "para": 0.0,
       "vntl": 0.0,
-      "xyz": 39374.92
+      "xyz": 18827.95
     },
-    "spot_value_usd": 39383.73,
+    "spot_value_usd": 18836.76,
     "spot_tokens": [
       {
         "coin": "USDC",
-        "qty": 39374.92256813,
-        "usd": 39374.92,
+        "qty": 18827.95116613,
+        "usd": 18827.95,
         "estimated": false
       },
       {
@@ -121,18 +121,18 @@
         "estimated": true
       }
     ],
-    "total_value_all_venues": 78758.65,
+    "total_value_all_venues": 37664.71,
     "non_native_share": 1.0,
     "current_max_leverage": 50.0,
     "has_extreme_leverage": true,
     "margin_types": [
       "cross"
     ],
-    "account_value": 39374.92,
+    "account_value": 18827.95,
     "fetch_errors": []
   },
-  "position_value": 1515977.92,
-  "unrealized_pnl": 13757.69,
+  "position_value": 1536474.7,
+  "unrealized_pnl": -6739.09,
   "n_open_positions": 1,
   "open_positions": [
     {
@@ -140,14 +140,14 @@
       "szi": -206.205,
       "side": "short",
       "entry_px": 7418.518,
-      "position_value": 1515977.919,
-      "unrealized_pnl": 13757.688418,
+      "position_value": 1536474.696,
+      "unrealized_pnl": -6739.088582,
       "leverage_value": 50.0,
       "leverage_type": "cross",
-      "liquidation_px": 7468.069680576,
-      "margin_used": 30319.55838,
+      "liquidation_px": 7467.8286707667,
+      "margin_used": 30729.49392,
       "max_leverage": 50.0,
-      "cum_funding_all_time": 2411.11053,
+      "cum_funding_all_time": 2461.304932,
       "dex": "xyz"
     }
   ],
@@ -333,12 +333,7 @@
       "is_liquidation": false
     }
   ],
-  "new_positions": [
-    {
-      "key": "xyz:SP500:short",
-      "coin": "xyz:SP500"
-    }
-  ],
+  "new_positions": [],
   "disappeared_positions": [],
   "initialized": false,
   "raw_source": "snapshot",

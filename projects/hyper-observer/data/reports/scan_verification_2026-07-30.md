@@ -8,7 +8,7 @@
 
 | 端點 | 成功 | 失敗 | 失敗樣本 |
 |---|---:|---:|---|
-| `clearinghouseState @ api.hyperliquid.xyz/info` | 38 | 0 | — |
+| `clearinghouseState @ api.hyperliquid.xyz/info` | 37 | 0 | — |
 | `clearinghouseState@abcd @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@cash @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@flx @ api.hyperliquid.xyz/info` | 3 | 0 | — |
@@ -19,34 +19,33 @@
 | `clearinghouseState@vntl @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@xyz @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `perpDexs @ api.hyperliquid.xyz/info` | 1 | 0 | — |
-| `portfolio @ api.hyperliquid.xyz/info` | 38 | 0 | — |
+| `portfolio @ api.hyperliquid.xyz/info` | 37 | 0 | — |
 | `spotClearinghouseState @ api.hyperliquid.xyz/info` | 3 | 0 | — |
-| `userFills @ api.hyperliquid.xyz/info` | 38 | 0 | — |
-| `userFunding @ api.hyperliquid.xyz/info` | 38 | 0 | — |
+| `userFills @ api.hyperliquid.xyz/info` | 37 | 0 | — |
+| `userFunding @ api.hyperliquid.xyz/info` | 37 | 0 | — |
 
 ## 2. 分類統計
 
 | 分類 | 錢包數 | 佔比 |
 |---|---:|---:|
-| consistent_winner | 6 | 16% |
-| blowup_risk | 18 | 47% |
-| wash_suspect | 0 | 0% |
-| one_hit | 8 | 21% |
+| consistent_winner | 5 | 14% |
+| blowup_risk | 22 | 59% |
+| wash_suspect | 1 | 3% |
+| one_hit | 3 | 8% |
 | dormant | 0 | 0% |
 | choppy | 6 | 16% |
 | insufficient_data | 0 | 0% |
-| **合計** | **38** | |
+| **合計** | **37** | |
 
 ## 3. consistent_winner 明細
 
 | 地址 | 總 PnL | 峰值回撤 | profit factor | 目前槓桿 | 主力幣 | 活躍天 | 可跟 |
 |---|---:|---:|---:|---:|---|---:|---|
-| `0x99b1098d9d50aa076f78bd26ab22e6abd3710729` | $26,460,783 | 40% | 3.01 | 10x | xyz:SKHX | 322 | ❌ 頻率過高：30 日推估 280 個部位事件 > 150（fills 截斷窗覆蓋 11.0 天、實測 103 個外推；fills 2000 筆僅參考）；持倉過短：平均 6.3h < 12h（30d 事件 103（截斷外推 280）／fills 2,000）|
-| `0x84abc08c0ea62e687c370154de1f38ea462f4d37` | $17,188,456 | 22% | 999.00 | —x | xyz:SKHX | 372 | ❌ 頻率過高：30 日推估 154 個部位事件 > 150（fills 截斷窗覆蓋 0.8 天、實測 4 個外推；fills 2000 筆僅參考）；持倉過短：平均 0.4h < 12h（30d 事件 4（截斷外推 154）／fills 2,000）|
-| `0x06cecfbac34101ae41c88ebc2450f8602b3d164b` | $15,200,064 | 28% | 0.91 | 20x | @107 | 687 | ❌ 槓桿過高：目前 20x > 10x（30d 事件 17／fills 1,379）|
-| `0xbe19541903f64af97bcf8436f4d15bf3a56b8bd1`（⚠️ 曾強平 2 次） | $10,048,899 | 17% | 392.06 | 10x | WLD | 364 | ✅（30d 事件 5（截斷外推 8）／fills 2,000）|
-| `0x8bae3527e5a33fa0cf184f37bc112d071463ab6d`（⚠️ 曾強平 1 次） | $9,717,057 | 6% | 1.58 | 20x | xyz:SNDK | 378 | ❌ 槓桿過高：目前 20x > 10x（30d 事件 40（截斷外推 76）／fills 2,000）|
-| `0xbe494a5e3a719a78a45a47ab453b7b0199b9d101` | $2,924,232 | 34% | 0.69 | 20x | HYPE | 316 | ❌ 持倉過短：平均 0.1h < 12h；槓桿過高：目前 20x > 10x（30d 事件 48（截斷外推 67）／fills 2,000）|
+| `0x99b1098d9d50aa076f78bd26ab22e6abd3710729` | $26,458,983 | 40% | 3.09 | 10x | xyz:SKHX | 323 | ❌ 頻率過高：30 日推估 296 個部位事件 > 150（fills 截斷窗覆蓋 11.0 天、實測 109 個外推；fills 2000 筆僅參考）；持倉過短：平均 6.3h < 12h（30d 事件 109（截斷外推 296）／fills 2,000）|
+| `0x06cecfbac34101ae41c88ebc2450f8602b3d164b` | $14,607,423 | 28% | 0.91 | 20x | @107 | 687 | ❌ 槓桿過高：目前 20x > 10x（30d 事件 17／fills 1,379）|
+| `0xbe19541903f64af97bcf8436f4d15bf3a56b8bd1`（⚠️ 曾強平 2 次） | $10,043,687 | 17% | 781.81 | 10x | WLD | 365 | ✅（30d 事件 5（截斷外推 8）／fills 2,000）|
+| `0x8bae3527e5a33fa0cf184f37bc112d071463ab6d`（⚠️ 曾強平 1 次） | $9,803,415 | 6% | 1.41 | 20x | xyz:SNDK | 379 | ❌ 槓桿過高：目前 20x > 10x（30d 事件 34（截斷外推 73）／fills 2,000）|
+| `0xbe494a5e3a719a78a45a47ab453b7b0199b9d101` | $2,921,956 | 34% | 0.69 | 20x | HYPE | 316 | ❌ 持倉過短：平均 0.1h < 12h；槓桿過高：目前 20x > 10x（30d 事件 48（截斷外推 67）／fills 2,000）|
 
 ## 4. Ground-truth 校驗
 
@@ -54,10 +53,10 @@
 
 ## 5. 裁決
 
-consistent_winner 數量：**6**
+consistent_winner 數量：**5**
 其中 followable（可跟）數量：**1**
 
-**consistent_winner 6 個，其中 followable 1 個（僅少數可跟候選，證據不足，需持續觀察）**
+**consistent_winner 5 個，其中 followable 1 個（僅少數可跟候選，證據不足，需持續觀察）**
 
 限制與醒目聲明：
 - **回望偏差**：宇宙來自全量排行榜以歷史窗績效過濾（非僅榜頂，倖存者偏差較輕），但「過去可跟畫像」仍是回望篩選；存在性 ≠ 未來獲利。
