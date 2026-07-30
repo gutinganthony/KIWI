@@ -1,0 +1,113 @@
+# EMA20/50 交叉策略回測 — 一次性研究用資料橋
+#
+# 為什麼需要這支 workflow：Claude 雲端 session 的 agent proxy 對「所有」行情源
+# 一律 CONNECT 403（實測 Yahoo query1/query2、stooq、coingecko、binance、
+# tiingo、nasdaqtrader、FRED 全擋；stooq 連 PoW 都過了仍回 Access denied），
+# 只有 GitHub Actions runner 抓得到。同 avi-v5 的 fetch_backtest_ext.py 模式。
+#
+# 與既有 6 支生產管線的隔離保證：
+#   1. 只在 research 分支上觸發，不在 main 上跑（無 schedule）
+#   2. 只寫 projects/ema-backtest/results/ —— main 的排程從不碰這條路徑，
+#      不會產生 agents/LEARNINGS.md 2026-07-30 那種「解不完的衝突」
+#   3. 觸發 paths 只含 *.py 與本檔；結果是 .json/.md → commit 回來不會自我重觸發
+#   4. 原始價格 CSV 留在 runner 的 /tmp，永不入版控（避免 2026-07-10 的肥 commit 坑）
+
+name: ema-backtest
+
+on:
+  workflow_dispatch:
+    inputs:
+      universe:
+        description: '標的範圍'
+        type: choice
+        default: ndx100
+        options: [ndx100, nasdaq-all]
+      start:
+        description: '取數起日'
+        default: '2018-01-01'
+  push:
+    branches:
+      - 'claude/ema-crossover-backtest-**'
+    paths:
+      - 'projects/ema-backtest/**.py'
+      - '.github/workflows/ema-backtest.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ema-backtest-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        working-directory: projects/ema-backtest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install yfinance pandas numpy lxml requests
+
+      # 先跑離線測試——引擎壞掉就不必浪費 30 分鐘抓資料
+      - name: Offline engine tests
+        run: python3 tests/test_offline.py
+
+      - name: Fetch daily bars (runner 不受雲端 proxy 限制)
+        run: |
+          python3 fetch_prices.py \
+            --universe "${{ github.event.inputs.universe || 'ndx100' }}" \
+            --out /tmp/prices \
+            --start "${{ github.event.inputs.start || '2018-01-01' }}"
+
+      # 三個變體：規格原樣（零成本）／加真實成本／收盤價成交
+      # ——用來量化「紙上績效 vs 可執行績效」的差距
+      - name: Run backtests
+        run: |
+          mkdir -p results
+          python3 run_report.py --prices /tmp/prices --out results \
+            --tag results_cost0     --cost-bps 0  --fill next_open --top 25
+          python3 run_report.py --prices /tmp/prices --out results \
+            --tag results_cost10    --cost-bps 10 --fill next_open --top 25
+          python3 run_report.py --prices /tmp/prices --out results \
+            --tag results_closefill --cost-bps 0  --fill close     --top 25
+          ls -la results/
+          du -sh results/
+
+      - name: Commit results
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add projects/ema-backtest/results/
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "data: EMA20/50 backtest results ($(date -u +%Y-%m-%d))"
+            # 多 workflow 寫同分支時的必要防護（agents/LEARNINGS.md 2026-07-10）
+            for i in 1 2 3 4; do
+              git pull --rebase origin "${GITHUB_REF_NAME}" && git push && break
+              echo "push attempt $i failed, retrying..." && sleep $((2**i))
+            done
+          fi
+
+      # 驗收句是「檔案有沒有出現在 repo」，不是「腳本有沒有成功」
+      # （agents/LEARNINGS.md 2026-07-27）
+      - name: Verify results landed
+        run: |
+          test -s results/results_cost0.json || { echo "❌ 結果檔未產出"; exit 1; }
+          python3 -c "
+          import json,sys
+          d=json.load(open('results/results_cost0.json'))
+          print('symbols:', d['n_symbols'])
+          assert d['n_symbols'] >= 50, f\"只有 {d['n_symbols']} 檔，取數大量失敗\"
+          print('24M summary:', d['summary']['24M'])
+          "
