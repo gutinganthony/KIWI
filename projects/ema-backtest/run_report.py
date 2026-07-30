@@ -106,6 +106,19 @@ def analyse(symbol, dates, op, cl, cost_bps=0.0, fill="next_open", slow_warmup=5
         "windows": {},
     }
 
+    # 逐年拆解：用來判斷「全樣本優勢」是可重複的，還是靠某一兩年撐起來的。
+    # 這是「能不能真的拿去交易」最關鍵的一張表——全樣本數字漂亮但只有一年
+    # 貢獻全部超額，等於沒有優勢。
+    years = sorted({d.year for d in dates})
+    for y in years:
+        ridx = [i for i, d in enumerate(dates) if d.year == y]
+        if len(ridx) < 60 or ridx[0] < slow_warmup:
+            continue
+        m = window_metrics(eq, cl, im, tr, ridx[0], ridx[-1])
+        if m:
+            m.pop("bars", None)
+            rec.setdefault("annual", {})[str(y)] = m
+
     for label, months in WINDOWS:
         cutoff = months_before(last, months)
         # 資料起點晚於窗起點 → 這檔根本沒有這個窗的歷史。若照算會把「上市

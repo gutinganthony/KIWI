@@ -82,12 +82,24 @@ jobs:
           ls -la results/
           du -sh results/
 
+      # 保留少數關鍵標的的原始日線，讓後續分析不必重跑整條管線。
+      # 只留 4 檔（~700KB），其餘 100+ 檔留在 runner 的 /tmp 隨之回收
+      # ——避免 agents/LEARNINGS.md 2026-07-10 的肥 commit 坑。
+      - name: Keep raw bars for key symbols only
+        run: |
+          mkdir -p data/prices
+          for s in BTC-USD ETH-USD QQQ SPY; do
+            cp "/tmp/prices/$s.csv" data/prices/ || echo "⚠️ $s 不存在"
+          done
+          du -sh data/prices/
+
       - name: Commit results
         run: |
           cd "$GITHUB_WORKSPACE"
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add projects/ema-backtest/results/
+          git add projects/ema-backtest/data/prices/
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
