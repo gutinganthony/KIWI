@@ -205,6 +205,134 @@ def account_summary(raw):
     }
 
 
+def parse_positions_by_dex(wallet):
+    """原生＋各 builder dex 的持倉**聯集**（HIP-3 盲點修正）。
+
+    回 (positions, by_dex)：
+      positions — 聯集清單，每筆多帶 "dex" 欄（原生為 ""），欄位其餘同 parse_positions；
+      by_dex    — {dex_name: {"n_positions", "account_value", "position_value"}}，
+                  原生的 key 為 ""（空字串）。
+    wallet 無 clearinghouseStateByDex（舊 snapshot）→ 只回原生，數值與舊邏輯完全一致。
+    """
+    positions, by_dex = [], {}
+    raws = [("", wallet.get("clearinghouseState"))]
+    raw_by_dex = wallet.get("clearinghouseStateByDex")
+    if isinstance(raw_by_dex, dict):
+        for dex, raw in raw_by_dex.items():
+            if isinstance(dex, str) and dex:
+                raws.append((dex, raw))
+    for dex, raw in raws:
+        pos = parse_positions(raw)
+        acct = account_summary(raw)
+        for p in pos:
+            p = dict(p)
+            p["dex"] = dex
+            positions.append(p)
+        by_dex[dex] = {
+            "n_positions": len(pos),
+            "account_value": acct["account_value"],
+            "position_value": round(sum(x["position_value"] for x in pos
+                                        if x["position_value"] is not None), 2),
+        }
+    return positions, by_dex
+
+
+def account_value_union(by_dex):
+    """各 dex accountValue 加總（None 視為缺值：全缺回 None，部分缺只加有值的）。
+
+    語意：原生與各 builder dex 的抵押品是**分離的帳戶**，總可動用淨值 = 相加。
+    """
+    vals = [v["account_value"] for v in by_dex.values() if v["account_value"] is not None]
+    if not vals:
+        return None
+    return sum(vals)
+
+
+def builder_account_value(by_dex):
+    """只有 builder dex（排除原生 key ""）的 accountValue 加總；全缺回 None。"""
+    vals = [v["account_value"] for d, v in by_dex.items()
+            if d and v["account_value"] is not None]
+    if not vals:
+        return None
+    return sum(vals)
+
+
+# ---------------------------------------------------------------------------
+# 現貨餘額（spotClearinghouseState）
+# ---------------------------------------------------------------------------
+# 現貨估值：這些 coin 一律 1:1 當美元計（其餘 token 用 entryNtl 成本基礎粗估並標註）。
+# 注意 "USDT0"（Hyperliquid 上的 USDT 橋接幣）不在此列 → 走 entryNtl 分支並標「估算」，
+# 這是刻意保守：本專案不打 allMids 省權重，不假設非白名單 token 一定是 1:1。
+SPOT_USD_COINS = ("USDC", "USD", "USDT", "USDH", "FEUSD")
+
+
+def summarize_spot(raw):
+    """spotClearinghouseState → 只留**非零餘額**（體積控制）＋美元估算。
+
+    USDC 類穩定幣 1:1 計美元；其他 token 無現價可查（本專案不打 allMids 以省權重），
+    退用 entryNtl（成本基礎）粗估並在報告標註「估算」；連 entryNtl 都沒有 → usd=None
+    （不猜數字），只在 usd_is_estimate/estimated 標記「有無法估值的餘額」。
+
+    （原本住在 track_wallet.py，因 compute_metrics 也要用而移來此處——track_wallet
+      改為 import 這一份，不得再有第二份實作。）
+    """
+    out = {"n_nonzero": 0, "balances": [], "usd_stable": 0.0,
+           "usd_est_other": 0.0, "usd_total_est": 0.0, "estimated": False}
+    balances = None
+    if isinstance(raw, dict):
+        for key in ("balances", "spotBalances", "data"):
+            if isinstance(raw.get(key), list):
+                balances = raw[key]
+                break
+    elif isinstance(raw, list):
+        balances = raw
+    if balances is None:
+        return out
+    for b in balances:
+        if not isinstance(b, dict):
+            continue
+        total = _to_float(b.get("total"))
+        if total is None or abs(total) <= 0:
+            continue
+        coin = str(b.get("coin") or "")
+        entry_ntl = _to_float(b.get("entryNtl"))
+        row = {"coin": coin, "total": total,
+               "hold": _to_float(b.get("hold")),
+               "entry_ntl": entry_ntl}
+        if coin.upper() in SPOT_USD_COINS:
+            row["usd"] = total
+            out["usd_stable"] += total
+        elif entry_ntl is not None:
+            row["usd"] = entry_ntl
+            row["usd_is_estimate"] = True
+            out["usd_est_other"] += entry_ntl
+            out["estimated"] = True
+        else:
+            row["usd"] = None
+            row["usd_is_estimate"] = True
+            out["estimated"] = True
+        out["balances"].append(row)
+    out["balances"].sort(key=lambda r: -(r.get("usd") or 0))
+    out["n_nonzero"] = len(out["balances"])
+    out["usd_total_est"] = round(out["usd_stable"] + out["usd_est_other"], 2)
+    out["usd_stable"] = round(out["usd_stable"], 2)
+    out["usd_est_other"] = round(out["usd_est_other"], 2)
+    return out
+
+
+def spot_token_rows(spot, limit=10):
+    """summarize_spot 的 balances → timeline/dossier 用的精簡列（體積控制）。"""
+    rows = []
+    for b in (spot or {}).get("balances", [])[:limit]:
+        rows.append({
+            "coin": b.get("coin"),
+            "qty": b.get("total"),
+            "usd": (round(b["usd"], 2) if b.get("usd") is not None else None),
+            "estimated": bool(b.get("usd_is_estimate")),
+        })
+    return rows
+
+
 def total_funding(raw_funding):
     """userFunding → 資金費淨總額（usdc 加總）；解析不到回 None。"""
     if isinstance(raw_funding, dict):
@@ -495,8 +623,36 @@ def compute_metrics(wallet, snapshot_date):
     n_fills = len(fills)
     # userFills 被 info API 截斷（近端窗）→ profit_factor/realized_win_rate 樣本偏誤大（BUG 3）
     fills_truncated = n_fills >= config.MAX_USER_FILLS
-    positions = parse_positions(wallet.get("clearinghouseState"))
-    acct = account_summary(wallet.get("clearinghouseState"))
+    # HIP-3 盲點修正：持倉/淨值取「原生 + 各 builder dex」聯集。舊 snapshot 沒有
+    # clearinghouseStateByDex 欄位 → union 只含原生，數值與修正前完全一致（向後相容）。
+    positions_native = parse_positions(wallet.get("clearinghouseState"))
+    acct_native = account_summary(wallet.get("clearinghouseState"))
+    positions, positions_by_dex = parse_positions_by_dex(wallet)
+    acct_union_value = account_value_union(positions_by_dex)
+    acct = dict(acct_native)
+    if acct_union_value is not None:
+        acct["account_value"] = acct_union_value
+    dexs_with_positions = sorted(d for d, v in positions_by_dex.items()
+                                 if d and v["n_positions"] > 0)
+
+    # --- 多場所資金分布（含現貨；每日抓取，見 config.FETCH_SPOT_TRACKED_ONLY）---
+    # clearinghouseState（含各 builder dex）**看不到現貨**：實測某 tracked 錢包 98.9% 資產
+    # 是現貨 USDC。spotClearinghouseState 缺席（舊 snapshot／非 tracked 錢包／查詢失敗）
+    # → 下面四個欄位一律 None，既有數值完全不變（向後相容）。
+    # 刻意設計：**現貨未知時不給 total_value_all_venues／non_native_share**——用「原生＋
+    # builder」冒充「全場所總值」會低報總資產（正是本次要修的盲點），寧可回 None。
+    spot_raw = wallet.get("spotClearinghouseState")
+    spot = summarize_spot(spot_raw) if spot_raw is not None else None
+    spot_value_usd = round(spot["usd_total_est"], 2) if spot is not None else None
+    spot_tokens = spot_token_rows(spot) if spot is not None else None
+    builder_usd = builder_account_value(positions_by_dex)
+    total_all_venues, non_native_share = None, None
+    if spot_value_usd is not None:
+        venue_value = acct["account_value"] or 0.0   # 原生＋builder 聯集（缺 byDex 時＝原生）
+        total_all_venues = round(venue_value + spot_value_usd, 2)
+        non_native_usd = (builder_usd or 0.0) + spot_value_usd
+        if total_all_venues > 0:   # 分母 0 防呆（全 $0 帳戶 → 占比無意義）
+            non_native_share = round(non_native_usd / total_all_venues, 4)
 
     # --- PnL 曲線衍生指標 ---
     if pnl_points:
@@ -607,6 +763,19 @@ def compute_metrics(wallet, snapshot_date):
         "funding_total": (lambda x: round(x, 2) if x is not None else None)(
             total_funding(wallet.get("userFunding"))),
         "n_open_positions": len(positions),
+        # 揭露：原生 vs 聯集，好讓報告能指出「持倉其實在 builder dex」
+        "n_open_positions_native": len(positions_native),
+        "dexs_with_positions": dexs_with_positions,
+        "account_value_native": round(acct_native["account_value"], 2)
+        if acct_native["account_value"] is not None else None,
+        "account_value_by_dex": {d: (round(v["account_value"], 2)
+                                    if v["account_value"] is not None else None)
+                                 for d, v in sorted(positions_by_dex.items())},
+        # 多場所資金分布（現貨為每日抓取；缺現貨資料時全為 None，見上方註解）
+        "spot_value_usd": spot_value_usd,
+        "spot_tokens": spot_tokens,
+        "total_value_all_venues": total_all_venues,
+        "non_native_share": non_native_share,
         "current_max_leverage": current_max_leverage,
         "has_extreme_leverage": has_extreme_leverage,
         "margin_types": margin_types,

@@ -42,6 +42,89 @@ INFO_TYPES = [
 # userFunding 起始時間（epoch 毫秒）：抓自此後的資金費紀錄，None → 省略 startTime
 USER_FUNDING_START_MS = None
 
+# ---------------------------------------------------------------------------
+# HIP-3 builder dex（多 dex 盲點修正）
+# ---------------------------------------------------------------------------
+# 真 bug 背景：clearinghouseState 不帶 dex 參數時**只回原生永續 dex**的持倉與帳戶淨值。
+# builder（HIP-3）部署的市場（coin 命名如 "xyz:SNDK"、"xyz:GOOGL"）屬於獨立的 perp dex，
+# 抵押品與部位不會出現在原生回應裡 → 觀測到「clearinghouseState accountValue=$0、0 持倉」
+# 但 portfolio accountValue=$4.08M、近 30 天 2000+ 筆 xyz: 成交的矛盾。
+# 修法：先查 {"type":"perpDexs"} 取得 dex 名稱清單（不硬編 "xyz"），再對每個 builder dex
+# 各查一次 clearinghouseState（帶 "dex"），新增 clearinghouseStateByDex 欄位（原欄位不動）。
+#
+# 請求量算明（info API 每 IP 1200 權重/min，clearinghouseState 權重 2）：
+#   每錢包多 N 個 dex × 權重 2。N=10（FETCH_MAX_DEXS 上限）→ 每錢包多 20 權重、10 個請求。
+#   60 錢包宇宙全做 → 多 600 請求；以 sleep 0.5s＋網路延遲 ~0.3s 計 ≈ +8 分鐘、
+#   平均權重密度反而下降（權重 2 的請求最便宜），不會觸限，但 CI 時間翻倍。
+#   折衷（採用）：全 dex 查詢只對 TRACKED_WALLETS 做（見 FETCH_ALL_DEXS_TRACKED_ONLY），
+#   宇宙掃描維持原生單查——宇宙用途是漏斗初篩（PnL/量/ROI 來自 portfolio，不依賴 dex 明細），
+#   tracked 錢包才需要精確持倉。3 個 tracked × 10 dex = 30 請求 ≈ 60 權重，可忽略。
+FETCH_PERP_DEXS = True            # False → 完全沿用舊行為（只查原生）
+FETCH_MAX_DEXS = 10               # 每錢包最多查幾個 builder dex（權重成本上限）
+FETCH_ALL_DEXS_TRACKED_ONLY = True  # True → 只有 TRACKED_WALLETS 做全 dex 查詢（見上方算式）
+# dex 名稱排序提示：名稱含此子字串者優先（觀測到的主戰場前綴；僅排序用，不硬編/不過濾）
+DEX_NAME_PRIORITY_SUBSTR = "xyz"
+
+# ---------------------------------------------------------------------------
+# 每日現貨餘額（spotClearinghouseState）—— 只對 TRACKED_WALLETS 抓
+# ---------------------------------------------------------------------------
+# 動機：clearinghouseState（含各 builder dex）**完全看不到現貨**。實測某 tracked 錢包
+# 98.9% 的資產（$4.07M USDC）躺在現貨帳戶，只有週期性的 run_diagnostic 抓得到，
+# 每日 timeline 因此看不出「現金水位在增加（收手）還是被派出去交易（重新進場）」。
+# 請求量：spotClearinghouseState 權重 2，每個 TRACKED 錢包**多 1 個請求**。
+#   3 個 tracked → +3 請求 ≈ +6 權重（每分鐘 1200 額度下可忽略）；宇宙掃描不抓。
+FETCH_SPOT_TRACKED_ONLY = True   # True → 只有 TRACKED_WALLETS 加抓現貨（False → 完全不抓）
+
+# ---------------------------------------------------------------------------
+# 資金流向趨勢（dossier「資金流向趨勢」節；純觀察敘述，不含投資建議）
+# ---------------------------------------------------------------------------
+FUNDS_TREND_DAYS = 7          # 比較 timeline 最近幾個資料點（≈天）
+FUNDS_TREND_MIN_POINTS = 3    # 少於此點數 → 「資料累積中」（不硬掰趨勢）
+FUNDS_TREND_CHANGE_PCT = 0.05  # 現貨占比／總值變化未達此門檻 → 「持平」
+
+# ---------------------------------------------------------------------------
+# 全維度診斷探測（track_wallet.run_diagnostic：回答「資金到哪去了」）
+# 純唯讀：只用 info API 的查詢型 type（DIAGNOSTIC_ALLOWED_INFO_TYPES 白名單硬限）。
+# ---------------------------------------------------------------------------
+
+# 診斷可用的 info type 白名單（track_wallet.diagnostic_info_body 硬限；非查詢 type 一律 raise）
+DIAGNOSTIC_ALLOWED_INFO_TYPES = (
+    "perpDexs",                      # builder dex 清單（權重小）
+    "clearinghouseState",            # 原生＋各 builder dex 持倉/淨值（權重 2）
+    "spotClearinghouseState",        # 現貨餘額（權重 2）
+    "userNonFundingLedgerUpdates",   # deposit/withdraw/internalTransfer/... （權重 20）
+    "portfolio",                     # 多視窗 accountValue/pnl（權重 20）
+    "userFills",                     # 成交（權重 20＋每 20 筆加權）
+)
+DIAGNOSTIC_LEDGER_DAYS = 45       # ledger updates 回看天數（判斷有無搬家）
+DIAGNOSTIC_MAX_LEDGER_ROWS = 200  # json 落地最多保留幾筆 ledger（體積控制）
+DIAGNOSTIC_MAX_FILLS = 20         # json 落地只留最後 N 筆成交（其餘只留統計）
+# 連續失敗這麼多次就中止探測並標「資料不足」（雲端 session egress 被擋時快速降級，
+# 不要 15 個請求各燒 3 次重試）
+DIAGNOSTIC_ABORT_AFTER_FAILURES = 3
+# 「換地址」裁決門檻：45 天內外轉（withdraw / 轉到他址）金額同時滿足
+#   >= DIAGNOSTIC_MOVEOUT_MIN_USD 且 >= 外轉後總資產＋外轉額的 DIAGNOSTIC_MOVEOUT_SHARE
+DIAGNOSTIC_MOVEOUT_MIN_USD = 100_000.0
+DIAGNOSTIC_MOVEOUT_SHARE = 0.5
+# 「同地址換戰場」裁決門檻：非原生（builder dex＋現貨）資金占總資產比例 >= 此值
+DIAGNOSTIC_NON_NATIVE_SHARE = 0.5
+# HyperCore ↔ HyperEVM 跨層轉移的「系統地址」判定（ledger send/spotSend 分類用）。
+# 每個 spot token 都有一個系統地址：第一個 byte 是 0x20、其餘為 0，末端以 big-endian
+# 編碼 token index（token index 0 → 0x2000…0000；token index 200 → 0x20…00c8）。
+# HYPE 例外，系統地址為 0x2222222222222222222222222222222222222222。
+# 送到系統地址＝款項進入「同一位擁有者在 HyperEVM 上的同一地址」，**不是第三方**——
+# 因此算 bridge_out（跨層轉移）而非 external_out（外轉），也不可算 unknown。
+# 來源：https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/hyperevm/
+#       hypercore-less-than-greater-than-hyperevm-transfers
+LEDGER_SYSTEM_ADDR_PREFIX = "0x20"
+LEDGER_HYPE_SYSTEM_ADDR = "0x2222222222222222222222222222222222222222"
+LEDGER_SYSTEM_ADDR_INDEX_MAX_HEX = 4   # 前綴後 38 個 hex 去前導 0 後最多幾字元＝token index
+# 「資本外移中」旗標門檻：跨層轉移金額占「跨層轉移＋目前總資產」比例 >= 此值時，
+# 在既有四裁決後面加註旗標（不取代裁決分類）
+DIAGNOSTIC_BRIDGE_OUT_SHARE = 0.20
+# 「真的停手觀望」裁決：最後一筆成交距今 >= 此天數
+DIAGNOSTIC_IDLE_DAYS = 7
+
 # 宇宙來源（Path A）：未文件化前端 leaderboard 端點。GET、免金鑰、**脆弱**（可能 403/
 # 改 schema/加防爬）。fetch.py 試打；失敗就記 meta.endpoint_health 並退回只用 seeds。
 LEADERBOARD_ENDPOINTS = [

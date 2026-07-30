@@ -75,6 +75,15 @@ td{padding:6px 10px;border-bottom:1px solid var(--grid);white-space:nowrap}
 td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 tr:last-child td{border-bottom:none}
 
+/* 合計列（表內各列之和）＋重點提示框（沿用既有 token，不新增顏色系統） */
+tr.total td{font-weight:600;border-top:1px solid var(--axis);border-bottom:none}
+.callout{border:1px solid var(--border);border-left:4px solid var(--st-warn);
+  border-radius:8px;padding:10px 12px;background:var(--surface);
+  font-size:13px;margin-top:8px;white-space:normal}
+.callout b{color:var(--ink)}
+.vtag{display:inline-block;font-size:11px;color:var(--ink2);border:1px solid var(--axis);
+  border-radius:99px;padding:0 7px;font-variant-numeric:tabular-nums}
+
 /* 月度 PnL 圖 */
 .chart-box{position:relative;margin-top:8px}
 .chart-scroll{overflow-x:auto}
@@ -306,19 +315,39 @@ function placeholderHTML(msg){
   tile('平均持倉時間', m.avg_hold_hours==null?'—':esc(m.avg_hold_hours.toFixed(0))+' h',
        m.avg_hold_hours==null?null:'約 '+(m.avg_hold_hours/24).toFixed(1)+' 天');
   tile('30 日事件數', esc(fmtNum(m.n_events_last_30d)), '事件中位名目 '+fmtUsd(m.median_event_notional));
-  tile('帳戶淨值', esc(fmtUsd(m.account_value)), '持倉名目 '+fmtUsd(hl.position_value));
-  tile('未實現 PnL', esc(signedUsd(hl.unrealized_pnl)), null, hl.unrealized_pnl>=0?'up':'down');
+  var vn = hl.venues || {};
+  tile('帳戶淨值（原生永續）', esc(fmtUsd(m.account_value)),
+       (vn.available && vn.total_usd!=null)
+         ? '多場所合計 '+fmtUsd(vn.total_usd)+'（見下方資金分布）'
+         : '持倉名目 '+fmtUsd(hl.positions_notional!=null ? hl.positions_notional
+                                                        : hl.position_value));
+  var multiPos = hl.positions_source==='diagnostic';
+  var upnl = multiPos ? hl.positions_unrealized_pnl : hl.unrealized_pnl;
+  tile(multiPos ? '未實現 PnL（多場所）' : '未實現 PnL', esc(signedUsd(upnl)),
+       multiPos ? '含 builder dex・診斷 '+esc(hl.positions_date) : null,
+       (upnl||0)>=0?'up':'down');
   html += '</div>';
 
+  /* 資金分布（多場所） */
+  html += renderVenues(vn);
+
   /* 目前持倉 */
-  html += '<h3>目前持倉（'+(hl.positions||[]).length+' 檔）</h3>';
-  if((hl.positions||[]).length){
+  var pos = hl.positions || [];
+  html += '<h3>目前持倉（'+pos.length+' 檔）</h3>';
+  if(hl.positions_source==='diagnostic'){
+    html += '<div class="small" style="color:var(--muted)">'
+          + '每日 dossier 的 open_positions 只涵蓋原生永續 dex（本日為空）；'
+          + '以下改用診斷資料（'+esc(hl.positions_date)+'）的多場所持倉。</div>';
+  }
+  if(pos.length){
     html += '<div class="table-scroll"><table><thead><tr>'
-          + '<th>幣種</th><th>方向</th><th class="num">槓桿</th><th class="num">名目 USD</th>'
+          + '<th>幣種</th><th>場所</th><th>方向</th><th class="num">槓桿</th><th class="num">名目 USD</th>'
           + '<th class="num">入場價</th><th class="num">未實現 PnL</th></tr></thead><tbody>';
-    hl.positions.forEach(function(p){
+    pos.forEach(function(p){
       var up = (p.unrealized_pnl||0)>=0;
-      html += '<tr><td>'+esc(p.coin)+'</td><td>'+esc(p.side==='long'?'做多':(p.side==='short'?'做空':p.side))+'</td>'
+      html += '<tr><td>'+esc(p.coin)+'</td>'
+            + '<td><span class="vtag">'+esc(p.venue||'原生')+'</span></td>'
+            + '<td>'+esc(p.side==='long'?'做多':(p.side==='short'?'做空':p.side))+'</td>'
             + '<td class="num">'+esc(p.leverage_value)+'x '+esc(p.leverage_type||'')+'</td>'
             + '<td class="num">'+esc(fmtUsdFull(p.position_value))+'</td>'
             + '<td class="num">'+esc(p.entry_px)+'</td>'
@@ -326,6 +355,9 @@ function placeholderHTML(msg){
     });
     html += '</tbody></table></div>';
   } else { html += '<div class="small">目前無持倉。</div>'; }
+
+  /* 資金流動（僅在有診斷資料時出現） */
+  html += renderFlows(hl.flows || {});
 
   /* 月度 PnL 圖 */
   html += '<h3>月度 PnL</h3><div class="chart-box"><div class="chart-scroll" id="hl-chart"></div>'
@@ -378,6 +410,89 @@ function placeholderHTML(msg){
   el.innerHTML = html;
   if(hl.monthly_pnl) renderMonthly('hl-chart','hl-tip','hl-chart-table', hl.monthly_pnl);
 })();
+
+/* ── 資金分布（多場所）───────────────────────────────────────
+   HIP-3 builder dex 與現貨掛在**同一個錢包地址**下（不是另一個錢包）。
+   只查原生永續 dex 會看成「無持倉、$0 淨值」——本表把分布攤開。
+   任何欄位缺失 → 顯示「—」；整區資料缺失 → 隱藏（舊格式 dossier 相容）。 */
+function renderVenues(vn){
+  if(!vn || !vn.available) return '';
+  var html = '<h3>資金分布（多場所・同一錢包地址）</h3>';
+  if(vn.non_native_alert){
+    html += '<div class="callout"><b>⚠︎ '+esc(vn.non_native_alert)+'</b></div>';
+  }
+  html += '<div class="table-scroll"><table><thead><tr>'
+        + '<th>場所</th><th class="num">帳戶淨值 USD</th><th class="num">未平倉數</th>'
+        + '<th class="num">名目 USD</th><th class="num">占總資產 %</th>'
+        + '</tr></thead><tbody>';
+  (vn.rows||[]).forEach(function(r){
+    var name = r.kind==='spot'
+      ? '現貨 spot'+(vn.spot_estimated?'（含估算）':'')
+      : (r.kind==='native' ? '原生永續 dex' : 'builder dex '+r.id);
+    html += '<tr><td>'+esc(name)+'</td>'
+          + '<td class="num">'+esc(fmtUsdFull(r.account_value))+'</td>'
+          + '<td class="num">'+esc(r.n_positions==null?'—':fmtNum(r.n_positions))+'</td>'
+          + '<td class="num">'+(r.notional==null?'—':esc(fmtUsdFull(r.notional)))+'</td>'
+          + '<td class="num">'+esc(fmtPct(r.share))+'</td></tr>';
+  });
+  html += '<tr class="total"><td>合計</td>'
+        + '<td class="num">'+esc(fmtUsdFull(vn.total_usd))+'</td>'
+        + '<td class="num">'+esc(vn.n_positions_total==null?'—':fmtNum(vn.n_positions_total))+'</td>'
+        + '<td class="num">'+esc(vn.notional_total==null?'—':fmtUsdFull(vn.notional_total))+'</td>'
+        + '<td class="num">'+(vn.total_usd?'100.0%':'—')+'</td></tr>';
+  html += '</tbody></table></div>';
+
+  var notes = [];
+  if((vn.zero_venues||[]).length){
+    notes.push('另 '+vn.zero_venues.length+' 個已查詢的 builder dex 淨值與持倉皆為 0：'
+               + esc(vn.zero_venues.join('、')));
+  }
+  if(vn.spot_estimated){
+    notes.push('現貨估值：USDC 類 1:1；其他 token 以 entryNtl 成本基礎粗估，故為估算值。');
+  }
+  if(vn.diagnostic_date){
+    notes.push('現貨與名目欄位來自診斷資料（週期性產物），診斷資料日期：<b>'
+               + esc(vn.diagnostic_date)+'</b>。');
+  }
+  if(vn.total_usd_diagnostic!=null && vn.total_usd!=null
+     && Math.abs(vn.total_usd_diagnostic-vn.total_usd) > 1){
+    notes.push('合計為表內各列之和；診斷資料同期合計 '+esc(fmtUsdFull(vn.total_usd_diagnostic))
+               + '（兩者取樣時點不同，差異屬預期）。');
+  }
+  if(notes.length) html += '<div class="note">'+notes.join('<br>')+'</div>';
+  return html;
+}
+
+/* ── 資金流動（跨層轉出／真外轉／最後成交距今）─────────────
+   措辭精確：跨層轉出＝HyperCore → HyperEVM 系統地址，資金仍屬同一擁有者，
+   不是轉給第三方；「真外轉」才是轉到他人地址。 */
+function renderFlows(fl){
+  if(!fl || !fl.available) return '';
+  var html = '<h3>資金流動（近 '+esc(fl.window_days==null?'—':fl.window_days)+' 天帳本）</h3>';
+  var items = [];
+  items.push('<b>跨層轉出</b>（HyperCore → HyperEVM 系統地址，<u>資金仍屬同一擁有者</u>，'
+    + '非轉給第三方）：'+esc(fmtUsdFull(fl.cross_layer_usd))
+    + '，共 '+esc(fmtNum(fl.cross_layer_n))+' 筆');
+  items.push('<b>真外轉</b>（轉到他人地址，資金真正離開此擁有者）：'
+    + esc(fmtUsdFull(fl.external_out_usd))
+    + '，共 '+esc(fmtNum(fl.external_out_n))+' 筆');
+  items.push('<b>最後成交距今</b>：'
+    + esc(fl.days_since_last_fill==null ? '—' : fl.days_since_last_fill.toFixed(1)+' 天')
+    + (fl.last_fill_iso ? '（'+esc(String(fl.last_fill_iso).replace('T',' ').slice(0,16))+' UTC）' : '')
+    + (fl.n_fills_7d==null ? '' : '・近 7 日成交 '+esc(fmtNum(fl.n_fills_7d))+' 筆'));
+  if(fl.fills_non_native_share!=null){
+    items.push('<b>成交戰場分布</b>：非原生 '+esc(fmtNum(fl.fills_non_native))+'／'
+      + esc(fmtNum(fl.fills_total))+' 筆（'+esc(fmtPct(fl.fills_non_native_share,0))+'）');
+  }
+  html += '<ul class="small" style="margin:8px 0 0;padding-left:18px">'
+        + items.map(function(s){ return '<li style="margin:2px 0">'+s+'</li>'; }).join('')
+        + '</ul>';
+  var tail = [];
+  if(fl.verdict) tail.push('診斷裁決：'+esc(fl.verdict));
+  tail.push('診斷資料日期：<b>'+esc(fl.date||'—')+'</b>（診斷為週期性產物，非每日更新）');
+  html += '<div class="note">'+tail.join('・')+'</div>';
+  return html;
+}
 
 /* ── 月度 PnL 直條圖（純 SVG，正上負下、零基線） ─────────── */
 function renderMonthly(chartId, tipId, tableId, monthly){

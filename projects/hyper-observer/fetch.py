@@ -14,6 +14,12 @@
    去重、上限 --max-wallets（seeds 永遠保留）。
 3. 每錢包 POST info API 抓 clearinghouseState / portfolio / userFills / userFunding，
    存 data/snapshots/{UTC日期}{suffix}/wallets/{addr}.json。
+   另查一次 {"type":"perpDexs"} 取 HIP-3 builder dex 清單，對 TRACKED_WALLETS 逐 dex 再查
+   clearinghouseState（帶 "dex"）→ 新增欄位 clearinghouseStateByDex（原欄位不動）。
+   理由：不帶 dex 的 clearinghouseState **只看原生永續**，builder 市場（"xyz:SNDK" 等）
+   的抵押品與部位完全看不到（曾誤判某錢包 0 持倉/$0 淨值）。折衷與請求量算式見 config。
+   TRACKED_WALLETS 另多 1 個請求 spotClearinghouseState → 新增欄位 spotClearinghouseState，
+   讓每日 timeline 也看得到現貨現金水位（實測某錢包 98.9% 資產在現貨）。
 4. snapshot 內的 leaderboard.json 只存**瘦身摘要**（地址清單＋列數；raw 不入版控）；
    完整 raw 落到 data/tmp/leaderboard_raw_{日期}.json（.gitignore，供 scan_universe.py 用）。
 5. meta（端點健康、成功/失敗計數、耗時）存 snapshot 目錄；維護 data/wallet_registry.json。
@@ -308,8 +314,84 @@ def _info_body(info_type, addr):
     return body
 
 
-def fetch_wallet(addr, meta, post_fn=None):
-    """抓單一錢包的四類 info 資料，任何一類失敗都記錄並繼續。"""
+# ---------------------------------------------------------------------------
+# HIP-3 builder dex（perpDexs → 每 dex 各查一次 clearinghouseState）
+# ---------------------------------------------------------------------------
+
+def parse_perp_dexs(raw, priority_substr=None, limit=None):
+    """{"type":"perpDexs"} 回應 → **builder dex 名稱清單**（純函式，供離線測試）。
+
+    Hyperliquid 的回應是 list，其中 **null（或空字串）代表原生永續 dex 的佔位**，
+    其餘元素形如 {"name": "xyz", "full_name": ..., "deployer": ...}（欄位名不保證）。
+    原生佔位一律剔除（原生用不帶 dex 的請求查，已是既有行為），只回 builder dex 名稱。
+    名稱含 priority_substr 者排前（觀測到的主戰場前綴；僅排序，不過濾、不硬編）。
+    """
+    names = []
+    if isinstance(raw, dict):  # 防禦：可能包一層
+        for key in ("perpDexs", "dexs", "data"):
+            if isinstance(raw.get(key), list):
+                raw = raw[key]
+                break
+    if not isinstance(raw, list):
+        return []
+    for item in raw:
+        name = None
+        if item is None:
+            continue  # 原生 dex 佔位
+        if isinstance(item, str):
+            name = item
+        elif isinstance(item, dict):
+            for key in ("name", "dex", "shortName", "full_name", "fullName"):
+                val = item.get(key)
+                if isinstance(val, str) and val.strip():
+                    name = val
+                    break
+        if not isinstance(name, str):
+            continue
+        name = name.strip()
+        if not name or name in names:
+            continue
+        names.append(name)
+    if priority_substr:
+        sub = priority_substr.lower()
+        order = {n: i for i, n in enumerate(names)}  # 原順序快照（穩定排序用，勿在排序中查 index）
+        names.sort(key=lambda n: (sub not in n.lower(), order[n]))
+    if limit is not None:
+        names = names[:limit]
+    return names
+
+
+def fetch_perp_dexs(meta, post_fn=None):
+    """查一次 {"type":"perpDexs"}（全宇宙共用一次，權重可忽略）。回傳 dex 名稱清單。
+
+    失敗 → 記 note 回空清單（呼叫端退回只查原生，即舊行為），不 crash。
+    """
+    if not config.FETCH_PERP_DEXS:
+        return []
+    post_fn = post_fn or http_post_info
+    data, ok = post_fn({"type": "perpDexs"}, "perpDexs", meta)
+    if not ok:
+        meta.note("perpDexs 查詢失敗，clearinghouseState 退回只查原生 dex（builder dex 盲點仍在）")
+        return []
+    names = parse_perp_dexs(data, config.DEX_NAME_PRIORITY_SUBSTR, config.FETCH_MAX_DEXS)
+    meta.note(f"perpDexs：偵測到 {len(names)} 個 builder dex（取前 {config.FETCH_MAX_DEXS}）"
+              f"{'：' + ', '.join(names) if names else ''}")
+    return names
+
+
+def fetch_wallet(addr, meta, post_fn=None, dex_names=None, fetch_spot=False):
+    """抓單一錢包的四類 info 資料，任何一類失敗都記錄並繼續。
+
+    dex_names 非空 → 額外對每個 builder dex 查一次 clearinghouseState（帶 "dex" 參數），
+    結果放進**新增欄位** clearinghouseStateByDex（原 clearinghouseState 欄位保持原生回應
+    不變，以免破壞 classify/track 的既有解析）。單一 dex 失敗只記錄，不影響其他。
+
+    fetch_spot=True → 再多查 1 個請求 {"type":"spotClearinghouseState"}（權重 2），
+    結果放進新增欄位 spotClearinghouseState（失敗 → 該欄位 None，錯誤記進
+    meta.endpoint_health 與 wallet["errors"]，不影響其他抓取）。只對 TRACKED_WALLETS 開
+    （見 config.FETCH_SPOT_TRACKED_ONLY）：現貨是「$4M 級資產的藏身處」，但宇宙掃描
+    的漏斗初篩不需要它，額度留給 tracked 錢包的每日資金分布 timeline。
+    """
     post_fn = post_fn or http_post_info
     wallet = {
         "address": addr,
@@ -327,6 +409,22 @@ def fetch_wallet(addr, meta, post_fn=None):
             wallet[info_type] = data
         else:
             wallet["errors"].append(f"{info_type}: request failed")
+    if dex_names:
+        by_dex = {}
+        for dex in dex_names:
+            body = {"type": "clearinghouseState", "user": addr, "dex": dex}
+            data, ok = post_fn(body, f"clearinghouseState@{dex}[{addr[:10]}…]", meta)
+            if ok:
+                by_dex[dex] = data
+            else:
+                wallet["errors"].append(f"clearinghouseState@{dex}: request failed")
+        wallet["clearinghouseStateByDex"] = by_dex
+    if fetch_spot:
+        body = {"type": "spotClearinghouseState", "user": addr}
+        data, ok = post_fn(body, f"spotClearinghouseState[{addr[:10]}…]", meta)
+        wallet["spotClearinghouseState"] = data if ok else None
+        if not ok:
+            wallet["errors"].append("spotClearinghouseState: request failed")
     return wallet
 
 
@@ -383,6 +481,8 @@ def main(argv=None):
     #     sleep 0.35s → ~92 req/min ≈ 1,430 權重/min > 1200 ✗（提案值不足，不採用）
     #     sleep 0.50s → ~75 req/min ≈ 1,160 權重/min（無餘裕，且未計大 userFills 附加）✗
     #     sleep 0.75s → ~57 req/min ≈   890 權重/min（~26% 餘裕，容納 userFills 附加權重）✓
+    #   TRACKED 錢包另加 N 個 builder dex 查詢（權重 2）＋1 個現貨查詢（權重 2）：
+    #     3 tracked × (10 + 1) ≈ 33 請求 ≈ 66 權重，對上面的密度計算可忽略。
     #   150 錢包 × 4 req × ~1.05s ≈ 10.5 分鐘，CI 可接受。掃描段（--max-wallets 150）
     #   一律配 --sleep 0.75；每日 top-60 維持預設 0.5（總量減半，實測未觸限）。
     parser.add_argument("--sleep", type=float, default=None,
@@ -443,17 +543,34 @@ def main(argv=None):
         summary["universe_size"] = len(universe)
         print(f"[fetch] wallet universe: {len(universe)} (seeds={len(seeds)})")
 
+        # builder dex 清單查一次共用；折衷見 config.FETCH_ALL_DEXS_TRACKED_ONLY 的算式註解：
+        # 全 dex 查詢只對 TRACKED_WALLETS 做（宇宙掃描維持原生單查，避免 CI 時間翻倍）。
+        dex_names = fetch_perp_dexs(meta)
+        tracked_addrs = {str(w.get("address", "")).lower()
+                         for w in config.TRACKED_WALLETS}
+
         for i, addr in enumerate(universe, 1):
+            wallet_dexs = dex_names
+            if config.FETCH_ALL_DEXS_TRACKED_ONLY and addr not in tracked_addrs:
+                wallet_dexs = []
+            # 現貨（spotClearinghouseState）同樣只對 TRACKED 錢包加抓：每錢包 +1 請求。
+            want_spot = bool(config.FETCH_SPOT_TRACKED_ONLY) and addr in tracked_addrs
             try:
-                wallet = fetch_wallet(addr, meta)
+                wallet = fetch_wallet(addr, meta, dex_names=wallet_dexs,
+                                      fetch_spot=want_spot)
             except Exception as exc:  # 單一錢包炸掉不影響其他
                 meta.note(f"wallet {addr} 抓取例外：{type(exc).__name__}: {exc}")
                 summary["wallets_failed"] += 1
                 continue
             write_json(snap_dir / "wallets" / f"{addr}.json", wallet)
-            if not wallet["errors"]:
+            # ok/partial/failed 只看四類主 info 的錯誤（builder dex／現貨的附加查詢失敗
+            # 不該讓「主資料全齊」的錢包被計為 failed）
+            core_errors = [e for e in wallet["errors"]
+                           if not e.startswith(("clearinghouseState@",
+                                                "spotClearinghouseState"))]
+            if not core_errors:
                 summary["wallets_ok"] += 1
-            elif len(wallet["errors"]) < len(config.INFO_TYPES):
+            elif len(core_errors) < len(config.INFO_TYPES):
                 summary["wallets_partial"] += 1
             else:
                 summary["wallets_failed"] += 1
