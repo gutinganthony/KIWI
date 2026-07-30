@@ -27,7 +27,16 @@ POLY_11M = "0x2005d16a84ceefa912d4e380cd32e7ff827875ea"
 
 MAX_CANDIDATES = 20      # 候選表最多列出筆數（控制產物大小）
 MAX_POSITIONS = 40       # 前瞻表現表最多列出筆數
+MAX_VENUES = 24          # 資金分布表最多列出場所數（控制產物大小）
 SIZE_LIMIT = 1_000_000   # 產物大小哨兵（bytes）
+
+# HyperCore → HyperEVM 跨層轉移的系統地址前綴：0x20…00 + token index。
+# 送到這類地址＝資金跨層到「同一擁有者」的 HyperEVM 地址，不是轉給第三方。
+CROSS_LAYER_PREFIX = "0x2000000000000000000000000000000000"
+
+NATIVE_KEYS = ("native", "", "perp", "hyperliquid", "none")  # by_dex 裡代表原生的鍵
+VENUE_NATIVE = "原生"
+VENUE_SPOT = "現貨"
 
 
 # ── 小工具 ─────────────────────────────────────────────────────────
@@ -51,6 +60,326 @@ def clean(v):
 
 def now_utc():
     return dt.datetime.now(dt.timezone.utc)
+
+
+def fnum(v):
+    """任何東西 → float 或 None（不炸）。"""
+    if isinstance(v, bool) or v is None:
+        return None
+    try:
+        f = float(v)
+    except (TypeError, ValueError):
+        return None
+    return None if (math.isnan(f) or math.isinf(f)) else f
+
+
+def fint(v):
+    f = fnum(v)
+    return None if f is None else int(f)
+
+
+def share_of(part, total):
+    """占比，分母 0/None/缺失 一律回 None（防呆，絕不 ZeroDivisionError）。"""
+    p, t = fnum(part), fnum(total)
+    if p is None or t is None or t == 0:
+        return None
+    return p / t
+
+
+# ── 多場所（multi-venue）視圖 ───────────────────────────────────────
+# HIP-3 builder dex 與現貨都掛在**同一個錢包地址**下（不是另一個錢包）。
+# 原生 clearinghouseState（不帶 dex）對 builder 市場全盲 → 只看聚合持倉會誤判「無持倉」。
+
+def position_venue(p):
+    """由 position dict 推導所屬場所短標籤。"""
+    dex = p.get("dex")
+    if dex not in (None, "", "native"):
+        return str(dex)
+    coin = str(p.get("coin") or "")
+    if coin.startswith("@"):          # @166 之類＝現貨市場代號
+        return VENUE_SPOT
+    if ":" in coin:                   # xyz:META＝builder dex 前綴
+        return coin.split(":", 1)[0] or VENUE_NATIVE
+    return VENUE_NATIVE
+
+
+def clean_position(p):
+    out = {k: clean(p.get(k)) for k in (
+        "coin", "side", "leverage_value", "leverage_type",
+        "position_value", "entry_px", "unrealized_pnl")}
+    out["venue"] = position_venue(p)
+    return out
+
+
+def latest_diagnostic(tracked):
+    """目錄下最新一份 diagnostic_*.json（週期性產物，不保證每日）→ (dict, date)。"""
+    path = latest_file(os.path.join(tracked, "diagnostic_*.json"))
+    if not path:
+        return None, None
+    try:
+        diag = load_json(path)
+    except Exception:
+        return None, None
+    date = diag.get("date")
+    if not date:
+        base = os.path.basename(path)
+        date = base[len("diagnostic_"):-len(".json")] or None
+    return diag, date
+
+
+def _is_cross_layer(dest):
+    """destination 是否為 HyperCore→HyperEVM 系統地址（同一擁有者跨層）。"""
+    return isinstance(dest, str) and dest.lower().startswith(CROSS_LAYER_PREFIX)
+
+
+def _by_dex_value(v):
+    """by_dex 的值可能是純數字，也可能是 {account_value:…, n_positions:…}。"""
+    if isinstance(v, dict):
+        return (fnum(v.get("account_value")),
+                fint(v.get("n_positions")),
+                fnum(v.get("position_value")))
+    return fnum(v), None, None
+
+
+def build_venues(metrics, diag, diag_date):
+    """組出「資金分布（多場所）」區塊。任何欄位缺失 → 優雅降級，不炸。
+
+    來源優先序：dossier 的 account_value_by_dex（每日產物）→ diagnostic 的
+    funds（週期性產物，額外提供現貨與名目）。兩者都缺 → available:False。
+    """
+    out = {"available": False, "rows": [], "zero_venues": [],
+           "diagnostic_date": None, "sources": []}
+    metrics = metrics or {}
+    funds = (diag or {}).get("funds") or {}
+
+    # venue_id → row（native/spot 用固定 id，builder dex 用 dex 名）
+    acc = {}
+
+    def row(vid, kind, name):
+        r = acc.get(vid)
+        if r is None:
+            r = acc[vid] = {"id": vid, "kind": kind, "name": name,
+                            "account_value": None, "n_positions": None,
+                            "notional": None, "share": None}
+        return r
+
+    # ① dossier: account_value_by_dex / account_value_native / dexs_with_positions
+    by_dex = metrics.get("account_value_by_dex")
+    if isinstance(by_dex, dict) and by_dex:
+        out["sources"].append("dossier")
+        for k, v in by_dex.items():
+            key = str(k or "").strip()
+            is_native = key.lower() in NATIVE_KEYS
+            vid = "native" if is_native else key
+            r = row(vid, "native" if is_native else "builder",
+                    "原生永續 dex" if is_native else "builder dex " + key)
+            av, npos, ntl = _by_dex_value(v)
+            r["account_value"] = av
+            if npos is not None:
+                r["n_positions"] = npos
+            if ntl is not None:
+                r["notional"] = ntl
+    av_native = fnum(metrics.get("account_value_native"))
+    if av_native is not None:
+        r = row("native", "native", "原生永續 dex")
+        if r["account_value"] is None:
+            r["account_value"] = av_native
+        out["sources"].append("dossier")
+    # 現貨：優先用 dossier 的每日抓取值（classify.spot_value_usd），
+    # 比週期性 diagnostic 新；下方 ② 只在此處為 None 時才回填。
+    spot_daily = fnum(metrics.get("spot_value_usd"))
+    if spot_daily is not None:
+        r = row("spot", "spot", "現貨 spot")
+        r["account_value"] = spot_daily
+        toks = metrics.get("spot_tokens")
+        if isinstance(toks, list) and r["n_positions"] is None:
+            r["n_positions"] = len(toks)
+        if any((t or {}).get("estimated") for t in (toks or []) if isinstance(t, dict)):
+            out["spot_estimated"] = True
+        out["sources"].append("dossier")
+    n_native = fint(metrics.get("n_open_positions_native"))
+    if n_native is not None and "native" in acc and acc["native"]["n_positions"] is None:
+        acc["native"]["n_positions"] = n_native
+    for d in (metrics.get("dexs_with_positions") or []):
+        key = str(d or "").strip()
+        if not key:
+            continue
+        is_native = key.lower() in NATIVE_KEYS
+        row("native" if is_native else key, "native" if is_native else "builder",
+            "原生永續 dex" if is_native else "builder dex " + key)
+
+    # ② diagnostic: funds.native / funds.builder_dex / funds.spot（含名目與現貨）
+    if funds:
+        out["sources"].append("diagnostic")
+        out["diagnostic_date"] = diag_date
+        nat = funds.get("native") or {}
+        if nat:
+            r = row("native", "native", "原生永續 dex")
+            if r["account_value"] is None:
+                r["account_value"] = fnum(nat.get("account_value"))
+            if r["n_positions"] is None:
+                r["n_positions"] = fint(nat.get("n_positions"))
+            if r["notional"] is None:
+                r["notional"] = fnum(nat.get("position_value"))
+        for name, v in (funds.get("builder_dex") or {}).items():
+            key = str(name or "").strip()
+            if not key:
+                continue
+            r = row(key, "builder", "builder dex " + key)
+            av, npos, ntl = _by_dex_value(v)
+            if r["account_value"] is None:
+                r["account_value"] = av
+            if r["n_positions"] is None:
+                r["n_positions"] = npos
+            if r["notional"] is None:
+                r["notional"] = ntl
+        spot = funds.get("spot") or {}
+        spot_usd = fnum(funds.get("spot_usd"))
+        if spot_usd is None:
+            spot_usd = fnum(spot.get("usd_total_est"))
+        if spot_usd is not None or spot:
+            r = row("spot", "spot", "現貨 spot")
+            # 每日 dossier 值優先——診斷是週期性產物，不可覆蓋較新的每日值
+            if r["account_value"] is None:
+                r["account_value"] = spot_usd
+            if r["n_positions"] is None:
+                r["n_positions"] = fint(spot.get("n_nonzero"))
+            r["notional"] = None      # 現貨無「名目」概念
+            if spot.get("estimated"):
+                out["spot_estimated"] = True
+
+    if not acc:
+        return out
+
+    # ③ 合計與占比（分母 0/缺失 → share=None，前端顯示「—」）
+    # 合計一律用「表內各列之和」，保證表格自洽（占比加總＝100%）；
+    # diagnostic 的 total_usd 只當交叉檢查（來源日期可能與 dossier 不同）。
+    vals = [r["account_value"] for r in acc.values() if r["account_value"] is not None]
+    total = sum(vals) if vals else None
+    out["total_usd_diagnostic"] = clean(fnum(funds.get("total_usd")))
+
+    def sort_key(r):
+        kind_order = {"native": 0, "builder": 1, "spot": 2}[r["kind"]]
+        return (kind_order, -(r["account_value"] or 0), r["id"])
+
+    rows = sorted(acc.values(), key=sort_key)
+    for r in rows:
+        r["share"] = share_of(r["account_value"], total)
+
+    # 零餘額 builder dex 併成一行說明（查過但沒錢），主表只留有訊號的場所
+    def is_signal(r):
+        return (r["kind"] != "builder"
+                or (r["account_value"] or 0) != 0
+                or (r["n_positions"] or 0) != 0)
+
+    out["zero_venues"] = [r["id"] for r in rows if not is_signal(r)]
+    out["rows"] = [r for r in rows if is_signal(r)][:MAX_VENUES]
+
+    native_usd = (acc.get("native") or {}).get("account_value")
+    bv = [r["account_value"] for r in rows
+          if r["kind"] == "builder" and r["account_value"] is not None]
+    builder_usd = sum(bv) if bv else None
+    spot_usd = (acc.get("spot") or {}).get("account_value")
+    nv = [v for v in (builder_usd, spot_usd) if v is not None]
+    non_native = sum(nv) if nv else None
+    non_native_share = share_of(non_native, total)
+
+    nz = [r["n_positions"] for r in rows
+          if r["kind"] != "spot" and r["n_positions"] is not None]
+    n_total = sum(nz) if nz else None
+    ntl_total = [r["notional"] for r in rows if r["notional"] is not None]
+
+    out.update({
+        "available": True,
+        "sources": sorted(set(out["sources"])),
+        "total_usd": clean(total),
+        "native_usd": clean(native_usd),
+        "builder_usd": clean(builder_usd),
+        "spot_usd": clean(spot_usd),
+        "non_native_usd": clean(non_native),
+        "non_native_share": clean(non_native_share),
+        "n_positions_total": n_total,
+        "notional_total": clean(sum(ntl_total)) if ntl_total else None,
+        "n_builder_dexs": sum(1 for r in rows if r["kind"] == "builder"),
+    })
+
+    # 非原生占比高 → 明確告訴使用者「主要活動不在原生 dex」
+    if non_native_share is not None and non_native_share >= 0.5:
+        out["non_native_alert"] = (
+            "主要活動不在原生 dex：非原生資金（builder dex ＋ 現貨）"
+            f"{_usd(non_native)} 占總資產 {_usd(total)} 的 "
+            f"{non_native_share * 100:.1f}%。"
+            "只查原生永續 dex（不帶 dex 參數的 clearinghouseState）會看成「無持倉、$0 淨值」。"
+        )
+    return out
+
+
+def _usd(v):
+    return "—" if v is None else f"${v:,.0f}"
+
+
+def build_flows(diag, diag_date):
+    """資金流動：跨層轉出（同一擁有者 HyperCore→HyperEVM）／真外轉／最後成交距今。"""
+    out = {"available": False}
+    if not diag:
+        return out
+    ledger = diag.get("ledger") or {}
+    trading = diag.get("trading") or {}
+    if not ledger and not trading:
+        return out
+
+    rows = ledger.get("rows") or []
+    cross_n = cross_usd = 0
+    ext_n = ext_usd = 0.0
+    for r in rows:
+        if not isinstance(r, dict):
+            continue
+        usd = fnum(r.get("usd")) or 0.0
+        if _is_cross_layer(r.get("destination")):
+            cross_n += 1
+            cross_usd += usd
+        elif str(r.get("type") or "").lower().startswith("send"):
+            ext_n += 1
+            ext_usd += usd
+
+    # hyper-observer 若日後補上明確欄位就優先採用（前向相容）
+    cross_usd = fnum(ledger.get("cross_layer_out_usd"))if ledger.get(
+        "cross_layer_out_usd") is not None else cross_usd
+    cross_n = fint(ledger.get("cross_layer_n")) if ledger.get(
+        "cross_layer_n") is not None else cross_n
+    declared_ext = fnum(ledger.get("external_out_usd"))
+    if declared_ext is not None:
+        ext_usd = max(ext_usd, declared_ext) if ext_usd else declared_ext
+
+    by_type = ledger.get("by_type") or {}
+    out = {
+        "available": True,
+        "date": diag_date,
+        "window_days": fint(diag.get("ledger_window_days")),
+        "cross_layer_usd": clean(cross_usd),
+        "cross_layer_n": int(cross_n or 0),
+        "external_out_usd": clean(ext_usd),
+        "external_out_n": int(ext_n or 0),
+        "unknown_usd": clean(ledger.get("unknown_usd")),
+        "internal_usd": clean(ledger.get("internal_usd")),
+        "vault_out_usd": clean(ledger.get("vault_out_usd")),
+        "ledger_n": fint(ledger.get("n_total")),
+        "by_type": {str(k): fint((v or {}).get("n")) for k, v in by_type.items()
+                    if isinstance(v, dict)},
+        "days_since_last_fill": clean(fnum(trading.get("days_since_last_fill"))),
+        "last_fill_iso": trading.get("last_fill_iso"),
+        "n_fills_7d": fint(trading.get("n_fills_7d")),
+        "fills_by_venue": {str(k): fint(v)
+                           for k, v in (trading.get("by_venue") or {}).items()},
+        "verdict": diag.get("verdict"),
+    }
+    fv = out["fills_by_venue"]
+    tot = sum(v for v in fv.values() if v)
+    nat = fv.get("native") or 0
+    out["fills_total"] = tot or None
+    out["fills_non_native"] = (tot - nat) if tot else None
+    out["fills_non_native_share"] = share_of(out["fills_non_native"], tot)
+    return out
 
 
 # ── §1 HL 持續贏家 ─────────────────────────────────────────────────
@@ -81,15 +410,34 @@ def collect_hl(root):
             "span_days",
         )},
         "monthly_pnl": {k: clean(v) for k, v in (m.get("monthly_pnl") or {}).items()},
-        "positions": [
-            {k: clean(p.get(k)) for k in (
-                "coin", "side", "leverage_value", "leverage_type",
-                "position_value", "entry_px", "unrealized_pnl")}
-            for p in (dossier.get("open_positions") or [])
-        ],
+        "positions": [clean_position(p) for p in (dossier.get("open_positions") or [])],
+        "positions_source": "dossier",
+        "positions_date": dossier.get("snapshot_date"),
     }
     months = sorted(out["monthly_pnl"])
     out["monthly_range"] = f"{months[0]} ～ {months[-1]}" if months else ""
+
+    # 多場所視圖（同一地址的原生永續／builder dex／現貨）
+    diag, diag_date = latest_diagnostic(tracked)
+    out["venues"] = build_venues(m, diag, diag_date)
+    out["flows"] = build_flows(diag, diag_date)
+
+    # dossier 的 open_positions 只涵蓋原生永續 dex；若它是空的而診斷抓到
+    # builder dex 部位，改用診斷的部位清單（並標明來源與資料日期）。
+    if not out["positions"]:
+        dpos = ((diag or {}).get("funds") or {}).get("positions") or []
+        if dpos:
+            out["positions"] = [clean_position(p) for p in dpos[:MAX_POSITIONS]]
+            out["positions_source"] = "diagnostic"
+            out["positions_date"] = diag_date
+    # 持倉表自身的名目/未實現合計（dossier 的 position_value/unrealized_pnl
+    # 只涵蓋原生永續 dex，與多場所持倉不可混用）
+    def _psum(key):
+        vals = [fnum(p.get(key)) for p in out["positions"]]
+        vals = [v for v in vals if v is not None]
+        return clean(sum(vals)) if vals else None
+    out["positions_notional"] = _psum("position_value")
+    out["positions_unrealized_pnl"] = _psum("unrealized_pnl")
 
     # timeline：前瞻追蹤的觀測日數
     timeline_days, timeline_rows = set(), 0

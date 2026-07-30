@@ -1,0 +1,62 @@
+name: Hyper XYZ Scan (builder dex 贏家掃描)
+
+# 一次性／按需執行的掃描，刻意**沒有 cron**：
+# 這是「找新獵物」的探索工作，不是需要每天跑的監控。要重跑就手動 dispatch。
+on:
+  push:
+    branches: [claude/polymarket-wallet-copy-trade-0l7v2z]
+    paths:
+      - 'projects/hyper-observer/xyzscan/**'
+      - '.github/workflows/hyper-xyz-scan.yml'
+  workflow_dispatch:
+    inputs:
+      ws_seconds:
+        description: '訂閱 trades 頻道收集地址的秒數（0＝跳過，直接用排行榜母體）'
+        type: string
+        default: '420'
+
+concurrency:
+  group: hyper-xyz-scan
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: read        # 唯讀：報告只留在 job log 與 artifact，不 commit
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # websocket-client 只有這支用得到（L1 母體來自公開 trades 頻道）
+      - name: Install deps
+        run: pip install --quiet requests websocket-client
+
+      - name: Offline self-test
+        working-directory: projects/hyper-observer/xyzscan
+        run: python3 tests/test_xyz_offline.py
+
+      - name: Scan
+        working-directory: projects/hyper-observer/xyzscan
+        run: |
+          python3 find_xyz_winners.py \
+            --ws-seconds "${{ github.event.inputs.ws_seconds || '420' }}" \
+            --out-json "$RUNNER_TEMP/xyz_winners.json" \
+            --out-md "$RUNNER_TEMP/xyz_winners.md"
+
+      # 報告不 commit（避免與 main 的資料檔衝突）；留 artifact 供事後翻查，
+      # 完整報告本身已印在上一步的 log 裡。
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xyz-winners-report
+          path: |
+            ${{ runner.temp }}/xyz_winners.json
+            ${{ runner.temp }}/xyz_winners.md
+          if-no-files-found: warn
+          retention-days: 30

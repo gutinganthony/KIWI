@@ -1020,6 +1020,970 @@ def test_shadow_all_requests_fail(tmp):
     ok(any("誠實聲明" in c for c in payload["caveats"]), "summary json 含 caveats 誠實聲明")
 
 
+# ---------------------------------------------------------------------------
+# HIP-3 builder dex 盲點修正 ＋ 全維度診斷探測
+# ---------------------------------------------------------------------------
+
+def _chs(account_value, positions=(), dex_prefix=""):
+    """組一份 clearinghouseState 回應（測試 fixture 產生器）。"""
+    asset_positions = []
+    for coin, szi, ntl in positions:
+        asset_positions.append({"type": "oneWay", "position": {
+            "coin": f"{dex_prefix}{coin}" if dex_prefix else coin,
+            "szi": str(szi), "entryPx": "100", "positionValue": str(ntl),
+            "unrealizedPnl": "10", "leverage": {"type": "cross", "value": 5},
+            "liquidationPx": "50", "marginUsed": str(ntl / 5),
+            "maxLeverage": 20, "cumFunding": {"allTime": "1.0"}}})
+    return {"marginSummary": {"accountValue": str(account_value),
+                              "totalNtlPos": "0.0", "totalRawUsd": "0.0",
+                              "totalMarginUsed": "0.0"},
+            "crossMarginSummary": {"accountValue": str(account_value)},
+            "withdrawable": "0.0", "assetPositions": asset_positions,
+            "time": 1785109343741}
+
+
+def test_perp_dexs_parsing():
+    print("[15] perpDexs 解析：null 原生佔位剔除、多形欄位、priority 排序、上限")
+    raw = [None,                                     # 原生 dex 佔位
+           {"name": "abc", "full_name": "ABC Perps", "deployer": "0x1"},
+           {"name": "xyz", "full_name": "XYZ equities"},
+           {"name": "abc"},                          # 重複
+           "plainstr", {"nope": 1}, None]
+    names = fetch.parse_perp_dexs(raw)
+    ok(names == ["abc", "xyz", "plainstr"],
+       f"剔除 null 原生佔位/重複/無名稱元素（{names}）")
+    ok(fetch.parse_perp_dexs(raw, "xyz")[0] == "xyz",
+       "priority substr 命中者排第一（不硬編、只排序）")
+    ok(fetch.parse_perp_dexs(raw, "xyz", 2) == ["xyz", "abc"],
+       f"limit 生效且維持其餘原順序（{fetch.parse_perp_dexs(raw, 'xyz', 2)}）")
+    ok(fetch.parse_perp_dexs(None) == [] and fetch.parse_perp_dexs({"x": 1}) == []
+       and fetch.parse_perp_dexs([None, None]) == [],
+       "垃圾/None/全 null 輸入回空清單，不 crash")
+    ok(fetch.parse_perp_dexs({"perpDexs": [None, {"name": "wrapped"}]}) == ["wrapped"],
+       "接受包一層 dict 的形狀")
+
+    # fetch_wallet 帶 dex_names → 新增 byDex 欄位、原欄位不動
+    calls = []
+
+    def fake_post(body, name, meta):
+        calls.append(body)
+        if body["type"] != "clearinghouseState":
+            return {"stub": body["type"]}, True
+        if body.get("dex") == "xyz":
+            return _chs(47155.39, [("SNDK", 10, 5000)], "xyz:"), True
+        if body.get("dex"):
+            return _chs(0.0), True
+        return _chs(0.0), True
+
+    meta = fetch.Meta()
+    w = fetch.fetch_wallet("0xabc", meta, post_fn=fake_post, dex_names=["xyz", "abc"])
+    ok(w["clearinghouseState"]["marginSummary"]["accountValue"] == "0.0",
+       "原 clearinghouseState 欄位保持原生回應（不被 byDex 覆寫）")
+    ok(set(w["clearinghouseStateByDex"]) == {"xyz", "abc"},
+       f"新增 clearinghouseStateByDex 含兩個 dex（{sorted(w['clearinghouseStateByDex'])}）")
+    ok(sum(1 for b in calls if b.get("dex")) == 2,
+       f"每個 builder dex 各查一次（{sum(1 for b in calls if b.get('dex'))}）")
+    ok(all(b["type"] in ("clearinghouseState", "portfolio", "userFills", "userFunding")
+           for b in calls), "只發唯讀查詢型 info type")
+    w0 = fetch.fetch_wallet("0xabc", fetch.Meta(), post_fn=fake_post)
+    ok("clearinghouseStateByDex" not in w0,
+       "不給 dex_names → 不新增 byDex 欄位（舊行為完全不變）")
+
+
+def test_by_dex_aggregation():
+    print("[16] byDex 彙總：兩 dex 持倉/淨值正確相加＋無 byDex 欄位的舊 raw 向後相容")
+    base = json.loads((FIXTURES / "wallet_consistent.json").read_text(encoding="utf-8"))
+    m_old = classify.compute_metrics(base, SNAP_DATE)
+
+    w = json.loads(json.dumps(base))  # deep copy
+    w["clearinghouseState"] = _chs(1000.0, [("BTC", 1, 60000)])
+    w["clearinghouseStateByDex"] = {
+        "xyz": _chs(47155.39, [("SNDK", 10, 5000), ("GOOGL", 5, 3000)], "xyz:"),
+        "abc": _chs(2500.0, [("FOO", 2, 800)], "abc:"),
+    }
+    m = classify.compute_metrics(w, SNAP_DATE)
+    ok(m["n_open_positions"] == 4,
+       f"聯集持倉數 = 原生 1 + xyz 2 + abc 1 = 4（{m['n_open_positions']}）")
+    ok(m["n_open_positions_native"] == 1,
+       f"原生持倉數單獨揭露 =1（{m['n_open_positions_native']}）")
+    ok(m["account_value"] == round(1000.0 + 47155.39 + 2500.0, 2),
+       f"帳戶淨值 = 原生+兩 dex 相加 ${m['account_value']}")
+    ok(m["account_value_native"] == 1000.0,
+       f"原生淨值單獨揭露 =$1000（{m['account_value_native']}）")
+    ok(m["dexs_with_positions"] == ["abc", "xyz"],
+       f"揭露有持倉的 builder dex（{m['dexs_with_positions']}）")
+
+    positions, by_dex = classify.parse_positions_by_dex(w)
+    ok({p["dex"] for p in positions} == {"", "xyz", "abc"},
+       "聯集持倉每筆帶 dex 標記（原生為空字串）")
+    ok(by_dex["xyz"]["position_value"] == 8000.0,
+       f"單 dex 名目加總（{by_dex['xyz']['position_value']}）")
+
+    # 向後相容：舊 raw（無 byDex 欄位）數值與修正前完全一致
+    w_old = json.loads(json.dumps(base))
+    m2 = classify.compute_metrics(w_old, SNAP_DATE)
+    ok(m2["n_open_positions"] == m_old["n_open_positions"] == 2
+       and m2["account_value"] == m_old["account_value"],
+       f"無 byDex 欄位 → 沿用原邏輯（pos={m2['n_open_positions']}, "
+       f"acct={m2['account_value']}）")
+    ok(m2["account_value_by_dex"] == {"": m_old["account_value"]},
+       f"byDex 揭露欄位只含原生（{m2['account_value_by_dex']}）")
+    ok(classify.account_value_union({"": {"account_value": None}}) is None,
+       "全缺 accountValue → union 回 None（不臆造 0）")
+    ok(classify.account_value_union(
+        {"": {"account_value": None}, "xyz": {"account_value": 5.0}}) == 5.0,
+       "部分缺值 → 只加有值的")
+
+
+def test_ledger_classification():
+    print("[17] ledger 分類：withdraw / internalTransfer / accountClassTransfer 歸類與加總")
+    self_addr = "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d"
+    other = "0xdead000000000000000000000000000000000001"
+    now_ms = 1785110000000
+    day = 86400000
+    raw = [
+        {"time": now_ms - 1 * day, "hash": "0x1",
+         "delta": {"type": "withdraw", "usdc": "250000.0", "fee": "1.0"}},
+        {"time": now_ms - 2 * day, "hash": "0x2",
+         "delta": {"type": "internalTransfer", "usdc": "100000.0",
+                   "user": self_addr, "destination": other}},
+        {"time": now_ms - 3 * day, "hash": "0x3",
+         "delta": {"type": "internalTransfer", "usdc": "7000.0",
+                   "user": other, "destination": self_addr}},
+        {"time": now_ms - 4 * day, "hash": "0x4",
+         "delta": {"type": "accountClassTransfer", "usdc": "4000000.0", "toPerp": False}},
+        {"time": now_ms - 5 * day, "hash": "0x5",
+         "delta": {"type": "deposit", "usdc": "500.0"}},
+        {"time": now_ms - 6 * day, "hash": "0x6",
+         "delta": {"type": "vaultDeposit", "vault": other, "usdc": "1000.0"}},
+        {"time": now_ms - 90 * day, "hash": "0x7",   # 視窗外，應被 cutoff 濾掉
+         "delta": {"type": "withdraw", "usdc": "999999.0"}},
+        "garbage",
+    ]
+    cutoff = (now_ms - 45 * day) / 1000.0
+    led = track_wallet.classify_ledger_updates(raw, self_addr, cutoff_ts=cutoff)
+    ok(led["n_total"] == 8 and led["n_in_window"] == 6,
+       f"視窗外與垃圾列被排除（total={led['n_total']}, window={led['n_in_window']}）")
+    ok(led["external_out_usd"] == 350000.0,
+       f"外轉 = withdraw 250k + 轉他址 100k = $350k（{led['external_out_usd']}）")
+    ok(led["external_in_usd"] == 7500.0,
+       f"外入 = 轉入 7k + deposit 500 = $7.5k（{led['external_in_usd']}）")
+    ok(led["internal_usd"] == 4000000.0,
+       f"accountClassTransfer 歸「同地址內部」$4M，不算搬家（{led['internal_usd']}）")
+    ok(led["vault_out_usd"] == 1000.0, f"vaultDeposit 單獨歸 vault_out（{led['vault_out_usd']}）")
+    ok(led["by_type"]["internalTransfer"]["n"] == 2
+       and led["by_type"]["internalTransfer"]["direction"] == "mixed",
+       "同 type 一進一出 → direction 標 mixed")
+    ok(led["counterparties"].get(other) == 101000.0,
+       f"對手方金額彙總（轉出 100k + vault 1k）（{led['counterparties']}）")
+    ok(len(led["external_out_rows"]) == 3 and led["external_out_rows"][0]["type"] == "withdraw",
+       "外轉明細按時間新→舊排序且含 3 筆")
+    ok(led["internal_rows"] and led["internal_rows"][0]["type"] == "accountClassTransfer",
+       "內部轉移明細單獨可列（作為「換戰場」證據）")
+    led_capped = track_wallet.classify_ledger_updates(
+        raw, self_addr, cutoff_ts=cutoff, max_rows=2)
+    ok(led_capped["n_kept"] == 2, f"體積控制：rows 上限生效（{led_capped['n_kept']}）")
+    empty = track_wallet.classify_ledger_updates([], self_addr)
+    ok(empty["external_out_usd"] == 0.0 and empty["external_out_rows"] == [],
+       "空 ledger → 外轉 0、明細空（md 會寫「無外轉紀錄」）")
+
+    ok(track_wallet.summarize_spot(
+        {"balances": [{"coin": "USDC", "total": "4000000.0", "hold": "0.0"},
+                      {"coin": "PURR", "total": "0.0"},
+                      {"coin": "HYPE", "total": "10.0", "entryNtl": "400.0"}]}
+    )["usd_total_est"] == 4000400.0, "現貨只留非零餘額，USDC 1:1 ＋ 其他用 entryNtl 估算")
+    ok(track_wallet.summarize_spot({"balances": []})["n_nonzero"] == 0
+       and track_wallet.summarize_spot(None)["n_nonzero"] == 0,
+       "空/None 現貨回應 → 0 筆非零餘額，不 crash")
+    ok(track_wallet._venue_of("xyz:SNDK") == "builder:xyz"
+       and track_wallet._venue_of("@166") == "spot"
+       and track_wallet._venue_of("BTC") == "native",
+       "coin 命名 → 戰場判定（builder dex 前綴 / 現貨 @ 索引 / 原生）")
+
+
+SYS_ADDR_IDX0 = "0x2000000000000000000000000000000000000000"
+
+
+def _real_send_rows(now_ms, day):
+    """實跑 0x8bae… 的真實三筆 send（$800k/$900k/$800k → 0x2000…0000，USDC）。"""
+    return [
+        {"time": now_ms - 10 * day, "hash": "0x2f2c0c8d",
+         "delta": {"type": "send", "destination": SYS_ADDR_IDX0,
+                   "token": "USDC", "amount": "800000.0"}},
+        {"time": now_ms - 20 * day, "hash": "0x82d58c29",
+         "delta": {"type": "send", "destination": SYS_ADDR_IDX0,
+                   "token": "USDC", "amount": "900000.0"}},
+        {"time": now_ms - 28 * day, "hash": "0x30cd2d5b",
+         "delta": {"type": "send", "destination": SYS_ADDR_IDX0,
+                   "token": "USDC", "amount": "800000.0"}},
+    ]
+
+
+def test_system_address_and_bridge_out():
+    print("[19] 系統地址判定 ＋ send → 跨層轉移（bridge_out）分類：$2.5M 不得被說成「沒有」")
+    is_sys = track_wallet.is_system_address
+    ok(is_sys(SYS_ADDR_IDX0), "全 0 尾（token index 0）＝系統地址")
+    ok(is_sys("0x20000000000000000000000000000000000000c8"),
+       "末端 c8（token index 200）＝系統地址")
+    ok(is_sys("0x20000000000000000000000000000000000000C8"),
+       "大小寫混合仍認得（normalize 小寫）")
+    ok(is_sys("  0x2000000000000000000000000000000000000000  "),
+       "前後空白會被去掉")
+    ok(is_sys(config.LEDGER_HYPE_SYSTEM_ADDR), "HYPE 例外系統地址 0x2222…2222")
+    ok(not is_sys("0xdead000000000000000000000000000000000001"),
+       "普通地址 → False")
+    ok(not is_sys("0x2000000000000000000000000000000000abcdef"),
+       "0x20 開頭但尾端非 token index（>4 hex 有效位）→ False")
+    ok(not is_sys(None) and not is_sys("") and not is_sys("0x")
+       and not is_sys("0x2000"),
+       "None／空字串／殘缺地址 → False（不 crash）")
+    ok(not is_sys("0x20000000000000000000000000000000000000zz"),
+       "非 hex 字元 → False")
+
+    addr = "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d"
+    other = "0xdead000000000000000000000000000000000001"
+    now_ms = 1785110000000
+    day = 86400000
+    cutoff = (now_ms - 45 * day) / 1000.0
+    led = track_wallet.classify_ledger_updates(
+        _real_send_rows(now_ms, day), addr, cutoff_ts=cutoff)
+    ok(led["bridge_out_usd"] == 2_500_000.0,
+       f"真實三筆 send → bridge_out $2.5M（{led['bridge_out_usd']}）")
+    ok(led["external_out_usd"] == 0.0 and led["vault_out_usd"] == 0.0,
+       f"跨層轉移不算外轉（external_out={led['external_out_usd']}）")
+    ok(led["unknown_usd"] == 0.0 and led["n_unknown"] == 0,
+       f"跨層轉移不再落到 unknown（unknown={led['unknown_usd']}）")
+    ok(led["n_bridge_out"] == 3 and len(led["bridge_out_rows"]) == 3
+       and led["bridge_out_rows"][0]["usd"] == 800000.0,
+       "bridge_out_rows 逐筆保留且按時間新→舊排序")
+    ok(led["by_type"]["send"]["direction"] == "bridge_out",
+       f"by_type 標 bridge_out（{led['by_type']['send']['direction']}）")
+    ok(led["counterparties"] == {},
+       "系統地址不列為「對手方」（不是第三方）")
+
+    led2 = track_wallet.classify_ledger_updates(
+        [{"time": now_ms - day, "hash": "0xs1",
+          "delta": {"type": "send", "destination": other, "amount": "123000.0"}},
+         {"time": now_ms - 2 * day, "hash": "0xs2",
+          "delta": {"type": "spotSend", "destination": other, "amount": "7000.0"}},
+         {"time": now_ms - 3 * day, "hash": "0xs3",
+          "delta": {"type": "spotSend", "destination": SYS_ADDR_IDX0,
+                    "token": "HYPE", "amount": "5000.0"}}],
+        addr, cutoff_ts=cutoff)
+    ok(led2["external_out_usd"] == 130000.0,
+       f"send／spotSend 到普通地址 → 一律 external_out（{led2['external_out_usd']}）")
+    ok(led2["bridge_out_usd"] == 5000.0 and led2["unknown_usd"] == 0.0,
+       f"同批中送系統地址的那筆才算跨層（{led2['bridge_out_usd']}）")
+    ok(led2["counterparties"].get(other) == 130000.0
+       and SYS_ADDR_IDX0 not in led2["counterparties"],
+       f"對手方只記真實第三方地址（{led2['counterparties']}）")
+    ok(all(r["destination"] == other for r in led2["external_out_rows"]),
+       "external_out_rows 保留 destination")
+
+    unknown_led = track_wallet.classify_ledger_updates(
+        [{"time": now_ms - day, "hash": "0xu",
+          "delta": {"type": "someBrandNewType", "amount": "42000.0"}}],
+        addr, cutoff_ts=cutoff)
+    ok(unknown_led["unknown_usd"] == 42000.0 and unknown_led["n_unknown"] == 1,
+       f"真正判不出方向的 type 才留 unknown（{unknown_led['unknown_usd']}）")
+
+
+def test_bridge_out_markdown_and_verdict(tmp):
+    print("[20] 跨層轉移報告誠實性：bridge_out>0 不得出現「無外轉紀錄」＋資本外移旗標")
+    addr = "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d"
+    now_ms = 1785110000000
+    day = 86400000
+    date = "2026-07-27"
+    fills = [{"coin": "xyz:SNDK", "px": "176.75", "sz": "6.65", "side": "B",
+              "time": now_ms - 2 * day, "dir": "Open Long", "closedPnl": "0.0"}]
+
+    post = _diag_responses(now_ms, native_value=0.0, spot_usdc=100000.0,
+                           ledger=_real_send_rows(now_ms, day), fills=fills)
+    diag = track_wallet.run_diagnostic(addr, tmp / "diagbr" / addr, date,
+                                       post_fn=post, now_ms=now_ms)
+    ok(diag["ledger"]["bridge_out_usd"] == 2_500_000.0
+       and diag["ledger"]["external_out_usd"] == 0.0,
+       f"端到端：bridge_out $2.5M／external_out $0（{diag['ledger']['bridge_out_usd']}）")
+    ok(diag["verdict"] == (track_wallet.VERDICT_SWITCHED + "｜"
+                           + track_wallet.VERDICT_FLAG_CAPITAL_OUT),
+       f"裁決保留既有分類並加註資本外移旗標（{diag['verdict']}）")
+    ok(any("資本正離開交易場" in r for r in diag["verdict_reasons"]),
+       "裁決理由明寫資本正離開交易場（跨層/減倉）")
+    md = (tmp / "diagbr" / addr / f"diagnostic_{date}.md").read_text(encoding="utf-8")
+    ok("無外轉紀錄" not in md,
+       "bridge_out>0 時 md **不得**出現「無外轉紀錄」（這是本次修掉的假陳述）")
+    ok("跨層轉移" in md and "HyperEVM" in md and "2,500,000.00" in md,
+       "(b) 出現跨層轉移區塊、HyperEVM 字樣與 $2,500,000.00 金額")
+    ok("同一位擁有者在 HyperEVM 上的同一地址" in md
+       and "已離開 HyperCore 交易帳戶" in md,
+       "(b) 說明資金仍屬同一擁有者控制但已離開 HyperCore 交易帳戶")
+    ok(md.count(SYS_ADDR_IDX0) >= 3, "(b) 逐筆列出 destination 系統地址（3 筆）")
+    ok("800,000.00" in md and "900,000.00" in md, "(b) 逐筆金額（$800k/$900k）都在")
+
+    # 跨層占比低於門檻 → 只報跨層轉移，不掛旗標（旗標不濫用）
+    post_small = _diag_responses(
+        now_ms, native_value=1_000_000.0, spot_usdc=0.0, fills=fills,
+        ledger=[{"time": now_ms - day, "hash": "0xsm",
+                 "delta": {"type": "send", "destination": SYS_ADDR_IDX0,
+                           "token": "USDC", "amount": "1000.0"}}])
+    diag_small = track_wallet.run_diagnostic(addr, tmp / "diagsm" / addr, date,
+                                             post_fn=post_small, now_ms=now_ms)
+    ok(track_wallet.VERDICT_FLAG_CAPITAL_OUT not in diag_small["verdict"],
+       f"跨層占比 < {config.DIAGNOSTIC_BRIDGE_OUT_SHARE:.0%} → 不掛旗標"
+       f"（{diag_small['verdict']}）")
+    md_small = (tmp / "diagsm" / addr / f"diagnostic_{date}.md").read_text(encoding="utf-8")
+    ok("無外轉紀錄" not in md_small and "跨層轉移" in md_small,
+       "占比低也照樣揭露跨層轉移、仍不得說「無外轉紀錄」")
+
+    # unknown > 0 → 必須醒目警示，且不得說「無外轉紀錄」
+    post_unk = _diag_responses(
+        now_ms, native_value=500000.0, spot_usdc=0.0, fills=fills,
+        ledger=[{"time": now_ms - day, "hash": "0xu",
+                 "delta": {"type": "someBrandNewType", "amount": "42000.0"}}])
+    diag_unk = track_wallet.run_diagnostic(addr, tmp / "diagunk" / addr, date,
+                                           post_fn=post_unk, now_ms=now_ms)
+    ok(diag_unk["ledger"]["unknown_usd"] == 42000.0, "unknown 金額落地")
+    md_unk = (tmp / "diagunk" / addr / f"diagnostic_{date}.md").read_text(encoding="utf-8")
+    ok("無外轉紀錄" not in md_unk, "unknown>0 時不得說「無外轉紀錄」")
+    ok("不可解讀為無資金移動" in md_unk and "42,000.00" in md_unk,
+       "unknown>0 時出現醒目警示與金額")
+    ok(any("無法分類" in r for r in diag_unk["verdict_reasons"]),
+       "裁決理由也帶上「無法分類」而非「無外轉紀錄」")
+
+    # 全 0 → 才可以印「無外轉紀錄」（回歸保護）
+    post_zero = _diag_responses(now_ms, native_value=500000.0, spot_usdc=0.0,
+                                ledger=[], fills=fills)
+    diag_zero = track_wallet.run_diagnostic(addr, tmp / "diagzero" / addr, date,
+                                            post_fn=post_zero, now_ms=now_ms)
+    md_zero = (tmp / "diagzero" / addr / f"diagnostic_{date}.md").read_text(encoding="utf-8")
+    ok("無外轉紀錄" in md_zero,
+       "四類離場訊號全為 0 → 才印「無外轉紀錄」")
+    ok(track_wallet.VERDICT_FLAG_CAPITAL_OUT not in diag_zero["verdict"],
+       "無跨層轉移 → 裁決不加旗標（既有四裁決字串不被污染）")
+
+
+def _diag_responses(now_ms, *, native_value=0.0, dex_value=None, spot_usdc=0.0,
+                    ledger=(), fills=()):
+    """組一組假 info API 回應，供 run_diagnostic 的 fake post_fn 使用。"""
+    resp = {
+        "perpDexs": [None, {"name": "xyz", "full_name": "XYZ"}],
+        "clearinghouseState": _chs(native_value),
+        "clearinghouseState:xyz": (_chs(dex_value[0], dex_value[1], "xyz:")
+                                   if dex_value else _chs(0.0)),
+        "spotClearinghouseState": {"balances": [
+            {"coin": "USDC", "total": str(spot_usdc), "hold": "0.0"}]},
+        "userNonFundingLedgerUpdates": list(ledger),
+        "portfolio": [["day", {"accountValueHistory": [[now_ms, "4078227.19"]],
+                               "pnlHistory": [[now_ms, "9280000.0"]], "vlm": "0.0"}],
+                      ["perpAllTime", {"accountValueHistory": [[now_ms, "47155.39"]],
+                                       "pnlHistory": [[now_ms, "9280000.0"]],
+                                       "vlm": "287970488.25"}]],
+        "userFills": list(fills),
+    }
+
+    def post(body, name, meta):
+        key = body["type"]
+        if body.get("dex"):
+            key = f"{key}:{body['dex']}"
+        if key not in resp:
+            meta.record(name, "fake", False, error="no fixture")
+            return None, False
+        meta.record(name, "fake", True, status=200)
+        return resp[key], True
+
+    return post
+
+
+def test_diagnostic_md(tmp):
+    print("[18] diagnostic 產生：三問區塊齊全、四種裁決正確、體積控制、md/json 落地")
+    addr = "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d"
+    now_ms = 1785110000000
+    day = 86400000
+    date = "2026-07-26"
+
+    # --- 情境 1：同地址換戰場（builder dex/現貨）— 真實觀測案例 ---
+    fills = [{"coin": "xyz:SNDK", "px": "176.75", "sz": "6.65", "side": "B",
+              "time": now_ms - 2 * day, "dir": "Open Long", "closedPnl": "0.0"},
+             {"coin": "xyz:GOOGL", "px": "200.0", "sz": "3.0", "side": "A",
+              "time": now_ms - 3 * day, "dir": "Close Long", "closedPnl": "12.5"},
+             {"coin": "BTC", "px": "60000", "sz": "0.1", "side": "B",
+              "time": now_ms - 40 * day, "dir": "Open Long", "closedPnl": "0.0"}]
+    ledger_internal = [{"time": now_ms - 5 * day, "hash": "0xa", "delta": {
+        "type": "accountClassTransfer", "usdc": "4000000.0", "toPerp": False}}]
+    post = _diag_responses(now_ms, native_value=0.0,
+                           dex_value=(47155.39, [("SNDK", 10, 5000)]),
+                           spot_usdc=4000000.0, ledger=ledger_internal, fills=fills)
+    diag = track_wallet.run_diagnostic(addr, tmp / "diag" / addr, date,
+                                       post_fn=post, now_ms=now_ms)
+    ok(diag is not None and all((diag["queries_ok"] or {}).values()),
+       f"7 類查詢全成功（{diag['queries_ok']}）")
+    ok(diag["dexs_detected"] == ["xyz"],
+       f"dex 名稱來自 perpDexs 回應而非硬編（{diag['dexs_detected']}）")
+    ok(diag["funds"]["native_usd"] == 0.0
+       and diag["funds"]["builder_usd"] == 47155.39
+       and diag["funds"]["spot_usd"] == 4000000.0,
+       "資金分場所落地：原生 $0／builder $47,155.39／現貨 $4,000,000")
+    ok(diag["funds"]["total_usd"] == 4047155.39,
+       f"合計資產 = 三者相加（{diag['funds']['total_usd']}）")
+    ok(diag["funds"]["n_positions_builder"] == 1
+       and diag["funds"]["n_positions_native"] == 0,
+       "持倉其實在 builder dex（原生 0 個 → 舊監控誤判『停止活動』的根因）")
+    ok(diag["trading"]["n_fills_7d"] == 2 and diag["trading"]["n_fills_30d"] == 2,
+       f"近 7/30 天成交筆數（{diag['trading']['n_fills_7d']}/"
+       f"{diag['trading']['n_fills_30d']}）")
+    ok(diag["trading"]["by_venue"].get("builder:xyz") == 2,
+       f"成交戰場分布認出 builder dex（{diag['trading']['by_venue']}）")
+    ok(diag["verdict"] == track_wallet.VERDICT_SWITCHED,
+       f"裁決＝同地址換戰場（{diag['verdict']}）")
+
+    md_path = tmp / "diag" / addr / f"diagnostic_{date}.md"
+    json_path = tmp / "diag" / addr / f"diagnostic_{date}.json"
+    ok(md_path.is_file() and json_path.is_file(), "diagnostic md/json 落地")
+    md = md_path.read_text(encoding="utf-8")
+    ok("## (a) 資金在哪？" in md and "## (b) 有沒有轉出到其他地址？" in md
+       and "## (c) 是否仍在交易？" in md, "md 三問區塊齊全")
+    ok("4,047,155.39" in md and "47,155.39" in md and "4,000,000.00" in md,
+       "(a) 附具體金額（合計/builder dex/現貨）")
+    ok("無外轉紀錄" in md and "4,000,000.00" in md,
+       "(b) 明寫「無外轉紀錄」並列出同地址內部轉移金額")
+    ok("最後成交時間" in md and "xyz:SNDK" in md, "(c) 含最後成交時間與幣種")
+    ok(f"**裁決：{track_wallet.VERDICT_SWITCHED}**" in md, "md 末段一句裁決")
+    ok(md_path.stat().st_size + json_path.stat().st_size < 1_000_000,
+       f"兩檔合計 <1MB（{md_path.stat().st_size + json_path.stat().st_size} bytes）")
+
+    # --- 情境 2：換地址（大額外轉且占比高）---
+    ledger_out = [{"time": now_ms - 3 * day, "hash": "0xb", "delta": {
+        "type": "withdraw", "usdc": "4000000.0"}},
+        {"time": now_ms - 4 * day, "hash": "0xc", "delta": {
+            "type": "internalTransfer", "usdc": "500000.0", "user": addr,
+            "destination": "0xdead000000000000000000000000000000000002"}}]
+    post2 = _diag_responses(now_ms, native_value=120.0, spot_usdc=0.0,
+                            ledger=ledger_out, fills=fills)
+    diag2 = track_wallet.run_diagnostic(addr, tmp / "diag2" / addr, date,
+                                        post_fn=post2, now_ms=now_ms)
+    ok(diag2["verdict"] == track_wallet.VERDICT_MOVED,
+       f"裁決＝換地址（{diag2['verdict']}）")
+    md2 = (tmp / "diag2" / addr / f"diagnostic_{date}.md").read_text(encoding="utf-8")
+    ok("4,500,000.00" in md2 and "0xdead000000000000000000000000000000000002" in md2,
+       "(b) 列出外轉金額與對手方地址")
+    ok(f"**裁決：{track_wallet.VERDICT_MOVED}**" in md2, "換地址裁決句落地")
+
+    # --- 情境 3：真的停手觀望（資金仍在原生、無外轉、久未成交）---
+    old_fills = [{"coin": "BTC", "px": "60000", "sz": "0.1", "side": "B",
+                  "time": now_ms - 25 * day, "dir": "Open Long", "closedPnl": "0.0"}]
+    post3 = _diag_responses(now_ms, native_value=500000.0, spot_usdc=0.0,
+                            ledger=[], fills=old_fills)
+    diag3 = track_wallet.run_diagnostic(addr, tmp / "diag3" / addr, date,
+                                        post_fn=post3, now_ms=now_ms)
+    ok(diag3["verdict"] == track_wallet.VERDICT_IDLE,
+       f"裁決＝真的停手觀望（{diag3['verdict']}）")
+    md3 = (tmp / "diag3" / addr / f"diagnostic_{date}.md").read_text(encoding="utf-8")
+    ok(f"**裁決：{track_wallet.VERDICT_IDLE}**" in md3 and "無外轉紀錄" in md3,
+       "停手裁決句落地且註明無外轉")
+
+    # --- 情境 4：資料不足（egress 被擋 → 連續失敗中止探測）---
+    def dead_post(body, name, meta):
+        meta.record(name, "fake", False, status=403, error="blocked by proxy")
+        return None, False
+
+    diag4 = track_wallet.run_diagnostic(addr, tmp / "diag4" / addr, date,
+                                        post_fn=dead_post, now_ms=now_ms)
+    ok(diag4["verdict"] == track_wallet.VERDICT_UNKNOWN,
+       f"裁決＝資料不足（{diag4['verdict']}）")
+    ok(diag4["aborted"] is True
+       and diag4["requests_failed"] == config.DIAGNOSTIC_ABORT_AFTER_FAILURES,
+       f"連續失敗即中止，不燒滿 15 個請求（failed={diag4['requests_failed']}）")
+    md4 = (tmp / "diag4" / addr / f"diagnostic_{date}.md").read_text(encoding="utf-8")
+    ok(f"**裁決：{track_wallet.VERDICT_UNKNOWN}**" in md4, "資料不足裁決句落地")
+    ok("無法判斷有無外轉" in md4,
+       "查詢失敗時 md 明寫無法判斷（不以缺資料推論「沒有外轉」）")
+    ok("## (a) 資金在哪？" in md4 and "## (c) 是否仍在交易？" in md4,
+       "降級情境下三問區塊仍在（結構穩定）")
+
+    # 白名單防呆：非查詢型 type 一律 raise
+    try:
+        track_wallet.diagnostic_info_body("order")
+        raised = False
+    except ValueError:
+        raised = True
+    ok(raised, "diagnostic_info_body 對白名單外的 type raise（唯讀防呆）")
+    ok(track_wallet.diagnostic_info_body(
+        "clearinghouseState", address=addr, dex="xyz") ==
+       {"type": "clearinghouseState", "user": addr, "dex": "xyz"},
+       "dex 參數原樣帶入請求體")
+
+    # run_track_wallet 的診斷開關：失敗的診斷不得影響 dossier
+    base = json.loads((FIXTURES / "wallet_consistent.json").read_text(encoding="utf-8"))
+    snap_dir = tmp / "diag-track" / "snapshots" / date
+    (snap_dir / "wallets").mkdir(parents=True, exist_ok=True)
+    (snap_dir / "wallets" / f"{base['address']}.json").write_text(
+        json.dumps(base, ensure_ascii=False), encoding="utf-8")
+    tracked_root = tmp / "diag-track" / "tracked"
+    d = track_wallet.run_track_wallet(base["address"], snap_dir, tracked_root,
+                                      diagnostic=True, diagnostic_post_fn=dead_post,
+                                      diagnostic_now_ms=now_ms)
+    ok(d is not None and (tracked_root / base["address"] / f"dossier_{date}.md").is_file(),
+       "診斷全失敗時 dossier 照樣完整落地")
+    ok(d.get("diagnostic_verdict") == track_wallet.VERDICT_UNKNOWN,
+       f"dossier 帶上診斷裁決（{d.get('diagnostic_verdict')}）")
+
+
+def _spot_raw(usdc=4026852.28921333, usdt0=48215.25091058, extra=None):
+    """真實 diagnostic_2026-07-27.json 觀測到的現貨形狀（USDC＋USDT0＋USDH 塵埃）。"""
+    balances = [
+        {"coin": "USDC", "total": str(usdc), "hold": "52433.613585", "entryNtl": "0.0"},
+        {"coin": "USDT0", "total": str(usdt0), "hold": "0.0", "entryNtl": str(usdt0)},
+        {"coin": "USDH", "total": "0.01250805", "hold": "0.0", "entryNtl": "0.01250805"},
+        {"coin": "PURR", "total": "0.0"},   # 零餘額：一律剔除
+    ]
+    if extra:
+        balances += extra
+    return {"balances": balances}
+
+
+def _wallet_with_venues(spot=True, by_dex=True, native_value="0.0"):
+    """組一份 tracked 錢包 raw：原生（可 $0）＋builder dex xyz ＋現貨。"""
+    w = {
+        "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+        "clearinghouseState": {"marginSummary": {"accountValue": native_value,
+                                                 "totalNtlPos": "0.0"},
+                               "withdrawable": native_value, "assetPositions": []},
+        "portfolio": None, "userFills": None, "userFunding": None, "errors": [],
+    }
+    if by_dex:
+        w["clearinghouseStateByDex"] = {
+            "xyz": {"marginSummary": {"accountValue": "44015.37722",
+                                      "totalNtlPos": "1005010.28"},
+                    "assetPositions": [
+                        {"type": "oneWay", "position": {
+                            "coin": "xyz:SNDK", "szi": "5000", "entryPx": "176.75",
+                            "positionValue": "1005010.28", "unrealizedPnl": "1200.0",
+                            "leverage": {"type": "cross", "value": 5},
+                            "liquidationPx": "120", "marginUsed": "200000"}}]},
+            "flx": {"marginSummary": {"accountValue": "0.0"}, "assetPositions": []},
+        }
+    if spot:
+        w["spotClearinghouseState"] = _spot_raw()
+    return w
+
+
+def test_spot_valuation_and_venue_totals():
+    print("[21] 現貨解析／估值＋全場所總值與非原生占比（含缺資料的向後相容分支）")
+    # --- 估值三分支：白名單 1:1、未知 token 走 entryNtl、連 entryNtl 都缺 ---
+    s = classify.summarize_spot({"balances": [
+        {"coin": "USDC", "total": "1000.0", "hold": "0.0"},
+        {"coin": "HYPE", "total": "10.0", "entryNtl": "400.0"},   # 未知 token → entryNtl
+        {"coin": "MYSTERY", "total": "7.0"},                      # 無 entryNtl → 無法估值
+        {"coin": "PURR", "total": "0.0"},                         # 零餘額 → 剔除
+    ]})
+    ok(s["n_nonzero"] == 3 and s["usd_stable"] == 1000.0 and s["usd_est_other"] == 400.0
+       and s["usd_total_est"] == 1400.0,
+       f"USDC 1:1 ＋未知 token 用 entryNtl；無 entryNtl 者不計入總額（{s['usd_total_est']}）")
+    ok(s["estimated"] is True, "有估算/無法估值的餘額 → estimated=True（報告須標註）")
+    rows = classify.spot_token_rows(s)
+    by_coin = {r["coin"]: r for r in rows}
+    ok(by_coin["USDC"]["usd"] == 1000.0 and by_coin["USDC"]["estimated"] is False,
+       "白名單穩定幣：usd 為實額、estimated=False")
+    ok(by_coin["HYPE"]["usd"] == 400.0 and by_coin["HYPE"]["estimated"] is True,
+       "未知 token：usd 走 entryNtl 且標 estimated=True")
+    ok(by_coin["MYSTERY"]["usd"] is None and by_coin["MYSTERY"]["estimated"] is True,
+       "缺 entryNtl：usd=None（不猜數字）且標 estimated=True")
+    ok(len(classify.spot_token_rows({"balances": [{"coin": f"C{i}", "total": 1.0,
+                                                   "usd": float(i)}
+                                                  for i in range(25)]})) == 10,
+       "spot_tokens 最多 10 筆（體積控制）")
+    ok(track_wallet.summarize_spot is classify.summarize_spot
+       and track_wallet.SPOT_USD_COINS is classify.SPOT_USD_COINS,
+       "summarize_spot 只有一份實作（track_wallet 為 classify 的別名）")
+
+    # --- 真實形狀：$4.07M 現貨 + $44K builder → 非原生占比 ~100% ---
+    m = classify.compute_metrics(_wallet_with_venues(), SNAP_DATE)
+    ok(m["spot_value_usd"] == 4075067.55,
+       f"spot_value_usd 重用同一套估值規則（{m['spot_value_usd']}）")
+    ok(m["total_value_all_venues"] == 4119082.93,
+       f"total_value_all_venues＝原生＋builder 聯集＋現貨（{m['total_value_all_venues']}）")
+    ok(m["non_native_share"] == 1.0,
+       f"原生 $0 → 非原生占比 100%（{m['non_native_share']}）")
+    ok([t["coin"] for t in m["spot_tokens"]] == ["USDC", "USDT0", "USDH"],
+       f"spot_tokens 依 USD 遞減、剔除零餘額（{[t['coin'] for t in m['spot_tokens']]}）")
+
+    # --- 分母 0 防呆：全場所皆 $0 → 占比 None（不 ZeroDivisionError、不寫 0%）---
+    zero = _wallet_with_venues(by_dex=False, native_value="0.0")
+    zero["spotClearinghouseState"] = {"balances": []}
+    mz = classify.compute_metrics(zero, SNAP_DATE)
+    ok(mz["spot_value_usd"] == 0.0 and mz["total_value_all_venues"] == 0.0
+       and mz["non_native_share"] is None,
+       f"總值 0 → non_native_share None（{mz['non_native_share']}）")
+
+    # --- 缺 byDex（只有原生＋現貨）：總值＝原生＋現貨，非原生＝現貨 ---
+    no_dex = _wallet_with_venues(by_dex=False, native_value="1000.0")
+    mnd = classify.compute_metrics(no_dex, SNAP_DATE)
+    ok(mnd["total_value_all_venues"] == round(1000.0 + 4075067.55, 2)
+       and mnd["non_native_share"] == round(4075067.55 / (1000.0 + 4075067.55), 4),
+       f"缺 byDex 仍算得出總值/占比（{mnd['total_value_all_venues']}）")
+
+    # --- 舊格式 raw（無 spot、無 byDex）：新欄位全 None，既有數值一字不差 ---
+    old = json.loads((FIXTURES / "wallet_consistent.json").read_text(encoding="utf-8"))
+    m_old = classify.compute_metrics(old, SNAP_DATE)
+    new_keys = ("spot_value_usd", "spot_tokens", "total_value_all_venues",
+                "non_native_share")
+    ok(all(m_old[k] is None for k in new_keys),
+       f"舊格式 raw → 四個新欄位皆 None（{[m_old[k] for k in new_keys]}）")
+    with_spot = dict(old, spotClearinghouseState=_spot_raw())
+    m_spot = classify.compute_metrics(with_spot, SNAP_DATE)
+    ok(all(m_old[k] == m_spot[k] for k in m_old if k not in new_keys),
+       "加上現貨欄位後，既有指標數值與修正前完全一致（向後相容）")
+    ok(m_spot["total_value_all_venues"] is not None
+       and m_old["account_value"] == m_spot["account_value"],
+       "現貨只加進新欄位，不污染 account_value（原生＋builder 語意不變）")
+
+
+def test_fetch_spot_tracked_only():
+    print("[22] fetch：TRACKED 錢包才加抓 spotClearinghouseState，失敗只降級不連坐")
+    addr = "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d"
+    calls = []
+
+    def post_ok(body, name, meta):
+        calls.append(body)
+        meta.record(name, "fake", True, status=200)
+        if body["type"] == "spotClearinghouseState":
+            return _spot_raw(), True
+        return {"marginSummary": {"accountValue": "1.0"}}, True
+
+    meta = fetch.Meta()
+    w = fetch.fetch_wallet(addr, meta, post_fn=post_ok, fetch_spot=True)
+    types = [b["type"] for b in calls]
+    ok(types.count("spotClearinghouseState") == 1,
+       f"每個 TRACKED 錢包只多 1 個現貨請求（{types}）")
+    ok(w["spotClearinghouseState"] == _spot_raw(), "現貨回應原樣存進新欄位")
+    ok(w["errors"] == [], "全成功 → 無錯誤")
+
+    calls.clear()
+    meta2 = fetch.Meta()
+    w2 = fetch.fetch_wallet(addr, meta2, post_fn=post_ok)
+    ok("spotClearinghouseState" not in [b["type"] for b in calls]
+       and "spotClearinghouseState" not in w2,
+       "fetch_spot=False（宇宙掃描）完全不查現貨，也不加欄位（額度與體積維持原樣）")
+
+    def post_spot_dead(body, name, meta):
+        if body["type"] == "spotClearinghouseState":
+            meta.record(name, "fake", False, status=403, error="blocked")
+            return None, False
+        meta.record(name, "fake", True, status=200)
+        return {"marginSummary": {"accountValue": "1.0"}}, True
+
+    meta3 = fetch.Meta()
+    w3 = fetch.fetch_wallet(addr, meta3, post_fn=post_spot_dead, fetch_spot=True)
+    ok(w3["spotClearinghouseState"] is None
+       and w3["errors"] == ["spotClearinghouseState: request failed"],
+       f"現貨查詢失敗 → 欄位 None＋記 errors（{w3['errors']}）")
+    ok(all(w3[t] is not None for t in config.INFO_TYPES)
+       and any(not h["ok"] and h["status"] == 403 for h in meta3.endpoint_health),
+       "現貨失敗不影響其他四類抓取，且失敗記進 endpoint_health")
+    ok(classify.compute_metrics(w3, SNAP_DATE)["spot_value_usd"] is None,
+       "現貨失敗 → spot_value_usd None（不以 $0 冒充「沒有現金」）")
+
+
+def test_timeline_funds_and_trend(tmp):
+    print("[23] timeline 資金分布欄位＋同日去重，與資金流向趨勢四種判定")
+    addr = "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d"
+    date = "2026-07-27"
+    base = _wallet_with_venues()
+    snap_dir = tmp / "funds" / "snapshots" / date
+    (snap_dir / "wallets").mkdir(parents=True, exist_ok=True)
+    (snap_dir / "wallets" / f"{addr}.json").write_text(
+        json.dumps(base, ensure_ascii=False), encoding="utf-8")
+    tracked_root = tmp / "funds" / "tracked"
+    d = track_wallet.run_track_wallet(addr, snap_dir, tracked_root)
+    tl_path = tracked_root / addr / "timeline.jsonl"
+    rows = track_wallet.read_timeline(tl_path)
+    ok(len(rows) == 1, f"timeline 落地 1 列（{len(rows)}）")
+    r = rows[0]
+    ok(r["spot_value_usd"] == 4075067.55 and r["total_value_all_venues"] == 4119082.93
+       and r["non_native_share"] == 1.0,
+       f"timeline 列含現貨/全場所總值/非原生占比（{r['spot_value_usd']}）")
+    ok(r["account_value_by_dex"] == {"xyz": 44015.38},
+       f"account_value_by_dex 只留非零 dex（{r['account_value_by_dex']}）")
+
+    # 同日重跑：不重複 append，就地覆寫成最新值
+    base2 = _wallet_with_venues()
+    base2["spotClearinghouseState"] = _spot_raw(usdc=3000000.0, usdt0=0.0)
+    (snap_dir / "wallets" / f"{addr}.json").write_text(
+        json.dumps(base2, ensure_ascii=False), encoding="utf-8")
+    track_wallet.run_track_wallet(addr, snap_dir, tracked_root)
+    rows2 = track_wallet.read_timeline(tl_path)
+    ok(len(rows2) == 1 and rows2[0]["spot_value_usd"] == 3000000.01,
+       f"同日重跑不重複 append，數值就地更新（{len(rows2)} 列 / "
+       f"{rows2[0]['spot_value_usd']}）")
+    md = (tracked_root / addr / f"dossier_{date}.md").read_text(encoding="utf-8")
+    ok("## 7. 資金分布（多場所）" in md and "現貨（spot）與各 builder dex 皆為**每日抓取**" in md,
+       "dossier 資金分布節落地並標明現貨為每日抓取")
+    ok("| builder dex `xyz` |" in md and "| 現貨 spot |" in md and "USDC" in md,
+       "資金分布表含 builder dex／現貨列與現貨明細")
+    ok("## 8. 資金流向趨勢" in md and track_wallet.TREND_ACCUMULATING in md,
+       "資料點不足時趨勢節寫「資料累積中」")
+    ok("不是投資建議" in md and "不預測價格" in md,
+       "趨勢節明寫不構成投資建議（措辭紅線）")
+    ok(d["funds_trend"]["status"] == track_wallet.TREND_ACCUMULATING,
+       f"dossier 帶上趨勢判定（{d['funds_trend']['status']}）")
+
+    # --- 趨勢四情境（純函式，直接餵 timeline 列）---
+    def row(date, spot, total, position_value=0.0):
+        return {"date": date, "spot_value_usd": spot,
+                "total_value_all_venues": total, "position_value": position_value}
+
+    cashing = track_wallet.funds_trend([
+        row("2026-07-01", 3_000_000.0, 4_000_000.0),
+        row("2026-07-02", 3_400_000.0, 3_800_000.0),
+        row("2026-07-03", 3_500_000.0, 3_550_000.0),
+    ])
+    ok(cashing["status"] == track_wallet.TREND_CASHING_OUT
+       and cashing["spot_share_change"] > 0 and cashing["total_change_pct"] < 0,
+       f"現貨占比↑＋總值↓ → 收手中（{cashing['status']}）")
+
+    reenter = track_wallet.funds_trend([
+        row("2026-07-01", 3_800_000.0, 4_000_000.0, 100_000.0),
+        row("2026-07-02", 3_000_000.0, 4_050_000.0, 800_000.0),
+        row("2026-07-03", 2_000_000.0, 4_100_000.0, 1_500_000.0),
+    ])
+    ok(reenter["status"] == track_wallet.TREND_REENTERING
+       and reenter["spot_share_change"] < 0 and reenter["perp_change_pct"] > 0,
+       f"現貨占比↓＋持倉側資金/名目↑ → 重新進場（{reenter['status']}）")
+
+    flat = track_wallet.funds_trend([
+        row("2026-07-01", 3_000_000.0, 4_000_000.0),
+        row("2026-07-02", 3_010_000.0, 4_005_000.0),
+        row("2026-07-03", 2_995_000.0, 3_998_000.0),
+    ])
+    ok(flat["status"] == track_wallet.TREND_FLAT
+       and abs(flat["spot_share_change"]) < config.FUNDS_TREND_CHANGE_PCT,
+       f"變化未達門檻 → 持平（{flat['status']}）")
+
+    thin = track_wallet.funds_trend([
+        row("2026-07-01", 3_000_000.0, 4_000_000.0),
+        row("2026-07-02", 3_400_000.0, 3_500_000.0),
+        {"date": "2026-07-03", "spot_value_usd": None,      # 舊列（無現貨）不參與
+         "total_value_all_venues": None, "position_value": 0.0},
+    ])
+    ok(thin["status"] == track_wallet.TREND_ACCUMULATING and thin["n_points"] == 2,
+       f"有效資料點 < {config.FUNDS_TREND_MIN_POINTS} → 資料累積中（{thin['n_points']} 點）")
+    ok(track_wallet.funds_trend([])["status"] == track_wallet.TREND_ACCUMULATING
+       and track_wallet.funds_trend([row("2026-07-01", 0.0, 0.0)] * 3)["status"]
+       == track_wallet.TREND_ACCUMULATING,
+       "空 timeline／總值全 0 → 資料累積中（分母 0 不硬掰方向）")
+    windowed = track_wallet.funds_trend(
+        [row(f"2026-07-{i:02d}", 1000.0 * i, 2000.0 * i) for i in range(1, 20)],
+        days=config.FUNDS_TREND_DAYS)
+    ok(windowed["n_points"] == config.FUNDS_TREND_DAYS
+       and windowed["last_date"] == "2026-07-19",
+       f"只取最近 {config.FUNDS_TREND_DAYS} 個資料點比較"
+       f"（{windowed['n_points']} 點，{windowed['first_date']}→{windowed['last_date']}）")
+
+
+# ---------------------------------------------------------------------------
+# [24] HIP-3 持倉盲點迴歸：dossier 的持倉必須是「原生＋各 builder dex」聯集
+# ---------------------------------------------------------------------------
+# 缺陷現場（0x8bae35 / 2026-07-28）：compute_dossier 用
+# classify.parse_positions(wallet["clearinghouseState"])（**只有原生永續 dex**）建
+# open_positions/n_open_positions/position_value/unrealized_pnl，導致 builder dex
+# `xyz` 的 3 個部位（名目 $1,009,385、未實現 −$62,986）在 dossier §2 持倉表、
+# timeline.jsonl、監控頁持倉表全部消失——而同一份 dossier 的 metrics 卻正確算出
+# n_open_positions=3、dexs_with_positions=['xyz']（自相矛盾即為病徵）。
+# 下面 4 組測試把「dossier 頂層持倉 == metrics 持倉 == 聯集」釘住。
+HIP3_ADDR = "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d"
+# (coin, szi, leverage, positionValue, unrealizedPnl, entryPx) — 模仿真實觀測值
+XYZ_REAL_POSITIONS = [
+    ("xyz:META", 1200, 20, 985118.0, -60645.0, "821.0"),
+    ("xyz:GOOGL", 60, 10, 15385.0, -223.0, "256.4"),
+    ("xyz:KIOXIA", 90, 4, 8883.0, -2118.0, "98.7"),
+]
+XYZ_REAL_NTL = 1009386.0      # 985118 + 15385 + 8883
+XYZ_REAL_UPNL = -62986.0      # -60645 - 223 - 2118
+# 真實回應裡除了 xyz 還有一整排零持倉的 builder dex（不得干擾聯集結果）
+ZERO_DEXS = ("flx", "abc", "vntl", "pear", "hip3", "rlp", "bull", "sndk")
+
+
+def _ap(coin, szi, lev, ntl, upnl, entry_px="100.0"):
+    """單筆 assetPositions 元素（oneWay 形狀，與真實回應一致）。"""
+    return {"type": "oneWay", "position": {
+        "coin": coin, "szi": str(szi), "entryPx": entry_px,
+        "positionValue": str(ntl), "unrealizedPnl": str(upnl),
+        "leverage": {"type": "cross", "value": lev},
+        "liquidationPx": "1.5", "marginUsed": str(round(ntl / lev, 2)),
+        "maxLeverage": lev, "cumFunding": {"allTime": "0.0"}}}
+
+
+def _chs_of(account_value, aps=()):
+    """clearinghouseState 形狀：accountValue ＋ assetPositions（totalNtlPos 自動加總）。"""
+    aps = list(aps)
+    ntl = round(sum(float(a["position"]["positionValue"]) for a in aps), 2)
+    return {"marginSummary": {"accountValue": str(account_value),
+                              "totalNtlPos": str(ntl), "totalMarginUsed": "0.0"},
+            "crossMarginSummary": {"accountValue": str(account_value)},
+            "withdrawable": "0.0", "assetPositions": aps,
+            "time": 1785110000000}
+
+
+_UNSET = object()   # 「這個參數沒給」的哨兵——讓 None 能當成有意義的值傳進來
+
+
+def _hip3_wallet(native_aps=(), xyz_aps=None, native_value="0.0", by_dex=True,
+                 by_dex_override=_UNSET):
+    """tracked 錢包 raw：原生 clearinghouseState ＋ clearinghouseStateByDex。
+
+    by_dex=False → 完全不放 clearinghouseStateByDex（模擬舊 snapshot）。
+    by_dex_override → 直接塞入該值（測 None／空 dict／畸形值的退回行為）。
+    """
+    w = {
+        "address": HIP3_ADDR,
+        "clearinghouseState": _chs_of(native_value, native_aps),
+        "portfolio": None, "userFills": None, "userFunding": None, "errors": [],
+    }
+    if by_dex_override is not _UNSET:
+        w["clearinghouseStateByDex"] = by_dex_override
+    elif by_dex:
+        aps = XYZ_REAL_POSITIONS if xyz_aps is None else xyz_aps
+        w["clearinghouseStateByDex"] = {
+            "xyz": _chs_of("44015.38", [_ap(*p) for p in aps]),
+        }
+        for d in ZERO_DEXS:
+            w["clearinghouseStateByDex"][d] = _chs_of("0.0")
+    return w
+
+
+def _run_hip3(tmp, wallet, tag, date="2026-07-28"):
+    """把 wallet raw 寫成 snapshot 後跑 run_track_wallet；回 (dossier, tracked_dir)。
+
+    每組測試各自一個 tag 子目錄 → prev_positions/timeline 互不污染，且全在 tmp 下
+    （不碰版控的 data/tracked）。
+    """
+    snap_dir = tmp / "hip3" / tag / "snapshots" / date
+    (snap_dir / "wallets").mkdir(parents=True, exist_ok=True)
+    (snap_dir / "wallets" / f"{HIP3_ADDR}.json").write_text(
+        json.dumps(wallet, ensure_ascii=False), encoding="utf-8")
+    tracked_root = tmp / "hip3" / tag / "tracked"
+    dossier = track_wallet.run_track_wallet(HIP3_ADDR, snap_dir, tracked_root)
+    return dossier, tracked_root / HIP3_ADDR
+
+
+POS_TABLE_HEADER = "| 場所 | 幣 | 方向 | 槓桿 |"
+
+
+def _pos_table_rows(md_text):
+    """抽出 dossier §2 持倉表的資料列 → [[場所, 幣, 方向, ...], ...]（無表則回 []）。"""
+    rows, in_tbl = [], False
+    for line in md_text.splitlines():
+        if line.startswith(POS_TABLE_HEADER):
+            in_tbl = True
+            continue
+        if in_tbl:
+            if not line.startswith("|"):
+                break
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if set("".join(cells)) <= set("-: "):   # markdown 對齊分隔列
+                continue
+            rows.append(cells)
+    return rows
+
+
+def test_hip3_dossier_positions_union(tmp):
+    print("[24] HIP-3 迴歸：dossier 持倉＝原生＋builder dex 聯集（§2 表含場所欄）")
+
+    # --- 1. 核心迴歸：原生零持倉、xyz 有 3 個部位（修正前這裡全是 0/空）---
+    d, tdir = _run_hip3(tmp, _hip3_wallet(), "core")
+    ok(d is not None, "run_track_wallet 正常回傳 dossier（原生零持倉＋9 個 builder dex）")
+    ok(d["n_open_positions"] == 3,
+       f"dossier 頂層 n_open_positions=3（修正前為 0）（{d['n_open_positions']}）")
+    ok(len(d["open_positions"]) == 3
+       and all(p.get("dex") == "xyz" for p in d["open_positions"]),
+       f"open_positions 3 筆且每筆 dex='xyz'（{[p.get('dex') for p in d['open_positions']]}）")
+    ok(abs(d["position_value"] - XYZ_REAL_NTL) <= 2,
+       f"名目總值 ≈ ${XYZ_REAL_NTL:,.0f}（{d['position_value']}）")
+    ok(abs(d["unrealized_pnl"] - XYZ_REAL_UPNL) <= 2,
+       f"未實現 PnL ≈ ${XYZ_REAL_UPNL:,.0f}（{d['unrealized_pnl']}）")
+    ok(d["metrics"]["n_open_positions"] == d["n_open_positions"] == 3
+       and d["metrics"]["dexs_with_positions"] == ["xyz"],
+       "dossier 頂層持倉數與 metrics 一致（修正前 metrics=3 但頂層=0，自相矛盾）")
+    ok({p["coin"] for p in d["open_positions"]}
+       == {c for c, *_ in XYZ_REAL_POSITIONS},
+       f"三個 xyz 幣別全數列出（{sorted(p['coin'] for p in d['open_positions'])}）")
+
+    md = (tdir / "dossier_2026-07-28.md").read_text(encoding="utf-8")
+    ok(POS_TABLE_HEADER in md, "§2 持倉表表頭含「場所」欄")
+    ok("（目前無未平倉部位）" not in md,
+       "§2 不再印「（目前無未平倉部位）」（修正前的錯誤輸出）")
+    rows = _pos_table_rows(md)
+    ok(len(rows) == 3 and [r[0] for r in rows] == ["xyz"] * 3,
+       f"§2 表 3 列、場所欄皆為 xyz（{[r[0] for r in rows]}）")
+    ok("xyz" in md and "xyz:META" in md, "md 含 xyz 場所與 xyz:META 部位")
+    tl = track_wallet.read_timeline(tdir / "timeline.jsonl")
+    ok(len(tl) == 1 and tl[0]["n_open_positions"] == 3
+       and abs(tl[0]["position_value"] - XYZ_REAL_NTL) <= 2,
+       f"timeline 該列 n_open_positions=3、名目同步（{tl[0]['n_open_positions']}）")
+
+    # --- 2. 原生＋builder 混合：1 + 2 = 3 筆聯集，md 同時出現「原生」與「xyz」 ---
+    native = [_ap("BTC", 1, 5, 60000.0, 1500.0, "60000.0")]
+    mixed = _hip3_wallet(native_aps=native, native_value="12000.0",
+                         xyz_aps=XYZ_REAL_POSITIONS[:2])
+    dm, tdir_m = _run_hip3(tmp, mixed, "mixed")
+    ok(dm["n_open_positions"] == 3
+       and sorted(p.get("dex") for p in dm["open_positions"]) == ["", "xyz", "xyz"],
+       f"聯集＝原生 1 ＋ xyz 2 ＝ 3（{sorted(p.get('dex') for p in dm['open_positions'])}）")
+    expect_ntl = round(60000.0 + 985118.0 + 15385.0, 2)
+    expect_upnl = round(1500.0 - 60645.0 - 223.0, 2)
+    ok(dm["position_value"] == expect_ntl and dm["unrealized_pnl"] == expect_upnl,
+       f"名目/未實現＝三者之和（${dm['position_value']} / ${dm['unrealized_pnl']}）")
+    rows_m = _pos_table_rows((tdir_m / "dossier_2026-07-28.md").read_text(encoding="utf-8"))
+    venues = [r[0] for r in rows_m]
+    ok(len(rows_m) == 3 and set(venues) == {"原生", "xyz"}
+       and venues.count("原生") == 1 and venues.count("xyz") == 2,
+       f"§2 表場所欄同時出現「原生」與「xyz」（{venues}）")
+
+    # --- 3. 向後相容：舊 snapshot（無 clearinghouseStateByDex）數值一字不差 ---
+    old_aps = [_ap("BTC", 1, 5, 60000.0, 1500.0, "60000.0"),
+               _ap("ETH", -10, 8, 25000.0, -300.0, "2500.0")]
+    old = _hip3_wallet(native_aps=old_aps, native_value="30000.0", by_dex=False)
+    do, tdir_o = _run_hip3(tmp, old, "legacy")
+    native_only = classify.parse_positions(old["clearinghouseState"])
+    ok("clearinghouseStateByDex" not in old and do["n_open_positions"] == 2,
+       f"無 byDex 欄位 → 僅原生 2 個部位（{do['n_open_positions']}）")
+    ok(all(p.get("dex") == "" for p in do["open_positions"]),
+       f"舊 snapshot 每筆 dex 為空字串（{[p.get('dex') for p in do['open_positions']]}）")
+    ok(do["position_value"] == round(sum(p["position_value"] for p in native_only), 2)
+       == 85000.0
+       and do["unrealized_pnl"] == round(sum(p["unrealized_pnl"] for p in native_only), 2)
+       == 1200.0,
+       f"數值與只用原生 parse_positions 完全一致（${do['position_value']}）")
+    rows_o = _pos_table_rows((tdir_o / "dossier_2026-07-28.md").read_text(encoding="utf-8"))
+    ok(len(rows_o) == 2 and {r[0] for r in rows_o} == {"原生"},
+       f"§2 場所欄顯示「原生」（{[r[0] for r in rows_o]}）")
+
+    # --- 4. 邊界：byDex 為 None／空 dict／畸形值 → 不 crash、退回原生 ---
+    edge_cases = (
+        ("None", None),
+        ("空 dict", {}),
+        ("dex 值為 null", {"xyz": None}),
+        # 畸形：list/str/int 當 dex 值，外加空字串 key（不得被當成 builder dex）
+        ("畸形值", {"xyz": ["not", "a", "dict"], "abc": "garbage", "flx": 12345,
+                    "": _chs_of("999.0", [_ap("FAKE", 1, 1, 7.0, 0.0)])}),
+        ("整體非 dict", ["xyz"]),
+    )
+    for i, (tag, override) in enumerate(edge_cases):
+        w = _hip3_wallet(native_aps=native, native_value="12000.0",
+                         by_dex_override=override)
+        db, _ = _run_hip3(tmp, w, f"edge{i}")
+        ok(db is not None and db["n_open_positions"] == 1
+           and db["position_value"] == 60000.0
+           and [p.get("dex") for p in db["open_positions"]] == [""],
+           f"byDex={tag} → 不 crash、退回原生 1 個部位（{db['n_open_positions']} 個，"
+           f"${db['position_value']}）")
+    pos_bad, by_dex_bad = classify.parse_positions_by_dex(
+        {"clearinghouseState": _chs_of("1.0", native), "clearinghouseStateByDex": {"xyz": 7}})
+    ok(len(pos_bad) == 1 and by_dex_bad["xyz"]["n_positions"] == 0
+       and by_dex_bad["xyz"]["account_value"] is None,
+       "parse_positions_by_dex：畸形 dex 值 → 0 筆持倉、淨值 None（不臆造）")
+
+
 def main():
     with tempfile.TemporaryDirectory(prefix="hyper-observer-test-") as td:
         tmp = Path(td)
@@ -1040,6 +2004,16 @@ def main():
         test_shadow_pure_functions()
         test_shadow_session_offline(tmp)
         test_shadow_all_requests_fail(tmp)
+        test_perp_dexs_parsing()
+        test_by_dex_aggregation()
+        test_ledger_classification()
+        test_diagnostic_md(tmp)
+        test_system_address_and_bridge_out()
+        test_bridge_out_markdown_and_verdict(tmp)
+        test_spot_valuation_and_venue_totals()
+        test_fetch_spot_tracked_only()
+        test_timeline_funds_and_trend(tmp)
+        test_hip3_dossier_positions_union(tmp)
     print(f"ALL TESTS PASSED ({checks} checks)")
     return 0
 
