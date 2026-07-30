@@ -16,7 +16,9 @@
 | `run_report.py` | 讀價格 CSV → 產出 1/3/6/12/24 個月績效表與跨標的彙總 |
 | `fetch_prices.py` | 取數（**必須在 GitHub Actions runner 上跑**，見下） |
 | `tests/test_offline.py` | 離線測試，41 項斷言，含正向案例 |
-| `results/` | workflow 產出的回測結果 |
+| `results/` | workflow 產出的回測結果（三個變體：零成本／10bps／收盤成交） |
+| `sensitivity.py` | 敏感度檢查：成本、成交時點、資料起點處理對結論的影響 |
+| **`FINDINGS.md`** | **實測結論——先看這份** |
 
 ## 為什麼取數要跑在 GitHub Actions 上
 
