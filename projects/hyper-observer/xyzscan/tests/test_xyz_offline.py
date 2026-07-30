@@ -113,9 +113,9 @@ def main():
     check(any("停手" in r for r in reasons), f"停手被抓到（reasons={reasons}）")
 
     print("[6] near_miss 分級")
-    soso = fills([(300, 33), (-200, 27)])   # 勝率 55%、pf 1.83
+    soso = fills([(300, 33), (-100, 27)])   # 勝率 55%、賠率 3.0、pf 3.67
     s = fx.dex_fill_stats(soso, "xyz", now_sec=NOW)
-    s["net_closed_pnl"] = 100.0             # 只有淨損益一項不過
+    s["net_closed_pnl"] = 100.0             # 只有損益一項不過
     v, reasons = fx.judge(s)
     check(v == "near_miss" and len(reasons) == 1,
           f"僅一項不過且非硬性 → near_miss（實得 {v}, {reasons}）")
@@ -163,8 +163,9 @@ def main():
                         "leverage": {"value": "5", "type": "isolated"},
                         "liquidationPx": None, "marginUsed": "1", "maxLeverage": "20",
                         "cumFunding": {"allTime": "0"}}}]}, True
-        if t == "userFills":
+        if t == "userFillsByTime":
             calls["fills"] += 1
+            check_start.append(body.get("startTime"))
             return [{"coin": "xyz:META", "closedPnl": "500", "time": int((NOW - 3 * DAY) * 1000),
                      "px": "1", "sz": "1", "side": "B", "fee": "0", "dir": "Close Long"}
                     for _ in range(40)] + \
@@ -172,6 +173,8 @@ def main():
                      "px": "1", "sz": "1", "side": "A", "fee": "0", "dir": "Close Long"}
                     for _ in range(20)], True
         return None, False
+
+    check_start = []
 
     def get_fn(url, name, meta):
         return {"leaderboardRows": [{"ethAddress": a} for a in lb_addrs]}, True
@@ -215,9 +218,11 @@ def main():
             pass
 
     fake = FakeWS()
-    addrs, n_trades = fx.collect_via_websocket(["xyz:META", "xyz:GOLD"], 5,
-                                               fx.fetch.Meta(), ws_factory=lambda u: fake)
-    check(len(addrs) == 3, f"收到 3 個地址（實得 {len(addrs)}）")
+    seen, n_trades = fx.collect_via_websocket(["xyz:META", "xyz:GOLD"], 5,
+                                              fx.fetch.Meta(), ws_factory=lambda u: fake)
+    check(len(seen) == 3, f"收到 3 個地址（實得 {len(seen)}）")
+    check(seen["0x" + "1" * 40] == 1 and seen["0x" + "3" * 40] == 1,
+          "每個地址都記到窗內成交次數")
     check(n_trades == 2, f"數到 2 筆 xyz 成交（實得 {n_trades}）")
     check(len(fake.sent) == 2 and all("subscribe" in s for s in fake.sent),
           "對每個合約各送一次 subscribe")
@@ -236,7 +241,8 @@ def main():
     md = fx.render_report(result)
     check("# xyz builder dex 贏家掃描" in md, "報告有標題")
     check("| L1 母體 |" in md and "| L3 驗證 |" in md, "報告有漏斗表")
-    check("判準" in md and "平均虧損／平均獲利" in md, "報告載明判準（含關鍵那條）")
+    check("判準" in md and "賠率" in md and "避免大虧" in md,
+          "報告載明判準（含賠率主關卡與避免大虧）")
     empty = {"dex": "xyz", "generated_at": "2026-07-30T00:00:00+00:00",
              "l1_method": "none", "l1_addresses": 0, "l2_survivors": 0,
              "n_winners": 0, "n_near_miss": 0, "notes": [],
@@ -251,8 +257,176 @@ def main():
     for bad in ("place_order", "private_key", "eth_account", "sign(", "/exchange"):
         check(bad not in src, f"不含 {bad}")
     check('"method": "subscribe"' in src, "WS 只做 subscribe")
-    for t in ('"type": "meta"', '"type": "clearinghouseState"', '"type": "userFills"'):
+    for t in ('"type": "meta"', '"type": "clearinghouseState"',
+              '"type": "userFillsByTime"'):
         check(t in src, f"使用唯讀查詢 {t}")
+
+    print("[15] userFillsByTime 分頁（第一版用 userFills 只看得到最近 2000 筆）")
+    pages = []
+
+    def paging_post(n_pages_full, rows_last=5):
+        """回一個 post_fn：前 n_pages_full 頁滿頁，最後一頁只回 rows_last 筆。"""
+        state = {"page": 0}
+
+        def fn(body, name, meta):
+            if body.get("type") != "userFillsByTime":
+                return None, False
+            pages.append(body.get("startTime"))
+            i = state["page"]
+            state["page"] += 1
+            n = 2000 if i < n_pages_full else rows_last
+            base = int((NOW - 30 * DAY + i * DAY) * 1000)
+            return [{"coin": "xyz:META", "closedPnl": "1", "time": base + j,
+                     "px": "1", "sz": "1", "side": "B", "fee": "0", "dir": "Close Long"}
+                    for j in range(n)], True
+        return fn
+
+    pages.clear()
+    raw, hit_cap = fx.fetch_fills_window("0xabc", fx.fetch.Meta(),
+                                         post_fn=paging_post(2), days=30)
+    check(len(raw) == 4005, f"三頁合計 4005 筆（實得 {len(raw)}）")
+    check(hit_cap is False, "未滿頁即停 → 不算觸及分頁上限")
+    check(len(pages) == 3, f"共 3 次請求（實得 {len(pages)}）")
+    check(pages == sorted(pages) and len(set(pages)) == 3,
+          f"startTime 每頁嚴格前進，不重複計入（實得 {pages}）")
+
+    pages.clear()
+    raw, hit_cap = fx.fetch_fills_window("0xabc", fx.fetch.Meta(),
+                                         post_fn=paging_post(99), days=30)
+    check(hit_cap is True, "每頁都滿 → 觸及分頁上限（判為做市／高頻型）")
+    check(len(pages) == xcfg.FILL_PAGE_CAP,
+          f"請求數受 FILL_PAGE_CAP 限制（實得 {len(pages)}）")
+    s_trunc = fx.dex_fill_stats(fx.classify.parse_fills(raw), "xyz",
+                                now_sec=NOW, truncated=hit_cap)
+    check(s_trunc["sample_truncated"] is True, "truncated 由呼叫端傳入而非猜總筆數")
+    v, reasons = fx.judge(s_trunc)
+    check(v == "reject" and any("分頁上限" in r for r in reasons),
+          f"觸頂 → 硬性淘汰（實得 {v}）")
+
+    pages.clear()
+    raw, hit_cap = fx.fetch_fills_window("0xabc", fx.fetch.Meta(),
+                                         post_fn=lambda *a, **k: (None, False))
+    check(raw == [] and hit_cap is False, "首頁失敗 → 回空清單不 crash")
+    raw, _ = fx.fetch_fills_window("0xabc", fx.fetch.Meta(),
+                                   post_fn=lambda *a, **k: ([], True))
+    check(raw == [], "空頁 → 立即停止")
+
+    print("[16] L1 依窗內成交次數排序：低頻優先（避開做市型帳戶）")
+    hi, lo = "0x" + "1" * 40, "0x" + "9" * 40
+    order_seen = []
+
+    def order_post(body, name, meta):
+        t = body.get("type")
+        if t == "meta":
+            return {"universe": [{"name": "META"}]}, True
+        if t == "clearinghouseState":
+            order_seen.append(body["user"])
+            return {"marginSummary": {"accountValue": "1"}, "assetPositions": []}, True
+        return None, False
+
+    class ManyTrades:
+        """hi 出現 5 次、lo 只出現 1 次。"""
+        def __init__(self):
+            self._msgs = ['{"channel":"trades","data":[{"coin":"xyz:META","users":["'
+                          + hi + '"]}]}'] * 5 + \
+                         ['{"channel":"trades","data":[{"coin":"xyz:META","users":["'
+                          + lo + '"]}]}']
+
+        def send(self, s):
+            pass
+
+        def recv(self):
+            if self._msgs:
+                return self._msgs.pop(0)
+            raise OSError("closed")
+
+        def close(self):
+            pass
+
+    args2 = types.SimpleNamespace(ws_seconds=1, out_json="", out_md="")
+    res2 = fx.run(args2, post_fn=order_post, get_fn=lambda *a, **k: (None, False),
+                  ws_factory=lambda u: ManyTrades())
+    check(order_seen[:2] == [lo, hi],
+          f"低頻地址先送進 L2（實得 {[a[:6] for a in order_seen[:2]]}）")
+    check(any("窗內成交次數分布" in n for n in res2["notes"]),
+          "備註揭露頻率分布（讓取樣偏誤看得見）")
+
+    print("[17] 硬性判定不靠字串比對（迴歸：改文案曾讓截斷錢包降級成 near_miss）")
+    src_judge = (XYZ_DIR / "find_xyz_winners.py").read_text(encoding="utf-8")
+    check("is_hard=True" in src_judge, "硬性缺陷用明確 flag 標記")
+    check('"偏誤" in r' not in src_judge, "不再用 reason 文字判硬性")
+
+    print("[18] 賠率主關卡（大賺小虧）與勝率降級")
+    # 0x6691da5f 的真實型態：勝率 46.2%、平均賺 $66／平均虧 $18（賠率 3.67）
+    low_wr_high_payoff = fills([(66, 46), (-18, 54)])
+    s = fx.dex_fill_stats(low_wr_high_payoff, "xyz", now_sec=NOW)
+    s["unrealized_pnl"] = 0.0
+    s["net_closed_pnl"] = 53_000.0
+    check(round(s["win_to_loss_ratio"], 2) == 3.67,
+          f"賠率 3.67（實得 {s['win_to_loss_ratio']:.2f}）")
+    v, reasons = fx.judge(s)
+    check(v == "winner",
+          f"低勝率但高賠率 → winner（舊判準會擋掉；實得 {v}, {reasons}）")
+
+    # 反例：勝率高但賠率不足（0x3acd3c8a：勝率 53.4%、$115/$85＝賠率 1.35）
+    high_wr_low_payoff = fills([(115, 53), (-85, 47)])
+    s = fx.dex_fill_stats(high_wr_low_payoff, "xyz", now_sec=NOW)
+    s["unrealized_pnl"] = 0.0
+    s["net_closed_pnl"] = 24_000.0
+    v, reasons = fx.judge(s)
+    check(any("賠率" in r for r in reasons), f"賠率不足被點名（reasons={reasons}）")
+
+    # 勝率 30%（低於樂透型下限）→ 仍要被擋
+    lottery = fills([(500, 30), (-50, 70)])
+    s = fx.dex_fill_stats(lottery, "xyz", now_sec=NOW)
+    s["unrealized_pnl"] = 0.0
+    s["net_closed_pnl"] = 11_500.0
+    v, reasons = fx.judge(s)
+    check(any("勝率" in r for r in reasons),
+          f"勝率 30% < 40% 下限仍被點名（reasons={reasons}）")
+
+    print("[19] 避免大虧：單筆最大虧損佔毛利")
+    big_loss = fills([(100, 60), (-1500, 1), (-20, 20)])
+    s = fx.dex_fill_stats(big_loss, "xyz", now_sec=NOW)
+    check(s["worst_loss"] == 1500.0, f"抓到最大單筆虧損（實得 {s['worst_loss']}）")
+    check(s["worst_loss_share_of_profit"] == 0.25,
+          f"佔毛利 25%（實得 {s['worst_loss_share_of_profit']:.2f}）")
+    huge = fills([(100, 60), (-3000, 1), (-20, 20)])
+    s = fx.dex_fill_stats(huge, "xyz", now_sec=NOW)
+    s["unrealized_pnl"] = 0.0
+    v, reasons = fx.judge(s)
+    check(any("大虧" in r for r in reasons),
+          f"單筆虧損佔毛利 50% 被點名（reasons={reasons}）")
+
+    print("[20] 未實現損益：補「從不認賠」的盲點")
+    clean = fills([(500, 40), (-150, 20)])
+    s = fx.dex_fill_stats(clean, "xyz", now_sec=NOW)
+    s["unrealized_pnl"] = -20_000.0          # 已實現 +$17k、未實現 -$20k
+    v, reasons = fx.judge(s)
+    check(s["total_pnl"] == -3_000.0,
+          f"總損益 = 已實現＋未實現（實得 {s['total_pnl']}）")
+    check(v == "reject" and any("抱虧不認" in r for r in reasons),
+          f"未實現虧損吃掉獲利 → 硬性淘汰（實得 {v}）")
+
+    s = fx.dex_fill_stats(clean, "xyz", now_sec=NOW)
+    s["unrealized_pnl"] = -1_000.0           # 小幅帳面虧損，仍在容許範圍
+    v, _ = fx.judge(s)
+    check(v == "winner", f"小幅未實現虧損不影響判定（實得 {v}）")
+
+    s = fx.dex_fill_stats(clean, "xyz", now_sec=NOW)
+    s["unrealized_pnl"] = None               # 缺資料
+    v, reasons = fx.judge(s)
+    check(v == "winner" and s["total_pnl"] == s["net_closed_pnl"],
+          "未實現缺資料 → 只用已實現，不臆造")
+
+    # 0x2171b50b 的型態：100% 勝率、零虧損樣本
+    perfect = fills([(809, 78)])
+    s = fx.dex_fill_stats(perfect, "xyz", now_sec=NOW)
+    s["unrealized_pnl"] = 0.0
+    check(s["win_to_loss_ratio"] is None, "零虧損 → 賠率 None（不給 inf）")
+    v, reasons = fx.judge(s)
+    check(v == "reject" and any("從不認賠" in r for r in reasons),
+          f"100% 勝率零虧損 → 硬性不予判定（實得 {v}, {reasons}）")
 
     print()
     if FAILURES:

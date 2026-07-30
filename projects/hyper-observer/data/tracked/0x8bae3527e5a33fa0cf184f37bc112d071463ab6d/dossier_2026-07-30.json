@@ -1,0 +1,385 @@
+{
+  "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+  "label": "scan-best-candidate-9M-lowdd",
+  "snapshot_date": "2026-07-30",
+  "classification": "consistent_winner",
+  "classification_reasons": [
+    "活動跨度 378.5 天 >= 60",
+    "總 PnL 9716403.49 > 10,000",
+    "回撤 0.0554 < 40% peak",
+    "目前槓桿 20.0 <= 20x",
+    "正月比率 0.692 >= 0.5",
+    "（fills 截斷 n>=2000，profit factor 1.576 樣本偏誤大，僅供低信心參考，不硬否決）"
+  ],
+  "followable": {
+    "ok": false,
+    "reasons": [
+      "槓桿過高：目前 20x > 10x"
+    ]
+  },
+  "metrics": {
+    "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+    "snapshot_date": "2026-07-30",
+    "pnl_source": "portfolio_curve",
+    "portfolio_window": "perpAllTime",
+    "low_confidence": false,
+    "total_pnl": 9716403.49,
+    "peak_pnl": 9788586.9,
+    "monthly_pnl": {
+      "2025-07": -73180.55,
+      "2025-08": -34288.37,
+      "2025-09": -8212.34,
+      "2025-10": 1435708.48,
+      "2025-11": 2045437.87,
+      "2025-12": 930544.52,
+      "2026-01": 638177.85,
+      "2026-02": 519822.91,
+      "2026-03": 1413004.59,
+      "2026-04": 1924051.99,
+      "2026-05": 106203.52,
+      "2026-06": -147782.42,
+      "2026-07": 966915.44
+    },
+    "active_months": 13,
+    "positive_month_ratio": 0.692,
+    "best_month_pnl": 2045437.87,
+    "max_drawdown_pct": 0.0554,
+    "current_drawdown_pct": 0.0074,
+    "max_single_day_crash_pct": 0.0331,
+    "span_days": 378.5,
+    "days_idle": 0.6,
+    "n_fills": 2000,
+    "profit_factor": 1.576,
+    "avg_win": 523.0,
+    "avg_loss": 345.55,
+    "realized_win_rate": 0.51,
+    "avg_hold_hours": 62.64,
+    "net_direction_ratio": 0.1426,
+    "n_fills_truncated": true,
+    "n_fills_last_30d": 2000,
+    "n_events": 40,
+    "n_events_last_30d": 40,
+    "n_events_last_30d_est": 76,
+    "events_30d_coverage_days": 15.8,
+    "median_fills_per_event": 18.5,
+    "median_event_notional": 99150.27,
+    "median_gap_between_events_hours": 0.3,
+    "p90_gap_between_events_hours": 24.04,
+    "had_liquidation": true,
+    "n_liquidations": 1,
+    "top_coin": "xyz:SNDK",
+    "vlm": 291804831.07,
+    "vlm_to_pnl_ratio": 30.03,
+    "funding_total": -152010.14,
+    "n_open_positions": 3,
+    "n_open_positions_native": 1,
+    "dexs_with_positions": [
+      "xyz"
+    ],
+    "account_value_native": 7407.21,
+    "account_value_by_dex": {
+      "": 7407.21,
+      "abcd": 0.0,
+      "cash": 0.0,
+      "flx": 0.0,
+      "hyna": 0.0,
+      "km": 0.0,
+      "mkts": 0.0,
+      "para": 0.0,
+      "vntl": 0.0,
+      "xyz": 105215.4
+    },
+    "spot_value_usd": 3329890.75,
+    "spot_tokens": [
+      {
+        "coin": "USDC",
+        "qty": 3281675.4894163297,
+        "usd": 3281675.49,
+        "estimated": false
+      },
+      {
+        "coin": "USDT0",
+        "qty": 48215.25091058,
+        "usd": 48215.25,
+        "estimated": true
+      },
+      {
+        "coin": "USDH",
+        "qty": 0.01250805,
+        "usd": 0.01,
+        "estimated": false
+      }
+    ],
+    "total_value_all_venues": 3442513.35,
+    "non_native_share": 0.9978,
+    "current_max_leverage": 20.0,
+    "has_extreme_leverage": false,
+    "margin_types": [
+      "cross",
+      "isolated"
+    ],
+    "account_value": 112622.6,
+    "fetch_errors": []
+  },
+  "position_value": 317368.92,
+  "unrealized_pnl": 6750.41,
+  "n_open_positions": 3,
+  "open_positions": [
+    {
+      "coin": "AIXBT",
+      "szi": 1304336.0,
+      "side": "long",
+      "entry_px": 0.01584,
+      "position_value": 22090.234496,
+      "unrealized_pnl": 1429.552256,
+      "leverage_value": 3.0,
+      "leverage_type": "cross",
+      "liquidation_px": null,
+      "margin_used": 7363.411498,
+      "max_leverage": 3.0,
+      "cum_funding_all_time": -1108.050781,
+      "dex": ""
+    },
+    {
+      "coin": "xyz:SMSN",
+      "szi": 618.556,
+      "side": "long",
+      "entry_px": 145.435,
+      "position_value": 91707.11256,
+      "unrealized_pnl": 1747.19573,
+      "leverage_value": 1.0,
+      "leverage_type": "isolated",
+      "liquidation_px": 0.0902300928,
+      "margin_used": 91654.090813,
+      "max_leverage": 10.0,
+      "cum_funding_all_time": -562.786586,
+      "dex": "xyz"
+    },
+    {
+      "coin": "xyz:DRAM",
+      "szi": 4535.1,
+      "side": "long",
+      "entry_px": 44.1,
+      "position_value": 203571.5688,
+      "unrealized_pnl": 3573.6588,
+      "leverage_value": 20.0,
+      "leverage_type": "cross",
+      "liquidation_px": null,
+      "margin_used": 10178.57844,
+      "max_leverage": 20.0,
+      "cum_funding_all_time": 12.246321,
+      "dex": "xyz"
+    }
+  ],
+  "recent_fills": [
+    {
+      "time": "2026-07-30T08:33:19.746000+00:00",
+      "coin": "xyz:DRAM",
+      "dir": "Open Long",
+      "px": 44.1,
+      "sz": 4.3,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-30T08:33:19.746000+00:00",
+      "coin": "xyz:DRAM",
+      "dir": "Open Long",
+      "px": 44.1,
+      "sz": 43.5,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-30T08:33:19.746000+00:00",
+      "coin": "xyz:DRAM",
+      "dir": "Open Long",
+      "px": 44.1,
+      "sz": 12.7,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-30T08:33:19.746000+00:00",
+      "coin": "xyz:DRAM",
+      "dir": "Open Long",
+      "px": 44.1,
+      "sz": 9.9,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-30T08:33:19.746000+00:00",
+      "coin": "xyz:DRAM",
+      "dir": "Open Long",
+      "px": 44.1,
+      "sz": 34.7,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-30T08:33:19.746000+00:00",
+      "coin": "xyz:DRAM",
+      "dir": "Open Long",
+      "px": 44.1,
+      "sz": 55.7,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-30T08:33:19.746000+00:00",
+      "coin": "xyz:DRAM",
+      "dir": "Open Long",
+      "px": 44.1,
+      "sz": 30.4,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-30T08:33:19.746000+00:00",
+      "coin": "xyz:DRAM",
+      "dir": "Open Long",
+      "px": 44.1,
+      "sz": 1.1,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-30T08:33:19.746000+00:00",
+      "coin": "xyz:DRAM",
+      "dir": "Open Long",
+      "px": 44.1,
+      "sz": 34.9,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-30T08:33:19.746000+00:00",
+      "coin": "xyz:DRAM",
+      "dir": "Open Long",
+      "px": 44.1,
+      "sz": 16.3,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-30T08:33:19.746000+00:00",
+      "coin": "xyz:DRAM",
+      "dir": "Open Long",
+      "px": 44.1,
+      "sz": 20.3,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-30T08:33:19.746000+00:00",
+      "coin": "xyz:DRAM",
+      "dir": "Open Long",
+      "px": 44.1,
+      "sz": 11.4,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-30T08:33:19.746000+00:00",
+      "coin": "xyz:DRAM",
+      "dir": "Open Long",
+      "px": 44.1,
+      "sz": 9.2,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-30T08:33:19.746000+00:00",
+      "coin": "xyz:DRAM",
+      "dir": "Open Long",
+      "px": 44.1,
+      "sz": 15.7,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-30T08:33:19.746000+00:00",
+      "coin": "xyz:DRAM",
+      "dir": "Open Long",
+      "px": 44.1,
+      "sz": 51.6,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-30T08:33:19.746000+00:00",
+      "coin": "xyz:DRAM",
+      "dir": "Open Long",
+      "px": 44.1,
+      "sz": 20.2,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-30T08:33:19.746000+00:00",
+      "coin": "xyz:DRAM",
+      "dir": "Open Long",
+      "px": 44.1,
+      "sz": 29.3,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-30T08:33:19.746000+00:00",
+      "coin": "xyz:DRAM",
+      "dir": "Open Long",
+      "px": 44.1,
+      "sz": 34.8,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-30T08:33:19.746000+00:00",
+      "coin": "xyz:DRAM",
+      "dir": "Open Long",
+      "px": 44.1,
+      "sz": 18.0,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-07-30T08:33:19.797000+00:00",
+      "coin": "xyz:DRAM",
+      "dir": "Open Long",
+      "px": 44.1,
+      "sz": 44.3,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    }
+  ],
+  "new_positions": [
+    {
+      "key": "xyz:DRAM:long",
+      "coin": "xyz:DRAM"
+    },
+    {
+      "key": "xyz:SMSN:long",
+      "coin": "xyz:SMSN"
+    }
+  ],
+  "disappeared_positions": [],
+  "initialized": false,
+  "raw_source": "snapshot",
+  "funds_trend": {
+    "status": "資料累積中",
+    "n_points": 1,
+    "days": 7,
+    "threshold": 0.05,
+    "first_date": null,
+    "last_date": null,
+    "spot_share_first": null,
+    "spot_share_last": null,
+    "spot_share_change": null,
+    "total_first": null,
+    "total_last": null,
+    "total_change_pct": null,
+    "perp_change_pct": null,
+    "position_value_change_pct": null
+  }
+}
