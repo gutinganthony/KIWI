@@ -1,8 +1,8 @@
 {
- "generated_at": "2026-07-30T11:35:28Z",
+ "generated_at": "2026-07-31T11:49:39Z",
  "market": "TW",
  "pipeline": "tw-funnel",
- "as_of_trading_day": "2026-07-30",
+ "as_of_trading_day": "2026-07-31",
  "endpoint_health": {
   "finmind_stock_info": {
    "ok": true,
@@ -45,8 +45,8 @@
    "ok": true,
    "source": "finmind",
    "dataset": "TaiwanStockMonthRevenue",
-   "pool": 60,
-   "fetched": 57,
+   "pool": 69,
+   "fetched": 65,
    "errors": 0
   },
   "company_basic": {
@@ -72,16 +72,15 @@
   }
  },
  "funnel_stats": {
-  "raw_filings": 314,
-  "qualified_events": 30,
-  "post_veto": 30,
+  "raw_filings": 315,
+  "qualified_events": 34,
+  "post_veto": 34,
   "final_candidates": 15
  },
  "veto_reasons": {},
  "january_window_active": false,
  "degradations": [
-  "pledge_data_unavailable: 董監質押比取數失敗/欄位不符，質押否決不生效",
-  "revenue_prev_month_missing: 1 檔通過籌碼關但無上月 YoY（月營收史料未累積滿 2 期），無法判加速，誠實不入池"
+  "pledge_data_unavailable: 董監質押比取數失敗/欄位不符，質押否決不生效"
  ],
  "todo_not_wired": [
   "tpex_otc_not_wired: v0 只做上市（TWSE），上櫃 TPEx 未接線",
