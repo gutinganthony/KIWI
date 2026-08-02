@@ -33,6 +33,22 @@ last_updated: 2026-07-06
   - ✅ 現在已有失敗推播（`deploy-pages.yml` → Telegram），收到通知再去按即可，不用自己巡邏網站。
   - 位置：Actions 分頁 → Deploy Dashboard to GitHub Pages → Re-run failed jobs；或等下次自動 deploy。
 
+### 2026-08-02 session 產生的（Serenity 全掃週報，8 月財報群前）
+- [ ] **Mersen H1 2026 新聞稿原文 → 抓 data center 分項銷售**（急，決定一個觸發判定）。
+  本週已確認的 H1 數字：營收 €6.11 億（organic +3.9%）、EBITDA €9,740 萬（15.9%）、經常營業利益 €5,650 萬（9.2%）、**全年指引上修**（organic 4–6%、EBITDA 率 16–16.5%、營業利益率 9.0–9.5%）。
+  **但雲端 WebSearch 抓不到 DC 分項**——唯一可得的 DC 數字仍是 Q1 2026 的 €1,000 萬。
+  Serenity 買進觸發 B 明文要求「**H1 DC 季銷售 ≥€15M ＋ 首次給 DC 專項目標/具名客戶**」，兩項皆未獲驗證 → 本週判定 **觸發 B ❌ 不成立**、降級條件亦標 `unverified`。
+  要看的頁：`mersen.com` → Group → News & Events / Financial results → 2026 H1 press release + slide deck。
+  **要抓三件**：①H1 或 Q2 的 DC 銷售金額 ②有無 DC 專項年度目標 ③有無具名客戶。
+  → 決定 T5 燈（AI 電力確認）與 Mersen 是否進入分批（現價 €37.24，已低於觸發 B 的 €38 價格條件）。
+- [ ] **Yahoo Finance 行情 API 是否恢復**（制度層，影響每週重定價）。
+  本 runner 2026-08-02 實測 **query1／query2／quoteSummary／getcrumb 四個端點全數回 HTTP 429 "Too Many Requests"**，`agents/loops/weekly-repricing-audit.md` 寫死的主源全掛。
+  本週已建立並實測通過的備援鏈：**CNBC quote cache**（`source="Exchange"`，美/日/英/法/台上市＋匯率，附 trailing P/E 與市值；**坑：逗號批次不支援、查不到韓股、查不到台股上櫃**）＋ **Naver `siseJson`**（韓股）＋ **FinMind `TaiwanStockPrice` + TPEx openapi**（台股含上櫃）。
+  → 若 Yahoo 持續 429，該把備援鏈正式寫進 loop 憲章 §HOW TO WORK（本 session 未自行改憲章，改制度檔前依 `agents/MAINTENANCE.md` 應先確認）。
+- [ ] **Ayar Labs 到底有沒有被 NVIDIA 收購**（兩說並存，影響 IPO 管線判斷）。
+  本 repo 07-15 週報記載「已被 NVIDIA ~$6.5B 收購、IPO 取消」；本週搜尋**查無該併購佐證**，反而查到「2026-03 完成 $500M Series E、與 Wiwynn 在 OFC 2026 發表 1,024 加速器機櫃級參考設計」。
+  → 兩說必須有一個是錯的，請以一手來源（NVIDIA newsroom / Ayar Labs newsroom）定讞。
+
 ### 2026-07-06 session 產生的（JEM 第一關收尾，加碼前必做）
 > 🔄 **2026-07-26 狀態更新：已改由資料橋自動處理，先別自己做。** 本 session 實測雲端 agent proxy 對 **TDnet／EDINET／irbank／kabutan／minkabu／Yahoo!JP／JEM 官網 全部 CONNECT 403**（curl 與 WebFetch 皆然）→ 新增 `scripts/fetch_jp_disclosures.py` 掛在 dashboard workflow（一天 3 次）的 `fetch_backtest_ext.py` 後面，由 Actions runner 抓 irbank 的 `/ir`（開示一覽）與 `/customers`（有報 相手先別販売実績），落地 `data/ext/jp_disclosures/6855_JEM.md`。**下次 bot 跑完就有檔；若檔內是 403 錯誤訊息（代表 runner 也被擋），才需要你在 Mac 上手動做下面兩項。**
 >
