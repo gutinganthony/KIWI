@@ -1,0 +1,916 @@
+{
+  "address": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+  "label": "hft-highvolume-candidate",
+  "date": "2026-08-03",
+  "probed_at": "2026-08-03T23:53:20.907006+00:00",
+  "ledger_window_days": 45,
+  "queries_ok": {
+    "perpDexs": true,
+    "clearinghouseState_native": true,
+    "clearinghouseState_dex": true,
+    "spotClearinghouseState": true,
+    "userNonFundingLedgerUpdates": true,
+    "portfolio": true,
+    "userFills": true
+  },
+  "dexs_detected": [
+    "xyz",
+    "flx",
+    "vntl",
+    "hyna",
+    "km",
+    "abcd",
+    "cash",
+    "para",
+    "mkts"
+  ],
+  "aborted": false,
+  "dexs_queried": [
+    "abcd",
+    "cash",
+    "flx",
+    "hyna",
+    "km",
+    "mkts",
+    "para",
+    "vntl",
+    "xyz"
+  ],
+  "portfolio_windows": {
+    "day": {
+      "account_value_last": 55298658.36,
+      "account_value_ts_iso": "2026-08-03T23:53:30.436000+00:00",
+      "pnl_last": 633204.72,
+      "vlm": 6501802.73,
+      "n_points": 12
+    },
+    "week": {
+      "account_value_last": 55298658.36,
+      "account_value_ts_iso": "2026-08-03T23:53:30.436000+00:00",
+      "pnl_last": 2399273.1,
+      "vlm": 64170014.7,
+      "n_points": 61
+    },
+    "month": {
+      "account_value_last": 55298658.36,
+      "account_value_ts_iso": "2026-08-03T23:53:30.436000+00:00",
+      "pnl_last": 2545679.83,
+      "vlm": 212953206.05,
+      "n_points": 45
+    },
+    "allTime": {
+      "account_value_last": 55298658.36,
+      "account_value_ts_iso": "2026-08-03T23:53:30.436000+00:00",
+      "pnl_last": 176338200.42,
+      "vlm": 4496058137.6,
+      "n_points": 79
+    },
+    "perpDay": {
+      "account_value_last": 28196853.97,
+      "account_value_ts_iso": "2026-08-03T23:53:30.436000+00:00",
+      "pnl_last": 3992.32,
+      "vlm": 5859713.24,
+      "n_points": 12
+    },
+    "perpWeek": {
+      "account_value_last": 28196853.97,
+      "account_value_ts_iso": "2026-08-03T23:53:30.436000+00:00",
+      "pnl_last": 3231827.27,
+      "vlm": 59797582.98,
+      "n_points": 61
+    },
+    "perpMonth": {
+      "account_value_last": 28196853.97,
+      "account_value_ts_iso": "2026-08-03T23:53:30.436000+00:00",
+      "pnl_last": 9002124.52,
+      "vlm": 199602296.54,
+      "n_points": 45
+    },
+    "perpAllTime": {
+      "account_value_last": 28196853.97,
+      "account_value_ts_iso": "2026-08-03T23:53:30.436000+00:00",
+      "pnl_last": 189990356.78,
+      "vlm": 4221714384.64,
+      "n_points": 83
+    }
+  },
+  "trading": {
+    "n_fills": 2000,
+    "truncated": true,
+    "last_fill_ts": 1785778607.034,
+    "last_fill_iso": "2026-08-03T17:36:47.034000+00:00",
+    "days_since_last_fill": 0.26,
+    "n_fills_7d": 2000,
+    "n_fills_30d": 2000,
+    "first_fill_iso": "2026-08-03T15:49:44.881000+00:00",
+    "top_coins": [
+      [
+        "xyz:GOLD",
+        1695
+      ],
+      [
+        "@107",
+        184
+      ],
+      [
+        "HYPE",
+        121
+      ]
+    ],
+    "by_venue": {
+      "builder:xyz": 1695,
+      "spot": 184,
+      "native": 121
+    },
+    "recent_fills": [
+      {
+        "time_iso": "2026-08-03T17:36:45.692000+00:00",
+        "coin": "xyz:GOLD",
+        "dir": "Open Short",
+        "px": 4039.8,
+        "sz": 0.0028,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-08-03T17:36:45.692000+00:00",
+        "coin": "xyz:GOLD",
+        "dir": "Open Short",
+        "px": 4039.8,
+        "sz": 0.0028,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-08-03T17:36:45.692000+00:00",
+        "coin": "xyz:GOLD",
+        "dir": "Open Short",
+        "px": 4039.8,
+        "sz": 0.0345,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-08-03T17:36:46.364000+00:00",
+        "coin": "xyz:GOLD",
+        "dir": "Open Short",
+        "px": 4039.8,
+        "sz": 0.4694,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-08-03T17:36:46.364000+00:00",
+        "coin": "xyz:GOLD",
+        "dir": "Open Short",
+        "px": 4039.8,
+        "sz": 0.0028,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-08-03T17:36:46.364000+00:00",
+        "coin": "xyz:GOLD",
+        "dir": "Open Short",
+        "px": 4039.8,
+        "sz": 0.0287,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-08-03T17:36:46.364000+00:00",
+        "coin": "xyz:GOLD",
+        "dir": "Open Short",
+        "px": 4039.8,
+        "sz": 0.0028,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-08-03T17:36:46.364000+00:00",
+        "coin": "xyz:GOLD",
+        "dir": "Open Short",
+        "px": 4039.8,
+        "sz": 0.0028,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-08-03T17:36:46.364000+00:00",
+        "coin": "xyz:GOLD",
+        "dir": "Open Short",
+        "px": 4039.8,
+        "sz": 0.0404,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-08-03T17:36:46.364000+00:00",
+        "coin": "xyz:GOLD",
+        "dir": "Open Short",
+        "px": 4039.8,
+        "sz": 0.062,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-08-03T17:36:46.364000+00:00",
+        "coin": "xyz:GOLD",
+        "dir": "Open Short",
+        "px": 4039.8,
+        "sz": 0.0089,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-08-03T17:36:46.364000+00:00",
+        "coin": "xyz:GOLD",
+        "dir": "Open Short",
+        "px": 4039.8,
+        "sz": 0.0028,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-08-03T17:36:47.034000+00:00",
+        "coin": "xyz:GOLD",
+        "dir": "Open Short",
+        "px": 4039.5,
+        "sz": 0.0028,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-08-03T17:36:47.034000+00:00",
+        "coin": "xyz:GOLD",
+        "dir": "Open Short",
+        "px": 4039.5,
+        "sz": 0.0185,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-08-03T17:36:47.034000+00:00",
+        "coin": "xyz:GOLD",
+        "dir": "Open Short",
+        "px": 4039.6,
+        "sz": 0.1434,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-08-03T17:36:47.034000+00:00",
+        "coin": "xyz:GOLD",
+        "dir": "Open Short",
+        "px": 4039.6,
+        "sz": 0.0542,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-08-03T17:36:47.034000+00:00",
+        "coin": "xyz:GOLD",
+        "dir": "Open Short",
+        "px": 4039.7,
+        "sz": 0.0923,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-08-03T17:36:47.034000+00:00",
+        "coin": "xyz:GOLD",
+        "dir": "Open Short",
+        "px": 4039.8,
+        "sz": 0.062,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-08-03T17:36:47.034000+00:00",
+        "coin": "xyz:GOLD",
+        "dir": "Open Short",
+        "px": 4039.8,
+        "sz": 0.0195,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-08-03T17:36:47.034000+00:00",
+        "coin": "xyz:GOLD",
+        "dir": "Open Short",
+        "px": 4039.8,
+        "sz": 0.228,
+        "closed_pnl": 0.0
+      }
+    ]
+  },
+  "funds": {
+    "native": {
+      "n_positions": 8,
+      "account_value": 22968843.85081,
+      "position_value": 113951001.14
+    },
+    "builder_dex": {
+      "xyz": {
+        "n_positions": 1,
+        "account_value": 5230880.081246,
+        "position_value": 21312644.16
+      },
+      "flx": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "vntl": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "hyna": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "km": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "abcd": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "cash": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "para": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "mkts": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      }
+    },
+    "spot": {
+      "n_nonzero": 10,
+      "balances": [
+        {
+          "coin": "USDC",
+          "total": 30209568.56727334,
+          "hold": 27391772.747401,
+          "entry_ntl": 0.0,
+          "usd": 30209568.56727334
+        },
+        {
+          "coin": "HYPE",
+          "total": 328044.30478903,
+          "hold": 0.0,
+          "entry_ntl": 21183758.56378686,
+          "usd": 21183758.56378686,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "UFART",
+          "total": 13964068.032653,
+          "hold": 0.0,
+          "entry_ntl": 3474598.8206207,
+          "usd": 3474598.8206207,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "UBONK",
+          "total": 2331863.80511,
+          "hold": 0.0,
+          "entry_ntl": 21.06872538,
+          "usd": 21.06872538,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "FUND",
+          "total": 18.69,
+          "hold": 0.0,
+          "entry_ntl": 14.0446005,
+          "usd": 14.0446005,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "UPUMP",
+          "total": 4014.188103,
+          "hold": 0.0,
+          "entry_ntl": 11.81897403,
+          "usd": 11.81897403,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "USDT0",
+          "total": 7.99944001,
+          "hold": 0.0,
+          "entry_ntl": 7.99944001,
+          "usd": 7.99944001,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "LICKO",
+          "total": 35585.49249208,
+          "hold": 0.0,
+          "entry_ntl": 0.21351295,
+          "usd": 0.21351295,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "USDH",
+          "total": 0.01001646,
+          "hold": 0.0,
+          "entry_ntl": 0.01001646,
+          "usd": 0.01001646
+        },
+        {
+          "coin": "LATINA",
+          "total": 45658.0657,
+          "hold": 0.0,
+          "entry_ntl": 0.0,
+          "usd": 0.0,
+          "usd_is_estimate": true
+        }
+      ],
+      "usd_stable": 30209568.58,
+      "usd_est_other": 24658412.53,
+      "usd_total_est": 54867981.11,
+      "estimated": true
+    },
+    "native_usd": 22968843.85,
+    "builder_usd": 5230880.08,
+    "spot_usd": 54867981.11,
+    "total_usd": 83067705.04,
+    "non_native_usd": 60098861.19,
+    "non_native_share": 0.7235,
+    "positions": [
+      {
+        "coin": "BTC",
+        "szi": -367.63672,
+        "side": "short",
+        "entry_px": 64110.9,
+        "position_value": 23337137.821536,
+        "unrealized_pnl": 232399.167134,
+        "leverage_value": 5.0,
+        "leverage_type": "cross",
+        "liquidation_px": 135303.3232138751,
+        "margin_used": 4667427.564307,
+        "max_leverage": 40.0,
+        "cum_funding_all_time": -16062283.265186,
+        "dex": ""
+      },
+      {
+        "coin": "ETH",
+        "szi": -31371.9638,
+        "side": "short",
+        "entry_px": 1877.0,
+        "position_value": 58289108.7404,
+        "unrealized_pnl": 596184.660534,
+        "leverage_value": 5.0,
+        "leverage_type": "cross",
+        "liquidation_px": 2693.4967971758,
+        "margin_used": 11657821.74808,
+        "max_leverage": 25.0,
+        "cum_funding_all_time": -14404609.785031,
+        "dex": ""
+      },
+      {
+        "coin": "SOL",
+        "szi": -95308.59,
+        "side": "short",
+        "entry_px": 80.4327,
+        "position_value": 7006420.37667,
+        "unrealized_pnl": 659508.942399,
+        "leverage_value": 10.0,
+        "leverage_type": "cross",
+        "liquidation_px": 347.1852459584,
+        "margin_used": 700642.037667,
+        "max_leverage": 20.0,
+        "cum_funding_all_time": -2717913.416989,
+        "dex": ""
+      },
+      {
+        "coin": "SUI",
+        "szi": -0.5,
+        "side": "short",
+        "entry_px": 3.67761,
+        "position_value": 0.345255,
+        "unrealized_pnl": 1.493551,
+        "leverage_value": 10.0,
+        "leverage_type": "cross",
+        "liquidation_px": 50427998.44373454,
+        "margin_used": 0.034525,
+        "max_leverage": 10.0,
+        "cum_funding_all_time": -120714.041488,
+        "dex": ""
+      },
+      {
+        "coin": "XRP",
+        "szi": -249233.0,
+        "side": "short",
+        "entry_px": 1.901026,
+        "position_value": 267881.859225,
+        "unrealized_pnl": 205916.636457,
+        "leverage_value": 20.0,
+        "leverage_type": "cross",
+        "liquidation_px": 105.7291680622,
+        "margin_used": 13394.092961,
+        "max_leverage": 20.0,
+        "cum_funding_all_time": -9428.135428,
+        "dex": ""
+      },
+      {
+        "coin": "HYPE",
+        "szi": -430442.34,
+        "side": "short",
+        "entry_px": 59.7982,
+        "position_value": 23204027.399316,
+        "unrealized_pnl": 2535655.12225,
+        "leverage_value": 5.0,
+        "leverage_type": "cross",
+        "liquidation_px": 110.372356452,
+        "margin_used": 4640805.479863,
+        "max_leverage": 5.0,
+        "cum_funding_all_time": -6777145.493137,
+        "dex": ""
+      },
+      {
+        "coin": "FARTCOIN",
+        "szi": -13946937.0,
+        "side": "short",
+        "entry_px": 0.23683,
+        "position_value": 1842111.43896,
+        "unrealized_pnl": 1461025.612639,
+        "leverage_value": 5.0,
+        "leverage_type": "cross",
+        "liquidation_px": 1.9339284312,
+        "margin_used": 368422.287792,
+        "max_leverage": 10.0,
+        "cum_funding_all_time": -276139.208975,
+        "dex": ""
+      },
+      {
+        "coin": "PUMP",
+        "szi": -2022108.0,
+        "side": "short",
+        "entry_px": 0.006521,
+        "position_value": 4313.156364,
+        "unrealized_pnl": 8874.18259,
+        "leverage_value": 5.0,
+        "leverage_type": "cross",
+        "liquidation_px": 12.4712013385,
+        "margin_used": 862.631272,
+        "max_leverage": 10.0,
+        "cum_funding_all_time": -254602.32409,
+        "dex": ""
+      },
+      {
+        "coin": "xyz:GOLD",
+        "szi": -5255.6333,
+        "side": "short",
+        "entry_px": 4107.25,
+        "position_value": 21312644.15816,
+        "unrealized_pnl": 273567.192048,
+        "leverage_value": 4.0,
+        "leverage_type": "cross",
+        "liquidation_px": 9042.4534440362,
+        "margin_used": 5328161.03954,
+        "max_leverage": 25.0,
+        "cum_funding_all_time": -144123.180579,
+        "dex": "xyz"
+      }
+    ],
+    "n_positions_total": 9,
+    "n_positions_native": 8,
+    "n_positions_builder": 1,
+    "known": true
+  },
+  "ledger": {
+    "n_total": 14,
+    "n_in_window": 14,
+    "n_kept": 14,
+    "by_type": {
+      "send": {
+        "n": 14,
+        "usd": 47999997.4,
+        "direction": "mixed"
+      }
+    },
+    "external_out_usd": 0.0,
+    "external_in_usd": 33999997.4,
+    "internal_usd": 0.0,
+    "vault_out_usd": 0.0,
+    "bridge_out_usd": 14000000.0,
+    "unknown_usd": 0.0,
+    "external_out_rows": [],
+    "bridge_out_rows": [
+      {
+        "time": 1785682341.735,
+        "time_iso": "2026-08-02T14:52:21.735000+00:00",
+        "type": "send",
+        "usd": 5000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x2e81267816ed7d232ffa04414aa6f901d9003e5db1e09bf5d249d1cad5e1570d"
+      },
+      {
+        "time": 1785371499.481,
+        "time_iso": "2026-07-30T00:31:39.481000+00:00",
+        "type": "send",
+        "usd": 3500000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x487ee85f70ccef4749f80441086daa0202f200450bc00e19ec4793b22fc0c931"
+      },
+      {
+        "time": 1783222543.673,
+        "time_iso": "2026-07-05T03:35:43.673000+00:00",
+        "type": "send",
+        "usd": 3000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x031d4b5001aca3e60497043f3d476e02015c00359cafc2b8a6e5f6a2c0a07dd0"
+      },
+      {
+        "time": 1782645423.947,
+        "time_iso": "2026-06-28T11:17:03.947000+00:00",
+        "type": "send",
+        "usd": 2500000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xb53d7a24cd972022b6b7043ebe52d701a600920a689a3ef4590625778c9afa0d"
+      }
+    ],
+    "unknown_rows": [],
+    "internal_rows": [],
+    "rows": [
+      {
+        "time": 1785682341.735,
+        "time_iso": "2026-08-02T14:52:21.735000+00:00",
+        "type": "send",
+        "usd": 5000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x2e81267816ed7d232ffa04414aa6f901d9003e5db1e09bf5d249d1cad5e1570d"
+      },
+      {
+        "time": 1785371499.481,
+        "time_iso": "2026-07-30T00:31:39.481000+00:00",
+        "type": "send",
+        "usd": 3500000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x487ee85f70ccef4749f80441086daa0202f200450bc00e19ec4793b22fc0c931"
+      },
+      {
+        "time": 1785154504.426,
+        "time_iso": "2026-07-27T12:15:04.426000+00:00",
+        "type": "send",
+        "usd": 2999999.6,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x28914ba2c1fac4ec2a0b0440da27030000cc63885cfde3becc59f6f580fe9ed6"
+      },
+      {
+        "time": 1784922129.48,
+        "time_iso": "2026-07-24T19:42:09.480000+00:00",
+        "type": "send",
+        "usd": 4999999.6,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xe748d38ab6fa40bde8c20440a88386010100eb7051fd5f8f8b117edd75fe1aa8"
+      },
+      {
+        "time": 1784616991.422,
+        "time_iso": "2026-07-21T06:56:31.422000+00:00",
+        "type": "send",
+        "usd": 4999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xe81d99187feb6d2be99704406758ce000058b0fe1aee8bfd8be6446b3eef4716"
+      },
+      {
+        "time": 1784387297.456,
+        "time_iso": "2026-07-18T15:08:17.456000+00:00",
+        "type": "send",
+        "usd": 2999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x3b06131330628d7b3c7f0440361c760000412af8cb65ac4ddecebe65ef666765"
+      },
+      {
+        "time": 1784293927.403,
+        "time_iso": "2026-07-17T13:12:07.403000+00:00",
+        "type": "send",
+        "usd": 4999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x1b6487acde8a6c971cde044022300000009f9f92798d8b69bf2d32ff9d8e4681"
+      },
+      {
+        "time": 1784193261.38,
+        "time_iso": "2026-07-16T09:14:21.380000+00:00",
+        "type": "send",
+        "usd": 3999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x27d8483e57af3f6a295204400ca5fa0000136023f2a25e3ccba0f39116a31954"
+      },
+      {
+        "time": 1784183405.376,
+        "time_iso": "2026-07-16T06:30:05.376000+00:00",
+        "type": "send",
+        "usd": 2999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xb5567ebbd1fc5d44b6d004400a8c0300009196a16cff7c16591f2a0e90f0372f"
+      },
+      {
+        "time": 1784124401.354,
+        "time_iso": "2026-07-15T14:06:41.354000+00:00",
+        "type": "send",
+        "usd": 999999.6,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x26764bd9dd12250127f0043ffdf19d0000b163bf781543d3ca3ef72c9c15feeb"
+      },
+      {
+        "time": 1783291955.45,
+        "time_iso": "2026-07-05T22:52:35.450000+00:00",
+        "type": "send",
+        "usd": 1999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xf0193efb77a04c9bf192043f4bdffa00005456e112a36b6e93e1ea4e36a42686"
+      },
+      {
+        "time": 1783222543.673,
+        "time_iso": "2026-07-05T03:35:43.673000+00:00",
+        "type": "send",
+        "usd": 3000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x031d4b5001aca3e60497043f3d476e02015c00359cafc2b8a6e5f6a2c0a07dd0"
+      },
+      {
+        "time": 1783140811.478,
+        "time_iso": "2026-07-04T04:53:31.478000+00:00",
+        "type": "send",
+        "usd": 2999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x2124c74cdb62a25e229e043f2bf4e600005fdf327665c130c4ed729f9a667c48"
+      },
+      {
+        "time": 1782645423.947,
+        "time_iso": "2026-06-28T11:17:03.947000+00:00",
+        "type": "send",
+        "usd": 2500000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xb53d7a24cd972022b6b7043ebe52d701a600920a689a3ef4590625778c9afa0d"
+      }
+    ],
+    "n_bridge_out": 4,
+    "n_unknown": 0,
+    "counterparties": {},
+    "parse_failed": false
+  },
+  "verdict": "同地址換戰場（builder dex/現貨）",
+  "verdict_reasons": [
+    "非原生資金 $60,098,861.19 占總資產 $83,067,705.04 的72%（builder dex $5,230,880.08／現貨 $54,867,981.11）",
+    "成交戰場分布：非原生 1879/2000 筆（94%）",
+    "近 45 天帳變動離場訊號：跨層轉移（HyperCore→HyperEVM，同一擁有者） $14,000,000.00"
+  ],
+  "endpoint_health": [
+    {
+      "name": "perpDexs",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.44
+    },
+    {
+      "name": "clearinghouseState[native]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "clearinghouseState[xyz]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "clearinghouseState[flx]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "clearinghouseState[vntl]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "clearinghouseState[hyna]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "clearinghouseState[km]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "clearinghouseState[abcd]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "clearinghouseState[cash]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "clearinghouseState[para]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "clearinghouseState[mkts]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "spotClearinghouseState",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.32
+    },
+    {
+      "name": "userNonFundingLedgerUpdates",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "portfolio",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "userFills",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.48
+    }
+  ],
+  "notes": [],
+  "requests_ok": 15,
+  "requests_failed": 0
+}
