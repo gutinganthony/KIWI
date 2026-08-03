@@ -18,7 +18,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |-------|---------|
 | [Technology](./topics/technology/INDEX.md) | 2 |
 | [Science](./topics/science/INDEX.md) | 0 |
-| [Business](./topics/business/INDEX.md) | 66 |
+| [Business](./topics/business/INDEX.md) | 67 |
 | [Health](./topics/health/INDEX.md) | 0 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Other](./topics/other/INDEX.md) | 2 |
@@ -32,6 +32,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-07-22 | [日本限定品群眾採買平台 — 商業模式計畫（autoplan 雙聲部審查）](./topics/business/2026-07-22-jp-limited-goods-platform-plan.md) | Business |
 | 2026-07-22 | [Grabr 台灣複製可行性評估 — Pincus Proven/Better/New 框架](./topics/business/2026-07-22-grabr-taiwan-feasibility.md) | Business |
 | 2026-07-22 | [C 案評估 — 精品級供應鏈接入服務（合作案）](./topics/business/2026-07-22-luxury-sourcing-service-evaluation.md) | Business |
 | 2026-07-22 | [Recovery Camp 市場研究 — 台灣行情/國際參照/法規紅線](./topics/business/2026-07-22-recovery-camp-market-research.md) | Business |
@@ -85,6 +86,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-07-22 | [C 案評估 — 精品級供應鏈接入服務（合作案）](./topics/business/2026-07-22-luxury-sourcing-service-evaluation.md) | Business |
 | 2026-07-22 | [C 案占位查證 — Pietra/Italic/費率/MOQ/關稅](./topics/business/2026-07-22-sourcing-c-case-research.md) | Business |
 | 2026-07-22 | [Grabr 台灣複製可行性評估 — Pincus Proven/Better/New 框架](./topics/business/2026-07-22-grabr-taiwan-feasibility.md) | Business |
+| 2026-07-22 | [日本限定品群眾採買平台 — 商業模式計畫（autoplan 雙聲部審查）](./topics/business/2026-07-22-jp-limited-goods-platform-plan.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
