@@ -66,6 +66,6 @@
 | 2026-07-22 | [Recovery Camp 顧客訪談訪綱 — Mom Test × 真 Offer 收尾](./2026-07-22-recovery-camp-interview-guide.md) | recovery-camp, interview-guide, customer-discovery, mom-test, van-westendorp, presale |
 | 2026-07-22 | [Recovery Camp 市場研究 — 台灣行情/國際參照/法規紅線](./2026-07-22-recovery-camp-market-research.md) | recovery-camp, market-research, pricing, taiwan-cases, regulation, wellness-retreat |
 | 2026-07-22 | [C 案評估 — 精品級供應鏈接入服務（合作案）](./2026-07-22-luxury-sourcing-service-evaluation.md) | sourcing-as-a-service, luxury-supply-chain, partnership, startup-evaluation, personal-project |
-| 2026-07-22 | [日本限定品群眾採買平台 — 商業模式計畫（autoplan 雙聲部審查）](./2026-07-22-jp-limited-goods-platform-plan.md) | daigou, marketplace, japan, crowdsourcing, business-model, autoplan, reliability-engine |
+| 2026-07-22 | [順手代購平台 — 商業模式計畫 v2（閒置行李額度 × 實體通路取得服務）](./2026-07-22-jp-limited-goods-platform-plan.md) | daigou, marketplace, japan, crowdsourcing, handcarry, idle-capacity, business-model, autoplan |
 | 2026-07-22 | [C 案占位查證 — Pietra/Italic/費率/MOQ/關稅](./2026-07-22-sourcing-c-case-research.md) | sourcing-as-a-service, occupancy-check, pietra, italic, moq, tariff, research |
 | 2026-07-22 | [Grabr 台灣複製可行性評估 — Pincus Proven/Better/New 框架](./2026-07-22-grabr-taiwan-feasibility.md) | grabr, daigou, cross-border-commerce, crowdshipping, pincus-framework, taiwan-market, feasibility-study |
