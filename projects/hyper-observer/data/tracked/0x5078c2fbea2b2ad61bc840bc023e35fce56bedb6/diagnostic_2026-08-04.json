@@ -1,0 +1,805 @@
+{
+  "address": "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6",
+  "label": "james-wynn-blowup-groundtruth",
+  "date": "2026-08-04",
+  "probed_at": "2026-08-04T23:47:25.325131+00:00",
+  "ledger_window_days": 45,
+  "queries_ok": {
+    "perpDexs": true,
+    "clearinghouseState_native": true,
+    "clearinghouseState_dex": true,
+    "spotClearinghouseState": true,
+    "userNonFundingLedgerUpdates": true,
+    "portfolio": true,
+    "userFills": true
+  },
+  "dexs_detected": [
+    "xyz",
+    "flx",
+    "vntl",
+    "hyna",
+    "km",
+    "abcd",
+    "cash",
+    "para",
+    "mkts"
+  ],
+  "aborted": false,
+  "dexs_queried": [
+    "abcd",
+    "cash",
+    "flx",
+    "hyna",
+    "km",
+    "mkts",
+    "para",
+    "vntl",
+    "xyz"
+  ],
+  "portfolio_windows": {
+    "day": {
+      "account_value_last": 895.71,
+      "account_value_ts_iso": "2026-08-04T23:47:34.214000+00:00",
+      "pnl_last": -1781.43,
+      "vlm": 221289.98,
+      "n_points": 17
+    },
+    "week": {
+      "account_value_last": 895.71,
+      "account_value_ts_iso": "2026-08-04T23:47:34.214000+00:00",
+      "pnl_last": -22268.6,
+      "vlm": 1638528.16,
+      "n_points": 62
+    },
+    "month": {
+      "account_value_last": 895.71,
+      "account_value_ts_iso": "2026-08-04T23:47:34.214000+00:00",
+      "pnl_last": -20442.84,
+      "vlm": 4076444.12,
+      "n_points": 55
+    },
+    "allTime": {
+      "account_value_last": 895.71,
+      "account_value_ts_iso": "2026-08-04T23:47:34.214000+00:00",
+      "pnl_last": -22072340.6,
+      "vlm": 18939999207.13,
+      "n_points": 104
+    },
+    "perpDay": {
+      "account_value_last": 0.0,
+      "account_value_ts_iso": "2026-08-04T23:47:34.214000+00:00",
+      "pnl_last": -1781.45,
+      "vlm": 221289.98,
+      "n_points": 17
+    },
+    "perpWeek": {
+      "account_value_last": 0.0,
+      "account_value_ts_iso": "2026-08-04T23:47:34.214000+00:00",
+      "pnl_last": -22268.6,
+      "vlm": 1638528.16,
+      "n_points": 62
+    },
+    "perpMonth": {
+      "account_value_last": 0.0,
+      "account_value_ts_iso": "2026-08-04T23:47:34.214000+00:00",
+      "pnl_last": -20442.83,
+      "vlm": 4076444.12,
+      "n_points": 55
+    },
+    "perpAllTime": {
+      "account_value_last": 0.0,
+      "account_value_ts_iso": "2026-08-04T23:47:34.214000+00:00",
+      "pnl_last": -23389110.96,
+      "vlm": 18931991619.76,
+      "n_points": 106
+    }
+  },
+  "trading": {
+    "n_fills": 2000,
+    "truncated": true,
+    "last_fill_ts": 1785856431.918,
+    "last_fill_iso": "2026-08-04T15:13:51.918000+00:00",
+    "days_since_last_fill": 0.36,
+    "n_fills_7d": 149,
+    "n_fills_30d": 500,
+    "first_fill_iso": "2026-03-25T11:31:34.048000+00:00",
+    "top_coins": [
+      [
+        "xyz:SP500",
+        1118
+      ],
+      [
+        "BTC",
+        770
+      ],
+      [
+        "xyz:GOLD",
+        66
+      ],
+      [
+        "xyz:SPCX",
+        27
+      ],
+      [
+        "SOL",
+        9
+      ],
+      [
+        "ETH",
+        5
+      ],
+      [
+        "@166",
+        3
+      ],
+      [
+        "@230",
+        2
+      ]
+    ],
+    "by_venue": {
+      "builder:xyz": 1211,
+      "native": 784,
+      "spot": 5
+    },
+    "recent_fills": [
+      {
+        "time_iso": "2026-08-04T11:43:34.059000+00:00",
+        "coin": "xyz:SP500",
+        "dir": "Close Short",
+        "px": 7622.2,
+        "sz": 2.135,
+        "closed_pnl": -434.72
+      },
+      {
+        "time_iso": "2026-08-04T11:43:34.059000+00:00",
+        "coin": "xyz:SP500",
+        "dir": "Close Short",
+        "px": 7622.2,
+        "sz": 0.189,
+        "closed_pnl": -38.48
+      },
+      {
+        "time_iso": "2026-08-04T11:43:34.059000+00:00",
+        "coin": "xyz:SP500",
+        "dir": "Close Short",
+        "px": 7622.2,
+        "sz": 0.021,
+        "closed_pnl": -4.28
+      },
+      {
+        "time_iso": "2026-08-04T11:43:34.059000+00:00",
+        "coin": "xyz:SP500",
+        "dir": "Close Short",
+        "px": 7622.2,
+        "sz": 0.466,
+        "closed_pnl": -94.88
+      },
+      {
+        "time_iso": "2026-08-04T11:43:34.059000+00:00",
+        "coin": "xyz:SP500",
+        "dir": "Close Short",
+        "px": 7622.2,
+        "sz": 0.5,
+        "closed_pnl": -101.81
+      },
+      {
+        "time_iso": "2026-08-04T11:43:34.059000+00:00",
+        "coin": "xyz:SP500",
+        "dir": "Close Short",
+        "px": 7622.1,
+        "sz": 0.949,
+        "closed_pnl": -193.13
+      },
+      {
+        "time_iso": "2026-08-04T13:30:33.965000+00:00",
+        "coin": "xyz:SP500",
+        "dir": "Close Short",
+        "px": 7633.2,
+        "sz": 4.62,
+        "closed_pnl": -991.52
+      },
+      {
+        "time_iso": "2026-08-04T14:01:18.982000+00:00",
+        "coin": "xyz:SP500",
+        "dir": "Close Short",
+        "px": 7654.7,
+        "sz": 3.696,
+        "closed_pnl": -872.68
+      },
+      {
+        "time_iso": "2026-08-04T14:18:06.916000+00:00",
+        "coin": "xyz:SP500",
+        "dir": "Close Short",
+        "px": 7673.9,
+        "sz": 2.957,
+        "closed_pnl": -754.96
+      },
+      {
+        "time_iso": "2026-08-04T15:13:51.918000+00:00",
+        "coin": "xyz:SP500",
+        "dir": "Close Short",
+        "px": 7693.1,
+        "sz": 1.374,
+        "closed_pnl": -377.18
+      },
+      {
+        "time_iso": "2026-08-04T15:13:51.918000+00:00",
+        "coin": "xyz:SP500",
+        "dir": "Close Short",
+        "px": 7693.1,
+        "sz": 0.006,
+        "closed_pnl": -1.65
+      },
+      {
+        "time_iso": "2026-08-04T15:13:51.918000+00:00",
+        "coin": "xyz:SP500",
+        "dir": "Close Short",
+        "px": 7693.0,
+        "sz": 2.0,
+        "closed_pnl": -548.83
+      },
+      {
+        "time_iso": "2026-08-04T15:13:51.918000+00:00",
+        "coin": "xyz:SP500",
+        "dir": "Close Short",
+        "px": 7693.0,
+        "sz": 0.619,
+        "closed_pnl": -169.86
+      },
+      {
+        "time_iso": "2026-08-04T15:13:51.918000+00:00",
+        "coin": "xyz:SP500",
+        "dir": "Close Short",
+        "px": 7693.0,
+        "sz": 0.022,
+        "closed_pnl": -6.04
+      },
+      {
+        "time_iso": "2026-08-04T15:13:51.918000+00:00",
+        "coin": "xyz:SP500",
+        "dir": "Close Short",
+        "px": 7693.0,
+        "sz": 0.197,
+        "closed_pnl": -54.06
+      },
+      {
+        "time_iso": "2026-08-04T15:13:51.918000+00:00",
+        "coin": "xyz:SP500",
+        "dir": "Close Short",
+        "px": 7693.0,
+        "sz": 0.649,
+        "closed_pnl": -178.09
+      },
+      {
+        "time_iso": "2026-08-04T15:13:51.918000+00:00",
+        "coin": "xyz:SP500",
+        "dir": "Close Short",
+        "px": 7692.9,
+        "sz": 3.255,
+        "closed_pnl": -892.89
+      },
+      {
+        "time_iso": "2026-08-04T15:13:51.918000+00:00",
+        "coin": "xyz:SP500",
+        "dir": "Close Short",
+        "px": 7692.9,
+        "sz": 0.301,
+        "closed_pnl": -82.57
+      },
+      {
+        "time_iso": "2026-08-04T15:13:51.918000+00:00",
+        "coin": "xyz:SP500",
+        "dir": "Close Short",
+        "px": 7692.9,
+        "sz": 0.202,
+        "closed_pnl": -55.41
+      },
+      {
+        "time_iso": "2026-08-04T15:13:51.918000+00:00",
+        "coin": "xyz:SP500",
+        "dir": "Close Short",
+        "px": 7692.9,
+        "sz": 3.206,
+        "closed_pnl": -879.45
+      }
+    ]
+  },
+  "funds": {
+    "native": {
+      "n_positions": 0,
+      "account_value": 0.0,
+      "position_value": 0
+    },
+    "builder_dex": {
+      "xyz": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "flx": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "vntl": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "hyna": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "km": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "abcd": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "cash": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "para": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "mkts": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      }
+    },
+    "spot": {
+      "n_nonzero": 5,
+      "balances": [
+        {
+          "coin": "USDC",
+          "total": 894.84488213,
+          "hold": 0.0,
+          "entry_ntl": 0.0,
+          "usd": 894.84488213
+        },
+        {
+          "coin": "FARM",
+          "total": 0.8,
+          "hold": 0.0,
+          "entry_ntl": 4.68664,
+          "usd": 4.68664,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "VAPOR",
+          "total": 816.0,
+          "hold": 0.0,
+          "entry_ntl": 3.5849328,
+          "usd": 3.5849328,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "HYPE",
+          "total": 0.01441524,
+          "hold": 0.0,
+          "entry_ntl": 0.5401004,
+          "usd": 0.5401004,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "MAX",
+          "total": 2908.3048,
+          "hold": 0.0,
+          "entry_ntl": 0.0,
+          "usd": 0.0,
+          "usd_is_estimate": true
+        }
+      ],
+      "usd_stable": 894.84,
+      "usd_est_other": 8.81,
+      "usd_total_est": 903.66,
+      "estimated": true
+    },
+    "native_usd": 0.0,
+    "builder_usd": 0.0,
+    "spot_usd": 903.66,
+    "total_usd": 903.66,
+    "non_native_usd": 903.66,
+    "non_native_share": 1.0,
+    "positions": [],
+    "n_positions_total": 0,
+    "n_positions_native": 0,
+    "n_positions_builder": 0,
+    "known": true
+  },
+  "ledger": {
+    "n_total": 22,
+    "n_in_window": 22,
+    "n_kept": 22,
+    "by_type": {
+      "rewardsClaim": {
+        "n": 16,
+        "usd": 4684.27,
+        "direction": "in"
+      },
+      "send": {
+        "n": 6,
+        "usd": 51802.8,
+        "direction": "in"
+      }
+    },
+    "external_out_usd": 0.0,
+    "external_in_usd": 56487.07,
+    "internal_usd": 0.0,
+    "vault_out_usd": 0.0,
+    "bridge_out_usd": 0.0,
+    "unknown_usd": 0.0,
+    "external_out_rows": [],
+    "bridge_out_rows": [],
+    "unknown_rows": [],
+    "internal_rows": [],
+    "rows": [
+      {
+        "time": 1785152910.733,
+        "time_iso": "2026-07-27T11:48:30.733000+00:00",
+        "type": "rewardsClaim",
+        "usd": 2205.31,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x96938db16f01f57f980d0440d9d0c50201af00970a0514513a5c39042e05cf6a"
+      },
+      {
+        "time": 1783434996.19,
+        "time_iso": "2026-07-07T14:36:36.190000+00:00",
+        "type": "rewardsClaim",
+        "usd": 298.76,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0xb3e94e6735e85f9ab563043f6a356f02117b004cd0eb7e6c57b1f9b9f4ec3985"
+      },
+      {
+        "time": 1783269031.712,
+        "time_iso": "2026-07-05T16:30:31.712000+00:00",
+        "type": "rewardsClaim",
+        "usd": 34.32,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x1022da8a730d2cab119c043f47098d02020700700e004b7db3eb85dd32010695"
+      },
+      {
+        "time": 1783258189.552,
+        "time_iso": "2026-07-05T13:29:49.552000+00:00",
+        "type": "rewardsClaim",
+        "usd": 58.44,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x92951e122c33a470940e043f44c1ee016d0035f7c736c342365dc964eb377e5b"
+      },
+      {
+        "time": 1783171525.52,
+        "time_iso": "2026-07-04T13:25:25.520000+00:00",
+        "type": "rewardsClaim",
+        "usd": 2.09,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0xed953bdad2708e3aef0e043f328c0002029700c06d73ad0c915de72d91746825"
+      },
+      {
+        "time": 1783164874.003,
+        "time_iso": "2026-07-04T11:34:34.003000+00:00",
+        "type": "rewardsClaim",
+        "usd": 115.96,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x017b0afd7f34f86902f4043f31281f01680022e31a38173ba543b6503e38d253"
+      },
+      {
+        "time": 1783076606.775,
+        "time_iso": "2026-07-03T11:03:26.775000+00:00",
+        "type": "rewardsClaim",
+        "usd": 94.11,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0xcd9d62f5e6eb11dccf17043f1db47c02050a00db81ee30ae71660e48a5eeebc7"
+      },
+      {
+        "time": 1783025994.128,
+        "time_iso": "2026-07-02T20:59:54.128000+00:00",
+        "type": "rewardsClaim",
+        "usd": 50.63,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x261fc10754f04fff2799043f127621019a00d8eceff36ed1c9e86c5a13f429e9"
+      },
+      {
+        "time": 1783006780.151,
+        "time_iso": "2026-07-02T15:39:40.151000+00:00",
+        "type": "rewardsClaim",
+        "usd": 67.02,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x9bbf0639c065eed09d38043f0e2fd302056f001f5b690da23f87b18c7f69c8bb"
+      },
+      {
+        "time": 1782990636.745,
+        "time_iso": "2026-07-02T11:10:36.745000+00:00",
+        "type": "rewardsClaim",
+        "usd": 246.72,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x90104c113d5feab5918a043f0a9b3702032200f6d853098733d8f763fc53c4a0"
+      },
+      {
+        "time": 1782751590.692,
+        "time_iso": "2026-06-29T16:46:30.692000+00:00",
+        "type": "rewardsClaim",
+        "usd": 229.97,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0xf5b7e389c00d4ce5f731043ed5b19902021b006f5b006bb899808edc7f0126d0"
+      },
+      {
+        "time": 1782751349.408,
+        "time_iso": "2026-06-29T16:42:29.408000+00:00",
+        "type": "send",
+        "usd": 16999.8,
+        "direction": "in",
+        "destination": "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6",
+        "token": "USDC",
+        "hash": "0x7821b0951c2af69d799b043ed5a3e200005cc87ab72e156f1bea5be7db2ed088"
+      },
+      {
+        "time": 1782751251.344,
+        "time_iso": "2026-06-29T16:40:51.344000+00:00",
+        "type": "send",
+        "usd": 9999.8,
+        "direction": "in",
+        "destination": "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6",
+        "token": "USDC",
+        "hash": "0xeb711ac33743e18eecea043ed59e7c0000ac32a8d24700608f39c615f647bb79"
+      },
+      {
+        "time": 1782751211.364,
+        "time_iso": "2026-06-29T16:40:11.364000+00:00",
+        "type": "send",
+        "usd": 4999.8,
+        "direction": "in",
+        "destination": "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6",
+        "token": "USDC",
+        "hash": "0x3a7473521ae6efc83bee043ed59c3e0000af8b37b5ea0e9ade3d1ea4d9eac9b2"
+      },
+      {
+        "time": 1782488298.172,
+        "time_iso": "2026-06-26T15:38:18.172000+00:00",
+        "type": "rewardsClaim",
+        "usd": 873.34,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x104e366e8a5955fc11c7043e9b97c202067b0054255c74ceb416e1c1495d2fe6"
+      },
+      {
+        "time": 1782206090.555,
+        "time_iso": "2026-06-23T09:14:50.555000+00:00",
+        "type": "rewardsClaim",
+        "usd": 28.54,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x88d88ab9a57c28838a52043e5d4aa70201c4009f407f47552ca1360c6470026e"
+      },
+      {
+        "time": 1782190704.495,
+        "time_iso": "2026-06-23T04:58:24.495000+00:00",
+        "type": "rewardsClaim",
+        "usd": 158.95,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x20db64f75b9f567e2255043e59e3b302073a00dcf6927550c4a4104a1a933068"
+      },
+      {
+        "time": 1782114326.125,
+        "time_iso": "2026-06-22T07:45:26.125000+00:00",
+        "type": "rewardsClaim",
+        "usd": 72.64,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0xc3ad570918666c2fc527043e48f5070201eb00eeb3698b016776025bd76a461a"
+      },
+      {
+        "time": 1782037285.352,
+        "time_iso": "2026-06-21T10:21:25.352000+00:00",
+        "type": "send",
+        "usd": 134.8,
+        "direction": "in",
+        "destination": "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6",
+        "token": "USDC",
+        "hash": "0xdd208a0e6a3058c4de9a043e37d1d700005ba1f40533779680e93561293432af"
+      },
+      {
+        "time": 1782037213.386,
+        "time_iso": "2026-06-21T10:20:13.386000+00:00",
+        "type": "send",
+        "usd": 99.8,
+        "direction": "in",
+        "destination": "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6",
+        "token": "USDC",
+        "hash": "0xbd2e9e28e4ded911bea8043e37cdc9000069b60e7fd1f7e360f7497ba3d2b2fc"
+      },
+      {
+        "time": 1782036995.415,
+        "time_iso": "2026-06-21T10:16:35.415000+00:00",
+        "type": "send",
+        "usd": 19568.8,
+        "direction": "in",
+        "destination": "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6",
+        "token": "USDC",
+        "hash": "0x35950c3e0a9673e3370e043e37c1550000d02423a59992b5d95db790c99a4dcd"
+      },
+      {
+        "time": 1782035748.834,
+        "time_iso": "2026-06-21T09:55:48.834000+00:00",
+        "type": "rewardsClaim",
+        "usd": 147.47,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0xe1e1b5a6cc7a910ce35b043e377a1001e700cd8c677dafde85aa60f98b7e6af7"
+      }
+    ],
+    "n_bridge_out": 0,
+    "n_unknown": 0,
+    "counterparties": {},
+    "parse_failed": false
+  },
+  "verdict": "同地址換戰場（builder dex/現貨）",
+  "verdict_reasons": [
+    "非原生資金 $903.66 占總資產 $903.66 的100%（builder dex $0.00／現貨 $903.66）",
+    "成交戰場分布：非原生 1216/2000 筆（61%）",
+    "近 45 天無外轉紀錄（內部轉移 $0.00）"
+  ],
+  "endpoint_health": [
+    {
+      "name": "perpDexs",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "clearinghouseState[native]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "clearinghouseState[xyz]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "clearinghouseState[flx]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "clearinghouseState[vntl]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "clearinghouseState[hyna]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "clearinghouseState[km]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "clearinghouseState[abcd]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "clearinghouseState[cash]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "clearinghouseState[para]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "clearinghouseState[mkts]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.33
+    },
+    {
+      "name": "spotClearinghouseState",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "userNonFundingLedgerUpdates",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "portfolio",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "userFills",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.44
+    }
+  ],
+  "notes": [],
+  "requests_ok": 15,
+  "requests_failed": 0
+}
