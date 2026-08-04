@@ -1,0 +1,2785 @@
+{
+  "date": "2026-08-04",
+  "generated_at": "2026-08-04T23:33:01.177669+00:00",
+  "snapshot_dir": "/home/runner/work/KIWI/KIWI/projects/poly-observer/data/snapshots/2026-08-04",
+  "verdict": "弱存在（樣本內僅少數 consistent_winner，證據不足，需持續觀察）",
+  "classification_counts": {
+    "choppy": 23,
+    "one_hit": 16,
+    "mm_bot_like": 9,
+    "dormant": 8,
+    "consistent_winner": 4
+  },
+  "wallets": {
+    "0x0224bb9eb0a5c9fd261ac9123a72cbdd5748292a": {
+      "metrics": {
+        "address": "0x0224bb9eb0a5c9fd261ac9123a72cbdd5748292a",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 461877.52,
+        "monthly_pnl": {
+          "2024-11": 0.0,
+          "2024-12": -62.72,
+          "2025-01": -379.54,
+          "2025-02": 957.12,
+          "2025-03": 0.0,
+          "2025-04": 0.0,
+          "2025-05": 0.0,
+          "2025-06": 0.0,
+          "2025-07": 0.0,
+          "2025-08": 0.0,
+          "2025-09": 968.59,
+          "2025-10": 5930.97,
+          "2025-11": 35037.27,
+          "2025-12": 8381.47,
+          "2026-01": 3661.69,
+          "2026-02": 27596.6,
+          "2026-03": -1038.54,
+          "2026-04": -445.4,
+          "2026-05": -34245.1,
+          "2026-06": 239516.09,
+          "2026-07": 104692.28,
+          "2026-08": 71306.75
+        },
+        "active_months": 15,
+        "positive_month_ratio": 0.667,
+        "best_month_pnl": 239516.09,
+        "max_drawdown_pct": 0.7437,
+        "recent_30d_pnl": 65267.0,
+        "n_trades": 1344,
+        "trade_months": 2,
+        "trades_per_month": 672.0,
+        "avg_hold_hours": 9.762,
+        "category_counts": {
+          "esports": 498,
+          "other": 662,
+          "sports": 7,
+          "politics": 125,
+          "economics": 52
+        },
+        "top_category": "other",
+        "top_category_share": 0.493,
+        "days_idle": 0.0,
+        "current_value": 237342.72,
+        "span_days": 615.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "回撤 0.7437 < 50% peak"
+      ]
+    },
+    "0x03805a13a0b3e058f55f6c6af95389d4f431073d": {
+      "metrics": {
+        "address": "0x03805a13a0b3e058f55f6c6af95389d4f431073d",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 708574.17,
+        "monthly_pnl": {
+          "2026-05": 105612.19,
+          "2026-06": 529693.28,
+          "2026-07": 465179.5,
+          "2026-08": -391910.8
+        },
+        "active_months": 4,
+        "positive_month_ratio": 0.75,
+        "best_month_pnl": 529693.28,
+        "max_drawdown_pct": 0.5029,
+        "recent_30d_pnl": 265352.06,
+        "n_trades": 1087,
+        "trade_months": 1,
+        "trades_per_month": 1087.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "weather": 643,
+          "other": 209,
+          "economics": 45,
+          "politics": 190
+        },
+        "top_category": "weather",
+        "top_category_share": 0.592,
+        "days_idle": 0.0,
+        "current_value": 80105.19,
+        "span_days": 68.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "one_hit",
+      "reasons": [
+        "最佳月 529,693 > 70% × 總 PnL 708,574"
+      ]
+    },
+    "0x06dc51826bc524d9a83770e7de9dd7e005b04524": {
+      "metrics": {
+        "address": "0x06dc51826bc524d9a83770e7de9dd7e005b04524",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 560395.7,
+        "monthly_pnl": {
+          "2026-03": 8848.03,
+          "2026-04": 176042.01,
+          "2026-05": 126837.98,
+          "2026-06": 60452.78,
+          "2026-07": 63208.0,
+          "2026-08": 125006.9
+        },
+        "active_months": 6,
+        "positive_month_ratio": 1.0,
+        "best_month_pnl": 176042.01,
+        "max_drawdown_pct": 0.6567,
+        "recent_30d_pnl": 247230.42,
+        "n_trades": 1443,
+        "trade_months": 1,
+        "trades_per_month": 1443.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "crypto": 1443
+        },
+        "top_category": "crypto",
+        "top_category_share": 1.0,
+        "days_idle": 0.0,
+        "current_value": 738240.2,
+        "span_days": 133.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "回撤 0.6567 < 50% peak"
+      ]
+    },
+    "0x09b428f7c2b469786286214aa5c90dd9015f7320": {
+      "metrics": {
+        "address": "0x09b428f7c2b469786286214aa5c90dd9015f7320",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 17455322.5,
+        "monthly_pnl": {
+          "2026-07": 17455322.5,
+          "2026-08": 0.0
+        },
+        "active_months": 1,
+        "positive_month_ratio": 1.0,
+        "best_month_pnl": 17455322.5,
+        "max_drawdown_pct": 0.0,
+        "recent_30d_pnl": 18877524.5,
+        "n_trades": 1492,
+        "trade_months": 1,
+        "trades_per_month": 1492.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "other": 1492
+        },
+        "top_category": "other",
+        "top_category_share": 1.0,
+        "days_idle": 21.0,
+        "current_value": 0.0,
+        "span_days": 13.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "one_hit",
+      "reasons": [
+        "活躍月數 1 < 2"
+      ]
+    },
+    "0x13fa4ce1b8a27dd0b7a72db6205a50ee6ff0954c": {
+      "metrics": {
+        "address": "0x13fa4ce1b8a27dd0b7a72db6205a50ee6ff0954c",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 55698.05,
+        "monthly_pnl": {
+          "2026-08": 55698.05
+        },
+        "active_months": 1,
+        "positive_month_ratio": 1.0,
+        "best_month_pnl": 55698.05,
+        "max_drawdown_pct": 0.0,
+        "recent_30d_pnl": 55698.05,
+        "n_trades": 1301,
+        "trade_months": 1,
+        "trades_per_month": 1301.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "weather": 756,
+          "other": 259,
+          "politics": 105,
+          "sports": 164,
+          "economics": 9,
+          "esports": 8
+        },
+        "top_category": "weather",
+        "top_category_share": 0.581,
+        "days_idle": 0.0,
+        "current_value": 2549.63,
+        "span_days": 1.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "one_hit",
+      "reasons": [
+        "活躍月數 1 < 2"
+      ]
+    },
+    "0x162f6fff88a52864f2ecc9833e58089d5254798d": {
+      "metrics": {
+        "address": "0x162f6fff88a52864f2ecc9833e58089d5254798d",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 368569.87,
+        "monthly_pnl": {
+          "2026-01": 1299.86,
+          "2026-02": 16067.47,
+          "2026-03": 40566.55,
+          "2026-04": 125408.72,
+          "2026-05": -268140.86,
+          "2026-06": 430872.95,
+          "2026-07": -31456.31,
+          "2026-08": 53951.5
+        },
+        "active_months": 8,
+        "positive_month_ratio": 0.75,
+        "best_month_pnl": 430872.95,
+        "max_drawdown_pct": 1.5149,
+        "recent_30d_pnl": 9412.38,
+        "n_trades": 1402,
+        "trade_months": 2,
+        "trades_per_month": 701.0,
+        "avg_hold_hours": 74.143,
+        "category_counts": {
+          "other": 757,
+          "economics": 63,
+          "politics": 562,
+          "sports": 20
+        },
+        "top_category": "other",
+        "top_category_share": 0.54,
+        "days_idle": 0.0,
+        "current_value": 700565.33,
+        "span_days": 188.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "one_hit",
+      "reasons": [
+        "最佳月 430,873 > 70% × 總 PnL 368,570"
+      ]
+    },
+    "0x16bb9951a36fce71e2ef57890b786145e0ba8492": {
+      "metrics": {
+        "address": "0x16bb9951a36fce71e2ef57890b786145e0ba8492",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": -294845.36,
+        "monthly_pnl": {
+          "2026-03": 27336.14,
+          "2026-04": 2688.75,
+          "2026-05": -119116.54,
+          "2026-06": -292175.87,
+          "2026-07": 35156.15,
+          "2026-08": 51266.0
+        },
+        "active_months": 6,
+        "positive_month_ratio": 0.667,
+        "best_month_pnl": 51266.0,
+        "max_drawdown_pct": 5.0472,
+        "recent_30d_pnl": 40828.74,
+        "n_trades": 1196,
+        "trade_months": 4,
+        "trades_per_month": 299.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "sports": 1163,
+          "other": 33
+        },
+        "top_category": "sports",
+        "top_category_share": 0.972,
+        "days_idle": 0.0,
+        "current_value": 202622.8,
+        "span_days": 135.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "總 PnL -294845.36 > 10,000",
+        "回撤 5.0472 < 50% peak"
+      ]
+    },
+    "0x1b20a00709dfe648afd26b326394b5e031f83ab0": {
+      "metrics": {
+        "address": "0x1b20a00709dfe648afd26b326394b5e031f83ab0",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 818664.74,
+        "monthly_pnl": {
+          "2026-07": 3456.95,
+          "2026-08": 815207.78
+        },
+        "active_months": 2,
+        "positive_month_ratio": 1.0,
+        "best_month_pnl": 815207.78,
+        "max_drawdown_pct": 1.3155,
+        "recent_30d_pnl": 818664.74,
+        "n_trades": 1425,
+        "trade_months": 2,
+        "trades_per_month": 712.5,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "sports": 1425
+        },
+        "top_category": "sports",
+        "top_category_share": 1.0,
+        "days_idle": 0.0,
+        "current_value": 61665.73,
+        "span_days": 8.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "one_hit",
+      "reasons": [
+        "最佳月 815,208 > 70% × 總 PnL 818,665"
+      ]
+    },
+    "0x1d1ade627d0bb0205758580b20d808573e720df6": {
+      "metrics": {
+        "address": "0x1d1ade627d0bb0205758580b20d808573e720df6",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": -248358.62,
+        "monthly_pnl": {
+          "2025-11": -158532.02,
+          "2025-12": 435737.17,
+          "2026-01": -393511.27,
+          "2026-02": -14914.21,
+          "2026-03": 16391.48,
+          "2026-04": -361508.59,
+          "2026-05": 69864.04,
+          "2026-06": 221748.05,
+          "2026-07": -200460.45,
+          "2026-08": 136827.18
+        },
+        "active_months": 10,
+        "positive_month_ratio": 0.5,
+        "best_month_pnl": 435737.17,
+        "max_drawdown_pct": 4.8704,
+        "recent_30d_pnl": -154804.93,
+        "n_trades": 1362,
+        "trade_months": 3,
+        "trades_per_month": 454.0,
+        "avg_hold_hours": 0.359,
+        "category_counts": {
+          "other": 796,
+          "sports": 566
+        },
+        "top_category": "other",
+        "top_category_share": 0.584,
+        "days_idle": 0.0,
+        "current_value": 36426.37,
+        "span_days": 260.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "mm_bot_like",
+      "reasons": [
+        "平均持有 0.36 小時 < 1.0"
+      ]
+    },
+    "0x1f2dd6d473f3e824cd2f8a89d9c69fb96f6ad0cf": {
+      "metrics": {
+        "address": "0x1f2dd6d473f3e824cd2f8a89d9c69fb96f6ad0cf",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": -521.0,
+        "monthly_pnl": {
+          "2024-11": 0.0,
+          "2024-12": 0.0,
+          "2025-01": 0.0,
+          "2025-02": 0.0,
+          "2025-03": 0.0,
+          "2025-04": 0.0,
+          "2025-05": 0.0,
+          "2025-06": 0.0,
+          "2025-07": 0.0,
+          "2025-08": 0.0,
+          "2025-09": 0.0,
+          "2025-10": 0.0,
+          "2025-11": 0.0,
+          "2025-12": 0.0,
+          "2026-01": 0.0,
+          "2026-02": 0.0,
+          "2026-03": 0.0,
+          "2026-04": -521.0,
+          "2026-05": 0.0,
+          "2026-06": 0.0,
+          "2026-07": 0.0,
+          "2026-08": 0.0
+        },
+        "active_months": 2,
+        "positive_month_ratio": 0.0,
+        "best_month_pnl": 0.0,
+        "max_drawdown_pct": 0.0,
+        "recent_30d_pnl": 0.0,
+        "n_trades": 1468,
+        "trade_months": 1,
+        "trades_per_month": 1468.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "politics": 1468
+        },
+        "top_category": "politics",
+        "top_category_share": 1.0,
+        "days_idle": 99.0,
+        "current_value": 0.0,
+        "span_days": 552.6,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "dormant",
+      "reasons": [
+        "閒置 99 天 > 30 且持倉 $0 <= 100"
+      ]
+    },
+    "0x2005d16a84ceefa912d4e380cd32e7ff827875ea": {
+      "metrics": {
+        "address": "0x2005d16a84ceefa912d4e380cd32e7ff827875ea",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 12416077.56,
+        "monthly_pnl": {
+          "2025-07": 2811.7,
+          "2025-08": 47592.99,
+          "2025-09": 149313.9,
+          "2025-10": 442729.53,
+          "2025-11": 785621.84,
+          "2025-12": 878962.4,
+          "2026-01": 2018064.2,
+          "2026-02": 900247.0,
+          "2026-03": 1281040.5,
+          "2026-04": 1319046.5,
+          "2026-05": 1237123.0,
+          "2026-06": 1295733.0,
+          "2026-07": 1699717.0,
+          "2026-08": 358074.0
+        },
+        "active_months": 14,
+        "positive_month_ratio": 1.0,
+        "best_month_pnl": 2018064.2,
+        "max_drawdown_pct": 0.1009,
+        "recent_30d_pnl": 1483565.0,
+        "n_trades": 1468,
+        "trade_months": 1,
+        "trades_per_month": 1468.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "other": 1232,
+          "sports": 236
+        },
+        "top_category": "other",
+        "top_category_share": 0.839,
+        "days_idle": 0.0,
+        "current_value": 343962.09,
+        "span_days": 391.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "consistent_winner",
+      "reasons": [
+        "活躍月數 14 >= 3",
+        "活動跨度 391.0 天 >= 75",
+        "正月比率 1.0 >= 0.6",
+        "總 PnL 12416077.56 > 10,000",
+        "回撤 0.1009 < 50% peak",
+        "頻率 1468.0 在 5–1500 筆/月"
+      ]
+    },
+    "0x204f72f35326db932158cba6adff0b9a1da95e14": {
+      "metrics": {
+        "address": "0x204f72f35326db932158cba6adff0b9a1da95e14",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 22879808.81,
+        "monthly_pnl": {
+          "2025-08": -23615.58,
+          "2025-09": -120271.36,
+          "2025-10": 180205.79,
+          "2025-11": 1517507.97,
+          "2025-12": 1582777.8,
+          "2026-01": 763323.7,
+          "2026-02": 601641.5,
+          "2026-03": 1135033.0,
+          "2026-04": 1127003.0,
+          "2026-05": 2398053.0,
+          "2026-06": 5091463.0,
+          "2026-07": 8111759.0,
+          "2026-08": 514928.0
+        },
+        "active_months": 13,
+        "positive_month_ratio": 0.846,
+        "best_month_pnl": 8111759.0,
+        "max_drawdown_pct": 44.4368,
+        "recent_30d_pnl": 5691706.0,
+        "n_trades": 1422,
+        "trade_months": 1,
+        "trades_per_month": 1422.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "other": 1315,
+          "sports": 107
+        },
+        "top_category": "other",
+        "top_category_share": 0.925,
+        "days_idle": 0.0,
+        "current_value": 161910.54,
+        "span_days": 360.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "回撤 44.4368 < 50% peak"
+      ]
+    },
+    "0x21468ad63a833f5f9ea5c2835fb4e9dec57ad41b": {
+      "metrics": {
+        "address": "0x21468ad63a833f5f9ea5c2835fb4e9dec57ad41b",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 144102.09,
+        "monthly_pnl": {
+          "2025-12": 2952.36,
+          "2026-01": 3565.46,
+          "2026-02": -4143.0,
+          "2026-03": -8684.22,
+          "2026-04": 37447.11,
+          "2026-05": -24205.07,
+          "2026-06": -31297.69,
+          "2026-07": 104582.48,
+          "2026-08": 63884.66
+        },
+        "active_months": 9,
+        "positive_month_ratio": 0.556,
+        "best_month_pnl": 104582.48,
+        "max_drawdown_pct": 3.4133,
+        "recent_30d_pnl": 176964.99,
+        "n_trades": 1453,
+        "trade_months": 1,
+        "trades_per_month": 1453.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "esports": 1448,
+          "sports": 5
+        },
+        "top_category": "esports",
+        "top_category_share": 0.997,
+        "days_idle": 0.0,
+        "current_value": 2571.42,
+        "span_days": 238.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "one_hit",
+      "reasons": [
+        "最佳月 104,582 > 70% × 總 PnL 144,102"
+      ]
+    },
+    "0x25e28169faea17421fcd4cc361f6436d1e449a09": {
+      "metrics": {
+        "address": "0x25e28169faea17421fcd4cc361f6436d1e449a09",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 176189.8,
+        "monthly_pnl": {
+          "2025-10": 59.8,
+          "2025-11": 59.13,
+          "2025-12": 0.0,
+          "2026-01": 69984.2,
+          "2026-02": 52453.17,
+          "2026-03": 117136.06,
+          "2026-04": -63302.56,
+          "2026-05": 0.0,
+          "2026-06": 0.0,
+          "2026-07": -200.0,
+          "2026-08": 0.0
+        },
+        "active_months": 7,
+        "positive_month_ratio": 0.714,
+        "best_month_pnl": 117136.06,
+        "max_drawdown_pct": 0.3287,
+        "recent_30d_pnl": -200.0,
+        "n_trades": 784,
+        "trade_months": 7,
+        "trades_per_month": 112.0,
+        "avg_hold_hours": 8.069,
+        "category_counts": {
+          "esports": 454,
+          "other": 260,
+          "sports": 70
+        },
+        "top_category": "esports",
+        "top_category_share": 0.579,
+        "days_idle": 16.0,
+        "current_value": 0.0,
+        "span_days": 267.7,
+        "activity_truncated": false,
+        "fetch_errors": []
+      },
+      "classification": "consistent_winner",
+      "reasons": [
+        "活躍月數 7 >= 3",
+        "活動跨度 267.7 天 >= 75",
+        "正月比率 0.714 >= 0.6",
+        "總 PnL 176189.8 > 10,000",
+        "回撤 0.3287 < 50% peak",
+        "頻率 112.0 在 5–1500 筆/月"
+      ]
+    },
+    "0x29b52d98ac9ef9414b04164246c95bc63d74cc6c": {
+      "metrics": {
+        "address": "0x29b52d98ac9ef9414b04164246c95bc63d74cc6c",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 297894.87,
+        "monthly_pnl": {
+          "2026-01": -145.64,
+          "2026-02": 5823.47,
+          "2026-03": -2697.79,
+          "2026-04": 36499.81,
+          "2026-05": 187923.31,
+          "2026-06": -159853.2,
+          "2026-07": 121110.37,
+          "2026-08": 109234.54
+        },
+        "active_months": 8,
+        "positive_month_ratio": 0.625,
+        "best_month_pnl": 187923.31,
+        "max_drawdown_pct": 5.4489,
+        "recent_30d_pnl": 172460.16,
+        "n_trades": 1410,
+        "trade_months": 1,
+        "trades_per_month": 1410.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "esports": 1410
+        },
+        "top_category": "esports",
+        "top_category_share": 1.0,
+        "days_idle": 0.0,
+        "current_value": 26484.77,
+        "span_days": 194.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "回撤 5.4489 < 50% peak"
+      ]
+    },
+    "0x2a69660046d7acc4ab204d7cc5ba78b0776cd2f7": {
+      "metrics": {
+        "address": "0x2a69660046d7acc4ab204d7cc5ba78b0776cd2f7",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 1021550.26,
+        "monthly_pnl": {
+          "2026-02": -4064.35,
+          "2026-03": -5023.39,
+          "2026-04": -2337.46,
+          "2026-05": 43514.27,
+          "2026-06": 453011.9,
+          "2026-07": 329711.54,
+          "2026-08": 206737.74
+        },
+        "active_months": 7,
+        "positive_month_ratio": 0.571,
+        "best_month_pnl": 453011.9,
+        "max_drawdown_pct": 25.3611,
+        "recent_30d_pnl": 581013.78,
+        "n_trades": 1334,
+        "trade_months": 1,
+        "trades_per_month": 1334.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "other": 1320,
+          "sports": 9,
+          "weather": 5
+        },
+        "top_category": "other",
+        "top_category_share": 0.99,
+        "days_idle": 0.0,
+        "current_value": 309503.2,
+        "span_days": 170.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "正月比率 0.571 >= 0.6",
+        "回撤 25.3611 < 50% peak"
+      ]
+    },
+    "0x2dc13c6bda81b202281e796953a7323de675b33c": {
+      "metrics": {
+        "address": "0x2dc13c6bda81b202281e796953a7323de675b33c",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 158188.39,
+        "monthly_pnl": {
+          "2026-04": -22447.67,
+          "2026-05": -123207.64,
+          "2026-06": 164731.81,
+          "2026-07": 96680.51,
+          "2026-08": 42431.38
+        },
+        "active_months": 5,
+        "positive_month_ratio": 0.6,
+        "best_month_pnl": 164731.81,
+        "max_drawdown_pct": 43.306,
+        "recent_30d_pnl": -10363.96,
+        "n_trades": 806,
+        "trade_months": 5,
+        "trades_per_month": 161.2,
+        "avg_hold_hours": 1.014,
+        "category_counts": {
+          "sports": 806
+        },
+        "top_category": "sports",
+        "top_category_share": 1.0,
+        "days_idle": 0.0,
+        "current_value": 15136.36,
+        "span_days": 111.0,
+        "activity_truncated": false,
+        "fetch_errors": []
+      },
+      "classification": "one_hit",
+      "reasons": [
+        "最佳月 164,732 > 70% × 總 PnL 158,188"
+      ]
+    },
+    "0x3954e1c6b7bc5645d9d3425a6f4490889ef122d9": {
+      "metrics": {
+        "address": "0x3954e1c6b7bc5645d9d3425a6f4490889ef122d9",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 113685.28,
+        "monthly_pnl": {
+          "2025-12": 10139.88,
+          "2026-01": 0.0,
+          "2026-02": 0.0,
+          "2026-03": 0.0,
+          "2026-04": 0.0,
+          "2026-05": 0.0,
+          "2026-06": 0.0,
+          "2026-07": -64024.94,
+          "2026-08": 167570.35
+        },
+        "active_months": 3,
+        "positive_month_ratio": 0.667,
+        "best_month_pnl": 167570.35,
+        "max_drawdown_pct": 4.0292,
+        "recent_30d_pnl": 103545.4,
+        "n_trades": 711,
+        "trade_months": 3,
+        "trades_per_month": 237.0,
+        "avg_hold_hours": 2.05,
+        "category_counts": {
+          "other": 104,
+          "esports": 607
+        },
+        "top_category": "esports",
+        "top_category_share": 0.854,
+        "days_idle": 0.0,
+        "current_value": 0.0,
+        "span_days": 224.6,
+        "activity_truncated": false,
+        "fetch_errors": []
+      },
+      "classification": "one_hit",
+      "reasons": [
+        "最佳月 167,570 > 70% × 總 PnL 113,685"
+      ]
+    },
+    "0x43372356634781eea88d61bbdd7824cdce958882": {
+      "metrics": {
+        "address": "0x43372356634781eea88d61bbdd7824cdce958882",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 723141.97,
+        "monthly_pnl": {
+          "2024-11": -8410.03,
+          "2024-12": 23714.92,
+          "2025-01": 19604.08,
+          "2025-02": 26719.64,
+          "2025-03": 9792.16,
+          "2025-04": 13002.62,
+          "2025-05": 24497.75,
+          "2025-06": 49947.63,
+          "2025-07": 32965.7,
+          "2025-08": 93807.7,
+          "2025-09": 110602.8,
+          "2025-10": 6498.3,
+          "2025-11": 215464.9,
+          "2025-12": 104497.06,
+          "2026-01": -4838.62,
+          "2026-02": 52964.12,
+          "2026-03": -17312.26,
+          "2026-04": -74338.55,
+          "2026-05": 176599.05,
+          "2026-06": -170307.8,
+          "2026-07": -203923.4,
+          "2026-08": 241594.2
+        },
+        "active_months": 22,
+        "positive_month_ratio": 0.727,
+        "best_month_pnl": 241594.2,
+        "max_drawdown_pct": 0.3861,
+        "recent_30d_pnl": 70461.4,
+        "n_trades": 1344,
+        "trade_months": 2,
+        "trades_per_month": 672.0,
+        "avg_hold_hours": 2.953,
+        "category_counts": {
+          "esports": 641,
+          "other": 653,
+          "politics": 32,
+          "sports": 18
+        },
+        "top_category": "other",
+        "top_category_share": 0.486,
+        "days_idle": 0.0,
+        "current_value": 850046.39,
+        "span_days": 615.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "consistent_winner",
+      "reasons": [
+        "活躍月數 22 >= 3",
+        "活動跨度 615.0 天 >= 75",
+        "正月比率 0.727 >= 0.6",
+        "總 PnL 723141.97 > 10,000",
+        "回撤 0.3861 < 50% peak",
+        "頻率 672.0 在 5–1500 筆/月"
+      ]
+    },
+    "0x448861155279dbf833d041b963e3ac854599e319": {
+      "metrics": {
+        "address": "0x448861155279dbf833d041b963e3ac854599e319",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 394401.11,
+        "monthly_pnl": {
+          "2024-11": 3937.43,
+          "2024-12": 92813.1,
+          "2025-01": 65440.33,
+          "2025-02": 68350.58,
+          "2025-03": 10070.69,
+          "2025-04": 112404.31,
+          "2025-05": -9235.06,
+          "2025-06": -172753.16,
+          "2025-07": 66023.89,
+          "2025-08": 3005.14,
+          "2025-09": 25789.88,
+          "2025-10": 79180.84,
+          "2025-11": 105998.64,
+          "2025-12": 78659.3,
+          "2026-01": -7047.56,
+          "2026-02": 59992.56,
+          "2026-03": -371937.34,
+          "2026-04": 134248.72,
+          "2026-05": 110416.56,
+          "2026-06": -15666.14,
+          "2026-07": -113861.1,
+          "2026-08": 68569.5
+        },
+        "active_months": 22,
+        "positive_month_ratio": 0.727,
+        "best_month_pnl": 134248.72,
+        "max_drawdown_pct": 0.6369,
+        "recent_30d_pnl": -30648.52,
+        "n_trades": 1458,
+        "trade_months": 1,
+        "trades_per_month": 1458.0,
+        "avg_hold_hours": 1.672,
+        "category_counts": {
+          "sports": 332,
+          "other": 1101,
+          "politics": 25
+        },
+        "top_category": "other",
+        "top_category_share": 0.755,
+        "days_idle": 0.0,
+        "current_value": 144333.36,
+        "span_days": 615.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "回撤 0.6369 < 50% peak"
+      ]
+    },
+    "0x4aec70021891ea712aaf3e2dd76c30f6b09a4ce9": {
+      "metrics": {
+        "address": "0x4aec70021891ea712aaf3e2dd76c30f6b09a4ce9",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 110342.9,
+        "monthly_pnl": {
+          "2026-06": 553.35,
+          "2026-07": 41098.3,
+          "2026-08": 68691.25
+        },
+        "active_months": 3,
+        "positive_month_ratio": 1.0,
+        "best_month_pnl": 68691.25,
+        "max_drawdown_pct": 2.5742,
+        "recent_30d_pnl": 109789.55,
+        "n_trades": 1489,
+        "trade_months": 1,
+        "trades_per_month": 1489.0,
+        "avg_hold_hours": 0.714,
+        "category_counts": {
+          "esports": 1489
+        },
+        "top_category": "esports",
+        "top_category_share": 1.0,
+        "days_idle": 0.0,
+        "current_value": 0.0,
+        "span_days": 63.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "mm_bot_like",
+      "reasons": [
+        "平均持有 0.71 小時 < 1.0"
+      ]
+    },
+    "0x5268527977f700f9bf9b6d5cd843859e4e70135d": {
+      "metrics": {
+        "address": "0x5268527977f700f9bf9b6d5cd843859e4e70135d",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 1604254.48,
+        "monthly_pnl": {
+          "2026-04": -30393.75,
+          "2026-05": 458015.3,
+          "2026-06": 511732.28,
+          "2026-07": 465662.05,
+          "2026-08": 199238.6
+        },
+        "active_months": 5,
+        "positive_month_ratio": 0.8,
+        "best_month_pnl": 511732.28,
+        "max_drawdown_pct": 6.8126,
+        "recent_30d_pnl": 554691.5,
+        "n_trades": 1467,
+        "trade_months": 1,
+        "trades_per_month": 1467.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "other": 1067,
+          "sports": 400
+        },
+        "top_category": "other",
+        "top_category_share": 0.727,
+        "days_idle": 0.0,
+        "current_value": 627939.25,
+        "span_days": 102.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "回撤 6.8126 < 50% peak"
+      ]
+    },
+    "0x56687bf447db6ffa42ffe2204a05edaa20f55839": {
+      "metrics": {
+        "address": "0x56687bf447db6ffa42ffe2204a05edaa20f55839",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 0.0,
+        "monthly_pnl": {
+          "2024-11": 0.0,
+          "2024-12": 0.0,
+          "2025-01": 0.0,
+          "2025-02": 0.0,
+          "2025-03": 0.0,
+          "2025-04": 0.0,
+          "2025-05": 0.0,
+          "2025-06": 0.0,
+          "2025-07": 0.0,
+          "2025-08": 0.0,
+          "2025-09": 0.0,
+          "2025-10": 0.0,
+          "2025-11": 0.0,
+          "2025-12": 0.0,
+          "2026-01": 0.0,
+          "2026-02": 0.0,
+          "2026-03": 0.0,
+          "2026-04": 0.0,
+          "2026-05": 0.0,
+          "2026-06": 0.0,
+          "2026-07": 0.0,
+          "2026-08": 0.0
+        },
+        "active_months": 2,
+        "positive_month_ratio": null,
+        "best_month_pnl": 0.0,
+        "max_drawdown_pct": 0.0,
+        "recent_30d_pnl": 0.0,
+        "n_trades": 1479,
+        "trade_months": 2,
+        "trades_per_month": 739.5,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "politics": 1400,
+          "other": 79
+        },
+        "top_category": "politics",
+        "top_category_share": 0.947,
+        "days_idle": 615.0,
+        "current_value": 0.0,
+        "span_days": 33.6,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "dormant",
+      "reasons": [
+        "閒置 615 天 > 30 且持倉 $0 <= 100"
+      ]
+    },
+    "0x58d71d66722aa4c1e6ebde57071693667d2917e1": {
+      "metrics": {
+        "address": "0x58d71d66722aa4c1e6ebde57071693667d2917e1",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 106981.76,
+        "monthly_pnl": {
+          "2024-11": 0.0,
+          "2024-12": 709.91,
+          "2025-01": 37.85,
+          "2025-02": -0.7,
+          "2025-03": 3.82,
+          "2025-04": -5.58,
+          "2025-05": -15.63,
+          "2025-06": 126.63,
+          "2025-07": 0.43,
+          "2025-08": 0.07,
+          "2025-09": 0.35,
+          "2025-10": 3.87,
+          "2025-11": 72.36,
+          "2025-12": 0.05,
+          "2026-01": 4.88,
+          "2026-02": 1.11,
+          "2026-03": 1.57,
+          "2026-04": 0.0,
+          "2026-05": -53.95,
+          "2026-06": 10988.81,
+          "2026-07": 94.59,
+          "2026-08": 95011.31
+        },
+        "active_months": 21,
+        "positive_month_ratio": 0.8,
+        "best_month_pnl": 95011.31,
+        "max_drawdown_pct": 0.2216,
+        "recent_30d_pnl": 95105.9,
+        "n_trades": 595,
+        "trade_months": 21,
+        "trades_per_month": 28.3,
+        "avg_hold_hours": 16.841,
+        "category_counts": {
+          "other": 333,
+          "sports": 226,
+          "politics": 1,
+          "economics": 6,
+          "crypto": 22,
+          "esports": 7
+        },
+        "top_category": "other",
+        "top_category_share": 0.56,
+        "days_idle": 0.0,
+        "current_value": 0.0,
+        "span_days": 637.2,
+        "activity_truncated": false,
+        "fetch_errors": []
+      },
+      "classification": "one_hit",
+      "reasons": [
+        "最佳月 95,011 > 70% × 總 PnL 106,982"
+      ]
+    },
+    "0x5a218c7ad04135830a45c41aaed7294df7809318": {
+      "metrics": {
+        "address": "0x5a218c7ad04135830a45c41aaed7294df7809318",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 1195790.88,
+        "monthly_pnl": {
+          "2025-02": -14.62,
+          "2025-03": 0.76,
+          "2025-04": 17.05,
+          "2025-05": 6.53,
+          "2025-06": -15.17,
+          "2025-07": 1.2,
+          "2025-08": -9.03,
+          "2025-09": -148.65,
+          "2025-10": 6.88,
+          "2025-11": 15.88,
+          "2025-12": 4331.81,
+          "2026-01": -26984.06,
+          "2026-02": 27939.89,
+          "2026-03": 24982.93,
+          "2026-04": 49778.93,
+          "2026-05": 394932.73,
+          "2026-06": 303418.52,
+          "2026-07": 582916.8,
+          "2026-08": -165387.5
+        },
+        "active_months": 19,
+        "positive_month_ratio": 0.684,
+        "best_month_pnl": 582916.8,
+        "max_drawdown_pct": 14.5727,
+        "recent_30d_pnl": 337952.1,
+        "n_trades": 1041,
+        "trade_months": 1,
+        "trades_per_month": 1041.0,
+        "avg_hold_hours": 2.45,
+        "category_counts": {
+          "weather": 489,
+          "politics": 147,
+          "other": 351,
+          "crypto": 40,
+          "sports": 2,
+          "esports": 1,
+          "economics": 11
+        },
+        "top_category": "weather",
+        "top_category_share": 0.47,
+        "days_idle": 0.0,
+        "current_value": 134638.19,
+        "span_days": 543.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "回撤 14.5727 < 50% peak"
+      ]
+    },
+    "0x664ce9fb97ae1bbd538d7381b2f4e92dab16f49c": {
+      "metrics": {
+        "address": "0x664ce9fb97ae1bbd538d7381b2f4e92dab16f49c",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 4288567.0,
+        "monthly_pnl": {
+          "2026-06": 4288567.0,
+          "2026-07": 0.0,
+          "2026-08": 0.0
+        },
+        "active_months": 1,
+        "positive_month_ratio": 1.0,
+        "best_month_pnl": 4288567.0,
+        "max_drawdown_pct": 0.0,
+        "recent_30d_pnl": 0.0,
+        "n_trades": 1027,
+        "trade_months": 1,
+        "trades_per_month": 1027.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "other": 1027
+        },
+        "top_category": "other",
+        "top_category_share": 1.0,
+        "days_idle": 39.0,
+        "current_value": 0.0,
+        "span_days": 1.3,
+        "activity_truncated": false,
+        "fetch_errors": []
+      },
+      "classification": "dormant",
+      "reasons": [
+        "閒置 39 天 > 30 且持倉 $0 <= 100"
+      ]
+    },
+    "0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee": {
+      "metrics": {
+        "address": "0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 11387989.5,
+        "monthly_pnl": {
+          "2025-06": 4966.89,
+          "2025-07": -671.29,
+          "2025-08": 9938.72,
+          "2025-09": -295049.32,
+          "2025-10": -42734.38,
+          "2025-11": 2943099.38,
+          "2025-12": -104367.7,
+          "2026-01": 6395107.2,
+          "2026-02": 2047363.0,
+          "2026-03": -604711.0,
+          "2026-04": 1650252.0,
+          "2026-05": -278262.0,
+          "2026-06": -336943.0,
+          "2026-07": 1.0,
+          "2026-08": 0.0
+        },
+        "active_months": 14,
+        "positive_month_ratio": 0.5,
+        "best_month_pnl": 6395107.2,
+        "max_drawdown_pct": 14.3907,
+        "recent_30d_pnl": 0.0,
+        "n_trades": 1438,
+        "trade_months": 2,
+        "trades_per_month": 719.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "sports": 1337,
+          "other": 101
+        },
+        "top_category": "sports",
+        "top_category_share": 0.93,
+        "days_idle": 35.0,
+        "current_value": 0.0,
+        "span_days": 370.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "dormant",
+      "reasons": [
+        "閒置 35 天 > 30 且持倉 $0 <= 100"
+      ]
+    },
+    "0x6d20c35f65d9899b6d6b74f8466e824580f9a165": {
+      "metrics": {
+        "address": "0x6d20c35f65d9899b6d6b74f8466e824580f9a165",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 1601526.06,
+        "monthly_pnl": {
+          "2026-06": -237648.34,
+          "2026-07": 939885.6,
+          "2026-08": 899288.8
+        },
+        "active_months": 3,
+        "positive_month_ratio": 0.667,
+        "best_month_pnl": 939885.6,
+        "max_drawdown_pct": 2.1823,
+        "recent_30d_pnl": 1811464.07,
+        "n_trades": 1451,
+        "trade_months": 2,
+        "trades_per_month": 725.5,
+        "avg_hold_hours": 2.067,
+        "category_counts": {
+          "esports": 576,
+          "sports": 306,
+          "other": 275,
+          "crypto": 294
+        },
+        "top_category": "esports",
+        "top_category_share": 0.397,
+        "days_idle": 0.0,
+        "current_value": 26.42,
+        "span_days": 46.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "活動跨度 46.0 天 >= 75",
+        "回撤 2.1823 < 50% peak"
+      ]
+    },
+    "0x73bcd24d510ff4e4d5feac6aec763c5511e246ce": {
+      "metrics": {
+        "address": "0x73bcd24d510ff4e4d5feac6aec763c5511e246ce",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 508662.0,
+        "monthly_pnl": {
+          "2026-01": -6789.66,
+          "2026-02": 193412.14,
+          "2026-03": 0.0,
+          "2026-04": 0.0,
+          "2026-05": 0.0,
+          "2026-06": 78015.67,
+          "2026-07": 189902.5,
+          "2026-08": 54121.35
+        },
+        "active_months": 5,
+        "positive_month_ratio": 0.8,
+        "best_month_pnl": 193412.14,
+        "max_drawdown_pct": 5.5779,
+        "recent_30d_pnl": 229047.97,
+        "n_trades": 1440,
+        "trade_months": 2,
+        "trades_per_month": 720.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "other": 748,
+          "sports": 1,
+          "esports": 691
+        },
+        "top_category": "other",
+        "top_category_share": 0.519,
+        "days_idle": 0.0,
+        "current_value": 0.0,
+        "span_days": 210.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "回撤 5.5779 < 50% peak"
+      ]
+    },
+    "0x7542fa229f63a7bd8a9ca4584638004a39317a20": {
+      "metrics": {
+        "address": "0x7542fa229f63a7bd8a9ca4584638004a39317a20",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 70450.34,
+        "monthly_pnl": {
+          "2026-07": 38002.89,
+          "2026-08": 32447.45
+        },
+        "active_months": 2,
+        "positive_month_ratio": 1.0,
+        "best_month_pnl": 38002.89,
+        "max_drawdown_pct": 0.7076,
+        "recent_30d_pnl": 70450.34,
+        "n_trades": 559,
+        "trade_months": 2,
+        "trades_per_month": 279.5,
+        "avg_hold_hours": 2.197,
+        "category_counts": {
+          "sports": 559
+        },
+        "top_category": "sports",
+        "top_category_share": 1.0,
+        "days_idle": 2.0,
+        "current_value": 0.0,
+        "span_days": 11.3,
+        "activity_truncated": false,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "活躍月數 2 >= 3",
+        "活動跨度 11.3 天 >= 75",
+        "回撤 0.7076 < 50% peak"
+      ]
+    },
+    "0x78b9ac44a6d7d7a076c14e0ad518b301b63c6b76": {
+      "metrics": {
+        "address": "0x78b9ac44a6d7d7a076c14e0ad518b301b63c6b76",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 0.0,
+        "monthly_pnl": {
+          "2024-11": 0.0,
+          "2024-12": 0.0,
+          "2025-01": 0.0,
+          "2025-02": 0.0,
+          "2025-03": 0.0,
+          "2025-04": 0.0,
+          "2025-05": 0.0,
+          "2025-06": 0.0,
+          "2025-07": 0.0,
+          "2025-08": 0.0,
+          "2025-09": 0.0,
+          "2025-10": 0.0,
+          "2025-11": 0.0,
+          "2025-12": 0.0,
+          "2026-01": 0.0,
+          "2026-02": 0.0,
+          "2026-03": 0.0,
+          "2026-04": 0.0,
+          "2026-05": 0.0,
+          "2026-06": 0.0,
+          "2026-07": 0.0,
+          "2026-08": 0.0
+        },
+        "active_months": 2,
+        "positive_month_ratio": null,
+        "best_month_pnl": 0.0,
+        "max_drawdown_pct": 0.0,
+        "recent_30d_pnl": 0.0,
+        "n_trades": 1486,
+        "trade_months": 2,
+        "trades_per_month": 743.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "politics": 1416,
+          "other": 70
+        },
+        "top_category": "politics",
+        "top_category_share": 0.953,
+        "days_idle": 615.0,
+        "current_value": 0.0,
+        "span_days": 29.1,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "dormant",
+      "reasons": [
+        "閒置 615 天 > 30 且持倉 $0 <= 100"
+      ]
+    },
+    "0x7e5e420a5cde8a322f3b5b93a12a164827f47315": {
+      "metrics": {
+        "address": "0x7e5e420a5cde8a322f3b5b93a12a164827f47315",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 179194.83,
+        "monthly_pnl": {
+          "2024-11": -2011.75,
+          "2024-12": 212.99,
+          "2025-01": -10.96,
+          "2025-02": -106.64,
+          "2025-03": -25.99,
+          "2025-04": -0.67,
+          "2025-05": 0.0,
+          "2025-06": 0.0,
+          "2025-07": 0.0,
+          "2025-08": 0.0,
+          "2025-09": 531.26,
+          "2025-10": -50.25,
+          "2025-11": 11158.58,
+          "2025-12": 7635.63,
+          "2026-01": -9537.03,
+          "2026-02": 5223.97,
+          "2026-03": -9693.56,
+          "2026-04": -5635.26,
+          "2026-05": 46455.37,
+          "2026-06": 33802.9,
+          "2026-07": -19834.13,
+          "2026-08": 121080.39
+        },
+        "active_months": 18,
+        "positive_month_ratio": 0.444,
+        "best_month_pnl": 121080.39,
+        "max_drawdown_pct": 1.3818,
+        "recent_30d_pnl": 174691.4,
+        "n_trades": 1414,
+        "trade_months": 2,
+        "trades_per_month": 707.0,
+        "avg_hold_hours": 4.266,
+        "category_counts": {
+          "other": 533,
+          "esports": 881
+        },
+        "top_category": "esports",
+        "top_category_share": 0.623,
+        "days_idle": 0.0,
+        "current_value": 113254.81,
+        "span_days": 615.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "正月比率 0.444 >= 0.6",
+        "回撤 1.3818 < 50% peak"
+      ]
+    },
+    "0x84cfffc3f16dcc353094de30d4a45226eccd2f63": {
+      "metrics": {
+        "address": "0x84cfffc3f16dcc353094de30d4a45226eccd2f63",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": -7536728.87,
+        "monthly_pnl": {
+          "2026-04": -724895.47,
+          "2026-05": -2528151.6,
+          "2026-06": -704923.8,
+          "2026-07": -3802158.5,
+          "2026-08": 223400.5
+        },
+        "active_months": 5,
+        "positive_month_ratio": 0.2,
+        "best_month_pnl": 223400.5,
+        "max_drawdown_pct": 15.0485,
+        "recent_30d_pnl": -4934335.2,
+        "n_trades": 1336,
+        "trade_months": 1,
+        "trades_per_month": 1336.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "sports": 1141,
+          "esports": 3,
+          "other": 192
+        },
+        "top_category": "sports",
+        "top_category_share": 0.854,
+        "days_idle": 0.0,
+        "current_value": 348649.68,
+        "span_days": 102.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "正月比率 0.2 >= 0.6",
+        "總 PnL -7536728.87 > 10,000",
+        "回撤 15.0485 < 50% peak"
+      ]
+    },
+    "0x8546a601f7c7cc3dae7141f20b0e09e42bbf35b8": {
+      "metrics": {
+        "address": "0x8546a601f7c7cc3dae7141f20b0e09e42bbf35b8",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 155621.74,
+        "monthly_pnl": {
+          "2026-05": 159.39,
+          "2026-06": 14803.72,
+          "2026-07": 67672.6,
+          "2026-08": 72986.04
+        },
+        "active_months": 4,
+        "positive_month_ratio": 1.0,
+        "best_month_pnl": 72986.04,
+        "max_drawdown_pct": 0.338,
+        "recent_30d_pnl": 136773.31,
+        "n_trades": 1421,
+        "trade_months": 2,
+        "trades_per_month": 710.5,
+        "avg_hold_hours": 0.497,
+        "category_counts": {
+          "other": 1396,
+          "sports": 21,
+          "esports": 4
+        },
+        "top_category": "other",
+        "top_category_share": 0.982,
+        "days_idle": 0.0,
+        "current_value": 24011.4,
+        "span_days": 67.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "mm_bot_like",
+      "reasons": [
+        "平均持有 0.50 小時 < 1.0"
+      ]
+    },
+    "0x88c4919de76e526d55a32c1f8afb439dd1f1129a": {
+      "metrics": {
+        "address": "0x88c4919de76e526d55a32c1f8afb439dd1f1129a",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 655671.38,
+        "monthly_pnl": {
+          "2026-02": 90828.08,
+          "2026-03": 320215.02,
+          "2026-04": 225341.84,
+          "2026-05": 23601.24,
+          "2026-06": -7203.74,
+          "2026-07": -78218.86,
+          "2026-08": 81107.8
+        },
+        "active_months": 7,
+        "positive_month_ratio": 0.714,
+        "best_month_pnl": 320215.02,
+        "max_drawdown_pct": 11.74,
+        "recent_30d_pnl": -20575.0,
+        "n_trades": 1456,
+        "trade_months": 4,
+        "trades_per_month": 364.0,
+        "avg_hold_hours": 208.379,
+        "category_counts": {
+          "sports": 145,
+          "other": 994,
+          "politics": 317
+        },
+        "top_category": "other",
+        "top_category_share": 0.683,
+        "days_idle": 0.0,
+        "current_value": 887730.55,
+        "span_days": 184.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "回撤 11.74 < 50% peak"
+      ]
+    },
+    "0x917182c1eb3257b2e2e4959d48228af78bfe9e5f": {
+      "metrics": {
+        "address": "0x917182c1eb3257b2e2e4959d48228af78bfe9e5f",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": -5770.86,
+        "monthly_pnl": {
+          "2026-04": 0.0,
+          "2026-05": -97.3,
+          "2026-06": -9533.85,
+          "2026-07": -17528.39,
+          "2026-08": 21388.68
+        },
+        "active_months": 5,
+        "positive_month_ratio": 0.25,
+        "best_month_pnl": 21388.68,
+        "max_drawdown_pct": 3.3399,
+        "recent_30d_pnl": -5939.24,
+        "n_trades": 337,
+        "trade_months": 5,
+        "trades_per_month": 67.4,
+        "avg_hold_hours": 1.588,
+        "category_counts": {
+          "other": 158,
+          "crypto": 10,
+          "esports": 160,
+          "sports": 9
+        },
+        "top_category": "esports",
+        "top_category_share": 0.475,
+        "days_idle": 3.0,
+        "current_value": 0.0,
+        "span_days": 96.6,
+        "activity_truncated": false,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "正月比率 0.25 >= 0.6",
+        "總 PnL -5770.86 > 10,000",
+        "回撤 3.3399 < 50% peak"
+      ]
+    },
+    "0x96cfcb0c30942cfcd1cdf76c7d408794d66b1acb": {
+      "metrics": {
+        "address": "0x96cfcb0c30942cfcd1cdf76c7d408794d66b1acb",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 9238344.8,
+        "monthly_pnl": {
+          "2026-06": 9238344.8,
+          "2026-07": 0.0,
+          "2026-08": 0.0
+        },
+        "active_months": 1,
+        "positive_month_ratio": 1.0,
+        "best_month_pnl": 9238344.8,
+        "max_drawdown_pct": 0.0,
+        "recent_30d_pnl": 0.0,
+        "n_trades": 727,
+        "trade_months": 1,
+        "trades_per_month": 727.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "sports": 1,
+          "other": 726
+        },
+        "top_category": "other",
+        "top_category_share": 0.999,
+        "days_idle": 49.0,
+        "current_value": 0.0,
+        "span_days": 13.1,
+        "activity_truncated": false,
+        "fetch_errors": []
+      },
+      "classification": "dormant",
+      "reasons": [
+        "閒置 49 天 > 30 且持倉 $0 <= 100"
+      ]
+    },
+    "0x9cb990f1862568a63d8601efeebe0304225c32f2": {
+      "metrics": {
+        "address": "0x9cb990f1862568a63d8601efeebe0304225c32f2",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 2297871.01,
+        "monthly_pnl": {
+          "2025-05": -1157.75,
+          "2025-06": 0.0,
+          "2025-07": -7413.0,
+          "2025-08": -11133.3,
+          "2025-09": 63523.8,
+          "2025-10": 155697.52,
+          "2025-11": 116946.97,
+          "2025-12": -159575.91,
+          "2026-01": 547494.09,
+          "2026-02": 536787.9,
+          "2026-03": -145364.3,
+          "2026-04": -21812.7,
+          "2026-05": 353250.6,
+          "2026-06": 382481.6,
+          "2026-07": 405651.5,
+          "2026-08": 82494.0
+        },
+        "active_months": 15,
+        "positive_month_ratio": 0.6,
+        "best_month_pnl": 547494.09,
+        "max_drawdown_pct": 59.1023,
+        "recent_30d_pnl": 516283.7,
+        "n_trades": 1344,
+        "trade_months": 2,
+        "trades_per_month": 672.0,
+        "avg_hold_hours": 1.384,
+        "category_counts": {
+          "other": 809,
+          "sports": 113,
+          "esports": 422
+        },
+        "top_category": "other",
+        "top_category_share": 0.602,
+        "days_idle": 0.0,
+        "current_value": 0.0,
+        "span_days": 457.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "回撤 59.1023 < 50% peak"
+      ]
+    },
+    "0x9d84ce0306f8551e02efef1680475fc0f1dc1344": {
+      "metrics": {
+        "address": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 1128479.0,
+        "monthly_pnl": {
+          "2024-11": 9246.0,
+          "2024-12": 25818.3,
+          "2025-01": -45091.3,
+          "2025-02": -20545.7,
+          "2025-03": -14891.3,
+          "2025-04": 20216.0,
+          "2025-05": -81296.0,
+          "2025-06": -5222.3,
+          "2025-07": 8800.7,
+          "2025-08": 34291.9,
+          "2025-09": 156449.0,
+          "2025-10": 105498.7,
+          "2025-11": 92760.8,
+          "2025-12": 93510.8,
+          "2026-01": 428301.2,
+          "2026-02": -88765.2,
+          "2026-03": -53202.8,
+          "2026-04": 85417.8,
+          "2026-05": 172989.4,
+          "2026-06": 231452.6,
+          "2026-07": -134234.0,
+          "2026-08": 106974.4
+        },
+        "active_months": 22,
+        "positive_month_ratio": 0.636,
+        "best_month_pnl": 428301.2,
+        "max_drawdown_pct": 0.0867,
+        "recent_30d_pnl": -112873.3,
+        "n_trades": 1449,
+        "trade_months": 1,
+        "trades_per_month": 1449.0,
+        "avg_hold_hours": 6.45,
+        "category_counts": {
+          "other": 536,
+          "economics": 238,
+          "politics": 639,
+          "sports": 36
+        },
+        "top_category": "politics",
+        "top_category_share": 0.441,
+        "days_idle": 0.0,
+        "current_value": 733196.7,
+        "span_days": 615.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "consistent_winner",
+      "reasons": [
+        "活躍月數 22 >= 3",
+        "活動跨度 615.0 天 >= 75",
+        "正月比率 0.636 >= 0.6",
+        "總 PnL 1128479.0 > 10,000",
+        "回撤 0.0867 < 50% peak",
+        "頻率 1449.0 在 5–1500 筆/月"
+      ]
+    },
+    "0x9f2fe025f84839ca81dd8e0338892605702d2ca8": {
+      "metrics": {
+        "address": "0x9f2fe025f84839ca81dd8e0338892605702d2ca8",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 956881.65,
+        "monthly_pnl": {
+          "2026-04": 1410199.85,
+          "2026-05": 2795491.7,
+          "2026-06": -1183074.7,
+          "2026-07": -2211510.86,
+          "2026-08": 145775.66
+        },
+        "active_months": 5,
+        "positive_month_ratio": 0.6,
+        "best_month_pnl": 2795491.7,
+        "max_drawdown_pct": 1.3776,
+        "recent_30d_pnl": -2836935.6,
+        "n_trades": 1439,
+        "trade_months": 2,
+        "trades_per_month": 719.5,
+        "avg_hold_hours": 24.824,
+        "category_counts": {
+          "sports": 657,
+          "other": 768,
+          "economics": 12,
+          "esports": 2
+        },
+        "top_category": "other",
+        "top_category_share": 0.534,
+        "days_idle": 0.0,
+        "current_value": 91304.41,
+        "span_days": 124.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "one_hit",
+      "reasons": [
+        "最佳月 2,795,492 > 70% × 總 PnL 956,882"
+      ]
+    },
+    "0xa71093cafc0c099b4ccab24c3cb8018d817923c4": {
+      "metrics": {
+        "address": "0xa71093cafc0c099b4ccab24c3cb8018d817923c4",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 1647465.25,
+        "monthly_pnl": {
+          "2026-02": 154301.91,
+          "2026-03": -526354.0,
+          "2026-04": 933670.19,
+          "2026-05": 104460.0,
+          "2026-06": 278830.75,
+          "2026-07": 522563.5,
+          "2026-08": 179992.9
+        },
+        "active_months": 7,
+        "positive_month_ratio": 0.857,
+        "best_month_pnl": 933670.19,
+        "max_drawdown_pct": 2.6267,
+        "recent_30d_pnl": 884663.96,
+        "n_trades": 1444,
+        "trade_months": 1,
+        "trades_per_month": 1444.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "sports": 1444
+        },
+        "top_category": "sports",
+        "top_category_share": 1.0,
+        "days_idle": 0.0,
+        "current_value": 181517.14,
+        "span_days": 180.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "回撤 2.6267 < 50% peak"
+      ]
+    },
+    "0xb0c85813a7a4428f1139ff91d3118a92c391fe7f": {
+      "metrics": {
+        "address": "0xb0c85813a7a4428f1139ff91d3118a92c391fe7f",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 376871.75,
+        "monthly_pnl": {
+          "2026-06": 26762.08,
+          "2026-07": 540901.67,
+          "2026-08": -190792.0
+        },
+        "active_months": 3,
+        "positive_month_ratio": 0.667,
+        "best_month_pnl": 540901.67,
+        "max_drawdown_pct": 0.6586,
+        "recent_30d_pnl": 251496.73,
+        "n_trades": 967,
+        "trade_months": 1,
+        "trades_per_month": 967.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "weather": 317,
+          "other": 446,
+          "economics": 25,
+          "sports": 25,
+          "politics": 134,
+          "crypto": 20
+        },
+        "top_category": "other",
+        "top_category_share": 0.461,
+        "days_idle": 0.0,
+        "current_value": 695.41,
+        "span_days": 41.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "one_hit",
+      "reasons": [
+        "最佳月 540,902 > 70% × 總 PnL 376,872"
+      ]
+    },
+    "0xb687f00464e33934f5d591f224e71c3559ecaee5": {
+      "metrics": {
+        "address": "0xb687f00464e33934f5d591f224e71c3559ecaee5",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 804034.15,
+        "monthly_pnl": {
+          "2026-05": 139048.09,
+          "2026-06": 1070402.16,
+          "2026-07": 134151.4,
+          "2026-08": -539567.5
+        },
+        "active_months": 4,
+        "positive_month_ratio": 0.75,
+        "best_month_pnl": 1070402.16,
+        "max_drawdown_pct": 0.9824,
+        "recent_30d_pnl": -1261327.4,
+        "n_trades": 1489,
+        "trade_months": 1,
+        "trades_per_month": 1489.0,
+        "avg_hold_hours": 35.443,
+        "category_counts": {
+          "weather": 76,
+          "politics": 604,
+          "other": 740,
+          "economics": 26,
+          "sports": 42,
+          "esports": 1
+        },
+        "top_category": "other",
+        "top_category_share": 0.497,
+        "days_idle": 0.0,
+        "current_value": 12849.45,
+        "span_days": 77.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "one_hit",
+      "reasons": [
+        "最佳月 1,070,402 > 70% × 總 PnL 804,034"
+      ]
+    },
+    "0xba3802d41ad55704b518564e8a13a8346da1fb57": {
+      "metrics": {
+        "address": "0xba3802d41ad55704b518564e8a13a8346da1fb57",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": -155283.84,
+        "monthly_pnl": {
+          "2026-06": -22260.93,
+          "2026-07": -280889.35,
+          "2026-08": 147866.44
+        },
+        "active_months": 3,
+        "positive_month_ratio": 0.333,
+        "best_month_pnl": 147866.44,
+        "max_drawdown_pct": 21.2956,
+        "recent_30d_pnl": -125914.83,
+        "n_trades": 1465,
+        "trade_months": 2,
+        "trades_per_month": 732.5,
+        "avg_hold_hours": 1.227,
+        "category_counts": {
+          "esports": 639,
+          "other": 826
+        },
+        "top_category": "other",
+        "top_category_share": 0.564,
+        "days_idle": 0.0,
+        "current_value": 0.0,
+        "span_days": 58.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "活動跨度 58.0 天 >= 75",
+        "正月比率 0.333 >= 0.6",
+        "總 PnL -155283.84 > 10,000",
+        "回撤 21.2956 < 50% peak"
+      ]
+    },
+    "0xbaa2bcb5439e985ce4ccf815b4700027d1b92c73": {
+      "metrics": {
+        "address": "0xbaa2bcb5439e985ce4ccf815b4700027d1b92c73",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 2501406.12,
+        "monthly_pnl": {
+          "2024-11": 2462.28,
+          "2024-12": 7200.8,
+          "2025-01": 170412.08,
+          "2025-02": 33564.37,
+          "2025-03": 129684.66,
+          "2025-04": 40313.72,
+          "2025-05": -58738.75,
+          "2025-06": -50291.87,
+          "2025-07": -134147.96,
+          "2025-08": -720.62,
+          "2025-09": 3005.82,
+          "2025-10": 241662.7,
+          "2025-11": 3834.68,
+          "2025-12": 70676.97,
+          "2026-01": 27594.5,
+          "2026-02": 16576.95,
+          "2026-03": 326292.7,
+          "2026-04": 836952.0,
+          "2026-05": -268403.0,
+          "2026-06": 972474.8,
+          "2026-07": 9301.0,
+          "2026-08": 121698.3
+        },
+        "active_months": 22,
+        "positive_month_ratio": 0.773,
+        "best_month_pnl": 972474.8,
+        "max_drawdown_pct": 0.6433,
+        "recent_30d_pnl": 101769.7,
+        "n_trades": 1462,
+        "trade_months": 2,
+        "trades_per_month": 731.0,
+        "avg_hold_hours": 48.476,
+        "category_counts": {
+          "other": 1189,
+          "politics": 273
+        },
+        "top_category": "other",
+        "top_category_share": 0.813,
+        "days_idle": 0.0,
+        "current_value": 1543540.67,
+        "span_days": 615.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "回撤 0.6433 < 50% peak"
+      ]
+    },
+    "0xbc11a64ab34a03a043fbe80598fa065ee87eeec6": {
+      "metrics": {
+        "address": "0xbc11a64ab34a03a043fbe80598fa065ee87eeec6",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 8879746.79,
+        "monthly_pnl": {
+          "2026-06": 8879746.79,
+          "2026-07": 0.0,
+          "2026-08": 0.0
+        },
+        "active_months": 1,
+        "positive_month_ratio": 1.0,
+        "best_month_pnl": 8879746.79,
+        "max_drawdown_pct": 0.0,
+        "recent_30d_pnl": 0.0,
+        "n_trades": 1495,
+        "trade_months": 1,
+        "trades_per_month": 1495.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "other": 1495
+        },
+        "top_category": "other",
+        "top_category_share": 1.0,
+        "days_idle": 45.0,
+        "current_value": 0.0,
+        "span_days": 2.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "dormant",
+      "reasons": [
+        "閒置 45 天 > 30 且持倉 $0 <= 100"
+      ]
+    },
+    "0xc1c7bb8761105f6d33fc8d71dec31b5688a0f0a7": {
+      "metrics": {
+        "address": "0xc1c7bb8761105f6d33fc8d71dec31b5688a0f0a7",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 70977.16,
+        "monthly_pnl": {
+          "2026-05": -8985.4,
+          "2026-06": 0.0,
+          "2026-07": -10435.01,
+          "2026-08": 90397.56
+        },
+        "active_months": 3,
+        "positive_month_ratio": 0.333,
+        "best_month_pnl": 90397.56,
+        "max_drawdown_pct": 1.2966,
+        "recent_30d_pnl": 79962.55,
+        "n_trades": 1465,
+        "trade_months": 2,
+        "trades_per_month": 732.5,
+        "avg_hold_hours": 0.648,
+        "category_counts": {
+          "esports": 501,
+          "other": 964
+        },
+        "top_category": "other",
+        "top_category_share": 0.658,
+        "days_idle": 0.0,
+        "current_value": 0.0,
+        "span_days": 84.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "mm_bot_like",
+      "reasons": [
+        "平均持有 0.65 小時 < 1.0"
+      ]
+    },
+    "0xc29198ad764bd6adaf7bb971a3757a689ece5d74": {
+      "metrics": {
+        "address": "0xc29198ad764bd6adaf7bb971a3757a689ece5d74",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 624077.11,
+        "monthly_pnl": {
+          "2026-02": 7541.39,
+          "2026-03": -6345.65,
+          "2026-04": 47965.01,
+          "2026-05": 2767.21,
+          "2026-06": 276443.01,
+          "2026-07": 216250.4,
+          "2026-08": 79455.75
+        },
+        "active_months": 7,
+        "positive_month_ratio": 0.857,
+        "best_month_pnl": 276443.01,
+        "max_drawdown_pct": 1.281,
+        "recent_30d_pnl": 245971.87,
+        "n_trades": 1296,
+        "trade_months": 1,
+        "trades_per_month": 1296.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "other": 1274,
+          "sports": 19,
+          "esports": 3
+        },
+        "top_category": "other",
+        "top_category_share": 0.983,
+        "days_idle": 0.0,
+        "current_value": 91048.36,
+        "span_days": 166.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "回撤 1.281 < 50% peak"
+      ]
+    },
+    "0xc65ca4755436f82d8eb461e65781584b8cadea39": {
+      "metrics": {
+        "address": "0xc65ca4755436f82d8eb461e65781584b8cadea39",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 352349.22,
+        "monthly_pnl": {
+          "2025-12": 236839.73,
+          "2026-01": -267937.37,
+          "2026-02": -173727.59,
+          "2026-03": 264559.84,
+          "2026-04": 86737.08,
+          "2026-05": -142246.11,
+          "2026-06": -205.88,
+          "2026-07": 280192.43,
+          "2026-08": 68137.1
+        },
+        "active_months": 9,
+        "positive_month_ratio": 0.556,
+        "best_month_pnl": 280192.43,
+        "max_drawdown_pct": 1.6812,
+        "recent_30d_pnl": 336640.1,
+        "n_trades": 1406,
+        "trade_months": 2,
+        "trades_per_month": 703.0,
+        "avg_hold_hours": 0.004,
+        "category_counts": {
+          "other": 120,
+          "esports": 1098,
+          "sports": 188
+        },
+        "top_category": "esports",
+        "top_category_share": 0.781,
+        "days_idle": 0.0,
+        "current_value": 2129.89,
+        "span_days": 238.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "mm_bot_like",
+      "reasons": [
+        "平均持有 0.00 小時 < 1.0"
+      ]
+    },
+    "0xc8075693f48668a264b9fa313b47f52712fcc12b": {
+      "metrics": {
+        "address": "0xc8075693f48668a264b9fa313b47f52712fcc12b",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 88417.41,
+        "monthly_pnl": {
+          "2026-03": -139104.62,
+          "2026-04": 1003007.86,
+          "2026-05": -1400242.96,
+          "2026-06": 428739.63,
+          "2026-07": 102464.6,
+          "2026-08": 93552.91
+        },
+        "active_months": 6,
+        "positive_month_ratio": 0.667,
+        "best_month_pnl": 1003007.86,
+        "max_drawdown_pct": 14.8631,
+        "recent_30d_pnl": 59706.69,
+        "n_trades": 1447,
+        "trade_months": 2,
+        "trades_per_month": 723.5,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "sports": 1447
+        },
+        "top_category": "sports",
+        "top_category_share": 1.0,
+        "days_idle": 0.0,
+        "current_value": 166516.8,
+        "span_days": 138.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "one_hit",
+      "reasons": [
+        "最佳月 1,003,008 > 70% × 總 PnL 88,417"
+      ]
+    },
+    "0xc84f7e76ec28ef20e7773b7b4926bfb7378be0c5": {
+      "metrics": {
+        "address": "0xc84f7e76ec28ef20e7773b7b4926bfb7378be0c5",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 733732.22,
+        "monthly_pnl": {
+          "2026-03": 33921.63,
+          "2026-04": 97491.51,
+          "2026-05": -22417.63,
+          "2026-06": 535514.31,
+          "2026-07": -86684.04,
+          "2026-08": 175906.44
+        },
+        "active_months": 6,
+        "positive_month_ratio": 0.667,
+        "best_month_pnl": 535514.31,
+        "max_drawdown_pct": 1.0459,
+        "recent_30d_pnl": 106564.4,
+        "n_trades": 1386,
+        "trade_months": 2,
+        "trades_per_month": 693.0,
+        "avg_hold_hours": 88.38,
+        "category_counts": {
+          "other": 920,
+          "politics": 466
+        },
+        "top_category": "other",
+        "top_category_share": 0.664,
+        "days_idle": 0.0,
+        "current_value": 1122134.57,
+        "span_days": 157.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "one_hit",
+      "reasons": [
+        "最佳月 535,514 > 70% × 總 PnL 733,732"
+      ]
+    },
+    "0xd23f8c8aab13cfb2a35da40b67f8471faf9894a1": {
+      "metrics": {
+        "address": "0xd23f8c8aab13cfb2a35da40b67f8471faf9894a1",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 422798.11,
+        "monthly_pnl": {
+          "2026-05": 848.75,
+          "2026-06": 120920.5,
+          "2026-07": 423578.56,
+          "2026-08": -122549.7
+        },
+        "active_months": 4,
+        "positive_month_ratio": 0.75,
+        "best_month_pnl": 423578.56,
+        "max_drawdown_pct": 0.3644,
+        "recent_30d_pnl": 237011.21,
+        "n_trades": 984,
+        "trade_months": 1,
+        "trades_per_month": 984.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "politics": 147,
+          "weather": 646,
+          "sports": 1,
+          "other": 190
+        },
+        "top_category": "weather",
+        "top_category_share": 0.657,
+        "days_idle": 0.0,
+        "current_value": 2257.24,
+        "span_days": 68.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "one_hit",
+      "reasons": [
+        "最佳月 423,579 > 70% × 總 PnL 422,798"
+      ]
+    },
+    "0xdb859a551fcf56e49416160911476bea7307152f": {
+      "metrics": {
+        "address": "0xdb859a551fcf56e49416160911476bea7307152f",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": -92443.98,
+        "monthly_pnl": {
+          "2026-04": -26787.9,
+          "2026-05": 113789.87,
+          "2026-06": 178190.09,
+          "2026-07": -473836.11,
+          "2026-08": 116200.08
+        },
+        "active_months": 5,
+        "positive_month_ratio": 0.6,
+        "best_month_pnl": 178190.09,
+        "max_drawdown_pct": 14.8806,
+        "recent_30d_pnl": -270565.33,
+        "n_trades": 1449,
+        "trade_months": 2,
+        "trades_per_month": 724.5,
+        "avg_hold_hours": 10.693,
+        "category_counts": {
+          "sports": 389,
+          "esports": 201,
+          "other": 859
+        },
+        "top_category": "other",
+        "top_category_share": 0.593,
+        "days_idle": 0.0,
+        "current_value": 84021.8,
+        "span_days": 126.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "總 PnL -92443.98 > 10,000",
+        "回撤 14.8806 < 50% peak"
+      ]
+    },
+    "0xe1000ddb5f5025849765e29d051dfff78f5d4d41": {
+      "metrics": {
+        "address": "0xe1000ddb5f5025849765e29d051dfff78f5d4d41",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 394889.63,
+        "monthly_pnl": {
+          "2025-12": -527.53,
+          "2026-01": 0.0,
+          "2026-02": 0.0,
+          "2026-03": -809.44,
+          "2026-04": 59534.39,
+          "2026-05": 184254.5,
+          "2026-06": -40092.49,
+          "2026-07": 17832.84,
+          "2026-08": 174697.35
+        },
+        "active_months": 7,
+        "positive_month_ratio": 0.571,
+        "best_month_pnl": 184254.5,
+        "max_drawdown_pct": 1.0349,
+        "recent_30d_pnl": 210165.13,
+        "n_trades": 1426,
+        "trade_months": 4,
+        "trades_per_month": 356.5,
+        "avg_hold_hours": 1.12,
+        "category_counts": {
+          "esports": 422,
+          "other": 1004
+        },
+        "top_category": "other",
+        "top_category_share": 0.704,
+        "days_idle": 0.0,
+        "current_value": 0.0,
+        "span_days": 220.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "choppy",
+      "reasons": [
+        "正月比率 0.571 >= 0.6",
+        "回撤 1.0349 < 50% peak"
+      ]
+    },
+    "0xe291a588ece487f3323736c55c6144f6a99e748e": {
+      "metrics": {
+        "address": "0xe291a588ece487f3323736c55c6144f6a99e748e",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 336899.26,
+        "monthly_pnl": {
+          "2026-05": -1566.28,
+          "2026-06": -2238.44,
+          "2026-07": 201174.81,
+          "2026-08": 139529.16
+        },
+        "active_months": 4,
+        "positive_month_ratio": 0.5,
+        "best_month_pnl": 201174.81,
+        "max_drawdown_pct": 6.8028,
+        "recent_30d_pnl": 345009.85,
+        "n_trades": 1452,
+        "trade_months": 2,
+        "trades_per_month": 726.0,
+        "avg_hold_hours": 0.434,
+        "category_counts": {
+          "other": 897,
+          "esports": 546,
+          "politics": 9
+        },
+        "top_category": "other",
+        "top_category_share": 0.618,
+        "days_idle": 0.0,
+        "current_value": 302918.19,
+        "span_days": 81.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "mm_bot_like",
+      "reasons": [
+        "平均持有 0.43 小時 < 1.0"
+      ]
+    },
+    "0xe30e74595517de48f1fb19f4553dd3d9f1e96b87": {
+      "metrics": {
+        "address": "0xe30e74595517de48f1fb19f4553dd3d9f1e96b87",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 38968.65,
+        "monthly_pnl": {
+          "2026-03": -14847.57,
+          "2026-04": 258322.99,
+          "2026-05": -268767.61,
+          "2026-06": -352656.65,
+          "2026-07": -67145.13,
+          "2026-08": 484062.62
+        },
+        "active_months": 6,
+        "positive_month_ratio": 0.333,
+        "best_month_pnl": 484062.62,
+        "max_drawdown_pct": 2.6759,
+        "recent_30d_pnl": 416917.49,
+        "n_trades": 1472,
+        "trade_months": 2,
+        "trades_per_month": 736.0,
+        "avg_hold_hours": 0.715,
+        "category_counts": {
+          "other": 1468,
+          "sports": 4
+        },
+        "top_category": "other",
+        "top_category_share": 0.997,
+        "days_idle": 0.0,
+        "current_value": 357945.52,
+        "span_days": 147.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "mm_bot_like",
+      "reasons": [
+        "平均持有 0.71 小時 < 1.0"
+      ]
+    },
+    "0xe59f2ab1b26b403f95b9df6e18ea66b395010d08": {
+      "metrics": {
+        "address": "0xe59f2ab1b26b403f95b9df6e18ea66b395010d08",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 85524.37,
+        "monthly_pnl": {
+          "2026-06": -16941.41,
+          "2026-07": 26187.64,
+          "2026-08": 76278.15
+        },
+        "active_months": 3,
+        "positive_month_ratio": 0.667,
+        "best_month_pnl": 76278.15,
+        "max_drawdown_pct": 2.9787,
+        "recent_30d_pnl": 102341.49,
+        "n_trades": 1481,
+        "trade_months": 1,
+        "trades_per_month": 1481.0,
+        "avg_hold_hours": 0.059,
+        "category_counts": {
+          "other": 134,
+          "esports": 1347
+        },
+        "top_category": "esports",
+        "top_category_share": 0.91,
+        "days_idle": 0.0,
+        "current_value": 0.0,
+        "span_days": 53.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "mm_bot_like",
+      "reasons": [
+        "平均持有 0.06 小時 < 1.0"
+      ]
+    },
+    "0xed64a7bf029040aa331abc87902434d815ef217d": {
+      "metrics": {
+        "address": "0xed64a7bf029040aa331abc87902434d815ef217d",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 0.0,
+        "monthly_pnl": {
+          "2026-06": 0.0,
+          "2026-07": 0.0,
+          "2026-08": 0.0
+        },
+        "active_months": 1,
+        "positive_month_ratio": null,
+        "best_month_pnl": 0.0,
+        "max_drawdown_pct": 0.0,
+        "recent_30d_pnl": 0.0,
+        "n_trades": 1495,
+        "trade_months": 1,
+        "trades_per_month": 1495.0,
+        "avg_hold_hours": null,
+        "category_counts": {
+          "other": 1495
+        },
+        "top_category": "other",
+        "top_category_share": 1.0,
+        "days_idle": 50.0,
+        "current_value": 0.0,
+        "span_days": 0.4,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "dormant",
+      "reasons": [
+        "閒置 50 天 > 30 且持倉 $0 <= 100"
+      ]
+    },
+    "0xf201a19b43471261a3c1ba9247335d55270e527e": {
+      "metrics": {
+        "address": "0xf201a19b43471261a3c1ba9247335d55270e527e",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 362808.92,
+        "monthly_pnl": {
+          "2025-12": -60.8,
+          "2026-01": -57.14,
+          "2026-02": 102613.44,
+          "2026-03": -99842.62,
+          "2026-04": 45191.06,
+          "2026-05": 181848.68,
+          "2026-06": 159848.24,
+          "2026-07": -120425.62,
+          "2026-08": 93693.68
+        },
+        "active_months": 9,
+        "positive_month_ratio": 0.556,
+        "best_month_pnl": 181848.68,
+        "max_drawdown_pct": 0.9991,
+        "recent_30d_pnl": 8328.24,
+        "n_trades": 1353,
+        "trade_months": 1,
+        "trades_per_month": 1353.0,
+        "avg_hold_hours": 0.286,
+        "category_counts": {
+          "esports": 836,
+          "other": 517
+        },
+        "top_category": "esports",
+        "top_category_share": 0.618,
+        "days_idle": 0.0,
+        "current_value": 111.4,
+        "span_days": 233.0,
+        "activity_truncated": true,
+        "fetch_errors": []
+      },
+      "classification": "mm_bot_like",
+      "reasons": [
+        "平均持有 0.29 小時 < 1.0"
+      ]
+    },
+    "0xf4e144462829dead1a93c6fd23a33560736e34a5": {
+      "metrics": {
+        "address": "0xf4e144462829dead1a93c6fd23a33560736e34a5",
+        "snapshot_date": "2026-08-04",
+        "pnl_source": "curve",
+        "low_confidence": false,
+        "total_pnl": 128394.19,
+        "monthly_pnl": {
+          "2025-03": -0.19,
+          "2025-04": 0.0,
+          "2025-05": 0.0,
+          "2025-06": 0.0,
+          "2025-07": 0.0,
+          "2025-08": 0.0,
+          "2025-09": 0.0,
+          "2025-10": 0.0,
+          "2025-11": 0.0,
+          "2025-12": 0.0,
+          "2026-01": 0.0,
+          "2026-02": 0.0,
+          "2026-03": 5742.41,
+          "2026-04": 1891.28,
+          "2026-05": 16675.35,
+          "2026-06": 99191.78,
+          "2026-07": -54835.67,
+          "2026-08": 59729.23
+        },
+        "active_months": 7,
+        "positive_month_ratio": 0.714,
+        "best_month_pnl": 99191.78,
+        "max_drawdown_pct": 0.5769,
+        "recent_30d_pnl": 47476.76,
+        "n_trades": 185,
+        "trade_months": 7,
+        "trades_per_month": 26.4,
+        "avg_hold_hours": 58.923,
+        "category_counts": {
+          "other": 113,
+          "sports": 52,
+          "esports": 20
+        },
+        "top_category": "other",
+        "top_category_share": 0.611,
+        "days_idle": 2.0,
+        "current_value": 0.0,
+        "span_days": 509.3,
+        "activity_truncated": false,
+        "fetch_errors": []
+      },
+      "classification": "one_hit",
+      "reasons": [
+        "最佳月 99,192 > 70% × 總 PnL 128,394"
+      ]
+    }
+  },
+  "ground_truth": [
+    {
+      "address": "0x25e28169faea17421fcd4cc361f6436d1e449a09",
+      "expected": [
+        "dormant"
+      ],
+      "actual": "consistent_winner",
+      "ok": false,
+      "note": null
+    }
+  ],
+  "endpoint_health_summary": [
+    {
+      "endpoint": "data-api.polymarket.com/activity",
+      "ok": 171,
+      "failed": 0,
+      "sample_error": null
+    },
+    {
+      "endpoint": "data-api.polymarket.com/positions",
+      "ok": 60,
+      "failed": 0,
+      "sample_error": null
+    },
+    {
+      "endpoint": "data-api.polymarket.com/v1/leaderboard",
+      "ok": 2,
+      "failed": 0,
+      "sample_error": null
+    },
+    {
+      "endpoint": "data-api.polymarket.com/value",
+      "ok": 60,
+      "failed": 0,
+      "sample_error": null
+    },
+    {
+      "endpoint": "user-pnl-api.polymarket.com/user-pnl",
+      "ok": 60,
+      "failed": 0,
+      "sample_error": null
+    }
+  ],
+  "snapshot_load_errors": []
+}
