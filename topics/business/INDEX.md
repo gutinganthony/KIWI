@@ -69,3 +69,4 @@
 | 2026-07-22 | [順手代購平台 — 商業模式計畫 v2（閒置行李額度 × 實體通路取得服務）](./2026-07-22-jp-limited-goods-platform-plan.md) | daigou, marketplace, japan, crowdsourcing, handcarry, idle-capacity, business-model, autoplan |
 | 2026-07-22 | [C 案占位查證 — Pietra/Italic/費率/MOQ/關稅](./2026-07-22-sourcing-c-case-research.md) | sourcing-as-a-service, occupancy-check, pietra, italic, moq, tariff, research |
 | 2026-07-22 | [Grabr 台灣複製可行性評估 — Pincus Proven/Better/New 框架](./2026-07-22-grabr-taiwan-feasibility.md) | grabr, daigou, cross-border-commerce, crowdshipping, pincus-framework, taiwan-market, feasibility-study |
+| 2026-08-04 | [順手代購 T1/T2 驗證 — 台灣人最常託帶品項 × 價差實測 × 雙邊 User Journey](./2026-08-04-handcarry-t1t2-and-user-journey.md) | daigou, handcarry, japan, price-validation, unit-economics, user-journey, marketplace |
