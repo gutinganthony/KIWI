@@ -67,25 +67,25 @@ axA.text(0, 0.12, "上一根一件，這一根三件。但單日暴漲永遠是�
 # ══════════ 左下：台韓走勢分歧 ══════════
 axB = fig.add_axes([0.108, 0.145, 0.335, 0.335])
 axB.set_facecolor(BG)
-axB.set_title("暴漲之後兩天，台韓走了兩條路", loc='left',
+axB.set_title("暴漲之後兩天，兩邊都守住了", loc='left',
               color=INK, fontsize=12, fontproperties=serif_b, pad=12)
 
 days = ["7/31", "8/3", "8/4"]
 tw = [100.0, 100.62, 100.56]
-kr = [100.0, 94.87, 94.46]
+kr = [100.0, 94.88, 96.41]
 x = range(3)
 
 axB.plot(x, tw, color=SLATE, lw=2.4, marker='o', ms=7, zorder=4, label="台股加權")
 axB.plot(x, kr, color=RED, lw=2.4, marker='o', ms=7, zorder=4, label="韓國 KOSPI")
 axB.axhline(100, color=LGRID, lw=1.0, ls='--', zorder=1)
 
-axB.text(2.06, tw[2] + 0.55, "守住並小漲", color=SLATE, fontsize=9,
+axB.text(2.06, tw[2] + 0.62, "守住並小漲", color=SLATE, fontsize=9,
          fontproperties=serif_b, ha='right')
-axB.text(2.06, kr[2] - 1.5, "吐掉漲幅約三分之一", color=RED, fontsize=9,
+axB.text(2.06, kr[2] + 0.62, "吐掉約四分之一後拉回", color=RED, fontsize=9,
          fontproperties=serif_b, ha='right')
 
 axB.set_xticks(list(x)); axB.set_xticklabels(days, fontsize=9.5, color=INK)
-axB.set_ylim(92.2, 102.6)
+axB.set_ylim(93.0, 102.6)
 axB.set_yticks([94, 96, 98, 100, 102])
 axB.set_yticklabels(["94", "96", "98", "100", "102"], fontsize=8.2, color=GREY)
 axB.grid(axis='y', color=LGRID, lw=0.6)
@@ -116,9 +116,9 @@ plus = [
     ("政策介入", "韓國監管處理槓桿 ETF", True),
     ("外資由賣轉買", "7/31 外資爆買", True),
     ("站上 200 日均線", "本波從未跌破", True),
-    ("暴漲後守得住", "台股成立，韓國不成立", None),
+    ("暴漲後守得住", "台股小漲；韓國吐四分之一後拉回", True),
+    ("廣度開始擴散", "8/4 韓國 KOSDAQ +5.88%", None),
     ("確認日出現", "8/5–8/10 見真章", False),
-    ("廣度擴散", "需從權值擴散到中小型", False),
 ]
 for i, (name, desc, ok) in enumerate(plus):
     y = 13.28 - i * 0.86
@@ -133,7 +133,7 @@ axC.plot([0, 10], [5.72, 5.72], color=RED, lw=0.9)
 
 minus = [
     ("回撤幅度已收斂", "9.2%，掉出回測甜蜜區"),
-    ("韓國連兩天回吐", "震央還在震"),
+    ("韓國波動仍劇烈", "一天 -5.13%、一天 +1.62%"),
     ("量增價平", "8/4 量 1.03 兆、指數未動"),
     ("九月升息風險", "三票異議，2016/9 以來最多"),
     ("主流規格動能收斂", "DDR5 僅 +2.68%，靠舊規格撐"),
@@ -144,13 +144,13 @@ for i, (name, desc) in enumerate(minus):
     axC.text(0.75, y, name, color=INK, fontsize=9.3, va='center', fontproperties=serif_b)
     axC.text(4.35, y, desc, color=GREY, fontsize=7.9, va='center')
 
-axC.text(0, 0.42, "八項加分：六項成立、一項分歧、兩項未知。五項減分全是「空間變窄」，",
+axC.text(0, 0.42, "八項加分：七項成立（含一項初步）、一項未知。五項減分全是「空間變窄」，",
          color=INK, fontsize=8.7, fontproperties=serif_b, va='center')
 axC.text(0, -0.18, "沒有一項是「論點被推翻」等級",
          color=INK, fontsize=8.7, fontproperties=serif_b, va='center')
 
 fig.text(0.048, 0.072,
-         "資料來源：TWSE、韓國交易所、TrendForce／DRAMeXchange、Fed，摸魚記整理。台股與 KOSPI 為 2026/7/31–8/4 收盤，8/4 KOSPI 為約當值。\n"
+         "資料來源：TWSE、韓國交易所、TrendForce／DRAMeXchange、Fed，摸魚記整理。台股與 KOSPI 均為 2026/7/31–8/4 實際收盤價，以 7/31 收盤指數化為 100。\n"
          "計分卡為摸魚記自訂框架，非標準技術指標；歷史統計不保證未來結果。",
          color=GREY, fontsize=7.5, linespacing=1.7, va='top')
 
