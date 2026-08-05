@@ -18,7 +18,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |-------|---------|
 | [Technology](./topics/technology/INDEX.md) | 2 |
 | [Science](./topics/science/INDEX.md) | 0 |
-| [Business](./topics/business/INDEX.md) | 68 |
+| [Business](./topics/business/INDEX.md) | 69 |
 | [Health](./topics/health/INDEX.md) | 0 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Other](./topics/other/INDEX.md) | 2 |
@@ -32,6 +32,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-08-04 | [台灣市場空白掃描 — 「國外已 run、台灣沒有」的七格佔位查證與框架修正](./topics/business/2026-08-04-taiwan-market-gap-scan.md) | Business |
 | 2026-08-04 | [順手代購 T1/T2 驗證 — 台灣人最常託帶品項 × 價差實測 × 雙邊 User Journey](./topics/business/2026-08-04-handcarry-t1t2-and-user-journey.md) | Business |
 | 2026-07-22 | [順手代購平台 — 商業模式計畫 v2（閒置行李額度 × 實體通路取得服務）](./topics/business/2026-07-22-jp-limited-goods-platform-plan.md) | Business |
 | 2026-07-22 | [Grabr 台灣複製可行性評估 — Pincus Proven/Better/New 框架](./topics/business/2026-07-22-grabr-taiwan-feasibility.md) | Business |
@@ -89,6 +90,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-07-22 | [Grabr 台灣複製可行性評估 — Pincus Proven/Better/New 框架](./topics/business/2026-07-22-grabr-taiwan-feasibility.md) | Business |
 | 2026-07-22 | [順手代購平台 — 商業模式計畫 v2（閒置行李額度 × 實體通路取得服務）](./topics/business/2026-07-22-jp-limited-goods-platform-plan.md) | Business |
 | 2026-08-04 | [順手代購 T1/T2 驗證 — 台灣人最常託帶品項 × 價差實測 × 雙邊 User Journey](./topics/business/2026-08-04-handcarry-t1t2-and-user-journey.md) | Business |
+| 2026-08-04 | [台灣市場空白掃描 — 「國外已 run、台灣沒有」的七格佔位查證與框架修正](./topics/business/2026-08-04-taiwan-market-gap-scan.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
