@@ -33,6 +33,21 @@ last_updated: 2026-07-06
   - ✅ 現在已有失敗推播（`deploy-pages.yml` → Telegram），收到通知再去按即可，不用自己巡邏網站。
   - 位置：Actions 分頁 → Deploy Dashboard to GitHub Pages → Re-run failed jobs；或等下次自動 deploy。
 
+### 2026-08-05 session 產生的（Serenity 週度輕量週報）
+- [ ] **JEM 6855 兩件功課 — 連三週未清，8/7 Q1 只剩 2 天**（最急，卡住一條否證判定）。
+  ①**TDnet 開示清單 7/3–7/6** ②**FY3/26 有価証券報告書的客戶表**（NAND 客戶占比／Micron 系是否回到 >10%）。
+  **否證 #3「有報單一 NAND 客戶 >30% → HBM 敘事降級」至今無法判定**，而 8/7 Q1 就到。
+  雲端擋點：EDINET/TDnet 與 kabutan/minkabu 皆 403。
+  → 這兩件不清，JEM 的首批建倉在框架上是「否證未驗完就進場」。（首批區 ¥6,400–6,800；8/4 收 ¥6,490 在區內、8/5 盤中 ¥7,190 已穿出）
+- [ ] **CNBC quote cache 的 User-Agent 坑（制度層，補進 loop 憲章）**。
+  2026-08-05 實測：CNBC `quote.cnbc.com/quote-html-webservice/...` **不帶桌面 User-Agent 會被 Akamai 回 `Access Denied`**（8/2 那次沒遇到）。
+  另 **LPKF 的正確代碼是 `LPK-DE`**，`LPKF-DE` 回 `code:1` 查無。
+  **Yahoo Finance API 連兩週全數 429**（8/5 再測 `query2/v8/finance/chart` 仍 429）→ 備援鏈已可視為常態主源，`agents/loops/weekly-repricing-audit.md` §HOW TO WORK 該正式改版（改制度檔前依 `agents/MAINTENANCE.md` 應先確認）。
+- [ ] **Yamaichi 6941 / Tamura 6768 的 8/5 Q1 決算短信**（本週報發稿時 14:10 JST 尚未發布）。
+  Yamaichi 的 **營益年化 run-rate ≥¥13B** 是本檔**唯一還活著的觸發路徑**（價格路徑已失效：¥10,010 vs 觸發 ¥6,700–7,200，高 39%）；
+  Tamura 看 **OP ≥¥14 億且段利潤率回 5%+**（三條件第 2 條）。
+  → 下輪（週日）週報會自動補判，但若你想早一步看，去 TDnet 抓決算短信 PDF。
+
 ### 2026-08-02 session 產生的（Serenity 全掃週報，8 月財報群前）
 - [ ] **Mersen H1 2026 新聞稿原文 → 抓 data center 分項銷售**（急，決定一個觸發判定）。
   本週已確認的 H1 數字：營收 €6.11 億（organic +3.9%）、EBITDA €9,740 萬（15.9%）、經常營業利益 €5,650 萬（9.2%）、**全年指引上修**（organic 4–6%、EBITDA 率 16–16.5%、營業利益率 9.0–9.5%）。
