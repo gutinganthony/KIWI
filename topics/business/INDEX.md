@@ -70,5 +70,6 @@
 | 2026-07-22 | [C 案占位查證 — Pietra/Italic/費率/MOQ/關稅](./2026-07-22-sourcing-c-case-research.md) | sourcing-as-a-service, occupancy-check, pietra, italic, moq, tariff, research |
 | 2026-07-22 | [Grabr 台灣複製可行性評估 — Pincus Proven/Better/New 框架](./2026-07-22-grabr-taiwan-feasibility.md) | grabr, daigou, cross-border-commerce, crowdshipping, pincus-framework, taiwan-market, feasibility-study |
 | 2026-08-04 | [順手代購 T1/T2 驗證 — 台灣人最常託帶品項 × 價差實測 × 雙邊 User Journey](./2026-08-04-handcarry-t1t2-and-user-journey.md) | daigou, handcarry, japan, price-validation, unit-economics, user-journey, marketplace |
-| 2026-08-04 | [台灣市場空白掃描 — 「國外已 run、台灣沒有」的七格佔位查證與框架修正](./2026-08-04-taiwan-market-gap-scan.md) | market-gap, occupancy-check, taiwan, startup-ideation, search-fund, aging-society, carbon-fee, pincus-framework |
+| 2026-08-04 | [台灣市場空白掃描 — 「國外已 run、台灣沒有」的十四格佔位查證與框架修正](./2026-08-04-taiwan-market-gap-scan.md) | market-gap, occupancy-check, taiwan, startup-ideation, search-fund, aging-society, carbon-fee, pincus-framework |
+| 2026-08-04 | [缺口 A 深入 — 台灣中小企業轉讓市場為何凍結，以及該不該自己做 search fund](./2026-08-04-sme-succession-market-deep-dive.md) | search-fund, sme-succession, business-broker, valuation, taiwan, deal-flow, market-structure |
 | 2026-08-04 | [順手代購 T1/T2 驗證 — 台灣人最常託帶品項 × 價差實測 × 雙邊 User Journey](./2026-08-04-handcarry-t1t2-and-user-journey.md) | daigou, handcarry, japan, price-validation, unit-economics, user-journey, marketplace |
