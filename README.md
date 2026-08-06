@@ -21,7 +21,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | [Business](./topics/business/INDEX.md) | 65 |
 | [Health](./topics/health/INDEX.md) | 0 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
-| [Other](./topics/other/INDEX.md) | 2 |
+| [Other](./topics/other/INDEX.md) | 3 |
 
 > New topics are added as needed.
 
@@ -32,6 +32,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-07-29 | [Dan Koe〈一天修好你的人生〉— 繁中摘要與 KIWI 應用](./topics/other/2026-07-29-dan-koe-fix-your-life-in-one-day.md) | Other |
 | 2026-07-29 | [HBM vs 傳統 DRAM 位元供給拆解 — 情境②③ 判別](./topics/business/2026-07-29-hbm-vs-conventional-bit-supply-decomposition.md) | Business |
 | 2026-07-29 | [記憶體：週期股還是「這次不一樣」？— 假說檢定框架實作](./topics/business/2026-07-29-memory-cycle-vs-structural-hypothesis-test.md) | Business |
 | 2026-07-28 | [NVDA 替 OpenAI 擔保／融資 — 雙面檢視（供應商融資＝晚期標記？）](./topics/business/2026-07-28-nvda-vendor-financing-two-sided-review.md) | Business |
@@ -90,6 +91,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-07-28 | [NVDA 替 OpenAI 擔保／融資 — 雙面檢視（供應商融資＝晚期標記？）](./topics/business/2026-07-28-nvda-vendor-financing-two-sided-review.md) | Business |
 | 2026-07-29 | [記憶體：週期股還是「這次不一樣」？— 假說檢定框架實作](./topics/business/2026-07-29-memory-cycle-vs-structural-hypothesis-test.md) | Business |
 | 2026-07-29 | [HBM vs 傳統 DRAM 位元供給拆解 — 情境②③ 判別](./topics/business/2026-07-29-hbm-vs-conventional-bit-supply-decomposition.md) | Business |
+| 2026-07-29 | [Dan Koe〈一天修好你的人生〉— 繁中摘要與 KIWI 應用](./topics/other/2026-07-29-dan-koe-fix-your-life-in-one-day.md) | Other |
 <!-- ALL_ENTRIES_END -->
 
 ---
