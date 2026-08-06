@@ -73,4 +73,5 @@
 | 2026-08-04 | [台灣市場空白掃描 — 「國外已 run、台灣沒有」的十四格佔位查證與框架修正](./2026-08-04-taiwan-market-gap-scan.md) | market-gap, occupancy-check, taiwan, startup-ideation, search-fund, aging-society, carbon-fee, pincus-framework |
 | 2026-08-04 | [缺口 A 深入 — 台灣中小企業轉讓市場為何凍結，以及該不該自己做 search fund](./2026-08-04-sme-succession-market-deep-dive.md) | search-fund, sme-succession, business-broker, valuation, taiwan, deal-flow, market-structure |
 | 2026-08-06 | [缺口 A 執行包 — V0–V3 工具組、信保查證、search fund 重評（含外部資源盤點）](./2026-08-06-sme-succession-v0-v3-kit.md) | search-fund, sme-succession, interview-guide, mom-test, valuation, execution-kit, agenda-check |
+| 2026-08-06 | [V3 Outreach — 收件人、管道與三封信全文](./2026-08-06-outreach-letters.md) | outreach, search-fund, sme-succession, networking, execution |
 | 2026-08-04 | [順手代購 T1/T2 驗證 — 台灣人最常託帶品項 × 價差實測 × 雙邊 User Journey](./2026-08-04-handcarry-t1t2-and-user-journey.md) | daigou, handcarry, japan, price-validation, unit-economics, user-journey, marketplace |
