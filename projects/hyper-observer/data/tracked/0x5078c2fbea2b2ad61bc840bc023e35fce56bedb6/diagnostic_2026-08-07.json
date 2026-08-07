@@ -2,7 +2,7 @@
   "address": "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6",
   "label": "james-wynn-blowup-groundtruth",
   "date": "2026-08-07",
-  "probed_at": "2026-08-07T01:42:12.105786+00:00",
+  "probed_at": "2026-08-07T23:22:29.715108+00:00",
   "ledger_window_days": 45,
   "queries_ok": {
     "perpDexs": true,
@@ -38,57 +38,57 @@
   ],
   "portfolio_windows": {
     "day": {
-      "account_value_last": 895.73,
-      "account_value_ts_iso": "2026-08-07T01:42:20.532000+00:00",
-      "pnl_last": -0.01,
+      "account_value_last": 895.71,
+      "account_value_ts_iso": "2026-08-07T23:22:38.996000+00:00",
+      "pnl_last": -0.03,
       "vlm": 0.0,
       "n_points": 13
     },
     "week": {
-      "account_value_last": 895.73,
-      "account_value_ts_iso": "2026-08-07T01:42:20.532000+00:00",
-      "pnl_last": -19617.99,
-      "vlm": 1638528.16,
-      "n_points": 60
+      "account_value_last": 895.71,
+      "account_value_ts_iso": "2026-08-07T23:22:38.996000+00:00",
+      "pnl_last": -12831.4,
+      "vlm": 834733.29,
+      "n_points": 64
     },
     "month": {
-      "account_value_last": 895.73,
-      "account_value_ts_iso": "2026-08-07T01:42:20.532000+00:00",
-      "pnl_last": -21161.52,
+      "account_value_last": 895.71,
+      "account_value_ts_iso": "2026-08-07T23:22:38.996000+00:00",
+      "pnl_last": -21161.54,
       "vlm": 3781069.89,
-      "n_points": 47
+      "n_points": 49
     },
     "allTime": {
-      "account_value_last": 895.73,
-      "account_value_ts_iso": "2026-08-07T01:42:20.532000+00:00",
-      "pnl_last": -22072340.58,
+      "account_value_last": 895.71,
+      "account_value_ts_iso": "2026-08-07T23:22:38.996000+00:00",
+      "pnl_last": -22072340.6,
       "vlm": 18939999207.13,
       "n_points": 97
     },
     "perpDay": {
       "account_value_last": 0.0,
-      "account_value_ts_iso": "2026-08-07T01:42:20.532000+00:00",
+      "account_value_ts_iso": "2026-08-07T23:22:38.996000+00:00",
       "pnl_last": 0.0,
       "vlm": 0.0,
       "n_points": 13
     },
     "perpWeek": {
       "account_value_last": 0.0,
-      "account_value_ts_iso": "2026-08-07T01:42:20.532000+00:00",
-      "pnl_last": -19618.0,
-      "vlm": 1638528.16,
-      "n_points": 60
+      "account_value_ts_iso": "2026-08-07T23:22:38.996000+00:00",
+      "pnl_last": -12831.43,
+      "vlm": 834733.29,
+      "n_points": 64
     },
     "perpMonth": {
       "account_value_last": 0.0,
-      "account_value_ts_iso": "2026-08-07T01:42:20.532000+00:00",
+      "account_value_ts_iso": "2026-08-07T23:22:38.996000+00:00",
       "pnl_last": -21161.56,
       "vlm": 3781069.89,
-      "n_points": 47
+      "n_points": 49
     },
     "perpAllTime": {
       "account_value_last": 0.0,
-      "account_value_ts_iso": "2026-08-07T01:42:20.532000+00:00",
+      "account_value_ts_iso": "2026-08-07T23:22:38.996000+00:00",
       "pnl_last": -23389110.96,
       "vlm": 18931991619.76,
       "n_points": 98
@@ -99,8 +99,8 @@
     "truncated": true,
     "last_fill_ts": 1785856431.918,
     "last_fill_iso": "2026-08-04T15:13:51.918000+00:00",
-    "days_since_last_fill": 2.44,
-    "n_fills_7d": 119,
+    "days_since_last_fill": 3.34,
+    "n_fills_7d": 80,
     "n_fills_30d": 480,
     "first_fill_iso": "2026-03-25T11:31:34.048000+00:00",
     "top_coins": [
@@ -419,13 +419,13 @@
     "known": true
   },
   "ledger": {
-    "n_total": 17,
-    "n_in_window": 17,
-    "n_kept": 17,
+    "n_total": 15,
+    "n_in_window": 15,
+    "n_kept": 15,
     "by_type": {
       "rewardsClaim": {
-        "n": 14,
-        "usd": 4464.16,
+        "n": 12,
+        "usd": 4276.67,
         "direction": "in"
       },
       "send": {
@@ -435,7 +435,7 @@
       }
     },
     "external_out_usd": 0.0,
-    "external_in_usd": 36463.56,
+    "external_in_usd": 36276.07,
     "internal_usd": 0.0,
     "vault_out_usd": 0.0,
     "bridge_out_usd": 0.0,
@@ -594,26 +594,6 @@
         "destination": null,
         "token": "USDC",
         "hash": "0x104e366e8a5955fc11c7043e9b97c202067b0054255c74ceb416e1c1495d2fe6"
-      },
-      {
-        "time": 1782206090.555,
-        "time_iso": "2026-06-23T09:14:50.555000+00:00",
-        "type": "rewardsClaim",
-        "usd": 28.54,
-        "direction": "in",
-        "destination": null,
-        "token": "USDC",
-        "hash": "0x88d88ab9a57c28838a52043e5d4aa70201c4009f407f47552ca1360c6470026e"
-      },
-      {
-        "time": 1782190704.495,
-        "time_iso": "2026-06-23T04:58:24.495000+00:00",
-        "type": "rewardsClaim",
-        "usd": 158.95,
-        "direction": "in",
-        "destination": null,
-        "token": "USDC",
-        "hash": "0x20db64f75b9f567e2255043e59e3b302073a00dcf6927550c4a4104a1a933068"
       }
     ],
     "n_bridge_out": 0,
@@ -634,7 +614,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.16
+      "elapsed_sec": 0.34
     },
     {
       "name": "clearinghouseState[native]",
@@ -642,7 +622,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.15
+      "elapsed_sec": 0.24
     },
     {
       "name": "clearinghouseState[xyz]",
@@ -650,7 +630,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.16
+      "elapsed_sec": 0.2
     },
     {
       "name": "clearinghouseState[flx]",
@@ -658,7 +638,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.16
+      "elapsed_sec": 0.22
     },
     {
       "name": "clearinghouseState[vntl]",
@@ -666,7 +646,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.16
+      "elapsed_sec": 0.22
     },
     {
       "name": "clearinghouseState[hyna]",
@@ -674,7 +654,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.16
+      "elapsed_sec": 0.19
     },
     {
       "name": "clearinghouseState[km]",
@@ -682,7 +662,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.16
+      "elapsed_sec": 0.19
     },
     {
       "name": "clearinghouseState[abcd]",
@@ -690,7 +670,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.16
+      "elapsed_sec": 0.26
     },
     {
       "name": "clearinghouseState[cash]",
@@ -698,7 +678,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.16
+      "elapsed_sec": 0.19
     },
     {
       "name": "clearinghouseState[para]",
@@ -706,7 +686,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.16
+      "elapsed_sec": 0.19
     },
     {
       "name": "clearinghouseState[mkts]",
@@ -714,7 +694,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.16
+      "elapsed_sec": 0.19
     },
     {
       "name": "spotClearinghouseState",
@@ -722,7 +702,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.15
+      "elapsed_sec": 0.23
     },
     {
       "name": "userNonFundingLedgerUpdates",
@@ -730,7 +710,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.15
+      "elapsed_sec": 0.2
     },
     {
       "name": "portfolio",
@@ -738,7 +718,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.16
+      "elapsed_sec": 0.34
     },
     {
       "name": "userFills",
@@ -746,7 +726,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.63
+      "elapsed_sec": 0.5
     }
   ],
   "notes": [],

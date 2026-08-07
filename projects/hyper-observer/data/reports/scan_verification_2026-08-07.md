@@ -8,7 +8,7 @@
 
 | 端點 | 成功 | 失敗 | 失敗樣本 |
 |---|---:|---:|---|
-| `clearinghouseState @ api.hyperliquid.xyz/info` | 38 | 0 | — |
+| `clearinghouseState @ api.hyperliquid.xyz/info` | 31 | 0 | — |
 | `clearinghouseState@abcd @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@cash @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@flx @ api.hyperliquid.xyz/info` | 3 | 0 | — |
@@ -19,30 +19,30 @@
 | `clearinghouseState@vntl @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@xyz @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `perpDexs @ api.hyperliquid.xyz/info` | 1 | 0 | — |
-| `portfolio @ api.hyperliquid.xyz/info` | 38 | 0 | — |
+| `portfolio @ api.hyperliquid.xyz/info` | 31 | 0 | — |
 | `spotClearinghouseState @ api.hyperliquid.xyz/info` | 3 | 0 | — |
-| `userFills @ api.hyperliquid.xyz/info` | 38 | 0 | — |
-| `userFunding @ api.hyperliquid.xyz/info` | 38 | 0 | — |
+| `userFills @ api.hyperliquid.xyz/info` | 31 | 0 | — |
+| `userFunding @ api.hyperliquid.xyz/info` | 31 | 0 | — |
 
 ## 2. 分類統計
 
 | 分類 | 錢包數 | 佔比 |
 |---|---:|---:|
-| consistent_winner | 2 | 5% |
-| blowup_risk | 22 | 58% |
+| consistent_winner | 2 | 6% |
+| blowup_risk | 19 | 61% |
 | wash_suspect | 1 | 3% |
-| one_hit | 5 | 13% |
+| one_hit | 5 | 16% |
 | dormant | 0 | 0% |
-| choppy | 8 | 21% |
+| choppy | 4 | 13% |
 | insufficient_data | 0 | 0% |
-| **合計** | **38** | |
+| **合計** | **31** | |
 
 ## 3. consistent_winner 明細
 
 | 地址 | 總 PnL | 峰值回撤 | profit factor | 目前槓桿 | 主力幣 | 活躍天 | 可跟 |
 |---|---:|---:|---:|---:|---|---:|---|
-| `0xbe19541903f64af97bcf8436f4d15bf3a56b8bd1`（⚠️ 曾強平 2 次） | $10,130,478 | 17% | 1,759.74 | 10x | MEGA | 372 | ✅（30d 事件 7（截斷外推 8）／fills 2,000）|
-| `0x8bae3527e5a33fa0cf184f37bc112d071463ab6d` | $9,784,664 | 6% | 0.82 | 20x | xyz:SKHX | 386 | ❌ 槓桿過高：目前 20x > 10x（30d 事件 21（截斷外推 73）／fills 2,000）|
+| `0xbe19541903f64af97bcf8436f4d15bf3a56b8bd1`（⚠️ 曾強平 2 次） | $10,147,766 | 17% | 1,759.74 | 10x | MEGA | 373 | ✅（30d 事件 7（截斷外推 8）／fills 2,000）|
+| `0x8bae3527e5a33fa0cf184f37bc112d071463ab6d` | $9,783,674 | 6% | 0.82 | 20x | xyz:SKHX | 387 | ❌ 槓桿過高：目前 20x > 10x（30d 事件 21（截斷外推 73）／fills 2,000）|
 
 ## 4. Ground-truth 校驗
 

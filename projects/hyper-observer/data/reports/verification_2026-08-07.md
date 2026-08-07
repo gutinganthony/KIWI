@@ -19,9 +19,9 @@
 | `clearinghouseState@xyz @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `leaderboard @ stats-data.hyperliquid.xyz/Mainnet/leaderboard` | 1 | 0 | — |
 | `perpDexs @ api.hyperliquid.xyz/info` | 1 | 0 | — |
-| `portfolio @ api.hyperliquid.xyz/info` | 59 | 1 | status=429 HTTP 429; body=null |
+| `portfolio @ api.hyperliquid.xyz/info` | 58 | 2 | status=429 HTTP 429; body=null |
 | `spotClearinghouseState @ api.hyperliquid.xyz/info` | 3 | 0 | — |
-| `userFills @ api.hyperliquid.xyz/info` | 59 | 1 | status=429 HTTP 429; body=null |
+| `userFills @ api.hyperliquid.xyz/info` | 58 | 2 | status=429 HTTP 429; body=null |
 | `userFunding @ api.hyperliquid.xyz/info` | 60 | 0 | — |
 
 ## 2. 分類統計
@@ -41,7 +41,7 @@
 
 | 地址 | 總 PnL | 峰值回撤 | profit factor | 目前槓桿 | 主力幣 | 活躍天 |
 |---|---:|---:|---:|---:|---|---:|
-| `0x8bae3527e5a33fa0cf184f37bc112d071463ab6d` | $9,787,485 | 6% | 0.82 | 20x | xyz:SKHX | 386 |
+| `0x8bae3527e5a33fa0cf184f37bc112d071463ab6d` | $9,783,402 | 6% | 0.82 | 20x | xyz:SKHX | 387 |
 
 ## 4. Ground-truth 校驗
 
