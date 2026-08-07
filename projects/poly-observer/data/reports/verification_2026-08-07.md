@@ -7,7 +7,7 @@
 
 | 端點 | 成功 | 失敗 | 失敗樣本 |
 |---|---:|---:|---|
-| `data-api.polymarket.com/activity` | 171 | 0 | — |
+| `data-api.polymarket.com/activity` | 173 | 0 | — |
 | `data-api.polymarket.com/positions` | 60 | 0 | — |
 | `data-api.polymarket.com/v1/leaderboard` | 2 | 0 | — |
 | `data-api.polymarket.com/value` | 60 | 0 | — |
@@ -19,10 +19,10 @@
 |---|---:|---:|
 | consistent_winner | 4 | 7% |
 | degraded | 0 | 0% |
-| dormant | 11 | 18% |
-| one_hit | 14 | 23% |
-| mm_bot_like | 8 | 13% |
-| choppy | 23 | 38% |
+| dormant | 10 | 17% |
+| one_hit | 18 | 30% |
+| mm_bot_like | 10 | 17% |
+| choppy | 18 | 30% |
 | insufficient_data | 0 | 0% |
 | **合計** | **60** | |
 
@@ -30,9 +30,9 @@
 
 | 地址 | 總 PnL | 正月比率 | 峰值回撤 | 頻率(筆/月) | 主類別 | 低信心 |
 |---|---:|---:|---:|---:|---|---|
-| `0x2005d16a84ceefa912d4e380cd32e7ff827875ea` | $12,688,294 | 100% | 10% | 1,454.0 | other (78%) | 否 |
-| `0xbca08c1bc204a34f2fddbe47b438b9bd42ac9705` | $1,312,781 | 100% | 17% | 1,296.0 | sports (98%) | 否 |
-| `0x43372356634781eea88d61bbdd7824cdce958882` | $723,480 | 73% | 39% | 666.5 | other (56%) | 否 |
+| `0x2005d16a84ceefa912d4e380cd32e7ff827875ea` | $12,736,225 | 100% | 10% | 1,399.0 | other (95%) | 否 |
+| `0xbca08c1bc204a34f2fddbe47b438b9bd42ac9705` | $1,333,127 | 100% | 17% | 1,308.0 | sports (99%) | 否 |
+| `0x43372356634781eea88d61bbdd7824cdce958882` | $717,110 | 73% | 39% | 680.5 | other (62%) | 否 |
 | `0x25e28169faea17421fcd4cc361f6436d1e449a09` | $176,190 | 71% | 33% | 112.0 | esports (58%) | 否 |
 
 ## 4. Ground-truth 校驗
