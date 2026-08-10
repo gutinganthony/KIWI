@@ -18,7 +18,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |-------|---------|
 | [Technology](./topics/technology/INDEX.md) | 5 |
 | [Science](./topics/science/INDEX.md) | 0 |
-| [Business](./topics/business/INDEX.md) | 65 |
+| [Business](./topics/business/INDEX.md) | 66 |
 | [Health](./topics/health/INDEX.md) | 0 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Other](./topics/other/INDEX.md) | 3 |
@@ -32,6 +32,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-08-06 | [美銀牛熊指標 9.7 — 歷史驗證與 BBI/貪婪指數背離的解釋](./topics/business/2026-08-06-bofa-bull-bear-9-7-signal-verification.md) | Business |
 | 2026-07-29 | [Dan Koe〈一天修好你的人生〉— 繁中摘要與 KIWI 應用](./topics/other/2026-07-29-dan-koe-fix-your-life-in-one-day.md) | Other |
 | 2026-07-29 | [HBM vs 傳統 DRAM 位元供給拆解 — 情境②③ 判別](./topics/business/2026-07-29-hbm-vs-conventional-bit-supply-decomposition.md) | Business |
 | 2026-07-29 | [記憶體：週期股還是「這次不一樣」？— 假說檢定框架實作](./topics/business/2026-07-29-memory-cycle-vs-structural-hypothesis-test.md) | Business |
@@ -92,6 +93,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-07-29 | [記憶體：週期股還是「這次不一樣」？— 假說檢定框架實作](./topics/business/2026-07-29-memory-cycle-vs-structural-hypothesis-test.md) | Business |
 | 2026-07-29 | [HBM vs 傳統 DRAM 位元供給拆解 — 情境②③ 判別](./topics/business/2026-07-29-hbm-vs-conventional-bit-supply-decomposition.md) | Business |
 | 2026-07-29 | [Dan Koe〈一天修好你的人生〉— 繁中摘要與 KIWI 應用](./topics/other/2026-07-29-dan-koe-fix-your-life-in-one-day.md) | Other |
+| 2026-08-06 | [美銀牛熊指標 9.7 — 歷史驗證與 BBI/貪婪指數背離的解釋](./topics/business/2026-08-06-bofa-bull-bear-9-7-signal-verification.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---

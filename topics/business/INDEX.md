@@ -72,3 +72,4 @@
 | 2026-07-28 | [NVDA 替 OpenAI 擔保／融資 — 多方 Coverage Note 的雙面檢視](./2026-07-28-nvda-vendor-financing-two-sided-review.md) | NVDA, vendor-financing, OpenAI, CDS, circularity, tail-dependence, late-cycle, AI-factory, memory, read-through |
 | 2026-07-29 | [記憶體：週期股還是「這次不一樣」？— 用假說檢定框架跑一遍](./2026-07-29-memory-cycle-vs-structural-hypothesis-test.md) | memory, cycle-vs-structural, hypothesis-testing, base-rate, discriminating-evidence, HBM, supply-efficiency, scenarios, marginal-price-setter, valuation |
 | 2026-07-29 | [HBM vs 傳統 DRAM 位元供給拆解 — 情境②③ 判別（含前份報告修正）](./2026-07-29-hbm-vs-conventional-bit-supply-decomposition.md) | memory, HBM, bit-supply, wafer-to-bit, trade-ratio, scenario-discrimination, model, correction |
+| 2026-08-06 | [美銀牛熊指標 9.7 — 歷史驗證與 BBI/貪婪指數背離的解釋](./2026-08-06-bofa-bull-bear-9-7-signal-verification.md) | BofA, bull-bear-indicator, sentiment, positioning, fear-greed, signal-verification, base-rate, timing, LFI |
