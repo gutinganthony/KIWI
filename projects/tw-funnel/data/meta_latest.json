@@ -1,8 +1,8 @@
 {
- "generated_at": "2026-08-06T11:53:42Z",
+ "generated_at": "2026-08-07T10:34:42Z",
  "market": "TW",
  "pipeline": "tw-funnel",
- "as_of_trading_day": "2026-08-06",
+ "as_of_trading_day": "2026-08-07",
  "endpoint_health": {
   "finmind_stock_info": {
    "ok": true,
@@ -45,8 +45,8 @@
    "ok": true,
    "source": "finmind",
    "dataset": "TaiwanStockMonthRevenue",
-   "pool": 51,
-   "fetched": 46,
+   "pool": 47,
+   "fetched": 43,
    "errors": 0
   },
   "company_basic": {
@@ -72,12 +72,14 @@
   }
  },
  "funnel_stats": {
-  "raw_filings": 224,
-  "qualified_events": 26,
-  "post_veto": 26,
+  "raw_filings": 238,
+  "qualified_events": 28,
+  "post_veto": 27,
   "final_candidates": 15
  },
- "veto_reasons": {},
+ "veto_reasons": {
+  "punish_list": 1
+ },
  "january_window_active": false,
  "degradations": [
   "pledge_data_unavailable: 董監質押比取數失敗/欄位不符，質押否決不生效"

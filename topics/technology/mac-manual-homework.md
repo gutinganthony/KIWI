@@ -23,6 +23,37 @@ last_updated: 2026-07-06
 
 ## 🔴 待辦（依急迫度）
 
+### 🟢 2026-08-09 好消息：TDnet 在 GitHub Actions runner 上**可以直連**（本檔頂部「做不到」清單需修正）
+
+本檔開頭寫「抓被 403 擋掉的…EDINET/TDnet」是雲端做不到的事——**這一半已經不成立**。
+2026-08-09 週報實測（Actions runner）：
+
+| 來源 | 狀態 |
+|---|---|
+| `https://www.release.tdnet.info/inbs/I_list_<頁>_<YYYYMMDD>.html`（適時開示一覽） | ✅ **HTTP 200** |
+| `https://www.release.tdnet.info/inbs/<docID>.pdf`（決算短信 PDF 原文） | ✅ **HTTP 200**，`pypdf` 可直接抽文字 |
+| kabutan.jp | ❌ 403/405 |
+| minkabu.jp | ❌ 403 |
+| stooq.com（日線 CSV） | ❌ JS challenge |
+| Yahoo Finance API | ❌ 連三週 429 |
+| EDINET（有価証券報告書） | ⚠️ **本輪未測**，仍留 Mac |
+
+→ **本週 9 份日本財報數字全部取自 TDnet 原文**（JEM／Yamaichi／santec／Towa／Tamura／JCU／Kohoku／Kokusai／岡本硝子）。
+
+**✅ 可從本清單移除的一項**：**「JEM TDnet 開示清單（7/3–7/6）」——雲端可自己做，不必等 Mac。**
+（JEM 的另一件功課「FY3/26 有価証券報告書客戶表」在 **EDINET**，尚未實測，**保留在下方**。）
+
+### 2026-08-09 新增／保留
+
+- [ ] **JEM 6855 FY3/26 有価証券報告書客戶表**（EDINET）——否證 #3「單一 NAND 客戶 >30%」**連四週無法判定**。
+      ⚠️ 注意：JEM 8/7 的通期上修理由只寫「**メモリー向け**プローブカード需要の急拡大」，**未區分 DRAM/HBM 與 NAND**，所以財報本身解不了這條。
+      **順帶請試一次 EDINET 在 runner 上通不通**——若通，這件功課也能自動化。
+- [ ] **Mersen H1 2026 新聞稿原文**抓 DC 分項季銷售（T5 首驗）。⚠️ **急迫性已下降**：價格 €40.68 > 觸發 B 的 €38 上限，即使數字達標觸發 B 的價格門也已關上（連兩週）。
+- [ ] **`agents/loops/weekly-repricing-audit.md` 憲章改版**（可在雲端做，但屬制度變更需你點頭）：
+      ①主源由 Yahoo 改為 **CNBC quote cache（需帶桌面 UA）／Naver siseJson／FinMind** 鏈；
+      ②**新增 TDnet 為日股一手揭露源**；③記下已知坑：LPKF 代碼是 `LPK-DE` 非 `LPKF-DE`、CNBC 逗號批次不支援且查不到韓股/台股上櫃。
+
+
 ### 站著的（長期）
 - [ ] **需要「手動觸發 workflow」時只能你按**（2026-07-30 確認）。雲端 session 的整合 token **沒有 `actions:write`**：`POST /actions/workflows/<file>/dispatches` 回 `403 Resource not accessible by integration`。能做的是「推 commit 觸發 push trigger」與「讀 run/log/artifact」，不能 dispatch、不能 re-run。
   - 位置：Actions 分頁 → 選那支 workflow → 右上 **Run workflow**。
