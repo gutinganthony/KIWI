@@ -74,3 +74,5 @@
 | 2026-07-29 | [記憶體：週期股還是「這次不一樣」？— 用假說檢定框架跑一遍](./2026-07-29-memory-cycle-vs-structural-hypothesis-test.md) | memory, cycle-vs-structural, hypothesis-testing, base-rate, discriminating-evidence, HBM, supply-efficiency, scenarios, marginal-price-setter, valuation |
 | 2026-07-29 | [HBM vs 傳統 DRAM 位元供給拆解 — 情境②③ 判別（含前份報告修正）](./2026-07-29-hbm-vs-conventional-bit-supply-decomposition.md) | memory, HBM, bit-supply, wafer-to-bit, trade-ratio, scenario-discrimination, model, correction |
 | 2026-08-06 | [美銀牛熊指標 9.7 — 歷史驗證與 BBI/貪婪指數背離的解釋](./2026-08-06-bofa-bull-bear-9-7-signal-verification.md) | BofA, bull-bear-indicator, sentiment, positioning, fear-greed, signal-verification, base-rate, timing, LFI |
+| 2026-08-10 | [個人帳戶交易政策（PA Dealing Policy）草案](./2026-08-10-personal-account-dealing-policy-draft.md) | fund, compliance, PA-dealing, conflict-of-interest, legacy-holdings, pre-clearance, blackout |
+| 2026-08-10 | [投資流程說明書（IPS）個人版草案](./2026-08-10-investment-process-statement-draft.md) | IPS, investment-process, serenity, four-meters, wavetrend, position-sizing, tail-dependence, exit-rules |
