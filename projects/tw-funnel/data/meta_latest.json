@@ -1,15 +1,15 @@
 {
- "generated_at": "2026-08-10T10:48:49Z",
+ "generated_at": "2026-08-11T10:37:44Z",
  "market": "TW",
  "pipeline": "tw-funnel",
- "as_of_trading_day": "2026-08-10",
+ "as_of_trading_day": "2026-08-11",
  "endpoint_health": {
   "finmind_stock_info": {
    "ok": true,
    "status": 200,
    "source": "finmind",
    "dataset": "TaiwanStockInfo",
-   "rows": 4303
+   "rows": 4305
   },
   "finmind_institutional": {
    "ok": false,
@@ -45,8 +45,8 @@
    "ok": true,
    "source": "finmind",
    "dataset": "TaiwanStockMonthRevenue",
-   "pool": 51,
-   "fetched": 46,
+   "pool": 44,
+   "fetched": 43,
    "errors": 0
   },
   "company_basic": {
@@ -72,13 +72,13 @@
   }
  },
  "funnel_stats": {
-  "raw_filings": 190,
+  "raw_filings": 322,
   "qualified_events": 27,
-  "post_veto": 24,
+  "post_veto": 25,
   "final_candidates": 15
  },
  "veto_reasons": {
-  "punish_list": 3
+  "punish_list": 2
  },
  "january_window_active": false,
  "degradations": [
