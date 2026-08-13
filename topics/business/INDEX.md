@@ -76,3 +76,4 @@
 | 2026-08-06 | [美銀牛熊指標 9.7 — 歷史驗證與 BBI/貪婪指數背離的解釋](./2026-08-06-bofa-bull-bear-9-7-signal-verification.md) | BofA, bull-bear-indicator, sentiment, positioning, fear-greed, signal-verification, base-rate, timing, LFI |
 | 2026-08-10 | [個人帳戶交易政策（PA Dealing Policy）草案](./2026-08-10-personal-account-dealing-policy-draft.md) | fund, compliance, PA-dealing, conflict-of-interest, legacy-holdings, pre-clearance, blackout |
 | 2026-08-10 | [投資流程說明書（IPS）個人版草案](./2026-08-10-investment-process-statement-draft.md) | IPS, investment-process, serenity, four-meters, wavetrend, position-sizing, tail-dependence, exit-rules |
+| 2026-08-13 | [台股光通訊 10 檔：Serenity × WaveTrend × 籌碼 三框架交集](./2026-08-13-tw-optical-10-triple-framework.md) | investment, optical, CPO, silicon-photonics, taiwan-stocks, serenity, wavetrend, chip-analysis, FAU, ELSFP, InP |
