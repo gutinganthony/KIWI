@@ -76,3 +76,4 @@
 | 2026-08-06 | [美銀牛熊指標 9.7 — 歷史驗證與 BBI/貪婪指數背離的解釋](./2026-08-06-bofa-bull-bear-9-7-signal-verification.md) | BofA, bull-bear-indicator, sentiment, positioning, fear-greed, signal-verification, base-rate, timing, LFI |
 | 2026-08-10 | [個人帳戶交易政策（PA Dealing Policy）草案](./2026-08-10-personal-account-dealing-policy-draft.md) | fund, compliance, PA-dealing, conflict-of-interest, legacy-holdings, pre-clearance, blackout |
 | 2026-08-10 | [投資流程說明書（IPS）個人版草案](./2026-08-10-investment-process-statement-draft.md) | IPS, investment-process, serenity, four-meters, wavetrend, position-sizing, tail-dependence, exit-rules |
+| 2026-08-14 | [台股飆股解剖：三個案例 + 全市場 1,733 檔的量化對照檢定](./2026-08-14-tw-surge-stock-anatomy.md) | taiwan-stocks, surge-stocks, momentum, case-control, 川湖-2059, 國巨-2327, 山太士-3595, turnover, volume-spike-is-noise, limit-up-is-lagging, laggard-trap, point-in-time, FinMind, out-of-sample |
