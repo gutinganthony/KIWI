@@ -1,0 +1,374 @@
+{
+  "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+  "label": "scan-best-candidate-9M-lowdd",
+  "snapshot_date": "2026-08-16",
+  "classification": "consistent_winner",
+  "classification_reasons": [
+    "活動跨度 396.0 天 >= 60",
+    "總 PnL 10008863.4 > 10,000",
+    "回撤 0.0554 < 40% peak",
+    "目前槓桿 10.0 <= 20x",
+    "正月比率 0.714 >= 0.5",
+    "（fills 截斷 n>=2000，profit factor 2.735 樣本偏誤大，僅供低信心參考，不硬否決）"
+  ],
+  "followable": {
+    "ok": true,
+    "reasons": []
+  },
+  "metrics": {
+    "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+    "snapshot_date": "2026-08-16",
+    "pnl_source": "portfolio_curve",
+    "portfolio_window": "perpAllTime",
+    "low_confidence": false,
+    "total_pnl": 10008863.4,
+    "peak_pnl": 10086457.19,
+    "monthly_pnl": {
+      "2025-07": -73180.55,
+      "2025-08": -34288.37,
+      "2025-09": -8212.34,
+      "2025-10": 1435708.48,
+      "2025-11": 2045437.87,
+      "2025-12": 930544.52,
+      "2026-01": 638177.85,
+      "2026-02": 519822.91,
+      "2026-03": 1413004.59,
+      "2026-04": 1924051.99,
+      "2026-05": 106203.52,
+      "2026-06": -253202.61,
+      "2026-07": 1236651.75,
+      "2026-08": 128143.8
+    },
+    "active_months": 14,
+    "positive_month_ratio": 0.714,
+    "best_month_pnl": 2045437.87,
+    "max_drawdown_pct": 0.0554,
+    "current_drawdown_pct": 0.0077,
+    "max_single_day_crash_pct": 0.0331,
+    "span_days": 396.0,
+    "days_idle": 0.0,
+    "n_fills": 2000,
+    "profit_factor": 2.735,
+    "avg_win": 527.96,
+    "avg_loss": 318.48,
+    "realized_win_rate": 0.623,
+    "avg_hold_hours": 74.6,
+    "net_direction_ratio": 0.0147,
+    "n_fills_truncated": true,
+    "n_fills_last_30d": 2000,
+    "n_events": 26,
+    "n_events_last_30d": 26,
+    "n_events_last_30d_est": 46,
+    "events_30d_coverage_days": 17.0,
+    "median_fills_per_event": 44.5,
+    "median_event_notional": 240199.09,
+    "median_gap_between_events_hours": 0.04,
+    "p90_gap_between_events_hours": 48.12,
+    "had_liquidation": false,
+    "n_liquidations": 0,
+    "top_coin": "xyz:GOOGL",
+    "vlm": 319146141.6,
+    "vlm_to_pnl_ratio": 31.89,
+    "funding_total": -171080.77,
+    "n_open_positions": 3,
+    "n_open_positions_native": 0,
+    "dexs_with_positions": [
+      "xyz"
+    ],
+    "account_value_native": 0.0,
+    "account_value_by_dex": {
+      "": 0.0,
+      "abcd": 0.0,
+      "cash": 0.0,
+      "flx": 0.0,
+      "hyna": 0.0,
+      "km": 0.0,
+      "mkts": 0.0,
+      "para": 0.0,
+      "vntl": 0.0,
+      "xyz": 673552.99
+    },
+    "spot_value_usd": 3622506.58,
+    "spot_tokens": [
+      {
+        "coin": "USDC",
+        "qty": 3574291.3124563303,
+        "usd": 3574291.31,
+        "estimated": false
+      },
+      {
+        "coin": "USDT0",
+        "qty": 48215.25091058,
+        "usd": 48215.25,
+        "estimated": true
+      },
+      {
+        "coin": "USDH",
+        "qty": 0.01250805,
+        "usd": 0.01,
+        "estimated": false
+      }
+    ],
+    "total_value_all_venues": 4296059.57,
+    "non_native_share": 1.0,
+    "current_max_leverage": 10.0,
+    "has_extreme_leverage": false,
+    "margin_types": [
+      "cross"
+    ],
+    "account_value": 673552.99,
+    "fetch_errors": []
+  },
+  "position_value": 7138929.02,
+  "unrealized_pnl": -20238.53,
+  "n_open_positions": 3,
+  "open_positions": [
+    {
+      "coin": "xyz:GOOGL",
+      "szi": 695.277,
+      "side": "long",
+      "entry_px": 343.187,
+      "position_value": 243041.02812,
+      "unrealized_pnl": 4430.398118,
+      "leverage_value": 10.0,
+      "leverage_type": "cross",
+      "liquidation_px": null,
+      "margin_used": 24304.102812,
+      "max_leverage": 20.0,
+      "cum_funding_all_time": 2135.295829,
+      "dex": "xyz"
+    },
+    {
+      "coin": "xyz:SKHX",
+      "szi": 2974.908,
+      "side": "long",
+      "entry_px": 1181.851,
+      "position_value": 3491649.5196,
+      "unrealized_pnl": -24251.3602,
+      "leverage_value": 10.0,
+      "leverage_type": "cross",
+      "liquidation_px": 33.1354454082,
+      "margin_used": 349164.95196,
+      "max_leverage": 10.0,
+      "cum_funding_all_time": 10000.57774,
+      "dex": "xyz"
+    },
+    {
+      "coin": "xyz:SKHY",
+      "szi": -20365.15,
+      "side": "short",
+      "entry_px": 167.1394,
+      "position_value": 3404238.474,
+      "unrealized_pnl": -417.5726,
+      "leverage_value": 10.0,
+      "leverage_type": "cross",
+      "liquidation_px": 317.904023705,
+      "margin_used": 340423.8474,
+      "max_leverage": 10.0,
+      "cum_funding_all_time": 4313.043226,
+      "dex": "xyz"
+    }
+  ],
+  "recent_fills": [
+    {
+      "time": "2026-08-13T18:50:16.326000+00:00",
+      "coin": "xyz:SKHY",
+      "dir": "Open Short",
+      "px": 167.64,
+      "sz": 1.25,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-08-13T18:50:16.326000+00:00",
+      "coin": "xyz:SKHY",
+      "dir": "Open Short",
+      "px": 167.64,
+      "sz": 208.06,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-08-13T18:50:16.326000+00:00",
+      "coin": "xyz:SKHY",
+      "dir": "Open Short",
+      "px": 167.65,
+      "sz": 23.85,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-08-13T18:50:16.326000+00:00",
+      "coin": "xyz:SKHY",
+      "dir": "Open Short",
+      "px": 167.65,
+      "sz": 118.81,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-08-13T18:50:16.326000+00:00",
+      "coin": "xyz:SKHY",
+      "dir": "Open Short",
+      "px": 167.65,
+      "sz": 0.67,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-08-13T18:50:16.326000+00:00",
+      "coin": "xyz:SKHY",
+      "dir": "Open Short",
+      "px": 167.65,
+      "sz": 4.47,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-08-13T18:50:16.326000+00:00",
+      "coin": "xyz:SKHY",
+      "dir": "Open Short",
+      "px": 167.65,
+      "sz": 4.72,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-08-13T18:50:16.326000+00:00",
+      "coin": "xyz:SKHY",
+      "dir": "Open Short",
+      "px": 167.65,
+      "sz": 1.25,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-08-13T18:50:16.326000+00:00",
+      "coin": "xyz:SKHY",
+      "dir": "Open Short",
+      "px": 167.66,
+      "sz": 23.85,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-08-13T18:50:16.326000+00:00",
+      "coin": "xyz:SKHY",
+      "dir": "Open Short",
+      "px": 167.66,
+      "sz": 27.99,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-08-13T18:50:16.326000+00:00",
+      "coin": "xyz:SKHY",
+      "dir": "Open Short",
+      "px": 167.67,
+      "sz": 23.85,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-08-13T18:50:16.326000+00:00",
+      "coin": "xyz:SKHY",
+      "dir": "Open Short",
+      "px": 167.67,
+      "sz": 16.44,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-08-13T18:50:16.326000+00:00",
+      "coin": "xyz:SKHY",
+      "dir": "Open Short",
+      "px": 167.67,
+      "sz": 23.45,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-08-13T18:50:16.326000+00:00",
+      "coin": "xyz:SKHY",
+      "dir": "Open Short",
+      "px": 167.67,
+      "sz": 24.0,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-08-13T18:50:16.326000+00:00",
+      "coin": "xyz:SKHY",
+      "dir": "Open Short",
+      "px": 167.67,
+      "sz": 72.28,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-08-13T18:50:16.326000+00:00",
+      "coin": "xyz:SKHY",
+      "dir": "Open Short",
+      "px": 167.67,
+      "sz": 1.25,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-08-13T18:50:16.326000+00:00",
+      "coin": "xyz:SKHY",
+      "dir": "Open Short",
+      "px": 167.68,
+      "sz": 0.45,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-08-13T18:50:16.326000+00:00",
+      "coin": "xyz:SKHY",
+      "dir": "Open Short",
+      "px": 167.69,
+      "sz": 54.61,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-08-13T18:50:16.997000+00:00",
+      "coin": "xyz:SKHY",
+      "dir": "Open Short",
+      "px": 167.61,
+      "sz": 0.6,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-08-13T18:50:16.997000+00:00",
+      "coin": "xyz:SKHY",
+      "dir": "Open Short",
+      "px": 167.61,
+      "sz": 361.66,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    }
+  ],
+  "new_positions": [],
+  "disappeared_positions": [],
+  "initialized": false,
+  "raw_source": "snapshot",
+  "funds_trend": {
+    "status": "重新進場",
+    "n_points": 7,
+    "days": 7,
+    "threshold": 0.05,
+    "first_date": "2026-08-10",
+    "last_date": "2026-08-16",
+    "spot_share_first": 0.9822,
+    "spot_share_last": 0.8432,
+    "spot_share_change": -0.139,
+    "total_first": 3632892.63,
+    "total_last": 4296059.57,
+    "total_change_pct": 0.1825,
+    "perp_change_pct": 9.4014,
+    "position_value_change_pct": 5.2999
+  }
+}
