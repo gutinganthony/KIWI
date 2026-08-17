@@ -111,8 +111,12 @@ def parse_history(raw):
 def parse_fills(raw):
     """userFills 原始回應 → 正規化成交清單。
 
-    回 [{ts, coin, px, sz, side, closed_pnl, fee, dir, is_liquidation}]。
+    回 [{ts, coin, px, sz, side, closed_pnl, fee, dir, is_liquidation,
+        start_position, tid}]。
     注意：Hyperliquid 的 closedPnl 對贏和輸的平倉都有值（無贏家倖存者偏誤）。
+    start_position（該筆成交發生前的部位）供 aggregate_round_trips 判斷「這是不是
+    從真正 flat 開始的完整回合」；tid（trade id）供 fills_history.py 去重用——
+    兩者原本不在既有輸出裡，此處純新增欄位，不影響既有呼叫端。
     """
     if isinstance(raw, dict):
         for key in ("fills", "data", "userFills"):
@@ -139,6 +143,8 @@ def parse_fills(raw):
             "fee": _to_float(it.get("fee")),
             "dir": d,
             "is_liquidation": is_liq,
+            "start_position": _to_float(it.get("startPosition")),
+            "tid": it.get("tid"),
         })
     out.sort(key=lambda f: (f["ts"] is None, f["ts"] or 0))
     return out
@@ -599,6 +605,162 @@ def net_direction_ratio(fills):
     if total <= EPS:
         return None
     return abs(buy - sell) / total
+
+
+# ---------------------------------------------------------------------------
+# 部位回合聚合（fills → 真正的 flat→flat 交易回合，供勝率/賠率計算）
+# ---------------------------------------------------------------------------
+# 動機：逐筆算勝率會被「一次平倉拆成幾十筆部分成交」污染——同一回合的 fills
+# 符號全同（closedPnl 同正或同負），逐筆勝率因此可能出現 100%/0% 這種假數字。
+# 真正該算的單位是「回合」：同一標的從 flat 開始、經過任意次加碼、回到 flat 為止。
+#
+# 實測踩到的坑（0x8bae35 的 2000 筆 xyz 成交驗證出來的，務必保留這段脈絡）：
+# **同一毫秒內的多筆成交，陣列順序與真實撮合順序無關**——大單在薄簿一次撮合拆成
+# 數十筆，Hyperliquid 回傳的順序是任意的。若逐筆依序累加 startPosition 判斷是否
+# 已平倉，1991 次「這筆的 sp 應該等於上一筆算出的部位」比對裡有 1799 次對不上，
+# 而且會把「早就有倉、視窗開始時已在平倉」誤判成「從 flat 全新開倉」。
+# 正解＝**批次原子化**：同一毫秒的成交視為一個不可分的批次，批次的淨變化量＝
+# 全部成交的 signed delta 加總（加總對順序不敏感，這步永遠正確）；批次「進入前」
+# 的部位＝鏈頭（chain head）——批次內每筆成交都有 (start, start+delta) 這對值，
+# 鏈頭就是那個沒有被任何別筆的 end 值蓋到的 start 值（它不是誰的延續）。
+# 用這個方法重算，2000 筆全部的收支（round_trips + open_positions + carry_in）
+# 加總對到原始 closedPnl 直接加總的分毫不差（$176,723.92）。
+# 已知限制（刻意不處理）：若同一毫秒內的批次「先平倉又重新開倉」，本函式只會
+# 看批次前後的淨狀態，偵測不到批次內部的這次穿越——單一撮合瞬間發生完整
+# 平倉再開倉的機率極低，這是刻意接受的簡化，不是疏漏。
+
+def _signed_delta(fill):
+    """該筆成交對部位的正負影響。dir 缺失時退回保守預設（開倉視為做多、平倉視為賣出）。"""
+    d = (fill.get("dir") or "").lower()
+    sz = fill.get("sz") or 0.0
+    if "open" in d:
+        return -sz if "short" in d else sz
+    return sz if "short" in d else -sz
+
+
+def _is_flat(pos, ref):
+    """浮點安全的「是否已平倉」判斷：絕對值門檻與相對參考值的千萬分之一取大者。"""
+    return abs(pos) <= max(1e-6, abs(ref) * 1e-7)
+
+
+def _batch_head_position(batch):
+    """批次（同一毫秒的成交清單）「進入前」的部位——用鏈頭回推，見上方模組註解。
+
+    多個/零個候選（捨入碰撞，或批次本身自成一個完整的平倉再開倉閉環，極罕見）
+    → 退回批次內絕對值最小的 start_position 當保守估計。
+    """
+    starts = {round(f["start_position"], 6) for f in batch}
+    ends = {round(f["start_position"] + _signed_delta(f), 6) for f in batch}
+    heads = starts - ends
+    if len(heads) == 1:
+        return heads.pop()
+    return min((f["start_position"] for f in batch), key=abs)
+
+
+def aggregate_round_trips(fills):
+    """fills（單一錢包，可跨多個 coin／dex 前綴）→ (round_trips, open_positions, carry_in)。
+
+    round_trips：完整回合清單，每筆 {coin, dir, start_ts, end_ts, n_fills, pnl, fee,
+      peak_size}。dir 取開倉批次的部位變化方向（"long"/"short"）。
+    open_positions：資料視窗結束時仍未平倉的部位（無法判斷輸贏，只列出已實現損益供
+      參考；每筆多帶 still_open_position 欄）。
+    carry_in：{coin: {"n_fills", "pnl", "fee"}} —— 進入某個批次時**已經有倉**但我們
+      手上沒有它的起點（第一個批次即非 flat，或前一批次結束後的部位與這一批次回推
+      出的進入前部位對不上——見下段），起點成本不明，不計入任何回合統計，只單獨
+      累計損益供對帳（帳本兜不攏的差額多半在這裡）。
+
+    設計要點：**每個批次的「進入前部位」一律用該批次自己的資料回推**
+    （_batch_head_position），不沿用前一批次算出的部位往前累加。這不只是為了不
+    依賴陣列順序：判斷「現在是不是 flat（該不該開新回合）」永遠用當下這批的第一手
+    資料，不會被前面任何一批可能存在的誤差污染——即使某次事件（強平／ADL／未進
+    userFills 的部位變化）讓實際部位跟我們原本以為的兜不攏，下一次「這批進入前是
+    不是 flat」的判斷依然只看這批自己的資料，不會把舊誤差帶進新判斷。
+    （限制：若這類事件發生在一個**已經開著**的回合中途——ep 不是 None——目前
+    仍會直接沿用新批次回推出的部位當作真值繼續累計，不會特地偵測「這裡有個缺口」
+    並中止該回合；漏掉的只有缺口本身没有對應 fill 的損益，不影響其餘會計。）
+
+    要求 fills 已由 parse_fills 產出（帶 start_position、ts），且 ts/start_position
+    缺失的筆直接跳過（不臆造）。同一 coin 的多次「flat→開倉→再 flat」在視窗內會拆成
+    多個獨立的 round_trips 項目（如視窗中途整個帳戶收手又重新進場）。
+    """
+    by_coin = defaultdict(list)
+    for f in fills:
+        if f["ts"] is None or f["start_position"] is None:
+            continue
+        by_coin[f["coin"]].append(f)
+
+    round_trips, open_positions, carry_in = [], [], {}
+    for coin, coin_fills in by_coin.items():
+        by_ts = defaultdict(list)
+        for f in coin_fills:
+            by_ts[f["ts"]].append(f)
+        ep, last_post_pos = None, None
+        for ts in sorted(by_ts):
+            batch = by_ts[ts]
+            batch_delta = sum(_signed_delta(f) for f in batch)
+            batch_pnl = sum(f["closed_pnl"] or 0.0 for f in batch)
+            batch_fee = sum(f["fee"] or 0.0 for f in batch)
+            n = len(batch)
+            pre_pos = _batch_head_position(batch)
+            post_pos = pre_pos + batch_delta
+            last_post_pos = post_pos
+
+            if ep is None:
+                if _is_flat(pre_pos, pre_pos):
+                    ep = {"coin": coin, "start_ts": ts, "pnl": 0.0, "fee": 0.0,
+                          "n_fills": 0, "peak_size": 0.0,
+                          "dir": "long" if batch_delta > 0 else "short"}
+                else:
+                    c = carry_in.setdefault(coin, {"n_fills": 0, "pnl": 0.0, "fee": 0.0})
+                    c["n_fills"] += n
+                    c["pnl"] += batch_pnl
+                    c["fee"] += batch_fee
+                    continue
+
+            ep["pnl"] += batch_pnl
+            ep["fee"] += batch_fee
+            ep["n_fills"] += n
+            ep["end_ts"] = ts
+            ep["peak_size"] = max(ep["peak_size"], abs(pre_pos), abs(post_pos))
+            if _is_flat(post_pos, ep["peak_size"]):
+                round_trips.append(ep)
+                ep = None
+        if ep is not None:
+            ep["still_open_position"] = last_post_pos
+            open_positions.append(ep)
+
+    round_trips.sort(key=lambda e: e["start_ts"])
+    return round_trips, open_positions, carry_in
+
+
+def round_trip_stats(round_trips):
+    """round_trips → 勝率／賠率／獲利因子等聚合統計（純函式，供離線測試與報告共用）。
+
+    語意刻意對齊 xyzscan 的 dex_fill_stats：wins/losses 以 pnl 正負判定；
+    payoff（賠率）＝平均賺÷平均虧，零虧損樣本回 None 而非 inf（見 xyz_config
+    對「零虧損樣本＝可疑，非滿分」的說明，這裡採同一立場）。
+    """
+    wins = [e["pnl"] for e in round_trips if e["pnl"] > 0]
+    losses = [e["pnl"] for e in round_trips if e["pnl"] < 0]
+    n = len(wins) + len(losses)
+    gp, gl = sum(wins), abs(sum(losses))
+    avg_w = (gp / len(wins)) if wins else None
+    avg_l = (gl / len(losses)) if losses else None
+    return {
+        "n_round_trips": n,
+        "win_rate": (len(wins) / n) if n else None,
+        "net_pnl": gp - gl,
+        "gross_profit": gp,
+        "gross_loss": gl,
+        "profit_factor": (gp / gl) if gl > EPS else (999.0 if gp > EPS else None),
+        "avg_win": avg_w,
+        "avg_loss": avg_l,
+        "payoff_ratio": (avg_w / avg_l) if (avg_w and avg_l and avg_l > EPS) else None,
+        "best_win": max(wins) if wins else None,
+        "worst_loss": min(losses) if losses else None,
+        "worst_loss_share_of_profit": (abs(min(losses)) / gp)
+        if losses and gp > EPS else None,
+    }
 
 
 def compute_metrics(wallet, snapshot_date):
