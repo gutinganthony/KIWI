@@ -89,5 +89,80 @@
 - 因子 3（庫存）覆蓋率僅 1/3、因子 5（中國）證據不足——這兩格是本判定最弱的地方。
 - 本檔採用的是**複審後**的結論；初稿版本（「不必動部位」）已被自身證據推翻，保留在原始報告中供對照。
 
+## 9. 【2026-08-19 重跑】缺口補齊後的八因子複判
+
+> **為什麼重跑**：§6 第 3 點寫明「7/28–30 Samsung／SK hynix 存貨＋MSFT/Meta/Amazon capex 出來後，本判定要立刻重跑」。逾期 20 天後於 2026-08-19 執行。
+> **標記**：`已確認`＝一手或多來源一致；`[推論]`＝二手推導；`unverified`＝來源互相矛盾，不採用。全節仍受 §8「數字皆二手」的限制。
+
+### 9.1 八因子複判表
+
+| 因子 | 7/26 判定 | **8/19 複判** | 關鍵新讀數 |
+|---|---|---|---|
+| 1 長約／客戶承諾 | 未現（強反證） | **未現，反證更強** | 三大廠 DRAM/HBM **2027 全年產能已售罄**；買方僅拿到請求量的 **60–70%**；Samsung 明言供給短缺持續**至 2028、2027 更嚴峻** `[推論]` |
+| 2 合約價／現貨價 | 部分已現 | **⚠️「已現」的那一半消失了** | 4Q26 合約價收斂至 **+8–13% QoQ**（3Q26 +13–18%）＝連三季收斂**但仍為正**；**DDR4 的下跌已反轉**（DDR4 轉緊、外溢到 DDR3）；**DDR5 現貨續漲**（32GB kit $100→$400+、YoY 近 +500%） |
+| 3 庫存 | 未現（低信心 1/3） | **未現（信心提高，但出現層次歧義）** | 原廠端：售罄至 2027 ⇒ 可售庫存趨近零。⚠️ **但 TrendForce 對 4Q26 收斂給的官方理由是「weak end demand and elevated inventory levels」——那是通路／客戶端庫存，不是原廠庫存。** 兩個層次方向相反，**本輪重跑最重要的歧義就在這一格** |
+| 4 供給 capex／設備 | 已現 | **已現且加深** | 8/7 SK hynix 董事會通過 **$383 億新廠**（Y2 DRAM $246 億＋M17 NAND $134 億），首批有意義產出**不早於 2029** |
+| 5 中國供給 | **證據不足** | **已現，且首次有量化時點** | CXMT 2026 底約 **350k wpm**（2024 初 100k → 2025 底 290k）；UBS 估中國 2026 新增 **120–140k wpm**；YMTC 武漢三廠 **2027** 上線、約 50k wpm 轉 DRAM；CXMT 目標 2026 底上海 **HBM 量產**；CXMT 1Q26 營收 **¥508 億、+719% YoY** ⇒ **供給浪落點 2027–2028** |
+| 6 需求 | 分層（AI 未現／消費已現） | **AI 端全數上修，無一下修** | 四大 2026 capex 合計約 **$730B**（2025 約 $410B）；Meta 上修至 **$135–145B**；Amazon 上修至 **~$220B**（⚠️ 明載理由含**記憶體漲價**＝成本推動而非量推動）；**MSFT FY27 指引 $255–260B** |
+| 7 賣方觀點 | 未現（9 家反駁見頂） | **⚠️ 語意翻轉：空方投降已成共識** | 大摩 2 月由「DRAM winter」翻多、7 月「capitulation has become the crowd」`[推論]`。**這一格的含義從「看多＝安全」變成「看多＝擁擠」**——空方投降在歷史上是中後期標記，不是早期標記 |
+| 8 歷史對照 | 4 步中第 2.5 步 | **仍 2.5–3 步，但沿「週期延長」方向移動** | 售罄至 2027 ＋ 供給浪 2027–2028 ＋ 賣方擁擠 ⇒ 頂的**時點往後**、頂的**性質**更像由供給浪定義，而非需求崩塌 |
+
+### 9.2 T1 四條（＋⑤）逐條現況
+
+| # | 條件 | 現況 |
+|---|---|---|
+| ① | 4Q26 合約價預估走平／轉負 | **未觸發**。但收斂序列已有四點：1Q26 **+81%** → 3Q26 **+13–18%** → 4Q26 **+8–13%**。二階導數持續為負 |
+| ② | DDR5／HBM 現貨跟進 DDR4 下跌 | **未觸發，且方向相反**——DDR4 自己反轉回漲，**這條的前提（DDR4 下跌是領先訊號）已被推翻** |
+| ③ | Samsung／SKH 存貨連兩季回升 | **無法判定**。未取得原廠存貨直接讀數；更根本的問題是**在「售罄至 2027」狀態下原廠存貨恆低，這條在本輪週期已失去鑑別力** |
+| ④ | 任一 hyperscaler capex 指引下修 | **未觸發**。⚠️ **假陽性警告**：MSFT 的 calendar-2026 由 ~$190B 改為 ~$175B 是**租賃會計重述**，不是需求下修——若只看數字會誤報 |
+| ⑤ | 供應商融資擴散 | **本輪未查**（需 NVDA Q2 應收／合約資產增速 vs 營收）。列為下輪必查 |
+
+### 9.3 結論：方向沒變，但**時鐘要往後、條件要改版**
+
+**方向**：一階導數（絕對價格、現貨、售罄狀態、capex）**全面更強**；二階導數（合約價漲幅收斂）**續存**。
+⇒ 7/26 的「實體面尚未見頂」**維持**，且「2027 減倉來不及」這個擔憂**應下修**——但下修的理由**不是需求更好，是供給的實體限制**（新廠 2029 才出貨、產能售罄至 2027、中國供給浪落在 2027–2028）。
+
+**⚠️ 但本次重跑真正的產出不是「該不該減倉」（答案是不該，且比 7/26 更明確），而是——T1 的五條裡有三條壞了：**
+
+- **② 前提被推翻**（DDR4 反轉）
+- **③ 在本輪失去鑑別力**（售罄狀態下原廠存貨恆低）
+- **④ 會有會計重述造成的假陽性**
+
+**一組有 3/5 條不可用的觸發條件，等於沒有觸發條件。** 這正是 `AGENDA.md` 出場手冊 v2 那一項要處理的同一件事。
+
+### 9.4 T1 v2 條件草案（🔧 自訂，需 Jake 裁決後才生效）
+
+| # | v2 條件 | 相對 v1 的變更 |
+|---|---|---|
+| ① | 4Q26／1Q27 合約價 QoQ **轉負**（**刪掉「走平」**） | 收緊。連三季收斂但仍 +8–13%，「走平」在成本上升環境下仍是實質正 |
+| ② | **HBM／伺服器 DRAM 合約價** QoQ 轉負（**不看現貨、不看 DDR4**） | 換指標。DDR4 已證明不是領先訊號 |
+| ③ | 三大廠**售罄覆蓋期**由「2027 全年」縮短至 **<2 季** | 換指標。取代失效的「原廠存貨連兩季回升」 |
+| ④ | hyperscaler **實際資本支出**連兩季低於前次指引，**且排除會計重述** | 加防偽。指引數字本身可被重述污染 |
+| ⑤ | 供應商融資擴散（維持 2026-07-28 定義） | 不變 |
+| ⑥ | 🆕 **CXMT DDR5 良率達標／HBM 通過客戶驗證**的具體里程碑 | 新增。因子 5 已從「證據不足」變成「有量化時點」，供給浪需要自己的觸發線 |
+
+> **減碼順序維持不變**：先 DRAM ETF（無合約下檔保護）、後 MU（有 take-or-pay 地板）。§4 的合約結構不對稱在本輪未被任何新證據削弱，反而因「售罄至 2027」而加強。
+
+### 9.5 本節的誠實標注
+
+- **未取得**：Samsung／SK hynix 的**原廠存貨直接讀數**（本節以「售罄至 2027」與 TrendForce 的通路庫存敘述間接推論，`[推論]`）。這一格仍是八因子中最弱的。
+- **unverified 不採用**：大摩對 MU 的目標價訊號在來源間互相矛盾（一說大幅上調、一說 $112→$98 Equal Weight，後者疑為舊文）——**未用於任何判定**。
+- **Samsung/SKH 的 Q2 絕對數字**（Samsung 營收 KRW 171.5 兆、OP KRW 89.5 兆；SKH 營收 KRW 79.3 兆、OP KRW 60.5 兆）量級異常巨大，`[未直接核對]`；**本節的判定不依賴這些絕對值**，只依賴「創高＋售罄」的方向性事實。
+- 本節全部來自雲端 session 的 WebSearch（多來源交叉），**未經 Actions runner 一手核對**。
+
+### 9.6 來源（本節新增）
+
+- [Samsung Electronics Announces Second Quarter 2026 Results](https://news.samsung.com/global/samsung-electronics-announces-second-quarter-2026-results)
+- [SK hynix Announces 2Q26 Financial Results](https://news.skhynix.com/en/q2-2026-business-results/)
+- [Long-Term Agreements Cap Price Increases; Server DRAM Contract Prices Expected to Rise 13-18% QoQ in 3Q26 (TrendForce)](https://www.trendforce.com/presscenter/news/20260709-13140.html)
+- [AI Server Demand Continues to Support Memory Prices in 3Q26, but Gains Moderate (TrendForce)](https://www.trendforce.com/presscenter/news/20260703-13134.html)
+- [Big Tech's AI Capex Race Hits $730 Billion — Q2 2026 Earnings](https://futurex.capital/en/ai-lab/reports/big-tech-ai-capex-2026q2)
+- [AI Capex Scorecard: What Earnings Week Actually Showed (July 2026)](https://www.digitalapplied.com/blog/ai-capex-scorecard-earnings-week-july-2026)
+- [China's CXMT and YMTC to massively expand memory output amid global crunch](https://kr-asia.com/chinas-cxmt-and-ymtc-to-massively-expand-memory-output-amid-global-crunch)
+- [CXMT close to matching Micron's memory capacity in 2026 (Tom's Hardware)](https://www.tomshardware.com/pc-components/dram/cxmt-close-to-matching-microns-memory-capacity-in-2026-research-claims-would-put-china-on-track-to-become-worlds-second-largest-dram-producer)
+- [Memory prices climb 500% in 12 months (Tom's Hardware)](https://www.tomshardware.com/pc-components/ram/memory-prices-climb-500-percent-in-12-months-up-to-10x-the-lowest-ever-tracked-prices-128gb-of-ddr5-now-usd3-399)
+- [Why the memory chip crunch is greater than expected, and may not ease until 2029 (Deloitte)](https://www.deloitte.com/us/en/insights/industry/technology/why-memory-chip-crunch-is-greater-than-expected.html)
+
 ## Update Log
 - 2026-07-26 v1.0：八因子判定＋對抗性複審。結論：估值修正、實體未見頂、二階導數轉向；NVDA-SKH 為 LOI 非合約；MU 與 DRAM ETF 因合約結構不同需分開時鐘（先減 ETF）；2027 日曆式減倉改事件驅動；7/28–30 為最近裁判日。
+- 2026-08-19 v1.1：**執行 §6 第 3 點要求的重跑**（逾期 20 天）。新增 §9：八因子複判（因子 5 由「證據不足」升為「已現且有量化時點」、因子 7 語意翻轉為「看多＝擁擠」、因子 2 的「已現」那一半因 DDR4 反轉而消失）；T1 五條逐條現況（**①④未觸發、②前提被推翻、③失去鑑別力、⑤未查**）；提出 T1 v2 六條草案待 Jake 裁決。**結論方向不變（實體面未見頂），但減倉時鐘往後、觸發條件需改版。**
