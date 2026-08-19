@@ -21,7 +21,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | [Business](./topics/business/INDEX.md) | 68 |
 | [Health](./topics/health/INDEX.md) | 0 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
-| [Other](./topics/other/INDEX.md) | 3 |
+| [Other](./topics/other/INDEX.md) | 4 |
 
 > New topics are added as needed.
 
@@ -32,6 +32,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-08-19 | [撲克作為決策訓練器 — 可行性評估與定位判決](./topics/other/2026-08-19-poker-as-decision-training-evaluation.md) | Other |
 | 2026-08-10 | [個人帳戶交易政策（PA Dealing Policy）草案](./topics/business/2026-08-10-personal-account-dealing-policy-draft.md) | Business |
 | 2026-08-10 | [投資流程說明書（IPS）個人版草案](./topics/business/2026-08-10-investment-process-statement-draft.md) | Business |
 | 2026-08-06 | [美銀牛熊指標 9.7 — 歷史驗證與 BBI/貪婪指數背離的解釋](./topics/business/2026-08-06-bofa-bull-bear-9-7-signal-verification.md) | Business |

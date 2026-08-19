@@ -52,6 +52,7 @@ gstack 檔案路徑一律用 `~/.claude/skills/gstack/...`（全域路徑）。
 | 「我有個產品 idea：XX」或「跑 buildlab」 | skills/buildlab/SKILL.md + skills/buildlab/pipeline.md（Pieter Levels 產品實驗管線：三閘門 + 時間盒 + 付費驗證 + 快殺；含實名投資內容合規紅線） |
 | 「幫我把這次寫成摸魚記貼文」或「/viral」 | skills/viralcontent/SKILL.md（Jenny Hoyos 病毒公式；摸魚記匿名觸及引擎專用，實名 IG 不套；含合規紅線與觸及→信任雙軌） |
 | 要跑或要寫 loop（把重複性工作自動化並自我查核） | agents/loops/README.md（用法＋寫憲章的鐵律）→ 再讀該 loop 的憲章檔 |
+| 「跑 pokerlab」「這週撲克練什麼」「幫我複盤這手牌」 | skills/pokerlab/SKILL.md（先驗 Gate 0）→ 再讀 training-plan.md 或 decision-log.md。**撲克在 KIWI 是決策訓練器不是收入專案；台灣境內線上真錢現金桌是紅線，不提供操作建議**（定位理由見 topics/other/2026-08-19-poker-as-decision-training-evaluation.md） |
 
 其餘任務一律不讀上表檔案。新增分析模組：在 `skills/` 下建資料夾寫 SKILL.md，然後在上表加一列。
 
