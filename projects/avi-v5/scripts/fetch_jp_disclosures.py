@@ -55,8 +55,8 @@ TARGETS = {
     "6855": {"name": "JEM", "why": "否證 #1 再增資/CB/業績下修"},
     "6834": {"name": "Seikoh", "why": "加碼 A 裁判日、9/1 分割"},
     "6777": {"name": "santec", "why": "🟢 觸發中，事件面追蹤"},
-    "6981": {"name": "Murata", "why": "exit-playbook §2.3 三條出場條件"},
-    "6857": {"name": "Advantest", "why": "exit-playbook §2.4 四條出場條件"},
+    "6981": {"name": "Murata", "why": "🔻 2026-08 已強制出場 → 三條轉為 exit-playbook §2.3 的再進場檢核條件"},
+    "6857": {"name": "Advantest", "why": "🔻 2026-08 已強制出場 → 四條轉為 exit-playbook §2.4 的再進場檢核條件"},
 }
 
 # 從決算短信 PDF 內文抽數字。值以「百万円」為多，這裡只抽原始字串與數值，
@@ -259,10 +259,14 @@ def render_monitor(state, now):
     mur_dir, mur_note = _trend(mur)
 
     return "\n".join([
-        "# EXIT_MONITOR — 村田 6981 ／ Advantest 6857 出場條件自動監控",
+        "# EXIT_MONITOR — 村田 6981 ／ Advantest 6857 條件自動監控",
         "",
         f"> 由 `fetch_jp_disclosures.py` 產出。更新：{now}",
         "> 補 `skills/serenity/exit-playbook.md` §7 缺口③。**權威條件定義仍在 exit-playbook §2.3／§2.4，本檔只報數字。**",
+        "",
+        "> 🔻 **2026-08 用途變更**：兩檔已因家庭資金需求**強制出場（非框架因素）**，"
+        "本檔監控的因此**不再是出場條件，而是再進場評估的輸入**。要重新建倉須重跑 Serenity Step 1–9，"
+        "**不可用本檔的綠燈當建倉理由**——這些條件的角色是「建倉之後」的出場線。",
         "",
         "## ⚠️ 先讀：這 7 條裡只有 2 條能真的自動化",
         "",
