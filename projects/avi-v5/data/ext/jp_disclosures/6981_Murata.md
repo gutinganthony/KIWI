@@ -1,7 +1,7 @@
-# 6834 Seikoh — TDnet 適時開示累積清單
+# 6981 Murata — TDnet 適時開示累積清單
 
 > 由 `fetch_jp_disclosures.py` 在 GitHub Actions runner 抓取（雲端 session 對 TDnet 403，實測回 000）。更新：2026-08-20T07:48:26+00:00
-> 用途：加碼 A 裁判日、9/1 分割
+> 用途：exit-playbook §2.3 三條出場條件
 
 ⚠️ **TDnet 一覽頁只保留約 31 天**，本檔為累積結果——早於本橋建立日的開示不會有。
 
