@@ -35,3 +35,9 @@ jinja2>=3.1.0
 mcp>=1.0.0
 playwright>=1.40.0
 # After installing: playwright install chromium
+
+# 決算短信 PDF 抽數（fetch_jp_disclosures.py 的 EXIT_MONITOR）
+# 純 Python；cryptography 只是選用 extra，未安裝時 pypdf 自動走 no-crypto provider。
+# 即使本套件安裝或 import 失敗，該橋也只會停用「數字抽取」，開示清單照常產出
+# （fetch_jp_disclosures._pdf_reader() 連 pyo3 PanicException 都攔）。
+pypdf>=4.0.0

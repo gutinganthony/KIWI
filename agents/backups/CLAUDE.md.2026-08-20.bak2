@@ -10,10 +10,6 @@
 - **`docs/` 會被整包部署到公開 GitHub Pages**（見 .github/workflows/deploy-pages.yml）。私人筆記、內部規則、金鑰、個人資料嚴禁寫入 docs/。
 - git log 每天被 `auto: update dashboard data` commit 洗版。查人為變更：`git log --oneline --invert-grep --grep='auto: update dashboard'`
 - `.github/workflows/` 是真實生產管線（每日 dashboard 更新、平日警報＋週六 weekend-bridge 警報、每週六 Serenity 週報、Pages 部署等共 6 支——確切清單以目錄內容為準）。**改 workflows 前先問使用者。**
-- **持倉的唯一真實來源是 Google Sheet「KIWI 持倉即時表」**（fileId `1tYg3PneDLrxXbtuoo1lsylFV8ehSpEblv9thEuAllns`）。
-  **session 開場必讀**（`mcp__Google_Drive__read_file_content`），並把 `skills/serenity/holdings.md` 同步成最新內容。
-  Jake 隨時在 Sheet 上改、不會通知你。`skills/serenity/watchlist.md` 的持倉表**已降級為歷史快照，不得當作現況**。
-  （Sheet 讀不到時：用 `holdings.md` 並**明說它可能過期**，不要沉默沿用。GitHub Actions runner 無 Google 憑證，只能讀 `holdings.md`。）
 - session 開始時讀三個小檔（若存在）：`agents/LEARNINGS.md`（歷任 session 踩坑紀錄）、`AGENDA.md`（Jake 的目標/任務盯梢板，~3KB——掃「📌 任務」區，有逾期項就開場提醒；使用者交代的新任務/目標＝寫進這裡，格式見該檔頂部，不要另建機制）與 `topics/technology/mac-manual-homework.md`（🖥️ Mac 手動功課清單，~3KB）——後者掃「待辦」區，有積欠就在開場提醒使用者。session 結束時把新的「雲端做不到」項（被 403 擋的站、需 actions:write 的操作等）append 進該檔「待辦」區。除此之外**不要**在 session 開始預讀任何分析檔——見 §3 路由。
 
 ## 1. gstack（必要，全域安裝）
@@ -51,7 +47,7 @@ gstack 檔案路徑一律用 `~/.claude/skills/gstack/...`（全域路徑）。
 | 新增文章/連結到知識庫 | README.md 看格式 → 寫入 topics/<主題>/ → 更新該主題 INDEX.md 與 README.md 的索引表 |
 | 改 avi-v5 程式 | projects/avi-v5/ARCHITECTURE.md（改 CPI 相關再加 CPI_ARCHITECTURE.md） |
 | 接收 Codex 提案或實作草稿 | handoffs/codex/<任務>/HANDOFF.md + agents/CODEX_COLLABORATION.md |
-| 「該不該減倉/賣出」「出場條件」「持倉賣訊檢查」 | skills/serenity/exit-playbook.md（機械出場條件）**＋ `skills/serenity/holdings.md`（持倉快照）**。⚠️ **權威持倉是 Google Sheet，見 §0；watchlist.md 的持倉表已是歷史快照，不得當現況** |
+| 「該不該減倉/賣出」「出場條件」「持倉賣訊檢查」 | skills/serenity/exit-playbook.md（每檔持倉的機械出場條件；權威持倉來源仍是 watchlist.md） |
 | 「用社會套利框架分析 $TICKER」或「我觀察到 XX 現象，跑三閘門」 | skills/socialarb/SKILL.md + skills/socialarb/watchlist.md（消費性需求端突發異常；Chris Camillo 資訊差邏輯。B2B 上游則移交 Serenity） |
 | 「我有個產品 idea：XX」或「跑 buildlab」 | skills/buildlab/SKILL.md + skills/buildlab/pipeline.md（Pieter Levels 產品實驗管線：三閘門 + 時間盒 + 付費驗證 + 快殺；含實名投資內容合規紅線） |
 | 「幫我把這次寫成摸魚記貼文」或「/viral」 | skills/viralcontent/SKILL.md（Jenny Hoyos 病毒公式；摸魚記匿名觸及引擎專用，實名 IG 不套；含合規紅線與觸及→信任雙軌） |
