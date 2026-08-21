@@ -333,6 +333,14 @@ PROBE_TARGETS = [
      "未驗證：雲端 403；runner 未測"),
     ("TDnet 一覽（對照組）", "https://www.release.tdnet.info/inbs/I_list_001_20260818.html",
      "已知：runner 可達 HTTP 200 —— 若這條也失敗，代表是 runner 網路問題不是站點問題"),
+    # ── 第二層候選（2026-08-21 新增）。第一層已證實 EDINET 網頁介面／ufocatch／JEM IR 皆 200 且不需金鑰，
+    #    但「首頁可達」不等於「取得到有価証券報告書」。下列路徑**全為猜測**，用途是讓 runner 幫我們排除。
+    ("ufocatch 檢索頁（猜測）", "https://ufocatch.com/Search.aspx?q=6855",
+     "⚠️ 猜測路徑。回 404 只代表這個路徑不對，不代表服務不可用"),
+    ("ufocatch 說明頁（已知存在）", "https://ufocatch.com/about.aspx",
+     "對照：此頁確實存在。若它 200 而檢索頁 404 → 站可用、只是路徑要找"),
+    ("EDINET 書類検索（猜測）", "https://disclosure2.edinet-fsa.go.jp/week0020.aspx",
+     "⚠️ 猜測路徑（WEEK0010 是首頁，書類検索可能是別的 aspx）"),
 ]
 
 
@@ -344,11 +352,11 @@ def probe_sources(now):
         try:
             raw = get(url, timeout=20, binary=True)
             status = "200"
-            snippet = raw[:180].decode("utf-8", errors="replace").replace("|", "/").replace("\n", " ")
+            snippet = raw[:1500].decode("utf-8", errors="replace").replace("|", "/").replace("\n", " ")
         except urllib.error.HTTPError as e:
             status = str(e.code)
             try:
-                snippet = e.read()[:180].decode("utf-8", errors="replace").replace("|", "/")
+                snippet = e.read()[:1500].decode("utf-8", errors="replace").replace("|", "/")
             except Exception:  # noqa: BLE001
                 snippet = ""
         except Exception as e:  # noqa: BLE001
@@ -377,6 +385,58 @@ def probe_sources(now):
               "2. 若 **EDINET 網頁介面 200** → 可走網頁抓取路線，**完全繞過 API key**，Jake 的註冊問題就不必解決。",
               "3. 若全數失敗且 TDnet 也失敗 → 是 runner 網路，不要改資料源。",
               "4. **在有 200 的路徑被實際抓到內容之前，JEM 否證 #3 的狀態是「無法判定」，不是「還沒做」。**", ""]
+    # 結構樣本：對回 200 的來源留較長片段。**這是刻意的**——EDINET 網頁是 .NET WebForms
+    # （viewstate/postback），沒看過真實 HTML 就寫解析器＝再造一個沉默失敗的橋（同 irbank 那次）。
+    # 下一輪 session 依這裡的樣本找出真正的表單欄位／連結格式，再實作抓取。
+    ok200 = [(r[0], r[1], r[4]) for r in rows if r[2] == "200"]
+    if ok200:
+        lines.append("")
+        lines.append("## 結構樣本（僅限回 200 者，供下一輪實作抓取用）")
+        lines.append("")
+        for name, url, snippet in ok200:
+            lines.append("### " + name)
+            lines.append("`" + url + "`")
+            lines.append("")
+            lines.append("```html")
+            lines.append(snippet[:1500])
+            lines.append("```")
+            lines.append("")
+
+    # TDnet 解析診斷：2026-08-21 首輪五檔開示清單全空，無法分辨「真沒開示」與「解析沒對上」。
+    lines.append("")
+    lines.append("## TDnet 解析診斷")
+    lines.append("")
+    try:
+        ymd = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y%m%d")
+        turl = TDNET_LIST.format(page=1, ymd=ymd)
+        raw_html = get(turl)
+        parsed = parse_list_page(raw_html)
+        hit = sum(1 for r in parsed if r["code4"] in TARGETS)
+        lines.append("- 測試頁：`" + turl + "`")
+        lines.append("- HTML 長度：" + format(len(raw_html), ",") + " 字元")
+        lines.append("- `parse_list_page` 解析出的列數：**" + str(len(parsed)) + "**")
+        lines.append("- 其中命中目標代碼：**" + str(hit) + "**")
+        lines.append("")
+        if parsed:
+            lines.append("前 3 列解析結果：")
+            lines.append("```")
+            for r in parsed[:3]:
+                lines.append(str(r))
+            lines.append("```")
+            lines.append("")
+            lines.append("→ **解析器正常**。若各代碼檔仍為空，代表這幾天那幾家公司真的沒有開示。")
+        else:
+            lines.append("```html")
+            lines.append(raw_html[:1500].replace("|", "/"))
+            lines.append("```")
+            lines.append("")
+            lines.append("→ ⚠️ **解析出 0 列＝解析器與實際 HTML 不符**（不是「沒開示」）。"
+                         "比對上方 HTML 與 `parse_list_page` 的 td class 假設。")
+        lines.append("")
+    except Exception as e:  # noqa: BLE001
+        lines.append("- ⚠️ 診斷本身失敗：" + type(e).__name__ + ": " + str(e))
+        lines.append("")
+
     PROBE_OUT.write_text("\n".join(lines), encoding="utf-8")
     print(f"source probe: {sum(1 for r in rows if r[2] == '200')}/{len(rows)} 回 200")
 
