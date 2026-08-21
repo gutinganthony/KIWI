@@ -708,6 +708,138 @@ def test_truncation_extrapolation():
        f"外推後頻率仍過高 → 不可跟，真高頻不被截斷窗洗白（{reasons}）")
 
 
+def test_round_trip_aggregation():
+    print("[13] 部位回合聚合：flat→flat 真勝率，含同毫秒批次亂序、carry-in、未平倉")
+    t0 = _ms(2026, 7, 1)
+
+    def pf(coin, sz, direction, sp, pnl=0.0, fee=0.0, t=t0, tid=None):
+        """直接產生 parse_fills 風格的已解析成交（繞過字串轉換，方便精確構造 fixture）。"""
+        return {"ts": t / 1000.0, "coin": coin, "px": 100.0, "sz": sz, "side": "B",
+                "closed_pnl": pnl, "fee": fee, "dir": direction, "is_liquidation": False,
+                "start_position": sp, "tid": tid}
+
+    print("  (a) 乾淨的單一回合：flat 開倉→分批平倉→回到 flat")
+    fills = [
+        pf("BTC", 10.0, "Open Long", 0.0, t=t0),
+        pf("BTC", 5.0, "Open Long", 10.0, t=t0 + 60_000),
+        pf("BTC", 8.0, "Close Long", 15.0, pnl=400.0, fee=1.0, t=t0 + 120_000),
+        pf("BTC", 7.0, "Close Long", 7.0, pnl=350.0, fee=1.0, t=t0 + 180_000),
+    ]
+    rt, op, ci = classify.aggregate_round_trips(fills)
+    ok(len(rt) == 1 and not op and not ci,
+       f"單一乾淨回合（rt={len(rt)}, open={len(op)}, carry_in={len(ci)}）")
+    ok(rt[0]["coin"] == "BTC" and rt[0]["dir"] == "long", "回合標的與方向正確")
+    ok(rt[0]["n_fills"] == 4 and abs(rt[0]["pnl"] - 750.0) < 1e-9 and rt[0]["fee"] == 2.0,
+       f"回合彙總 n_fills/pnl/fee 正確（{rt[0]['n_fills']}, {rt[0]['pnl']}, {rt[0]['fee']}）")
+
+    print("  (b) 輸入順序打亂不影響結果（函式內部依 ts 重排）")
+    import random
+    shuffled = list(fills)
+    random.Random(42).shuffle(shuffled)
+    rt2, op2, ci2 = classify.aggregate_round_trips(shuffled)
+    ok(len(rt2) == 1 and abs(rt2[0]["pnl"] - rt[0]["pnl"]) < 1e-9,
+       "打亂輸入順序，回合聚合結果不變")
+
+    print("  (c) carry-in：視窗開始時已有倉（sp≠0 起手），起點不明不算回合")
+    carry_fills = [
+        pf("ETH", 3.0, "Close Long", 20.0, pnl=100.0, t=t0),
+        pf("ETH", 17.0, "Close Long", 17.0, pnl=500.0, t=t0 + 60_000),
+        # 平倉後歸零，接著全新開倉→這段才是乾淨回合
+        pf("ETH", 5.0, "Open Long", 0.0, t=t0 + 120_000),
+        pf("ETH", 5.0, "Close Long", 5.0, pnl=-50.0, t=t0 + 180_000),
+    ]
+    rt3, op3, ci3 = classify.aggregate_round_trips(carry_fills)
+    ok("ETH" in ci3 and ci3["ETH"]["n_fills"] == 2
+       and abs(ci3["ETH"]["pnl"] - 600.0) < 1e-9,
+       f"carry-in 正確累計、不進回合（{ci3.get('ETH')}）")
+    ok(len(rt3) == 1 and abs(rt3[0]["pnl"] - (-50.0)) < 1e-9,
+       f"carry-in 結束後的全新開倉單獨算一個回合（{rt3}）")
+
+    print("  (d) 未平倉：視窗結束時仍有部位 → 不算回合，只記已實現損益")
+    open_fills = [
+        pf("SOL", 10.0, "Open Long", 0.0, t=t0),
+        pf("SOL", 3.0, "Close Long", 10.0, pnl=60.0, t=t0 + 60_000),
+    ]
+    rt4, op4, ci4 = classify.aggregate_round_trips(open_fills)
+    ok(not rt4 and len(op4) == 1, f"未平倉不計入回合（rt={len(rt4)}, open={len(op4)}）")
+    ok(abs(op4[0]["still_open_position"] - 7.0) < 1e-9 and abs(op4[0]["pnl"] - 60.0) < 1e-9,
+       f"未平倉部位大小與已實現損益正確（{op4[0]['still_open_position']}, {op4[0]['pnl']}）")
+
+    print("  (e) 同毫秒批次亂序不誤判（迴歸測試：實測 0x8bae35 的 xyz 資料曾抓到"
+          "1991 次比對裡 1799 次逐筆 startPosition 對不上、carry-in 誤判成新倉）")
+    # 5 筆同一毫秒的 Close Long，真實撮合順序是 sp: 50→40→25→15→5→0（陣列刻意反著放）
+    same_ms = t0 + 500_000
+    true_order_sz = [10.0, 15.0, 10.0, 10.0, 5.0]   # 50-10=40, 40-15=25, ... 5-5=0
+    true_order_sp = [50.0, 40.0, 25.0, 15.0, 5.0]
+    batch = [pf("XRP", sz, "Close Long", sp, pnl=(-1 if i % 2 else 1) * 20.0, t=same_ms)
+             for i, (sz, sp) in enumerate(zip(true_order_sz, true_order_sp))]
+    scrambled_batch = [batch[3], batch[0], batch[4], batch[1], batch[2]]  # 陣列順序打亂
+    prior = [pf("XRP", 30.0, "Open Long", 0.0, t=t0), pf("XRP", 20.0, "Open Long", 30.0,
+                                                          t=t0 + 60_000)]
+    rt5, op5, ci5 = classify.aggregate_round_trips(prior + scrambled_batch)
+    ok(not ci5 and not op5 and len(rt5) == 1,
+       f"整批（含開倉＋亂序平倉批次）聚合成 1 個完整回合（rt={len(rt5)}, "
+       f"open={len(op5)}, carry_in={list(ci5)}）")
+    ok(rt5[0]["n_fills"] == 7, f"回合含全部 7 筆成交（{rt5[0]['n_fills']}）")
+
+    print("  (f) 批次「進入前」部位＝鏈頭，與陣列順序無關（單元驗證 _batch_head_position）")
+    head = classify._batch_head_position(scrambled_batch)
+    ok(abs(head - 50.0) < 1e-6, f"不論陣列順序，鏈頭正確回推為 50.0（實得 {head}）")
+
+    print("  (g) 多 coin 交錯不互相污染")
+    interleaved = [
+        pf("BTC", 10.0, "Open Long", 0.0, t=t0),
+        pf("ETH", 5.0, "Open Short", 0.0, t=t0 + 10_000),
+        pf("BTC", 10.0, "Close Long", 10.0, pnl=100.0, t=t0 + 20_000),
+        pf("ETH", 5.0, "Close Short", -5.0, pnl=-30.0, t=t0 + 30_000),
+    ]
+    rt6, op6, ci6 = classify.aggregate_round_trips(interleaved)
+    ok(len(rt6) == 2 and {e["coin"] for e in rt6} == {"BTC", "ETH"},
+       f"BTC／ETH 各自獨立成一個回合（{[(e['coin'], e['pnl']) for e in rt6]}）")
+
+    print("  (h) ts／start_position 缺失的筆跳過，不 crash、不臆造")
+    bad = [dict(pf("BTC", 1.0, "Open Long", 0.0, t=t0), ts=None),
+           dict(pf("BTC", 1.0, "Open Long", 0.0, t=t0), start_position=None)]
+    rt7, op7, ci7 = classify.aggregate_round_trips(bad)
+    ok(not rt7 and not op7 and not ci7, "兩筆都因欄位缺失被跳過")
+
+    print("  (i) parse_fills 正確帶出 start_position／tid（銜接層驗證）")
+    raw_fill = {"coin": "BTC", "px": "100", "sz": "1", "side": "B", "time": t0,
+               "closedPnl": "0", "dir": "Open Long", "startPosition": "12.5", "tid": 999}
+    parsed = classify.parse_fills([raw_fill])
+    ok(parsed[0]["start_position"] == 12.5 and parsed[0]["tid"] == 999,
+       f"parse_fills 帶出新欄位（{parsed[0]['start_position']}, {parsed[0]['tid']}）")
+
+def test_round_trip_stats():
+    print("[14] 回合統計：勝率／賠率／獲利因子（語意對齊 xyzscan.dex_fill_stats）")
+
+    def rt(pnl):
+        return {"pnl": pnl}
+
+    s = classify.round_trip_stats([])
+    ok(s["n_round_trips"] == 0 and s["win_rate"] is None and s["profit_factor"] is None,
+       "空清單 → None，不臆造")
+
+    mixed = [rt(500), rt(-150), rt(300), rt(-100), rt(-50)]
+    s = classify.round_trip_stats(mixed)
+    ok(s["n_round_trips"] == 5 and s["win_rate"] == 0.4,
+       f"5 回合 2 勝 3 敗，勝率 40%（{s['win_rate']}）")
+    ok(abs(s["net_pnl"] - 500.0) < 1e-9, f"淨損益 500（{s['net_pnl']}）")
+    ok(abs(s["avg_win"] - 400.0) < 1e-9 and abs(s["avg_loss"] - 100.0) < 1e-9,
+       f"平均賺 400／平均虧 100（{s['avg_win']}, {s['avg_loss']}）")
+    ok(abs(s["payoff_ratio"] - 4.0) < 1e-9, f"賠率 4.0（{s['payoff_ratio']}）")
+    ok(s["worst_loss"] == -150 and s["best_win"] == 500, "最大單筆虧損／獲利正確")
+    ok(abs(s["worst_loss_share_of_profit"] - 150 / 800) < 1e-9,
+       f"單筆最大虧損占毛利比例正確（{s['worst_loss_share_of_profit']}）")
+
+    all_win = [rt(100), rt(200)]
+    s = classify.round_trip_stats(all_win)
+    ok(s["profit_factor"] == 999.0, f"零虧損 → 獲利因子哨兵值 999（{s['profit_factor']}）")
+    ok(s["payoff_ratio"] is None, "零虧損 → 賠率 None，不除以零")
+    ok(s["worst_loss"] is None and s["worst_loss_share_of_profit"] is None,
+       "無虧損樣本 → 相關欄位 None")
+
+
 def test_decision_frequency_dossier(tmp):
     print("[11] track dossier：決策頻率複核節＋升級後可跟性判定＋tracked 名單含 0x8bae35")
     base = json.loads((FIXTURES / "wallet_consistent.json").read_text(encoding="utf-8"))
@@ -2000,6 +2132,8 @@ def main():
         test_aggregate_events()
         test_followability_events()
         test_truncation_extrapolation()
+        test_round_trip_aggregation()
+        test_round_trip_stats()
         test_decision_frequency_dossier(tmp)
         test_shadow_pure_functions()
         test_shadow_session_offline(tmp)

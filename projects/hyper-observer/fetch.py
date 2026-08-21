@@ -429,6 +429,52 @@ def fetch_wallet(addr, meta, post_fn=None, dex_names=None, fetch_spot=False):
 
 
 # ---------------------------------------------------------------------------
+# 成交時間窗分頁（userFillsByTime）—— 突破 userFills 單次 2000 筆上限
+# ---------------------------------------------------------------------------
+# 唯讀查詢，供 fills_history.py 做每日增量累積用。與 xyzscan/find_xyz_winners.py
+# 裡的 fetch_fills_window 是同一個手法（分頁前進 startTime）獨立實作——那支是
+# xyz 專用一次性掃描，這支是通用（不限 dex）的每日累積，故不共用以免跨模組耦合。
+
+def fetch_fills_since(addr, meta, post_fn=None, start_ms=None, days=None, page_cap=4):
+    """用 userFillsByTime 分頁抓成交。start_ms 與 days 二選一：
+
+    - start_ms：增量抓取（帶上次歷史最後一筆的時間戳，通常 +1ms 避免重複抓到自己）。
+    - days：回填窗（例如首次執行、沒有既有歷史可續抓時，回填最近 N 天）。
+
+    回 (raw_fills, hit_cap)。hit_cap=True 代表連 page_cap 頁都填滿，該視窗内的活動
+    可能多到還沒抓完；呼叫端應據此判斷樣本是否完整，不要靜默當作「就這些了」。
+    """
+    if start_ms is None:
+        if days is None:
+            raise ValueError("fetch_fills_since 需要 start_ms 或 days 其中之一")
+        start_ms = int((time.time() - days * 86400) * 1000)
+    post_fn = post_fn or http_post_info
+    out, hit_cap = [], False
+    for page in range(page_cap):
+        data, ok = post_fn({"type": "userFillsByTime", "user": addr, "startTime": start_ms},
+                           f"userFillsByTime:{addr[:10]}:p{page}", meta)
+        if not ok:
+            break
+        rows = data if isinstance(data, list) else []
+        if not rows:
+            break
+        out.extend(rows)
+        if len(rows) < config.MAX_USER_FILLS:
+            break            # 未滿頁 → 這個時間窗已抓完
+        times = [r.get("time") for r in rows
+                 if isinstance(r, dict) and isinstance(r.get("time"), (int, float))]
+        if not times:
+            break
+        next_start = int(max(times)) + 1
+        if next_start <= start_ms:      # 防禦：時間沒前進就停，不無限迴圈
+            break
+        start_ms = next_start
+        if page == page_cap - 1:
+            hit_cap = True
+    return out, hit_cap
+
+
+# ---------------------------------------------------------------------------
 # Registry
 # ---------------------------------------------------------------------------
 

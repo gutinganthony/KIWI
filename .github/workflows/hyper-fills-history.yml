@@ -1,0 +1,74 @@
+name: Hyper Fills History (每日成交歷史累積)
+
+# 為什麼獨立一支：突破 userFills 單次 2000 筆上限，靠「每天累積一點」而非一次抓完，
+# 所以要天天跑；但刻意不跟 hyper-observer.yml 共用 paths 過濾（不含
+# projects/hyper-observer/*.py 的其他共用檔案），否則每次動 classify/fetch/config
+# 就會多跑一次這支——道理同 hyper-watch.yml、hyper-xyz-scan.yml。
+on:
+  push:
+    branches: [claude/polymarket-wallet-copy-trade-0l7v2z]
+    paths:
+      - 'projects/hyper-observer/fills_history.py'
+      - 'projects/hyper-observer/tests/test_fills_history_offline.py'
+      - '.github/workflows/hyper-fills-history.yml'
+  workflow_dispatch:
+  schedule:
+    # 22:45 UTC 是 hyper-observer 的每日班；這支排在它之後 30 分鐘，好讓「首次執行
+    # 用今天的 latest_raw.json 當零成本種子」這條路徑用得到當天剛抓的快照。
+    # 沒趕上也不影響正確性，只是那天會多打一次 API 回填而已（見 seed_fills）。
+    - cron: '15 23 * * *'   # 07:15 台北，只在 default branch 生效
+
+concurrency:
+  group: hyper-fills-history
+  cancel-in-progress: false
+
+jobs:
+  accumulate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: pip install --quiet requests
+
+      - name: Offline self-test
+        working-directory: projects/hyper-observer
+        run: python3 tests/test_fills_history_offline.py
+
+      - name: Accumulate (read-only, incremental per TRACKED_WALLETS)
+        working-directory: projects/hyper-observer
+        run: python3 fills_history.py
+
+      # 只 commit 這支自己的產出（fills_history.jsonl／fills_history_stats.json）。
+      # 這兩個檔名固定，跟 hyper-observer.yml 寫的 dossier_*/diagnostic_*/latest_raw.json
+      # 不重疊，兩支各自 commit 不會互相覆蓋；仍加 rebase 以防同時間推送互相卡住。
+      - name: Commit data back
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add projects/hyper-observer/data/tracked/*/fills_history.jsonl \
+                  projects/hyper-observer/data/tracked/*/fills_history_stats.json
+          if git diff --cached --quiet; then
+            echo "No data changes to commit."
+          else
+            git commit -m "auto: fills-history update $(date -u +%F)"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push
+          fi
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python3 projects/avi-v5/scripts/notify_ops.py \
+            --title "❌ hyper-fills-history 累積失敗" \
+            --body "每日成交歷史累積這一輪掛了，長期勝率樣本可能缺一天。查 log。" \
+            --url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" || true

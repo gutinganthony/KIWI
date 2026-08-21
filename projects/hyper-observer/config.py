@@ -315,3 +315,15 @@ SHADOW_BOOK_TOP_LEVELS = 5    # 兩側前 N 檔累計名目
 SHADOW_ALLOWED_INFO_TYPES = ("l2Book", "userFills", "clearinghouseState", "allMids")
 # --address 預設：TRACKED_WALLETS 中 label 含此子字串者（掃描最佳候選 0x8bae35…）
 SHADOW_DEFAULT_LABEL_SUBSTR = "scan-best-candidate"
+
+# ---------------------------------------------------------------------------
+# 成交歷史累積（fills_history.py）
+# ---------------------------------------------------------------------------
+# 動機：userFills／userFillsByTime 單次最多回 2000 筆（見 MAX_USER_FILLS）。高頻標的
+# 幾天內就能吃光這個上限，dossier/xyzscan 算出的勝率因此只反映最近幾天，樣本量太小
+# 下結論。這支腳本每天對 TRACKED_WALLETS 做「增量」抓取（只抓上次之後的新成交），
+# 累積出遠超單次窗口的歷史，讓 aggregate_round_trips／round_trip_stats 算出的勝率／
+# 賠率有真正的樣本量（見 2026-08-11 對 0x8bae35 的分析：當時樣本只有 10.2 天）。
+FILLS_HISTORY_RETENTION_DAYS = 180   # 原始成交保留期限，到期直接捨棄（不做月結彙總）
+FILLS_HISTORY_BACKFILL_DAYS = 30     # 首次執行且無 latest_raw.json 可種子時的回填窗
+FILLS_HISTORY_PAGE_CAP = 4           # 單次抓取最多翻幾頁 userFillsByTime（每頁權重 20）
