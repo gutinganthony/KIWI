@@ -58,6 +58,104 @@
           "with_depth": 414
         }
       }
+    },
+    {
+      "address": "0x2005d16a84ceefa912d4e380cd32e7ff827875ea",
+      "session_stamp": "20260819T151734Z",
+      "date": "2026-08-19",
+      "started_utc": "2026-08-19T15:17:34+00:00",
+      "duration_min": 40.0,
+      "poll_sec": 4.0,
+      "polls": 568,
+      "activity_failures": 0,
+      "book_failures": 0,
+      "baseline_seeded": 48,
+      "jsonl_file": "session_20260819T151734Z.jsonl",
+      "stats": {
+        "n_detected": 206,
+        "n_book_ok": 206,
+        "n_book_unavailable": 0,
+        "detect_lag_sec": {
+          "median": 22.7,
+          "p90": 32.01,
+          "n": 206
+        },
+        "adverse_drift": {
+          "BUY": {
+            "median": 0.035714,
+            "p90": 0.191781,
+            "n": 206
+          },
+          "SELL": {
+            "median": null,
+            "p90": null,
+            "n": 0
+          }
+        },
+        "spread": {
+          "median": 0.01,
+          "n": 204
+        },
+        "depth_at_best_usd": {
+          "median": 316.54,
+          "n": 206
+        },
+        "fixed_copy_usd": 50.0,
+        "fillable_at_best_ratio": 0.6456310679611651,
+        "fillable_at_best_counts": {
+          "fillable": 133,
+          "with_depth": 206
+        }
+      }
+    },
+    {
+      "address": "0x2005d16a84ceefa912d4e380cd32e7ff827875ea",
+      "session_stamp": "20260819T234306Z",
+      "date": "2026-08-19",
+      "started_utc": "2026-08-19T23:43:06+00:00",
+      "duration_min": 40.0,
+      "poll_sec": 4.0,
+      "polls": 553,
+      "activity_failures": 0,
+      "book_failures": 0,
+      "baseline_seeded": 49,
+      "jsonl_file": "session_20260819T234306Z.jsonl",
+      "stats": {
+        "n_detected": 370,
+        "n_book_ok": 370,
+        "n_book_unavailable": 0,
+        "detect_lag_sec": {
+          "median": 20.92,
+          "p90": 31.15,
+          "n": 370
+        },
+        "adverse_drift": {
+          "BUY": {
+            "median": 0.02,
+            "p90": 0.156863,
+            "n": 357
+          },
+          "SELL": {
+            "median": null,
+            "p90": null,
+            "n": 0
+          }
+        },
+        "spread": {
+          "median": 0.01,
+          "n": 343
+        },
+        "depth_at_best_usd": {
+          "median": 661.02,
+          "n": 357
+        },
+        "fixed_copy_usd": 50.0,
+        "fillable_at_best_ratio": 0.7366946778711485,
+        "fillable_at_best_counts": {
+          "fillable": 263,
+          "with_depth": 357
+        }
+      }
     }
   ]
 }

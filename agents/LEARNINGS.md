@@ -33,3 +33,14 @@
 - [2026-08-19] 情境：替新專案設「開跑前置閘門」，其中一條想綁「mac-manual-homework 積欠 ≤1 項」｜錯誤：憑該檔「待辦區看起來只有幾項」目測就寫進門檻，實際 `grep -c '^- \[ \]'` 是 **46 項**（週六 bot 也報 46）——門檻永遠紅燈＝使用者必然繞過＝等於沒設門檻｜正解：改綁**具名單項**（EDINET API key 已放 secret），並在檔內註明為何不綁總數；AGENDA 逾期數則用 `python3 scripts/agenda_reminder.py --dry-run` 實測（當日 9 項，非目測的 7 項）｜規則：**任何門檻寫進檔案前先實測當下數值**；且門檻要設在「努力一下可達」的位置——不可達的門檻不是嚴格，是自我豁免的藉口。
 - [2026-08-19] 情境：在側掛型 best-effort 腳本裡 import 第三方套件（pypdf）｜錯誤：用 `try: import pypdf / except ImportError` 包住，以為夠安全｜事實：**環境若有損壞的系統 `cryptography`（缺 `_cffi_backend`），import 會拋 pyo3 的 `PanicException`，而它繼承 `BaseException`——`except Exception` 和 `except ImportError` 都攔不住**（本容器實測）。宿主 `fetch_backtest_ext.run_jp_bridge()` 的守衛正是 `except Exception`，漏過去就會打掛每日 dashboard job｜正解：在自己的模組裡用 `except BaseException` 包住 import 與使用，並把結果快取（否則每個檔案重複 panic）｜規則：**side-mount／best-effort 腳本裡凡是 import 或呼叫含原生擴充（pyo3/rust/cffi）的套件，一律 `except BaseException` 並快取結果**；不要假設 `except Exception` 是安全網——宿主的守衛通常也只有 `except Exception`。
 - [2026-08-20] 情境：依 repo 內的持倉記載做組合層判讀（集中度、出場鐘涵蓋率）｜錯誤：`skills/serenity/watchlist.md` 的持倉表已過期，據此寫出「持倉＝DRAM ETF＋MU＝100% 記憶體週期」並推導「100% 部位靠一組半數失效的觸發條件在管」——**兩者皆錯**，實際持倉是 8271／SK hynix ADR／華新科／現金（使用者在同一輪對話才提到，且他先前並未逐筆回報調整）｜正解：持倉權威改為 **Google Sheet「KIWI 持倉即時表」**（fileId `1tYg3PneDLrxXbtuoo1lsylFV8ehSpEblv9thEuAllns`），session 開場用 `mcp__Google_Drive__read_file_content` 讀取並同步進 `skills/serenity/holdings.md`（runner 無 Google 憑證，只能讀快照）｜規則：**做任何組合層判讀（集中度／曝險／出場鐘涵蓋率）之前，先讀當下的持倉真實來源，不要相信分析檔裡的持倉表**——分析檔的持倉欄位是寫作當時的快照，它不會因為使用者換股而更新。**過期的持倉不是資訊缺口，它會主動生出錯誤結論。**
+
+## 2026-08-13 ⚠️ 日期陷阱：用檔名時戳推斷「今天」導致 15 天過期的錯誤分析
+
+**踩坑**：分析台股光通訊時，把使用者上傳 CSV 的下載時戳（20260729）當成當天日期，並在派工 prompt 裡寫「今天 ~2026-07-29」——agent 照此抓資料，得出「全類股跌停、不要進場」的警報。**實際當天是 8/13，7/29 是波段最低點，此後族群反彈 24–73%。** 是另一個 agent 主動用即時資料發現才更正。
+
+**鐵律**：
+1. **任何時間敏感分析，第一步用 API 確認「最新可得交易日」**（如 FinMind `TaiwanStockPrice` 查 2330 的 max date），不可從檔名、使用者敘述、或先前訊息推斷。
+2. 派 agent 時**不要在 prompt 裡寫死日期**，改要求 agent「先確認今天日期並回報」。
+3. 系統 context 的 `currentDate` 是權威來源，優先於任何推斷。
+
+**附帶學到（值得記）**：**FinMind API 在雲端 session 可用且免 token**，是取台股量化數據（股價/月營收/三大法人/融資融券/財報）的唯一活路——本次 mops/cnyes/moneydj/yahoo股市/goodinfo/statementdog/TWSE/TPEx **全被 egress proxy 封鎖**，四個 agent 網路全滅，量化全靠 FinMind 撐起。
