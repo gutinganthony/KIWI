@@ -417,6 +417,20 @@ def probe_sources(now):
         lines.append("- `parse_list_page` 解析出的列數：**" + str(len(parsed)) + "**")
         lines.append("- 其中命中目標代碼：**" + str(hit) + "**")
         lines.append("")
+        # ⚠️ 無論解析成敗都列出頁面實際出現的 class 值。理由：2026-08-21 兩輪
+        # （09:20、23:26）五檔全空，最可能的原因是 class 名與 `kj[A-Za-z]+` 假設不符
+        # （例如 `kjCode1` 帶數字就會匹配失敗）。列出實際值可一眼看出，不必再猜一輪。
+        classes = sorted(set(re.findall(r'class="([^"]+)"', raw_html)))
+        lines.append("實際出現的 class 值（前 40 個）：")
+        lines.append("```")
+        lines.append(", ".join(classes[:40]) if classes else "（頁面完全沒有 class 屬性）")
+        lines.append("```")
+        lines.append("")
+        kj = [c for c in classes if c.lower().startswith("kj")]
+        lines.append("其中以 `kj` 開頭者：**" + (", ".join(kj) if kj else "無 ← 這就是解析失敗的原因") + "**")
+        lines.append("")
+        lines.append("`<tr>` 標籤數：**" + str(len(re.split(r"(?i)<tr[^>]*>", raw_html)) - 1) + "**")
+        lines.append("")
         if parsed:
             lines.append("前 3 列解析結果：")
             lines.append("```")
