@@ -1,8 +1,9 @@
-# 6834 Seikoh — TDnet 適時開示累積清單
+# 6834 Seikoh — 開示與客戶結構快照
 
-> 由 `fetch_jp_disclosures.py` 在 GitHub Actions runner 抓取（雲端 session 對 TDnet 403，實測回 000）。更新：2026-08-20T08:01:08+00:00
-> 用途：加碼 A 裁判日、9/1 分割
+> 由 `fetch_jp_disclosures.py` 在 GitHub Actions runner 抓取（雲端 session 對日本站 403）。抓取時間：2026-07-28T02:46:03+00:00
 
-⚠️ **TDnet 一覽頁只保留約 31 天**，本檔為累積結果——早於本橋建立日的開示不會有。
+> ⚠️ **EDINET code `E02052` 未經確認**——請先核對下方內容的公司名是否為 Seikoh（6834）；不符則本檔作廢並修正對照表。
 
-（目前尚無累積到的開示。若連續多次執行後仍為空，先確認 runner 對 TDnet 的可達性——不要假設「沒開示」。）
+⚠️ 適時開示一覽（TDnet 轉載） 抓取失敗：HTTPError: HTTP Error 403: Forbidden　URL=https://irbank.net/E02052/ir
+
+⚠️ 主要な顧客（有報 相手先別販売実績） 抓取失敗：HTTPError: HTTP Error 403: Forbidden　URL=https://irbank.net/E02052/customers
