@@ -23,6 +23,26 @@ last_updated: 2026-07-06
 
 ## 🔴 待辦（依急迫度）
 
+### 🟢 2026-08-19 六週懸案定讞：**EDINET 不是被雲端擋，是需要一把免費的 API key**（做完這一項，JEM 否證 #3 就自動化了）
+
+2026-08-19 週報在 Actions runner 上實測（`已確認`）：
+
+| 端點 | 結果 |
+|---|---|
+| `https://api.edinet-fsa.go.jp/api/v2/documents.json?date=...&type=2` | HTTP **200**，但 body ＝ `{"StatusCode": 401, "message": "Access denied due to invalid subscription key.Make sure to provide a valid key for an active subscription."}` |
+| `https://disclosure.edinet-fsa.go.jp/api/v1/documents.json?...`（舊版） | HTTP **403**（v1 已淘汰）|
+| 對照組 `https://www.release.tdnet.info/inbs/I_list_001_20260818.html` | HTTP **200**（TDnet 連三週正常）|
+
+→ **結論：雲端到得了 EDINET，缺的只是訂閱金鑰。** 本檔頂部「抓被 403 擋掉的…EDINET」那句對 EDINET 也**不再成立**——它不是被擋，是沒帶 key。
+
+- [ ] **申請 EDINET API 金鑰並放進 repo secret**（**約 5 分鐘，做完解鎖一條卡了六週的否證判定**）
+  1. 開 https://api.edinet-fsa.go.jp/ （金融庁 EDINET API 申請頁）→ 註冊帳號 → 取得 **Subscription Key**（免費）
+  2. GitHub → `gutinganthony/KIWI` → Settings → Secrets and variables → Actions → New repository secret
+  3. Name 填 **`EDINET_API_KEY`**，Value 貼 key
+  4. 用法備忘（給未來 session）：呼叫時帶 header `Ocp-Apim-Subscription-Key: <key>`，或 query 參數 `Subscription-Key=<key>`
+  5. 驗收：下一次 Serenity 週報應能取得 **JEM 6855 FY3/26 有価証券報告書「主な相手先別販売実績」** → 判定否證 #3「單一 NAND 客戶 >30%」
+  > ⚠️ 在 key 到位前，JEM 否證 #3 就是**無法判定**（不是「還沒做」）——請不要再把它列成每週待辦。
+
 ### 🟢 2026-08-09 好消息：TDnet 在 GitHub Actions runner 上**可以直連**（本檔頂部「做不到」清單需修正）
 
 本檔開頭寫「抓被 403 擋掉的…EDINET/TDnet」是雲端做不到的事——**這一半已經不成立**。

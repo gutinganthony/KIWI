@@ -8,40 +8,42 @@
 
 | 端點 | 成功 | 失敗 | 失敗樣本 |
 |---|---:|---:|---|
-| `clearinghouseState @ api.hyperliquid.xyz/info` | 32 | 0 | — |
+| `clearinghouseState @ api.hyperliquid.xyz/info` | 28 | 0 | — |
 | `clearinghouseState@abcd @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@cash @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@flx @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@hyna @ api.hyperliquid.xyz/info` | 3 | 0 | — |
+| `clearinghouseState@io @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@km @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@mkts @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@para @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@vntl @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@xyz @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `perpDexs @ api.hyperliquid.xyz/info` | 1 | 0 | — |
-| `portfolio @ api.hyperliquid.xyz/info` | 32 | 0 | — |
+| `portfolio @ api.hyperliquid.xyz/info` | 28 | 0 | — |
 | `spotClearinghouseState @ api.hyperliquid.xyz/info` | 3 | 0 | — |
-| `userFills @ api.hyperliquid.xyz/info` | 32 | 0 | — |
-| `userFunding @ api.hyperliquid.xyz/info` | 32 | 0 | — |
+| `userFills @ api.hyperliquid.xyz/info` | 28 | 0 | — |
+| `userFunding @ api.hyperliquid.xyz/info` | 28 | 0 | — |
 
 ## 2. 分類統計
 
 | 分類 | 錢包數 | 佔比 |
 |---|---:|---:|
-| consistent_winner | 1 | 3% |
-| blowup_risk | 24 | 75% |
+| consistent_winner | 2 | 7% |
+| blowup_risk | 19 | 68% |
 | wash_suspect | 0 | 0% |
-| one_hit | 2 | 6% |
+| one_hit | 3 | 11% |
 | dormant | 0 | 0% |
-| choppy | 5 | 16% |
+| choppy | 4 | 14% |
 | insufficient_data | 0 | 0% |
-| **合計** | **32** | |
+| **合計** | **28** | |
 
 ## 3. consistent_winner 明細
 
 | 地址 | 總 PnL | 峰值回撤 | profit factor | 目前槓桿 | 主力幣 | 活躍天 | 可跟 |
 |---|---:|---:|---:|---:|---|---:|---|
-| `0x8bae3527e5a33fa0cf184f37bc112d071463ab6d` | $10,025,872 | 6% | 2.73 | 10x | xyz:GOOGL | 397 | ✅（30d 事件 26（截斷外推 43）／fills 2,000）|
+| `0x8bae3527e5a33fa0cf184f37bc112d071463ab6d` | $10,038,924 | 6% | 2.73 | 10x | xyz:GOOGL | 397 | ✅（30d 事件 27（截斷外推 45）／fills 2,000）|
+| `0x0a0b4d654d967a00407f5329588a258b68a4f615`（⚠️ 曾強平 2 次） | $31,863 | 0% | 1.43 | —x | @107 | 838 | ❌ 持倉過短：平均 6.1h < 12h（30d 事件 0／fills 0）|
 
 ## 4. Ground-truth 校驗
 
@@ -49,10 +51,10 @@
 
 ## 5. 裁決
 
-consistent_winner 數量：**1**
+consistent_winner 數量：**2**
 其中 followable（可跟）數量：**1**
 
-**consistent_winner 1 個，其中 followable 1 個（僅少數可跟候選，證據不足，需持續觀察）**
+**consistent_winner 2 個，其中 followable 1 個（僅少數可跟候選，證據不足，需持續觀察）**
 
 限制與醒目聲明：
 - **回望偏差**：宇宙來自全量排行榜以歷史窗績效過濾（非僅榜頂，倖存者偏差較輕），但「過去可跟畫像」仍是回望篩選；存在性 ≠ 未來獲利。

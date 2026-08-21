@@ -1,6 +1,6 @@
 # 全維度診斷探測 — 0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6
 
-> 純唯讀診斷（2026-08-17，探測時間 2026-08-17T14:36:14.299237+00:00）。
+> 純唯讀診斷（2026-08-17，探測時間 2026-08-17T23:05:14.907010+00:00）。
 > 只用 Hyperliquid 公開 info API 的查詢型 type；不含下單/簽章/金鑰/錢包連線。
 > 動機：clearinghouseState（不帶 dex）只看原生永續 dex，對 HIP-3 builder 市場全盲，導致「0 持倉、$0 淨值」與 portfolio 的百萬淨值自相矛盾。
 
@@ -16,7 +16,7 @@
 | portfolio | ✅ |
 | userFills | ✅ |
 
-perpDexs 偵測到的 builder dex（查詢上限 10 個）：xyz, flx, vntl, hyna, km, abcd, cash, para, mkts
+perpDexs 偵測到的 builder dex（查詢上限 10 個）：xyz, flx, vntl, hyna, km, abcd, cash, para, mkts, io
 
 ## (a) 資金在哪？
 
@@ -27,6 +27,7 @@ perpDexs 偵測到的 builder dex（查詢上限 10 個）：xyz, flx, vntl, hyn
 | builder dex `cash` | $0.00 | 0 | $0.00 |
 | builder dex `flx` | $0.00 | 0 | $0.00 |
 | builder dex `hyna` | $0.00 | 0 | $0.00 |
+| builder dex `io` | $0.00 | 0 | $0.00 |
 | builder dex `km` | $0.00 | 0 | $0.00 |
 | builder dex `mkts` | $0.00 | 0 | $0.00 |
 | builder dex `para` | $0.00 | 0 | $0.00 |
@@ -51,10 +52,10 @@ portfolio 各視窗最新帳戶淨值（與 clearinghouseState 對照）：
 
 | 視窗 | accountValue | vlm |
 |---|---:|---:|
-| day | $895.78 | $0.00 |
-| week | $895.78 | $0.00 |
-| month | $895.78 | $3,109,980.29 |
-| allTime | $895.78 | $18,939,999,207.13 |
+| day | $895.81 | $0.00 |
+| week | $895.81 | $0.00 |
+| month | $895.81 | $3,109,980.29 |
+| allTime | $895.81 | $18,939,999,207.13 |
 | perpDay | $0.00 | $0.00 |
 | perpWeek | $0.00 | $0.00 |
 | perpMonth | $0.00 | $3,109,980.29 |
@@ -79,7 +80,7 @@ portfolio 各視窗最新帳戶淨值（與 clearinghouseState 對照）：
 
 ## (c) 是否仍在交易？
 
-- 最後成交時間：**2026-08-04T15:13:51.918000+00:00**（距今 12.97 天）
+- 最後成交時間：**2026-08-04T15:13:51.918000+00:00**（距今 13.33 天）
 - 近 7 天成交：**0** 筆／近 30 天：**342** 筆（回應共 2000 筆，已達 API 截斷上限）
 - 成交戰場分布：{'builder:xyz': 1211, 'native': 784, 'spot': 5}
 - 主力幣：xyz:SP500×1118、BTC×770、xyz:GOLD×66、xyz:SPCX×27、SOL×9

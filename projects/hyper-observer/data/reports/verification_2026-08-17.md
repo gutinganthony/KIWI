@@ -7,11 +7,12 @@
 
 | 端點 | 成功 | 失敗 | 失敗樣本 |
 |---|---:|---:|---|
-| `clearinghouseState @ api.hyperliquid.xyz/info` | 59 | 1 | status=429 HTTP 429; body=null |
+| `clearinghouseState @ api.hyperliquid.xyz/info` | 60 | 0 | — |
 | `clearinghouseState@abcd @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@cash @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@flx @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@hyna @ api.hyperliquid.xyz/info` | 3 | 0 | — |
+| `clearinghouseState@io @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@km @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@mkts @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@para @ api.hyperliquid.xyz/info` | 3 | 0 | — |
@@ -19,29 +20,29 @@
 | `clearinghouseState@xyz @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `leaderboard @ stats-data.hyperliquid.xyz/Mainnet/leaderboard` | 1 | 0 | — |
 | `perpDexs @ api.hyperliquid.xyz/info` | 1 | 0 | — |
-| `portfolio @ api.hyperliquid.xyz/info` | 59 | 1 | status=429 HTTP 429; body=null |
+| `portfolio @ api.hyperliquid.xyz/info` | 60 | 0 | — |
 | `spotClearinghouseState @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `userFills @ api.hyperliquid.xyz/info` | 60 | 0 | — |
-| `userFunding @ api.hyperliquid.xyz/info` | 58 | 2 | status=429 HTTP 429; body=null |
+| `userFunding @ api.hyperliquid.xyz/info` | 60 | 0 | — |
 
 ## 2. 分類統計
 
 | 分類 | 錢包數 | 佔比 |
 |---|---:|---:|
 | consistent_winner | 1 | 2% |
-| blowup_risk | 30 | 50% |
-| wash_suspect | 20 | 33% |
+| blowup_risk | 28 | 47% |
+| wash_suspect | 23 | 38% |
 | one_hit | 1 | 2% |
 | dormant | 0 | 0% |
 | choppy | 7 | 12% |
-| insufficient_data | 1 | 2% |
+| insufficient_data | 0 | 0% |
 | **合計** | **60** | |
 
 ## 3. consistent_winner 明細
 
 | 地址 | 總 PnL | 峰值回撤 | profit factor | 目前槓桿 | 主力幣 | 活躍天 |
 |---|---:|---:|---:|---:|---|---:|
-| `0x8bae3527e5a33fa0cf184f37bc112d071463ab6d` | $10,022,366 | 6% | 2.73 | 10x | xyz:GOOGL | 397 |
+| `0x8bae3527e5a33fa0cf184f37bc112d071463ab6d` | $10,089,862 | 6% | 2.73 | 10x | xyz:GOOGL | 397 |
 
 ## 4. Ground-truth 校驗
 

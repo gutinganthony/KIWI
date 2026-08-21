@@ -2,7 +2,7 @@
   "address": "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6",
   "label": "james-wynn-blowup-groundtruth",
   "date": "2026-08-17",
-  "probed_at": "2026-08-17T14:36:14.299237+00:00",
+  "probed_at": "2026-08-17T23:05:14.907010+00:00",
   "ledger_window_days": 45,
   "queries_ok": {
     "perpDexs": true,
@@ -22,7 +22,8 @@
     "abcd",
     "cash",
     "para",
-    "mkts"
+    "mkts",
+    "io"
   ],
   "aborted": false,
   "dexs_queried": [
@@ -30,6 +31,7 @@
     "cash",
     "flx",
     "hyna",
+    "io",
     "km",
     "mkts",
     "para",
@@ -38,57 +40,57 @@
   ],
   "portfolio_windows": {
     "day": {
-      "account_value_last": 895.78,
-      "account_value_ts_iso": "2026-08-17T14:36:22.839000+00:00",
-      "pnl_last": 0.03,
+      "account_value_last": 895.81,
+      "account_value_ts_iso": "2026-08-17T23:05:25.077000+00:00",
+      "pnl_last": 0.05,
       "vlm": 0.0,
       "n_points": 13
     },
     "week": {
-      "account_value_last": 895.78,
-      "account_value_ts_iso": "2026-08-17T14:36:22.839000+00:00",
-      "pnl_last": 0.08,
+      "account_value_last": 895.81,
+      "account_value_ts_iso": "2026-08-17T23:05:25.077000+00:00",
+      "pnl_last": 0.1,
       "vlm": 0.0,
-      "n_points": 64
+      "n_points": 65
     },
     "month": {
-      "account_value_last": 895.78,
-      "account_value_ts_iso": "2026-08-17T14:36:22.839000+00:00",
-      "pnl_last": -19687.4,
+      "account_value_last": 895.81,
+      "account_value_ts_iso": "2026-08-17T23:05:25.077000+00:00",
+      "pnl_last": -21794.56,
       "vlm": 3109980.29,
       "n_points": 45
     },
     "allTime": {
-      "account_value_last": 895.78,
-      "account_value_ts_iso": "2026-08-17T14:36:22.839000+00:00",
-      "pnl_last": -22072340.53,
+      "account_value_last": 895.81,
+      "account_value_ts_iso": "2026-08-17T23:05:25.077000+00:00",
+      "pnl_last": -22072340.5,
       "vlm": 18939999207.13,
       "n_points": 86
     },
     "perpDay": {
       "account_value_last": 0.0,
-      "account_value_ts_iso": "2026-08-17T14:36:22.839000+00:00",
+      "account_value_ts_iso": "2026-08-17T23:05:25.077000+00:00",
       "pnl_last": 0.0,
       "vlm": 0.0,
       "n_points": 13
     },
     "perpWeek": {
       "account_value_last": 0.0,
-      "account_value_ts_iso": "2026-08-17T14:36:22.839000+00:00",
+      "account_value_ts_iso": "2026-08-17T23:05:25.077000+00:00",
       "pnl_last": 0.0,
       "vlm": 0.0,
-      "n_points": 64
+      "n_points": 65
     },
     "perpMonth": {
       "account_value_last": 0.0,
-      "account_value_ts_iso": "2026-08-17T14:36:22.839000+00:00",
-      "pnl_last": -19687.48,
+      "account_value_ts_iso": "2026-08-17T23:05:25.077000+00:00",
+      "pnl_last": -21794.66,
       "vlm": 3109980.29,
       "n_points": 45
     },
     "perpAllTime": {
       "account_value_last": 0.0,
-      "account_value_ts_iso": "2026-08-17T14:36:22.839000+00:00",
+      "account_value_ts_iso": "2026-08-17T23:05:25.077000+00:00",
       "pnl_last": -23389110.96,
       "vlm": 18931991619.76,
       "n_points": 87
@@ -99,7 +101,7 @@
     "truncated": true,
     "last_fill_ts": 1785856431.918,
     "last_fill_iso": "2026-08-04T15:13:51.918000+00:00",
-    "days_since_last_fill": 12.97,
+    "days_since_last_fill": 13.33,
     "n_fills_7d": 0,
     "n_fills_30d": 342,
     "first_fill_iso": "2026-03-25T11:31:34.048000+00:00",
@@ -356,6 +358,11 @@
         "n_positions": 0,
         "account_value": 0.0,
         "position_value": 0
+      },
+      "io": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
       }
     },
     "spot": {
@@ -519,7 +526,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.21
+      "elapsed_sec": 0.23
     },
     {
       "name": "clearinghouseState[native]",
@@ -527,7 +534,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.15
+      "elapsed_sec": 0.22
     },
     {
       "name": "clearinghouseState[xyz]",
@@ -535,7 +542,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.15
+      "elapsed_sec": 0.23
     },
     {
       "name": "clearinghouseState[flx]",
@@ -543,7 +550,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.16
+      "elapsed_sec": 0.22
     },
     {
       "name": "clearinghouseState[vntl]",
@@ -551,7 +558,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.16
+      "elapsed_sec": 0.22
     },
     {
       "name": "clearinghouseState[hyna]",
@@ -559,7 +566,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.16
+      "elapsed_sec": 0.26
     },
     {
       "name": "clearinghouseState[km]",
@@ -567,7 +574,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.16
+      "elapsed_sec": 0.23
     },
     {
       "name": "clearinghouseState[abcd]",
@@ -575,7 +582,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.18
+      "elapsed_sec": 0.23
     },
     {
       "name": "clearinghouseState[cash]",
@@ -583,7 +590,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.16
+      "elapsed_sec": 0.23
     },
     {
       "name": "clearinghouseState[para]",
@@ -591,7 +598,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.16
+      "elapsed_sec": 0.22
     },
     {
       "name": "clearinghouseState[mkts]",
@@ -599,7 +606,15 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.18
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "clearinghouseState[io]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
     },
     {
       "name": "spotClearinghouseState",
@@ -607,7 +622,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.16
+      "elapsed_sec": 0.22
     },
     {
       "name": "userNonFundingLedgerUpdates",
@@ -615,7 +630,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.15
+      "elapsed_sec": 0.23
     },
     {
       "name": "portfolio",
@@ -623,7 +638,7 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.26
+      "elapsed_sec": 0.23
     },
     {
       "name": "userFills",
@@ -631,10 +646,10 @@
       "ok": true,
       "status": 200,
       "error": null,
-      "elapsed_sec": 0.27
+      "elapsed_sec": 0.51
     }
   ],
   "notes": [],
-  "requests_ok": 15,
+  "requests_ok": 16,
   "requests_failed": 0
 }
