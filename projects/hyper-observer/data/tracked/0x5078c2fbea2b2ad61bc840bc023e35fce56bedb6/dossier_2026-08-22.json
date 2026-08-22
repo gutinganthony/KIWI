@@ -1,0 +1,336 @@
+{
+  "address": "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6",
+  "label": "james-wynn-blowup-groundtruth",
+  "snapshot_date": "2026-08-22",
+  "classification": "blowup_risk",
+  "classification_reasons": [
+    "userFills 出現 620 次強平 >= 3（反覆爆倉，真高風險）"
+  ],
+  "followable": {
+    "ok": true,
+    "reasons": []
+  },
+  "metrics": {
+    "address": "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6",
+    "snapshot_date": "2026-08-22",
+    "pnl_source": "portfolio_curve",
+    "portfolio_window": "perpAllTime",
+    "low_confidence": false,
+    "total_pnl": -23389110.96,
+    "peak_pnl": 75743085.19,
+    "monthly_pnl": {
+      "2025-03": 1744509.83,
+      "2025-04": 12568380.69,
+      "2025-05": -15082151.13,
+      "2025-06": -21028761.1,
+      "2025-07": -1290472.28,
+      "2025-08": -14681.81,
+      "2025-09": -8122.95,
+      "2025-10": -195785.88,
+      "2025-11": -27798.04,
+      "2025-12": 10668.27,
+      "2026-01": 14248.04,
+      "2026-02": -6466.42,
+      "2026-03": -5543.77,
+      "2026-04": -1010.62,
+      "2026-05": -5170.35,
+      "2026-06": 13961.99,
+      "2026-07": -62084.03,
+      "2026-08": -12831.43
+    },
+    "active_months": 18,
+    "positive_month_ratio": 0.278,
+    "best_month_pnl": 12568380.69,
+    "max_drawdown_pct": 1.0,
+    "current_drawdown_pct": 1.0,
+    "max_single_day_crash_pct": 1.0,
+    "span_days": 521.1,
+    "days_idle": 0.0,
+    "n_fills": 2000,
+    "profit_factor": 0.485,
+    "avg_win": 374.7,
+    "avg_loss": 181.31,
+    "realized_win_rate": 0.19,
+    "avg_hold_hours": 356.387,
+    "net_direction_ratio": 0.0062,
+    "n_fills_truncated": true,
+    "n_fills_last_30d": 306,
+    "n_events": 103,
+    "n_events_last_30d": 14,
+    "n_events_last_30d_est": 14,
+    "events_30d_coverage_days": 30.0,
+    "median_fills_per_event": 15,
+    "median_event_notional": 95909.69,
+    "median_gap_between_events_hours": 6.89,
+    "p90_gap_between_events_hours": 70.91,
+    "had_liquidation": true,
+    "n_liquidations": 620,
+    "top_coin": "xyz:SP500",
+    "vlm": 18931991619.76,
+    "vlm_to_pnl_ratio": 809.44,
+    "funding_total": -7760768.29,
+    "n_open_positions": 0,
+    "n_open_positions_native": 0,
+    "dexs_with_positions": [],
+    "account_value_native": 0.0,
+    "account_value_by_dex": {
+      "": 0.0,
+      "abcd": 0.0,
+      "cash": 0.0,
+      "flx": 0.0,
+      "hyna": 0.0,
+      "io": 0.0,
+      "km": 0.0,
+      "mkts": 0.0,
+      "para": 0.0,
+      "vntl": 0.0,
+      "xyz": 0.0
+    },
+    "spot_value_usd": 903.66,
+    "spot_tokens": [
+      {
+        "coin": "USDC",
+        "qty": 894.84488213,
+        "usd": 894.84,
+        "estimated": false
+      },
+      {
+        "coin": "FARM",
+        "qty": 0.8,
+        "usd": 4.69,
+        "estimated": true
+      },
+      {
+        "coin": "VAPOR",
+        "qty": 816.0,
+        "usd": 3.58,
+        "estimated": true
+      },
+      {
+        "coin": "HYPE",
+        "qty": 0.01441524,
+        "usd": 0.54,
+        "estimated": true
+      },
+      {
+        "coin": "MAX",
+        "qty": 2908.3048,
+        "usd": 0.0,
+        "estimated": true
+      }
+    ],
+    "total_value_all_venues": 903.66,
+    "non_native_share": 1.0,
+    "current_max_leverage": null,
+    "has_extreme_leverage": false,
+    "margin_types": [],
+    "account_value": 0.0,
+    "fetch_errors": []
+  },
+  "position_value": 0,
+  "unrealized_pnl": 0,
+  "n_open_positions": 0,
+  "open_positions": [],
+  "recent_fills": [
+    {
+      "time": "2026-08-04T11:43:34.059000+00:00",
+      "coin": "xyz:SP500",
+      "dir": "Close Short",
+      "px": 7622.2,
+      "sz": 2.135,
+      "closed_pnl": -434.72,
+      "is_liquidation": true
+    },
+    {
+      "time": "2026-08-04T11:43:34.059000+00:00",
+      "coin": "xyz:SP500",
+      "dir": "Close Short",
+      "px": 7622.2,
+      "sz": 0.189,
+      "closed_pnl": -38.48,
+      "is_liquidation": true
+    },
+    {
+      "time": "2026-08-04T11:43:34.059000+00:00",
+      "coin": "xyz:SP500",
+      "dir": "Close Short",
+      "px": 7622.2,
+      "sz": 0.021,
+      "closed_pnl": -4.28,
+      "is_liquidation": true
+    },
+    {
+      "time": "2026-08-04T11:43:34.059000+00:00",
+      "coin": "xyz:SP500",
+      "dir": "Close Short",
+      "px": 7622.2,
+      "sz": 0.466,
+      "closed_pnl": -94.88,
+      "is_liquidation": true
+    },
+    {
+      "time": "2026-08-04T11:43:34.059000+00:00",
+      "coin": "xyz:SP500",
+      "dir": "Close Short",
+      "px": 7622.2,
+      "sz": 0.5,
+      "closed_pnl": -101.81,
+      "is_liquidation": true
+    },
+    {
+      "time": "2026-08-04T11:43:34.059000+00:00",
+      "coin": "xyz:SP500",
+      "dir": "Close Short",
+      "px": 7622.1,
+      "sz": 0.949,
+      "closed_pnl": -193.13,
+      "is_liquidation": true
+    },
+    {
+      "time": "2026-08-04T13:30:33.965000+00:00",
+      "coin": "xyz:SP500",
+      "dir": "Close Short",
+      "px": 7633.2,
+      "sz": 4.62,
+      "closed_pnl": -991.52,
+      "is_liquidation": true
+    },
+    {
+      "time": "2026-08-04T14:01:18.982000+00:00",
+      "coin": "xyz:SP500",
+      "dir": "Close Short",
+      "px": 7654.7,
+      "sz": 3.696,
+      "closed_pnl": -872.68,
+      "is_liquidation": true
+    },
+    {
+      "time": "2026-08-04T14:18:06.916000+00:00",
+      "coin": "xyz:SP500",
+      "dir": "Close Short",
+      "px": 7673.9,
+      "sz": 2.957,
+      "closed_pnl": -754.96,
+      "is_liquidation": true
+    },
+    {
+      "time": "2026-08-04T15:13:51.918000+00:00",
+      "coin": "xyz:SP500",
+      "dir": "Close Short",
+      "px": 7693.1,
+      "sz": 1.374,
+      "closed_pnl": -377.18,
+      "is_liquidation": true
+    },
+    {
+      "time": "2026-08-04T15:13:51.918000+00:00",
+      "coin": "xyz:SP500",
+      "dir": "Close Short",
+      "px": 7693.1,
+      "sz": 0.006,
+      "closed_pnl": -1.65,
+      "is_liquidation": true
+    },
+    {
+      "time": "2026-08-04T15:13:51.918000+00:00",
+      "coin": "xyz:SP500",
+      "dir": "Close Short",
+      "px": 7693.0,
+      "sz": 2.0,
+      "closed_pnl": -548.83,
+      "is_liquidation": true
+    },
+    {
+      "time": "2026-08-04T15:13:51.918000+00:00",
+      "coin": "xyz:SP500",
+      "dir": "Close Short",
+      "px": 7693.0,
+      "sz": 0.619,
+      "closed_pnl": -169.86,
+      "is_liquidation": true
+    },
+    {
+      "time": "2026-08-04T15:13:51.918000+00:00",
+      "coin": "xyz:SP500",
+      "dir": "Close Short",
+      "px": 7693.0,
+      "sz": 0.022,
+      "closed_pnl": -6.04,
+      "is_liquidation": true
+    },
+    {
+      "time": "2026-08-04T15:13:51.918000+00:00",
+      "coin": "xyz:SP500",
+      "dir": "Close Short",
+      "px": 7693.0,
+      "sz": 0.197,
+      "closed_pnl": -54.06,
+      "is_liquidation": true
+    },
+    {
+      "time": "2026-08-04T15:13:51.918000+00:00",
+      "coin": "xyz:SP500",
+      "dir": "Close Short",
+      "px": 7693.0,
+      "sz": 0.649,
+      "closed_pnl": -178.09,
+      "is_liquidation": true
+    },
+    {
+      "time": "2026-08-04T15:13:51.918000+00:00",
+      "coin": "xyz:SP500",
+      "dir": "Close Short",
+      "px": 7692.9,
+      "sz": 3.255,
+      "closed_pnl": -892.89,
+      "is_liquidation": true
+    },
+    {
+      "time": "2026-08-04T15:13:51.918000+00:00",
+      "coin": "xyz:SP500",
+      "dir": "Close Short",
+      "px": 7692.9,
+      "sz": 0.301,
+      "closed_pnl": -82.57,
+      "is_liquidation": true
+    },
+    {
+      "time": "2026-08-04T15:13:51.918000+00:00",
+      "coin": "xyz:SP500",
+      "dir": "Close Short",
+      "px": 7692.9,
+      "sz": 0.202,
+      "closed_pnl": -55.41,
+      "is_liquidation": true
+    },
+    {
+      "time": "2026-08-04T15:13:51.918000+00:00",
+      "coin": "xyz:SP500",
+      "dir": "Close Short",
+      "px": 7692.9,
+      "sz": 3.206,
+      "closed_pnl": -879.45,
+      "is_liquidation": true
+    }
+  ],
+  "new_positions": [],
+  "disappeared_positions": [],
+  "initialized": false,
+  "raw_source": "snapshot",
+  "funds_trend": {
+    "status": "持平",
+    "n_points": 7,
+    "days": 7,
+    "threshold": 0.05,
+    "first_date": "2026-08-16",
+    "last_date": "2026-08-22",
+    "spot_share_first": 1.0,
+    "spot_share_last": 1.0,
+    "spot_share_change": 0.0,
+    "total_first": 903.66,
+    "total_last": 903.66,
+    "total_change_pct": 0.0,
+    "perp_change_pct": null,
+    "position_value_change_pct": null
+  }
+}
