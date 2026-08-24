@@ -49,13 +49,31 @@ last_updated: 2026-07-06
 
 → **結論：雲端到得了 EDINET，缺的只是訂閱金鑰。** 本檔頂部「抓被 403 擋掉的…EDINET」那句對 EDINET 也**不再成立**——它不是被擋，是沒帶 key。
 
-- [ ] **申請 EDINET API 金鑰並放進 repo secret**（**約 5 分鐘，做完解鎖一條卡了六週的否證判定**）
+- [x] ~~**申請 EDINET API 金鑰並放進 repo secret**~~ 🎉 **2026-08-21 撤銷這項功課：不需要金鑰了。**
+  Jake 多次嘗試註冊皆卡在登入問題。與其繼續跟表單纏鬥，改由 runner 直接探測「哪扇門是開的」
+  （`fetch_jp_disclosures.py --probe`，產出 `projects/avi-v5/data/ext/jp_disclosures/_SOURCE_PROBE.md`）。
+  **2026-08-21 09:20 runner 實測結果**（`已確認`）：
+
+  | 來源 | 狀態 |
+  |---|---|
+  | **`https://disclosure2.edinet-fsa.go.jp/WEEK0010.aspx`（EDINET 網頁介面）** | **HTTP 200，回真實 HTML**（`EDINETの閲覧サイトです。有価…`）→ 🎯 **不需金鑰** |
+  | **`https://ufocatch.com/`（有報キャッチャー，EDINET/TDnet XBRL 鏡像）** | **HTTP 200** → 備援路線 |
+  | **`https://www.jem-net.co.jp/`（JEM 公司 IR 站）** | **HTTP 200**（雲端是 403，runner 不是） |
+  | `https://api.edinet-fsa.go.jp/api/v2/documents.json`（無 key） | 200 但 body ＝ 401 invalid subscription key（如預期） |
+  | 對照組 TDnet | **HTTP 200** ✅ → 確認 runner 網路正常，上列 200 可信 |
+
+  → **「申請 key」不再是 JEM 否證 #3 的阻塞點**；阻塞點變成「找出 EDINET 網頁介面取文件的正確路徑」，
+  而那是 runner 上的工程工作，**不是你的手動功課**。本項因此自你的清單移除。
+  ⚠️ 仍未完成的是：**在真的抓到「主な相手先別販売実績」內容之前，JEM 否證 #3 的狀態是「無法判定」**。
+
+<details><summary>原始步驟（保留備查，已不需執行）</summary>
   1. 開 https://api.edinet-fsa.go.jp/ （金融庁 EDINET API 申請頁）→ 註冊帳號 → 取得 **Subscription Key**（免費）
   2. GitHub → `gutinganthony/KIWI` → Settings → Secrets and variables → Actions → New repository secret
   3. Name 填 **`EDINET_API_KEY`**，Value 貼 key
   4. 用法備忘（給未來 session）：呼叫時帶 header `Ocp-Apim-Subscription-Key: <key>`，或 query 參數 `Subscription-Key=<key>`
   5. 驗收：下一次 Serenity 週報應能取得 **JEM 6855 FY3/26 有価証券報告書「主な相手先別販売実績」** → 判定否證 #3「單一 NAND 客戶 >30%」
   > ⚠️ 在 key 到位前，JEM 否證 #3 就是**無法判定**（不是「還沒做」）——請不要再把它列成每週待辦。
+</details>
 
 ### 🟢 2026-08-09 好消息：TDnet 在 GitHub Actions runner 上**可以直連**（本檔頂部「做不到」清單需修正）
 
@@ -70,7 +88,7 @@ last_updated: 2026-07-06
 | minkabu.jp | ❌ 403 |
 | stooq.com（日線 CSV） | ❌ JS challenge |
 | Yahoo Finance API | ❌ 連三週 429 |
-| EDINET（有価証券報告書） | ⚠️ **本輪未測**，仍留 Mac |
+| EDINET（有価証券報告書） | ✅ **2026-08-21 已測：網頁介面 `disclosure2.edinet-fsa.go.jp` 回 200 且不需金鑰**（API 才要 key）→ 不再是 Mac 功課 |
 
 → **本週 9 份日本財報數字全部取自 TDnet 原文**（JEM／Yamaichi／santec／Towa／Tamura／JCU／Kohoku／Kokusai／岡本硝子）。
 
