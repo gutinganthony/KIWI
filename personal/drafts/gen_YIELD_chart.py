@@ -94,22 +94,23 @@ for i, (num, name, c, desc) in enumerate(levels):
              fontproperties=serif_b, va='center')
     axR.text(0.45, top - 0.90, desc, color=GREY, fontsize=8.4, va='center')
 
-axR.text(0, 4.18, "財政部出手三次，市場不買帳", color=INK,
+axR.text(0, 4.34, "財政部出手四次，一次比一次大", color=INK,
          fontsize=12.5, fontproperties=serif_b, va='center')
 
 moves = [
-    ("8/19", "宣布買回至少加倍（20 億 → 40 億）", "30Y 5.26% → 5.18%", GREEN),
-    ("8/20 早", "長端反轉，吐回全部跌幅", "10Y 回升至 4.7% 以上", RED),
-    ("8/20", "說可再超過 40 億，並預告財政整頓計畫", "市場評價：弱化版扭轉操作", GREY),
+    ("8/19", "買回至少加倍（20 億 → 40 億）", "30Y 5.26% → 5.18%", GREEN),
+    ("8/20 早", "長端反轉，吐回全部跌幅", "10Y 回升逾 4.7%", RED),
+    ("8/20", "說可再超過 40 億＋預告財政整頓", "評價：弱化版扭轉操作", GREY),
+    ("8/24", "傳動用近 1 兆美元 TGA 帳戶", "殖利率仍不買帳", RED),
 ]
 for j, (d, act, react, c) in enumerate(moves):
-    y = 3.52 - j * 0.62
-    axR.text(0.3, y, d, color=c, fontsize=8.8, fontproperties=serif_b, va='center')
-    axR.text(1.55, y, act, color=INK, fontsize=8.4, va='center')
-    axR.text(9.95, y, react, color=c, fontsize=8.2, va='center', ha='right')
+    y = 3.72 - j * 0.56
+    axR.text(0.3, y, d, color=c, fontsize=8.6, fontproperties=serif_b, va='center')
+    axR.text(1.62, y, act, color=INK, fontsize=8.3, va='center')
+    axR.text(9.95, y, react, color=c, fontsize=8.1, va='center', ha='right')
 
-axR.text(0.3, 1.60, "本質是用短債換長債：債務總量不變，只是搬動問題",
-         color=INK, fontsize=9.2, fontproperties=serif_b, va='center')
+axR.text(0.3, 1.62, "本質是用短債換長債：債務總量不變，只是搬動問題（且不是 QE）",
+         color=INK, fontsize=9, fontproperties=serif_b, va='center')
 
 axR.add_patch(mpatches.Rectangle((0, 0.10), 10, 1.10,
                                  facecolor=GOLD, alpha=0.10, zorder=0))
