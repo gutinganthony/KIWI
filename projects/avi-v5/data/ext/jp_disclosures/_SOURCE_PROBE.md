@@ -1,6 +1,6 @@
 # _SOURCE_PROBE — 有価証券報告書來源探測（JEM 否證 #3）
 
-> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-08-24T23:24:25+00:00
+> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-08-25T02:59:53+00:00
 > **為什麼有這支**：2026-08-20 Jake 多次嘗試註冊 EDINET API key 失敗（登入問題）。
 > 與其讓他繼續跟註冊表單纏鬥，不如讓 runner 直接回報**哪一條路是通的**。
 
@@ -91,19 +91,19 @@
 
 ## TDnet 解析診斷
 
-- 測試頁：`https://www.release.tdnet.info/inbs/I_list_001_20260823.html`
-- HTML 長度：1,706 字元
+- 測試頁：`https://www.release.tdnet.info/inbs/I_list_001_20260824.html`
+- HTML 長度：54,332 字元
 - `parse_list_page` 解析出的列數：**0**
 - 其中命中目標代碼：**0**
 
 實際出現的 class 值（前 40 個）：
 ```
-（頁面完全沒有 class 屬性）
+evennew-L kjTime, evennew-M kjCode, evennew-M kjName, evennew-M kjPlace, evennew-M kjTitle, evennew-M kjXbrl, evennew-R kjHistroy, header-L, header-M, header-R, kaijiSum, oddnew-L kjTime, oddnew-M kjCode, oddnew-M kjName, oddnew-M kjPlace, oddnew-M kjTitle, oddnew-M kjXbrl, oddnew-R kjHistroy, pager-L, pager-M, pager-O, pager-R, pagerTd, style002, xbrl-button, xbrl-mask
 ```
 
 其中以 `kj` 開頭者：**無 ← 這就是解析失敗的原因**
 
-`<tr>` 標籤數：**7**
+`<tr>` 標籤數：**109**
 
 ```html
 <!DOCTYPE html>
@@ -117,44 +117,33 @@
 <meta http-equiv="Expires" content="0">
 <script type="text/javascript" charset="UTF-8" src="./js/I_JAVASCRIPT.js"></script>
 <script type="text/javascript" charset="UTF-8" src="./js/I_MENSEKI.js"></script>
-<link rel="stylesheet" href="./css/I_STYLE.css" media="screen">
-</head>
-<body leftMargin="0" topMargin="0" bottomMargin="0" marginwidth="0" marginheight="0" width="100%" style="background-color: #eeeeee;">
-<form method="get" name="form2" action="../">
-<table border="0" cellSpacing="0" cellPadding="0" id="list-body-box">
-<tr>
-<td>
-<div id="floating-menu">
-<table border="0" cellSpacing="0" cellPadding="0" align="left" id="kaiji-info-box-top">
-<tr>
-<td align="left" noWrap id="kaiji-kensu-1">
-<div id="kaiji-date-1">2026年08月23日</div>
-<div id="kaiji-text-1">に開示された情報はありません。</div>
-</td>
-</tr>
-</table>
-</div>
-<div id="main-list" style="height:55px;"></div>
-</td>
-</tr>
-<tr>
-<td>
-<div id="main-footer">
-<table border="0" cellSpacing="0" cellPadding="0" align="left" id="main-footer-box">
-<tr>
-<td>
-<table border="0" cellSpacing="0" cellPadding="0" align="left" id="footer-table">
-<tr>
-<td id="mensekiNiayou">
-<script>
+<script type="text/javascript" charset="UTF-8" src="./runtime/jquery-1.8.3.min.js"></script>
+<script type="text/javascript">
 <!--
-document.write(mensekiNaiyou);
+  $(document).ready(function(){
+    $(".pagerTd > DIV >  DIV[onClick]").mousedown(function(event){
+      event.currentTarget.setAttribute("id","pager_active");
+    });
+    $(".pagerTd > DIV > DIV[onClick]").mouseup(function(event){
+      event.currentTarget.removeAttribute("id");
+    });
+    $(".pagerTd > DIV > DIV[onClick]").mouseleave(function(event){
+      event.currentTarget.removeAttribute("id");
+    });
+
+    $(".xbrl-mask > DIV > A").mousedown(function(event){
+      event.currentTarget.setAttribute("id","xbrl-button_active");
+    });
+    $(".xbrl-mask > DIV > A").mouseup(function(event){
+      event.currentTarget.removeAttribute("id");
+    });
+    $(".xbrl-mask > DIV > A").mouseleave(function(event){
+      event.currentTarget.removeAttribute("id");
+    });
+  });
 // -->
 </script>
-</td>
-</tr>
-<tr>
-<td id="footerHr"><div></d
+<link rel="stylesheet" href="./css/I_STYLE.css" m
 ```
 
 → ⚠️ **解析出 0 列＝解析器與實際 HTML 不符**（不是「沒開示」）。比對上方 HTML 與 `parse_list_page` 的 td class 假設。
