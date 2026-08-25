@@ -1,0 +1,2750 @@
+{
+  "date": "2026-08-25",
+  "snapshot_dir": "/home/runner/work/KIWI/KIWI/projects/poly-observer/data/snapshots/2026-08-25",
+  "universe_size": 60,
+  "wallets_ok": 60,
+  "wallets_partial": 0,
+  "wallets_failed": 0,
+  "requests_ok": 342,
+  "requests_failed": 0,
+  "elapsed_sec": 182.1,
+  "endpoint_health": [
+    {
+      "name": "leaderboard[MONTH]",
+      "url": "https://data-api.polymarket.com/v1/leaderboard?timePeriod=MONTH&orderBy=PNL&limit=50&category=OVERALL&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "leaderboard[ALL]",
+      "url": "https://data-api.polymarket.com/v1/leaderboard?timePeriod=ALL&orderBy=PNL&limit=50&category=OVERALL&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x25e28169…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x25e28169faea17421fcd4cc361f6436d1e449a09&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "activity[0x25e28169…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x25e28169faea17421fcd4cc361f6436d1e449a09&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.4
+    },
+    {
+      "name": "positions[0x25e28169…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x25e28169faea17421fcd4cc361f6436d1e449a09&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "value[0x25e28169…]",
+      "url": "https://data-api.polymarket.com/value?user=0x25e28169faea17421fcd4cc361f6436d1e449a09",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "pnl[0x25e28169…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x25e28169faea17421fcd4cc361f6436d1e449a09&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "activity[0x2005d16a…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x2005d16a84ceefa912d4e380cd32e7ff827875ea&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x2005d16a…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x2005d16a84ceefa912d4e380cd32e7ff827875ea&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "activity[0x2005d16a…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x2005d16a84ceefa912d4e380cd32e7ff827875ea&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "positions[0x2005d16a…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x2005d16a84ceefa912d4e380cd32e7ff827875ea&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.06
+    },
+    {
+      "name": "value[0x2005d16a…]",
+      "url": "https://data-api.polymarket.com/value?user=0x2005d16a84ceefa912d4e380cd32e7ff827875ea",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.43
+    },
+    {
+      "name": "pnl[0x2005d16a…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x2005d16a84ceefa912d4e380cd32e7ff827875ea&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "activity[0x6d20c35f…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x6d20c35f65d9899b6d6b74f8466e824580f9a165&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "activity[0x6d20c35f…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x6d20c35f65d9899b6d6b74f8466e824580f9a165&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "activity[0x6d20c35f…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x6d20c35f65d9899b6d6b74f8466e824580f9a165&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.25
+    },
+    {
+      "name": "positions[0x6d20c35f…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x6d20c35f65d9899b6d6b74f8466e824580f9a165&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.07
+    },
+    {
+      "name": "value[0x6d20c35f…]",
+      "url": "https://data-api.polymarket.com/value?user=0x6d20c35f65d9899b6d6b74f8466e824580f9a165",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "pnl[0x6d20c35f…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x6d20c35f65d9899b6d6b74f8466e824580f9a165&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x9319a045…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x9319a045cdd0c2180e5eb7ad44374383db9a6410&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "positions[0x9319a045…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x9319a045cdd0c2180e5eb7ad44374383db9a6410&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "value[0x9319a045…]",
+      "url": "https://data-api.polymarket.com/value?user=0x9319a045cdd0c2180e5eb7ad44374383db9a6410",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "pnl[0x9319a045…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x9319a045cdd0c2180e5eb7ad44374383db9a6410&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0xcd30f469…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xcd30f4698c6f5f3829893e68e183a8e5ea18f316&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.27
+    },
+    {
+      "name": "activity[0xcd30f469…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xcd30f4698c6f5f3829893e68e183a8e5ea18f316&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "activity[0xcd30f469…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xcd30f4698c6f5f3829893e68e183a8e5ea18f316&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "positions[0xcd30f469…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xcd30f4698c6f5f3829893e68e183a8e5ea18f316&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "value[0xcd30f469…]",
+      "url": "https://data-api.polymarket.com/value?user=0xcd30f4698c6f5f3829893e68e183a8e5ea18f316",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "pnl[0xcd30f469…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xcd30f4698c6f5f3829893e68e183a8e5ea18f316&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0xe30e7459…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xe30e74595517de48f1fb19f4553dd3d9f1e96b87&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "activity[0xe30e7459…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xe30e74595517de48f1fb19f4553dd3d9f1e96b87&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "activity[0xe30e7459…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xe30e74595517de48f1fb19f4553dd3d9f1e96b87&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "positions[0xe30e7459…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xe30e74595517de48f1fb19f4553dd3d9f1e96b87&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "value[0xe30e7459…]",
+      "url": "https://data-api.polymarket.com/value?user=0xe30e74595517de48f1fb19f4553dd3d9f1e96b87",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "pnl[0xe30e7459…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xe30e74595517de48f1fb19f4553dd3d9f1e96b87&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x983eedfb…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x983eedfbd75803602e4a6e6ea9aab6dc6b9c6748&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.3
+    },
+    {
+      "name": "positions[0x983eedfb…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x983eedfbd75803602e4a6e6ea9aab6dc6b9c6748&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.12
+    },
+    {
+      "name": "value[0x983eedfb…]",
+      "url": "https://data-api.polymarket.com/value?user=0x983eedfbd75803602e4a6e6ea9aab6dc6b9c6748",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "pnl[0x983eedfb…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x983eedfbd75803602e4a6e6ea9aab6dc6b9c6748&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x4bff30af…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x4bff30af91642dc7d2b19a8664378fe55c45fc26&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "activity[0x4bff30af…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x4bff30af91642dc7d2b19a8664378fe55c45fc26&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "activity[0x4bff30af…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x4bff30af91642dc7d2b19a8664378fe55c45fc26&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "positions[0x4bff30af…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x4bff30af91642dc7d2b19a8664378fe55c45fc26&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "value[0x4bff30af…]",
+      "url": "https://data-api.polymarket.com/value?user=0x4bff30af91642dc7d2b19a8664378fe55c45fc26",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "pnl[0x4bff30af…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x4bff30af91642dc7d2b19a8664378fe55c45fc26&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "activity[0x168a51f1…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x168a51f1cac0ad3b166797069382495a8aa10d24&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "positions[0x168a51f1…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x168a51f1cac0ad3b166797069382495a8aa10d24&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "value[0x168a51f1…]",
+      "url": "https://data-api.polymarket.com/value?user=0x168a51f1cac0ad3b166797069382495a8aa10d24",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "pnl[0x168a51f1…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x168a51f1cac0ad3b166797069382495a8aa10d24&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x34dd4a4b…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x34dd4a4b70eaf79a17878f7938263c801d4dfd83&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "positions[0x34dd4a4b…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x34dd4a4b70eaf79a17878f7938263c801d4dfd83&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "value[0x34dd4a4b…]",
+      "url": "https://data-api.polymarket.com/value?user=0x34dd4a4b70eaf79a17878f7938263c801d4dfd83",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "pnl[0x34dd4a4b…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x34dd4a4b70eaf79a17878f7938263c801d4dfd83&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x204f72f3…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x204f72f35326db932158cba6adff0b9a1da95e14&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "activity[0x204f72f3…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x204f72f35326db932158cba6adff0b9a1da95e14&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "activity[0x204f72f3…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x204f72f35326db932158cba6adff0b9a1da95e14&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "positions[0x204f72f3…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x204f72f35326db932158cba6adff0b9a1da95e14&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "value[0x204f72f3…]",
+      "url": "https://data-api.polymarket.com/value?user=0x204f72f35326db932158cba6adff0b9a1da95e14",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "pnl[0x204f72f3…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x204f72f35326db932158cba6adff0b9a1da95e14&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x1465b79b…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1465b79bff7992bc703e1aafb3683b1089647072&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.29
+    },
+    {
+      "name": "activity[0x1465b79b…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1465b79bff7992bc703e1aafb3683b1089647072&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "activity[0x1465b79b…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1465b79bff7992bc703e1aafb3683b1089647072&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "positions[0x1465b79b…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x1465b79bff7992bc703e1aafb3683b1089647072&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "value[0x1465b79b…]",
+      "url": "https://data-api.polymarket.com/value?user=0x1465b79bff7992bc703e1aafb3683b1089647072",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "pnl[0x1465b79b…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x1465b79bff7992bc703e1aafb3683b1089647072&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x03805a13…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x03805a13a0b3e058f55f6c6af95389d4f431073d&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "activity[0x03805a13…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x03805a13a0b3e058f55f6c6af95389d4f431073d&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.29
+    },
+    {
+      "name": "activity[0x03805a13…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x03805a13a0b3e058f55f6c6af95389d4f431073d&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 1.33
+    },
+    {
+      "name": "positions[0x03805a13…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x03805a13a0b3e058f55f6c6af95389d4f431073d&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "value[0x03805a13…]",
+      "url": "https://data-api.polymarket.com/value?user=0x03805a13a0b3e058f55f6c6af95389d4f431073d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "pnl[0x03805a13…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x03805a13a0b3e058f55f6c6af95389d4f431073d&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0xf201a19b…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xf201a19b43471261a3c1ba9247335d55270e527e&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "activity[0xf201a19b…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xf201a19b43471261a3c1ba9247335d55270e527e&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "activity[0xf201a19b…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xf201a19b43471261a3c1ba9247335d55270e527e&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "positions[0xf201a19b…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xf201a19b43471261a3c1ba9247335d55270e527e&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.28
+    },
+    {
+      "name": "value[0xf201a19b…]",
+      "url": "https://data-api.polymarket.com/value?user=0xf201a19b43471261a3c1ba9247335d55270e527e",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "pnl[0xf201a19b…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xf201a19b43471261a3c1ba9247335d55270e527e&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x13fa4ce1…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x13fa4ce1b8a27dd0b7a72db6205a50ee6ff0954c&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "activity[0x13fa4ce1…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x13fa4ce1b8a27dd0b7a72db6205a50ee6ff0954c&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "activity[0x13fa4ce1…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x13fa4ce1b8a27dd0b7a72db6205a50ee6ff0954c&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "positions[0x13fa4ce1…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x13fa4ce1b8a27dd0b7a72db6205a50ee6ff0954c&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "value[0x13fa4ce1…]",
+      "url": "https://data-api.polymarket.com/value?user=0x13fa4ce1b8a27dd0b7a72db6205a50ee6ff0954c",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.06
+    },
+    {
+      "name": "pnl[0x13fa4ce1…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x13fa4ce1b8a27dd0b7a72db6205a50ee6ff0954c&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.06
+    },
+    {
+      "name": "activity[0x52685279…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x5268527977f700f9bf9b6d5cd843859e4e70135d&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "activity[0x52685279…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x5268527977f700f9bf9b6d5cd843859e4e70135d&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "activity[0x52685279…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x5268527977f700f9bf9b6d5cd843859e4e70135d&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 1.42
+    },
+    {
+      "name": "positions[0x52685279…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x5268527977f700f9bf9b6d5cd843859e4e70135d&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.65
+    },
+    {
+      "name": "value[0x52685279…]",
+      "url": "https://data-api.polymarket.com/value?user=0x5268527977f700f9bf9b6d5cd843859e4e70135d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "pnl[0x52685279…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x5268527977f700f9bf9b6d5cd843859e4e70135d&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "activity[0x2ba6c2c2…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x2ba6c2c20075a5c5f6996dd32f080e5d005e644c&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "positions[0x2ba6c2c2…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x2ba6c2c20075a5c5f6996dd32f080e5d005e644c&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "value[0x2ba6c2c2…]",
+      "url": "https://data-api.polymarket.com/value?user=0x2ba6c2c20075a5c5f6996dd32f080e5d005e644c",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "pnl[0x2ba6c2c2…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x2ba6c2c20075a5c5f6996dd32f080e5d005e644c&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0xf5f92940…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xf5f92940519a72da460b1c2a606bc1230f0e87b0&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "activity[0xf5f92940…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xf5f92940519a72da460b1c2a606bc1230f0e87b0&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.58
+    },
+    {
+      "name": "activity[0xf5f92940…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xf5f92940519a72da460b1c2a606bc1230f0e87b0&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.31
+    },
+    {
+      "name": "positions[0xf5f92940…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xf5f92940519a72da460b1c2a606bc1230f0e87b0&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "value[0xf5f92940…]",
+      "url": "https://data-api.polymarket.com/value?user=0xf5f92940519a72da460b1c2a606bc1230f0e87b0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "pnl[0xf5f92940…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xf5f92940519a72da460b1c2a606bc1230f0e87b0&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "activity[0xe40aaa5c…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xe40aaa5ce1dac0b7dc24c9d0284f27e17c3fe4a2&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "activity[0xe40aaa5c…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xe40aaa5ce1dac0b7dc24c9d0284f27e17c3fe4a2&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.35
+    },
+    {
+      "name": "activity[0xe40aaa5c…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xe40aaa5ce1dac0b7dc24c9d0284f27e17c3fe4a2&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.25
+    },
+    {
+      "name": "positions[0xe40aaa5c…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xe40aaa5ce1dac0b7dc24c9d0284f27e17c3fe4a2&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.29
+    },
+    {
+      "name": "value[0xe40aaa5c…]",
+      "url": "https://data-api.polymarket.com/value?user=0xe40aaa5ce1dac0b7dc24c9d0284f27e17c3fe4a2",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.41
+    },
+    {
+      "name": "pnl[0xe40aaa5c…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xe40aaa5ce1dac0b7dc24c9d0284f27e17c3fe4a2&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "activity[0x16bb9951…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x16bb9951a36fce71e2ef57890b786145e0ba8492&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "activity[0x16bb9951…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x16bb9951a36fce71e2ef57890b786145e0ba8492&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.27
+    },
+    {
+      "name": "activity[0x16bb9951…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x16bb9951a36fce71e2ef57890b786145e0ba8492&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "positions[0x16bb9951…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x16bb9951a36fce71e2ef57890b786145e0ba8492&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.06
+    },
+    {
+      "name": "value[0x16bb9951…]",
+      "url": "https://data-api.polymarket.com/value?user=0x16bb9951a36fce71e2ef57890b786145e0ba8492",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "pnl[0x16bb9951…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x16bb9951a36fce71e2ef57890b786145e0ba8492&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "activity[0x4f1d5ae2…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x4f1d5ae26fc31472966e951af3183308736d8de2&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "activity[0x4f1d5ae2…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x4f1d5ae26fc31472966e951af3183308736d8de2&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "activity[0x4f1d5ae2…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x4f1d5ae26fc31472966e951af3183308736d8de2&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "positions[0x4f1d5ae2…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x4f1d5ae26fc31472966e951af3183308736d8de2&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "value[0x4f1d5ae2…]",
+      "url": "https://data-api.polymarket.com/value?user=0x4f1d5ae26fc31472966e951af3183308736d8de2",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "pnl[0x4f1d5ae2…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x4f1d5ae26fc31472966e951af3183308736d8de2&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0xb0c85813…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xb0c85813a7a4428f1139ff91d3118a92c391fe7f&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "activity[0xb0c85813…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xb0c85813a7a4428f1139ff91d3118a92c391fe7f&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "activity[0xb0c85813…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xb0c85813a7a4428f1139ff91d3118a92c391fe7f&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "positions[0xb0c85813…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xb0c85813a7a4428f1139ff91d3118a92c391fe7f&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "value[0xb0c85813…]",
+      "url": "https://data-api.polymarket.com/value?user=0xb0c85813a7a4428f1139ff91d3118a92c391fe7f",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "pnl[0xb0c85813…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xb0c85813a7a4428f1139ff91d3118a92c391fe7f&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x5a218c7a…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x5a218c7ad04135830a45c41aaed7294df7809318&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "activity[0x5a218c7a…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x5a218c7ad04135830a45c41aaed7294df7809318&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "activity[0x5a218c7a…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x5a218c7ad04135830a45c41aaed7294df7809318&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "positions[0x5a218c7a…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x5a218c7ad04135830a45c41aaed7294df7809318&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "value[0x5a218c7a…]",
+      "url": "https://data-api.polymarket.com/value?user=0x5a218c7ad04135830a45c41aaed7294df7809318",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.12
+    },
+    {
+      "name": "pnl[0x5a218c7a…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x5a218c7ad04135830a45c41aaed7294df7809318&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0xf705fa04…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xf705fa045201391d9632b7f3cde06a5e24453ca7&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.29
+    },
+    {
+      "name": "activity[0xf705fa04…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xf705fa045201391d9632b7f3cde06a5e24453ca7&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "activity[0xf705fa04…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xf705fa045201391d9632b7f3cde06a5e24453ca7&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "positions[0xf705fa04…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xf705fa045201391d9632b7f3cde06a5e24453ca7&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "value[0xf705fa04…]",
+      "url": "https://data-api.polymarket.com/value?user=0xf705fa045201391d9632b7f3cde06a5e24453ca7",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "pnl[0xf705fa04…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xf705fa045201391d9632b7f3cde06a5e24453ca7&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x0a39b3b2…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x0a39b3b29ab3b7dd753aa96fde4ecab3f2dbb0b9&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "activity[0x0a39b3b2…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x0a39b3b29ab3b7dd753aa96fde4ecab3f2dbb0b9&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.25
+    },
+    {
+      "name": "activity[0x0a39b3b2…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x0a39b3b29ab3b7dd753aa96fde4ecab3f2dbb0b9&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.3
+    },
+    {
+      "name": "positions[0x0a39b3b2…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x0a39b3b29ab3b7dd753aa96fde4ecab3f2dbb0b9&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.3
+    },
+    {
+      "name": "value[0x0a39b3b2…]",
+      "url": "https://data-api.polymarket.com/value?user=0x0a39b3b29ab3b7dd753aa96fde4ecab3f2dbb0b9",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "pnl[0x0a39b3b2…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x0a39b3b29ab3b7dd753aa96fde4ecab3f2dbb0b9&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "activity[0x65c18d74…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x65c18d740c8246af3353741c0b32e4b6da552988&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "activity[0x65c18d74…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x65c18d740c8246af3353741c0b32e4b6da552988&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.25
+    },
+    {
+      "name": "activity[0x65c18d74…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x65c18d740c8246af3353741c0b32e4b6da552988&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "positions[0x65c18d74…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x65c18d740c8246af3353741c0b32e4b6da552988&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "value[0x65c18d74…]",
+      "url": "https://data-api.polymarket.com/value?user=0x65c18d740c8246af3353741c0b32e4b6da552988",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "pnl[0x65c18d74…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x65c18d740c8246af3353741c0b32e4b6da552988&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0xaabec5bf…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xaabec5bfb0c7e2516900c4066ae58073d59e9158&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "positions[0xaabec5bf…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xaabec5bfb0c7e2516900c4066ae58073d59e9158&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "value[0xaabec5bf…]",
+      "url": "https://data-api.polymarket.com/value?user=0xaabec5bfb0c7e2516900c4066ae58073d59e9158",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "pnl[0xaabec5bf…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xaabec5bfb0c7e2516900c4066ae58073d59e9158&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "activity[0x076daa87…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x076daa87c4fe1a85402a9b6b8e0a866224388d4c&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.41
+    },
+    {
+      "name": "activity[0x076daa87…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x076daa87c4fe1a85402a9b6b8e0a866224388d4c&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.31
+    },
+    {
+      "name": "activity[0x076daa87…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x076daa87c4fe1a85402a9b6b8e0a866224388d4c&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.28
+    },
+    {
+      "name": "positions[0x076daa87…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x076daa87c4fe1a85402a9b6b8e0a866224388d4c&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "value[0x076daa87…]",
+      "url": "https://data-api.polymarket.com/value?user=0x076daa87c4fe1a85402a9b6b8e0a866224388d4c",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.06
+    },
+    {
+      "name": "pnl[0x076daa87…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x076daa87c4fe1a85402a9b6b8e0a866224388d4c&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x8546a601…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x8546a601f7c7cc3dae7141f20b0e09e42bbf35b8&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.27
+    },
+    {
+      "name": "activity[0x8546a601…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x8546a601f7c7cc3dae7141f20b0e09e42bbf35b8&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "activity[0x8546a601…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x8546a601f7c7cc3dae7141f20b0e09e42bbf35b8&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.37
+    },
+    {
+      "name": "positions[0x8546a601…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x8546a601f7c7cc3dae7141f20b0e09e42bbf35b8&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "value[0x8546a601…]",
+      "url": "https://data-api.polymarket.com/value?user=0x8546a601f7c7cc3dae7141f20b0e09e42bbf35b8",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "pnl[0x8546a601…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x8546a601f7c7cc3dae7141f20b0e09e42bbf35b8&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0xf23c5bc7…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xf23c5bc7b547867eb6532920144562718aa49f81&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "activity[0xf23c5bc7…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xf23c5bc7b547867eb6532920144562718aa49f81&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "activity[0xf23c5bc7…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xf23c5bc7b547867eb6532920144562718aa49f81&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "positions[0xf23c5bc7…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xf23c5bc7b547867eb6532920144562718aa49f81&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "value[0xf23c5bc7…]",
+      "url": "https://data-api.polymarket.com/value?user=0xf23c5bc7b547867eb6532920144562718aa49f81",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "pnl[0xf23c5bc7…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xf23c5bc7b547867eb6532920144562718aa49f81&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0xab51c55e…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xab51c55eb5cefec49c52a174acc10b3cd69e2473&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.25
+    },
+    {
+      "name": "activity[0xab51c55e…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xab51c55eb5cefec49c52a174acc10b3cd69e2473&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "activity[0xab51c55e…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xab51c55eb5cefec49c52a174acc10b3cd69e2473&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.28
+    },
+    {
+      "name": "positions[0xab51c55e…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xab51c55eb5cefec49c52a174acc10b3cd69e2473&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "value[0xab51c55e…]",
+      "url": "https://data-api.polymarket.com/value?user=0xab51c55eb5cefec49c52a174acc10b3cd69e2473",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "pnl[0xab51c55e…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xab51c55eb5cefec49c52a174acc10b3cd69e2473&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x1b20a007…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1b20a00709dfe648afd26b326394b5e031f83ab0&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "activity[0x1b20a007…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1b20a00709dfe648afd26b326394b5e031f83ab0&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.41
+    },
+    {
+      "name": "activity[0x1b20a007…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1b20a00709dfe648afd26b326394b5e031f83ab0&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.44
+    },
+    {
+      "name": "positions[0x1b20a007…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x1b20a00709dfe648afd26b326394b5e031f83ab0&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "value[0x1b20a007…]",
+      "url": "https://data-api.polymarket.com/value?user=0x1b20a00709dfe648afd26b326394b5e031f83ab0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "pnl[0x1b20a007…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x1b20a00709dfe648afd26b326394b5e031f83ab0&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0xfbd8c9c2…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xfbd8c9c22ca76b3662d0e53a4f79719fdc684027&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "activity[0xfbd8c9c2…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xfbd8c9c22ca76b3662d0e53a4f79719fdc684027&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "activity[0xfbd8c9c2…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xfbd8c9c22ca76b3662d0e53a4f79719fdc684027&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "positions[0xfbd8c9c2…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xfbd8c9c22ca76b3662d0e53a4f79719fdc684027&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "value[0xfbd8c9c2…]",
+      "url": "https://data-api.polymarket.com/value?user=0xfbd8c9c22ca76b3662d0e53a4f79719fdc684027",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "pnl[0xfbd8c9c2…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xfbd8c9c22ca76b3662d0e53a4f79719fdc684027&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x6e2c0e94…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x6e2c0e9474af7d720e5aba2a5b0bb6f723b7787c&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x6e2c0e94…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x6e2c0e9474af7d720e5aba2a5b0bb6f723b7787c&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.25
+    },
+    {
+      "name": "activity[0x6e2c0e94…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x6e2c0e9474af7d720e5aba2a5b0bb6f723b7787c&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "positions[0x6e2c0e94…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x6e2c0e9474af7d720e5aba2a5b0bb6f723b7787c&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.25
+    },
+    {
+      "name": "value[0x6e2c0e94…]",
+      "url": "https://data-api.polymarket.com/value?user=0x6e2c0e9474af7d720e5aba2a5b0bb6f723b7787c",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "pnl[0x6e2c0e94…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x6e2c0e9474af7d720e5aba2a5b0bb6f723b7787c&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x91dda263…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x91dda263d251e7f771ea333f8cb6b6066761600b&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "positions[0x91dda263…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x91dda263d251e7f771ea333f8cb6b6066761600b&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "value[0x91dda263…]",
+      "url": "https://data-api.polymarket.com/value?user=0x91dda263d251e7f771ea333f8cb6b6066761600b",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "pnl[0x91dda263…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x91dda263d251e7f771ea333f8cb6b6066761600b&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.12
+    },
+    {
+      "name": "activity[0xe1000ddb…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xe1000ddb5f5025849765e29d051dfff78f5d4d41&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "activity[0xe1000ddb…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xe1000ddb5f5025849765e29d051dfff78f5d4d41&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "activity[0xe1000ddb…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xe1000ddb5f5025849765e29d051dfff78f5d4d41&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "positions[0xe1000ddb…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xe1000ddb5f5025849765e29d051dfff78f5d4d41&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.12
+    },
+    {
+      "name": "value[0xe1000ddb…]",
+      "url": "https://data-api.polymarket.com/value?user=0xe1000ddb5f5025849765e29d051dfff78f5d4d41",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "pnl[0xe1000ddb…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xe1000ddb5f5025849765e29d051dfff78f5d4d41&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "activity[0xdc41c39b…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xdc41c39b95453c943174f369926018f6963bdd7e&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "activity[0xdc41c39b…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xdc41c39b95453c943174f369926018f6963bdd7e&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.25
+    },
+    {
+      "name": "activity[0xdc41c39b…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xdc41c39b95453c943174f369926018f6963bdd7e&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "positions[0xdc41c39b…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xdc41c39b95453c943174f369926018f6963bdd7e&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "value[0xdc41c39b…]",
+      "url": "https://data-api.polymarket.com/value?user=0xdc41c39b95453c943174f369926018f6963bdd7e",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "pnl[0xdc41c39b…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xdc41c39b95453c943174f369926018f6963bdd7e&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x01e6e3c5…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x01e6e3c5cfe50943e7721398054cb1e22032e7e0&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "activity[0x01e6e3c5…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x01e6e3c5cfe50943e7721398054cb1e22032e7e0&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.25
+    },
+    {
+      "name": "activity[0x01e6e3c5…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x01e6e3c5cfe50943e7721398054cb1e22032e7e0&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "positions[0x01e6e3c5…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x01e6e3c5cfe50943e7721398054cb1e22032e7e0&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.39
+    },
+    {
+      "name": "value[0x01e6e3c5…]",
+      "url": "https://data-api.polymarket.com/value?user=0x01e6e3c5cfe50943e7721398054cb1e22032e7e0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "pnl[0x01e6e3c5…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x01e6e3c5cfe50943e7721398054cb1e22032e7e0&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "activity[0xc3acf587…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xc3acf5878a03523d09a3ac859943445d7baeb964&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "activity[0xc3acf587…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xc3acf5878a03523d09a3ac859943445d7baeb964&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "activity[0xc3acf587…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xc3acf5878a03523d09a3ac859943445d7baeb964&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "positions[0xc3acf587…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xc3acf5878a03523d09a3ac859943445d7baeb964&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "value[0xc3acf587…]",
+      "url": "https://data-api.polymarket.com/value?user=0xc3acf5878a03523d09a3ac859943445d7baeb964",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "pnl[0xc3acf587…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xc3acf5878a03523d09a3ac859943445d7baeb964&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x10ef4832…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x10ef48324b3ebc06d9137794c70285e8e37a7d7b&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "activity[0x10ef4832…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x10ef48324b3ebc06d9137794c70285e8e37a7d7b&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "activity[0x10ef4832…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x10ef48324b3ebc06d9137794c70285e8e37a7d7b&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "positions[0x10ef4832…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x10ef48324b3ebc06d9137794c70285e8e37a7d7b&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.12
+    },
+    {
+      "name": "value[0x10ef4832…]",
+      "url": "https://data-api.polymarket.com/value?user=0x10ef48324b3ebc06d9137794c70285e8e37a7d7b",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "pnl[0x10ef4832…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x10ef48324b3ebc06d9137794c70285e8e37a7d7b&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "activity[0xd3b034d7…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xd3b034d7bfb2473fb252d0414646d9786bac329e&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "activity[0xd3b034d7…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xd3b034d7bfb2473fb252d0414646d9786bac329e&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "activity[0xd3b034d7…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xd3b034d7bfb2473fb252d0414646d9786bac329e&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.29
+    },
+    {
+      "name": "positions[0xd3b034d7…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xd3b034d7bfb2473fb252d0414646d9786bac329e&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "value[0xd3b034d7…]",
+      "url": "https://data-api.polymarket.com/value?user=0xd3b034d7bfb2473fb252d0414646d9786bac329e",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "pnl[0xd3b034d7…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xd3b034d7bfb2473fb252d0414646d9786bac329e&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x21064fd3…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x21064fd320bfd5a86f8c92a94d3209edf4154dea&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "activity[0x21064fd3…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x21064fd320bfd5a86f8c92a94d3209edf4154dea&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "activity[0x21064fd3…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x21064fd320bfd5a86f8c92a94d3209edf4154dea&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "positions[0x21064fd3…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x21064fd320bfd5a86f8c92a94d3209edf4154dea&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.25
+    },
+    {
+      "name": "value[0x21064fd3…]",
+      "url": "https://data-api.polymarket.com/value?user=0x21064fd320bfd5a86f8c92a94d3209edf4154dea",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.27
+    },
+    {
+      "name": "pnl[0x21064fd3…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x21064fd320bfd5a86f8c92a94d3209edf4154dea&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "activity[0x2f44fa07…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x2f44fa076c8d2976ac6bea0ddfd9502bad2b93c2&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "positions[0x2f44fa07…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x2f44fa076c8d2976ac6bea0ddfd9502bad2b93c2&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "value[0x2f44fa07…]",
+      "url": "https://data-api.polymarket.com/value?user=0x2f44fa076c8d2976ac6bea0ddfd9502bad2b93c2",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "pnl[0x2f44fa07…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x2f44fa076c8d2976ac6bea0ddfd9502bad2b93c2&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x4b341d46…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x4b341d4612437b6e5b5fbcf98e5b675dbacf48a8&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.12
+    },
+    {
+      "name": "positions[0x4b341d46…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x4b341d4612437b6e5b5fbcf98e5b675dbacf48a8&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "value[0x4b341d46…]",
+      "url": "https://data-api.polymarket.com/value?user=0x4b341d4612437b6e5b5fbcf98e5b675dbacf48a8",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "pnl[0x4b341d46…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x4b341d4612437b6e5b5fbcf98e5b675dbacf48a8&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x83733b87…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x83733b87090cf97aee473b1000beb9bfab7af0bc&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "activity[0x83733b87…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x83733b87090cf97aee473b1000beb9bfab7af0bc&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.3
+    },
+    {
+      "name": "activity[0x83733b87…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x83733b87090cf97aee473b1000beb9bfab7af0bc&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.28
+    },
+    {
+      "name": "positions[0x83733b87…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x83733b87090cf97aee473b1000beb9bfab7af0bc&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.31
+    },
+    {
+      "name": "value[0x83733b87…]",
+      "url": "https://data-api.polymarket.com/value?user=0x83733b87090cf97aee473b1000beb9bfab7af0bc",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "pnl[0x83733b87…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x83733b87090cf97aee473b1000beb9bfab7af0bc&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.12
+    },
+    {
+      "name": "activity[0xc72d7dcd…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xc72d7dcdb23597d143a83536fb97b1d7db7efc21&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "activity[0xc72d7dcd…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xc72d7dcdb23597d143a83536fb97b1d7db7efc21&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "activity[0xc72d7dcd…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xc72d7dcdb23597d143a83536fb97b1d7db7efc21&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.12
+    },
+    {
+      "name": "positions[0xc72d7dcd…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xc72d7dcdb23597d143a83536fb97b1d7db7efc21&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "value[0xc72d7dcd…]",
+      "url": "https://data-api.polymarket.com/value?user=0xc72d7dcdb23597d143a83536fb97b1d7db7efc21",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "pnl[0xc72d7dcd…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xc72d7dcdb23597d143a83536fb97b1d7db7efc21&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0xa3282d3e…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xa3282d3e882501229c75d0caf134e62e3afb4977&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "activity[0xa3282d3e…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xa3282d3e882501229c75d0caf134e62e3afb4977&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.48
+    },
+    {
+      "name": "activity[0xa3282d3e…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xa3282d3e882501229c75d0caf134e62e3afb4977&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.29
+    },
+    {
+      "name": "positions[0xa3282d3e…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xa3282d3e882501229c75d0caf134e62e3afb4977&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.3
+    },
+    {
+      "name": "value[0xa3282d3e…]",
+      "url": "https://data-api.polymarket.com/value?user=0xa3282d3e882501229c75d0caf134e62e3afb4977",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.49
+    },
+    {
+      "name": "pnl[0xa3282d3e…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xa3282d3e882501229c75d0caf134e62e3afb4977&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.12
+    },
+    {
+      "name": "activity[0xb55fa129…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xb55fa1296e6ec55d0ce53d93b9237389f11764d4&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.07
+    },
+    {
+      "name": "activity[0xb55fa129…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xb55fa1296e6ec55d0ce53d93b9237389f11764d4&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0xb55fa129…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xb55fa1296e6ec55d0ce53d93b9237389f11764d4&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "positions[0xb55fa129…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xb55fa1296e6ec55d0ce53d93b9237389f11764d4&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "value[0xb55fa129…]",
+      "url": "https://data-api.polymarket.com/value?user=0xb55fa1296e6ec55d0ce53d93b9237389f11764d4",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.25
+    },
+    {
+      "name": "pnl[0xb55fa129…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xb55fa1296e6ec55d0ce53d93b9237389f11764d4&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.06
+    },
+    {
+      "name": "activity[0x5c3a1a60…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x5c3a1a602848565bb16165fcd460b00c3d43020b&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "activity[0x5c3a1a60…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x5c3a1a602848565bb16165fcd460b00c3d43020b&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "activity[0x5c3a1a60…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x5c3a1a602848565bb16165fcd460b00c3d43020b&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.27
+    },
+    {
+      "name": "positions[0x5c3a1a60…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x5c3a1a602848565bb16165fcd460b00c3d43020b&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "value[0x5c3a1a60…]",
+      "url": "https://data-api.polymarket.com/value?user=0x5c3a1a602848565bb16165fcd460b00c3d43020b",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "pnl[0x5c3a1a60…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x5c3a1a602848565bb16165fcd460b00c3d43020b&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "activity[0x31864feb…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x31864feb9d25dee93728c6225ba891530967e9ca&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "activity[0x31864feb…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x31864feb9d25dee93728c6225ba891530967e9ca&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "activity[0x31864feb…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x31864feb9d25dee93728c6225ba891530967e9ca&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "positions[0x31864feb…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x31864feb9d25dee93728c6225ba891530967e9ca&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "value[0x31864feb…]",
+      "url": "https://data-api.polymarket.com/value?user=0x31864feb9d25dee93728c6225ba891530967e9ca",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "pnl[0x31864feb…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x31864feb9d25dee93728c6225ba891530967e9ca&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x1f7105a1…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1f7105a18d9f36aef7c83e5df210e57cf487b2e4&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.25
+    },
+    {
+      "name": "activity[0x1f7105a1…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1f7105a18d9f36aef7c83e5df210e57cf487b2e4&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.4
+    },
+    {
+      "name": "activity[0x1f7105a1…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1f7105a18d9f36aef7c83e5df210e57cf487b2e4&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "positions[0x1f7105a1…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x1f7105a18d9f36aef7c83e5df210e57cf487b2e4&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "value[0x1f7105a1…]",
+      "url": "https://data-api.polymarket.com/value?user=0x1f7105a18d9f36aef7c83e5df210e57cf487b2e4",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "pnl[0x1f7105a1…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x1f7105a18d9f36aef7c83e5df210e57cf487b2e4&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x56687bf4…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x56687bf447db6ffa42ffe2204a05edaa20f55839&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.12
+    },
+    {
+      "name": "activity[0x56687bf4…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x56687bf447db6ffa42ffe2204a05edaa20f55839&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "activity[0x56687bf4…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x56687bf447db6ffa42ffe2204a05edaa20f55839&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "positions[0x56687bf4…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x56687bf447db6ffa42ffe2204a05edaa20f55839&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.12
+    },
+    {
+      "name": "value[0x56687bf4…]",
+      "url": "https://data-api.polymarket.com/value?user=0x56687bf447db6ffa42ffe2204a05edaa20f55839",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "pnl[0x56687bf4…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x56687bf447db6ffa42ffe2204a05edaa20f55839&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x1f2dd6d4…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1f2dd6d473f3e824cd2f8a89d9c69fb96f6ad0cf&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "activity[0x1f2dd6d4…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1f2dd6d473f3e824cd2f8a89d9c69fb96f6ad0cf&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "activity[0x1f2dd6d4…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1f2dd6d473f3e824cd2f8a89d9c69fb96f6ad0cf&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.27
+    },
+    {
+      "name": "positions[0x1f2dd6d4…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x1f2dd6d473f3e824cd2f8a89d9c69fb96f6ad0cf&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "value[0x1f2dd6d4…]",
+      "url": "https://data-api.polymarket.com/value?user=0x1f2dd6d473f3e824cd2f8a89d9c69fb96f6ad0cf",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "pnl[0x1f2dd6d4…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x1f2dd6d473f3e824cd2f8a89d9c69fb96f6ad0cf&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x6a72f618…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "activity[0x6a72f618…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "activity[0x6a72f618…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.32
+    },
+    {
+      "name": "positions[0x6a72f618…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.07
+    },
+    {
+      "name": "value[0x6a72f618…]",
+      "url": "https://data-api.polymarket.com/value?user=0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "pnl[0x6a72f618…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "activity[0x96cfcb0c…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x96cfcb0c30942cfcd1cdf76c7d408794d66b1acb&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "activity[0x96cfcb0c…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x96cfcb0c30942cfcd1cdf76c7d408794d66b1acb&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.29
+    },
+    {
+      "name": "positions[0x96cfcb0c…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x96cfcb0c30942cfcd1cdf76c7d408794d66b1acb&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "value[0x96cfcb0c…]",
+      "url": "https://data-api.polymarket.com/value?user=0x96cfcb0c30942cfcd1cdf76c7d408794d66b1acb",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "pnl[0x96cfcb0c…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x96cfcb0c30942cfcd1cdf76c7d408794d66b1acb&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.07
+    },
+    {
+      "name": "activity[0xed64a7bf…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xed64a7bf029040aa331abc87902434d815ef217d&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.07
+    },
+    {
+      "name": "activity[0xed64a7bf…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xed64a7bf029040aa331abc87902434d815ef217d&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.07
+    },
+    {
+      "name": "activity[0xed64a7bf…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xed64a7bf029040aa331abc87902434d815ef217d&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.07
+    },
+    {
+      "name": "positions[0xed64a7bf…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xed64a7bf029040aa331abc87902434d815ef217d&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "value[0xed64a7bf…]",
+      "url": "https://data-api.polymarket.com/value?user=0xed64a7bf029040aa331abc87902434d815ef217d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "pnl[0xed64a7bf…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xed64a7bf029040aa331abc87902434d815ef217d&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.07
+    },
+    {
+      "name": "activity[0xbc11a64a…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xbc11a64ab34a03a043fbe80598fa065ee87eeec6&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "activity[0xbc11a64a…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xbc11a64ab34a03a043fbe80598fa065ee87eeec6&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "activity[0xbc11a64a…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xbc11a64ab34a03a043fbe80598fa065ee87eeec6&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "positions[0xbc11a64a…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xbc11a64ab34a03a043fbe80598fa065ee87eeec6&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "value[0xbc11a64a…]",
+      "url": "https://data-api.polymarket.com/value?user=0xbc11a64ab34a03a043fbe80598fa065ee87eeec6",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "pnl[0xbc11a64a…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xbc11a64ab34a03a043fbe80598fa065ee87eeec6&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "activity[0x78b9ac44…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x78b9ac44a6d7d7a076c14e0ad518b301b63c6b76&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "activity[0x78b9ac44…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x78b9ac44a6d7d7a076c14e0ad518b301b63c6b76&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "activity[0x78b9ac44…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x78b9ac44a6d7d7a076c14e0ad518b301b63c6b76&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "positions[0x78b9ac44…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x78b9ac44a6d7d7a076c14e0ad518b301b63c6b76&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "value[0x78b9ac44…]",
+      "url": "https://data-api.polymarket.com/value?user=0x78b9ac44a6d7d7a076c14e0ad518b301b63c6b76",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "pnl[0x78b9ac44…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x78b9ac44a6d7d7a076c14e0ad518b301b63c6b76&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.07
+    },
+    {
+      "name": "activity[0x664ce9fb…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x664ce9fb97ae1bbd538d7381b2f4e92dab16f49c&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.07
+    },
+    {
+      "name": "activity[0x664ce9fb…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x664ce9fb97ae1bbd538d7381b2f4e92dab16f49c&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.06
+    },
+    {
+      "name": "activity[0x664ce9fb…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x664ce9fb97ae1bbd538d7381b2f4e92dab16f49c&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "positions[0x664ce9fb…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x664ce9fb97ae1bbd538d7381b2f4e92dab16f49c&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.1
+    },
+    {
+      "name": "value[0x664ce9fb…]",
+      "url": "https://data-api.polymarket.com/value?user=0x664ce9fb97ae1bbd538d7381b2f4e92dab16f49c",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "pnl[0x664ce9fb…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x664ce9fb97ae1bbd538d7381b2f4e92dab16f49c&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.08
+    },
+    {
+      "name": "activity[0x09b428f7…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x09b428f7c2b469786286214aa5c90dd9015f7320&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "activity[0x09b428f7…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x09b428f7c2b469786286214aa5c90dd9015f7320&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.28
+    },
+    {
+      "name": "activity[0x09b428f7…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x09b428f7c2b469786286214aa5c90dd9015f7320&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.25
+    },
+    {
+      "name": "positions[0x09b428f7…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x09b428f7c2b469786286214aa5c90dd9015f7320&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    },
+    {
+      "name": "value[0x09b428f7…]",
+      "url": "https://data-api.polymarket.com/value?user=0x09b428f7c2b469786286214aa5c90dd9015f7320",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "pnl[0x09b428f7…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x09b428f7c2b469786286214aa5c90dd9015f7320&interval=all&fidelity=1d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.04
+    }
+  ],
+  "notes": []
+}
