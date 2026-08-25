@@ -81,3 +81,4 @@
 | 2026-08-10 | [投資流程說明書（IPS）個人版草案](./2026-08-10-investment-process-statement-draft.md) | IPS, investment-process, serenity, four-meters, wavetrend, position-sizing, tail-dependence, exit-rules |
 | 2026-08-13 | [台股光通訊 10 檔：Serenity × WaveTrend × 籌碼 三框架交集](./2026-08-13-tw-optical-10-triple-framework.md) | investment, optical, CPO, silicon-photonics, taiwan-stocks, serenity, wavetrend, chip-analysis, FAU, ELSFP, InP |
 | 2026-08-21 | [Serenity Step 1–9：Seikoh Giken 6834 建倉前重評（2026-08 版）](./2026-08-21-serenity-step1-9-seikoh-6834-reentry.md) | serenity, seikoh-giken, 6834, optical-connector, valuation, japan, position-sizing |
+| 2026-08-25 | [「中國曝險」紅旗的第一性原理重寫 — 從七個字到三條可判定條件](./2026-08-25-china-red-flag-first-principles-rewrite.md) | serenity, framework, china-exposure, red-flag, first-principles, geopolitics, supply-chain |
