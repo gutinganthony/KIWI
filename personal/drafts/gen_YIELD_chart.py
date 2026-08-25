@@ -94,24 +94,28 @@ for i, (num, name, c, desc) in enumerate(levels):
              fontproperties=serif_b, va='center')
     axR.text(0.45, top - 0.90, desc, color=GREY, fontsize=8.4, va='center')
 
-axR.text(0, 4.02, "但台灣出現反直覺的現象", color=INK,
+axR.text(0, 4.18, "財政部出手三次，市場不買帳", color=INK,
          fontsize=12.5, fontproperties=serif_b, va='center')
 
-axR.add_patch(mpatches.Rectangle((0, 1.62), 10, 2.02,
-                                 facecolor=GREEN, alpha=0.06, zorder=0))
-tw_lines = [
-    "美債殖利率在漲，但新台幣連升：32.261 → 32.168 → 31.848",
-    "外資 8/13 單日買超台股 756.95 億元，史上第七大",
-    "解讀：無風險利率上升時，資金變挑剔，但不會停止找成長",
+moves = [
+    ("8/19", "宣布買回至少加倍（20 億 → 40 億）", "30Y 5.26% → 5.18%", GREEN),
+    ("8/20 早", "長端反轉，吐回全部跌幅", "10Y 回升至 4.7% 以上", RED),
+    ("8/20", "說可再超過 40 億，並預告財政整頓計畫", "市場評價：弱化版扭轉操作", GREY),
 ]
-for j, ln in enumerate(tw_lines):
-    axR.text(0.3, 3.28 - j * 0.52, ln, color=INK, fontsize=9, va='center')
+for j, (d, act, react, c) in enumerate(moves):
+    y = 3.52 - j * 0.62
+    axR.text(0.3, y, d, color=c, fontsize=8.8, fontproperties=serif_b, va='center')
+    axR.text(1.55, y, act, color=INK, fontsize=8.4, va='center')
+    axR.text(9.95, y, react, color=c, fontsize=8.2, va='center', ha='right')
 
-axR.add_patch(mpatches.Rectangle((0, 0.10), 10, 1.18,
+axR.text(0.3, 1.60, "本質是用短債換長債：債務總量不變，只是搬動問題",
+         color=INK, fontsize=9.2, fontproperties=serif_b, va='center')
+
+axR.add_patch(mpatches.Rectangle((0, 0.10), 10, 1.10,
                                  facecolor=GOLD, alpha=0.10, zorder=0))
-axR.text(0.3, 0.90, "留得住是因為現在夠好，不是因為它有耐心。",
-         color=INK, fontsize=9.8, fontproperties=serif_b, va='center')
-axR.text(0.3, 0.40, "旁邊有 5% 的無風險選項在等，故事一有裂縫，撤退會更果斷",
+axR.text(0.3, 0.88, "台灣的反直覺：台幣連升 32.261 → 31.848，外資 8/13 買超 756.95 億史上第七大",
+         color=INK, fontsize=8.8, fontproperties=serif_b, va='center')
+axR.text(0.3, 0.38, "留得住是因為現在夠好，不是因為它有耐心",
          color=GREY, fontsize=8.6, va='center')
 
 fig.text(0.046, 0.062,
