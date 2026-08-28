@@ -1,6 +1,6 @@
 # _SOURCE_PROBE — 有価証券報告書來源探測（JEM 否證 #3）
 
-> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-08-28T04:59:44+00:00
+> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-08-28T06:48:53+00:00
 > **為什麼有這支**：2026-08-20 Jake 多次嘗試註冊 EDINET API key 失敗（登入問題）。
 > 與其讓他繼續跟註冊表單纏鬥，不如讓 runner 直接回報**哪一條路是通的**。
 
@@ -17,7 +17,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv` |
-| [JEM 公司 IR 站](https://www.jem-net.co.jp/) | **200** | 未驗證：雲端 403；runner 未測 | `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja-jp` |
+| [JEM 公司 IR 站](https://www.jem-net.co.jp/) | **ERR URLError** | 未驗證：雲端 403；runner 未測 | `` |
 | [TDnet 一覽（對照組）](https://www.release.tdnet.info/inbs/I_list_001_20260818.html) | **200** | 已知：runner 可達 HTTP 200 —— 若這條也失敗，代表是 runner 網路問題不是站點問題 | `<!DOCTYPE html> <html> <head> <title>適時開示情報閲覧サービス - 開示情報一覧</title> <meta content="text/html" charset="UTF-8" http-equiv="content-type"> <meta name="robots" content="noindex,no` |
 | [ufocatch 檢索頁（猜測）](https://ufocatch.com/Search.aspx?q=6855) | **404** | ⚠️ 猜測路徑。回 404 只代表這個路徑不對，不代表服務不可用 | `<!DOCTYPE html>
 <html>
@@ -58,13 +58,6 @@
 
 ```html
 <!DOCTYPE html> <html lang="ja"> <head>     <!-- Google Tag Manager -->     <script>(function(w,d,s,l,i){w[l]=w[l]//[];w[l].push({'gtm.start':     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);     })(window,document,'script','dataLayer','GTM-KQ5J3GZM');</script>     <!-- End Google Tag Manager -->     <meta charset="utf-8" />     <meta name="viewport" content="width=device-width, initial-scale=1.0" />     <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />     <meta name="google-site-verification" content="Me5AYZ0nFZgkYjEfhSMHKiX-3RtBCC4Pu3oj79fryxo" />     <meta name="description" content="EDINETやTDnetで公表された企業開示情報をご提供するサービスです。XBRLを活用し、会社属性情報などをデータ化しています。" />     <meta name="twitter:card" content="summary" />     <meta name="twitter:site" content="@ufocatch" />     <meta property="og:url" content="https://ufocatch.com/" />     <meta property="og:title" content="有報キャッチャー" />     <meta property="og:description" content="EDINETやTDnetで公表された企業開示情報をご提供するサービスです。XBRLを活用し、会社属性情報などをデータ化しています。" />     <meta property="og:image" content="http://ufocatc
-```
-
-### JEM 公司 IR 站
-`https://www.jem-net.co.jp/`
-
-```html
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja-jp" lang="ja-jp" dir="ltr"> <head> <link rel="stylesheet" href="/templates/business/css/normalize.css" type="text/css" media="print,screen" /> <link rel="stylesheet" href="/templates/business/css/template.css" type="text/css" media="print,screen" /> <link rel="stylesheet" media="screen and (max-width: 640px)" href="/templates/business/css/responsive.css" type="text/css" /> <script type="text/javascript"> if ((navigator.userAgent.indexOf('iPhone') > 0) // navigator.userAgent.indexOf('iPod') > 0 // navigator.userAgent.indexOf('Android') > 0) { document.write('<meta name="viewport" content="width=device-width">'); }else{ document.write('<meta name="format-detection" content="telephone=no">');     } </script>  <base href="https://www.jem-net.co.jp/" /> 	<meta http-equiv="content-type" content="text/html; charset=utf-8" /> 	<meta name="keywords" content="半導体,プローブカード,研究,開発,検査用部品,製造" /> 	<meta name="robots" content="index, follow" /> 	<meta name="description" content="日本電子材料株式会社は、兵庫県尼崎市に本社を置くプローブカード（半導体検査用部品）のメーカーです。" /> 	<title>日本電子材料株式会社-半導体検査用部品プローブカードの研究開発製造</title> 	<link href="/templates/business/favic
 ```
 
 ### TDnet 一覽（對照組）
