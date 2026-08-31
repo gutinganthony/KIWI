@@ -82,3 +82,4 @@
 | 2026-08-13 | [台股光通訊 10 檔：Serenity × WaveTrend × 籌碼 三框架交集](./2026-08-13-tw-optical-10-triple-framework.md) | investment, optical, CPO, silicon-photonics, taiwan-stocks, serenity, wavetrend, chip-analysis, FAU, ELSFP, InP |
 | 2026-08-21 | [Serenity Step 1–9：Seikoh Giken 6834 建倉前重評（2026-08 版）](./2026-08-21-serenity-step1-9-seikoh-6834-reentry.md) | serenity, seikoh-giken, 6834, optical-connector, valuation, japan, position-sizing |
 | 2026-08-25 | [「中國曝險」紅旗的第一性原理重寫 — 從七個字到三條可判定條件](./2026-08-25-china-red-flag-first-principles-rewrite.md) | serenity, framework, china-exposure, red-flag, first-principles, geopolitics, supply-chain |
+| 2026-08-28 | [T1 條件⑤ 檢核 — NVDA Q2 FY27：供應商融資擴散**觸發**](./2026-08-28-t1-condition5-nvda-q2-fy27-trigger.md) | T1, exit-signal, nvda, vendor-financing, receivables, dso, memory |
