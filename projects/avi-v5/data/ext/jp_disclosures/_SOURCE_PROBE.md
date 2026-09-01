@@ -1,6 +1,6 @@
 # _SOURCE_PROBE — 有価証券報告書來源探測（JEM 否證 #3）
 
-> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-09-01T01:43:07+00:00
+> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-09-01T07:23:53+00:00
 > **為什麼有這支**：2026-08-20 Jake 多次嘗試註冊 EDINET API key 失敗（登入問題）。
 > 與其讓他繼續跟註冊表單纏鬥，不如讓 runner 直接回報**哪一條路是通的**。
 
@@ -13,10 +13,10 @@
 | [EDINET v2 API（無 key）](https://api.edinet-fsa.go.jp/api/v2/documents.json?date=2026-08-18&type=2) | **200** | 已知：HTTP 200 但 body 為 401 invalid subscription key | `{"StatusCode": 401,"message": "Access denied due to invalid subscription key.Make sure to provide a valid key for an active subscription."}` |
 | [EDINET 網頁介面（不需 key？）](https://disclosure2.edinet-fsa.go.jp/WEEK0010.aspx) | **200** | 未驗證：網頁 UI 若可達，或可不透過 API 取文件 | `<!DOCTYPE html> <html lang="ja"> <head> <meta name="viewport" content="width=device-width,initial-scale=1"/> <meta name="description" content="EDINETの閲覧サイトです。有価証券報告書、有価証券届出書、大量保有報告` |
 | [有報キャッチャー ufocatch 首頁](https://ufocatch.com/) | **200** | 未驗證：EDINET/TDnet XBRL 的第三方鏡像，宣稱免費且不需金鑰 | `<!DOCTYPE html> <html lang="ja"> <head>     <!-- Google Tag Manager -->     <script>(function(w,d,s,l,i){w[l]=w[l]//[];w[l].push({'gtm.start':     new Date().getTime(),event:'` |
-| [ufocatch Atom（候選路徑，純猜測）](https://resource.ufocatch.com/atom/edinetx/query/6855) | **404** | ⚠️ 路徑為猜測，回 404 不代表服務不存在，只代表這個路徑不對 | `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv` |
+| [ufocatch Atom（候選路徑，純猜測）](https://resource.ufocatch.com/atom/edinetx/query/6855) | **403** | ⚠️ 路徑為猜測，回 404 不代表服務不存在，只代表這個路徑不對 | `<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]>` |
 | [JEM 公司 IR 站](https://www.jem-net.co.jp/) | **200** | 未驗證：雲端 403；runner 未測 | `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja-jp` |
 | [TDnet 一覽（對照組）](https://www.release.tdnet.info/inbs/I_list_001_20260818.html) | **200** | 已知：runner 可達 HTTP 200 —— 若這條也失敗，代表是 runner 網路問題不是站點問題 | `<!DOCTYPE html> <html> <head> <title>適時開示情報閲覧サービス - 開示情報一覧</title> <meta content="text/html" charset="UTF-8" http-equiv="content-type"> <meta name="robots" content="noindex,no` |
 | [ufocatch 檢索頁（猜測）](https://ufocatch.com/Search.aspx?q=6855) | **404** | ⚠️ 猜測路徑。回 404 只代表這個路徑不對，不代表服務不可用 | `<!DOCTYPE html>
