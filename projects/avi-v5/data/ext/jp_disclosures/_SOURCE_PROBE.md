@@ -1,6 +1,6 @@
 # _SOURCE_PROBE — 有価証券報告書來源探測（JEM 否證 #3）
 
-> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-08-24T07:02:45+00:00
+> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-09-02T06:53:39+00:00
 > **為什麼有這支**：2026-08-20 Jake 多次嘗試註冊 EDINET API key 失敗（登入問題）。
 > 與其讓他繼續跟註冊表單纏鬥，不如讓 runner 直接回報**哪一條路是通的**。
 
@@ -13,10 +13,10 @@
 | [EDINET v2 API（無 key）](https://api.edinet-fsa.go.jp/api/v2/documents.json?date=2026-08-18&type=2) | **200** | 已知：HTTP 200 但 body 為 401 invalid subscription key | `{"StatusCode": 401,"message": "Access denied due to invalid subscription key.Make sure to provide a valid key for an active subscription."}` |
 | [EDINET 網頁介面（不需 key？）](https://disclosure2.edinet-fsa.go.jp/WEEK0010.aspx) | **200** | 未驗證：網頁 UI 若可達，或可不透過 API 取文件 | `<!DOCTYPE html> <html lang="ja"> <head> <meta name="viewport" content="width=device-width,initial-scale=1"/> <meta name="description" content="EDINETの閲覧サイトです。有価証券報告書、有価証券届出書、大量保有報告` |
 | [有報キャッチャー ufocatch 首頁](https://ufocatch.com/) | **200** | 未驗證：EDINET/TDnet XBRL 的第三方鏡像，宣稱免費且不需金鑰 | `<!DOCTYPE html> <html lang="ja"> <head>     <!-- Google Tag Manager -->     <script>(function(w,d,s,l,i){w[l]=w[l]//[];w[l].push({'gtm.start':     new Date().getTime(),event:'` |
-| [ufocatch Atom（候選路徑，純猜測）](https://resource.ufocatch.com/atom/edinetx/query/6855) | **404** | ⚠️ 路徑為猜測，回 404 不代表服務不存在，只代表這個路徑不對 | `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv` |
+| [ufocatch Atom（候選路徑，純猜測）](https://resource.ufocatch.com/atom/edinetx/query/6855) | **403** | ⚠️ 路徑為猜測，回 404 不代表服務不存在，只代表這個路徑不對 | `<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]>` |
 | [JEM 公司 IR 站](https://www.jem-net.co.jp/) | **200** | 未驗證：雲端 403；runner 未測 | `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja-jp` |
 | [TDnet 一覽（對照組）](https://www.release.tdnet.info/inbs/I_list_001_20260818.html) | **200** | 已知：runner 可達 HTTP 200 —— 若這條也失敗，代表是 runner 網路問題不是站點問題 | `<!DOCTYPE html> <html> <head> <title>適時開示情報閲覧サービス - 開示情報一覧</title> <meta content="text/html" charset="UTF-8" http-equiv="content-type"> <meta name="robots" content="noindex,no` |
 | [ufocatch 檢索頁（猜測）](https://ufocatch.com/Search.aspx?q=6855) | **404** | ⚠️ 猜測路徑。回 404 只代表這個路徑不對，不代表服務不可用 | `<!DOCTYPE html>
@@ -50,7 +50,7 @@
 `https://disclosure2.edinet-fsa.go.jp/WEEK0010.aspx`
 
 ```html
-<!DOCTYPE html> <html lang="ja"> <head> <meta name="viewport" content="width=device-width,initial-scale=1"/> <meta name="description" content="EDINETの閲覧サイトです。有価証券報告書、有価証券届出書、大量保有報告書、公開買付届出書等の開示書類を閲覧できます。"/> <meta name="apple-mobile-web-app-capable" content="yes"/> <!--[if IE]><meta http-equiv="page-enter" content="blendTrans(Duration=0.1)"/><![endif]--> <meta name="fragment" content="!"/> <meta http-equiv="content-type" content="text/html; charset=UTF-8"/> <title>EDINET</title> <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css?202662917264682"/> <link id="gxtheme_css_reference" rel="stylesheet" type="text/css" href="Resources/Japanese/ThemeBlue.css?202662917264682" /> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/fontawesome_v5/css/fontawesome.min.css"/> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/fontawesome_v5/css/all.min.css"/> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/DVelopBootstrap.css"/> <script type="text/javascript" src="jquery.js?2136580" ></script><script type="text/javascript" src="bootstrap/js/bootstrap.min.js?202662917264682" ></script><script type="text/javascript" src="gxgral.js?2136580" ></script><script type="text/javascript" src="gxcfg.js?202662211504234" ></script><script type="text/javascript" src="js/CommonJS.js?20260704094052" ></script><script ty
+<!DOCTYPE html> <html lang="ja"> <head> <meta name="viewport" content="width=device-width,initial-scale=1"/> <meta name="description" content="EDINETの閲覧サイトです。有価証券報告書、有価証券届出書、大量保有報告書、公開買付届出書等の開示書類を閲覧できます。"/> <meta name="apple-mobile-web-app-capable" content="yes"/> <!--[if IE]><meta http-equiv="page-enter" content="blendTrans(Duration=0.1)"/><![endif]--> <meta name="fragment" content="!"/> <meta http-equiv="content-type" content="text/html; charset=UTF-8"/> <title>EDINET</title> <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css?202682016474931"/> <link id="gxtheme_css_reference" rel="stylesheet" type="text/css" href="Resources/Japanese/ThemeBlue.css?202682016474931" /> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/fontawesome_v5/css/fontawesome.min.css"/> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/fontawesome_v5/css/all.min.css"/> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/DVelopBootstrap.css"/> <script type="text/javascript" src="jquery.js?2136580" ></script><script type="text/javascript" src="bootstrap/js/bootstrap.min.js?202682016474931" ></script><script type="text/javascript" src="gxgral.js?2136580" ></script><script type="text/javascript" src="gxcfg.js?20268201645714" ></script><script type="text/javascript" src="js/CommonJS.js?20260828182232" ></script><script typ
 ```
 
 ### 有報キャッチャー ufocatch 首頁
@@ -85,25 +85,25 @@
 `https://disclosure2.edinet-fsa.go.jp/week0020.aspx`
 
 ```html
-<!DOCTYPE html> <html lang="ja"> <head> <meta name="viewport" content="width=device-width,initial-scale=1"/> <meta name="description" content="開示情報利用者用トップ画面（英語）"/> <meta name="apple-mobile-web-app-capable" content="yes"/> <!--[if IE]><meta http-equiv="page-enter" content="blendTrans(Duration=0.1)"/><![endif]--> <meta name="fragment" content="!"/> <meta http-equiv="content-type" content="text/html; charset=UTF-8"/> <title>EDINET</title> <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css?202662917264682"/> <link id="gxtheme_css_reference" rel="stylesheet" type="text/css" href="Resources/Japanese/ThemeBlue.css?202662917264682" /> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/fontawesome_v5/css/fontawesome.min.css"/> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/fontawesome_v5/css/all.min.css"/> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/DVelopBootstrap.css"/> <script type="text/javascript" src="jquery.js?2136580" ></script><script type="text/javascript" src="bootstrap/js/bootstrap.min.js?202662917264682" ></script><script type="text/javascript" src="gxgral.js?2136580" ></script><script type="text/javascript" src="gxcfg.js?202662211522359" ></script><script type="text/javascript" src="Window/InNewWindowRender.js" ></script><script type="text/javascript" src="js/CommonJS.js?20260704094052" ></script><script type="text/javascript" src="js/Scrolltop.js?
+<!DOCTYPE html> <html lang="ja"> <head> <meta name="viewport" content="width=device-width,initial-scale=1"/> <meta name="description" content="開示情報利用者用トップ画面（英語）"/> <meta name="apple-mobile-web-app-capable" content="yes"/> <!--[if IE]><meta http-equiv="page-enter" content="blendTrans(Duration=0.1)"/><![endif]--> <meta name="fragment" content="!"/> <meta http-equiv="content-type" content="text/html; charset=UTF-8"/> <title>EDINET</title> <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css?202682016474931"/> <link id="gxtheme_css_reference" rel="stylesheet" type="text/css" href="Resources/Japanese/ThemeBlue.css?202682016474931" /> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/fontawesome_v5/css/fontawesome.min.css"/> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/fontawesome_v5/css/all.min.css"/> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/DVelopBootstrap.css"/> <script type="text/javascript" src="jquery.js?2136580" ></script><script type="text/javascript" src="bootstrap/js/bootstrap.min.js?202682016474931" ></script><script type="text/javascript" src="gxgral.js?2136580" ></script><script type="text/javascript" src="gxcfg.js?202682016464954" ></script><script type="text/javascript" src="Window/InNewWindowRender.js" ></script><script type="text/javascript" src="js/CommonJS.js?20260828182232" ></script><script type="text/javascript" src="js/Scrolltop.js?
 ```
 
 
 ## TDnet 解析診斷
 
-- 測試頁：`https://www.release.tdnet.info/inbs/I_list_001_20260823.html`
-- HTML 長度：1,706 字元
+- 測試頁：`https://www.release.tdnet.info/inbs/I_list_001_20260901.html`
+- HTML 長度：54,885 字元
 - `parse_list_page` 解析出的列數：**0**
 - 其中命中目標代碼：**0**
 
 實際出現的 class 值（前 40 個）：
 ```
-（頁面完全沒有 class 屬性）
+evennew-L kjTime, evennew-M kjCode, evennew-M kjName, evennew-M kjPlace, evennew-M kjTitle, evennew-M kjXbrl, evennew-R kjHistroy, header-L, header-M, header-R, kaijiSum, oddnew-L kjTime, oddnew-M kjCode, oddnew-M kjName, oddnew-M kjPlace, oddnew-M kjTitle, oddnew-M kjXbrl, oddnew-R kjHistroy, pager-L, pager-M, pager-O, pager-R, pagerTd, style002, xbrl-button, xbrl-mask
 ```
 
 其中以 `kj` 開頭者：**無 ← 這就是解析失敗的原因**
 
-`<tr>` 標籤數：**7**
+`<tr>` 標籤數：**109**
 
 ```html
 <!DOCTYPE html>
@@ -117,44 +117,33 @@
 <meta http-equiv="Expires" content="0">
 <script type="text/javascript" charset="UTF-8" src="./js/I_JAVASCRIPT.js"></script>
 <script type="text/javascript" charset="UTF-8" src="./js/I_MENSEKI.js"></script>
-<link rel="stylesheet" href="./css/I_STYLE.css" media="screen">
-</head>
-<body leftMargin="0" topMargin="0" bottomMargin="0" marginwidth="0" marginheight="0" width="100%" style="background-color: #eeeeee;">
-<form method="get" name="form2" action="../">
-<table border="0" cellSpacing="0" cellPadding="0" id="list-body-box">
-<tr>
-<td>
-<div id="floating-menu">
-<table border="0" cellSpacing="0" cellPadding="0" align="left" id="kaiji-info-box-top">
-<tr>
-<td align="left" noWrap id="kaiji-kensu-1">
-<div id="kaiji-date-1">2026年08月23日</div>
-<div id="kaiji-text-1">に開示された情報はありません。</div>
-</td>
-</tr>
-</table>
-</div>
-<div id="main-list" style="height:55px;"></div>
-</td>
-</tr>
-<tr>
-<td>
-<div id="main-footer">
-<table border="0" cellSpacing="0" cellPadding="0" align="left" id="main-footer-box">
-<tr>
-<td>
-<table border="0" cellSpacing="0" cellPadding="0" align="left" id="footer-table">
-<tr>
-<td id="mensekiNiayou">
-<script>
+<script type="text/javascript" charset="UTF-8" src="./runtime/jquery-1.8.3.min.js"></script>
+<script type="text/javascript">
 <!--
-document.write(mensekiNaiyou);
+  $(document).ready(function(){
+    $(".pagerTd > DIV >  DIV[onClick]").mousedown(function(event){
+      event.currentTarget.setAttribute("id","pager_active");
+    });
+    $(".pagerTd > DIV > DIV[onClick]").mouseup(function(event){
+      event.currentTarget.removeAttribute("id");
+    });
+    $(".pagerTd > DIV > DIV[onClick]").mouseleave(function(event){
+      event.currentTarget.removeAttribute("id");
+    });
+
+    $(".xbrl-mask > DIV > A").mousedown(function(event){
+      event.currentTarget.setAttribute("id","xbrl-button_active");
+    });
+    $(".xbrl-mask > DIV > A").mouseup(function(event){
+      event.currentTarget.removeAttribute("id");
+    });
+    $(".xbrl-mask > DIV > A").mouseleave(function(event){
+      event.currentTarget.removeAttribute("id");
+    });
+  });
 // -->
 </script>
-</td>
-</tr>
-<tr>
-<td id="footerHr"><div></d
+<link rel="stylesheet" href="./css/I_STYLE.css" m
 ```
 
 → ⚠️ **解析出 0 列＝解析器與實際 HTML 不符**（不是「沒開示」）。比對上方 HTML 與 `parse_list_page` 的 td class 假設。
