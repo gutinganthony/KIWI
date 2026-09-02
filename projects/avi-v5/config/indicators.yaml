@@ -51,13 +51,19 @@ indicators:
     weight: 0.08
 
   # --- Macro Dimension ---
-  yield_spread_10y2y:
-    name: "10Y-2Y Treasury Yield Spread"
+  # 2026-08 改版（乙案）：原本是 T10Y2Y 的「水位百分位 + up_is_risk」，
+  # 效果等於「曲線越陡越危險」，與註解宣稱的「倒掛=麻煩」完全相反。
+  # 但單純把方向翻成 up_is_safe 也是錯的——實證上倒掛後股市平均還會漲
+  # 13-17 個月（+19%），2022-24 史上最長倒掛更是沒有衰退。
+  # 水位這個「形式」本身不對，改用狀態轉折：曾倒掛 + 正在快速變陡。
+  # 詳見 src/data/sources/fred.py:fetch_curve_uninversion 的完整說明。
+  yield_curve_uninversion:
+    name: "Yield Curve Un-inversion (steepening after inversion)"
     source: fred
     fred_ids:
       - T10Y2Y
-    computation: direct
-    direction: up_is_risk  # ↑=↑risk (inverted curve signals trouble)
+    computation: curve_uninversion
+    direction: up_is_risk  # 陡化越快=風險越高（Fed 開始降息通常代表有東西壞了）
     dimension: macro
     weight: 0.04
 

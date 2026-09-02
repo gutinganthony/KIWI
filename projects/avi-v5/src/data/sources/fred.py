@@ -180,6 +180,55 @@ class FREDSource:
         logger.info(f"Computed Real Yield: {len(result)} observations")
         return result
 
+    def fetch_curve_uninversion(
+        self,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        lookback_months: int = 24,
+        steepen_months: int = 6,
+    ) -> pd.Series:
+        """殖利率曲線「解除倒掛」訊號 —— 取代原本的 T10Y2Y 水位百分位。
+
+        為什麼不用水位：實證上「倒掛 = 高風險」在股票的時間尺度上不成立。
+        從倒掛日到股市見頂平均還有 13-17 個月、期間平均上漲約 19%，
+        而 2022-10 至 2024-12 那次史上最長倒掛更是完全沒有出現衰退。
+        原設定 direction=up_is_risk 等於「曲線越陡越危險」，會把 2010-2014
+        健康復甦期的陡峭曲線打成滿分風險；改成 up_is_safe 也只是換一種錯，
+        會把 2022-24 倒掛但大漲那段打成高風險。水位這個形式本身就不對。
+
+        真正貼近崩盤的是**解除倒掛的轉折**：曲線之所以從倒掛轉回正斜率，
+        通常是因為 Fed 開始降息，而 Fed 開始降息通常是因為有東西壞掉了。
+
+        訊號定義（僅在「近期曾倒掛」的狀態下才計分，否則為 0）：
+            was_inverted = 過去 lookback_months 個月的最低 spread < 0
+            signal       = max(spread − spread.shift(steepen_months), 0) if was_inverted else 0
+
+        搭配 direction=up_is_risk：陡化越快 → 百分位越高 → 風險越高。
+        平時 signal 恆為 0，百分位自然落在低檔，不會產生常駐底噪。
+
+        初步事件驗證（SPY 1993-2026，4 次解除倒掛：2001/2007/2019/2024）：
+            解除倒掛後 12 個月平均報酬 +3.5%（全樣本基準 +11.8%）
+            期間平均最大回撤 -24.8%（全樣本基準 -14.4%）—— 4/4 成立
+        樣本數小，完整 FRED 回測見 scripts/curve_uninversion_validation.py
+        （該腳本需要 FRED 存取，只能在 GitHub Actions 上跑）。
+        """
+        spread = self.fetch_direct("T10Y2Y", start_date, end_date)
+        if spread.empty:
+            logger.warning("T10Y2Y empty — curve_uninversion unavailable")
+            return spread
+
+        was_inverted = spread.rolling(lookback_months, min_periods=6).min() < 0
+        steepening = spread - spread.shift(steepen_months)
+        signal = steepening.where(was_inverted, 0.0).clip(lower=0.0)
+        signal = signal.dropna()
+        signal.name = "yield_curve_uninversion"
+        logger.info(
+            f"Computed curve un-inversion: {len(signal)} obs, "
+            f"currently {'ARMED (recently inverted)' if bool(was_inverted.iloc[-1]) else 'idle'}, "
+            f"signal={signal.iloc[-1]:.3f}" if len(signal) else "Computed curve un-inversion: empty"
+        )
+        return signal
+
     def fetch_baa_aaa_diff(
         self,
         start_date: Optional[str] = None,
