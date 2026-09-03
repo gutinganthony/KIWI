@@ -84,3 +84,6 @@
 | 2026-08-10 | [投資流程說明書（IPS）個人版草案](./2026-08-10-investment-process-statement-draft.md) | IPS, investment-process, serenity, four-meters, wavetrend, position-sizing, tail-dependence, exit-rules |
 | 2026-08-13 | [台股光通訊 10 檔：Serenity × WaveTrend × 籌碼 三框架交集](./2026-08-13-tw-optical-10-triple-framework.md) | investment, optical, CPO, silicon-photonics, taiwan-stocks, serenity, wavetrend, chip-analysis, FAU, ELSFP, InP |
 | 2026-08-21 | [Serenity Step 1–9：Seikoh Giken 6834 建倉前重評（2026-08 版）](./2026-08-21-serenity-step1-9-seikoh-6834-reentry.md) | serenity, seikoh-giken, 6834, optical-connector, valuation, japan, position-sizing |
+| 2026-09-03 | [匯率觀點：台幣／美元／日圓／瑞郎 — 短中長期](./2026-09-03-fx-outlook-twd-usd-jpy-chf.md) | fx, twd, usd, jpy, chf, central-banks, fed, boj, snb, cbc, carry, hedging, ips-gap |
+| 2026-09-03 | [沃什的五個聯準會工作組 — 制度工程 vs 鷹派修辭，與 1–12 個月利率推演](./2026-09-03-warsh-fed-taskforces-rate-path.md) | fed, warsh, fomc, rates, inflation-framework, balance-sheet, term-premium, curve-steepener, bloomberg-intelligence |
+| 2026-09-03 | [AI Capex $100 流向圖 — 從金流圖到利潤圖到瓶頸圖，與 1–3 年投資排序](./2026-09-03-ai-capex-sankey-investment-map.md) | investment, ai-capex, sankey, nvidia, rubin, hbm, power, cooling, wfe, cpo, bottleneck, serenity, portfolio-diagnosis |

@@ -18,7 +18,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |-------|---------|
 | [Technology](./topics/technology/INDEX.md) | 5 |
 | [Science](./topics/science/INDEX.md) | 0 |
-| [Business](./topics/business/INDEX.md) | 78 |
+| [Business](./topics/business/INDEX.md) | 81 |
 | [Health](./topics/health/INDEX.md) | 1 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Other](./topics/other/INDEX.md) | 4 |
@@ -32,6 +32,9 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-09-03 | [AI Capex $100 流向圖 — 從金流圖到利潤圖到瓶頸圖，與 1–3 年投資排序](./topics/business/2026-09-03-ai-capex-sankey-investment-map.md) | Business |
+| 2026-09-03 | [沃什的五個聯準會工作組 — 制度工程 vs 鷹派修辭，與 1–12 個月利率推演](./topics/business/2026-09-03-warsh-fed-taskforces-rate-path.md) | Business |
+| 2026-09-03 | [匯率觀點：台幣／美元／日圓／瑞郎 — 短中長期](./topics/business/2026-09-03-fx-outlook-twd-usd-jpy-chf.md) | Business |
 | 2026-08-21 | [Serenity Step 1–9：Seikoh Giken 6834 建倉前重評](./topics/business/2026-08-21-serenity-step1-9-seikoh-6834-reentry.md) | Business |
 | 2026-08-19 | [撲克作為決策訓練器 — 可行性評估與定位判決](./topics/other/2026-08-19-poker-as-decision-training-evaluation.md) | Other |
 | 2026-08-10 | [個人帳戶交易政策（PA Dealing Policy）草案](./topics/business/2026-08-10-personal-account-dealing-policy-draft.md) | Business |
@@ -100,6 +103,9 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-08-06 | [美銀牛熊指標 9.7 — 歷史驗證與 BBI/貪婪指數背離的解釋](./topics/business/2026-08-06-bofa-bull-bear-9-7-signal-verification.md) | Business |
 | 2026-08-10 | [個人帳戶交易政策（PA Dealing Policy）草案](./topics/business/2026-08-10-personal-account-dealing-policy-draft.md) | Business |
 | 2026-08-10 | [投資流程說明書（IPS）個人版草案](./topics/business/2026-08-10-investment-process-statement-draft.md) | Business |
+| 2026-09-03 | [匯率觀點：台幣／美元／日圓／瑞郎 — 短中長期](./topics/business/2026-09-03-fx-outlook-twd-usd-jpy-chf.md) | Business |
+| 2026-09-03 | [沃什的五個聯準會工作組 — 制度工程 vs 鷹派修辭，與 1–12 個月利率推演](./topics/business/2026-09-03-warsh-fed-taskforces-rate-path.md) | Business |
+| 2026-09-03 | [AI Capex $100 流向圖 — 從金流圖到利潤圖到瓶頸圖，與 1–3 年投資排序](./topics/business/2026-09-03-ai-capex-sankey-investment-map.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
