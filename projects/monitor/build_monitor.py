@@ -461,6 +461,8 @@ def collect_hl(root):
     out["shadow"] = collect_hl_shadow(root)
     # 掃描裁決
     out["scan"] = collect_hl_scan(root)
+    # 部位回合聚合（依場所勝率/賠率，每日成交歷史累積的產物）
+    out["fills_history"] = collect_hl_fills_history(root)
     # 證據閘門記分板
     out["gates"] = build_gates(out)
     return out
@@ -502,6 +504,47 @@ def collect_hl_scan(root):
         }
     except Exception:
         return {"available": False}
+
+
+# ── 部位回合聚合（fills_history.py 每日累積，突破 userFills 單次 2000 筆上限）──
+# 逐筆算勝率會被「一次平倉拆成幾十筆部分成交」污染成假數字（同回合的部分成交
+# 符號全同）；fills_history_stats.json 已用 aggregate_round_trips 的 flat→flat
+# 真實回合算好勝率/賠率，這裡只是原樣揭露，不重算。依 dex 前綴分組（"native"＝
+# 原生永續），讓使用者一眼看出「哪個場所才是他真正的優勢」。
+
+def _round_trip_group(s):
+    if not isinstance(s, dict):
+        return None
+    return {k: clean(s.get(k)) for k in (
+        "n_round_trips", "win_rate", "net_pnl", "profit_factor", "payoff_ratio",
+        "avg_win", "avg_loss", "best_win", "worst_loss", "worst_loss_share_of_profit",
+        "n_open_positions", "open_positions_realized_pnl", "carry_in_pnl",
+    )}
+
+
+def collect_hl_fills_history(root):
+    path = os.path.join(root, "projects", "hyper-observer", "data", "tracked",
+                        HL_ADDR, "fills_history_stats.json")
+    try:
+        s = load_json(path)
+    except Exception:
+        return {"available": False,
+               "placeholder": "成交歷史累積尚未產出（fills_history.py 排程每日 23:15 UTC 執行）。"}
+    by_dex = {dex: g for dex, g in
+              ((k, _round_trip_group(v)) for k, v in (s.get("by_dex") or {}).items())
+              if g is not None}
+    return {
+        "available": True,
+        "generated_at": s.get("generated_at"),
+        "n_fills_total": fint(s.get("n_fills_total")),
+        "span_days": clean(s.get("span_days")),
+        "earliest_fill": s.get("earliest_fill"),
+        "latest_fill": s.get("latest_fill"),
+        "is_high_frequency": bool(s.get("is_high_frequency")),
+        "retention_days": fint(s.get("retention_days")),
+        "overall": _round_trip_group(s.get("overall")),
+        "by_dex": by_dex,
+    }
 
 
 def build_gates(hl):
