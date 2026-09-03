@@ -8,7 +8,7 @@
 
 | 端點 | 成功 | 失敗 | 失敗樣本 |
 |---|---:|---:|---|
-| `clearinghouseState @ api.hyperliquid.xyz/info` | 69 | 0 | — |
+| `clearinghouseState @ api.hyperliquid.xyz/info` | 45 | 0 | — |
 | `clearinghouseState@abcd @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@cash @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@flx @ api.hyperliquid.xyz/info` | 3 | 0 | — |
@@ -20,31 +20,31 @@
 | `clearinghouseState@vntl @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@xyz @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `perpDexs @ api.hyperliquid.xyz/info` | 1 | 0 | — |
-| `portfolio @ api.hyperliquid.xyz/info` | 69 | 0 | — |
+| `portfolio @ api.hyperliquid.xyz/info` | 45 | 0 | — |
 | `spotClearinghouseState @ api.hyperliquid.xyz/info` | 3 | 0 | — |
-| `userFills @ api.hyperliquid.xyz/info` | 69 | 0 | — |
-| `userFunding @ api.hyperliquid.xyz/info` | 69 | 0 | — |
+| `userFills @ api.hyperliquid.xyz/info` | 45 | 0 | — |
+| `userFunding @ api.hyperliquid.xyz/info` | 45 | 0 | — |
 
 ## 2. 分類統計
 
 | 分類 | 錢包數 | 佔比 |
 |---|---:|---:|
-| consistent_winner | 3 | 4% |
-| blowup_risk | 39 | 57% |
-| wash_suspect | 7 | 10% |
-| one_hit | 8 | 12% |
+| consistent_winner | 3 | 7% |
+| blowup_risk | 30 | 67% |
+| wash_suspect | 2 | 4% |
+| one_hit | 2 | 4% |
 | dormant | 0 | 0% |
-| choppy | 12 | 17% |
+| choppy | 8 | 18% |
 | insufficient_data | 0 | 0% |
-| **合計** | **69** | |
+| **合計** | **45** | |
 
 ## 3. consistent_winner 明細
 
 | 地址 | 總 PnL | 峰值回撤 | profit factor | 目前槓桿 | 主力幣 | 活躍天 | 可跟 |
 |---|---:|---:|---:|---:|---|---:|---|
-| `0x8bae3527e5a33fa0cf184f37bc112d071463ab6d` | $11,293,604 | 6% | 11.15 | 10x | xyz:META | 413 | ✅（30d 事件 28／fills 852）|
+| `0x8bae3527e5a33fa0cf184f37bc112d071463ab6d` | $11,295,937 | 6% | 11.15 | 10x | xyz:META | 413 | ✅（30d 事件 28／fills 852）|
 | `0xd2a238110d411970efdc9cccfb4110a6fe24206e` | $1,633,535 | 0% | 379.45 | —x | @151 | 525 | ✅（30d 事件 0／fills 0）|
-| `0xbd34523189edc7a9e9c202a15e00afe18ba4bc7f` | $62,890 | 31% | 4.23 | 3x | @107 | 214 | ✅（30d 事件 14／fills 1,036）|
+| `0xbd34523189edc7a9e9c202a15e00afe18ba4bc7f` | $64,846 | 31% | 4.23 | 3x | @107 | 214 | ✅（30d 事件 14／fills 1,036）|
 
 ## 4. Ground-truth 校驗
 
