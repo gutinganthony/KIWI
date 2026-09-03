@@ -448,6 +448,116 @@ def test_diagnostic_edge_cases(tmp):
           "非數字 days_since_last_fill → None")
 
 
+ROUND_TRIP_GROUP = {
+    "n_round_trips": 4, "win_rate": 0.75, "net_pnl": 12345.67,
+    "profit_factor": 3.1, "payoff_ratio": 2.5, "avg_win": 5000.0,
+    "avg_loss": -2000.0, "best_win": 8000.0, "worst_loss": -3000.0,
+    "worst_loss_share_of_profit": 0.15, "n_open_positions": 1,
+    "open_positions_realized_pnl": 100.0, "carry_in_pnl": -50.0,
+}
+
+FILLS_HISTORY_FIXTURE = {
+    "generated_at": "2026-08-28T06:56:25Z", "n_fills_total": 2513,
+    "span_days": 26.9, "earliest_fill": "2026-07-31T00:36Z",
+    "latest_fill": "2026-08-26T21:08Z",
+    "overall": ROUND_TRIP_GROUP,
+    "by_dex": {"native": ROUND_TRIP_GROUP, "xyz": ROUND_TRIP_GROUP},
+}
+
+
+def test_fills_history_section(tmp):
+    print("[9] 部位回合表現（fills_history.py 每日累積）：正常/缺失/高頻/畸形")
+    skel = os.path.join(tmp, "fh-normal")
+    d_dir = _write_hl(skel, json.loads(json.dumps(DOSSIER_BASE)))
+    with open(os.path.join(d_dir, "fills_history_stats.json"), "w", encoding="utf-8") as f:
+        json.dump(FILLS_HISTORY_FIXTURE, f, ensure_ascii=False)
+    out = os.path.join(skel, "index.html")
+    build_monitor.render(skel, out)
+    html = open(out, encoding="utf-8").read()
+    d = extract_data(html)
+    fh = d["hl"]["fills_history"]
+    check(fh["available"] is True, "fills_history.available=True")
+    check(fh["n_fills_total"] == 2513 and fh["span_days"] == 26.9,
+          "樣本數與跨度正確透傳")
+    check(set(fh["by_dex"]) == {"native", "xyz"}, "by_dex 分組正確透傳")
+    check(fh["overall"]["n_round_trips"] == 4 and fh["overall"]["win_rate"] == 0.75,
+          "overall 回合數與勝率正確透傳")
+    check(fh["is_high_frequency"] is False, "未標記高頻旗標時預設 False（不臆造）")
+    # 注意：頁面是靜態 JS 樣板，client-side 執行才會把 'builder dex '+dex 串成
+    # 「builder dex xyz」——這裡沒有無頭瀏覽器執行 JS，只能靜態比對原始檔案文字，
+    # 所以驗證的是「原始檔含這段字面常數／JS 源碼片段」，不是「瀏覽器渲染後的 DOM」。
+    for s in ("部位回合表現", "<th>場所</th>", "回合數", "賠率", "獲利因子",
+              "淨損益（回合）", "未平倉（已實現）", "carry-in", "原生永續",
+              "全體", "flat→flat"):
+        check(s in html, f"頁面含「{s}」")
+    check("'builder dex '+dex" in html,
+          "JS 源碼含 builder dex 前綴串接邏輯（執行時期才會產出「builder dex xyz」）")
+    # 「非高頻不顯示警示」屬 client-side 條件渲染，這裡沒有無頭瀏覽器可執行 JS
+    # 驗證實際 DOM——高頻警示的字面常數本來就恆常存在於 template 的 JS 原始碼
+    # 裡（不管這次的資料是不是高頻），靜態文字比對測不出「有沒有顯示」，只能
+    # 測到此為止：資料層 is_high_frequency 正確為 False（見上面那條 check）。
+
+    print("[10] fills_history_stats.json 缺失 → 佔位訊息，不影響其餘 hl 區塊")
+    skel2 = os.path.join(tmp, "fh-missing")
+    _write_hl(skel2, json.loads(json.dumps(DOSSIER_BASE)))
+    out2 = os.path.join(skel2, "index.html")
+    build_monitor.render(skel2, out2)
+    html2 = open(out2, encoding="utf-8").read()
+    d2 = extract_data(html2)
+    check(d2["hl"]["fills_history"]["available"] is False,
+          "檔案缺失 → available=False（build 不炸）")
+    check("排程每日" in d2["hl"]["fills_history"]["placeholder"],
+          "佔位訊息說明排程時間，不是空白一片")
+    check(d2["hl"]["available"] is True, "fills_history 缺失不拖累其餘 hl 區塊")
+    # 同上：renderRoundTrips() 的 early-return（!fh.available）是 client-side
+    # 條件邏輯，函式本體（含「部位回合表現」字面常數）仍恆常存在於 template 的
+    # JS 原始碼裡，靜態文字比對驗不出「這次沒渲染」——已用資料層 available=False
+    # 驗證前提條件成立，JS 的 early-return guard 靠人讀（見 renderRoundTrips
+    # 開頭那行 if(!fh || !fh.available) return '';）。
+
+    print("[11] 高頻／做市型旗標 → 頁面顯示警示")
+    skel3 = os.path.join(tmp, "fh-hft")
+    d_dir3 = _write_hl(skel3, json.loads(json.dumps(DOSSIER_BASE)))
+    hft_fixture = json.loads(json.dumps(FILLS_HISTORY_FIXTURE))
+    hft_fixture["is_high_frequency"] = True
+    hft_fixture["retention_days"] = 14
+    with open(os.path.join(d_dir3, "fills_history_stats.json"), "w", encoding="utf-8") as f:
+        json.dump(hft_fixture, f, ensure_ascii=False)
+    out3 = os.path.join(skel3, "index.html")
+    build_monitor.render(skel3, out3)
+    html3 = open(out3, encoding="utf-8").read()
+    d3 = extract_data(html3)
+    check(d3["hl"]["fills_history"]["is_high_frequency"] is True
+          and d3["hl"]["fills_history"]["retention_days"] == 14,
+          "高頻旗標與保留期正確透傳（渲染與否交給 JS 的 if(fh.is_high_frequency) guard，"
+          "見 template.html renderRoundTrips；靜態檔案無法驗證條件渲染的實際結果）")
+
+    print("[12] 畸形 fills_history_stats.json → 不炸，退化成安全值")
+    skel4 = os.path.join(tmp, "fh-malformed")
+    d_dir4 = _write_hl(skel4, json.loads(json.dumps(DOSSIER_BASE)))
+    with open(os.path.join(d_dir4, "fills_history_stats.json"), "w", encoding="utf-8") as f:
+        f.write("not valid json{{{")
+    out4 = os.path.join(skel4, "index.html")
+    build_monitor.render(skel4, out4)
+    html4 = open(out4, encoding="utf-8").read()
+    d4 = extract_data(html4)
+    check(d4["hl"]["fills_history"]["available"] is False,
+          "壞掉的 JSON → available=False，不炸整頁")
+    check("聰明錢系統監控" in html4, "壞檔不影響頁面其餘部分完整產出")
+
+    skel5 = os.path.join(tmp, "fh-badshape")
+    d_dir5 = _write_hl(skel5, json.loads(json.dumps(DOSSIER_BASE)))
+    with open(os.path.join(d_dir5, "fills_history_stats.json"), "w", encoding="utf-8") as f:
+        json.dump({"by_dex": {"xyz": "不是 dict", "native": None}, "overall": "壞掉"}, f)
+    out5 = os.path.join(skel5, "index.html")
+    build_monitor.render(skel5, out5)
+    d5 = extract_data(open(out5, encoding="utf-8").read())
+    check(d5["hl"]["fills_history"]["available"] is True
+          and d5["hl"]["fills_history"]["by_dex"] == {}
+          and d5["hl"]["fills_history"]["overall"] is None,
+          "型別錯誤的 by_dex/overall 被淨化成空/None，不臆造假數字")
+
+
 def main():
     tmp = tempfile.mkdtemp(prefix="monitor-test-")
     try:
@@ -458,6 +568,7 @@ def main():
         test_venues_legacy(tmp)
         test_venue_share_math(tmp)
         test_diagnostic_edge_cases(tmp)
+        test_fills_history_section(tmp)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     print(f"ALL TESTS PASSED ({CHECKS} checks)")

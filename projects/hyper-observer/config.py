@@ -327,3 +327,13 @@ SHADOW_DEFAULT_LABEL_SUBSTR = "scan-best-candidate"
 FILLS_HISTORY_RETENTION_DAYS = 180   # 原始成交保留期限，到期直接捨棄（不做月結彙總）
 FILLS_HISTORY_BACKFILL_DAYS = 30     # 首次執行且無 latest_raw.json 可種子時的回填窗
 FILLS_HISTORY_PAGE_CAP = 4           # 單次抓取最多翻幾頁 userFillsByTime（每頁權重 20）
+
+# 高頻／做市型錢包的保留期降級（2026-08-28 實測發現）：
+# TRACKED_WALLETS 裡 label="hft-highvolume-candidate" 的 0x5b5d5120 累積 10.1 天就
+# 吃到 58,000 筆（≈5,800 筆/天，是原本抓大戶 0x8bae35 那條 ~200 筆/天估計的 29 倍），
+# 檔案 10 天就到 5.6MB——用 180 天的通用保留期會膨脹到 100MB+，而且這種錢包幾乎不
+# 回到 flat（aggregate_round_trips 算出 n_round_trips=0，全部落在 carry_in），根本
+# 不適合用回合聚合分析，長期累積它的原始成交沒有分析價值，純粹是白佔 repo 空間。
+# 判定依據用實測速率（而非寫死錢包位址／label 字串），下次出現新的高頻標的一樣擋得住。
+FILLS_HISTORY_HFT_FILLS_PER_DAY = 500   # 平均每天成交數超過此值 → 視為高頻／做市型
+FILLS_HISTORY_HFT_RETENTION_DAYS = 14   # 高頻錢包改用的保留期（只夠近期監控，不做長期分析）

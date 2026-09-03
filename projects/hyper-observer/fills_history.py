@@ -225,6 +225,31 @@ def save_stats(path, stats):
 # 主流程
 # ---------------------------------------------------------------------------
 
+def _fills_per_day(fills):
+    """粗估每日成交速率（總筆數 / 跨度天數）。樣本跨度 <1 天時分母保底 1 天，
+    避免剛種子完、跨度極短時被誤判成極端高頻。"""
+    ts_vals = [f["ts"] for f in fills if f["ts"] is not None]
+    if len(ts_vals) < 2:
+        return 0.0
+    span_days = max((max(ts_vals) - min(ts_vals)) / 86400, 1.0)
+    return len(fills) / span_days
+
+
+def effective_retention_days(fills):
+    """回 (retention_days, is_high_frequency)。
+
+    高頻／做市型錢包（見 config.FILLS_HISTORY_HFT_FILLS_PER_DAY 的實測依據：
+    0x5b5d5120 標籤 hft-highvolume-candidate，10.1 天吃到 58,000 筆＝約 5,800
+    筆/天，累積 180 天會膨脹到 100MB+，且這種錢包幾乎不回到 flat，長期累積原始
+    成交沒有分析價值）改用短保留期，只夠近期監控用，不做長期回合分析。
+    判定用實測速率而非寫死位址／label，下次出現新的高頻標的一樣擋得住。
+    """
+    rate = _fills_per_day(fills)
+    if rate > config.FILLS_HISTORY_HFT_FILLS_PER_DAY:
+        return config.FILLS_HISTORY_HFT_RETENTION_DAYS, True
+    return config.FILLS_HISTORY_RETENTION_DAYS, False
+
+
 def run_for_wallet(addr, data_dir, meta, post_fn=None, now_sec=None):
     """回 stats dict。data_dir＝該錢包的 data/tracked/{addr} 目錄。"""
     now_sec = now_sec if now_sec is not None else time.time()
@@ -241,12 +266,18 @@ def run_for_wallet(addr, data_dir, meta, post_fn=None, now_sec=None):
     meta.note(f"{addr[:10]}… {note}｜新增 {n_added} 筆（去重後）")
 
     stats = build_stats(merged)
+    retention_days, is_hft = effective_retention_days(merged)
+    stats["is_high_frequency"] = is_hft
+    stats["retention_days"] = retention_days
+    if is_hft:
+        meta.note(f"{addr[:10]}… 平均 {_fills_per_day(merged):.0f} 筆/天，"
+                  f"超過 {config.FILLS_HISTORY_HFT_FILLS_PER_DAY} 視為高頻／做市型，"
+                  f"保留期降為 {retention_days} 天（不做長期回合分析）")
     save_stats(stats_path, stats)
 
-    trimmed, n_dropped = trim_retention(merged, now_sec, config.FILLS_HISTORY_RETENTION_DAYS)
+    trimmed, n_dropped = trim_retention(merged, now_sec, retention_days)
     if n_dropped:
-        meta.note(f"{addr[:10]}… 修剪 {n_dropped} 筆超過 "
-                  f"{config.FILLS_HISTORY_RETENTION_DAYS} 天保留期的舊成交")
+        meta.note(f"{addr[:10]}… 修剪 {n_dropped} 筆超過 {retention_days} 天保留期的舊成交")
     save_history(hist_path, trimmed)
     return stats
 
@@ -256,6 +287,9 @@ def print_summary(addr, stats):
     print(f"[fills_history] {addr}")
     print(f"  歷史樣本：{stats['n_fills_total']} 筆成交、跨度 {stats['span_days']:.1f} 天"
          f"（{stats['earliest_fill']} ～ {stats['latest_fill']}）")
+    if stats.get("is_high_frequency"):
+        print(f"  ⚠ 高頻／做市型（平均 >{config.FILLS_HISTORY_HFT_FILLS_PER_DAY} 筆/天），"
+             f"保留期降為 {stats.get('retention_days')} 天，回合統計不具長期分析價值")
     wr = "?" if ov["win_rate"] is None else f"{ov['win_rate']:.1%}"
     pf = "?" if ov["profit_factor"] is None else f"{ov['profit_factor']:.2f}"
     print(f"  全體：{ov['n_round_trips']} 個完整回合｜勝率 {wr}｜獲利因子 {pf}｜"
@@ -293,6 +327,9 @@ def main(argv=None):
                 print(f"[fills_history] {addr}：本地無歷史（尚未跑過或已被修剪殆盡）")
                 continue
             stats = build_stats(fills)
+            retention_days, is_hft = effective_retention_days(fills)
+            stats["is_high_frequency"] = is_hft
+            stats["retention_days"] = retention_days
         else:
             os.makedirs(data_dir, exist_ok=True)
             stats = run_for_wallet(addr, data_dir, meta)

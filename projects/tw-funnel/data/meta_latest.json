@@ -1,15 +1,15 @@
 {
- "generated_at": "2026-09-01T14:20:55Z",
+ "generated_at": "2026-09-02T13:54:04Z",
  "market": "TW",
  "pipeline": "tw-funnel",
- "as_of_trading_day": "2026-09-01",
+ "as_of_trading_day": "2026-09-02",
  "endpoint_health": {
   "finmind_stock_info": {
    "ok": true,
    "status": 200,
    "source": "finmind",
    "dataset": "TaiwanStockInfo",
-   "rows": 4315
+   "rows": 4318
   },
   "finmind_institutional": {
    "ok": false,
@@ -37,55 +37,49 @@
    "error": "{\"msg\":\"Your level is register. Please update your user level. Detail information:https://finmindtrade.com/analysis/#/Sponsor/sponsor\",\"status\":400,\"t"
   },
   "stock_day_all": {
-   "ok": false,
+   "ok": true,
    "status": 200,
-   "error": "Expecting value: line 1 column 1 (char 0)",
    "url": "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL"
   },
   "finmind_month_revenue": {
    "ok": true,
    "source": "finmind",
    "dataset": "TaiwanStockMonthRevenue",
-   "pool": 65,
-   "fetched": 63,
+   "pool": 56,
+   "fetched": 56,
    "errors": 0
   },
   "company_basic": {
-   "ok": false,
+   "ok": true,
    "status": 200,
-   "error": "Expecting value: line 1 column 1 (char 0)",
    "url": "https://openapi.twse.com.tw/v1/opendata/t187ap03_L"
   },
   "punish_list": {
-   "ok": false,
+   "ok": true,
    "status": 200,
-   "error": "Expecting value: line 1 column 1 (char 0)",
    "url": "https://openapi.twse.com.tw/v1/announcement/punish"
   },
   "attention_list": {
-   "ok": false,
+   "ok": true,
    "status": 200,
-   "error": "Expecting value: line 1 column 1 (char 0)",
    "url": "https://openapi.twse.com.tw/v1/announcement/notice"
   },
   "pledge_t187ap11_L": {
    "ok": false,
    "status": 200,
-   "error": "HTTPSConnectionPool(host='openapi.twse.com.tw', port=443): Max retries exceeded with url: /v1/opendata/t187ap11_L (Caused by NewConnectionError(\"HTTPS",
-   "url": "https://openapi.twse.com.tw/v1/opendata/t187ap11_L"
+   "url": "https://openapi.twse.com.tw/v1/opendata/t187ap11_L",
+   "error": "回應可取但無設質/持股欄位——欄位假設不成立，質押否決不生效"
   }
  },
  "funnel_stats": {
-  "raw_filings": 264,
-  "qualified_events": 36,
-  "post_veto": 36,
+  "raw_filings": 267,
+  "qualified_events": 33,
+  "post_veto": 33,
   "final_candidates": 15
  },
  "veto_reasons": {},
  "january_window_active": false,
  "degradations": [
-  "punish_list_unavailable: 處置股清單取數失敗/未取，該否決不生效",
-  "attention_list_unavailable: 注意股清單取數失敗/未取，該否決不生效",
   "pledge_data_unavailable: 董監質押比取數失敗/欄位不符，質押否決不生效"
  ],
  "todo_not_wired": [
