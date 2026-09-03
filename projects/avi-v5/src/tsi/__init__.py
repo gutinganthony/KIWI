@@ -137,6 +137,14 @@ class TechStressIndex:
             vix_daily = vix_daily[vix_daily.index <= cutoff]
             if treasury_30y is not None:
                 treasury_30y = treasury_30y[treasury_30y.index <= cutoff]
+            # vvix/hyg 也必須裁切，否則 as_of 回測會有未來資訊洩漏（look-ahead bias）。
+            # 這兩支合計佔 26% 權重（vvix_lead 14% + credit_divergence 12%），
+            # 漏切會讓回測 AUC 虛高。現有回測腳本都自己預先切窗才傳入，
+            # 所以既有結果未受影響；補上這段是防止未來直接依賴 as_of 時出錯。
+            if vvix_daily is not None:
+                vvix_daily = vvix_daily[vvix_daily.index <= cutoff]
+            if hyg_daily is not None:
+                hyg_daily = hyg_daily[hyg_daily.index <= cutoff]
 
         date = sox_daily.index[-1].to_pydatetime()
         indicators = []

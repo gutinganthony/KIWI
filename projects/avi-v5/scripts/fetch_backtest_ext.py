@@ -28,6 +28,11 @@ TICKERS = {
     "QQQ": "QQQ",
     "HYG": "HYG",
     "SMH": "SMH",
+    # MRI 信用觸發層用：HYG 單獨含「信用利差 + 利率久期」兩種成分，
+    # 必須減掉久期相近的公債(IEF)才能分離出純信用利差。LQD 提供投等級對照，
+    # HYG/LQD 則是信用內部的品質利差。三者一起才構成可用的信用壓力量測。
+    "LQD": "LQD",      # 投資等級公司債
+    "IEF": "IEF",      # 7-10年公債（久期與 HYG/LQD 相近的無信用風險對照組）
     "^VVIX": "VVIX",   # extends local VVIX.csv beyond 2025-02
     "^VIX": "VIX",     # 讓 LFI 用完整 3 年校準（否則受限於 yfinance 2 年窗）
     # 真實 Serenity 標的（供未來用真標的驗證節流閥/擇時，取代高beta代理籃）
@@ -39,6 +44,12 @@ TICKERS = {
     "8035.T": "TokyoElectron",
 }
 START = "2019-01-01"
+# 個別標的的起始日覆寫：信用層要回測 2008 金融海嘯，2019 起太短（只涵蓋 3 次事件）。
+# LQD/IEF 都在 2002-07 成立，抓到成立日才能涵蓋 2008，事件數從 3 提升到 6 次以上。
+START_OVERRIDE = {
+    "LQD": "2002-07-01",
+    "IEF": "2002-07-01",
+}
 FRESH_SECONDS = 6 * 86400
 
 
@@ -103,7 +114,8 @@ def main():
     ok = 0
     for ticker, path in targets.items():
         try:
-            df = yf.download(ticker, start=START, auto_adjust=False, progress=False)
+            df = yf.download(ticker, start=START_OVERRIDE.get(ticker, START),
+                             auto_adjust=False, progress=False)
             if df is None or len(df) < 100:
                 print(f"⚠️ {ticker}: too little data ({0 if df is None else len(df)}) — kept old file")
                 continue
