@@ -18,7 +18,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |-------|---------|
 | [Technology](./topics/technology/INDEX.md) | 5 |
 | [Science](./topics/science/INDEX.md) | 0 |
-| [Business](./topics/business/INDEX.md) | 81 |
+| [Business](./topics/business/INDEX.md) | 84 |
 | [Health](./topics/health/INDEX.md) | 1 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Other](./topics/other/INDEX.md) | 4 |
@@ -32,6 +32,9 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-09-03 | [能源板塊「三重訊號」檢視 × AI 融資泡沫的正確計時點](./topics/business/2026-09-03-ai-bubble-timing-and-energy-signals.md) | Business |
+| 2026-09-03 | [AI 追蹤系統 v1 — 供應鏈層（Sankey）＋ 融資層（AFI）](./topics/business/2026-09-03-ai-capex-tracker.md) | Business |
+| 2026-09-03 | [冷卻 × 800VDC — Serenity 前置篩選（Step 1–4）與 9/6 全掃清單](./topics/business/2026-09-03-cooling-800vdc-serenity-prescreen.md) | Business |
 | 2026-09-03 | [AI Capex $100 流向圖 — 從金流圖到利潤圖到瓶頸圖，與 1–3 年投資排序](./topics/business/2026-09-03-ai-capex-sankey-investment-map.md) | Business |
 | 2026-09-03 | [沃什的五個聯準會工作組 — 制度工程 vs 鷹派修辭，與 1–12 個月利率推演](./topics/business/2026-09-03-warsh-fed-taskforces-rate-path.md) | Business |
 | 2026-09-03 | [匯率觀點：台幣／美元／日圓／瑞郎 — 短中長期](./topics/business/2026-09-03-fx-outlook-twd-usd-jpy-chf.md) | Business |
@@ -106,6 +109,9 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-09-03 | [匯率觀點：台幣／美元／日圓／瑞郎 — 短中長期](./topics/business/2026-09-03-fx-outlook-twd-usd-jpy-chf.md) | Business |
 | 2026-09-03 | [沃什的五個聯準會工作組 — 制度工程 vs 鷹派修辭，與 1–12 個月利率推演](./topics/business/2026-09-03-warsh-fed-taskforces-rate-path.md) | Business |
 | 2026-09-03 | [AI Capex $100 流向圖 — 從金流圖到利潤圖到瓶頸圖，與 1–3 年投資排序](./topics/business/2026-09-03-ai-capex-sankey-investment-map.md) | Business |
+| 2026-09-03 | [冷卻 × 800VDC — Serenity 前置篩選（Step 1–4）與 9/6 全掃清單](./topics/business/2026-09-03-cooling-800vdc-serenity-prescreen.md) | Business |
+| 2026-09-03 | [AI 追蹤系統 v1 — 供應鏈層（Sankey）＋ 融資層（AFI）](./topics/business/2026-09-03-ai-capex-tracker.md) | Business |
+| 2026-09-03 | [能源板塊「三重訊號」檢視 × AI 融資泡沫的正確計時點](./topics/business/2026-09-03-ai-bubble-timing-and-energy-signals.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---

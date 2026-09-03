@@ -87,3 +87,6 @@
 | 2026-09-03 | [匯率觀點：台幣／美元／日圓／瑞郎 — 短中長期](./2026-09-03-fx-outlook-twd-usd-jpy-chf.md) | fx, twd, usd, jpy, chf, central-banks, fed, boj, snb, cbc, carry, hedging, ips-gap |
 | 2026-09-03 | [沃什的五個聯準會工作組 — 制度工程 vs 鷹派修辭，與 1–12 個月利率推演](./2026-09-03-warsh-fed-taskforces-rate-path.md) | fed, warsh, fomc, rates, inflation-framework, balance-sheet, term-premium, curve-steepener, bloomberg-intelligence |
 | 2026-09-03 | [AI Capex $100 流向圖 — 從金流圖到利潤圖到瓶頸圖，與 1–3 年投資排序](./2026-09-03-ai-capex-sankey-investment-map.md) | investment, ai-capex, sankey, nvidia, rubin, hbm, power, cooling, wfe, cpo, bottleneck, serenity, portfolio-diagnosis |
+| 2026-09-03 | [冷卻 × 800VDC — Serenity 前置篩選（Step 1–4）與 9/6 全掃清單](./2026-09-03-cooling-800vdc-serenity-prescreen.md) | serenity, cooling, liquid-cooling, UQD, 800VDC, solid-state-transformer, sidecar, taiwan-stocks, prescreen |
+| 2026-09-03 | [AI 追蹤系統 v1 — 供應鏈層（Sankey）＋ 融資層（AFI）](./2026-09-03-ai-capex-tracker.md) | tracker, ai-capex, sankey, AFI, financing-intensity, credit-spreads, RPO, monitoring, scorecard |
+| 2026-09-03 | [能源板塊「三重訊號」檢視 × AI 融資泡沫的正確計時點](./2026-09-03-ai-bubble-timing-and-energy-signals.md) | energy, insider-buying, 13F, pelosi, thiel, vistra, bloom-energy, ai-bubble, timing, credit-spreads, decision-audit |
