@@ -7,7 +7,7 @@
 
 | 端點 | 成功 | 失敗 | 失敗樣本 |
 |---|---:|---:|---|
-| `clearinghouseState @ api.hyperliquid.xyz/info` | 60 | 0 | — |
+| `clearinghouseState @ api.hyperliquid.xyz/info` | 59 | 1 | status=429 HTTP 429; body=null |
 | `clearinghouseState@abcd @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@cash @ api.hyperliquid.xyz/info` | 3 | 0 | — |
 | `clearinghouseState@flx @ api.hyperliquid.xyz/info` | 3 | 0 | — |
@@ -22,7 +22,7 @@
 | `perpDexs @ api.hyperliquid.xyz/info` | 1 | 0 | — |
 | `portfolio @ api.hyperliquid.xyz/info` | 60 | 0 | — |
 | `spotClearinghouseState @ api.hyperliquid.xyz/info` | 3 | 0 | — |
-| `userFills @ api.hyperliquid.xyz/info` | 59 | 1 | status=429 HTTP 429; body=null |
+| `userFills @ api.hyperliquid.xyz/info` | 60 | 0 | — |
 | `userFunding @ api.hyperliquid.xyz/info` | 60 | 0 | — |
 
 ## 2. 分類統計
@@ -30,8 +30,8 @@
 | 分類 | 錢包數 | 佔比 |
 |---|---:|---:|
 | consistent_winner | 1 | 2% |
-| blowup_risk | 30 | 50% |
-| wash_suspect | 22 | 37% |
+| blowup_risk | 32 | 53% |
+| wash_suspect | 20 | 33% |
 | one_hit | 2 | 3% |
 | dormant | 0 | 0% |
 | choppy | 5 | 8% |
@@ -42,7 +42,7 @@
 
 | 地址 | 總 PnL | 峰值回撤 | profit factor | 目前槓桿 | 主力幣 | 活躍天 |
 |---|---:|---:|---:|---:|---|---:|
-| `0x8bae3527e5a33fa0cf184f37bc112d071463ab6d` | $11,293,476 | 6% | 11.15 | 10x | xyz:META | 413 |
+| `0x8bae3527e5a33fa0cf184f37bc112d071463ab6d` | $11,296,641 | 6% | 11.15 | 10x | xyz:META | 413 |
 
 ## 4. Ground-truth 校驗
 

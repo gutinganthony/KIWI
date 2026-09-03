@@ -359,6 +359,9 @@ function placeholderHTML(msg){
   /* 資金流動（僅在有診斷資料時出現） */
   html += renderFlows(hl.flows || {});
 
+  /* 部位回合表現（依場所，每日成交歷史累積） */
+  html += renderRoundTrips(hl.fills_history || {});
+
   /* 月度 PnL 圖 */
   html += '<h3>月度 PnL</h3><div class="chart-box"><div class="chart-scroll" id="hl-chart"></div>'
         + '<div class="tooltip" id="hl-tip"></div>'
@@ -491,6 +494,59 @@ function renderFlows(fl){
   if(fl.verdict) tail.push('診斷裁決：'+esc(fl.verdict));
   tail.push('診斷資料日期：<b>'+esc(fl.date||'—')+'</b>（診斷為週期性產物，非每日更新）');
   html += '<div class="note">'+tail.join('・')+'</div>';
+  return html;
+}
+
+/* ── 部位回合聚合（依場所勝率/賠率，fills_history.py 每日累積）───
+   逐筆算勝率會被「一次平倉拆成幾十筆部分成交」污染成假數字（同一回合的部分
+   成交符號全同，曾算出 100%/0% 這種無意義數字）；這裡顯示的是用 startPosition
+   追蹤 flat→flat 真實回合算出的勝率/賠率，樣本量隨每日累積增加。
+   賠率＝平均賺÷平均虧；worst_loss_share_of_profit 高代表曾經歷過大虧。 */
+function renderRoundTrips(fh){
+  if(!fh || !fh.available) return '';
+  var html = '<h3>部位回合表現（依場所・每日成交歷史累積）</h3>';
+  html += '<div class="small">樣本：'+esc(fmtNum(fh.n_fills_total))+' 筆成交・跨度 '
+        + esc(fh.span_days==null?'—':fh.span_days.toFixed(1))+' 天（'
+        + esc(fh.earliest_fill||'—')+' ～ '+esc(fh.latest_fill||'—')+'）</div>';
+  if(fh.is_high_frequency){
+    html += '<div class="callout"><b>⚠︎ 高頻／做市型錢包</b>——'
+      + '成交速率遠超一般大戶，保留期已降為 '+esc(fh.retention_days)+' 天'
+      + '（只夠近期監控，回合統計不具長期分析價值，勝率/賠率僅供參考）。</div>';
+  }
+  function row(name, g){
+    if(!g) return '';
+    var wr = fmtPct(g.win_rate);
+    var payoff = g.payoff_ratio==null ? '—' : g.payoff_ratio.toFixed(2);
+    var pf = g.profit_factor==null ? '—' : (g.profit_factor>=999?'∞':g.profit_factor.toFixed(2));
+    var netUp = (g.net_pnl||0)>=0;
+    return '<tr><td>'+esc(name)+'</td>'
+      + '<td class="num">'+esc(fmtNum(g.n_round_trips))+'</td>'
+      + '<td class="num">'+esc(wr)+'</td>'
+      + '<td class="num">'+esc(payoff)+'</td>'
+      + '<td class="num">'+esc(pf)+'</td>'
+      + '<td class="num" style="color:var(--'+(netUp?'pos':'neg')+'-text)">'
+        + esc(signedUsd(g.net_pnl))+'</td>'
+      + '<td class="num">'+esc(fmtNum(g.n_open_positions))+'（'+esc(signedUsd(g.open_positions_realized_pnl))+'）</td>'
+      + '<td class="num">'+esc(signedUsd(g.carry_in_pnl))+'</td></tr>';
+  }
+  html += '<div class="table-scroll"><table><thead><tr>'
+        + '<th>場所</th><th class="num">回合數</th><th class="num">勝率</th>'
+        + '<th class="num">賠率</th><th class="num">獲利因子</th>'
+        + '<th class="num">淨損益（回合）</th><th class="num">未平倉（已實現）</th>'
+        + '<th class="num">carry-in</th></tr></thead><tbody>';
+  var byDex = fh.by_dex || {};
+  var order = Object.keys(byDex).sort(function(a,b){
+    if(a==='native') return -1; if(b==='native') return 1;
+    return (byDex[b].n_round_trips||0) - (byDex[a].n_round_trips||0);
+  });
+  order.forEach(function(dex){
+    html += row(dex==='native' ? '原生永續' : 'builder dex '+dex, byDex[dex]);
+  });
+  html += row('全體', fh.overall);
+  html += '</tbody></table></div>';
+  html += '<div class="note">回合＝用 startPosition 追蹤的 flat→flat 完整交易（非逐筆），'
+        + '賠率＝平均賺÷平均虧（越高越好，＜1 代表贏的沒有顯著大於輸的）；'
+        + 'carry-in＝資料視窗開始時已有倉、起點成本不明的損益，不計入回合統計但仍記入對帳。</div>';
   return html;
 }
 

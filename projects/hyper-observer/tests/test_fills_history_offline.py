@@ -245,7 +245,54 @@ def main():
         loaded, _ = fh.load_history(str(data_dir / fh.HISTORY_FILENAME))
         check(len(loaded) == 1, "query 模式讀本地歷史成功")
 
-    print("[12] 唯讀保證")
+    print("[12] 高頻／做市型錢包偵測：保留期自動降級（2026-08-28 實測發現，0x5b5d5120")
+    print("     10.1 天吃到 58,000 筆，180 天保留期會膨脹成 100MB+）")
+    now = 1_000_000.0
+    hft_fills = [mk_fill(now - i * 10.0, "BTC", 1, "Open Long", 0.0, tid=i)
+                for i in range(1000)]  # 1000 筆塞在 ~2.8 小時內 → 極端高頻
+    retention, is_hft = fh.effective_retention_days(hft_fills)
+    check(is_hft is True, f"速率超過門檻 → 判定為高頻（{fh._fills_per_day(hft_fills):.0f} 筆/天）")
+    check(retention == config.FILLS_HISTORY_HFT_RETENTION_DAYS,
+          f"保留期降為 HFT 專用值（{retention}）")
+
+    normal_fills = [mk_fill(now - i * 86400.0, "BTC", 1, "Open Long", 0.0, tid=i)
+                    for i in range(30)]  # 30 筆分散在 30 天 → 每天 1 筆，正常速率
+    retention2, is_hft2 = fh.effective_retention_days(normal_fills)
+    check(is_hft2 is False and retention2 == config.FILLS_HISTORY_RETENTION_DAYS,
+          f"正常速率不誤判（retention={retention2}）")
+
+    check(fh.effective_retention_days([])[1] is False, "空清單不誤判為高頻")
+    single = [mk_fill(now, "BTC", 1, "Open Long", 0.0, tid=1)]
+    check(fh.effective_retention_days(single)[1] is False,
+          "只有 1 筆（算不出跨度）不誤判為高頻")
+
+    with tempfile.TemporaryDirectory(prefix="fills-history-test-") as td:
+        data_dir = Path(td)
+        # 用真實量級的 epoch 秒（而非上面 now=1_000_000.0）：raw_fill 的 "time" 要乘 1000
+        # 變成毫秒餵給 classify.parse_fills，_norm_ts 靠「> 1e12 才視為毫秒」判斷單位，
+        # 太小的 epoch base 乘 1000 後可能還低於門檻，會被誤當成「本來就是秒」而不轉換，
+        # 造成時間軸整整差 1000 倍——這裡刻意用貼近真實日期的量級，避免這個陷阱。
+        now_real = 1_700_000_000.0
+
+        def raw_fill_hft(i):
+            return {"coin": "BTC", "px": "100", "sz": "1", "side": "B",
+                    "time": int((now_real - i * 10.0) * 1000), "closedPnl": "0",
+                    "dir": "Open Long", "startPosition": "0", "tid": i}
+
+        (data_dir / "latest_raw.json").write_text(
+            json.dumps({"userFills": [raw_fill_hft(i) for i in range(1000)]}), encoding="utf-8")
+        meta = fh.fetch.Meta()
+        stats = fh.run_for_wallet("0xhft", str(data_dir), meta,
+                                  post_fn=lambda *a, **k: (None, False), now_sec=now_real)
+        check(stats["is_high_frequency"] is True, "run_for_wallet 端到端標記高頻旗標")
+        check(stats["retention_days"] == config.FILLS_HISTORY_HFT_RETENTION_DAYS,
+              f"端到端保留期正確降級（{stats['retention_days']}）")
+        check(any("高頻" in n for n in meta.notes), f"備註記錄高頻判定（{meta.notes}）")
+        loaded, _ = fh.load_history(str(data_dir / fh.HISTORY_FILENAME))
+        check(len(loaded) == 1000,
+              "全部 1000 筆都在 14 天保留窗內（測試時間差 <1 天），暫不會被修剪")
+
+    print("[13] 唯讀保證")
     src = (PROJECT_DIR / "fills_history.py").read_text(encoding="utf-8")
     for bad in ("place_order", "private_key", "eth_account", "sign(", "/exchange"):
         check(bad not in src, f"fills_history.py 不含 {bad}")

@@ -5,7 +5,7 @@
   "classification": "consistent_winner",
   "classification_reasons": [
     "活動跨度 413.1 天 >= 60",
-    "總 PnL 11293476.26 > 10,000",
+    "總 PnL 11296640.56 > 10,000",
     "回撤 0.0554 < 40% peak",
     "目前槓桿 10.0 <= 20x",
     "正月比率 0.733 >= 0.5",
@@ -21,8 +21,8 @@
     "pnl_source": "portfolio_curve",
     "portfolio_window": "perpAllTime",
     "low_confidence": false,
-    "total_pnl": 11293476.26,
-    "peak_pnl": 11295019.83,
+    "total_pnl": 11296640.56,
+    "peak_pnl": 11296640.56,
     "monthly_pnl": {
       "2025-07": -73180.55,
       "2025-08": -34288.37,
@@ -38,16 +38,16 @@
       "2026-06": -253202.61,
       "2026-07": 1066691.25,
       "2026-08": 1548394.09,
-      "2026-09": 34323.06
+      "2026-09": 37487.36
     },
     "active_months": 15,
     "positive_month_ratio": 0.733,
     "best_month_pnl": 2045437.87,
     "max_drawdown_pct": 0.0554,
-    "current_drawdown_pct": 0.0001,
+    "current_drawdown_pct": 0.0,
     "max_single_day_crash_pct": 0.0331,
     "span_days": 413.1,
-    "days_idle": 1.0,
+    "days_idle": 0.9,
     "n_fills": 2000,
     "profit_factor": 11.148,
     "avg_win": 1853.02,
@@ -69,8 +69,8 @@
     "n_liquidations": 0,
     "top_coin": "xyz:META",
     "vlm": 341755306.05,
-    "vlm_to_pnl_ratio": 30.26,
-    "funding_total": -182190.53,
+    "vlm_to_pnl_ratio": 30.25,
+    "funding_total": -182227.82,
     "n_open_positions": 3,
     "n_open_positions_native": 0,
     "dexs_with_positions": [
@@ -88,14 +88,14 @@
       "mkts": 0.0,
       "para": 0.0,
       "vntl": 0.0,
-      "xyz": 721096.32
+      "xyz": 724252.5
     },
-    "spot_value_usd": 4407156.18,
+    "spot_value_usd": 4410162.25,
     "spot_tokens": [
       {
         "coin": "USDC",
-        "qty": 4358940.92080133,
-        "usd": 4358940.92,
+        "qty": 4361946.98422533,
+        "usd": 4361946.98,
         "estimated": false
       },
       {
@@ -111,7 +111,7 @@
         "estimated": false
       }
     ],
-    "total_value_all_venues": 5128252.5,
+    "total_value_all_venues": 5134414.75,
     "non_native_share": 1.0,
     "current_max_leverage": 10.0,
     "has_extreme_leverage": false,
@@ -119,11 +119,11 @@
       "cross",
       "isolated"
     ],
-    "account_value": 721096.32,
+    "account_value": 724252.5,
     "fetch_errors": []
   },
-  "position_value": 1509982.58,
-  "unrealized_pnl": 34809.79,
+  "position_value": 1513149.88,
+  "unrealized_pnl": 37977.08,
   "n_open_positions": 3,
   "open_positions": [
     {
@@ -131,14 +131,14 @@
       "szi": 4103.967,
       "side": "long",
       "entry_px": 219.24,
-      "position_value": 923720.89236,
-      "unrealized_pnl": 23964.07083,
+      "position_value": 924787.92378,
+      "unrealized_pnl": 25031.10225,
       "leverage_value": 5.0,
       "leverage_type": "cross",
       "liquidation_px": null,
-      "margin_used": 184744.178472,
+      "margin_used": 184957.584756,
       "max_leverage": 20.0,
-      "cum_funding_all_time": 4668.630259,
+      "cum_funding_all_time": 4676.093351,
       "dex": "xyz"
     },
     {
@@ -146,14 +146,14 @@
       "szi": 5688.92,
       "side": "long",
       "entry_px": 87.8794,
-      "position_value": 511877.64376,
-      "unrealized_pnl": 11938.28868,
+      "position_value": 513942.72172,
+      "unrealized_pnl": 14003.36664,
       "leverage_value": 1.0,
       "leverage_type": "isolated",
-      "liquidation_px": 0.1229785951,
-      "margin_used": 511213.00914,
+      "liquidation_px": 0.1235698122,
+      "margin_used": 513274.891883,
       "max_leverage": 10.0,
-      "cum_funding_all_time": 5546.956605,
+      "cum_funding_all_time": 5550.151822,
       "dex": "xyz"
     },
     {
@@ -161,14 +161,14 @@
       "szi": 219.928,
       "side": "long",
       "entry_px": 343.187,
-      "position_value": 74384.04816,
-      "unrealized_pnl": -1092.572852,
+      "position_value": 74419.23664,
+      "unrealized_pnl": -1057.384372,
       "leverage_value": 10.0,
       "leverage_type": "cross",
       "liquidation_px": null,
-      "margin_used": 7438.404816,
+      "margin_used": 7441.923664,
       "max_leverage": 20.0,
-      "cum_funding_all_time": 2462.212888,
+      "cum_funding_all_time": 2462.677815,
       "dex": "xyz"
     }
   ],
@@ -366,12 +366,12 @@
     "first_date": "2026-08-28",
     "last_date": "2026-09-03",
     "spot_share_first": 0.8583,
-    "spot_share_last": 0.8594,
-    "spot_share_change": 0.0011,
+    "spot_share_last": 0.8589,
+    "spot_share_change": 0.0007,
     "total_first": 5144128.34,
-    "total_last": 5128252.5,
-    "total_change_pct": -0.0031,
-    "perp_change_pct": -0.0109,
-    "position_value_change_pct": -0.0047
+    "total_last": 5134414.75,
+    "total_change_pct": -0.0019,
+    "perp_change_pct": -0.0066,
+    "position_value_change_pct": -0.0027
   }
 }
