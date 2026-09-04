@@ -90,3 +90,4 @@
 | 2026-09-03 | [冷卻 × 800VDC — Serenity 前置篩選（Step 1–4）與 9/6 全掃清單](./2026-09-03-cooling-800vdc-serenity-prescreen.md) | serenity, cooling, liquid-cooling, UQD, 800VDC, solid-state-transformer, sidecar, taiwan-stocks, prescreen |
 | 2026-09-03 | [AI 追蹤系統 v1 — 供應鏈層（Sankey）＋ 融資層（AFI）](./2026-09-03-ai-capex-tracker.md) | tracker, ai-capex, sankey, AFI, financing-intensity, credit-spreads, RPO, monitoring, scorecard |
 | 2026-09-03 | [能源板塊「三重訊號」檢視 × AI 融資泡沫的正確計時點](./2026-09-03-ai-bubble-timing-and-energy-signals.md) | energy, insider-buying, 13F, pelosi, thiel, vistra, bloom-energy, ai-bubble, timing, credit-spreads, decision-audit |
+| 2026-09-03 | [訊號驗證：信用利差 × RPOC × 台股月營收 × 跟單 Thiel/Pelosi](./2026-09-03-signal-verification-credit-rpoc-tw-revenue.md) | verification, backtest, credit-spreads, HY-OAS, RPOC, taiwan-revenue, finmind, pelosi, thiel, NANC, self-refutation |

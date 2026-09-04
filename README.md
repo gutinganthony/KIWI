@@ -18,7 +18,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |-------|---------|
 | [Technology](./topics/technology/INDEX.md) | 5 |
 | [Science](./topics/science/INDEX.md) | 0 |
-| [Business](./topics/business/INDEX.md) | 84 |
+| [Business](./topics/business/INDEX.md) | 85 |
 | [Health](./topics/health/INDEX.md) | 1 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Other](./topics/other/INDEX.md) | 4 |
@@ -32,6 +32,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-09-03 | [訊號驗證：信用利差 × RPOC × 台股月營收 × 跟單 Thiel/Pelosi](./topics/business/2026-09-03-signal-verification-credit-rpoc-tw-revenue.md) | Business |
 | 2026-09-03 | [能源板塊「三重訊號」檢視 × AI 融資泡沫的正確計時點](./topics/business/2026-09-03-ai-bubble-timing-and-energy-signals.md) | Business |
 | 2026-09-03 | [AI 追蹤系統 v1 — 供應鏈層（Sankey）＋ 融資層（AFI）](./topics/business/2026-09-03-ai-capex-tracker.md) | Business |
 | 2026-09-03 | [冷卻 × 800VDC — Serenity 前置篩選（Step 1–4）與 9/6 全掃清單](./topics/business/2026-09-03-cooling-800vdc-serenity-prescreen.md) | Business |
@@ -112,6 +113,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-09-03 | [冷卻 × 800VDC — Serenity 前置篩選（Step 1–4）與 9/6 全掃清單](./topics/business/2026-09-03-cooling-800vdc-serenity-prescreen.md) | Business |
 | 2026-09-03 | [AI 追蹤系統 v1 — 供應鏈層（Sankey）＋ 融資層（AFI）](./topics/business/2026-09-03-ai-capex-tracker.md) | Business |
 | 2026-09-03 | [能源板塊「三重訊號」檢視 × AI 融資泡沫的正確計時點](./topics/business/2026-09-03-ai-bubble-timing-and-energy-signals.md) | Business |
+| 2026-09-03 | [訊號驗證：信用利差 × RPOC × 台股月營收 × 跟單 Thiel/Pelosi](./topics/business/2026-09-03-signal-verification-credit-rpoc-tw-revenue.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
