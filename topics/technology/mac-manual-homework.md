@@ -203,8 +203,51 @@ last_updated: 2026-07-06
   >    **安裝前先跑 `which gemini codex`**，確認跳出來的是你認得的工具。
   > 3. `.env` 放在專案 CWD 並**列入 `.gitignore`**（`references/SETUP.md:87-89` 有提醒）。
   >
-  > **步驟**：clone repo → 把 `llm-council/` 資料夾放進 `~/.claude/skills/` → `.env` 填
-  > `OPENAI_API_KEY`/`GEMINI_API_KEY` → 套用上面第 1 點的修改 → `which gemini codex` 確認。
+  > ---
+  > ### ✅ 2026-09-04 更新：上面三件事**已經全部做完了**，剩下的是三個指令
+  >
+  > 第 1 點（key 洩漏）**已修**，在 `skills/llm-council/scripts/query_llms.py:131`；
+  > 第 3 點（`.gitignore`）**已加**，`.env` 與 `**/.env` 都在裡面。剩第 2 點是你要跑的一行指令。
+  >
+  > 🔴 **關鍵：從 KIWI repo 這一份裝，不要重新 clone 上游。**
+  > 修好的版本**只存在於本 repo**（`skills/llm-council/`），上游發布的 bundle 沒有這個修正。
+  > 重新 clone ＝ 把已經修掉的金鑰洩漏又裝回來。
+  >
+  > 🆕 **讀碼發現一件會改變做法的事：這個 skill 是 CLI 優先、API key 只是 fallback。**
+  > `main()` 先跑 `is_cli_available("gemini")` 與 `is_cli_available("codex")`，
+  > **CLI 成功就完全不會碰 API key**（`:186` `if chatgpt_response is None:` 才走 API）。
+  > → **如果 `which gemini codex` 兩個都找得到且已登入，你根本不需要填任何 key**，
+  > 也就順帶避開「把金鑰貼進逐字稿」這個風險（金鑰一旦貼進對話就會落在
+  > `~/.claude/projects/*.jsonl`，那正是 `:131` 修掉的同一條外洩路徑）。
+  >
+  > ⚠️ **另一個讀碼細節，填錯地方會靜默失效**：`load_env_file()` 讀的是
+  > **當前工作目錄的 `.env`**（`env_path: str = ".env"`，不是 skill 目錄）。
+  > → `.env` 要放在**你開 Claude Code 的那個資料夾**（也就是 KIWI repo 根目錄），
+  > 放進 `~/.claude/skills/llm-council/` 是**讀不到的**，而且不會報錯，只會說「key not found」。
+  >
+  > **執行步驟（三個指令）**：
+  > ```bash
+  > cd <你的 KIWI 路徑>            # 忘了在哪：find ~ -maxdepth 4 -type d -name KIWI
+  > git pull
+  > which gemini codex             # ← 先看這個的輸出，決定走 A 還是 B
+  > mkdir -p ~/.claude/skills && cp -r skills/llm-council ~/.claude/skills/
+  > ```
+  > - **A：兩個 CLI 都在** → 不用 `.env`，直接重啟 Claude Code，結束。
+  > - **B：缺一個或兩個** → 在 **KIWI 根目錄**建 `.env`（已在 .gitignore，不會被 commit）：
+  >   ```
+  >   OPENAI_API_KEY=sk-...
+  >   GEMINI_API_KEY=...
+  >   ```
+  >   金鑰自己去 platform.openai.com / aistudio.google.com 申請並**自己貼進檔案**。
+  >   🔴 **不要把金鑰貼進與 Claude 的對話**——貼進來就等於寫進逐字稿與雲端 log。
+  >
+  > **驗收**（裝完重啟後跑一次，能看到 JSON 就成功）：
+  > ```bash
+  > python3 ~/.claude/skills/llm-council/scripts/query_llms.py "reply with the single word: ok"
+  > ```
+  > 回傳 JSON 裡每個模型有 `source` 欄位：`codex-cli`／`gemini-cli` ＝走 CLI；`api (...)` ＝走 key；
+  > `none` ＝兩條路都不通。⚠️ 需要 `requests`（`pip3 install requests`）。
+  > ---
   > 用法：對話裡打「Consult the council: ＜問題＞」。
   > **⚠️ 紅線不變：只拿它問技術/通用問題，別把 KIWI 持倉、部位、fund 細節餵給它**——內容會送到 OpenAI 和 Google。
   > ChatGPT 本來就是 council 兩席之一，免額外設定。
