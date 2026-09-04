@@ -18,7 +18,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |-------|---------|
 | [Technology](./topics/technology/INDEX.md) | 5 |
 | [Science](./topics/science/INDEX.md) | 0 |
-| [Business](./topics/business/INDEX.md) | 78 |
+| [Business](./topics/business/INDEX.md) | 81 |
 | [Health](./topics/health/INDEX.md) | 1 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Other](./topics/other/INDEX.md) | 4 |
@@ -32,6 +32,8 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-08-28 | [T1 條件⑤ 檢核 — NVDA Q2 FY27：供應商融資擴散觸發](./topics/business/2026-08-28-t1-condition5-nvda-q2-fy27-trigger.md) | Business |
+| 2026-08-25 | [「中國曝險」紅旗的第一性原理重寫](./topics/business/2026-08-25-china-red-flag-first-principles-rewrite.md) | Business |
 | 2026-08-21 | [Serenity Step 1–9：Seikoh Giken 6834 建倉前重評](./topics/business/2026-08-21-serenity-step1-9-seikoh-6834-reentry.md) | Business |
 | 2026-08-19 | [撲克作為決策訓練器 — 可行性評估與定位判決](./topics/other/2026-08-19-poker-as-decision-training-evaluation.md) | Other |
 | 2026-08-10 | [個人帳戶交易政策（PA Dealing Policy）草案](./topics/business/2026-08-10-personal-account-dealing-policy-draft.md) | Business |
