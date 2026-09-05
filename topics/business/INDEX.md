@@ -91,3 +91,4 @@
 | 2026-09-03 | [AI 追蹤系統 v1 — 供應鏈層（Sankey）＋ 融資層（AFI）](./2026-09-03-ai-capex-tracker.md) | tracker, ai-capex, sankey, AFI, financing-intensity, credit-spreads, RPO, monitoring, scorecard |
 | 2026-09-03 | [能源板塊「三重訊號」檢視 × AI 融資泡沫的正確計時點](./2026-09-03-ai-bubble-timing-and-energy-signals.md) | energy, insider-buying, 13F, pelosi, thiel, vistra, bloom-energy, ai-bubble, timing, credit-spreads, decision-audit |
 | 2026-09-03 | [訊號驗證：信用利差 × RPOC × 台股月營收 × 跟單 Thiel/Pelosi](./2026-09-03-signal-verification-credit-rpoc-tw-revenue.md) | verification, backtest, credit-spreads, HY-OAS, RPOC, taiwan-revenue, finmind, pelosi, thiel, NANC, self-refutation |
+| 2026-09-05 | [〈The Teaser Period〉— 算力 take-or-pay 的重設牆，與它對 KIWI 的四個修正](./2026-09-05-teaser-period-reset-wall.md) | ai-bubble, take-or-pay, reset-wall, RPO, openai, anthropic, off-balance-sheet, subprime-analogy, second-derivative, self-correction |
