@@ -18,7 +18,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |-------|---------|
 | [Technology](./topics/technology/INDEX.md) | 5 |
 | [Science](./topics/science/INDEX.md) | 0 |
-| [Business](./topics/business/INDEX.md) | 86 |
+| [Business](./topics/business/INDEX.md) | 87 |
 | [Health](./topics/health/INDEX.md) | 1 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Other](./topics/other/INDEX.md) | 4 |
@@ -32,6 +32,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-09-05 | [全掃 Step 5–9：3324 雙鴻 × 2492 華新科 — 兩檔都有決定性發現](./topics/business/2026-09-05-scan-3324-2492-step5-9.md) | Business |
 | 2026-09-05 | [〈The Teaser Period〉— 算力 take-or-pay 的重設牆，與它對 KIWI 的四個修正](./topics/business/2026-09-05-teaser-period-reset-wall.md) | Business |
 | 2026-09-03 | [訊號驗證：信用利差 × RPOC × 台股月營收 × 跟單 Thiel/Pelosi](./topics/business/2026-09-03-signal-verification-credit-rpoc-tw-revenue.md) | Business |
 | 2026-09-03 | [能源板塊「三重訊號」檢視 × AI 融資泡沫的正確計時點](./topics/business/2026-09-03-ai-bubble-timing-and-energy-signals.md) | Business |
@@ -116,6 +117,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-09-03 | [能源板塊「三重訊號」檢視 × AI 融資泡沫的正確計時點](./topics/business/2026-09-03-ai-bubble-timing-and-energy-signals.md) | Business |
 | 2026-09-03 | [訊號驗證：信用利差 × RPOC × 台股月營收 × 跟單 Thiel/Pelosi](./topics/business/2026-09-03-signal-verification-credit-rpoc-tw-revenue.md) | Business |
 | 2026-09-05 | [〈The Teaser Period〉— 算力 take-or-pay 的重設牆，與它對 KIWI 的四個修正](./topics/business/2026-09-05-teaser-period-reset-wall.md) | Business |
+| 2026-09-05 | [全掃 Step 5–9：3324 雙鴻 × 2492 華新科 — 兩檔都有決定性發現](./topics/business/2026-09-05-scan-3324-2492-step5-9.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
