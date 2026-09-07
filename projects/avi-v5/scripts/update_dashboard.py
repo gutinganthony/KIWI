@@ -126,6 +126,20 @@ def fetch_fred_data():
     start = end - timedelta(days=730)
     result = {}
 
+    # ECY 需要「過去 10 年的年化通膨」來把名目 10Y 換成實質 10Y，
+    # 730 天的窗口不夠。單獨用 12 年窗口再抓一次 CPI（只多一次 API 呼叫）。
+    try:
+        cpi_long = fred.get_series(
+            "CPIAUCSL",
+            observation_start=end - timedelta(days=365 * 12),
+            observation_end=end,
+        ).dropna()
+        if len(cpi_long) > 120:
+            result["cpi_index_long"] = cpi_long
+            log.info(f"Fetched FRED CPIAUCSL (12y): {len(cpi_long)} obs for ECY")
+    except Exception as e:
+        log.warning(f"Failed to fetch long CPI for ECY: {e}")
+
     for fred_id, key in series_ids.items():
         try:
             s = fred.get_series(fred_id, observation_start=start, observation_end=end)
@@ -724,6 +738,33 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val, lfi_resu
         if not _valid.empty:
             data_date = _valid.index[-1].strftime("%Y-%m-%d")
 
+    # ── ECY（脆弱度讀數）───────────────────────────────────────────────────────
+    # 與 AVI/CRI/TSI 完全獨立，只是多一個數字，不影響任何既有邏輯。
+    # 它回答的是那三個都答不出來的問題：「如果出事，會有多痛？」
+    # 定位（scripts/erp_validation.py 實證）：做不到擇時（1年相關 0.227），
+    # 但最貴20%與最便宜20%之間，未來一年大跌機率差 3.3 倍。
+    ecy_payload = None
+    try:
+        from src.ecy import compute_ecy
+        cpi_long = fred_data.get("cpi_index_long")
+        cpi_now = cpi_ago = None
+        if cpi_long is not None and len(cpi_long) > 120:
+            cpi_now = float(cpi_long.iloc[-1])
+            cpi_ago = float(cpi_long.iloc[-121])   # 約 10 年前（月頻）
+        r = compute_ecy(cape=cape, nominal_10y=t10y, cpi_now=cpi_now, cpi_10y_ago=cpi_ago)
+        if r is not None:
+            ecy_payload = {
+                "ecy": r.ecy, "percentile": r.percentile, "level": r.level,
+                "earnings_yield": r.earnings_yield, "real_10y": r.real_10y,
+                "inflation_10y": r.inflation_10y, "hist_median": r.hist_median,
+                "source": r.source,
+            }
+            log.info(f"ECY: {r.summary()}")
+        else:
+            log.warning("ECY unavailable this run (資料不足，不用假值填補)")
+    except Exception as e:
+        log.warning(f"ECY computation failed: {e}", exc_info=True)
+
     # ── Alert ─────────────────────────────────────────────────────────────────
     alert = build_alert(tsi_score, cri_score, tsi_bias, avi_lvl)
 
@@ -752,6 +793,9 @@ def build_payload(yf_data, fred_data, cpi_result, tsi_result, cape_val, lfi_resu
             "vvix_vix": None, "credit_rel_5d": None, "rising": None,
             "days_ge_80": None, "days_ge_90": None, "days_ge_95": None, "as_of": "",
         },
+        # 脆弱度讀數。None 代表本期算不出來——前端必須顯示「無資料」而非沿用舊值，
+        # 這是這次因子健檢的教訓：靜默降級比缺值更危險。
+        "ecy": ecy_payload,
         "market": {
             "sp500": sp500,
             "vix":   vix,

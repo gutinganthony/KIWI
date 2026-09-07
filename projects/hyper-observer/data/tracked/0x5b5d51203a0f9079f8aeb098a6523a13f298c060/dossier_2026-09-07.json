@@ -1,0 +1,571 @@
+{
+  "address": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+  "label": "hft-highvolume-candidate",
+  "snapshot_date": "2026-09-07",
+  "classification": "blowup_risk",
+  "classification_reasons": [
+    "userFills 出現 5 次強平 >= 3（反覆爆倉，真高風險）"
+  ],
+  "followable": {
+    "ok": false,
+    "reasons": [
+      "平均持倉時間估不出（無 Open/Close 成交可配對），保守判不可跟"
+    ]
+  },
+  "metrics": {
+    "address": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+    "snapshot_date": "2026-09-07",
+    "pnl_source": "portfolio_curve",
+    "portfolio_window": "perpAllTime",
+    "low_confidence": false,
+    "total_pnl": 119312657.25,
+    "peak_pnl": 187519752.25,
+    "monthly_pnl": {
+      "2025-02": -0.02,
+      "2025-03": 0.0,
+      "2025-04": 0.0,
+      "2025-05": -3152823.43,
+      "2025-06": 35434876.45,
+      "2025-07": -109002005.03,
+      "2025-08": -39453843.08,
+      "2025-09": 37588007.68,
+      "2025-10": 119706104.36,
+      "2025-11": 113924938.83,
+      "2025-12": 15102246.98,
+      "2026-01": -10907830.56,
+      "2026-02": 18629523.08,
+      "2026-03": 1321352.43,
+      "2026-04": 937961.91,
+      "2026-05": 611349.55,
+      "2026-06": 2920055.69,
+      "2026-07": 3859837.4,
+      "2026-08": -62998864.21,
+      "2026-09": -5208230.78
+    },
+    "active_months": 18,
+    "positive_month_ratio": 0.611,
+    "best_month_pnl": 119706104.36,
+    "max_drawdown_pct": 1.0,
+    "current_drawdown_pct": 0.3637,
+    "max_single_day_crash_pct": 1.0,
+    "span_days": 557.1,
+    "days_idle": 1.0,
+    "n_fills": 2000,
+    "profit_factor": null,
+    "avg_win": null,
+    "avg_loss": null,
+    "realized_win_rate": null,
+    "avg_hold_hours": null,
+    "net_direction_ratio": 1.0,
+    "n_fills_truncated": true,
+    "n_fills_last_30d": 2000,
+    "n_events": 4,
+    "n_events_last_30d": 4,
+    "n_events_last_30d_est": 34,
+    "events_30d_coverage_days": 3.6,
+    "median_fills_per_event": 399.5,
+    "median_event_notional": 234846.86,
+    "median_gap_between_events_hours": 4.02,
+    "p90_gap_between_events_hours": 11.2,
+    "had_liquidation": true,
+    "n_liquidations": 5,
+    "top_coin": "XPL",
+    "vlm": 4900469531.79,
+    "vlm_to_pnl_ratio": 41.07,
+    "funding_total": 1040566.69,
+    "n_open_positions": 13,
+    "n_open_positions_native": 10,
+    "dexs_with_positions": [
+      "xyz"
+    ],
+    "account_value_native": 97483736.69,
+    "account_value_by_dex": {
+      "": 97483736.69,
+      "abcd": 0.0,
+      "cash": 0.0,
+      "flx": 0.0,
+      "hyna": 0.0,
+      "io": 0.0,
+      "km": 0.0,
+      "mkts": 0.0,
+      "para": 0.0,
+      "vntl": 0.0,
+      "xyz": 8661485.35
+    },
+    "spot_value_usd": 168023646.37,
+    "spot_tokens": [
+      {
+        "coin": "USDC",
+        "qty": 105965021.85549712,
+        "usd": 105965021.86,
+        "estimated": false
+      },
+      {
+        "coin": "HYPE",
+        "qty": 793040.49143316,
+        "usd": 56511936.62,
+        "estimated": true
+      },
+      {
+        "coin": "UFART",
+        "qty": 23636163.760043,
+        "usd": 4939582.93,
+        "estimated": true
+      },
+      {
+        "coin": "UXPL",
+        "qty": 6632011.511632,
+        "usd": 607049.81,
+        "estimated": true
+      },
+      {
+        "coin": "UBONK",
+        "qty": 2331863.80511,
+        "usd": 21.07,
+        "estimated": true
+      },
+      {
+        "coin": "FUND",
+        "qty": 18.69,
+        "usd": 14.04,
+        "estimated": true
+      },
+      {
+        "coin": "UPUMP",
+        "qty": 4014.188103,
+        "usd": 11.82,
+        "estimated": true
+      },
+      {
+        "coin": "USDT0",
+        "qty": 7.99944001,
+        "usd": 8.0,
+        "estimated": true
+      },
+      {
+        "coin": "LICKO",
+        "qty": 35585.49249208,
+        "usd": 0.21,
+        "estimated": true
+      },
+      {
+        "coin": "USDH",
+        "qty": 0.01001646,
+        "usd": 0.01,
+        "estimated": false
+      }
+    ],
+    "total_value_all_venues": 274168868.4,
+    "non_native_share": 0.6444,
+    "current_max_leverage": 10.0,
+    "has_extreme_leverage": false,
+    "margin_types": [
+      "cross",
+      "isolated"
+    ],
+    "account_value": 106145222.03,
+    "fetch_errors": []
+  },
+  "position_value": 616031669.66,
+  "unrealized_pnl": -65497827.3,
+  "n_open_positions": 13,
+  "open_positions": [
+    {
+      "coin": "BTC",
+      "szi": -2153.76515,
+      "side": "short",
+      "entry_px": 72152.1,
+      "position_value": 172572586.4089,
+      "unrealized_pnl": -17173718.900068,
+      "leverage_value": 5.0,
+      "leverage_type": "cross",
+      "liquidation_px": 119408.6559374238,
+      "margin_used": 34514517.28178,
+      "max_leverage": 20.0,
+      "cum_funding_all_time": -16779015.620834,
+      "dex": ""
+    },
+    {
+      "coin": "ETH",
+      "szi": -80778.1244,
+      "side": "short",
+      "entry_px": 2220.62,
+      "position_value": 203019660.05452,
+      "unrealized_pnl": -23641456.258643,
+      "leverage_value": 5.0,
+      "leverage_type": "cross",
+      "liquidation_px": 3552.236130681,
+      "margin_used": 40603932.010904,
+      "max_leverage": 15.0,
+      "cum_funding_all_time": -15299569.160779,
+      "dex": ""
+    },
+    {
+      "coin": "SOL",
+      "szi": -793019.24,
+      "side": "short",
+      "entry_px": 93.9437,
+      "position_value": 84210713.0956,
+      "unrealized_pnl": -9711497.211699,
+      "leverage_value": 10.0,
+      "leverage_type": "cross",
+      "liquidation_px": 210.3377832797,
+      "margin_used": 8421071.30956,
+      "max_leverage": 10.0,
+      "cum_funding_all_time": -3046215.29876,
+      "dex": ""
+    },
+    {
+      "coin": "DOGE",
+      "szi": -814065.0,
+      "side": "short",
+      "entry_px": 0.081073,
+      "position_value": 74024.55858,
+      "unrealized_pnl": -8025.457049,
+      "leverage_value": 10.0,
+      "leverage_type": "cross",
+      "liquidation_px": 98.0472092388,
+      "margin_used": 7402.455858,
+      "max_leverage": 10.0,
+      "cum_funding_all_time": -98.04992,
+      "dex": ""
+    },
+    {
+      "coin": "SUI",
+      "szi": -0.5,
+      "side": "short",
+      "entry_px": 3.67761,
+      "position_value": 0.40733,
+      "unrealized_pnl": 1.431476,
+      "leverage_value": 10.0,
+      "leverage_type": "cross",
+      "liquidation_px": 159492283.94381273,
+      "margin_used": 0.040733,
+      "max_leverage": 10.0,
+      "cum_funding_all_time": -120714.045698,
+      "dex": ""
+    },
+    {
+      "coin": "XRP",
+      "szi": -17823634.0,
+      "side": "short",
+      "entry_px": 1.475659,
+      "position_value": 25320254.4604,
+      "unrealized_pnl": 981364.821725,
+      "leverage_value": 5.0,
+      "leverage_type": "cross",
+      "liquidation_px": 6.0740120761,
+      "margin_used": 5064050.89208,
+      "max_leverage": 20.0,
+      "cum_funding_all_time": -98410.882798,
+      "dex": ""
+    },
+    {
+      "coin": "HYPE",
+      "szi": -874556.08,
+      "side": "short",
+      "entry_px": 68.4273,
+      "position_value": 76720781.940432,
+      "unrealized_pnl": -16877263.815335,
+      "leverage_value": 5.0,
+      "leverage_type": "cross",
+      "liquidation_px": 177.8706205032,
+      "margin_used": 15344156.388086,
+      "max_leverage": 5.0,
+      "cum_funding_all_time": -7309219.308861,
+      "dex": ""
+    },
+    {
+      "coin": "FARTCOIN",
+      "szi": -23636252.1,
+      "side": "short",
+      "entry_px": 0.20186,
+      "position_value": 4275325.279848,
+      "unrealized_pnl": 495916.795074,
+      "leverage_value": 5.0,
+      "leverage_type": "cross",
+      "liquidation_px": 3.5465493235,
+      "margin_used": 855065.055969,
+      "max_leverage": 10.0,
+      "cum_funding_all_time": -364641.948884,
+      "dex": ""
+    },
+    {
+      "coin": "PUMP",
+      "szi": -3563583367.0,
+      "side": "short",
+      "entry_px": 0.004607,
+      "position_value": 14215134.050963,
+      "unrealized_pnl": 2205299.723625,
+      "leverage_value": 5.0,
+      "leverage_type": "cross",
+      "liquidation_px": 0.0261857584,
+      "margin_used": 2843026.810192,
+      "max_leverage": 10.0,
+      "cum_funding_all_time": -373763.947166,
+      "dex": ""
+    },
+    {
+      "coin": "XPL",
+      "szi": -10830354.0,
+      "side": "short",
+      "entry_px": 0.094668,
+      "position_value": 976573.02018,
+      "unrealized_pnl": 48721.511808,
+      "leverage_value": 3.0,
+      "leverage_type": "cross",
+      "liquidation_px": 7.3779303657,
+      "margin_used": 325524.34006,
+      "max_leverage": 10.0,
+      "cum_funding_all_time": -1196847.416721,
+      "dex": ""
+    },
+    {
+      "coin": "xyz:GOLD",
+      "szi": -7767.4839,
+      "side": "short",
+      "entry_px": 4191.43,
+      "position_value": 34379660.48979,
+      "unrealized_pnl": -1822727.138106,
+      "leverage_value": 4.0,
+      "leverage_type": "cross",
+      "liquidation_px": 15370.7778037282,
+      "margin_used": 8594915.122447,
+      "max_leverage": 25.0,
+      "cum_funding_all_time": -335222.354703,
+      "dex": "xyz"
+    },
+    {
+      "coin": "xyz:SILVER",
+      "szi": -1.33,
+      "side": "short",
+      "entry_px": 64.042,
+      "position_value": 88.12979,
+      "unrealized_pnl": -2.953818,
+      "leverage_value": 5.0,
+      "leverage_type": "cross",
+      "liquidation_px": 63919320.872884415,
+      "margin_used": 17.625958,
+      "max_leverage": 25.0,
+      "cum_funding_all_time": -10269.039339,
+      "dex": "xyz"
+    },
+    {
+      "coin": "xyz:STRC",
+      "szi": 2736.6,
+      "side": "long",
+      "entry_px": 95.48622,
+      "position_value": 266867.7588,
+      "unrealized_pnl": 5560.148654,
+      "leverage_value": 3.0,
+      "leverage_type": "isolated",
+      "liquidation_px": 55.5388662762,
+      "margin_used": 122479.480421,
+      "max_leverage": 10.0,
+      "cum_funding_all_time": -1571.186824,
+      "dex": "xyz"
+    }
+  ],
+  "recent_fills": [
+    {
+      "time": "2026-09-04T15:16:20.295000+00:00",
+      "coin": "BTC",
+      "dir": "Open Short",
+      "px": 79199.0,
+      "sz": 0.02525,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-04T15:18:40.068000+00:00",
+      "coin": "BTC",
+      "dir": "Open Short",
+      "px": 79231.0,
+      "sz": 0.01534,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-04T15:26:24.223000+00:00",
+      "coin": "BTC",
+      "dir": "Open Short",
+      "px": 79345.0,
+      "sz": 0.0099,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-04T15:32:33.098000+00:00",
+      "coin": "BTC",
+      "dir": "Open Short",
+      "px": 79420.0,
+      "sz": 0.02519,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-04T15:34:01.015000+00:00",
+      "coin": "BTC",
+      "dir": "Open Short",
+      "px": 79362.0,
+      "sz": 0.02516,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-04T15:34:02.518000+00:00",
+      "coin": "BTC",
+      "dir": "Open Short",
+      "px": 79375.0,
+      "sz": 0.0054,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-04T15:38:05.895000+00:00",
+      "coin": "BTC",
+      "dir": "Open Short",
+      "px": 79482.0,
+      "sz": 0.01981,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-04T15:39:32.245000+00:00",
+      "coin": "BTC",
+      "dir": "Open Short",
+      "px": 79476.0,
+      "sz": 0.02513,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-05T01:45:07.170000+00:00",
+      "coin": "ETH",
+      "dir": "Open Short",
+      "px": 2453.5,
+      "sz": 0.1618,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-05T01:45:08.175000+00:00",
+      "coin": "ETH",
+      "dir": "Open Short",
+      "px": 2453.5,
+      "sz": 0.1618,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-05T01:45:09.050000+00:00",
+      "coin": "ETH",
+      "dir": "Open Short",
+      "px": 2453.5,
+      "sz": 0.1618,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-05T01:45:10.123000+00:00",
+      "coin": "ETH",
+      "dir": "Open Short",
+      "px": 2453.5,
+      "sz": 0.1618,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-05T01:45:11.069000+00:00",
+      "coin": "ETH",
+      "dir": "Open Short",
+      "px": 2453.5,
+      "sz": 0.1618,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-05T01:45:12.093000+00:00",
+      "coin": "ETH",
+      "dir": "Open Short",
+      "px": 2453.5,
+      "sz": 0.1618,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-05T01:45:13.104000+00:00",
+      "coin": "ETH",
+      "dir": "Open Short",
+      "px": 2453.5,
+      "sz": 0.1618,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-05T01:45:14.138000+00:00",
+      "coin": "ETH",
+      "dir": "Open Short",
+      "px": 2453.5,
+      "sz": 0.1618,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-05T01:45:15.061000+00:00",
+      "coin": "ETH",
+      "dir": "Open Short",
+      "px": 2453.5,
+      "sz": 0.0791,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-05T01:45:15.061000+00:00",
+      "coin": "ETH",
+      "dir": "Open Short",
+      "px": 2453.5,
+      "sz": 0.0827,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-05T01:45:16.067000+00:00",
+      "coin": "ETH",
+      "dir": "Open Short",
+      "px": 2453.5,
+      "sz": 0.1618,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-05T01:45:17.175000+00:00",
+      "coin": "ETH",
+      "dir": "Open Short",
+      "px": 2453.5,
+      "sz": 0.1618,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    }
+  ],
+  "new_positions": [],
+  "disappeared_positions": [],
+  "initialized": false,
+  "raw_source": "snapshot",
+  "funds_trend": {
+    "status": "持平",
+    "n_points": 7,
+    "days": 7,
+    "threshold": 0.05,
+    "first_date": "2026-09-01",
+    "last_date": "2026-09-07",
+    "spot_share_first": 0.628,
+    "spot_share_last": 0.6128,
+    "spot_share_change": -0.0151,
+    "total_first": 248868938.35,
+    "total_last": 274168868.4,
+    "total_change_pct": 0.1017,
+    "perp_change_pct": 0.1464,
+    "position_value_change_pct": 0.2297
+  }
+}

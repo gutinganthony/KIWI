@@ -24,7 +24,7 @@ dimensions:
     description: "Macroeconomic stress signals"
     total_weight: 0.14  # 4 + 5 + 5 = 14%
     indicators:
-      - yield_spread_10y2y
+      - yield_curve_uninversion   # 2026-08 由 yield_spread_10y2y 改版（見 indicators.yaml）
       - vix
       - stlfsi
 
