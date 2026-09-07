@@ -225,11 +225,20 @@ last_updated: 2026-07-06
   > → `.env` 要放在**你開 Claude Code 的那個資料夾**（也就是 KIWI repo 根目錄），
   > 放進 `~/.claude/skills/llm-council/` 是**讀不到的**，而且不會報錯，只會說「key not found」。
   >
-  > **執行步驟：貼這一行**（2026-09-04 起 `skills/setup.sh` 會自己做完安裝＋環境檢查）：
+  > **執行步驟：貼這一行**（`skills/setup.sh` 會自己做完安裝＋環境檢查）：
   > ```
-  > cd "$(find ~ -maxdepth 4 -type d -name KIWI -print -quit)" && git pull && bash skills/setup.sh
+  > cd "$(find ~ -maxdepth 4 -type d -name KIWI -print -quit)" && git fetch origin && rm -rf /tmp/kiwi-skills && mkdir -p /tmp/kiwi-skills && git archive origin/main skills | tar -x -C /tmp/kiwi-skills && bash /tmp/kiwi-skills/skills/setup.sh
   > ```
   > 然後重啟 Claude Code。腳本會印出 gemini/codex CLI 在不在、要不要 `.env`、`requests` 有沒有裝。
+  >
+  > 🔴 **為什麼繞開 `git pull`**（2026-09-07 第二次踩到）：Jake 的本機 KIWI 有 **divergent branches**，
+  > `git pull` 直接失敗（`fatal: Need to specify how to reconcile divergent branches.`）
+  > → `&&` 鏈中斷 → 安裝根本沒跑。
+  > 上面改用 **`git fetch` + `git archive origin/main skills`** 解到 `/tmp`，
+  > **完全不碰他的工作目錄、不需要解決分歧、不會動到任何本機修改**。
+  > 📌 **本機分歧仍需另外處理**（與安裝無關）：先跑
+  > `git status` 與 `git log --oneline -5` 看有沒有自己的本機 commit，再決定 merge 還是 reset。
+  > **在看清楚之前不要 `git reset --hard`。**
   >
   > 🔴 **給未來 session 的鐵律：貼給 Jake 的指令區塊裡絕對不要放 `#` 註解。**
   > 他的 shell 是 **macOS zsh 互動模式，`INTERACTIVE_COMMENTS` 預設關閉**

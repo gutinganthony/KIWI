@@ -16,7 +16,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 
 | Topic | Entries |
 |-------|---------|
-| [Technology](./topics/technology/INDEX.md) | 5 |
+| [Technology](./topics/technology/INDEX.md) | 6 |
 | [Science](./topics/science/INDEX.md) | 0 |
 | [Business](./topics/business/INDEX.md) | 81 |
 | [Health](./topics/health/INDEX.md) | 1 |
@@ -43,6 +43,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-07-29 | [HBM vs 傳統 DRAM 位元供給拆解 — 情境②③ 判別](./topics/business/2026-07-29-hbm-vs-conventional-bit-supply-decomposition.md) | Business |
 | 2026-07-29 | [記憶體：週期股還是「這次不一樣」？— 假說檢定框架實作](./topics/business/2026-07-29-memory-cycle-vs-structural-hypothesis-test.md) | Business |
 | 2026-07-28 | [NVDA 替 OpenAI 擔保／融資 — 雙面檢視（供應商融資＝晚期標記？）](./topics/business/2026-07-28-nvda-vendor-financing-two-sided-review.md) | Business |
+| 2026-09-07 | [台股券商 API 評估 —— 自動監控持倉變化](./topics/technology/2026-09-07-taiwan-broker-api-holdings-monitor.md) | Technology |
 | 2026-07-27 | [Loop Engineering — 從「下 prompt」到「寫迴圈」的工作方式轉換](./topics/technology/2026-07-27-loop-engineering.md) | Technology |
 | 2026-07-26 | [記憶體是否進入熊市？八因子實體面判定](./topics/business/2026-07-26-memory-bear-market-multifactor-verdict.md) | Business |
 | 2026-07-26 | [Serenity Step 1–9：群翊 6664 建倉前複核（建議暫緩至 8/14）](./topics/business/2026-07-26-serenity-step1-9-groupup-6664-pre-entry-review.md) | Business |
