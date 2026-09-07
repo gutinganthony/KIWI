@@ -225,15 +225,21 @@ last_updated: 2026-07-06
   > → `.env` 要放在**你開 Claude Code 的那個資料夾**（也就是 KIWI repo 根目錄），
   > 放進 `~/.claude/skills/llm-council/` 是**讀不到的**，而且不會報錯，只會說「key not found」。
   >
-  > **執行步驟（三個指令）**：
-  > ```bash
-  > cd <你的 KIWI 路徑>            # 忘了在哪：find ~ -maxdepth 4 -type d -name KIWI
-  > git pull
-  > which gemini codex             # ← 先看這個的輸出，決定走 A 還是 B
-  > mkdir -p ~/.claude/skills && cp -r skills/llm-council ~/.claude/skills/
+  > **執行步驟：貼這一行**（2026-09-04 起 `skills/setup.sh` 會自己做完安裝＋環境檢查）：
   > ```
-  > - **A：兩個 CLI 都在** → 不用 `.env`，直接重啟 Claude Code，結束。
-  > - **B：缺一個或兩個** → 在 **KIWI 根目錄**建 `.env`（已在 .gitignore，不會被 commit）：
+  > cd "$(find ~ -maxdepth 4 -type d -name KIWI -print -quit)" && git pull && bash skills/setup.sh
+  > ```
+  > 然後重啟 Claude Code。腳本會印出 gemini/codex CLI 在不在、要不要 `.env`、`requests` 有沒有裝。
+  >
+  > 🔴 **給未來 session 的鐵律：貼給 Jake 的指令區塊裡絕對不要放 `#` 註解。**
+  > 他的 shell 是 **macOS zsh 互動模式，`INTERACTIVE_COMMENTS` 預設關閉**
+  > → `#` 之後的字**不會被當註解**，而是原樣塞進上一個指令的參數。
+  > 2026-09-07 實際踩到：`cd ~/KIWI            # 忘了路徑就先跑：find ...`
+  > → `cd: too many arguments` → 後面 `git pull`／`bash skills/setup.sh` 連鎖失敗。
+  > 註解寫在程式碼區塊**外面**，區塊裡只放可以整段貼的純指令。
+  >
+  > - **A：腳本說「兩個 CLI 都在」** → 不用 `.env`，重啟 Claude Code，結束。
+  > - **B：腳本說有 CLI 缺席** → 在 **KIWI 根目錄**建 `.env`（已在 .gitignore，不會被 commit）：
   >   ```
   >   OPENAI_API_KEY=sk-...
   >   GEMINI_API_KEY=...
@@ -241,8 +247,8 @@ last_updated: 2026-07-06
   >   金鑰自己去 platform.openai.com / aistudio.google.com 申請並**自己貼進檔案**。
   >   🔴 **不要把金鑰貼進與 Claude 的對話**——貼進來就等於寫進逐字稿與雲端 log。
   >
-  > **驗收**（裝完重啟後跑一次，能看到 JSON 就成功）：
-  > ```bash
+  > **驗收**（裝完重啟後貼這一行，能看到 JSON 就成功）：
+  > ```
   > python3 ~/.claude/skills/llm-council/scripts/query_llms.py "reply with the single word: ok"
   > ```
   > 回傳 JSON 裡每個模型有 `source` 欄位：`codex-cli`／`gemini-cli` ＝走 CLI；`api (...)` ＝走 key；
