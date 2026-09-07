@@ -93,3 +93,5 @@
 | 2026-09-03 | [訊號驗證：信用利差 × RPOC × 台股月營收 × 跟單 Thiel/Pelosi](./2026-09-03-signal-verification-credit-rpoc-tw-revenue.md) | verification, backtest, credit-spreads, HY-OAS, RPOC, taiwan-revenue, finmind, pelosi, thiel, NANC, self-refutation |
 | 2026-09-05 | [〈The Teaser Period〉— 算力 take-or-pay 的重設牆，與它對 KIWI 的四個修正](./2026-09-05-teaser-period-reset-wall.md) | ai-bubble, take-or-pay, reset-wall, RPO, openai, anthropic, off-balance-sheet, subprime-analogy, second-derivative, self-correction |
 | 2026-09-05 | [全掃 Step 5–9：3324 雙鴻 × 2492 華新科 — 兩檔都有決定性發現](./2026-09-05-scan-3324-2492-step5-9.md) | serenity, step5-9, 3324, 2492, purity-filter, pricing-power, passive-components, liquid-cooling, UQD, payrolls, fed-correction |
+| 2026-09-07 | [全掃收尾：3013／3533／CEJN／GaN-SiC — 冷卻與 800VDC 兩線結案](./2026-09-07-scan-remaining-cooling-800vdc.md) | serenity, step5-9, cooling, 800VDC, UQD, CEJN, navitas, GaN, purity-filter, no-position |
+| 2026-09-07 | [SEMICON Taiwan 2026：從先進製程到 3D IC — 重點與對 KIWI 的意涵](./2026-09-07-semicon-taiwan-2026-3dic.md) | semicon-taiwan, 3DIC, advanced-packaging, hybrid-bonding, TCB, FOPLP, SoIC, system-integration, advantest |
