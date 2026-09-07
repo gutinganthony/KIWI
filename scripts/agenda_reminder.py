@@ -90,10 +90,13 @@ def homework_backlog():
         text = path.read_text(encoding="utf-8")
     except OSError:
         return None
-    todo = text.split("## 🔴 待辦", 1)
+    # ⚠️ 2026-09-07：原本用 text.split("## ✅") 切尾，但那是**子字串比對**——
+    # 內文只要出現任何 "### ✅ ..." 子標題就會被誤判成區段結束，待辦數靜默少算
+    # （實際發生過：50 → 22，且不會報錯）。改為行首錨定的正規表達式。
+    todo = re.split(r"^## 🔴 待辦", text, maxsplit=1, flags=re.M)
     if len(todo) < 2:
         return None
-    todo = todo[1].split("## ✅", 1)[0]
+    todo = re.split(r"^## ✅", todo[1], maxsplit=1, flags=re.M)[0]
     return len(re.findall(r"^\s*- \[ \]", todo, flags=re.M))
 
 
