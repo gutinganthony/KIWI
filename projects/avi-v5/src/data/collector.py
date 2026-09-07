@@ -180,6 +180,9 @@ class IndicatorCollector:
         elif computation == "difference":
             return self.fred.fetch_baa_aaa_diff(start_date, end_date)
 
+        elif computation == "curve_uninversion":
+            return self.fred.fetch_curve_uninversion(start_date, end_date)
+
         else:
             logger.warning(f"Unknown computation '{computation}' for {key}")
             return None
