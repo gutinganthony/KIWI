@@ -1,0 +1,743 @@
+{
+  "address": "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6",
+  "label": "james-wynn-blowup-groundtruth",
+  "date": "2026-09-04",
+  "probed_at": "2026-09-04T00:30:37.539476+00:00",
+  "ledger_window_days": 45,
+  "queries_ok": {
+    "perpDexs": true,
+    "clearinghouseState_native": true,
+    "clearinghouseState_dex": true,
+    "spotClearinghouseState": true,
+    "userNonFundingLedgerUpdates": true,
+    "portfolio": true,
+    "userFills": true
+  },
+  "dexs_detected": [
+    "xyz",
+    "flx",
+    "vntl",
+    "hyna",
+    "km",
+    "abcd",
+    "cash",
+    "para",
+    "mkts",
+    "io"
+  ],
+  "aborted": false,
+  "dexs_queried": [
+    "abcd",
+    "cash",
+    "flx",
+    "hyna",
+    "io",
+    "km",
+    "mkts",
+    "para",
+    "vntl",
+    "xyz"
+  ],
+  "portfolio_windows": {
+    "day": {
+      "account_value_last": 1782.91,
+      "account_value_ts_iso": "2026-09-04T00:30:47.351000+00:00",
+      "pnl_last": 432.29,
+      "vlm": 51268.76,
+      "n_points": 18
+    },
+    "week": {
+      "account_value_last": 1782.91,
+      "account_value_ts_iso": "2026-09-04T00:30:47.351000+00:00",
+      "pnl_last": -4643.95,
+      "vlm": 548705.17,
+      "n_points": 60
+    },
+    "month": {
+      "account_value_last": 1782.91,
+      "account_value_ts_iso": "2026-09-04T00:30:47.351000+00:00",
+      "pnl_last": -4643.49,
+      "vlm": 548705.17,
+      "n_points": 48
+    },
+    "allTime": {
+      "account_value_last": 1782.91,
+      "account_value_ts_iso": "2026-09-04T00:30:47.351000+00:00",
+      "pnl_last": -22076984.08,
+      "vlm": 18940547912.3,
+      "n_points": 91
+    },
+    "perpDay": {
+      "account_value_last": 1684.4,
+      "account_value_ts_iso": "2026-09-04T00:30:47.351000+00:00",
+      "pnl_last": 432.21,
+      "vlm": 51268.76,
+      "n_points": 18
+    },
+    "perpWeek": {
+      "account_value_last": 1684.4,
+      "account_value_ts_iso": "2026-09-04T00:30:47.351000+00:00",
+      "pnl_last": -4643.98,
+      "vlm": 548705.17,
+      "n_points": 60
+    },
+    "perpMonth": {
+      "account_value_last": 1684.4,
+      "account_value_ts_iso": "2026-09-04T00:30:47.351000+00:00",
+      "pnl_last": -4643.98,
+      "vlm": 548705.17,
+      "n_points": 48
+    },
+    "perpAllTime": {
+      "account_value_last": 1684.4,
+      "account_value_ts_iso": "2026-09-04T00:30:47.351000+00:00",
+      "pnl_last": -23393754.94,
+      "vlm": 18932540324.93,
+      "n_points": 91
+    }
+  },
+  "trading": {
+    "n_fills": 2000,
+    "truncated": true,
+    "last_fill_ts": 1788465010.925,
+    "last_fill_iso": "2026-09-03T19:50:10.925000+00:00",
+    "days_since_last_fill": 0.19,
+    "n_fills_7d": 50,
+    "n_fills_30d": 50,
+    "first_fill_iso": "2026-03-30T14:50:57.886000+00:00",
+    "top_coins": [
+      [
+        "xyz:SP500",
+        1118
+      ],
+      [
+        "BTC",
+        758
+      ],
+      [
+        "xyz:GOLD",
+        66
+      ],
+      [
+        "xyz:SPCX",
+        27
+      ],
+      [
+        "CASHCAT",
+        13
+      ],
+      [
+        "SOL",
+        9
+      ],
+      [
+        "ETH",
+        5
+      ],
+      [
+        "@166",
+        2
+      ]
+    ],
+    "by_venue": {
+      "builder:xyz": 1211,
+      "native": 785,
+      "spot": 4
+    },
+    "recent_fills": [
+      {
+        "time_iso": "2026-09-01T18:27:43.925000+00:00",
+        "coin": "BTC",
+        "dir": "Close Long",
+        "px": 76963.0,
+        "sz": 0.05197,
+        "closed_pnl": -90.18
+      },
+      {
+        "time_iso": "2026-09-01T18:27:43.925000+00:00",
+        "coin": "BTC",
+        "dir": "Close Long",
+        "px": 76963.0,
+        "sz": 0.12672,
+        "closed_pnl": -219.9
+      },
+      {
+        "time_iso": "2026-09-01T18:37:07.474000+00:00",
+        "coin": "BTC",
+        "dir": "Close Long",
+        "px": 76734.0,
+        "sz": 1.19115,
+        "closed_pnl": -2339.78
+      },
+      {
+        "time_iso": "2026-09-03T14:58:30.805000+00:00",
+        "coin": "BTC",
+        "dir": "Open Long",
+        "px": 80293.0,
+        "sz": 0.05525,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T14:58:30.805000+00:00",
+        "coin": "BTC",
+        "dir": "Open Long",
+        "px": 80293.0,
+        "sz": 0.415,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T14:58:30.805000+00:00",
+        "coin": "BTC",
+        "dir": "Open Long",
+        "px": 80293.0,
+        "sz": 0.115,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T14:58:30.805000+00:00",
+        "coin": "BTC",
+        "dir": "Open Long",
+        "px": 80293.0,
+        "sz": 0.02851,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T14:59:12.511000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.27439,
+        "sz": 436.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T15:03:57.092000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.27248,
+        "sz": 1535.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T15:03:57.092000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.27248,
+        "sz": 443.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T15:03:57.092000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.27248,
+        "sz": 443.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T15:03:57.092000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.27194,
+        "sz": 460.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T19:50:10.925000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.30485,
+        "sz": 296.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T19:50:10.925000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.30484,
+        "sz": 271.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T19:50:10.925000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.30473,
+        "sz": 370.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T19:50:10.925000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.30434,
+        "sz": 869.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T19:50:10.925000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.30432,
+        "sz": 869.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T19:50:10.925000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.30432,
+        "sz": 65.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T19:50:10.925000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.30427,
+        "sz": 328.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T19:50:10.925000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.30426,
+        "sz": 492.0,
+        "closed_pnl": 0.0
+      }
+    ]
+  },
+  "funds": {
+    "native": {
+      "n_positions": 2,
+      "account_value": 1683.344418,
+      "position_value": 51732.53
+    },
+    "builder_dex": {
+      "xyz": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "flx": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "vntl": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "hyna": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "km": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "abcd": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "cash": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "para": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "mkts": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "io": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      }
+    },
+    "spot": {
+      "n_nonzero": 5,
+      "balances": [
+        {
+          "coin": "USDC",
+          "total": 1780.49308018,
+          "hold": 1780.49308018,
+          "entry_ntl": 0.0,
+          "usd": 1780.49308018
+        },
+        {
+          "coin": "FARM",
+          "total": 0.8,
+          "hold": 0.0,
+          "entry_ntl": 4.68664,
+          "usd": 4.68664,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "VAPOR",
+          "total": 816.0,
+          "hold": 0.0,
+          "entry_ntl": 3.5849328,
+          "usd": 3.5849328,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "HYPE",
+          "total": 0.01439447,
+          "hold": 0.0,
+          "entry_ntl": 0.5393222,
+          "usd": 0.5393222,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "MAX",
+          "total": 2908.3048,
+          "hold": 0.0,
+          "entry_ntl": 0.0,
+          "usd": 0.0,
+          "usd_is_estimate": true
+        }
+      ],
+      "usd_stable": 1780.49,
+      "usd_est_other": 8.81,
+      "usd_total_est": 1789.3,
+      "estimated": true
+    },
+    "native_usd": 1683.34,
+    "builder_usd": 0.0,
+    "spot_usd": 1789.3,
+    "total_usd": 3472.64,
+    "non_native_usd": 1789.3,
+    "non_native_share": 0.5153,
+    "positions": [
+      {
+        "coin": "BTC",
+        "szi": 0.61376,
+        "side": "long",
+        "entry_px": 80293.0,
+        "position_value": 49782.0736,
+        "unrealized_pnl": 501.44192,
+        "leverage_value": 40.0,
+        "leverage_type": "cross",
+        "liquidation_px": 79735.3874024894,
+        "margin_used": 1244.55184,
+        "max_leverage": 40.0,
+        "cum_funding_all_time": 5821622.512062,
+        "dex": ""
+      },
+      {
+        "coin": "CASHCAT",
+        "szi": 6877.0,
+        "side": "long",
+        "entry_px": 0.289108,
+        "position_value": 1950.45474,
+        "unrealized_pnl": -37.74594,
+        "leverage_value": 3.0,
+        "leverage_type": "cross",
+        "liquidation_px": 0.138242155,
+        "margin_used": 650.15158,
+        "max_leverage": 3.0,
+        "cum_funding_all_time": 5.383386,
+        "dex": ""
+      }
+    ],
+    "n_positions_total": 2,
+    "n_positions_native": 2,
+    "n_positions_builder": 0,
+    "known": true
+  },
+  "ledger": {
+    "n_total": 10,
+    "n_in_window": 10,
+    "n_kept": 10,
+    "by_type": {
+      "rewardsClaim": {
+        "n": 6,
+        "usd": 6966.77,
+        "direction": "in"
+      },
+      "send": {
+        "n": 4,
+        "usd": 9684.36,
+        "direction": "mixed"
+      }
+    },
+    "external_out_usd": 0.0,
+    "external_in_usd": 12193.57,
+    "internal_usd": 0.0,
+    "vault_out_usd": 0.0,
+    "bridge_out_usd": 4457.57,
+    "unknown_usd": 0.0,
+    "external_out_rows": [],
+    "bridge_out_rows": [
+      {
+        "time": 1787834148.352,
+        "time_iso": "2026-08-27T12:35:48.352000+00:00",
+        "type": "send",
+        "usd": 4457.57,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xbd69155dde569d08bee2044316dfbf02030a00437959bbda6131c0b09d5a76f3"
+      }
+    ],
+    "unknown_rows": [],
+    "internal_rows": [],
+    "rows": [
+      {
+        "time": 1788465035.651,
+        "time_iso": "2026-09-03T19:50:35.651000+00:00",
+        "type": "rewardsClaim",
+        "usd": 97.14,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x0ec77aab13a32f12104104439dbd6402032e0090aea64de4b29025fdd2a708fc"
+      },
+      {
+        "time": 1788447491.607,
+        "time_iso": "2026-09-03T14:58:11.607000+00:00",
+        "type": "rewardsClaim",
+        "usd": 156.7,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0xd03d53dfe1424b94d1b7044399fe5802035400c57c456a667405ff32a046257f"
+      },
+      {
+        "time": 1788279654.454,
+        "time_iso": "2026-09-01T16:20:54.454000+00:00",
+        "type": "rewardsClaim",
+        "usd": 92.51,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x4ac378bed1a880be4c3d044376275902038500a46cab9f90ee8c241190ac5aa8"
+      },
+      {
+        "time": 1788238469.471,
+        "time_iso": "2026-09-01T04:54:29.471000+00:00",
+        "type": "rewardsClaim",
+        "usd": 852.39,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0xf12a39552c1d6a1af2a304436d54d8020309003ac71088ed94f2e4a7eb114405"
+      },
+      {
+        "time": 1787994520.386,
+        "time_iso": "2026-08-29T09:08:40.386000+00:00",
+        "type": "send",
+        "usd": 1123.19,
+        "direction": "in",
+        "destination": "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6",
+        "token": "USDC",
+        "hash": "0x63bf304c549e587b653804433932750000fa4831ef91774d0787db9f13923266"
+      },
+      {
+        "time": 1787994504.371,
+        "time_iso": "2026-08-29T09:08:24.371000+00:00",
+        "type": "send",
+        "usd": 1758.8,
+        "direction": "in",
+        "destination": "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6",
+        "token": "USDC",
+        "hash": "0xaca2fd28cc593af2ae1c04433931a10000de150e675c59c4506ba87b8b5d14dd"
+      },
+      {
+        "time": 1787994430.44,
+        "time_iso": "2026-08-29T09:07:10.440000+00:00",
+        "type": "send",
+        "usd": 2344.8,
+        "direction": "in",
+        "destination": "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6",
+        "token": "USDC",
+        "hash": "0xa7b1843308b68bdfa92b0443392ddf0000ec9c18a3b9aab14b7a2f85c7ba65ca"
+      },
+      {
+        "time": 1787834148.352,
+        "time_iso": "2026-08-27T12:35:48.352000+00:00",
+        "type": "send",
+        "usd": 4457.57,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xbd69155dde569d08bee2044316dfbf02030a00437959bbda6131c0b09d5a76f3"
+      },
+      {
+        "time": 1787834103.298,
+        "time_iso": "2026-08-27T12:35:03.298000+00:00",
+        "type": "rewardsClaim",
+        "usd": 3562.72,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x155bc08152a184b616d5044316dd2b02097b0066eda4a388b9246bd411a55ea0"
+      },
+      {
+        "time": 1785152910.733,
+        "time_iso": "2026-07-27T11:48:30.733000+00:00",
+        "type": "rewardsClaim",
+        "usd": 2205.31,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x96938db16f01f57f980d0440d9d0c50201af00970a0514513a5c39042e05cf6a"
+      }
+    ],
+    "n_bridge_out": 1,
+    "n_unknown": 0,
+    "counterparties": {},
+    "parse_failed": false
+  },
+  "verdict": "同地址換戰場（builder dex/現貨）｜⚠️ 資本外移中",
+  "verdict_reasons": [
+    "非原生資金 $1,789.30 占總資產 $3,472.64 的52%（builder dex $0.00／現貨 $1,789.30）",
+    "成交戰場分布：非原生 1215/2000 筆（61%）",
+    "近 45 天帳變動離場訊號：跨層轉移（HyperCore→HyperEVM，同一擁有者） $4,457.57",
+    "跨層轉移（HyperCore→HyperEVM，同一地址擁有者，非第三方）$4,457.57，占「現餘＋跨層轉移」56%（≥ 20% 門檻）→ 資本正離開交易場（跨層/減倉）"
+  ],
+  "endpoint_health": [
+    {
+      "name": "perpDexs",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "clearinghouseState[native]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.27
+    },
+    {
+      "name": "clearinghouseState[xyz]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "clearinghouseState[flx]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "clearinghouseState[vntl]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "clearinghouseState[hyna]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "clearinghouseState[km]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "clearinghouseState[abcd]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "clearinghouseState[cash]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "clearinghouseState[para]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "clearinghouseState[mkts]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "clearinghouseState[io]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "spotClearinghouseState",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "userNonFundingLedgerUpdates",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "portfolio",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.34
+    },
+    {
+      "name": "userFills",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.42
+    }
+  ],
+  "notes": [],
+  "requests_ok": 16,
+  "requests_failed": 0
+}

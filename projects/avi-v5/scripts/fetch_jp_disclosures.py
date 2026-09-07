@@ -407,10 +407,27 @@ def probe_sources(now):
     lines.append("## TDnet 解析診斷")
     lines.append("")
     try:
-        ymd = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y%m%d")
-        turl = TDNET_LIST.format(page=1, ymd=ymd)
-        raw_html = get(turl)
-        parsed = parse_list_page(raw_html)
+        # ⚠️ 2026-08-24 修正：原本固定取「今天 −1 天」，結果抽到 08-23（週日），
+        # 頁面回「に開示された情報はありません」——**證明不了解析器是好是壞**。
+        # 改為往回找最近一個「真的有開示」的日子；找不到才退回昨天並註明。
+        raw_html, parsed, turl, ymd = None, [], "", ""
+        tried = []
+        for back in range(1, 11):
+            ymd = (datetime.now(timezone.utc) - timedelta(days=back)).strftime("%Y%m%d")
+            turl = TDNET_LIST.format(page=1, ymd=ymd)
+            try:
+                raw_html = get(turl)
+            except Exception:  # noqa: BLE001
+                tried.append(ymd + "(取得失敗)")
+                continue
+            parsed = parse_list_page(raw_html)
+            empty_day = "情報はありません" in raw_html
+            tried.append(f"{ymd}({'空日' if empty_day else str(len(parsed)) + '列'})")
+            if parsed or not empty_day:
+                break
+        lines.append("- 回溯嘗試：" + " → ".join(tried))
+        if raw_html is None:
+            raise RuntimeError("十天內都取不到 TDnet 一覽頁")
         hit = sum(1 for r in parsed if r["code4"] in TARGETS)
         lines.append("- 測試頁：`" + turl + "`")
         lines.append("- HTML 長度：" + format(len(raw_html), ",") + " 字元")
