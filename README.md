@@ -35,6 +35,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |------|-------|-------|
 | 2026-08-28 | [T1 條件⑤ 檢核 — NVDA Q2 FY27：供應商融資擴散觸發](./topics/business/2026-08-28-t1-condition5-nvda-q2-fy27-trigger.md) | Business |
 | 2026-08-25 | [「中國曝險」紅旗的第一性原理重寫](./topics/business/2026-08-25-china-red-flag-first-principles-rewrite.md) | Business |
+| 2026-09-07 | [Silicon Constraint Theory（Vince Liu）— 重點、核實、與對 Serenity 的框架修補](./topics/business/2026-09-07-silicon-constraint-theory.md) | Business |
 | 2026-09-07 | [SEMICON Taiwan 2026：從先進製程到 3D IC — 重點與對 KIWI 的意涵](./topics/business/2026-09-07-semicon-taiwan-2026-3dic.md) | Business |
 | 2026-09-07 | [全掃收尾：3013／3533／CEJN／GaN-SiC — 冷卻與 800VDC 兩線結案](./topics/business/2026-09-07-scan-remaining-cooling-800vdc.md) | Business |
 | 2026-09-05 | [全掃 Step 5–9：3324 雙鴻 × 2492 華新科 — 兩檔都有決定性發現](./topics/business/2026-09-05-scan-3324-2492-step5-9.md) | Business |
@@ -125,6 +126,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-09-05 | [全掃 Step 5–9：3324 雙鴻 × 2492 華新科 — 兩檔都有決定性發現](./topics/business/2026-09-05-scan-3324-2492-step5-9.md) | Business |
 | 2026-09-07 | [SEMICON Taiwan 2026：從先進製程到 3D IC — 重點與對 KIWI 的意涵](./topics/business/2026-09-07-semicon-taiwan-2026-3dic.md) | Business |
 | 2026-09-07 | [全掃收尾：3013／3533／CEJN／GaN-SiC — 冷卻與 800VDC 兩線結案](./topics/business/2026-09-07-scan-remaining-cooling-800vdc.md) | Business |
+| 2026-09-07 | [Silicon Constraint Theory（Vince Liu）— 重點、核實、與對 Serenity 的框架修補](./topics/business/2026-09-07-silicon-constraint-theory.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---

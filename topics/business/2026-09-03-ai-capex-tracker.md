@@ -31,11 +31,13 @@
 | **Power $20** | ① GE Vernova 燃氣渦輪積壓（GW）與**最早交機年份** | GEV 財報／8-K | 每季 | **交機年份由 2031 往前移** ⇒ 產能開始追上，瓶頸租金開始消退 | runner |
 | | ② 電力變壓器交期（週） | Wood Mackenzie／產業媒體 | 每季 | **由 128 週降至 <100 週** ⇒ 同上 | 手動／runner |
 | | ③ ERCOT／PJM **大負載併網排隊量** | ERCOT／PJM 公開佇列 | 每月 | **排隊量開始下降**（不論是核准還是撤案）⇒ 需求端變化的最早訊號之一 | runner |
-| **Memory $15** | ④ **HBM4e 認證/量產消息**（哪家過、何時） | SK hynix／Samsung／Micron IR、TrendForce | 事件驅動 | **三家都過 ⇒ 供給集中度下降，定價權轉弱** | runner |
+| **Memory $15** | ④ **HBM4e 認證/量產消息**（哪家過、何時）＋🔧 **2026-09-07 擴充：該家的 base die 是自家製程還是外包代工、幾奈米** | SK hynix／Samsung／Micron IR、TrendForce | 事件驅動 | **三家都過 ⇒ 供給集中度下降，定價權轉弱**；**Samsung（自家 4nm 一條龍）與 Micron／Hynix（base die 外包 TSMC）的毛利差開始出現 ⇒ 記憶體不可再當同質板塊，ETF 式買法會稀釋掉分化** | runner |
 | | ⑤ **Rubin Ultra 每櫃記憶體規格確認**（目前 365TB 為二手） | NVIDIA GTC／官方規格 | 事件驅動 | **若實際 <365TB ⇒ 記憶體份額上升論點被削弱** | runner |
 | **Cooling $7.5** | ⑥ **每世代每櫃 kW**（120→600 這條線） | NVIDIA 官方 | 事件驅動 | **若 Kyber 實際 <600kW ⇒ 冷卻/電力份額上升幅度下修** | runner |
 | | ⑦ **UQD 交期與是否有新合格供應商**（見 `2026-09-03-cooling-800vdc-serenity-prescreen.md`） | 產業媒體、OCP | 每季 | **出現第 6 家以上合格供應商 ⇒ 瓶頸解除** | 手動 |
-| **WFE $8 / Packaging $2** | ⑧ HBM 堆疊層數、混合鍵合導入率 | 原廠技術發表、TechInsights | 每季 | **層數停止增加 ⇒ 單位位元設備強度停止上升** | 手動／runner |
+| **WFE $8 / Packaging $2** | ⑧ HBM 堆疊層數、混合鍵合導入率 | 原廠技術發表、TechInsights、**每年 9 月 SEMICON Taiwan（固定觀察窗）** | 每季 | **層數停止增加 ⇒ 單位位元設備強度停止上升** | 手動／runner |
+| | 🔧 **⑧b 產能擴張對照項**（2026-09-07 新增）：三大記憶體廠合計 capex 與產能爬坡倍數；先進封裝產能擴張速度 | 券商估、原廠法說、台積電擴產公告 | 每季 | **2027H2 記憶體供給過剩警告成真 ⇒ 80% 毛利的租金期結束**。⚠️ **瓶頸論的否證來自產能追上，不是需求下滑** | 手動 |
+| **🆕 Phase 結構** | ⑪ **Prefill:Decode 配比的可觀測代理**（決定 Memory Bandwidth Bound 的權重） | ❌ **目前無可用來源** | — | **配比明顯往 Prefill 移 ⇒ Memory Bandwidth Bound 權重下降，記憶體租金結束但產能一片沒少** | 🔴 **未解決問題**（見 `2026-09-07-silicon-constraint-theory.md` §5.3） |
 | **Optical $5.5** | ⑨ 🔴 **COHR 在雷射／SiPh 的份額**（**不是模組出貨量**） | COHR 財報分部揭露、NVIDIA 合作公告 | 每季 | **被 Lumentum 或原廠自製擠掉 ⇒ 這才是 COHR 論點的否證，模組量下滑不是** | runner |
 | **Accelerator $25** | ⑩ **客製 XPU 佔加速器出貨的比重** | Broadcom／Marvell 財報之 AI 營收、雲廠自研公告 | 每季 | **比重加速上升 ⇒ NVDA 份額論點鬆動（對持倉是中性偏正：客製化提高記憶體與封裝含量）** | runner |
 
@@ -208,3 +210,4 @@ Jake 要求「先驗證有效性再決定要不要接 workflow」。實測結果
 
 ## Update Log
 - 2026-09-03 v1.0：建檔。A 模組（Sankey 十項＋主控項 A0）；B 模組（AFI 四層，刻意不做「房價型」水位指標，改追新增信用的流量與品質）；工程現況與手動記分卡；標明 workflow 未改、需先問過。
+- 2026-09-07 v1.1：①**層 4（信用利差）已從「工程待辦」轉為「線上運行」**——`fetch_credit_spreads.py` 併入 main，首次成功執行產出 787 筆 FRED 真實資料與 `STATUS.md`（讀數與首跑發現見 `2026-09-03-signal-verification-credit-rpoc-tw-revenue.md` §1.4）。②依 `2026-09-07-silicon-constraint-theory.md` 修訂三格：**A1-④ 擴充**為同時記錄 base die 是自家製程或外包代工、幾奈米（Samsung 一條龍 vs Micron／Hynix 外包 TSMC ⇒ 毛利將在 2027 分化，記憶體不可再當同質板塊、ETF 式買法會稀釋分化）；**新增 A1-⑧b 產能擴張對照項**（三大廠合計 capex 2026 ~$110B → 2027 ~$140B、SEMICON Taiwan 為固定觀察窗）——**瓶頸論的否證來自產能追上，不是需求下滑**；**新增 A1-⑪ Phase 結構代理**（Prefill:Decode 配比）並誠實標為 🔴 **未解決問題——目前無可用來源**。
