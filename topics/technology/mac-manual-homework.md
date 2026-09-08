@@ -225,27 +225,21 @@ last_updated: 2026-07-06
   > → `.env` 要放在**你開 Claude Code 的那個資料夾**（也就是 KIWI repo 根目錄），
   > 放進 `~/.claude/skills/llm-council/` 是**讀不到的**，而且不會報錯，只會說「key not found」。
   >
-  > **執行步驟：貼這一行**（`skills/setup.sh` 會自己做完安裝＋環境檢查）：
+  > **執行步驟：貼這一行**：
   > ```
-  > cd "$(find ~ -maxdepth 4 -type d -name KIWI -print -quit)" && git fetch origin && rm -rf /tmp/kiwi-skills && mkdir -p /tmp/kiwi-skills && git archive origin/main skills | tar -x -C /tmp/kiwi-skills && bash /tmp/kiwi-skills/skills/setup.sh
+  > cd "$(find ~ -maxdepth 4 -type d -name KIWI -print -quit)" && git fetch origin claude/poker-training-plan-6g0srd && rm -rf /tmp/kiwi-skills && mkdir -p /tmp/kiwi-skills && git archive FETCH_HEAD skills | tar -x -C /tmp/kiwi-skills && bash /tmp/kiwi-skills/skills/setup.sh
   > ```
   > 然後重啟 Claude Code。腳本會印出 gemini/codex CLI 在不在、要不要 `.env`、`requests` 有沒有裝。
   >
-  > 🔴 **為什麼繞開 `git pull`**（2026-09-07 第二次踩到）：Jake 的本機 KIWI 有 **divergent branches**，
-  > `git pull` 直接失敗（`fatal: Need to specify how to reconcile divergent branches.`）
-  > → `&&` 鏈中斷 → 安裝根本沒跑。
-  > 上面改用 **`git fetch` + `git archive origin/main skills`** 解到 `/tmp`，
-  > **完全不碰他的工作目錄、不需要解決分歧、不會動到任何本機修改**。
-  > 📌 **本機分歧仍需另外處理**（與安裝無關）：先跑
-  > `git status` 與 `git log --oneline -5` 看有沒有自己的本機 commit，再決定 merge 還是 reset。
-  > **在看清楚之前不要 `git reset --hard`。**
+  > 🔴 **2026-09-07 第三次修正——前一版指向 `origin/main`，而修好的 `setup.sh` 還在未合併的分支上。**
+  > 後果：`git archive origin/main skills` 取到的是**舊版 setup.sh（只 cp SKILL.md、不 cp scripts/）**
+  > → skill 註冊成功、`scripts/query_llms.py` 從未被複製 → Jake 以為裝好了，
+  > 執行驗收指令得到 `No such file or directory`。**這正是我自己修掉的「空殼」bug，被自己的指令重現。**
+  > → 現改為指向分支 `claude/poker-training-plan-6g0srd`。
+  > 📌 **該分支合併進 main 之後，這裡要改回 `origin/main`**（否則會永遠釘在一個舊分支上）。
   >
-  > 🔴 **給未來 session 的鐵律：貼給 Jake 的指令區塊裡絕對不要放 `#` 註解。**
-  > 他的 shell 是 **macOS zsh 互動模式，`INTERACTIVE_COMMENTS` 預設關閉**
-  > → `#` 之後的字**不會被當註解**，而是原樣塞進上一個指令的參數。
-  > 2026-09-07 實際踩到：`cd ~/KIWI            # 忘了路徑就先跑：find ...`
-  > → `cd: too many arguments` → 後面 `git pull`／`bash skills/setup.sh` 連鎖失敗。
-  > 註解寫在程式碼區塊**外面**，區塊裡只放可以整段貼的純指令。
+  > ⚠️ **通則**：`git archive <ref>` 的 `<ref>` 必須是**真的含有你要的修正**的那個 ref。
+  > 改了檔案卻還沒合併時，指令要跟著指到分支——**否則使用者拿到的是你修之前的版本。**
   >
   > - **A：腳本說「兩個 CLI 都在」** → 不用 `.env`，重啟 Claude Code，結束。
   > - **B：腳本說有 CLI 缺席** → 在 **KIWI 根目錄**建 `.env`（已在 .gitignore，不會被 commit）：
