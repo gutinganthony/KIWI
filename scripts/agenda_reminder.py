@@ -100,6 +100,47 @@ def homework_backlog():
     return len(re.findall(r"^\s*- \[ \]", todo, flags=re.M))
 
 
+SHEET_URL = "https://docs.google.com/spreadsheets/d/1FPmLpXYVgm8Xrsv6Gs01bC-SlKytcEdmXF7NC2vUqJ4/edit"
+
+
+def holdings_prompt():
+    """每週問一次「持倉有沒有變動」。
+
+    2026-09-08 新增。動機：Google Sheet 前一版失敗的原因不是表不好用，
+    是「沒有人在固定時間問他」。所以真正的修法不是換工具，是把問題排進
+    每週已經會送到他手機的那則推播裡。
+
+    只讀 holdings.md 的標題行取代碼清單——刻意不算權重、不取價格：
+    這則訊息的功能是「提問」，不是「報告」。
+    """
+    path = REPO / "skills" / "serenity" / "holdings.md"
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+    m = re.search(r"^\*\*最後同步：([0-9]{4}-[0-9]{2}-[0-9]{2})", text, flags=re.M)
+    synced = m.group(1) if m else None
+    # ⚠️ 只掃「現有部位」表——不截斷的話會把「已出場」表的代碼一起撈進來
+    #（2026-09-08 首次跑就踩到：6981／6857／DRAM 都是已出場的）
+    current = re.split(r"^## 已出場", text, maxsplit=1, flags=re.M)[0]
+    codes = re.findall(r"^\| (?:\*\*)?([A-Z0-9]{2,6})(?:\*\*)? \| ", current, flags=re.M)
+    seen, tickers = set(), []
+    for c in codes:
+        if c in seen or c in {"CASH"}:
+            continue
+        seen.add(c)
+        tickers.append(c)
+    if not tickers:
+        return None
+    line = f"💼 <b>持倉確認</b>：目前記錄的是 <b>{' · '.join(tickers[:8])}</b>"
+    if synced:
+        line += f"（最後同步 {synced}）"
+    line += ('\n　<b>這週有買賣嗎？</b>有的話直接改 '
+             f'<a href="{SHEET_URL}">持倉表</a>，不用回我；'
+             "沒有的話忽略這則。")
+    return line
+
+
 def is_first_saturday(today):
     return today.weekday() == 5 and today.day <= 7
 
@@ -130,6 +171,9 @@ def build_message(today, tasks, malformed, n_goals, checklist, backlog):
         parts.append("✅ 無逾期、無 14 天內到期任務。")
     if backlog:
         parts.append(f"🖥 Mac 手動功課積欠 <b>{backlog}</b> 項（mac-manual-homework.md）")
+    hp = holdings_prompt()
+    if hp:
+        parts.append(hp)
     if n_goals:
         parts.append(f"🎯 進行中的里程碑目標 {n_goals} 項（無到期日，見 AGENDA.md）")
     if malformed:

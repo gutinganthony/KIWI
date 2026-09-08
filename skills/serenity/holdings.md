@@ -1,14 +1,19 @@
 # 持倉快照（自 Google Sheet 同步，**非權威**）
 
 > ## ⚠️ 權威來源是 Google Sheet，不是這個檔
-> **KIWI 持倉即時表**：https://docs.google.com/spreadsheets/d/1tYg3PneDLrxXbtuoo1lsylFV8ehSpEblv9thEuAllns/edit
+> **KIWI 持倉表（權威來源・唯一一張）**：https://docs.google.com/spreadsheets/d/1FPmLpXYVgm8Xrsv6Gs01bC-SlKytcEdmXF7NC2vUqJ4/edit
 >
 > Jake 隨時在 Sheet 上更新，**不需要通知 Claude**。
-> **每個 session 開場必須用 `mcp__Google_Drive__read_file_content`（fileId `1tYg3PneDLrxXbtuoo1lsylFV8ehSpEblv9thEuAllns`）讀一次，
+> **每個 session 開場必須用 `mcp__Google_Drive__read_file_content`（fileId `1FPmLpXYVgm8Xrsv6Gs01bC-SlKytcEdmXF7NC2vUqJ4`）讀一次，
 > 並把本檔同步成最新內容。** 本檔存在的唯一理由是：GitHub Actions runner 沒有 Google 憑證、讀不到 Sheet，
 > 所以自動管線只能讀這份快照。
 >
 > **本檔與 Sheet 不一致時，一律以 Sheet 為準。**
+>
+> 📌 **2026-09-08 重建，且設計刻意改了**：新表**只放「只有 Jake 知道的事實」**（股數／平均成本／幣別／建倉日／建倉理由／現金），**不再放權重、曝險、損益等計算欄位**。
+> **理由**：算式放進試算表就會出現「沒人驗證卻看起來權威」的數字（v2 嘗試放公式，CSV 匯入時公式沒有生效、整欄空白而不報錯——正是這個風險的實例）。
+> **計算一律留在本檔**，因為這裡的每個數字都會被 review。
+> ⚠️ 舊表（`1tYg3Pne…`）已移至 Google Drive 垃圾桶（可還原），**避免同時存在兩張「權威」表**——那正是前一輪失效的形狀。
 
 **最後同步：2026-09-07 第二次（Jake 於對話中完整重報持倉）**
 ⚠️ **Google Sheet 停在 2026-08-20，已落後 18 天且內容全錯**（仍列 SKHY／2492／COHX，無 SPCX／SPCH／2303／BE）。

@@ -10,7 +10,7 @@
 - **`docs/` 會被整包部署到公開 GitHub Pages**（見 .github/workflows/deploy-pages.yml）。私人筆記、內部規則、金鑰、個人資料嚴禁寫入 docs/。
 - git log 每天被 `auto: update dashboard data` commit 洗版。查人為變更：`git log --oneline --invert-grep --grep='auto: update dashboard'`
 - `.github/workflows/` 是真實生產管線（每日 dashboard 更新、平日警報＋週六 weekend-bridge 警報、每週六 Serenity 週報、Pages 部署等共 6 支——確切清單以目錄內容為準）。**改 workflows 前先問使用者。**
-- **持倉的唯一真實來源是 Google Sheet「KIWI 持倉即時表」**（fileId `1tYg3PneDLrxXbtuoo1lsylFV8ehSpEblv9thEuAllns`）。
+- **持倉的唯一真實來源是 Google Sheet「KIWI 持倉表（權威來源・唯一一張）」**（fileId `1FPmLpXYVgm8Xrsv6Gs01bC-SlKytcEdmXF7NC2vUqJ4`）。
   **session 開場必讀**（`mcp__Google_Drive__read_file_content`），並把 `skills/serenity/holdings.md` 同步成最新內容。
   Jake 隨時在 Sheet 上改、不會通知你。`skills/serenity/watchlist.md` 的持倉表**已降級為歷史快照，不得當作現況**。
   （Sheet 讀不到時：用 `holdings.md` 並**明說它可能過期**，不要沉默沿用。GitHub Actions runner 無 Google 憑證，只能讀 `holdings.md`。）
