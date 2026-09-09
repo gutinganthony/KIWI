@@ -34,6 +34,10 @@
 - [x] 2026-09-06 | ⭐ 全掃：冷卻／800VDC 兩線 ＋ 2492 | ✅ **2026-09-05～07 全部跑完**。**兩線結案：0 檔進入建倉候選池**（`2026-09-07-scan-remaining-cooling-800vdc.md`）。①**3324 雙鴻**：純度過關但過的是「液冷系統整合」非「UQD 瓶頸」（QD 是自製非外售），營收 +117% 同時毛利壓縮 ⇒ 定價權不過 ②**2492 華新科**：AI 純度僅 15–20%，新硬條件一票否決；獲利改善屬被動元件漲價循環（`2026-09-05-scan-3324-2492-step5-9.md`）③**3533 嘉澤**：補六季序列，營益率 31.6%→22.0% 單向下滑（對照奇鋐 +8.7pp），維持出局 ④**3013 晟銘電**：GM 20.5% 代工級、營益率停滯三季 ⇒ 不建倉 ⑤**CEJN 未上市（家族第三代）** ⑥**GaN/SiC：Navitas 為唯一「瓶頸＋純度」雙成立，但營收下滑且 P/S 約 53× ⇒ 觀察名單**。🔴 **最重要的結構性結論：UQD 是真瓶頸但沒有可投資的純標的**（三家最純的全未上市，三家上市的純度 <30%）。⚠️ 剩 ENPH 未跑（優先序最低）
 - [x] 2026-09-03 | COHX 出場規則裁決 | ✅ **Jake 裁決：只用 WT cross**。已寫進 `exit-playbook.md` §0 規則 2（COHR 週線 WT1 下穿 WT2 → 全出；看 COHR 不看 COHX；不設水位；**無停損**）。🔴 **記錄在案**：舊規則 2(b)「−30% 硬停損」在改版當下**已觸發未執行**（9/1 收盤 −35.38%）；配套認定 COHX 為「可歸零部位」。D7 連四週最高優先項結案
 - [x] 2026-09-05 | 信用利差監控接入管線 | ✅ **Jake 核准並已完成**。`projects/avi-v5/scripts/fetch_credit_spreads.py` 掛進 `update-dashboard.yml`（runner 已有 FRED_API_KEY，不需新 workflow）。抓 HY/BB/CCC 三條 ICE BofA OAS → `data/ext/credit/{hy_oas.csv, STATUS.md}`，**只在 🟡(≥100bp)/🔴(≥150bp) 推 Telegram，🟢 靜音**。這是 AI 追蹤系統裡**唯一通過歷史驗證**的訊號（2007 領先 S&P 見頂 4.4 個月）。⚠️ **首次 runner 執行後要驗收**：確認 STATUS.md 有產出且數字合理（現值應約 265bp）
+- [ ] 2026-09-12 | 🟢 摸魚記歡迎信上線 【needs Jake，2 分鐘】| **100 訂閱已達（2026-09-09 硬觸發）**。文案在 `skills/checkup/templates.md` §1，貼進 Substack Settings→Emails→Welcome email。回信＝熱讀者名單來源
+- [ ] 2026-09-14 | 🟢 諮詢開口 Step 1：圈 8–10 熱讀者、發前 3 封 DM 【needs Jake】| 北極星已切換「第一個付費關係」。DM 模板 `skills/checkup/templates.md` §2、熱讀者定義 SKILL.md §3。**硬觸發不往後挪**（2026-06-27 pt.2 拍板：防門檻滑到 200/500/never）
+- [ ] 2026-09-21 | 🟢 第一場免費框架健檢完成 【needs Jake】| 訪談腳本 templates §3、一頁體檢報告 templates §4；訪後 24h 內寄報告＋要見證；痛點逐字記 `skills/checkup/sessions-log.md`
+- [ ] 2026-10-04 | 🟢 免費 2–3 場完成 → 定創始價 【needs Jake】| 包裝成方案（90 分健檢＋框架筆記）不報時薪，錨 NT$3,000–5,000/hr；**收費前措辭先過律師**（checkup 紅線 6）
 - [ ] 2026-09-08 | 🔴 **信用利差監控合併進 main（驗收未完成的唯一原因）** 【needs Jake】| **2026-09-07 驗收結果：這一格從來沒跑過，也不會跑。** 原因是機制性的——**GitHub Actions 的 schedule 只從 default branch 執行**，而 `update-dashboard.yml` 的 push trigger 也只認 `branches: [main]`。程式碼與 workflow 改動都在 `claude/kiwi-memory-supercycle-hgtt34` 上，**main 沒有 `fetch_credit_spreads.py`、workflow 也沒有那個步驟、`data/ext/credit/STATUS.md` 不存在**。管線本身是健康的（run #251 於 2026-09-07 07:04 UTC schedule 觸發、成功）。⚠️ **feature 落後 main 1170 個 commit**，且 main 剛併入 PR #39（三指數因子健檢＋殖利率曲線改版＋ECY）⇒ **合併需先 rebase／merge main 並處理衝突，不是一行指令**。**需要你一句話授權才動 main。**
 
 ## 🎯 目標（里程碑，無硬到期日）
@@ -43,6 +47,7 @@
 - `docs/SERETINY_STOCK_PICKING.md` 從空模板變成自己的方法論（≥1,500 字，含「我什麼時候會錯」）
 - **記憶體減倉（T1）：日曆式「2027」已作廢 → 改事件驅動**（2026-07-26 八因子判定：股價歷史領先實體見頂 5–7 個月、合約價見頂估 2026Q4–2027H1 ⇒ 等 2027 大概率太晚）。四條機械條件：①4Q26 合約價預估走平/轉負 ②DDR5/HBM 現貨跟進 DDR4 下跌 ③Samsung/SKH 存貨連兩季回升 ④任一 hyperscaler capex 指引下修 **⑤供應商融資擴散（2026-07-28 新增）**：NVDA/AMD 對客戶擔保融資再擴大、錨定客戶(OpenAI/Anthropic)募資困難、或 NVDA 應收/合約資產增速顯著高於營收 ⇒ 需求品質下降，與合約價轉跌同權重（可能更領先）。**減碼順序寫死：先 DRAM ETF（無合約下檔保護）、後 MU（有 take-or-pay 地板）**。✅ **2026-08-25 更新：v1 四條已作廢，改為 v2 六條**（Jake 裁決 T1 不降級 → 壞掉的條件必須修）。v2＝①4Q26/1Q27 合約價**轉負**（刪「走平」）②**HBM／伺服器 DRAM** 合約價轉負（不看現貨/DDR4）③售罄覆蓋期縮至 **<2 季** 🔧 ④hyperscaler **實際 capex** 連兩季低於前次指引且排除會計重述 ⑤供應商融資擴散（不變）⑥🆕 CXMT DDR5 良率／HBM 驗證。權威定義在 `skills/serenity/exit-playbook.md` §3。⚠️ **適用對象只剩 SK hynix ADR**（DRAM ETF/MU 已出場；8271 是模組廠不掛 T1）。⚠️ **維護義務**：八因子每季必須真的重跑，否則 T1 退化成沒人更新卻仍能扣扳機的條件
 - **PokerLab（決策訓練器，Gate 0 未過前不啟動）**：成功指標**不是**贏率或時薪，而是「每月一條 poker→投資轉譯**被真的寫進 `skills/` 並執行過**」；12 個月累計 <3 條＝殺。載體僅限 trainer／play-money／積分制賽事／合法轄區現場賽；台灣境內線上真錢現金桌為紅線。系統見 `skills/pokerlab/`
+- **摸魚記 L2 變現（2026-09-09 硬觸發啟動）**：訂閱 100 已達 → 北極星切換為「第一個付費關係（框架健檢）」。開口 4 步、合規紅線、全部文案模板見 `skills/checkup/`；策略源頭 `topics/business/2026-06-26-personal-monopoly-flywheel-action-plan.md`。付費 tier 等 ~200 訂閱，不是現在的事
 
 ## 🗓 每月自檢清單（每月第一個週六隨提醒附上；出自 topics/other/2026-07-12-decision-quality-self-audit.md §D2）
 
