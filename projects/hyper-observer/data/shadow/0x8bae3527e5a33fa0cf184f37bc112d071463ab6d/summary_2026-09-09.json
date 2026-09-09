@@ -1,0 +1,290 @@
+{
+  "date": "2026-09-09",
+  "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+  "caveats": [
+    "⚠️ 誠實聲明：本工具**純唯讀**——只 POST Hyperliquid 公開 info API 的查詢",
+    "（l2Book/userFills/clearinghouseState/allMids 白名單），不下單、不簽章、無私鑰、",
+    "無錢包連線，絕不碰 exchange endpoint。",
+    "⚠️ 數據性質：深度剖面是**時點快照**、非成交保證；滑點估算基於當下簿面 walk-the-book，",
+    "實盤可能更差（快照後簿面會變、撤單/搶跑/資金費未計）。低頻標的的延遲/劣化樣本需",
+    "**多班累積**才有統計意義，單班零新成交屬預期。detect_lag 受輪詢間隔下限影響，是實際",
+    "可達延遲的**上界**，且含本機/伺服器時鐘差 ±數秒。不構成投資建議。"
+  ],
+  "sessions": [
+    {
+      "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+      "session_stamp": "20260909T072757Z",
+      "date": "2026-09-09",
+      "started_utc": "2026-09-09T07:27:57+00:00",
+      "duration_min": 30.0,
+      "poll_sec": 5.0,
+      "targets": [
+        {
+          "coin": "xyz:INTC",
+          "sources": [
+            "active"
+          ],
+          "n_fills_30d": 224
+        },
+        {
+          "coin": "xyz:NVDA",
+          "sources": [
+            "active"
+          ],
+          "n_fills_30d": 222
+        },
+        {
+          "coin": "xyz:DRAM",
+          "sources": [
+            "active"
+          ],
+          "n_fills_30d": 180
+        },
+        {
+          "coin": "xyz:SKHY",
+          "sources": [
+            "active"
+          ],
+          "n_fills_30d": 179
+        },
+        {
+          "coin": "kLUNC",
+          "sources": [
+            "active"
+          ],
+          "n_fills_30d": 73
+        }
+      ],
+      "main_market": "xyz:INTC",
+      "polls": 329,
+      "fills_poll_failures": 0,
+      "book_failures": 0,
+      "allmids_failures": 0,
+      "rate_limited_backoffs": 0,
+      "discovery_errors": [],
+      "baseline_seeded": 2000,
+      "jsonl_file": "session_20260909T072757Z.jsonl",
+      "depth": {
+        "xyz:INTC": {
+          "open": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 104.285,
+            "spread_pct": 0.0096,
+            "mid_allmids": null,
+            "top_bid_notional_usd": 194246.66,
+            "top_ask_notional_usd": 127783.51,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.0048,
+              "5000": 0.0121,
+              "20000": 0.0138
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.0048,
+              "5000": 0.0117,
+              "20000": 0.0137
+            }
+          },
+          "close": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 104.17500000000001,
+            "spread_pct": 0.0096,
+            "mid_allmids": null,
+            "top_bid_notional_usd": 103632.97,
+            "top_ask_notional_usd": 112424.09,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.0048,
+              "5000": 0.0091,
+              "20000": 0.0131
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.0048,
+              "5000": 0.0125,
+              "20000": 0.0139
+            }
+          }
+        },
+        "xyz:NVDA": {
+          "open": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 226.305,
+            "spread_pct": 0.0044,
+            "mid_allmids": null,
+            "top_bid_notional_usd": 78308.81,
+            "top_ask_notional_usd": 99011.44,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.0022,
+              "5000": 0.0022,
+              "20000": 0.0059
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.0022,
+              "5000": 0.0022,
+              "20000": 0.0034
+            }
+          },
+          "close": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 226.285,
+            "spread_pct": 0.0044,
+            "mid_allmids": null,
+            "top_bid_notional_usd": 87861.93,
+            "top_ask_notional_usd": 66122.07,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.0022,
+              "5000": 0.0022,
+              "20000": 0.0022
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.0022,
+              "5000": 0.0022,
+              "20000": 0.0022
+            }
+          }
+        },
+        "xyz:DRAM": {
+          "open": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 61.341499999999996,
+            "spread_pct": 0.0082,
+            "mid_allmids": null,
+            "top_bid_notional_usd": 7017.02,
+            "top_ask_notional_usd": 11484.2,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.0041,
+              "5000": 0.0063,
+              "20000": 0.0125
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.0054,
+              "5000": 0.0057,
+              "20000": 0.0134
+            }
+          },
+          "close": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 61.412,
+            "spread_pct": 0.0065,
+            "mid_allmids": null,
+            "top_bid_notional_usd": 6766.69,
+            "top_ask_notional_usd": 9249.11,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.0033,
+              "5000": 0.0036,
+              "20000": 0.0112
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.0064,
+              "5000": 0.013,
+              "20000": 0.0203
+            }
+          }
+        },
+        "xyz:SKHY": {
+          "open": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 187.89499999999998,
+            "spread_pct": 0.016,
+            "mid_allmids": null,
+            "top_bid_notional_usd": 93531.06,
+            "top_ask_notional_usd": 87572.98,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.008,
+              "5000": 0.012,
+              "20000": 0.017
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.008,
+              "5000": 0.008,
+              "20000": 0.0153
+            }
+          },
+          "close": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 187.975,
+            "spread_pct": 0.0053,
+            "mid_allmids": null,
+            "top_bid_notional_usd": 95177.12,
+            "top_ask_notional_usd": 11920.61,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.0027,
+              "5000": 0.0027,
+              "20000": 0.0175
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.0074,
+              "5000": 0.0079,
+              "20000": 0.008
+            }
+          }
+        },
+        "kLUNC": {
+          "open": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 0.053723,
+            "spread_pct": 0.0372,
+            "mid_allmids": 0.053736,
+            "top_bid_notional_usd": 659.89,
+            "top_ask_notional_usd": 1980.4,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.0186,
+              "5000": 0.05,
+              "20000": 0.1373
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.0346,
+              "5000": 0.0906,
+              "20000": 0.1616
+            }
+          },
+          "close": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 0.0536595,
+            "spread_pct": 0.0205,
+            "mid_allmids": 0.053643,
+            "top_bid_notional_usd": 178.58,
+            "top_ask_notional_usd": 4905.41,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.0102,
+              "5000": 0.0346,
+              "20000": 0.2388
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.0527,
+              "5000": 0.14,
+              "20000": 0.2294
+            }
+          }
+        }
+      },
+      "roundtrip_1k_pct": {
+        "coin": "xyz:INTC",
+        "value": 0.0096,
+        "pass": "close"
+      },
+      "new_fills": {
+        "n_detected": 0,
+        "n_book_ok": 0,
+        "detect_lag_sec": {
+          "median": null,
+          "p90": null,
+          "n": 0
+        },
+        "copy_1k_degradation_pct": {
+          "median": null,
+          "p90": null,
+          "n": 0
+        }
+      }
+    }
+  ]
+}
