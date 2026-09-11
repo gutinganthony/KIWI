@@ -356,3 +356,7 @@ last_updated: 2026-07-06
 - [ ] **（2026-09-07 新增）核實三大記憶體廠 2026Q2 毛利的一手來源**——我用 WebSearch 二手核實了 Vince Liu 文中「記憶體大廠毛利攀升到 80% 以上」為真（SK hynix 毛利約 83%／營益率 76.3%、Samsung 記憶體事業 83%／DS 營益率 70%、Micron FY26Q3 non-GAAP 毛利 84.9%、FQ4 指引約 86%），**但三家口徑不同且我沒讀過任何一家的 IR 原始檔**。要做的：開 SK hynix Newsroom 2Q26、Samsung IR、Micron IR 各抓一張原始損益表，把口徑對齊後回填 `topics/business/2026-09-07-silicon-constraint-theory.md` §二。**這是該檔唯一影響結論的二手數字。**
 - [ ] **（2026-09-07 新增）核實 Custom HBM base die 的代工安排是否已確認**——查到的多為「reportedly／評估中」語氣：Micron HBM4E base die 交 TSMC（目標 2027）、SK hynix 主流 TSMC 12nm／旗艦評估 3nm、Samsung 自家 4nm 一條龍、TSMC C-HBM4E 用 N3P。**若其中任一已是確認的量產安排，`silicon-constraint-theory.md` §5.2 的「2027 三家毛利分化」推論就從假說升級為可追蹤事實**，並直接影響追蹤項 A1-④。
 - [ ] **（2026-09-07 新增）核實三大記憶體廠 capex 2026 $110B → 2027 $140B**——目前是**單一來源**（Hyundai Motor Securities 估計），而它是追蹤項 A1-⑧b 的門檻基準。同時查 2027H2「記憶體供給過剩」警告 vs SK hynix CEO「2027 是產業史上供給最糟的一年」這兩個相反說法的原始出處。
+
+- [ ] **（2026-09-11 新增，🔴 最高優先）查 UMC 的 interposer／3DIC 平台營收佔比**——Vince 的 STCO 篇（一手）點名 Interposer 上的 eDTC 是 800V→0.5–0.7V 壓降鏈的必要元件，而 UMC 已整合 eDTC 進 3DIC 平台並拿下 Qualcomm interposer 案（1500nF/mm²，最快 1Q26 量產，二手）。**這讓 2303 從「沒有論點」變成「有一個可檢核的問題」，但 UMC 沒有分部揭露，雲端查不到。** 要做的：開 UMC 法說簡報／年報，找 2.5D/3D IC 或 advanced packaging 的營收或佔比揭露（哪怕是口頭指引）。**有數字才跑 Step 5-9。** 這同時解掉「2303 建倉理由未入庫」這個掛了四週的缺口。
+- [ ] **（2026-09-11 新增）核實 Qualcomm × UMC interposer 是否已實際量產**——目前二手來源寫「最快 2026 Q1 量產」，語氣是預期不是確認。若已量產，2303 的論點強度顯著提升；若延後，則是相反訊號。
+- [ ] **（2026-09-11 新增）核實 ASMI 的 ALD 市佔與 ALD 佔其營收比重**——目前 30% 市佔為 Yole 轉述之單一來源。ASMI 是 `2026-09-11-semicon-taiwan-2026-stco-and-3dic.md` §5.1 登記的頭號新候選，純度是第一道關卡。

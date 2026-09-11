@@ -38,6 +38,10 @@
 | **WFE $8 / Packaging $2** | ⑧ HBM 堆疊層數、混合鍵合導入率 | 原廠技術發表、TechInsights、**每年 9 月 SEMICON Taiwan（固定觀察窗）** | 每季 | **層數停止增加 ⇒ 單位位元設備強度停止上升** | 手動／runner |
 | | 🔧 **⑧b 產能擴張對照項**（2026-09-07 新增）：三大記憶體廠合計 capex 與產能爬坡倍數；先進封裝產能擴張速度 | 券商估、原廠法說、台積電擴產公告 | 每季 | **2027H2 記憶體供給過剩警告成真 ⇒ 80% 毛利的租金期結束**。⚠️ **瓶頸論的否證來自產能追上，不是需求下滑** | 手動 |
 | **🆕 Phase 結構** | ⑪ **Prefill:Decode 配比的可觀測代理**（決定 Memory Bandwidth Bound 的權重） | ❌ **目前無可用來源** | — | **配比明顯往 Prefill 移 ⇒ Memory Bandwidth Bound 權重下降，記憶體租金結束但產能一片沒少** | 🔴 **未解決問題**（見 `2026-09-07-silicon-constraint-theory.md` §5.3） |
+| **🆕 System Scaling**（2026-09-11 新增，來源見 `2026-09-11-semicon-taiwan-2026-stco-and-3dic.md`） | ⑫ **ALD 製程道數**（現 >100，預期 >120） | 原廠技術發表、SEMICON、ASMI/AMAT/TEL 法說 | 每年 | **道數停止成長 ⇒ 單位晶圓設備強度停止上升**（比 A1-⑧ 的 HBM 層數更前段） | 手動 |
+| | ⑬ **TSMC「2029 年 >48x 電晶體堆疊」目標** | TSMC 技術論壇、SEMICON | 每年 | **時程延後或倍數下修 ⇒ System Scaling 的速度假設要整體下修** | 手動 |
+| | ⑭ 🔴 **High NA EUV 的 Foundry 實際導入進度** | ASML 法說、foundry 技術發表 | 每季 | **原文明說 gating factor 是 Cost（單價高＋拼接誤差＋throughput）** ⇒ **導入持續延後 ⇒「先進製程仍是關鍵」鬆動，價值進一步往封裝移**。⚠️ 獨佔 ≠ 會被買單 | runner／手動 |
+| | ⑮ **先進封裝 pitch 下探至 5um 以下** | 原廠技術發表 | 每年 | **pitch 持續下探 ⇒ 先進製程與先進封裝界線消失，兩者的競爭者名單必須合併看** | 手動 |
 | **Optical $5.5** | ⑨ 🔴 **COHR 在雷射／SiPh 的份額**（**不是模組出貨量**） | COHR 財報分部揭露、NVIDIA 合作公告 | 每季 | **被 Lumentum 或原廠自製擠掉 ⇒ 這才是 COHR 論點的否證，模組量下滑不是** | runner |
 | **Accelerator $25** | ⑩ **客製 XPU 佔加速器出貨的比重** | Broadcom／Marvell 財報之 AI 營收、雲廠自研公告 | 每季 | **比重加速上升 ⇒ NVDA 份額論點鬆動（對持倉是中性偏正：客製化提高記憶體與封裝含量）** | runner |
 
@@ -211,3 +215,4 @@ Jake 要求「先驗證有效性再決定要不要接 workflow」。實測結果
 ## Update Log
 - 2026-09-03 v1.0：建檔。A 模組（Sankey 十項＋主控項 A0）；B 模組（AFI 四層，刻意不做「房價型」水位指標，改追新增信用的流量與品質）；工程現況與手動記分卡；標明 workflow 未改、需先問過。
 - 2026-09-07 v1.1：①**層 4（信用利差）已從「工程待辦」轉為「線上運行」**——`fetch_credit_spreads.py` 併入 main，首次成功執行產出 787 筆 FRED 真實資料與 `STATUS.md`（讀數與首跑發現見 `2026-09-03-signal-verification-credit-rpoc-tw-revenue.md` §1.4）。②依 `2026-09-07-silicon-constraint-theory.md` 修訂三格：**A1-④ 擴充**為同時記錄 base die 是自家製程或外包代工、幾奈米（Samsung 一條龍 vs Micron／Hynix 外包 TSMC ⇒ 毛利將在 2027 分化，記憶體不可再當同質板塊、ETF 式買法會稀釋分化）；**新增 A1-⑧b 產能擴張對照項**（三大廠合計 capex 2026 ~$110B → 2027 ~$140B、SEMICON Taiwan 為固定觀察窗）——**瓶頸論的否證來自產能追上，不是需求下滑**；**新增 A1-⑪ Phase 結構代理**（Prefill:Decode 配比）並誠實標為 🔴 **未解決問題——目前無可用來源**。
+- 2026-09-11 v1.2：依 `2026-09-11-semicon-taiwan-2026-stco-and-3dic.md`（Vince Liu SEMICON 系列一手原文）新增 **System Scaling 四格**：⑫ **ALD 製程道數**（現 >100、預期 >120——結構性道數成長，比 A1-⑧ 的 HBM 層數更前段）、⑬ **TSMC「2029 >48x 電晶體堆疊」目標**、⑭ 🔴 **High NA EUV 的 Foundry 實際導入**（原文明說 gating factor 是 Cost ⇒ **獨佔 ≠ 會被買單**，導入延後反而讓價值往封裝移）、⑮ **先進封裝 pitch 下探 5um 以下**（界線消失 ⇒ 競爭者名單要合併看）。⚠️ 同時記一筆：本追蹤系統 09-07 曾引用 `2026-09-07-semicon-taiwan-2026-3dic.md` 的「先進封裝產能擴張速度」對照項，**該檔已於 09-11 被標記為重建版失敗案例**——A1-⑧b 的邏輯（否證來自產能追上）仍成立，但**不要再引用該檔的推論**。
