@@ -23,6 +23,18 @@ last_updated: 2026-07-06
 
 ## 🔴 待辦（依急迫度）
 
+### 🆕 2026-09-13 新增（總經 forecast session 產生；全部因 WebFetch 對財經站被 egress proxy 封鎖）
+
+- [ ] 🔴 **核對「核心 CPI 2.4% vs 核心 PCE 3.3%」倒掛**（BLS `cpi.nr0.htm` 8 月報告／BEA 7 月 Personal Income and Outlays）。
+      核心 PCE 通常低於核心 CPI，兩者至少一個是錯的；**這一格決定 `2026-09-13-macro-first-principles-asset-forecast.md` §7 情境 A 的機率**（若核心 CPI 2.4% 為真 ⇒ 通膨純能源 ⇒ Fed 一次性 ⇒ A 上修至 50%）。
+- [ ] **核對 10 年 TIPS 實質利率 2.55%**（FRED `DFII10`）與 **CME 官方 FedWatch 年底累積機率**（cmegroup.com；本輪只拿到轉述站 85.5% 與預測市場 ~4.0%）。
+- [ ] **S&P 500 最新 forward 12M P/E 與 Q2 2026 實際 EPS 年增率**（FactSet `EarningsInsight_091126.pdf`）——報告 §1.2 的「forward 盈餘殖利率 ≈ 10y」是用賣方 EPS 反推的 `[推論]`。
+- [ ] **BOJ 政策利率現值**：subagent 查到 0.75%（tradingeconomics），KIWI `2026-09-03-fx-outlook-twd-usd-jpy-chf.md` 寫 1.00%——擇一更正另一份。
+- [ ] **SpaceX（SPCX）IPO 日期與鎖定期到期日**——SPCX/SPCH 無年線，出場規則需要一個日期錨。
+- [ ] NVDA Q3 FY27 財報日（Wall Street Horizon 11/17 vs investing.com 11/25）。
+- [ ] 黃金 9/11 結算價（$4,349 vs $4,409 兩來源不一致）；VIX 15.84／CNN 恐懼貪婪 33（週報導讀數字，未獨立核對）。
+
+
 ### 🆕 2026-09-07 新增（主對話 session 產生）
 
 - [ ] **開 `insights.redef.tech` 那篇〈SEMICON Taiwan 最新發展分析之一：從先進製程到 3D IC〉**
