@@ -35,6 +35,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |------|-------|-------|
 | 2026-08-28 | [T1 條件⑤ 檢核 — NVDA Q2 FY27：供應商融資擴散觸發](./topics/business/2026-08-28-t1-condition5-nvda-q2-fy27-trigger.md) | Business |
 | 2026-08-25 | [「中國曝險」紅旗的第一性原理重寫](./topics/business/2026-08-25-china-red-flag-first-principles-rewrite.md) | Business |
+| 2026-09-14 | [Serenity 框架修補：把「下游已量產」改寫成「資金流動證據 × 認知落差」雙條件](./topics/business/2026-09-14-serenity-recognition-gap-rule-design.md) | Business |
 | 2026-09-13 | [Serenity Step 1–9 雙標的：2303 聯電（純度實測）× ASM International（ALD 瓶頸）](./topics/business/2026-09-13-step1-9-umc-2303-and-asmi.md) | Business |
 | 2026-09-11 | [SEMICON Taiwan 2026 系列（一）3D IC ×（二）STCO — 原文一手摘要、與對持倉的實際影響](./topics/business/2026-09-11-semicon-taiwan-2026-stco-and-3dic.md) | Business |
 | 2026-09-09 | [Morgan Stanley《The Humanoid 100》— 重點、瓶頸萃取，與 19 個月後的實際開獎](./topics/business/2026-09-09-ms-humanoid-100-bottleneck-and-19m-scorecard.md) | Business |
@@ -133,6 +134,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-09-09 | [Morgan Stanley《The Humanoid 100》— 重點、瓶頸萃取，與 19 個月後的實際開獎](./topics/business/2026-09-09-ms-humanoid-100-bottleneck-and-19m-scorecard.md) | Business |
 | 2026-09-11 | [SEMICON Taiwan 2026 系列（一）3D IC ×（二）STCO — 原文一手摘要、與對持倉的實際影響](./topics/business/2026-09-11-semicon-taiwan-2026-stco-and-3dic.md) | Business |
 | 2026-09-13 | [Serenity Step 1–9 雙標的：2303 聯電（純度實測）× ASM International（ALD 瓶頸）](./topics/business/2026-09-13-step1-9-umc-2303-and-asmi.md) | Business |
+| 2026-09-14 | [Serenity 框架修補：把「下游已量產」改寫成「資金流動證據 × 認知落差」雙條件](./topics/business/2026-09-14-serenity-recognition-gap-rule-design.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
