@@ -25,8 +25,14 @@ last_updated: 2026-07-06
 
 ### 🆕 2026-09-13 新增（總經 forecast session 產生；全部因 WebFetch 對財經站被 egress proxy 封鎖）
 
-- [ ] 🔴 **核對「核心 CPI 2.4% vs 核心 PCE 3.3%」倒掛**（BLS `cpi.nr0.htm` 8 月報告／BEA 7 月 Personal Income and Outlays）。
-      核心 PCE 通常低於核心 CPI，兩者至少一個是錯的；**這一格決定 `2026-09-13-macro-first-principles-asset-forecast.md` §7 情境 A 的機率**（若核心 CPI 2.4% 為真 ⇒ 通膨純能源 ⇒ Fed 一次性 ⇒ A 上修至 50%）。
+- [x] ~~**核對「核心 CPI 2.4% vs 核心 PCE 3.3%」倒掛**~~ ✅ **2026-09-14 Jake 直接提供三欄讀數結案：兩個都是官方值、都符合預期**
+      （核心 CPI 實際 2.4%／預測 2.4%／前值 2.5%，09-11 發布；核心 PCE 實際 3.3%／預測 3.3%／前值 3.3%，08-26 發布）。
+      **倒掛不是資料錯誤，是真實現象** ⇒ 已升格為報告 §1.1c 獨立分析，並改動了 §7 機率（A 30→32、B 40→38、C 15→12、D 15→18）。
+- [ ] 🔴 **（接續上項）核心 PCE − 核心 CPI 缺口的分項拆解**——這是現在最該補的單一資料。
+      要三個數字：①**BLS 住房（rent／OER）YoY**（在 CPI 詳表）②**BEA NIPA Table 2.4.4U 的「金融服務與保險」YoY**（含投資組合管理費與 FISIM）③同表**醫療** YoY。
+      **用途**：驗證 `2026-09-13-macro-first-principles-asset-forecast.md` §1.1c 的歸因——
+      我推斷住房權重效應是主因（0.5–0.9pp）、設算金融服務是次因（0.1–0.3pp），**但本輪實際分項貢獻完全沒取得，這個排序目前是 `[推論]`**。
+      若拆出來發現金融服務那條遠大於我的估計 ⇒ 「Fed 在對自己的升息與多頭市場做出反應」這個迴路要從配角升為主角，§7 的 C 還要再降。
 - [ ] **核對 10 年 TIPS 實質利率 2.55%**（FRED `DFII10`）與 **CME 官方 FedWatch 年底累積機率**（cmegroup.com；本輪只拿到轉述站 85.5% 與預測市場 ~4.0%）。
 - [ ] **S&P 500 最新 forward 12M P/E 與 Q2 2026 實際 EPS 年增率**（FactSet `EarningsInsight_091126.pdf`）——報告 §1.2 的「forward 盈餘殖利率 ≈ 10y」是用賣方 EPS 反推的 `[推論]`。
 - [ ] **BOJ 政策利率現值**：subagent 查到 0.75%（tradingeconomics），KIWI `2026-09-03-fx-outlook-twd-usd-jpy-chf.md` 寫 1.00%——擇一更正另一份。
