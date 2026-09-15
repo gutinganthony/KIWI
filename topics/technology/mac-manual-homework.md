@@ -23,6 +23,28 @@ last_updated: 2026-07-06
 
 ## 🔴 待辦（依急迫度）
 
+### 🆕 2026-09-15 第三批（情境模型重建 session 產生）
+
+**背景**：情境機率模型因統計方法錯誤已重建（`projects/macro-scenarios/`）。以下三項會影響模型參數，但**不影響已成立的核心結論**（條件獨立假設被推翻這件事是自算的，不依賴外部來源）。
+
+- [ ] **Campbell-Pflueger-Viceira (2020, JPE 128(8))** 與 **NBER w34323** 中，供給／需求衝擊與股債聯動的**符號**。
+      ⚠️ 研究員回報：搜尋擷取的措辭與 JPE 版本、AQR 推導**方向相反**（疑為殖利率／價格混淆）。
+      **這一項是三項裡唯一可能推翻論述的**——若符號相反，`README.md` 裡「−0.406 代表需求主導」的解讀要重寫。
+- [ ] **Neville et al. (2021, JPM 47(8))** 與 **Baltussen et al. (2023, FAJ 79(3))** 的各 regime 報酬表，
+      用來檢查圖 5 資產欄的方向。目前那五欄是**從折現式推出的判斷**，不是回測——
+      因為文獻上**不存在乾淨的「成長×通膨」2×2 資產報酬矩陣**（二維交叉後樣本不足），這點本身已查證。
+- [ ] **油價選擇權隱含機率**（Brent 未來 6–12 個月破 $115）與 **CPI cap/floor 隱含通膨機率**。
+      取到就能把模型裡「油價三態」從判斷換成市場定價。CME／Barchart 需即時頁、FRED OVXCLS 403、Minneapolis Fed 頁被擋。
+
+**本輪新增的被擋站點**（`github.com` 與 `raw.githubusercontent.com` 是唯二可達的）：
+nber.org・frbsf.org・papers.ssrn.com・aqr.com・man.com・robeco.com・msci.com・schroders.com・pgim.com・
+blackrock.com・morningstar.com・bridgewater.com・arxiv.org・imf.org・bis.org・federalreserve.gov・
+fred.stlouisfed.org・api.stlouisfed.org・www.eia.gov・en.wikipedia.org・hbs.edu・campbell.scholars.harvard.edu・
+cpflueger.github.io・thierry-roncalli.com・rba.gov.au・econbrowser.com
+⚠️ **WebFetch 本輪對所有網域回 EGRESS_BLOCKED**，外部數字全部只到搜尋摘要層。
+
+---
+
 ### 🆕 2026-09-15 第二批（Jake 三問引發的查證，全部因相關站點被 egress proxy 擋）
 
 - [ ] **Ball & Koh, NBER WP 34113《Market Rents and CPI Shelter Inflation》(2025-08) 全文**，取其**確切落後季數點估計**。

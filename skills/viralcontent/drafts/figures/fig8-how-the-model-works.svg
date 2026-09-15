@@ -1,63 +1,54 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="700" viewBox="0 0 1040 700" font-family="WenQuanYi Zen Hei, Noto Sans CJK TC, PingFang TC, Microsoft JhengHei, sans-serif">
-  <rect width="1040" height="700" fill="#fcfcfb"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="660" viewBox="0 0 1040 660" font-family="WenQuanYi Zen Hei, Noto Sans CJK TC, PingFang TC, Microsoft JhengHei, sans-serif">
+  <rect width="1040" height="660" fill="#fcfcfb"/>
 
-  <text x="44" y="52" font-size="29" font-weight="700" fill="#0b0b0b">那些機率是怎麼算出來的</text>
-  <text x="44" y="82" font-size="16" fill="#52514e">以及一個很多人會踩的算術陷阱。</text>
+  <text x="44" y="52" font-size="29" font-weight="700" fill="#0b0b0b">那五個機率是怎麼算出來的</text>
+  <text x="44" y="82" font-size="16" fill="#52514e">兩個問題定義情境，一個東西推動它們，「會不會一起發生」交給四十年的歷史。</text>
 
-  <!-- ============ LEFT : the wrong way ============ -->
-  <rect x="44" y="108" width="450" height="322" rx="8" fill="#ffffff" stroke="#e1e0d9" stroke-width="1.5"/>
-  <rect x="44" y="108" width="450" height="6" rx="3" fill="#c93030"/>
-  <text x="70" y="148" font-size="19" font-weight="700" fill="#b02a2a">✗　原本的做法：三個數字相乘</text>
+  <!-- STEP 1 : the two axes -->
+  <rect x="44" y="108" width="952" height="180" rx="8" fill="#ffffff" stroke="#e1e0d9" stroke-width="1.5"/>
+  <rect x="44" y="108" width="952" height="6" rx="3" fill="#2a78d6"/>
+  <text x="70" y="148" font-size="20" font-weight="700" fill="#0b0b0b">① 只有兩件事會決定你的部位</text>
 
-  <text x="70" y="184" font-size="16" fill="#0b0b0b">猜三件事的機率，然後乘起來：</text>
-  <rect x="70" y="200" width="122" height="40" rx="4" fill="#f0efec"/>
-  <text x="131" y="225" font-size="15" fill="#52514e" text-anchor="middle">油價</text>
-  <text x="202" y="225" font-size="18" fill="#898781" text-anchor="middle">×</text>
-  <rect x="214" y="200" width="122" height="40" rx="4" fill="#f0efec"/>
-  <text x="275" y="225" font-size="15" fill="#52514e" text-anchor="middle">通膨</text>
-  <text x="346" y="225" font-size="18" fill="#898781" text-anchor="middle">×</text>
-  <rect x="358" y="200" width="112" height="40" rx="4" fill="#f0efec"/>
-  <text x="414" y="225" font-size="15" fill="#52514e" text-anchor="middle">就業</text>
+  <text x="70" y="184" font-size="18" fill="#0b0b0b">價格 ＝ 未來能賺到的錢 ÷ (1 ＋ 折現率)</text>
 
-  <text x="70" y="276" font-size="16" fill="#0b0b0b">這個乘法偷偷假設了一件事：</text>
-  <text x="70" y="302" font-size="17" font-weight="700" fill="#b02a2a">「通膨和就業互不相干。」</text>
+  <rect x="70" y="202" width="420" height="64" rx="5" fill="#e8f0fc"/>
+  <text x="280" y="228" font-size="17" font-weight="700" fill="#1a5fb0" text-anchor="middle">就業 ── 管分子</text>
+  <text x="280" y="252" font-size="15" fill="#52514e" text-anchor="middle">大家有工作，公司才賺得到錢</text>
 
-  <text x="70" y="338" font-size="16" fill="#0b0b0b">但資料說不是——扣掉油價的影響後，</text>
-  <text x="70" y="364" font-size="16" fill="#0b0b0b">通膨動能和失業率的相關係數是</text>
-  <text x="70" y="400" font-size="34" font-weight="700" fill="#b02a2a">−0.41<tspan font-size="16" font-weight="400" fill="#52514e">　（1986–2025，不是 0）</tspan></text>
+  <rect x="510" y="202" width="420" height="64" rx="5" fill="#e8f0fc"/>
+  <text x="720" y="228" font-size="17" font-weight="700" fill="#1a5fb0" text-anchor="middle">通膨 ── 管分母</text>
+  <text x="720" y="252" font-size="15" fill="#52514e" text-anchor="middle">通膨高就利率高，未來的錢更不值錢</text>
 
-  <!-- ============ RIGHT : the right way ============ -->
-  <rect x="518" y="108" width="478" height="322" rx="8" fill="#ffffff" stroke="#e1e0d9" stroke-width="1.5"/>
-  <rect x="518" y="108" width="478" height="6" rx="3" fill="#2a78d6"/>
-  <text x="544" y="148" font-size="19" font-weight="700" fill="#1a5fb0">✓　改成：兩個軸，一個推力</text>
+  <text x="950" y="232" font-size="15" fill="#898781" text-anchor="end"></text>
 
-  <text x="544" y="184" font-size="16" fill="#0b0b0b">價格 ＝ 未來的現金流 ÷ (1 ＋ 折現率)</text>
+  <!-- STEP 2 : marginals -->
+  <rect x="44" y="304" width="464" height="198" rx="8" fill="#ffffff" stroke="#e1e0d9" stroke-width="1.5"/>
+  <rect x="44" y="304" width="464" height="6" rx="3" fill="#eb6834"/>
+  <text x="70" y="344" font-size="20" font-weight="700" fill="#0b0b0b">② 各自的機率：抄共識</text>
 
-  <rect x="544" y="202" width="200" height="56" rx="5" fill="#e8f0fc"/>
-  <text x="644" y="223" font-size="15" font-weight="700" fill="#1a5fb0" text-anchor="middle">就業</text>
-  <text x="644" y="245" font-size="14" fill="#52514e" text-anchor="middle">管分子（賺不賺得到）</text>
+  <text x="70" y="380" font-size="16" font-weight="700" fill="#0b0b0b">就業壞掉 <tspan font-size="22" fill="#b02a2a">20%</tspan></text>
+  <text x="70" y="404" font-size="14" fill="#52514e">失業率 4.1% → 4.5% 以上</text>
+  <text x="70" y="426" font-size="14" fill="#898781">紐約聯準 13.9%・高盛 15%・SPF 20%</text>
+  <text x="70" y="446" font-size="14" fill="#898781">摩根大通 20%・華爾街日報調查 25%</text>
 
-  <rect x="764" y="202" width="206" height="56" rx="5" fill="#e8f0fc"/>
-  <text x="867" y="223" font-size="15" font-weight="700" fill="#1a5fb0" text-anchor="middle">通膨</text>
-  <text x="867" y="245" font-size="14" fill="#52514e" text-anchor="middle">管分母（折現多少）</text>
+  <text x="70" y="480" font-size="16" font-weight="700" fill="#0b0b0b">通膨沒回到 2.5% 以下 <tspan font-size="22" fill="#b02a2a">70%</tspan></text>
 
-  <text x="544" y="288" font-size="16" fill="#0b0b0b">這兩個就是情境的<tspan font-weight="700">座標軸</tspan>。</text>
-  <text x="544" y="314" font-size="16" fill="#0b0b0b">油價<tspan font-weight="700">不是第三個軸</tspan>，它是推動這兩個軸的力量。</text>
+  <!-- STEP 3 : dependence -->
+  <rect x="532" y="304" width="464" height="198" rx="8" fill="#ffffff" stroke="#e1e0d9" stroke-width="1.5"/>
+  <rect x="532" y="304" width="464" height="6" rx="3" fill="#1baf7a"/>
+  <text x="558" y="344" font-size="20" font-weight="700" fill="#0b0b0b">③ 會不會一起發生：數歷史</text>
 
-  <text x="544" y="352" font-size="16" fill="#0b0b0b">至於「兩件事會不會一起發生」——</text>
-  <text x="544" y="382" font-size="19" font-weight="700" fill="#0b0b0b">不猜，直接數歷史。</text>
-  <text x="544" y="408" font-size="15" fill="#52514e">1986 年以來每個月往後看 12 個月，</text>
-  <text x="544" y="428" font-size="15" fill="#52514e">共 <tspan font-weight="700" fill="#0b0b0b">474 組</tspan>真的發生過的組合，數每格幾組。</text>
+  <text x="558" y="380" font-size="16" fill="#0b0b0b">1986 年以來每個月往後看 12 個月，</text>
+  <text x="558" y="404" font-size="16" fill="#0b0b0b">記下通膨和失業率<tspan font-weight="700">實際</tspan>各變了多少 ⇒</text>
+  <text x="558" y="438" font-size="26" font-weight="700" fill="#0b0b0b">474 組<tspan font-size="16" font-weight="400" fill="#52514e">　真的發生過的組合</tspan></text>
+  <text x="558" y="470" font-size="16" fill="#0b0b0b">再數每一格裡有幾組。</text>
+  <text x="558" y="492" font-size="14" fill="#898781">沒有常態假設，沒有模擬，就是數。</text>
 
-  <!-- ============ BOTTOM : what it changed ============ -->
-  <rect x="44" y="452" width="952" height="140" rx="8" fill="#f0efec"/>
-  <text x="70" y="488" font-size="19" font-weight="700" fill="#0b0b0b">差別在哪：假設無關，就把「兩件壞事一起來」算得太容易</text>
+  <!-- WHY IT MATTERS -->
+  <rect x="44" y="518" width="952" height="104" rx="8" fill="#f0efec"/>
+  <text x="70" y="550" font-size="19" font-weight="700" fill="#0b0b0b">為什麼第三步不能省：兩件事同時發生的機率，不等於兩個機率相乘</text>
+  <text x="70" y="580" font-size="16" fill="#0b0b0b">通膨和就業是連動的——需求旺的時候通膨升、失業降；需求垮的時候兩個一起反過來（相關係數 <tspan font-weight="700">−0.41</tspan>）。</text>
+  <text x="70" y="606" font-size="16" fill="#0b0b0b">所以「通膨燒起來」和「就業垮掉」<tspan font-weight="700">本來就不太會同時發生</tspan>——那正好是停滯性通膨的定義。</text>
 
-  <text x="70" y="524" font-size="16" fill="#0b0b0b">停滯性通膨 ＝ 通膨燒起來 <tspan font-weight="700">而且</tspan> 就業垮掉。但這兩件事本來就<tspan font-weight="700">不太會同時發生</tspan>——</text>
-  <text x="70" y="550" font-size="16" fill="#0b0b0b">需求旺的時候通膨升、失業降；需求垮的時候兩個一起反過來。<tspan font-weight="700">假設它們無關，等於把這個保護機制拆掉。</tspan></text>
-
-  <text x="70" y="580" font-size="17" fill="#0b0b0b">結果：停滯性通膨被算成 <tspan font-weight="700" fill="#b02a2a">14%</tspan>，實際上是 <tspan font-weight="700" fill="#1a5fb0">10.8%</tspan>　—　<tspan font-weight="700">高估了 1.3 倍。</tspan></text>
-
-  <text x="44" y="638" font-size="15" fill="#52514e">模型不會讓判斷變客觀。它做的是把主觀性關進幾個攤得開的數字，</text>
-  <text x="44" y="662" font-size="15" fill="#52514e">把「兩件事會不會一起發生」交給資料，然後把每個假設攤開，讓別人可以指著其中一條說「這裡錯了」。</text>
+  <text x="44" y="648" font-size="15" fill="#52514e">⇒ 停滯性通膨是 <tspan font-weight="700" fill="#1a5fb0">10%</tspan>，不是把兩個機率乘一乘得到的 <tspan font-weight="700" fill="#b02a2a">14%</tspan>。</text>
 </svg>
