@@ -33,6 +33,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-09-15 | [核心 PCE 高於核心 CPI 的 798 個月 — 一個看起來像訊號、其實不是訊號的數字](./topics/business/2026-09-15-core-pce-cpi-inversion-798-months.md) | Business |
 | 2026-09-13 | [總經第一性原理分析與各資產 forecast — 2026-09-13（FOMC 前）](./topics/business/2026-09-13-macro-first-principles-asset-forecast.md) | Business |
 | 2026-08-28 | [T1 條件⑤ 檢核 — NVDA Q2 FY27：供應商融資擴散觸發](./topics/business/2026-08-28-t1-condition5-nvda-q2-fy27-trigger.md) | Business |
 | 2026-08-25 | [「中國曝險」紅旗的第一性原理重寫](./topics/business/2026-08-25-china-red-flag-first-principles-rewrite.md) | Business |

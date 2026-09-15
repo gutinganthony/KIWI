@@ -98,3 +98,4 @@
 | 2026-09-07 | [全掃收尾：3013／3533／CEJN／GaN-SiC — 冷卻與 800VDC 兩線結案](./2026-09-07-scan-remaining-cooling-800vdc.md) | serenity, step5-9, cooling, 800VDC, UQD, CEJN, navitas, GaN, purity-filter, no-position |
 | 2026-09-07 | [SEMICON Taiwan 2026：從先進製程到 3D IC — 重點與對 KIWI 的意涵](./2026-09-07-semicon-taiwan-2026-3dic.md) | semicon-taiwan, 3DIC, advanced-packaging, hybrid-bonding, TCB, FOPLP, SoIC, system-integration, advantest |
 | 2026-09-13 | [總經第一性原理分析與各資產 forecast — 2026-09-13（FOMC 前）](./2026-09-13-macro-first-principles-asset-forecast.md) | macro, first-principles, fed, warsh, fomc, oil, iran, real-yield, term-premium, boj, yen-carry, credit-spreads, ai-capex, asset-allocation, forecast, portfolio-diagnosis, spacex |
+| 2026-09-15 | [核心 PCE 高於核心 CPI 的 798 個月 — 一個看起來像訊號、其實不是訊號的數字](./2026-09-15-core-pce-cpi-inversion-798-months.md) | inflation, cpi, pce, inversion, event-study, base-rate, shelter, data-artifact, signal-verification, methodology |
