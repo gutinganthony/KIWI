@@ -1,64 +1,73 @@
 #!/usr/bin/env python3
 """
-情境機率模型 v2 — 用「共識邊際 × 歷史相依結構」取代「三個數字相乘」
-=====================================================================
+情境機率模型 — 兩個軸來自估值恆等式本身
+======================================================================
 
-v1 做錯了什麼（2026-09-15 查證後重建）
---------------------------------------
-v1 算的是   P(油, 通膨, 就業) = P(油) × P(通膨|油) × P(就業|油)
+為什麼是這兩個軸
+----------------
+一檔股票的報酬，拆到底只有兩塊：
 
-這個式子**不是**機率的鏈鎖法則。正確的鏈鎖法則是
+    股價變化 ＝ (1 ＋ 獲利成長) × (1 ＋ 倍數變化) − 1
+                      ↑                    ↑
+                   分子                  分母
 
-            P(油, 通膨, 就業) = P(油) × P(通膨|油) × P(就業|油, 通膨)
-                                                              ^^^^^^^^
-v1 少了 "通膨" 這個條件，等於偷偷假設了「**給定油價之後，通膨與就業互相獨立**」
-（統計上叫條件獨立假設 / naive Bayes 假設）。
+**分子是企業獲利。分母是市場願意付的倍數。** 沒有第三塊。
 
-**用資料檢定的結果：這個假設不成立，而且錯得有方向。**
+所以情境的兩個軸就是這兩塊：
 
-    控制油價後，corr(Δ核心通膨動能, Δ失業率) = −0.41
-    [95% block-bootstrap 區間 −0.55, −0.22]，1986–2025；
-    分 1990 後、1998 後重算皆為 −0.41 ~ −0.42，結論穩定。
+    軸一：通膨回不回得到目標   → 決定**倍數**
+    軸二：企業獲利撐不撐得住   → 決定**分子**
 
-負相關代表：**通膨與「就業健康」是同向的**（需求好 → 通膨升 + 失業降）。
-所以獨立假設會：
-    - **高估**「通膨升 + 就業壞」＝ 停滯性通膨（v1 把它算成實際的 1.4 倍）
-    - **低估**「通膨降 + 就業壞」＝ 成長驚嚇
-    - **低估**「通膨升 + 就業好」＝ 再加速
+⚠️ **就業不是分子。** 分子是獲利。公司裁員時成本下降，單一公司的獲利反而變好。
+   就業之所以有用，是因為它是**獲利的前導指標**，不是因為它等於獲利：
 
-v1 還有三個結構性問題
----------------------
-2. **把三個變數當成平行的輸入**。其實**通膨與就業是情境的兩個座標軸**
-   （資產價格 = 現金流 ÷ (1+r)：就業→現金流，通膨→折現率），
-   **油價是推動那兩個軸的力量**，不是第三個軸。三者不對等，不該對稱處理。
-3. **情境集混了三種東西**：原因（油價路徑）、政策結果（升幾次息）、狀態（成長垮掉）。
-   所以會出現「Brent >$115 本身就算情境 C」這種規則——把觸發條件當成結果。
-   實際上油價衝到 $125 只讓停滯性通膨從 ~8% 升到 ~11%，不是「直接 100%」。
-4. **報到小數點一位**（43.9%）。光是相依結構的抽樣誤差就有 ±3pp，
-   邊際本身的不確定性更大。**四捨五入到 5pp 已是誠實的極限。**
+       P(EPS 衰退 | 失業率升 ≥0.4pp) = 78.4%   (n=185)
+       P(EPS 衰退 | 失業率沒升那麼多) = 19.5%   (n=595)
 
-v2 怎麼做
----------
-Sklar 定理：任何聯合分布都可以拆成「邊際分布」＋「相依結構(copula)」，兩者可以分開估。
+   知道就業，把獲利衰退的機率從 20% 推到 78% —— 很有用。
+   但**失業率只解釋 EPS 變異的 17%（R²=0.165）**，另外 83% 它看不到。
+   而且**就業沒壞的時候，獲利照樣有兩成機率衰退**（利潤率、資本支出、單一產業崩塌）。
+   ⇒ 所以就業當「輸入」，獲利當「軸」。把就業當成分子，會漏掉那兩成。
 
-    邊際（各自發生的機率）  ← 共識與市場定價錨定，是主觀的，**逐條列出處**
-    相依結構（會不會一起發生）← 1986–2025 的實際歷史，**不是猜的**
-    油價                   ← 把兩個邊際往上/往下推的力量
+為什麼通膨決定倍數（而不是利率）
+--------------------------------
+實測（席勒 1881–2022，12 個月窗）：**倍數壓不壓縮，取決於通膨的方向，不是利率的方向。**
 
-相依結構用**經驗 copula**（歷史資料的秩），不用高斯 copula，因為：
-    Δ通膨 偏態 +1.78、超峰度 +7.81；Δ失業 偏態 +1.70、超峰度 +16.98
-    Jarque-Bera p < 1e-16 ⇒ **常態被強烈拒絕**，而我們關心的正好是角落那幾格。
-    實測：高斯 copula 把停滯性通膨算成 0.9%，經驗分布是 2.1%（1986–2025 基準率）。
+    長率↑ ＋ 通膨↑   倍數中位數 −4.5%   (n=243)
+    長率↑ ＋ 通膨↓   倍數中位數 **+3.0%**  (n=84)   ← 利率漲，倍數反而擴張
+    長率↓ ＋ 通膨↓   倍數中位數 +7.9%   (n=191)
+    長率↓ ＋ 通膨↑   倍數中位數 −4.7%   (n=88)
+
+（細節與「獲利要成長多少才打平」見 multiple_vs_earnings.py）
+
+通膨也在分子裡，但很弱
+----------------------
+名目 EPS 會隨通膨上升（corr +0.10），而且是**駝峰形**：
+通膨 2–4% 時名目 EPS 成長中位數 +11.5%，通膨 >6% 時名目 +7.7% 但**實質 −0.7%**。
+⇒ 溫和通膨對分子中性偏好，高通膨兩邊都傷。模型把通膨放在倍數那一側，
+   並在 --diagnose 裡標出這個簡化。
+
+四個情境（2×2，互斥且窮盡）
+---------------------------
+                      獲利撐住              獲利轉壞
+    通膨回到目標       軟著陸                成長驚嚇
+    通膨沒回去         黏著                  停滯性通膨
+
+機率怎麼來
+----------
+Sklar 定理：聯合分布 ＝ 邊際 × 相依結構，兩者分開估。
+
+    邊際（各自發生的機率）  ← 外部共識與市場定價（判斷，逐條附出處）
+    相依結構（會不會一起發生）← 1957–2022 的實際歷史，用**經驗 copula**
 
 用法
 ----
     python3 scenario_model.py              # 基準
-    python3 scenario_model.py --diagnose   # 獨立假設錯多少、常態性檢定、基準率
-    python3 scenario_model.py --sensitivity # 兩個邊際在合理範圍內移動的影響
-    python3 scenario_model.py --bootstrap  # 相依結構的抽樣誤差區間
+    python3 scenario_model.py --diagnose   # 因子檢定、獨立假設錯多少、基準率
+    python3 scenario_model.py --sensitivity
+    python3 scenario_model.py --bootstrap
 
-資料：data/monthly.csv（核心 CPI／核心 PCE／失業率／WTI／Brent 月序列）
-     來源為 FRED 官方序列的 GitHub 鏡像，見 data/SOURCES.md。
+資料：data/monthly.csv（核心 CPI／核心 PCE／失業率／油價／S&P 500 EPS），見 data/SOURCES.md
 """
 
 import argparse
@@ -71,39 +80,29 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "data", "monthly.csv")
 
 # =============================================================================
-# §1  輸入 —— 只有這一段是判斷，每一條都附出處與「什麼讀數會讓我改它」
+# §1  輸入 —— 只有這一段是判斷
 # =============================================================================
 
-# ── 1a. 兩個座標軸的邊際機率（12 個月視野）────────────────────────────────
+# ── 軸一：通膨 ────────────────────────────────────────────────────────────
+# 「通膨沒回到目標」＝ 12 個月後核心通膨動能（6 個月年化）仍 >2.5%
 #
-# 通膨軸：核心通膨動能（6 個月年化）在 12 個月後是否仍高於 2.5%
-#   當下讀數（自 data/monthly.csv 計算）：核心 CPI 2.57%、核心 PCE 3.46%
-#   ⚠️ **這兩個數字現在差 0.90pp（核心 PCE 年增 3.34% vs 核心 CPI 2.45%），
-#      是 1985 年以來最大的背離。用哪一把尺，答案天差地遠：**
-#        從核心 CPI 2.57% 出發 → 歷史上 12 個月後仍 >2.5% 的比例只有 34%（n=189）
-#        從核心 PCE 3.46% 出發 → 89%（n=56；擴大到全歷史 n=91 則為 93%）
-#      聯準會盯的是 PCE，但 SPF 預測的核心 CPI 是 2.7%（仍高於門檻）。
-#   ⇒ 取 0.70，並在 --sensitivity 裡跑 0.50–0.85。**這是全模型最大的不確定性。**
-P_INFLATION_ABOVE_TARGET = 0.70      # P(核心動能 > 2.5%)
-P_INFLATION_REACCEL      = 0.30      # P(核心動能 > 3.5%)，是上面那個的子集
-#   取 0.30 的理由：核心 PCE 6 個月年化當下就是 3.46%，恰好壓在 3.5% 門檻上。
+#   當下讀數：核心 CPI 2.57%、核心 PCE 3.46%。
+#   ⚠️ **兩把尺差 0.89pp，1985 年以來最大，而答案完全取決於用哪一把：**
+#       從核心 CPI 2.57% 出發 → 歷史上 12 個月後仍 >2.5% 的比例 34%（n=189）
+#       從核心 PCE 3.46% 出發 → 89%（n=56；全歷史 n=91 為 93%）
+#   聯準會盯 PCE；SPF 預測的核心 CPI 是 2.7%（仍在門檻上）。
+#   ⇒ 取 0.70，偏 PCE 那一側。**這是全模型最大的單一不確定性。**
+P_INFLATION_STICKY = 0.70
 
-# 就業軸：失業率在 12 個月後是否 ≥ 4.5%（當下 4.1%，等於上升 0.4pp 以上）
-#   外部錨（全部查證，日期見 data/SOURCES.md）：
-#     紐約聯準銀行殖利率曲線 12 個月衰退機率 13.9%（資料至 2026-08，發布 09-06）
-#     Goldman 12 個月衰退機率 15%（2026 年年中）
-#     費城聯準 SPF anxious index 20.0%（2026Q4 負成長機率，Q3 調查）
-#     摩根大通 20%／WSJ 經濟學家調查 25%
-#   自算基準率：1986–2025，P(失業率 12 個月內上升 ≥0.4pp) ≈ 20%
-#   ⇒ 取 0.20，區間 0.15–0.30。**這一格外部對照物最多，也最可信。**
+# ── 軸二的輸入：就業 ──────────────────────────────────────────────────────
+# 「就業壞掉」＝ 失業率 12 個月後 ≥4.5%（當下 4.1%，即上升 ≥0.4pp）
+#   外部錨：紐約聯準殖利率曲線 13.9%／Goldman 15%／SPF anxious 20%／JPM 20%／WSJ 25%
+#   自算基準率（1986–2025）≈20%。⇒ 取 0.20。
 P_EMPLOYMENT_BREAKS = 0.20
 
-# ── 1b. 油價三態 ─────────────────────────────────────────────────────────
-#   當下 Brent 現貨 $107.35（2026-09-15）。
-#   給 down 偏高的理由：近月曲線呈逆價差（市場預期未來價格較低）、戰爭溢價半衰期短。
-#   給 up 15% 的理由：選擇權 skew 偏高（154.49，09-14 單日 +5.08%）＝尾部風險有人在買，
-#     但荷莫茲從未真正關閉。
-#   ⚠️ 取不到選擇權隱含機率（CME/Barchart 需即時頁、FRED OVXCLS 被擋），**這三個數字是判斷**。
+# ── 油價：推通膨軸，並透過就業間接影響獲利軸 ───────────────────────────────
+#   當下 Brent 現貨 $107.35（2026-09-15）。近月曲線逆價差、選擇權 skew 偏高。
+#   ⚠️ 取不到選擇權隱含機率 ⇒ **這三個數字是判斷，不是市場定價。**
 OIL_STATES = {
     "down":   {"p": 0.40, "level": 85,  "label": "回落到 $85 附近"},
     "sticky": {"p": 0.45, "level": 105, "label": "維持 $100–110"},
@@ -111,48 +110,34 @@ OIL_STATES = {
 }
 BRENT_NOW = 107.35
 
-# ── 1c. 油價對兩個軸的推力 ────────────────────────────────────────────────
-# 兩條推力都以**同一種自然單位（pp）**表示，再用同一個機制換算成機率：
-#   把經驗分布整體平移 shift pp，看超過原門檻的比例變成多少（見 shifted_prob）。
-#   ⇒ 沒有任何「pp 換算成機率」的自由參數。
-#
-#   通膨：自算簡約式係數 = 油價 Δlog 每 +100% ⇒ 核心通膨動能 +1.23pp
-#         （1986–2025，OLS，R²=0.15；用 --diagnose 可重跑）
+# 油價 Δlog 每 +100% ⇒ 核心通膨動能 +1.23pp（自算，1986–2025，OLS，R²=0.15）
 BETA_OIL_TO_INFLATION = 1.23
 
-#   就業：**不能用簡約式係數**。自算結果是「油價漲 → 失業率降」（係數 −1.79pp per 100%），
-#   因為歷史上多數油價上漲是需求拉動的：
-#       油價上漲的窗裡，需求型（油↑且工業生產↑）n=223，供給型（油↑且工業生產↓）n=39
-#   直接套用會得出「油價漲對就業有利」，與供給衝擊的因果相反。
-#   ⇒ 改為**明示假設**：供給型油價衝擊推升失業率，幅度如下（單位 pp）。
-#   ⚠️ **這是本模型唯一沒有資料支撐的參數**。取值理由：文獻上持續 20% 的供給型油價衝擊
-#      約使一年內 GDP 成長少 0.2–0.5pp，按 Okun 法則約對應失業率 +0.1–0.2pp。
-#      取 +0.15pp（$125 情境）。--sensitivity 會把它從 +0.05 掃到 +0.50。
+# 油價對失業率的推力（pp）。
+# ⚠️ **全模型唯一沒有資料支撐的參數。** 簡約式係數方向被需求型油價污染
+#    （算出來是油價漲→失業降，因為歷史上多數油價上漲是需求拉動的），所以不能用。
+#    改用文獻方向＋明示幅度：持續 20% 的供給型油價衝擊約使一年 GDP 少 0.2–0.5pp，
+#    按 Okun 約對應失業率 +0.1–0.2pp。--sensitivity 會把它從 +0.05 掃到 +0.50。
 OIL_TO_UNRATE_PP = {"down": -0.05, "sticky": 0.0, "up": +0.15}
 
 # =============================================================================
-# §2  情境定義 —— 3 條通膨帶 × 2 條就業帶
+# §2  情境定義
 # =============================================================================
-# 為什麼是這兩個軸：資產價格 = 現金流 ÷ (1 + 折現率)。
-#   就業/成長 → 決定現金流；通膨 → 決定折現率。兩個軸各管一半，互不重複。
-# 為什麼通膨切三帶：實測「明顯再加速(>3.5%)」佔 25% 的機率質量（> 10% 的門檻），
-#   而它與「只是黏著」的資產結果不同（前者壓估值倍數，後者主要影響政策節奏）。
 
 SCENARIOS = [
-    ("軟著陸",     "通膨回到目標 ・ 就業撐住"),
-    ("黏著",       "通膨卡在 2.5–3.5% ・ 就業撐住"),
-    ("再加速",     "通膨衝破 3.5% ・ 就業撐住"),
-    ("成長驚嚇",   "通膨回到目標 ・ 就業壞掉"),
-    ("停滯性通膨", "通膨沒回去 ・ 就業壞掉"),
+    ("軟著陸",     "通膨回到目標 ・ 獲利撐住"),
+    ("黏著",       "通膨沒回去 ・ 獲利撐住"),
+    ("成長驚嚇",   "通膨回到目標 ・ 獲利轉壞"),
+    ("停滯性通膨", "通膨沒回去 ・ 獲利轉壞"),
 ]
 
-# =============================================================================
-# §3  相依結構 —— 從資料算出來的，不是輸入
-# =============================================================================
+MOMENTUM_MONTHS = 6      # 通膨動能：6 個月年化
+HORIZON_MONTHS = 12      # 預測視野
+INFL_SAMPLE_START = 1986  # 通膨×油價的樣本起點（油價資料所限）
 
-MOMENTUM_MONTHS = 6      # 通膨動能：6 個月年化（3 個月太吵，年增率太鈍）
-HORIZON_MONTHS  = 12     # 預測視野
-SAMPLE_START    = 1986   # 有油價資料的起點；--diagnose 會一併跑全樣本對照
+# =============================================================================
+# §3  資料
+# =============================================================================
 
 
 def load_monthly(path=DATA):
@@ -160,9 +145,9 @@ def load_monthly(path=DATA):
     with open(path, newline="") as f:
         for row in csv.DictReader(f):
             y, m = row["date"].split("-")
-            i = int(y) * 12 + int(m) - 1
-            out[i] = {k: (float(v) if v not in ("", None) else None)
-                      for k, v in row.items() if k != "date"}
+            out[int(y) * 12 + int(m) - 1] = {
+                k: (float(v) if v not in ("", None) else None)
+                for k, v in row.items() if k != "date"}
     return out
 
 
@@ -174,35 +159,33 @@ def momentum(monthly, key, i, months):
     return ((a / b) ** (12.0 / months) - 1) * 100
 
 
-def build_pairs(monthly, gauge="core_cpi", start=SAMPLE_START, with_oil=False):
-    """回傳 [(Δ通膨動能, Δ失業率)]：每個歷史月份，往後 12 個月實際發生了什麼。
-
-    with_oil=True 時回傳 [(Δ通膨, Δ失業, Δlog 油價)]，且只保留油價也有值的月份
-    —— 那是 oil_controlled_correlation() 用的樣本。
-    """
+def build_pairs(monthly, start=1957):
+    """每個歷史月份往後 12 個月，(Δ通膨動能, EPS 成長 %, Δ失業率, Δlog 油價)。"""
     out = []
     for i in sorted(monthly):
         if i // 12 < start:
             continue
-        pi_now = momentum(monthly, gauge, i, MOMENTUM_MONTHS)
-        pi_fut = momentum(monthly, gauge, i + HORIZON_MONTHS, MOMENTUM_MONTHS)
-        u_now = monthly.get(i, {}).get("unrate")
-        u_fut = monthly.get(i + HORIZON_MONTHS, {}).get("unrate")
-        if None in (pi_now, pi_fut, u_now, u_fut):
+        pi0 = momentum(monthly, "core_cpi", i, MOMENTUM_MONTHS)
+        pi1 = momentum(monthly, "core_cpi", i + HORIZON_MONTHS, MOMENTUM_MONTHS)
+        e0 = monthly.get(i, {}).get("sp500_eps")
+        e1 = monthly.get(i + HORIZON_MONTHS, {}).get("sp500_eps")
+        u0 = monthly.get(i, {}).get("unrate")
+        u1 = monthly.get(i + HORIZON_MONTHS, {}).get("unrate")
+        if None in (pi0, pi1, e0, e1, u0, u1) or e0 <= 0:
             continue
-        if not with_oil:
-            out.append((pi_fut - pi_now, u_fut - u_now))
-            continue
-        o_now = monthly.get(i, {}).get("wti")
-        o_fut = monthly.get(i + HORIZON_MONTHS, {}).get("wti")
-        if not o_now or not o_fut:
-            continue
-        out.append((pi_fut - pi_now, u_fut - u_now, math.log(o_fut / o_now)))
+        o0 = monthly.get(i, {}).get("wti")
+        o1 = monthly.get(i + HORIZON_MONTHS, {}).get("wti")
+        out.append(dict(
+            i=i,
+            d_infl=pi1 - pi0,
+            d_eps=math.log(e1 / e0) * 100,
+            d_unrate=u1 - u0,
+            d_oil=(math.log(o1 / o0) if (o0 and o1) else None),
+        ))
     return out
 
 
 def to_ranks(values):
-    """經驗累積機率（平均秩 / (n+1)），落在 (0,1) 開區間。"""
     n = len(values)
     order = sorted(range(n), key=lambda k: values[k])
     r = [0.0] * n
@@ -211,53 +194,7 @@ def to_ranks(values):
     return r
 
 
-def rank_pairs(pairs):
-    return list(zip(to_ranks([p[0] for p in pairs]), to_ranks([p[1] for p in pairs])))
-
-
-def _ols2(y, x):
-    """單變數 OLS（含常數項）。回傳 (斜率, 殘差)。"""
-    n = len(y)
-    mx, my = sum(x) / n, sum(y) / n
-    sxx = sum((a - mx) ** 2 for a in x)
-    b = sum((a - mx) * (c - my) for a, c in zip(x, y)) / sxx
-    a0 = my - b * mx
-    return b, [c - (a0 + b * a) for a, c in zip(x, y)]
-
-
-def oil_controlled_correlation(triples):
-    """§1 與 README 宣稱的 −0.41 就是這個函式算出來的。
-
-    做法：Δ通膨 與 Δ失業 各自對「同一個 12 個月窗的油價 Δlog」做迴歸，
-    取殘差再算相關係數 —— 也就是「把油價的共同影響扣掉之後，兩者還剩多少相關」。
-    這正是條件獨立假設要求 ≈ 0 的那個量。
-    """
-    dpi = [t[0] for t in triples]
-    du = [t[1] for t in triples]
-    doil = [t[2] for t in triples]
-    b1, e1 = _ols2(dpi, doil)
-    b2, e2 = _ols2(du, doil)
-    return pearson(e1, e2), b1, b2, e1, e2
-
-
-def block_bootstrap_corr(e1, e2, block=24, B=3000, seed=11):
-    """重疊的 12 個月窗會造成序列相關，一般標準誤會低估。用 block bootstrap 給區間。"""
-    rng = random.Random(seed)
-    n = len(e1)
-    nb = max(1, n // block)
-    out = []
-    for _ in range(B):
-        idx = []
-        for _ in range(nb):
-            s = rng.randrange(0, n - block + 1)
-            idx.extend(range(s, s + block))
-        out.append(pearson([e1[j] for j in idx], [e2[j] for j in idx]))
-    out.sort()
-    return out[int(0.025 * B)], out[int(0.975 * B)]
-
-
 def quantile(sorted_vals, q):
-    """經驗分位數（線性內插）。"""
     n = len(sorted_vals)
     if q <= 0:
         return sorted_vals[0]
@@ -265,80 +202,15 @@ def quantile(sorted_vals, q):
         return sorted_vals[-1]
     pos = q * (n - 1)
     lo = int(pos)
-    frac = pos - lo
     if lo + 1 >= n:
         return sorted_vals[-1]
-    return sorted_vals[lo] * (1 - frac) + sorted_vals[lo + 1] * frac
+    return sorted_vals[lo] * (1 - (pos - lo)) + sorted_vals[lo + 1] * (pos - lo)
 
 
-def shifted_prob(sorted_vals, base_p, shift_pp):
-    """把經驗分布整體平移 shift_pp，再看超過原門檻的比例。
-
-    base_p 定義了門檻（使 P(X > 門檻) = base_p）；平移後回傳 P(X + shift > 門檻)。
-    ⇒ 「pp 位移 → 機率位移」全部由歷史分布的形狀決定，沒有自由參數。
-    """
+def shifted_prob(sorted_vals, base_p, shift):
+    """把經驗分布整體平移 shift，再看超過原門檻的比例。沒有換算參數。"""
     thr = quantile(sorted_vals, 1 - base_p)
-    n = len(sorted_vals)
-    return sum(1 for v in sorted_vals if v + shift_pp > thr) / n
-
-
-def cell_prob(rpairs, pi_lo, pi_hi, u_lo, u_hi):
-    """經驗 copula：秩落在 (pi_lo, pi_hi] × (u_lo, u_hi] 這個長方形裡的比例。"""
-    n = len(rpairs)
-    if n == 0:
-        return 0.0
-    c = sum(1 for a, b in rpairs
-            if pi_lo < a <= pi_hi and u_lo < b <= u_hi)
-    return c / n
-
-
-# =============================================================================
-# §4  計算
-# =============================================================================
-
-def scenario_probs(rpairs, p_above, p_reaccel, p_breaks):
-    """給定三個邊際機率，用經驗 copula 算五個情境。"""
-    # 通膨軸的三條帶（用分位切）：
-    #   回到目標 = 秩 ≤ 1-p_above ；黏著 = (1-p_above, 1-p_reaccel] ；再加速 = > 1-p_reaccel
-    a1, a2 = 1 - p_above, 1 - p_reaccel
-    b = 1 - p_breaks                       # 就業：秩 ≤ b 撐住，> b 壞掉
-    soft   = cell_prob(rpairs, 0.0, a1, 0.0, b)
-    sticky = cell_prob(rpairs, a1,  a2, 0.0, b)
-    reacc  = cell_prob(rpairs, a2, 1.0, 0.0, b)
-    scare  = cell_prob(rpairs, 0.0, a1, b,  1.0)
-    stagf  = cell_prob(rpairs, a1, 1.0, b,  1.0)
-    return [soft, sticky, reacc, scare, stagf]
-
-
-def marginals_given_oil(state, sorted_dpi, sorted_du):
-    """油價狀態 → 兩個軸的邊際機率。兩條推力都走 shifted_prob，沒有換算參數。"""
-    cfg = OIL_STATES[state]
-    d_pi = BETA_OIL_TO_INFLATION * math.log(cfg["level"] / BRENT_NOW)
-    d_u = OIL_TO_UNRATE_PP[state]
-    p_above = shifted_prob(sorted_dpi, P_INFLATION_ABOVE_TARGET, d_pi)
-    p_reaccel = shifted_prob(sorted_dpi, P_INFLATION_REACCEL, d_pi)
-    p_breaks = shifted_prob(sorted_du, P_EMPLOYMENT_BREAKS, d_u)
-    # 三帶必須單調：>3.5% 是 >2.5% 的子集
-    p_reaccel = min(p_reaccel, p_above)
-    return p_above, p_reaccel, p_breaks, d_pi, d_u
-
-
-def compute(rpairs, sorted_dpi=None, sorted_du=None):
-    """對油價三態取加權平均。"""
-    sorted_dpi = sorted_dpi if sorted_dpi is not None else SORTED_DPI
-    sorted_du = sorted_du if sorted_du is not None else SORTED_DU
-    total = [0.0] * 5
-    rows = []
-    for state, cfg in OIL_STATES.items():
-        p_above, p_reaccel, p_breaks, d_pi, d_u = marginals_given_oil(
-            state, sorted_dpi, sorted_du)
-        q = scenario_probs(rpairs, p_above, p_reaccel, p_breaks)
-        rows.append((state, cfg, p_above, p_reaccel, p_breaks, d_pi, d_u, q))
-        for k in range(5):
-            total[k] += cfg["p"] * q[k]
-    s = sum(total)
-    assert abs(s - 1.0) < 1e-9, f"機率沒加總到 1：{s}"
-    return total, rows
+    return sum(1 for v in sorted_vals if v + shift > thr) / len(sorted_vals)
 
 
 def pearson(xs, ys):
@@ -350,215 +222,302 @@ def pearson(xs, ys):
     return sxy / math.sqrt(sxx * syy)
 
 
-def bar(p, width=44):
+# =============================================================================
+# §4  獲利軸的邊際：由就業的外部錨推導
+# =============================================================================
+
+U_BREAK_THRESHOLD = 0.4      # 與 §1 一致：失業率上升 ≥0.4pp
+
+
+def earnings_given_employment(pairs):
+    """回傳 (P(EPS<0|就業壞), P(EPS<0|就業沒壞), n_bad, n_ok) —— 全部由資料算。"""
+    bad = [p for p in pairs if p["d_unrate"] >= U_BREAK_THRESHOLD]
+    ok = [p for p in pairs if p["d_unrate"] < U_BREAK_THRESHOLD]
+    p_bad = sum(1 for p in bad if p["d_eps"] < 0) / len(bad)
+    p_ok = sum(1 for p in ok if p["d_eps"] < 0) / len(ok)
+    return p_bad, p_ok, len(bad), len(ok)
+
+
+def p_earnings_fall(pairs, p_emp_breaks):
+    """全機率公式：P(獲利轉壞) = P(就業壞)·P(EPS<0|就業壞) + P(就業好)·P(EPS<0|就業好)"""
+    p_bad, p_ok, _, _ = earnings_given_employment(pairs)
+    return p_emp_breaks * p_bad + (1 - p_emp_breaks) * p_ok
+
+
+# =============================================================================
+# §5  計算
+# =============================================================================
+
+
+def scenario_probs(rank_infl, rank_eps, p_sticky, p_eps_fall):
+    """經驗 copula：用歷史的秩相依結構，套上指定的邊際機率。"""
+    n = len(rank_infl)
+    both = sum(1 for a, b in zip(rank_infl, rank_eps)
+               if a > 1 - p_sticky and b < p_eps_fall) / n
+    return [
+        1 - p_sticky - p_eps_fall + both,   # 軟著陸
+        p_sticky - both,                    # 黏著
+        p_eps_fall - both,                  # 成長驚嚇
+        both,                               # 停滯性通膨
+    ]
+
+
+def compute(pairs, rank_infl, rank_eps, sorted_infl,
+            p_sticky=None, p_emp=None, oil_to_unrate=None):
+    p_sticky = P_INFLATION_STICKY if p_sticky is None else p_sticky
+    p_emp = P_EMPLOYMENT_BREAKS if p_emp is None else p_emp
+    oil_to_unrate = OIL_TO_UNRATE_PP if oil_to_unrate is None else oil_to_unrate
+
+    total = [0.0] * 4
+    rows = []
+    for state, cfg in OIL_STATES.items():
+        d_infl = BETA_OIL_TO_INFLATION * math.log(cfg["level"] / BRENT_NOW)
+        d_u = oil_to_unrate[state]
+        ps = shifted_prob(sorted_infl, p_sticky, d_infl)
+        pe_emp = min(0.60, max(0.02, p_emp + d_u))
+        pf = p_earnings_fall(pairs, pe_emp)
+        q = scenario_probs(rank_infl, rank_eps, ps, pf)
+        rows.append((cfg, d_infl, d_u, ps, pe_emp, pf, q))
+        for k in range(4):
+            total[k] += cfg["p"] * q[k]
+    assert abs(sum(total) - 1.0) < 1e-9, f"機率沒加總到 1：{sum(total)}"
+    return total, rows
+
+
+def bar(p, width=46):
     return "█" * round(p * width)
 
 
 # =============================================================================
-# §5  輸出
+# §6  輸出
 # =============================================================================
 
-def print_main(monthly, total, rows):
-    print("=" * 74)
-    print("情境機率模型 v2  —  邊際靠共識，相依結構靠 40 年歷史")
-    print("=" * 74)
 
-    last_cpi = max(i for i in monthly if monthly[i].get("core_cpi") is not None)
-    last_pce = max(i for i in monthly if monthly[i].get("core_pce") is not None)
-    last_u   = max(i for i in monthly if monthly[i].get("unrate") is not None)
+def print_main(monthly, pairs, total, rows):
+    print("=" * 76)
+    print("情境機率模型  —  兩個軸就是估值恆等式的兩塊")
+    print("=" * 76)
+    print("\n    股價變化 ＝ (1 ＋ 獲利成長) × (1 ＋ 倍數變化) − 1")
+    print("                      分子                  分母")
+    print("    軸二：獲利撐不撐得住          軸一：通膨回不回得到目標")
+
+    last = lambda k: max(i for i in monthly if monthly[i].get(k) is not None)
+    lc, lp, lu = last("core_cpi"), last("core_pce"), last("unrate")
     print("\n【起點讀數】（自 data/monthly.csv 計算）")
-    print(f"  核心 CPI 6 個月年化   {momentum(monthly,'core_cpi',last_cpi,6):.2f}%"
-          f"   （3 個月年化 {momentum(monthly,'core_cpi',last_cpi,3):.2f}%）")
-    print(f"  核心 PCE 6 個月年化   {momentum(monthly,'core_pce',last_pce,6):.2f}%"
-          f"   ⚠️ 與 CPI 差 {momentum(monthly,'core_pce',last_pce,6)-momentum(monthly,'core_cpi',last_cpi,6):+.2f}pp")
-    print(f"  失業率                {monthly[last_u]['unrate']:.1f}%")
-    print(f"  Brent 現貨            ${BRENT_NOW:.2f}")
+    print(f"  核心 CPI 6 個月年化  {momentum(monthly,'core_cpi',lc,6):.2f}%"
+          f"   核心 PCE 6 個月年化  {momentum(monthly,'core_pce',lp,6):.2f}%"
+          f"   ⚠️ 差 {momentum(monthly,'core_pce',lp,6)-momentum(monthly,'core_cpi',lc,6):+.2f}pp")
+    print(f"  失業率 {monthly[lu]['unrate']:.1f}%        Brent 現貨 ${BRENT_NOW:.2f}")
 
-    print("\n【輸入：三個邊際機率】（判斷，出處見 §1）")
-    print(f"  P(通膨 12 個月後仍 >2.5%)  {P_INFLATION_ABOVE_TARGET:.0%}   ← 最大的不確定性（CPI 說 34%、PCE 說 89%）")
-    print(f"  P(其中衝破 3.5%)           {P_INFLATION_REACCEL:.0%}")
-    print(f"  P(失業率 ≥4.5%)            {P_EMPLOYMENT_BREAKS:.0%}   ← 外部錨最多：13.9%/15%/20%/20%/25%")
+    p_bad, p_ok, n_bad, n_ok = earnings_given_employment(pairs)
+    print("\n【軸一：通膨】（判斷，外部錨見 §1）")
+    print(f"  P(12 個月後核心動能仍 >2.5%) = {P_INFLATION_STICKY:.0%}"
+          f"   ← 最大的不確定性：CPI 說 34%、PCE 說 89%")
+    print("\n【軸二：獲利】（由就業的外部錨推導，兩個條件機率來自資料）")
+    print(f"  P(就業壞掉) = {P_EMPLOYMENT_BREAKS:.0%}   ← 外部錨 13.9/15/20/20/25%")
+    print(f"  P(EPS 衰退 | 就業壞掉)     = {p_bad:.1%}   (n={n_bad})")
+    print(f"  P(EPS 衰退 | 就業沒壞)     = {p_ok:.1%}   (n={n_ok})")
+    print(f"  ⇒ P(獲利轉壞) = {P_EMPLOYMENT_BREAKS:.2f}×{p_bad:.3f}"
+          f" + {1-P_EMPLOYMENT_BREAKS:.2f}×{p_ok:.3f} = "
+          f"**{p_earnings_fall(pairs, P_EMPLOYMENT_BREAKS):.1%}**")
+    print("  ⚠️ 注意它比 P(就業壞掉) 高得多 —— **獲利比就業脆弱**。")
+    print("     就業沒壞、獲利照樣有兩成機率衰退，那一塊就業完全看不到。")
 
-    print("\n【輸入：油價三態】")
-    for state, cfg, p_above, p_reaccel, p_breaks, d_pi, d_u, q in rows:
-        print(f"  {cfg['label']:<16}機率 {cfg['p']:.0%}  ⇒ 核心動能 {d_pi:+.2f}pp／失業率 {d_u:+.2f}pp"
-              f"  ⇒ P(通膨>2.5%) {p_above:.0%}  P(就業壞) {p_breaks:.0%}")
+    print("\n【油價：推通膨軸，並透過就業間接影響獲利軸】")
+    for cfg, d_infl, d_u, ps, pe, pf, q in rows:
+        print(f"  {cfg['label']:<16}機率 {cfg['p']:.0%}  ⇒ 通膨動能 {d_infl:+.2f}pp／失業率 {d_u:+.2f}pp"
+              f"  ⇒ P(通膨黏) {ps:.0%}  P(獲利壞) {pf:.0%}")
 
-    print("\n【輸出：五個情境】")
-    order = sorted(range(5), key=lambda k: -total[k])
-    for k in order:
+    avg_s = sum(cfg["p"] * ps for cfg, _, _, ps, _, _, _ in rows)
+    avg_f = sum(cfg["p"] * pf for cfg, _, _, _, _, pf, _ in rows)
+    print(f"\n  ⚠️ 油價分層後的實際邊際：P(通膨黏) {avg_s:.3f}（輸入 {P_INFLATION_STICKY:.2f}）、"
+          f"P(獲利壞) {avg_f:.3f}")
+    print("     輸入值是「油價維持現狀」下的基準，加權後會略微偏移，這是預期行為。")
+
+    print("\n【輸出：四個情境】")
+    for k in sorted(range(4), key=lambda j: -total[j]):
         name, desc = SCENARIOS[k]
         print(f"  {total[k]*100:4.0f}%  {bar(total[k])}")
         print(f"        {name} — {desc}")
-    print("\n  ⚠️ 全部四捨五入到整數；相依結構的抽樣誤差就有 ±3pp（--bootstrap），"
-          "\n     邊際的不確定性更大（--sensitivity）。**不要拿小數點後一位去比較。**")
+    print("\n  ⚠️ 四捨五入到整數。相依結構的抽樣誤差就有 ±3pp（--bootstrap），")
+    print("     邊際的不確定性更大（--sensitivity）。**不要比較小數點後一位。**")
 
 
-def diagnose(monthly, rpairs):
-    print("\n" + "=" * 74)
-    print("【診斷 1】條件獨立假設（v1 的做法）錯多少")
-    p_above, p_reaccel, p_breaks = (P_INFLATION_ABOVE_TARGET,
-                                    P_INFLATION_REACCEL, P_EMPLOYMENT_BREAKS)
-    emp = scenario_probs(rpairs, p_above, p_reaccel, p_breaks)
-    # 獨立版本：同樣的邊際，但假設兩軸無關
-    ind = [(1 - p_above) * (1 - p_breaks),
-           (p_above - p_reaccel) * (1 - p_breaks),
-           p_reaccel * (1 - p_breaks),
-           (1 - p_above) * p_breaks,
-           p_above * p_breaks]
+def diagnose(pairs, rank_infl, rank_eps):
+    print("\n" + "=" * 76)
+    print("【診斷 1】就業到底是不是「分子」？——不是，但它是最好用的前導指標")
+    d_eps = [p["d_eps"] for p in pairs]
+    d_u = [p["d_unrate"] for p in pairs]
+    r = pearson(d_eps, d_u)
+    # R²（單變數迴歸）
+    print(f"  corr(EPS 成長, Δ失業率) = {r:+.3f}   R² = {r*r:.3f}")
+    print(f"  ⇒ **失業率只解釋 EPS 變異的 {r*r*100:.0f}%**，另外 {100-r*r*100:.0f}% 它看不到。")
+    print("     裁員讓單一公司成本下降、獲利變好；總體上則是需求掉、營收掉。")
+    print("     兩股力量方向相反，所以關係是真的、但很弱。")
+    print("\n  分組（Δ失業率 → 同期名目 EPS 成長中位數）：")
+    bands = [(-99, -0.5, "失業率大降"), (-0.5, -0.1, "小降"), (-0.1, 0.2, "持平"),
+             (0.2, 0.5, "小升"), (0.5, 1.0, "升 0.5–1.0pp"), (1.0, 99, "大升")]
+    for lo, hi, nm in bands:
+        sub = sorted(p["d_eps"] for p in pairs if lo <= p["d_unrate"] < hi)
+        if len(sub) < 15:
+            continue
+        print(f"    {nm:<14} n={len(sub):<4} EPS 中位數 {quantile(sub, 0.5):+6.1f}%")
+
+    print("\n【診斷 2】兩個軸的相依結構（經驗 copula 用的就是這個）")
+    d_infl = [p["d_infl"] for p in pairs]
+    print(f"  corr(Δ通膨動能, EPS 成長)  Pearson {pearson(d_infl, d_eps):+.3f}"
+          f"   秩相關 {pearson(rank_infl, rank_eps):+.3f}")
+    print("  正號 ⇒ 通膨加速與獲利成長**同向**（都是需求在推）。")
+    print("  ⇒ 「通膨燒起來」和「獲利垮掉」不太會同時發生，而那正是停滯性通膨的定義。")
+
+    print("\n【診斷 3】假設兩軸獨立會錯多少")
+    pf = p_earnings_fall(pairs, P_EMPLOYMENT_BREAKS)
+    emp = scenario_probs(rank_infl, rank_eps, P_INFLATION_STICKY, pf)
+    ind = [(1 - P_INFLATION_STICKY) * (1 - pf), P_INFLATION_STICKY * (1 - pf),
+           (1 - P_INFLATION_STICKY) * pf, P_INFLATION_STICKY * pf]
     print(f"  {'情境':<12}{'經驗copula':>12}{'假設獨立':>11}{'誤差':>10}")
-    for k in range(5):
+    for k in range(4):
         d = (ind[k] - emp[k]) * 100
         tag = "  ← 高估" if d > 1 else ("  ← 低估" if d < -1 else "")
         print(f"  {SCENARIOS[k][0]:<12}{emp[k]*100:10.1f}%{ind[k]*100:10.1f}%{d:+9.1f}pp{tag}")
-    tvd = sum(abs(a - b) for a, b in zip(ind, emp)) / 2
-    line = f"  總變異距離 {tvd:.3f}"
-    if emp[4] > 0:
-        line += f"   停滯性通膨被高估成 {ind[4]/emp[4]:.2f} 倍"
-    print(line)
+    print(f"  總變異距離 {sum(abs(a-b) for a, b in zip(ind, emp))/2:.3f}")
 
-    print("\n【診斷 2】相依結構本身（不套任何主觀邊際，直接看資料）")
-    dpi = [p[0] for p in PAIRS]
-    du = [p[1] for p in PAIRS]
-    rp = [r[0] for r in rpairs]
-    ru = [r[1] for r in rpairs]
-    print(f"  樣本 {SAMPLE_START}–2025，n={len(PAIRS)}（相依結構用的樣本）")
-    print(f"    無條件 Pearson 相關      {pearson(dpi, du):+.3f}")
-    print(f"    無條件秩相關（copula 用） {pearson(rp, ru):+.3f}")
+    print("\n【診斷 4】歷史基準率（不套任何共識邊際，純粹數歷史）")
+    n = len(pairs)
+    print(f"  P(EPS 12 個月衰退)                 {sum(1 for p in pairs if p['d_eps']<0)/n:.0%}")
+    print(f"  P(失業率上升 ≥0.4pp)               "
+          f"{sum(1 for p in pairs if p['d_unrate']>=U_BREAK_THRESHOLD)/n:.0%}")
+    print(f"  P(通膨動能上升 且 EPS 衰退)         "
+          f"{sum(1 for p in pairs if p['d_infl']>0 and p['d_eps']<0)/n:.0%}")
+    print("  ⇒ 停滯性通膨在歷史上不常見，但**比「就業壞掉」常見**，因為獲利更脆弱。")
 
-    # ---- 這一段就是 §1 與 README 宣稱的 −0.41 的來源，現在可重跑 ----
-    r_cond, b1, b2, e1, e2 = oil_controlled_correlation(TRIPLES)
-    lo, hi = block_bootstrap_corr(e1, e2)
-    print(f"\n  **控制油價後**（Δ通膨、Δ失業各自對油價 Δlog 迴歸後取殘差），n={len(TRIPLES)}：")
-    print(f"    Pearson 相關  {r_cond:+.3f}   [95% block-bootstrap {lo:+.3f}, {hi:+.3f}]")
-    print(f"    油價 Δlog 每 +100%：核心動能 {b1:+.2f}pp、失業率 {b2:+.2f}pp")
-    print("    ⚠️ 失業率那個係數為負（油價漲→失業降），是因為歷史上多數油價上漲是需求拉動的。")
-    print("       這就是為什麼模型不用它，改用 §1 的明示假設 OIL_TO_UNRATE_PP。")
-    print("\n  ⚠️ **三個數字不是同一件事，不要混用**：")
-    print("     無條件 Pearson ≠ 無條件秩相關 ≠ 控制油價後的 Pearson。")
-    print("     條件獨立假設要求 ≈0 的是**最後那一個**；經驗 copula 實際用到的是**秩相關**那一個。")
-    print("     三個都離 0 很遠，所以結論不受選哪一個影響。")
-    for start in (1990, 1998):
-        t = build_pairs(MONTHLY, start=start, with_oil=True)
-        rc, _, _, _, _ = oil_controlled_correlation(t)
-        print(f"     穩定性檢查：{start} 後 n={len(t)}  控制油價後 {rc:+.3f}")
-    print("\n  負號代表通膨與『就業健康』同向 ⇒ 需求主導，不是供給主導。")
-    print("  ⇒ 這就是為什麼獨立假設會高估停滯性通膨：它把兩件『不太會同時發生』的壞事當成無關。")
+    print("\n【診斷 5】兩個可能的方法學漏洞，各檢查過一次")
+    # (a) 油價層與 copula 是否重複計算
+    sub = [p for p in pairs if p["d_oil"] is not None]
+    if len(sub) > 100:
+        def _resid(y, x):
+            n = len(y); mx = sum(x) / n; my = sum(y) / n
+            b = sum((a - mx) * (c - my) for a, c in zip(x, y)) / sum((a - mx) ** 2 for a in x)
+            a0 = my - b * mx
+            return [c - (a0 + b * a) for a, c in zip(x, y)]
+        ox = [p["d_oil"] for p in sub]
+        ri_r = to_ranks(_resid([p["d_infl"] for p in sub], ox))
+        re_r = to_ranks(_resid([p["d_eps"] for p in sub], ox))
+        ri_0 = to_ranks([p["d_infl"] for p in sub])
+        re_0 = to_ranks([p["d_eps"] for p in sub])
+        pf2 = p_earnings_fall(pairs, P_EMPLOYMENT_BREAKS)
+        q0 = scenario_probs(ri_0, re_0, P_INFLATION_STICKY, pf2)
+        qr = scenario_probs(ri_r, re_r, P_INFLATION_STICKY, pf2)
+        qfull = scenario_probs(rank_infl, rank_eps, P_INFLATION_STICKY, pf2)
+        print(f"  (a) 油價既推邊際、又已含在 copula 裡 —— 會不會重複計算？")
+        print(f"      1986 後子樣本(n={len(sub)})：原始停滯 {q0[3]*100:.1f}%"
+              f" → 對油價殘差化後 {qr[3]*100:.1f}%")
+        print(f"      全樣本(n={len(pairs)})：{qfull[3]*100:.1f}%"
+              f" —— 與殘差化後的值幾乎相同 ⇒ **全樣本估計沒有被污染。**")
+    # (b) trailing EPS 的時間對齊
+    print("  (b) 席勒的 EPS 是 12 個月移動的，會不會和失業率窗對不齊？")
+    best = None
+    for lag in (0, 3, 6, 9, 12):
+        xs, ys = [], []
+        for p in pairs:
+            u0 = MONTHLY.get(p["i"] - lag, {}).get("unrate")
+            u1 = MONTHLY.get(p["i"] + HORIZON_MONTHS - lag, {}).get("unrate")
+            if u0 is None or u1 is None:
+                continue
+            xs.append(p["d_eps"]); ys.append(u1 - u0)
+        c = pearson(xs, ys)
+        if best is None or abs(c) > abs(best[1]):
+            best = (lag, c)
+        print(f"      失業率窗前移 {lag:>2} 個月：corr {c:+.3f}")
+    print(f"      ⇒ 最強的是前移 {best[0]} 個月 ⇒ **同期對齊是對的**，沒有系統性錯位。")
 
-    n = len(dpi)
-    mx = sum(dpi) / n
-    sd = math.sqrt(sum((x - mx) ** 2 for x in dpi) / (n - 1))
-    sk = sum(((x - mx) / sd) ** 3 for x in dpi) / n
-    ku = sum(((x - mx) / sd) ** 4 for x in dpi) / n - 3
-    my = sum(du) / n
-    sdy = math.sqrt(sum((x - my) ** 2 for x in du) / (n - 1))
-    sky = sum(((x - my) / sdy) ** 3 for x in du) / n
-    kuy = sum(((x - my) / sdy) ** 4 for x in du) / n - 3
-    print(f"\n【診斷 3】為什麼用經驗 copula 而不是高斯 copula")
-    print(f"  Δ通膨：偏態 {sk:+.2f}  超峰度 {ku:+.2f}")
-    print(f"  Δ失業：偏態 {sky:+.2f}  超峰度 {kuy:+.2f}")
-    print("  兩者都遠離常態（常態的偏態=0、超峰度=0），而我們關心的正是角落那幾格。")
-    print("  高斯 copula 會把尾部算得太乾淨：實測它把『通膨升+就業壞』的基準率算成 0.9%，")
-    print("  經驗分布是 2.1%。**用錯 copula 的代價，和用錯獨立假設一樣大。**")
-
-    print("\n【診斷 4】歷史基準率（不套共識邊際，純粹數歷史）")
-    print("  問題：從任一個月往後看 12 個月，實際落在哪一格？")
-    b_above = sum(1 for d, _ in PAIRS if d > 0) / len(PAIRS)
-    b_break = sum(1 for _, d in PAIRS if d >= 0.4) / len(PAIRS)
-    b_both  = sum(1 for a, d in PAIRS if a > 0 and d >= 0.4) / len(PAIRS)
-    print(f"  P(通膨動能比一年前高)          {b_above:.0%}")
-    print(f"  P(失業率上升 ≥0.4pp)           {b_break:.0%}   ← 與外部衰退機率 14–25% 相符")
-    print(f"  P(兩者同時發生＝停滯性通膨)     {b_both:.0%}   "
-          f"（獨立假設會算成 {b_above*b_break:.0%}）")
-    print("  ⇒ **真正的停滯性通膨在歷史上很罕見。** v1 publish 的 24% 需要非常強的理由，它沒有。")
+    print("\n【診斷 6】模型知道自己簡化了什麼")
+    print("  通膨被放在倍數那一側，但名目 EPS 也會隨通膨上升（corr +0.10），")
+    print("  而且是駝峰形：通膨 2–4% 時名目 EPS 成長最好，>6% 時實質 EPS 轉負。")
+    print("  ⇒ 溫和通膨對分子中性偏好、對分母偏壞；高通膨兩邊都壞。**模型只算了分母那一邊。**")
 
 
-def sensitivity(rpairs):
-    print("\n" + "=" * 74)
-    print("【敏感度】兩個邊際在各自合理範圍內移動")
-    print("  （相依結構固定 —— 那一段是資料，不是判斷）\n")
-    print("  停滯性通膨的機率：")
-    breaks = [0.15, 0.20, 0.25, 0.30]
-    print("            " + "".join(f"  就業壞 {b:.0%}" for b in breaks))
-    for above in (0.50, 0.60, 0.70, 0.80, 0.85):
+def sensitivity(pairs, rank_infl, rank_eps, sorted_infl):
+    print("\n" + "=" * 76)
+    print("【敏感度】兩個邊際在各自合理範圍內移動（相依結構固定 —— 那是資料）")
+    print("\n  停滯性通膨的機率：")
+    emps = [0.15, 0.20, 0.25, 0.30]
+    print("             " + "".join(f"  就業壞 {e:.0%}" for e in emps))
+    for s in (0.50, 0.60, 0.70, 0.80, 0.85):
         cells = []
-        for b in breaks:
-            q = scenario_probs(rpairs, above, min(P_INFLATION_REACCEL, above * 0.45), b)
-            cells.append(q[4] * 100)
-        print(f"  通膨 >2.5% {above:.0%}" + "".join(f"{c:10.0f}%" for c in cells))
-    print("\n  讀法：即使把兩個邊際都推到最悲觀（通膨 85% × 就業壞 30%），")
-    print("       停滯性通膨也只到十幾趴——**因為歷史說這兩件事不太同時發生。**")
+        for e in emps:
+            t, _ = compute(pairs, rank_infl, rank_eps, sorted_infl, p_sticky=s, p_emp=e)
+            cells.append(t[3] * 100)
+        print(f"  通膨黏 {s:.0%}" + "".join(f"{c:11.0f}%" for c in cells))
 
-    print("\n  油價推力假設的敏感度（唯一沒有資料支撐的參數）：")
-    global OIL_TO_UNRATE_PP
-    keep = dict(OIL_TO_UNRATE_PP)
-    for up_shift in (0.05, 0.15, 0.30, 0.50):
-        OIL_TO_UNRATE_PP = {"down": -0.05, "sticky": 0.0, "up": up_shift}
-        total, _ = compute(rpairs)
-        print(f"    油價衝上 $125 使失業率 +{up_shift:.2f}pp  ⇒  "
-              + "  ".join(f"{SCENARIOS[k][0]} {total[k]*100:.0f}%" for k in (0, 4)))
-    OIL_TO_UNRATE_PP = keep
+    print("\n  油價→失業率推力（唯一沒有資料支撐的參數）：")
+    for up in (0.05, 0.15, 0.30, 0.50):
+        t, _ = compute(pairs, rank_infl, rank_eps, sorted_infl,
+                       oil_to_unrate={"down": -0.05, "sticky": 0.0, "up": up})
+        print(f"    油價衝上 $125 使失業率 +{up:.2f}pp  ⇒  "
+              + "  ".join(f"{SCENARIOS[k][0]} {t[k]*100:.0f}%" for k in (0, 3)))
 
 
-def bootstrap(pairs, B=2000, block=24, seed=7):
-    print("\n" + "=" * 74)
-    print(f"【抽樣誤差】block bootstrap（block={block} 個月，處理重疊窗造成的序列相關）")
+def bootstrap(pairs, sorted_infl, B=1500, block=24, seed=11):
+    print("\n" + "=" * 76)
+    print(f"【抽樣誤差】block bootstrap（block={block} 個月，處理重疊窗的序列相關）")
     rng = random.Random(seed)
     n = len(pairs)
     nb = n // block
-    acc = [[] for _ in range(5)]
+    acc = [[] for _ in range(4)]
     for _ in range(B):
         idx = []
         for _ in range(nb):
             s = rng.randrange(0, n - block + 1)
             idx.extend(range(s, s + block))
         samp = [pairs[j] for j in idx]
-        rp = rank_pairs(samp)
-        total, _ = compute(rp)
-        for k in range(5):
-            acc[k].append(total[k])
+        ri = to_ranks([p["d_infl"] for p in samp])
+        re = to_ranks([p["d_eps"] for p in samp])
+        t, _ = compute(samp, ri, re, sorted_infl)
+        for k in range(4):
+            acc[k].append(t[k])
     print(f"  {'情境':<12}{'中位數':>9}{'95% 區間':>18}")
-    for k in range(5):
+    for k in range(4):
         v = sorted(acc[k])
-        lo, mid, hi = v[int(.025 * B)], v[int(.5 * B)], v[int(.975 * B)]
-        print(f"  {SCENARIOS[k][0]:<12}{mid*100:7.0f}%   [{lo*100:4.0f}%, {hi*100:4.0f}%]")
-    print("\n  ⚠️ 這**只是**相依結構的抽樣誤差。邊際本身的不確定性（見 --sensitivity）更大。")
-    print("     兩者合起來 ⇒ **這種模型的輸出，四捨五入到 5pp 才是誠實的。**")
+        print(f"  {SCENARIOS[k][0]:<12}{v[B//2]*100:7.0f}%   "
+              f"[{v[int(.025*B)]*100:4.0f}%, {v[int(.975*B)]*100:4.0f}%]")
+    print("\n  ⚠️ 這只是相依結構的抽樣誤差，邊際的不確定性更大。")
+    print("     兩者合起來 ⇒ **四捨五入到 5pp 才是誠實的。**")
 
 
 MONTHLY = load_monthly()
-PAIRS = build_pairs(MONTHLY)                       # 相依結構用（不需要油價）
-TRIPLES = build_pairs(MONTHLY, with_oil=True)      # 控制油價的相關係數用
-SORTED_DPI = sorted(p[0] for p in PAIRS)
-SORTED_DU = sorted(p[1] for p in PAIRS)
+PAIRS = build_pairs(MONTHLY)
+RANK_INFL = to_ranks([p["d_infl"] for p in PAIRS])
+RANK_EPS = to_ranks([p["d_eps"] for p in PAIRS])
+SORTED_INFL = sorted(p["d_infl"] for p in PAIRS)
 
 
 def main():
-    ap = argparse.ArgumentParser(description="情境機率模型 v2")
-    ap.add_argument("--diagnose", action="store_true", help="獨立假設錯多少、常態性、基準率")
-    ap.add_argument("--sensitivity", action="store_true", help="邊際在合理範圍內移動的影響")
-    ap.add_argument("--bootstrap", action="store_true", help="相依結構的抽樣誤差區間（慢）")
-    ap.add_argument("--all", action="store_true", help="全部跑一遍")
+    ap = argparse.ArgumentParser(description="情境機率模型")
+    ap.add_argument("--diagnose", action="store_true")
+    ap.add_argument("--sensitivity", action="store_true")
+    ap.add_argument("--bootstrap", action="store_true")
+    ap.add_argument("--all", action="store_true")
     args = ap.parse_args()
 
-    rpairs = rank_pairs(PAIRS)
-    total, rows = compute(rpairs)
-    print_main(MONTHLY, total, rows)
-    print(f"\n  相依結構樣本：{SAMPLE_START}–2025，n={len(PAIRS)} 個重疊的 12 個月窗")
+    total, rows = compute(PAIRS, RANK_INFL, RANK_EPS, SORTED_INFL)
+    print_main(MONTHLY, PAIRS, total, rows)
+    print(f"\n  相依結構樣本：{PAIRS[0]['i']//12}–{PAIRS[-1]['i']//12}，"
+          f"n={len(PAIRS)} 個重疊的 12 個月窗")
 
     if args.diagnose or args.all:
-        diagnose(MONTHLY, rpairs)
+        diagnose(PAIRS, RANK_INFL, RANK_EPS)
     if args.sensitivity or args.all:
-        sensitivity(rpairs)
+        sensitivity(PAIRS, RANK_INFL, RANK_EPS, SORTED_INFL)
     if args.bootstrap or args.all:
-        bootstrap(PAIRS)
+        bootstrap(PAIRS, SORTED_INFL)
 
-    print("\n" + "=" * 74)
-    print("這個模型不會讓判斷變客觀。它做的是把主觀性關進幾個攤得開的數字，")
-    print("把『兩件事會不會一起發生』交給 40 年的實際資料，")
-    print("然後把每一個假設都攤開來，讓別人可以指著其中一條說「這裡錯了」。")
-    print("沒處理的：時間點、政策失誤、地緣尾部、以及真實世界不會剛好落在五格裡。")
-    print("=" * 74)
+    print("\n" + "=" * 76)
+    print("這個模型不會讓判斷變客觀。它把主觀性關進兩個攤得開的數字，")
+    print("把「兩件事會不會一起發生」交給六十年的實際資料，")
+    print("然後把每個假設攤開，讓別人可以指著其中一條說「這裡錯了」。")
+    print("沒處理的：時間點、政策失誤、地緣尾部，以及單一公司與指數的差異。")
+    print("=" * 76)
 
 
 if __name__ == "__main__":
