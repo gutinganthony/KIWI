@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="880" viewBox="0 0 880 880" font-family="WenQuanYi Zen Hei, Noto Sans CJK TC, PingFang TC, Microsoft JhengHei, sans-serif">
+  <rect width="880" height="880" fill="#fcfcfb"/>
+
+  <text x="44" y="54" font-size="29" font-weight="700" fill="#0b0b0b">那些機率是怎麼算出來的</text>
+  <text x="44" y="88" font-size="17" fill="#52514e">就像氣象預報不直接猜「明天野餐會不會成功」，而是先估下不下雨、風大不大，再推出結論。</text>
+
+  <!-- STEP 1 -->
+  <rect x="44" y="110" width="792" height="176" rx="8" fill="#ffffff" stroke="#e1e0d9" stroke-width="1.5"/>
+  <rect x="44" y="110" width="792" height="6" rx="3" fill="#2a78d6"/>
+  <text x="68" y="150" font-size="20" font-weight="700" fill="#0b0b0b">第一步：不猜「會發生哪個情境」，只猜三件可以去查的事</text>
+
+  <text x="68" y="188" font-size="17" font-weight="700" fill="#0b0b0b">① 油價</text>
+  <text x="200" y="188" font-size="16" fill="#52514e">回落 <tspan font-weight="700" fill="#0b0b0b">35%</tspan>　黏著 <tspan font-weight="700" fill="#0b0b0b">50%</tspan>　飆破 115 美元 <tspan font-weight="700" fill="#0b0b0b">15%</tspan></text>
+
+  <text x="68" y="224" font-size="17" font-weight="700" fill="#0b0b0b">② 核心通膨</text>
+  <text x="200" y="224" font-size="16" fill="#52514e">維持溫和 <tspan font-weight="700" fill="#0b0b0b">48%</tspan>　轉熱 <tspan font-weight="700" fill="#0b0b0b">52%</tspan>　<tspan font-size="14" fill="#898781">（看最近三個月年化，不看年增率）</tspan></text>
+
+  <text x="68" y="260" font-size="17" font-weight="700" fill="#0b0b0b">③ 就業</text>
+  <text x="200" y="260" font-size="16" fill="#52514e">很強 <tspan font-weight="700" fill="#0b0b0b">20%</tspan>　普通 <tspan font-weight="700" fill="#0b0b0b">55%</tspan>　變差 <tspan font-weight="700" fill="#0b0b0b">25%</tspan></text>
+
+  <path d="M440 292 L440 314 M432 306 L440 314 L448 306" stroke="#898781" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- STEP 2 -->
+  <rect x="44" y="322" width="792" height="196" rx="8" fill="#ffffff" stroke="#e1e0d9" stroke-width="1.5"/>
+  <rect x="44" y="322" width="792" height="6" rx="3" fill="#eb6834"/>
+  <text x="68" y="362" font-size="20" font-weight="700" fill="#0b0b0b">第二步：把三件事的每一種組合乘起來，看它落在哪一格</text>
+  <text x="68" y="388" font-size="15" fill="#898781">舉一個組合當例子：</text>
+
+  <rect x="68" y="404" width="148" height="46" rx="4" fill="#e8f0fc"/>
+  <text x="142" y="424" font-size="15" fill="#52514e" text-anchor="middle">油價黏著</text>
+  <text x="142" y="443" font-size="17" font-weight="700" fill="#0b0b0b" text-anchor="middle">50%</text>
+  <text x="228" y="434" font-size="20" fill="#898781" text-anchor="middle">×</text>
+
+  <rect x="244" y="404" width="148" height="46" rx="4" fill="#e8f0fc"/>
+  <text x="318" y="424" font-size="15" fill="#52514e" text-anchor="middle">通膨轉熱</text>
+  <text x="318" y="443" font-size="17" font-weight="700" fill="#0b0b0b" text-anchor="middle">55%</text>
+  <text x="404" y="434" font-size="20" fill="#898781" text-anchor="middle">×</text>
+
+  <rect x="420" y="404" width="148" height="46" rx="4" fill="#e8f0fc"/>
+  <text x="494" y="424" font-size="15" fill="#52514e" text-anchor="middle">就業普通</text>
+  <text x="494" y="443" font-size="17" font-weight="700" fill="#0b0b0b" text-anchor="middle">57%</text>
+  <text x="580" y="434" font-size="20" fill="#898781" text-anchor="middle">＝</text>
+
+  <rect x="596" y="404" width="112" height="46" rx="4" fill="#2a78d6"/>
+  <text x="652" y="434" font-size="20" font-weight="700" fill="#ffffff" text-anchor="middle">15.7%</text>
+
+  <text x="724" y="428" font-size="16" fill="#52514e">落進</text>
+  <text x="724" y="450" font-size="16" font-weight="700" fill="#0b0b0b">「連續升息」</text>
+
+  <text x="68" y="484" font-size="16" fill="#0b0b0b">為什麼落進那一格？因為規則寫死了：<tspan font-weight="700">核心通膨轉熱 ⇒ 最後一哩沒走完 ⇒ 聯準會得繼續升。</tspan></text>
+  <text x="68" y="506" font-size="15" fill="#898781">規則是明文的、可以逐條吵。改規則＝改了情境的定義，不是改判斷。</text>
+
+  <path d="M440 524 L440 546 M432 538 L440 546 L448 538" stroke="#898781" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- STEP 3 -->
+  <rect x="44" y="554" width="792" height="150" rx="8" fill="#ffffff" stroke="#e1e0d9" stroke-width="1.5"/>
+  <rect x="44" y="554" width="792" height="6" rx="3" fill="#1baf7a"/>
+  <text x="68" y="594" font-size="20" font-weight="700" fill="#0b0b0b">第三步：十八種組合全部算完，同一格的加起來</text>
+
+  <text x="68" y="632" font-size="16" fill="#52514e">3 種油價 × 2 種通膨 × 3 種就業 ＝ <tspan font-weight="700" fill="#0b0b0b">18 種組合</tspan>，每一種都算一次、歸到一格，最後加總：</text>
+
+  <text x="68" y="672" font-size="17" fill="#0b0b0b">連續升息 <tspan font-weight="700">44%</tspan>　・　需求被打壞 <tspan font-weight="700">24%</tspan>　・　升一次就停 <tspan font-weight="700">13%</tspan>　・　經濟夠強 <tspan font-weight="700">11%</tspan>　・　成長驚嚇 <tspan font-weight="700">9%</tspan></text>
+
+  <!-- WHY -->
+  <rect x="44" y="722" width="792" height="96" rx="8" fill="#f0efec"/>
+  <text x="68" y="754" font-size="19" font-weight="700" fill="#0b0b0b">為什麼要繞這一圈？因為這樣才吵得起來。</text>
+  <text x="68" y="782" font-size="16" fill="#0b0b0b">直接說「我覺得停滯性通膨機率 24%」，別人只能信或不信，沒辦法討論。</text>
+  <text x="68" y="806" font-size="16" fill="#0b0b0b">但說「我覺得油價飆破 115 的機率是 15%」，你可以拿資料來吵——<tspan font-weight="700">而那才是真正在討論。</tspan></text>
+
+  <text x="44" y="852" font-size="14" fill="#898781">通膨與就業的機率是「在各種油價下」的加權結果——油價會同時影響另外兩個，所以不是三個獨立數字相乘。</text>
+  <text x="44" y="872" font-size="14" fill="#898781">模型不會讓判斷變客觀，它只是把主觀的地方從一個藏起來的數字，換成三個攤開來、可以被指正的數字。</text>
+</svg>

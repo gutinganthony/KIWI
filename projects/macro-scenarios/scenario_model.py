@@ -181,9 +181,82 @@ def fmt(probs, keys="ABCDE"):
 # §4  敏感度：哪一個輸入最重要？
 # =============================================================================
 
+def _dist_given(oil=None, core=None, growth=None):
+    """條件分布：若已知某個變數的狀態，情境機率會變成什麼。回傳 (分布, 該狀態的機率)。"""
+    probs = {k: 0.0 for k in SCENARIOS}
+    tot = 0.0
+    for o, c, g in product(OIL_STATES, ["cool", "hot"], ["strong", "normal", "breaks"]):
+        if oil and o != oil:
+            continue
+        if core and c != core:
+            continue
+        if growth and g != growth:
+            continue
+        p = PRIOR_OIL[o]
+        p *= P_CORE_HOT_GIVEN_OIL[o] if c == "hot" else 1 - P_CORE_HOT_GIVEN_OIL[o]
+        p *= P_GROWTH_GIVEN_OIL[o][g]
+        probs[classify(o, c, g)] += p
+        tot += p
+    return {k: v / tot for k, v in probs.items()}, tot
+
+
+def _tvd(p, q):
+    """總變異距離：兩個機率分布差多少（0=一樣，1=完全不同）。"""
+    return sum(abs(p[k] - q[k]) for k in SCENARIOS) / 2
+
+
+VARIABLES = [
+    ("油價", OIL_STATES, "oil"),
+    ("核心通膨", ["cool", "hot"], "core"),
+    ("就業", ["strong", "normal", "breaks"], "growth"),
+]
+
+
+def information_value():
+    """
+    🔴 這一段是 2026-09-15 補的，用來修正一個方法論錯誤。
+
+    原本的 sensitivity() 把**油價推到機率 1.0**，卻只把**核心通膨移動 0.25**，
+    然後得出「油價主導一切」。**那是不公平的比較** —— 標準不同，結論當然偏向油價。
+
+    正確問法不是「把輸入推到極端會怎樣」，而是：
+        **「如果我能查清楚其中一個變數，平均而言我的判斷會移動多少？」**
+    這就是資訊價值（EVPI 的簡化版）：
+        資訊價值(V) = Σ_s  P(V=s) × TVD( P(情境 | V=s), P(情境) )
+    用每個狀態自己的機率加權 —— 一個很少發生但很極端的狀態，不該拿滿分。
+    """
+    base, _ = compute()
+
+    print("\n【公平測試 1】三個變數都推到「完全確定」，看擺幅一樣大嗎")
+    for label, states, kw in VARIABLES:
+        print(f"\n  {label}")
+        for s in states:
+            d, w = _dist_given(**{kw: s})
+            line = " ".join(f"{k}{d[k]*100:4.0f}%" for k in SCENARIOS)
+            print(f"    確定是 {s:<7}（機率 {w*100:4.1f}%）→ {line}   偏離基準 {_tvd(d, base)*100:4.1f}")
+
+    print("\n【公平測試 2】資訊價值 —— 該先去查哪一個？")
+    print("  （用各狀態自己的機率加權，避免「罕見但極端」被高估）\n")
+    ranked = []
+    for label, states, kw in VARIABLES:
+        v = sum(_dist_given(**{kw: s})[1] * _tvd(_dist_given(**{kw: s})[0], base)
+                for s in states)
+        ranked.append((v, label))
+    for v, l in sorted(ranked, reverse=True):
+        print(f"    {l:<6} {v*100:5.1f}  " + "█" * int(v * 120))
+
+    top = sorted(ranked, reverse=True)[0][1]
+    print(f"\n  ⇒ 最值得先查的是：**{top}**")
+    print("  ⚠️ 但三者差距不大（最大與最小相差不到 8），而這個排序**部分來自模型結構**：")
+    print("     核心通膨與就業都是「條件於油價」的，油價因此有額外的間接影響力；")
+    print("     而分類規則寫法也會改變誰比較重要。**不要把它當成經濟學結論。**")
+
+
 def sensitivity():
     base, _ = compute()
-    print("\n【敏感度分析】把單一輸入推到極端，看四個情境怎麼動")
+    print("\n【敏感度分析】把單一輸入推到極端，看情境怎麼動")
+    print("  ⚠️ 這一段的比較**標準不一致**（油價推到 1.0，核心只移 0.25），")
+    print("     曾因此得出「油價主導一切」的錯誤結論。公平版見 --info。\n")
     print(f"  基準： {fmt(base)}\n")
 
     cases = [
@@ -215,7 +288,8 @@ def sensitivity():
 
 def main():
     ap = argparse.ArgumentParser(description="四情境機率模型")
-    ap.add_argument("--sensitivity", action="store_true", help="加跑敏感度分析")
+    ap.add_argument("--sensitivity", action="store_true", help="加跑敏感度分析（⚠️ 標準不一致，見 --info）")
+    ap.add_argument("--info", action="store_true", help="加跑資訊價值分析（公平比較，推薦用這個）")
     ap.add_argument("--detail", action="store_true", help="列出全部組合")
     args = ap.parse_args()
 
@@ -273,6 +347,9 @@ def main():
 
     if args.sensitivity:
         sensitivity()
+
+    if args.info:
+        information_value()
 
     print("\n" + "=" * 66)
     print("⚠️  這個模型不會讓判斷變客觀。它做的是把主觀性推到三個")
