@@ -1,87 +1,110 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="880" height="820" viewBox="0 0 880 820" font-family="WenQuanYi Zen Hei, Noto Sans CJK TC, PingFang TC, Microsoft JhengHei, sans-serif">
-  <rect width="880" height="820" fill="#fcfcfb"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="612" viewBox="0 0 1040 612" font-family="WenQuanYi Zen Hei, Noto Sans CJK TC, PingFang TC, Microsoft JhengHei, sans-serif">
+  <rect width="1040" height="612" fill="#fcfcfb"/>
 
-  <text x="44" y="54" font-size="29" font-weight="700" fill="#0b0b0b">五種走法，誰會受益、誰會受傷</text>
-  <text x="44" y="86" font-size="17" fill="#52514e">機率由三個可查證的變數推算（油價、核心通膨動能、就業），不是直接猜情境。</text>
+  <text x="44" y="52" font-size="29" font-weight="700" fill="#0b0b0b">五種走法，誰會受益、誰會受傷</text>
+  <text x="44" y="82" font-size="16" fill="#52514e">兩個問題決定你在哪一格：<tspan font-weight="700" fill="#0b0b0b">通膨有沒有回到目標</tspan>、<tspan font-weight="700" fill="#0b0b0b">就業有沒有壞掉</tspan>。</text>
 
-  <g font-size="15">
-    <rect x="44" y="106" width="16" height="16" rx="3" fill="#2a78d6"/><text x="68" y="120" fill="#0b0b0b">相對有利</text>
-    <rect x="176" y="106" width="16" height="16" rx="3" fill="#f0efec" stroke="#c3c2b7"/><text x="200" y="120" fill="#0b0b0b">普通</text>
-    <rect x="284" y="106" width="16" height="16" rx="3" fill="#e87070"/><text x="308" y="120" fill="#0b0b0b">相對不利</text>
-    <text x="420" y="120" fill="#898781">（每格都有文字，顏色只是輔助）</text>
-  </g>
+  <!-- ===== header ===== -->
+  <text x="44"  y="128" font-size="14" font-weight="700" fill="#898781">情境</text>
+  <text x="332" y="128" font-size="14" font-weight="700" fill="#898781" text-anchor="middle">機率</text>
+  <text x="446" y="128" font-size="14" font-weight="700" fill="#898781" text-anchor="middle">現金與短債</text>
+  <text x="566" y="128" font-size="14" font-weight="700" fill="#898781" text-anchor="middle">長天期公債</text>
+  <text x="686" y="128" font-size="14" font-weight="700" fill="#898781" text-anchor="middle">高估值成長股</text>
+  <text x="806" y="128" font-size="14" font-weight="700" fill="#898781" text-anchor="middle">黃金</text>
+  <text x="926" y="128" font-size="14" font-weight="700" fill="#898781" text-anchor="middle">能源</text>
+  <line x1="44" y1="140" x2="996" y2="140" stroke="#e1e0d9" stroke-width="1.5"/>
 
-  <text x="352" y="166" font-size="15" font-weight="700" fill="#52514e" text-anchor="middle">現金與短債</text>
-  <text x="464" y="166" font-size="15" font-weight="700" fill="#52514e" text-anchor="middle">長天期公債</text>
-  <text x="576" y="166" font-size="15" font-weight="700" fill="#52514e" text-anchor="middle">高估值成長股</text>
-  <text x="688" y="166" font-size="15" font-weight="700" fill="#52514e" text-anchor="middle">黃金</text>
-  <text x="800" y="166" font-size="15" font-weight="700" fill="#52514e" text-anchor="middle">能源</text>
+  <!-- ===== row 1 : 黏著 33% ===== -->
+  <text x="44" y="176" font-size="19" font-weight="700" fill="#0b0b0b">黏著</text>
+  <text x="44" y="198" font-size="14" fill="#52514e">通膨卡在 2.5–3.5%，就業撐住</text>
+  <text x="332" y="188" font-size="27" font-weight="700" fill="#0b0b0b" text-anchor="middle">33%</text>
 
-  <!-- B (largest first) -->
-  <text x="44" y="204" font-size="19" font-weight="700" fill="#0b0b0b">連續升息，油價黏著</text>
-  <text x="44" y="228" font-size="17" font-weight="700" fill="#2a78d6">44%</text>
-  <text x="104" y="228" font-size="14" fill="#898781">機率最高的一條</text>
-  <rect x="300" y="184" width="104" height="52" rx="4" fill="#2a78d6"/><text x="352" y="216" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">有利</text>
-  <rect x="412" y="184" width="104" height="52" rx="4" fill="#e87070"/><text x="464" y="216" font-size="16" fill="#0b0b0b" text-anchor="middle">不利</text>
-  <rect x="524" y="184" width="104" height="52" rx="4" fill="#e87070"/><text x="576" y="216" font-size="16" fill="#0b0b0b" text-anchor="middle">不利</text>
-  <rect x="636" y="184" width="104" height="52" rx="4" fill="#f0efec"/><text x="688" y="216" font-size="16" fill="#0b0b0b" text-anchor="middle">普通</text>
-  <rect x="748" y="184" width="104" height="52" rx="4" fill="#2a78d6"/><text x="800" y="216" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">有利</text>
+  <rect x="390" y="156" width="112" height="44" rx="5" fill="#dbe9fa"/>
+  <text x="446" y="184" font-size="16" font-weight="700" fill="#1a5fb0" text-anchor="middle">有利</text>
+  <rect x="510" y="156" width="112" height="44" rx="5" fill="#fadedd"/>
+  <text x="566" y="184" font-size="16" font-weight="700" fill="#b02a2a" text-anchor="middle">不利</text>
+  <rect x="630" y="156" width="112" height="44" rx="5" fill="#fadedd"/>
+  <text x="686" y="184" font-size="16" font-weight="700" fill="#b02a2a" text-anchor="middle">不利</text>
+  <rect x="750" y="156" width="112" height="44" rx="5" fill="#f0efec"/>
+  <text x="806" y="184" font-size="16" fill="#52514e" text-anchor="middle">普通</text>
+  <rect x="870" y="156" width="112" height="44" rx="5" fill="#f0efec"/>
+  <text x="926" y="184" font-size="16" fill="#52514e" text-anchor="middle">普通</text>
 
-  <!-- C -->
-  <text x="44" y="282" font-size="19" font-weight="700" fill="#0b0b0b">油價再升，需求被打壞</text>
-  <text x="44" y="306" font-size="17" font-weight="700" fill="#2a78d6">24%</text>
-  <text x="104" y="306" font-size="14" fill="#898781">最像 2011 歐洲那條路</text>
-  <rect x="300" y="262" width="104" height="52" rx="4" fill="#2a78d6"/><text x="352" y="294" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">有利</text>
-  <rect x="412" y="262" width="104" height="52" rx="4" fill="#f0efec"/><text x="464" y="288" font-size="15" fill="#0b0b0b" text-anchor="middle">先跌後漲</text>
-  <text x="464" y="307" font-size="13" fill="#898781" text-anchor="middle">後段最強</text>
-  <rect x="524" y="262" width="104" height="52" rx="4" fill="#c93030"/><text x="576" y="294" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">最不利</text>
-  <rect x="636" y="262" width="104" height="52" rx="4" fill="#2a78d6"/><text x="688" y="294" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">有利</text>
-  <rect x="748" y="262" width="104" height="52" rx="4" fill="#f0efec"/><text x="800" y="288" font-size="15" fill="#0b0b0b" text-anchor="middle">先漲後跌</text>
-  <text x="800" y="307" font-size="13" fill="#898781" text-anchor="middle">需求被打壞</text>
+  <!-- ===== row 2 : 再加速 25% ===== -->
+  <text x="44" y="256" font-size="19" font-weight="700" fill="#0b0b0b">再加速</text>
+  <text x="44" y="278" font-size="14" fill="#52514e">通膨衝破 3.5%，就業撐住</text>
+  <text x="332" y="268" font-size="27" font-weight="700" fill="#0b0b0b" text-anchor="middle">25%</text>
 
-  <!-- A -->
-  <text x="44" y="360" font-size="19" font-weight="700" fill="#0b0b0b">升一次就停，油價回落</text>
-  <text x="44" y="384" font-size="17" font-weight="700" fill="#2a78d6">13%</text>
-  <text x="104" y="384" font-size="14" fill="#898781">最像 2004–06 那條路</text>
-  <rect x="300" y="340" width="104" height="52" rx="4" fill="#f0efec"/><text x="352" y="372" font-size="16" fill="#0b0b0b" text-anchor="middle">普通</text>
-  <rect x="412" y="340" width="104" height="52" rx="4" fill="#2a78d6"/><text x="464" y="372" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">有利</text>
-  <rect x="524" y="340" width="104" height="52" rx="4" fill="#2a78d6"/><text x="576" y="372" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">最有利</text>
-  <rect x="636" y="340" width="104" height="52" rx="4" fill="#f0efec"/><text x="688" y="372" font-size="16" fill="#0b0b0b" text-anchor="middle">普通</text>
-  <rect x="748" y="340" width="104" height="52" rx="4" fill="#e87070"/><text x="800" y="372" font-size="16" fill="#0b0b0b" text-anchor="middle">不利</text>
+  <rect x="390" y="236" width="112" height="44" rx="5" fill="#2a78d6"/>
+  <text x="446" y="264" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">最有利</text>
+  <rect x="510" y="236" width="112" height="44" rx="5" fill="#c93030"/>
+  <text x="566" y="264" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">最不利</text>
+  <rect x="630" y="236" width="112" height="44" rx="5" fill="#c93030"/>
+  <text x="686" y="264" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">最不利</text>
+  <rect x="750" y="236" width="112" height="44" rx="5" fill="#f0efec"/>
+  <text x="806" y="264" font-size="16" fill="#52514e" text-anchor="middle">普通</text>
+  <rect x="870" y="236" width="112" height="44" rx="5" fill="#dbe9fa"/>
+  <text x="926" y="264" font-size="16" font-weight="700" fill="#1a5fb0" text-anchor="middle">有利</text>
 
-  <!-- D -->
-  <text x="44" y="438" font-size="19" font-weight="700" fill="#0b0b0b">經濟夠強，撐得住高利率</text>
-  <text x="44" y="462" font-size="17" font-weight="700" fill="#2a78d6">11%</text>
-  <text x="104" y="462" font-size="14" fill="#898781">最少人在談的一條</text>
-  <rect x="300" y="418" width="104" height="52" rx="4" fill="#e87070"/><text x="352" y="450" font-size="16" fill="#0b0b0b" text-anchor="middle">不利</text>
-  <rect x="412" y="418" width="104" height="52" rx="4" fill="#e87070"/><text x="464" y="450" font-size="16" fill="#0b0b0b" text-anchor="middle">不利</text>
-  <rect x="524" y="418" width="104" height="52" rx="4" fill="#2a78d6"/><text x="576" y="450" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">有利</text>
-  <rect x="636" y="418" width="104" height="52" rx="4" fill="#e87070"/><text x="688" y="450" font-size="16" fill="#0b0b0b" text-anchor="middle">不利</text>
-  <rect x="748" y="418" width="104" height="52" rx="4" fill="#f0efec"/><text x="800" y="450" font-size="16" fill="#0b0b0b" text-anchor="middle">普通</text>
+  <!-- ===== row 3 : 軟著陸 23% ===== -->
+  <text x="44" y="336" font-size="19" font-weight="700" fill="#0b0b0b">軟著陸</text>
+  <text x="44" y="358" font-size="14" fill="#52514e">通膨回到目標，就業撐住</text>
+  <text x="332" y="348" font-size="27" font-weight="700" fill="#0b0b0b" text-anchor="middle">23%</text>
 
-  <!-- E -->
-  <text x="44" y="516" font-size="19" font-weight="700" fill="#0b0b0b">通膨降了，經濟也垮了</text>
-  <text x="44" y="540" font-size="17" font-weight="700" fill="#2a78d6">9%</text>
-  <text x="94" y="540" font-size="14" fill="#898781">建模時才發現漏掉這格</text>
-  <rect x="300" y="496" width="104" height="52" rx="4" fill="#2a78d6"/><text x="352" y="528" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">有利</text>
-  <rect x="412" y="496" width="104" height="52" rx="4" fill="#2a78d6"/><text x="464" y="528" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">最有利</text>
-  <rect x="524" y="496" width="104" height="52" rx="4" fill="#e87070"/><text x="576" y="528" font-size="16" fill="#0b0b0b" text-anchor="middle">不利</text>
-  <rect x="636" y="496" width="104" height="52" rx="4" fill="#2a78d6"/><text x="688" y="528" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">有利</text>
-  <rect x="748" y="496" width="104" height="52" rx="4" fill="#e87070"/><text x="800" y="528" font-size="16" fill="#0b0b0b" text-anchor="middle">不利</text>
+  <rect x="390" y="316" width="112" height="44" rx="5" fill="#fadedd"/>
+  <text x="446" y="344" font-size="16" font-weight="700" fill="#b02a2a" text-anchor="middle">不利</text>
+  <rect x="510" y="316" width="112" height="44" rx="5" fill="#dbe9fa"/>
+  <text x="566" y="344" font-size="16" font-weight="700" fill="#1a5fb0" text-anchor="middle">有利</text>
+  <rect x="630" y="316" width="112" height="44" rx="5" fill="#2a78d6"/>
+  <text x="686" y="344" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">最有利</text>
+  <rect x="750" y="316" width="112" height="44" rx="5" fill="#f0efec"/>
+  <text x="806" y="344" font-size="16" fill="#52514e" text-anchor="middle">普通</text>
+  <rect x="870" y="316" width="112" height="44" rx="5" fill="#f0efec"/>
+  <text x="926" y="344" font-size="16" fill="#52514e" text-anchor="middle">普通</text>
 
-  <line x1="44" y1="572" x2="836" y2="572" stroke="#e1e0d9" stroke-width="1"/>
+  <!-- ===== row 4 : 成長驚嚇 10% ===== -->
+  <text x="44" y="416" font-size="19" font-weight="700" fill="#0b0b0b">成長驚嚇</text>
+  <text x="44" y="438" font-size="14" fill="#52514e">通膨回到目標，就業壞掉</text>
+  <text x="332" y="428" font-size="27" font-weight="700" fill="#0b0b0b" text-anchor="middle">10%</text>
 
-  <text x="44" y="604" font-size="19" font-weight="700" fill="#0b0b0b">直著看每一欄，比橫著看每一列有用：</text>
-  <circle cx="50" cy="631" r="4" fill="#0b0b0b"/>
-  <text x="66" y="636" font-size="17" fill="#0b0b0b"><tspan font-weight="700">高估值成長股</tspan>在合計約<tspan font-weight="700">四分之三</tspan>的機率上受傷，只有兩條路對它好。</text>
-  <circle cx="50" cy="659" r="4" fill="#0b0b0b"/>
-  <text x="66" y="664" font-size="17" fill="#0b0b0b"><tspan font-weight="700">現金與短債</tspan>是唯一五種情況都不會太慘的一欄——代價是它在最好的那條路上跑輸。</text>
-  <circle cx="50" cy="687" r="4" fill="#0b0b0b"/>
-  <text x="66" y="692" font-size="17" fill="#0b0b0b"><tspan font-weight="700">沒有任何一欄在五種情況都好。</tspan>問題不是「選哪個」，是「你能承受哪一種錯」。</text>
+  <rect x="390" y="396" width="112" height="44" rx="5" fill="#dbe9fa"/>
+  <text x="446" y="424" font-size="16" font-weight="700" fill="#1a5fb0" text-anchor="middle">有利</text>
+  <rect x="510" y="396" width="112" height="44" rx="5" fill="#2a78d6"/>
+  <text x="566" y="424" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">最有利</text>
+  <rect x="630" y="396" width="112" height="44" rx="5" fill="#fadedd"/>
+  <text x="686" y="424" font-size="16" font-weight="700" fill="#b02a2a" text-anchor="middle">不利</text>
+  <rect x="750" y="396" width="112" height="44" rx="5" fill="#dbe9fa"/>
+  <text x="806" y="424" font-size="16" font-weight="700" fill="#1a5fb0" text-anchor="middle">有利</text>
+  <rect x="870" y="396" width="112" height="44" rx="5" fill="#c93030"/>
+  <text x="926" y="424" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">最不利</text>
 
-  <line x1="44" y1="716" x2="836" y2="716" stroke="#e1e0d9" stroke-width="1"/>
-  <text x="44" y="744" font-size="14" fill="#898781">機率由公開模型推算（三個輸入：油價路徑、核心通膨三月年化、就業）。輸入仍是判斷，但每一個都綁一個可以去查的讀數。</text>
-  <text x="44" y="766" font-size="14" fill="#898781">上一版曾少了「通膨降了但經濟也垮了」這一格，並把它誤併進「升一次就停」——那兩者的資產結果完全相反，已更正。</text>
-  <text x="44" y="788" font-size="14" fill="#898781">五條路加起來 100%，但真實世界不會剛好落在其中一條。格子裡是相對於其他資產的方向性推論，不是報酬率預測。</text>
-  <text x="44" y="810" font-size="14" fill="#898781">模型與全部假設：projects/macro-scenarios/scenario_model.py（可自行改輸入重跑）。</text>
+  <!-- ===== row 5 : 停滯性通膨 10% ===== -->
+  <text x="44" y="496" font-size="19" font-weight="700" fill="#0b0b0b">停滯性通膨</text>
+  <text x="44" y="518" font-size="14" fill="#52514e">通膨沒回去，就業也壞掉</text>
+  <text x="332" y="508" font-size="27" font-weight="700" fill="#0b0b0b" text-anchor="middle">10%</text>
+
+  <rect x="390" y="476" width="112" height="44" rx="5" fill="#dbe9fa"/>
+  <text x="446" y="504" font-size="16" font-weight="700" fill="#1a5fb0" text-anchor="middle">有利</text>
+  <rect x="510" y="476" width="112" height="44" rx="5" fill="#fadedd"/>
+  <text x="566" y="504" font-size="16" font-weight="700" fill="#b02a2a" text-anchor="middle">不利</text>
+  <rect x="630" y="476" width="112" height="44" rx="5" fill="#c93030"/>
+  <text x="686" y="504" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">最不利</text>
+  <rect x="750" y="476" width="112" height="44" rx="5" fill="#f0efec"/>
+  <text x="806" y="504" font-size="16" fill="#52514e" text-anchor="middle">普通</text>
+  <rect x="870" y="476" width="112" height="44" rx="5" fill="#f0efec"/>
+  <text x="926" y="504" font-size="16" fill="#52514e" text-anchor="middle">普通</text>
+
+  <!-- ===== legend ===== -->
+  <line x1="44" y1="548" x2="996" y2="548" stroke="#e1e0d9" stroke-width="1.5"/>
+  <rect x="44"  y="566" width="26" height="18" rx="4" fill="#2a78d6"/>
+  <text x="78"  y="580" font-size="14" fill="#52514e">最有利</text>
+  <rect x="134" y="566" width="26" height="18" rx="4" fill="#dbe9fa"/>
+  <text x="168" y="580" font-size="14" fill="#52514e">有利</text>
+  <rect x="212" y="566" width="26" height="18" rx="4" fill="#f0efec"/>
+  <text x="246" y="580" font-size="14" fill="#52514e">普通</text>
+  <rect x="290" y="566" width="26" height="18" rx="4" fill="#fadedd"/>
+  <text x="324" y="580" font-size="14" fill="#52514e">不利</text>
+  <rect x="368" y="566" width="26" height="18" rx="4" fill="#c93030"/>
+  <text x="402" y="580" font-size="14" fill="#52514e">最不利</text>
+  <text x="996" y="580" font-size="14" fill="#898781" text-anchor="end">機率四捨五入到整數，誤差約 ±3–5 個百分點</text>
 </svg>
