@@ -19,11 +19,12 @@ import scenario_model as M  # noqa: E402
 ASSETS = ["現金與短債", "長天期公債", "高估值成長股", "黃金", "能源"]
 
 # 每個情境的資產方向。-2 最不利 / -1 不利 / 0 普通 / 1 有利 / 2 最有利
+# 9 = 「看獲利」：總體面決定不了這一格，由公司自己的獲利成長決定（見 fig9）
 VIEW = {
     "軟著陸":     [-1,  1,  2,  0,  0],
-    "黏著":       [ 1, -1, -1,  0,  0],
+    "黏著":       [ 1, -1,  9,  0,  0],
     "再加速":     [ 2, -2, -2,  0,  1],
-    "成長驚嚇":   [ 1,  2, -1,  1, -2],
+    "成長驚嚇":   [ 1,  2,  9,  1, -2],
     "停滯性通膨": [ 1, -1, -2,  0,  0],
 }
 
@@ -36,10 +37,13 @@ REASONS = {
                   "黃金只給普通：1890 年以來 7 次停滯性通膨，黃金只有 1973–75 真正發揮",
 }
 
-FILL = {2: "#2a78d6", 1: "#dbe9fa", 0: "#f0efec", -1: "#fadedd", -2: "#c93030"}
-INK = {2: "#ffffff", 1: "#1a5fb0", 0: "#52514e", -1: "#b02a2a", -2: "#ffffff"}
-LABEL = {2: "最有利", 1: "有利", 0: "普通", -1: "不利", -2: "最不利"}
-BOLD = {2: "700", 1: "700", 0: "400", -1: "700", -2: "700"}
+FILL = {2: "#2a78d6", 1: "#dbe9fa", 0: "#f0efec", -1: "#fadedd", -2: "#c93030", 9: "#ffffff"}
+INK = {2: "#ffffff", 1: "#1a5fb0", 0: "#52514e", -1: "#b02a2a", -2: "#ffffff", 9: "#0b0b0b"}
+# 「看獲利」不在藍↔紅這條軸上，所以不給它第三種色相（會撞色盲判讀），
+# 改用虛線外框當第二編碼通道 —— 語意上也對：它就是「不在這個量尺上」。
+STROKE = {9: "#c9a227"}
+LABEL = {2: "最有利", 1: "有利", 0: "普通", -1: "不利", -2: "最不利", 9: "看獲利"}
+BOLD = {2: "700", 1: "700", 0: "400", -1: "700", -2: "700", 9: "700"}
 
 DESC = {
     "軟著陸": "通膨回到目標，就業撐住",
@@ -70,7 +74,8 @@ def build():
         '五種走法，誰會受益、誰會受傷</text>',
         '<text x="44" y="82" font-size="16" fill="#52514e">兩個問題決定你在哪一格：'
         '<tspan font-weight="700" fill="#0b0b0b">通膨有沒有回到目標</tspan>、'
-        '<tspan font-weight="700" fill="#0b0b0b">就業有沒有壞掉</tspan>。</text>',
+        '<tspan font-weight="700" fill="#0b0b0b">就業有沒有壞掉</tspan>。'
+        '　<tspan font-weight="700" fill="#0b0b0b">「看獲利」＝ 總體面決定不了這一格，由公司自己的獲利成長決定。</tspan></text>',
         '<text x="44" y="128" font-size="14" font-weight="700" fill="#898781">情境</text>',
         '<text x="332" y="128" font-size="14" font-weight="700" fill="#898781" '
         'text-anchor="middle">機率</text>',
@@ -88,8 +93,10 @@ def build():
         out.append(f'<text x="332" y="{y + 32}" font-size="27" font-weight="700" '
                    f'fill="#0b0b0b" text-anchor="middle">{round(p * 100)}%</text>')
         for x, v in zip(COL_X, VIEW[name]):
+            extra = (f' stroke="{STROKE[v]}" stroke-width="2" stroke-dasharray="5 3"'
+                     if v in STROKE else '')
             out.append(f'<rect x="{x}" y="{y}" width="{CELL_W}" height="{CELL_H}" rx="5" '
-                       f'fill="{FILL[v]}"/>')
+                       f'fill="{FILL[v]}"{extra}/>')
             out.append(f'<text x="{x + CELL_W // 2}" y="{y + 28}" font-size="16" '
                        f'font-weight="{BOLD[v]}" fill="{INK[v]}" text-anchor="middle">'
                        f'{LABEL[v]}</text>')
@@ -97,11 +104,14 @@ def build():
     ly = TOP + ROW_H * 5 + 8
     out.append(f'<line x1="44" y1="{ly}" x2="996" y2="{ly}" stroke="#e1e0d9" stroke-width="1.5"/>')
     lx = 44
-    for v in (2, 1, 0, -1, -2):
-        out.append(f'<rect x="{lx}" y="{ly + 18}" width="26" height="18" rx="4" fill="{FILL[v]}"/>')
+    for v in (2, 1, 0, -1, -2, 9):
+        ex = (f' stroke="{STROKE[v]}" stroke-width="2" stroke-dasharray="4 2.5"'
+              if v in STROKE else '')
+        out.append(f'<rect x="{lx}" y="{ly + 18}" width="26" height="18" rx="4" '
+                   f'fill="{FILL[v]}"{ex}/>')
         out.append(f'<text x="{lx + 34}" y="{ly + 32}" font-size="14" fill="#52514e">'
                    f'{LABEL[v]}</text>')
-        lx += 90 if len(LABEL[v]) == 3 else 78
+        lx += 88 if len(LABEL[v]) == 3 else 76
     out.append(f'<text x="996" y="{ly + 32}" font-size="14" fill="#898781" text-anchor="end">'
                f'機率四捨五入到整數，誤差約 ±3–5 個百分點</text>')
     out.append('</svg>')
