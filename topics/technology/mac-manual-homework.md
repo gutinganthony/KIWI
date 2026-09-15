@@ -23,6 +23,20 @@ last_updated: 2026-07-06
 
 ## 🔴 待辦（依急迫度）
 
+### 🆕 2026-09-15 第二批（Jake 三問引發的查證，全部因相關站點被 egress proxy 擋）
+
+- [ ] **Ball & Koh, NBER WP 34113《Market Rents and CPI Shelter Inflation》(2025-08) 全文**，取其**確切落後季數點估計**。
+      目前文章寫「3–4 季」，那個數字的正確出處是 **Cleveland Fed WP 22-38**（新租客領先全體租客約 4 季），不是 w34113。
+      w34113 只支持「有落後 + 落後的三個來源」。nber.org／ssrn／repec 皆被擋。
+- [ ] **《Journal of Housing Economics》2026-01-09 那篇 rent-gap 論文**的作者與完整假設（sciencedirect 被擋）。
+      它才是「2026 年住房落後效應可壓低核心 CPI **37bp**」的出處，且該數字是**相對於「住房項年增 3.1pp」的反事實基準**，
+      並使用 2025 年底前資料、**早於 2026 年租金回升** ⇒ 以今天資料看很可能偏高。**引用時三個條件缺一不可。**
+- [ ] **Cleveland Fed EC 2024-17《New-Tenant Rent Passthrough and the Future of Rent Inflation》** 的確切 passthrough 數字。
+      它指傳導是**漸進的**而非乾淨的 4 季平移 ⇒ 若要寫「4 季後全部反映完」會過度簡化。
+- [ ] **Dias & Duarte / Fed IFDP 1248** 的脈衝反應**量級與持續期**（federalreserve.gov 被擋）。
+      文章現在寫「升息對租金的淨效果是往上」，方向有文獻支持，但**幅度多大、持續多久尚未取得**。
+
+
 ### 🆕 2026-09-15 新增（摸魚記定稿 session 產生）
 
 - [ ] 🔴 **BLS 2025-10 政府關門期間的住房（租金）資料處理方式——原始技術說明**。
