@@ -9,6 +9,13 @@
 | `unrate` | `UNRATE` | 失業率 % | 1948-01 ～ 2026-08 |
 | `wti` | `MCOILWTICO` | WTI 原油月均價 USD/bbl | 1986-01 ～ 2026-08 |
 | `brent` | `MCOILBRENTEU` | Brent 原油月均價 USD/bbl | 1987-05 ～ 2026-08 |
+| `sp500_eps` | （非 FRED） | S&P 500 十二個月移動每股盈餘，**名目** | 1871-01 ～ 2023-09 |
+
+⚠️ **`sp500_eps` 是「獲利軸」的唯一資料來源**（78.4%／19.5%／R²=0.165／780 組全部來自它），
+來源是本 repo 既有的 `projects/avi-v5/data/ext/shiller_sp500.csv` 的 `Earnings` 欄，
+即 Robert Shiller 公開的 S&P 500 長期資料集。逐月核對與該檔一致（例：1948-01 為 1.6433）。
+**三個已知限制**：(a) 它是**十二個月移動**的，所以比市場落後——這正是「市場比財報早動」那個結論的來源；
+(b) 季資料內插成月資料；(c) **不含股息**，所以本專案所有股票報酬都是價格報酬。
 
 **取得方式**：本環境的 egress proxy 擋掉 `fred.stlouisfed.org` 與 `api.stlouisfed.org`（curl 回 HTTP 000／403），
 但 `raw.githubusercontent.com` 可通。序列取自 FRED 官方 CSV 的 GitHub 鏡像：

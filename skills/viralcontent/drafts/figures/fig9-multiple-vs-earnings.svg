@@ -1,61 +1,66 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="620" viewBox="0 0 1040 620" font-family="WenQuanYi Zen Hei, Noto Sans CJK TC, PingFang TC, Microsoft JhengHei, sans-serif">
-  <rect width="1040" height="620" fill="#fcfcfb"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="624" viewBox="0 0 1040 624" font-family="WenQuanYi Zen Hei, Noto Sans CJK TC, PingFang TC, Microsoft JhengHei, sans-serif">
+  <rect width="1040" height="624" fill="#fcfcfb"/>
 
-  <text x="44" y="52" font-size="29" font-weight="700" fill="#0b0b0b">成長股在每一格的拉鋸，誰贏</text>
-  <text x="44" y="82" font-size="16" fill="#52514e">倍數往下拉、獲利往上推。兩邊相乘才是你拿到的報酬。</text>
+  <text x="44" y="52" font-size="29" font-weight="700" fill="#0b0b0b">四格的中位數都是正的。差別全在左尾。</text>
+  <text x="44" y="82" font-size="16" fill="#52514e">S&#38;P 500，十二個月實質報酬（扣掉通膨），1871–2022。</text>
 
-  <!-- header -->
-  <text x="44"  y="128" font-size="14" font-weight="700" fill="#898781">情境</text>
-  <text x="420" y="128" font-size="14" font-weight="700" fill="#898781" text-anchor="middle">倍數怎麼動</text>
-  <text x="600" y="128" font-size="14" font-weight="700" fill="#898781" text-anchor="middle">獲利要成長多少才打平</text>
-  <text x="780" y="128" font-size="14" font-weight="700" fill="#898781" text-anchor="middle">這一格實際的獲利</text>
-  <text x="940" y="128" font-size="14" font-weight="700" fill="#898781" text-anchor="middle">結果</text>
-  <line x1="44" y1="140" x2="996" y2="140" stroke="#e1e0d9" stroke-width="1.5"/>
+  <!-- axis -->
+  <line x1="470" y1="128" x2="470" y2="430" stroke="#c9c8c2" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="470" y="120" font-size="13" fill="#898781" text-anchor="middle">0%</text>
+  <text x="352" y="120" font-size="13" fill="#898781" text-anchor="middle">−20%</text>
+  <text x="588" y="120" font-size="13" fill="#898781" text-anchor="middle">+20%</text>
+  <line x1="352" y1="124" x2="352" y2="430" stroke="#ebeae4" stroke-width="1"/>
+  <line x1="588" y1="124" x2="588" y2="430" stroke="#ebeae4" stroke-width="1"/>
 
-  <!-- 黏著 -->
-  <text x="44" y="180" font-size="19" font-weight="700" fill="#0b0b0b">黏著</text>
-  <text x="44" y="202" font-size="13" fill="#898781">50%</text>
-  <text x="420" y="188" font-size="18" fill="#b02a2a" text-anchor="middle">−6.8%</text>
-  <text x="600" y="188" font-size="19" font-weight="700" fill="#0b0b0b" text-anchor="middle">＋7.3%</text>
-  <text x="780" y="188" font-size="19" font-weight="700" fill="#1a5fb0" text-anchor="middle">＋14.1%</text>
-  <rect x="884" y="166" width="112" height="32" rx="5" fill="#dbe9fa"/>
-  <text x="940" y="188" font-size="15" font-weight="700" fill="#1a5fb0" text-anchor="middle">81% 過關</text>
+  <text x="44" y="120" font-size="13" font-weight="700" fill="#898781">情境</text>
+  <text x="700" y="120" font-size="13" font-weight="700" fill="#898781" text-anchor="middle">壞情況（25 分位）</text>
+  <text x="850" y="120" font-size="13" font-weight="700" fill="#898781" text-anchor="middle">中位數</text>
+  <text x="966" y="120" font-size="13" font-weight="700" fill="#898781" text-anchor="middle">正報酬</text>
 
-  <!-- 軟著陸 -->
-  <text x="44" y="248" font-size="19" font-weight="700" fill="#0b0b0b">軟著陸</text>
-  <text x="44" y="270" font-size="13" fill="#898781">19%</text>
-  <text x="420" y="256" font-size="18" font-weight="700" fill="#1a5fb0" text-anchor="middle">＋11.8%</text>
-  <text x="600" y="256" font-size="19" font-weight="700" fill="#1a5fb0" text-anchor="middle">−10.6%</text>
-  <text x="780" y="256" font-size="19" font-weight="700" fill="#1a5fb0" text-anchor="middle">＋12.0%</text>
-  <rect x="884" y="234" width="112" height="32" rx="5" fill="#2a78d6"/>
-  <text x="940" y="256" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">100% 過關</text>
+  <!-- 軟著陸: 25th +3.3, med +9.1, 75th +13.5 -->
+  <text x="44" y="160" font-size="18" font-weight="700" fill="#0b0b0b">軟著陸</text>
+  <text x="44" y="180" font-size="13" fill="#898781">19%</text>
+  <rect x="489" y="146" width="80" height="26" rx="4" fill="#dbe9fa"/>
+  <circle cx="524" cy="159" r="6" fill="#2a78d6"/>
+  <text x="700" y="165" font-size="17" font-weight="700" fill="#1a5fb0" text-anchor="middle">＋3.3%</text>
+  <text x="850" y="165" font-size="17" font-weight="700" fill="#0b0b0b" text-anchor="middle">＋9.1%</text>
+  <text x="966" y="165" font-size="17" fill="#52514e" text-anchor="middle">78%</text>
 
-  <!-- 停滯性通膨 -->
-  <text x="44" y="316" font-size="19" font-weight="700" fill="#0b0b0b">停滯性通膨</text>
-  <text x="44" y="338" font-size="13" fill="#898781">17%</text>
-  <text x="420" y="324" font-size="18" fill="#b02a2a" text-anchor="middle">−6.8%</text>
-  <text x="600" y="324" font-size="19" font-weight="700" fill="#0b0b0b" text-anchor="middle">＋7.3%</text>
-  <text x="780" y="324" font-size="19" font-weight="700" fill="#b02a2a" text-anchor="middle">−8.8%</text>
-  <rect x="884" y="302" width="112" height="32" rx="5" fill="#c93030"/>
-  <text x="940" y="324" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">0% 過關</text>
+  <!-- 成長驚嚇: 25th -5.0, med +7.2, 75th +17.3 -->
+  <text x="44" y="234" font-size="18" font-weight="700" fill="#0b0b0b">成長驚嚇</text>
+  <text x="44" y="254" font-size="13" fill="#898781">14%</text>
+  <rect x="411" y="220" width="215" height="26" rx="4" fill="#e6e5df"/>
+  <circle cx="512" cy="233" r="6" fill="#52514e"/>
+  <text x="700" y="239" font-size="17" fill="#b02a2a" text-anchor="middle">−5.0%</text>
+  <text x="850" y="239" font-size="17" font-weight="700" fill="#0b0b0b" text-anchor="middle">＋7.2%</text>
+  <text x="966" y="239" font-size="17" fill="#52514e" text-anchor="middle">70%</text>
 
-  <!-- 成長驚嚇 -->
-  <text x="44" y="384" font-size="19" font-weight="700" fill="#0b0b0b">成長驚嚇</text>
-  <text x="44" y="406" font-size="13" fill="#898781">14%</text>
-  <text x="420" y="392" font-size="18" font-weight="700" fill="#1a5fb0" text-anchor="middle">＋11.8%</text>
-  <text x="600" y="392" font-size="19" font-weight="700" fill="#1a5fb0" text-anchor="middle">−10.6%</text>
-  <text x="780" y="392" font-size="19" font-weight="700" fill="#b02a2a" text-anchor="middle">−11.0%</text>
-  <rect x="884" y="370" width="112" height="32" rx="5" fill="#f0efec"/>
-  <text x="940" y="392" font-size="15" font-weight="700" fill="#52514e" text-anchor="middle">50% 過關</text>
+  <!-- 黏著: 25th -5.1, med +4.6, 75th +14.0 -->
+  <text x="44" y="308" font-size="18" font-weight="700" fill="#0b0b0b">黏著</text>
+  <text x="44" y="328" font-size="13" fill="#898781">50%　機率最高</text>
+  <rect x="410" y="294" width="196" height="26" rx="4" fill="#e6e5df"/>
+  <circle cx="524" cy="307" r="6" fill="#52514e"/>
+  <text x="700" y="313" font-size="17" fill="#b02a2a" text-anchor="middle">−5.1%</text>
+  <text x="850" y="313" font-size="17" font-weight="700" fill="#0b0b0b" text-anchor="middle">＋4.6%</text>
+  <text x="966" y="313" font-size="17" fill="#52514e" text-anchor="middle">64%</text>
 
-  <line x1="44" y1="422" x2="996" y2="422" stroke="#e1e0d9" stroke-width="1.5"/>
+  <!-- 停滯性通膨: 25th -16.8, med +3.4, 75th +13.6 -->
+  <text x="44" y="382" font-size="18" font-weight="700" fill="#0b0b0b">停滯性通膨</text>
+  <text x="44" y="402" font-size="13" fill="#898781">17%</text>
+  <rect x="272" y="368" width="318" height="26" rx="4" fill="#fadedd"/>
+  <circle cx="510" cy="381" r="6" fill="#c93030"/>
+  <text x="700" y="387" font-size="17" font-weight="700" fill="#b02a2a" text-anchor="middle">−16.8%</text>
+  <text x="850" y="387" font-size="17" font-weight="700" fill="#0b0b0b" text-anchor="middle">＋3.4%</text>
+  <text x="966" y="387" font-size="17" fill="#52514e" text-anchor="middle">55%</text>
 
-  <!-- takeaway -->
-  <rect x="44" y="442" width="952" height="96" rx="8" fill="#e8f0fc"/>
-  <text x="70" y="474" font-size="19" font-weight="700" fill="#0b0b0b">機率最高的那一格，成長股是贏的。</text>
-  <text x="70" y="502" font-size="16" fill="#0b0b0b">「通膨黏著」聽起來像壞消息，但倍數只壓 7%，而這一格的獲利成長中位數有 14%——<tspan font-weight="700">獲利跑贏了倍數。</tspan></text>
-  <text x="70" y="528" font-size="16" fill="#0b0b0b">連「成長驚嚇」都只是銅板翻面：獲利掉 11%，但降息讓倍數漲 12%，<tspan font-weight="700">幾乎剛好抵銷。</tspan></text>
+  <text x="352" y="424" font-size="12" fill="#898781" text-anchor="middle">橫條 ＝ 25 到 75 分位，圓點 ＝ 中位數</text>
 
-  <text x="44" y="572" font-size="16" font-weight="700" fill="#0b0b0b">真正要命的只有一格：通膨沒回去、獲利又轉壞。那一格歷史上 0% 過關。</text>
-  <text x="44" y="598" font-size="15" fill="#52514e">倍數變化為席勒 1881–2022 同類環境的中位數（高估值放大 1.5 倍）；獲利為該格歷史窗的中位數。打平門檻 ＝ 1÷(1＋倍數變化) − 1。</text>
+  <line x1="44" y1="446" x2="996" y2="446" stroke="#e1e0d9" stroke-width="1.5"/>
+
+  <rect x="44" y="464" width="952" height="82" rx="8" fill="#e8f0fc"/>
+  <text x="70" y="494" font-size="19" font-weight="700" fill="#0b0b0b">連最壞那一格，中位數都還是正的——所以重點不是「會不會跌」。</text>
+  <text x="70" y="522" font-size="16" fill="#0b0b0b">重點是<tspan font-weight="700">壞情況有多壞</tspan>：軟著陸的壞情況只是少賺（仍 +3.3%），停滯性通膨的壞情況是實質 <tspan font-weight="700" fill="#b02a2a">−16.8%</tspan>——深三倍。</text>
+
+  <text x="44" y="574" font-size="15" fill="#52514e">⚠️ 為什麼連「獲利轉壞」的格子中位數也是正的：<tspan font-weight="700" fill="#0b0b0b">市場比財報早動。</tspan>等十二個月移動盈餘真的掉了，股價常常已經跌完又漲回來。</text>
+  <text x="44" y="598" font-size="15" fill="#52514e">這不是「獲利衰退沒關係」，是<tspan font-weight="700" fill="#0b0b0b">「等財報確認再動，你會太晚」</tspan>。另：這是大盤，高估值的名字兩邊尾巴都更肥。</text>
 </svg>
