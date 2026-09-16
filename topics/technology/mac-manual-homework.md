@@ -23,6 +23,27 @@ last_updated: 2026-07-06
 
 ## 🔴 待辦（依急迫度）
 
+### 🆕 2026-09-16 第四批（補核心商品那一段產生）
+
+**背景**：文章把核心 CPI 拆成三塊後，核心商品的數字**全部只到搜尋摘要層**，一個都沒從官方讀回來。
+
+- [ ] **`CUSR0000SACL1E`（核心商品 CPI）完整月序列**，至少近 24 個月。
+      ⇒ 有了它才能算官方口徑的 3／6 個月年化（目前 3 個月是自算 ≈+0.8%、誤差 ±0.3pp；6 個月因缺 2026 年 3、4 月**算不出來**）。
+      FRED／BLS／BEA／federalreserve.gov 本輪全被擋（curl HTTP:000、WebFetch EGRESS_BLOCKED），兩個資料鏡像也都沒有這個序列。
+- [ ] **`CUSR0000SASLE`（核心服務 CPI）** 同上，兩個鏡像也沒有。
+- [ ] **BLS Relative Importance 表（2025-12 基準）** 的精確權重
+      https://www.bls.gov/cpi/tables/relative-importance/2025.htm
+      ⇒ 現在用的「核心商品約 1/4、住房約 1/3」是自算與二手轉述反推的，不是官方值。
+- [ ] **核心商品 PCE 口徑**的最新讀數。⚠️ **CPI +0.7%（2026-08） vs PCE +2.36%（2026-07）差 1.7pp**，
+      而聯準會看 PCE。這個差距沒有解釋清楚前，「核心商品在不在通膨」這句話會因為口徑而反轉。
+- [ ] **2026 年 2 月 SCOTUS 關稅裁決**的真實性與影響範圍（研究員標為未證實）。
+
+**本輪新增被擋站點**：api.bls.gov・download.bls.gov・beta.bls.gov・apps.bls.gov・www.bea.gov・apps.bea.gov・
+api.db.nomics.world・tradingeconomics.com・ycharts.com・macrotrends.net・data.nasdaq.com・usinflationcalculator.com・
+reuters.com・cnbc.com（**連 en.wikipedia.org 都擋**）
+
+---
+
 ### 🆕 2026-09-15 第三批（情境模型重建 session 產生）
 
 **背景**：情境機率模型因統計方法錯誤已重建（`projects/macro-scenarios/`）。以下三項會影響模型參數，但**不影響已成立的核心結論**（條件獨立假設被推翻這件事是自算的，不依賴外部來源）。
