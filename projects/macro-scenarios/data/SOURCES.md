@@ -10,6 +10,7 @@
 | `wti` | `MCOILWTICO` | WTI 原油月均價 USD/bbl | 1986-01 ～ 2026-08 |
 | `brent` | `MCOILBRENTEU` | Brent 原油月均價 USD/bbl | 1987-05 ～ 2026-08 |
 | `sp500_eps` | （非 FRED） | S&P 500 十二個月移動每股盈餘，**名目** | 1871-01 ～ 2023-09 |
+| `cpi_shelter` | `CUSR0000SAH1` | CPI 住房分項（shelter），指數 | 1953-01 ～ 2026-07 |
 
 ⚠️ **`sp500_eps` 是「獲利軸」的唯一資料來源**（78.4%／19.5%／R²=0.165／780 組全部來自它），
 來源是本 repo 既有的 `projects/avi-v5/data/ext/shiller_sp500.csv` 的 `Earnings` 欄，
@@ -21,7 +22,11 @@
 但 `raw.githubusercontent.com` 可通。序列取自 FRED 官方 CSV 的 GitHub 鏡像：
 
 - `CPILFESL` / `PCEPILFE` / `UNRATE`：`theodorewright11/macro_eco_dashboard` → `public/data/fred/<代號>.csv`
-- `MCOILWTICO` / `MCOILBRENTEU`：`Gariyuuu/forecast-graveyard` → `data/raw/<代號>.csv`
+- `MCOILWTICO` / `MCOILBRENTEU` / `CUSR0000SAH1`：`Gariyuuu/forecast-graveyard` → `data/raw/<代號>.csv`
+
+⚠️ **核心商品（`CUSR0000SACL1E`）與核心服務（`CUSR0000SASLE`）兩個鏡像都沒有**，已逐一試過
+（連同 apparel、新車、二手車、PCE 財貨/服務分項），全部 404。
+⇒ 核心 CPI 目前只能拆成「住房」與「其餘」，**無法把核心商品單獨拆出來**。這是已知資料缺口。
 
 這條路徑與 `topics/business/2026-09-15-core-pce-cpi-inversion-798-months.md` §7 記錄的是同一條，
 該輪已做過鏡像可信度交叉驗證（核心 CPI 兩個獨立 repo 共同 834 個月 **0 筆不符**）。
