@@ -79,13 +79,15 @@ def load(eps_now=None, eps_date=None):
             price[i] = f(r["SP500"])
             div[i] = f(r["Dividend"])
             eps[i] = f(r["Earnings"])
+        # CPI 與 10 年期：官方鏡像優先（CPI-U 1913-01 起、GS10 1953-04 起），席勒只補鏡像開始前的年代。
+        # 理由：兩邊在 1913–2022 一致到 0.002%／0.00pp，但席勒最後幾個月是估計值（2023-08/09 CPI 差 0.3–0.5%，
+        # 2023-09 10y 差 0.29pp），且席勒 2019-07 的 10y 有一個 0.43pp 的異常值。
+        cpi[i] = cpi_m.get(ym, np.nan)
+        r10[i] = r10_m.get(ym, np.nan)
+        if np.isnan(cpi[i]) and r:
             cpi[i] = f(r["Consumer Price Index"])
+        if np.isnan(r10[i]) and r:
             r10[i] = f(r["Long Interest Rate"])
-        # 席勒之後接鏡像（接縫已核對：2023-06 CPI 305.11 vs 305.109，10y 3.75 vs 3.75）
-        if np.isnan(cpi[i]) and ym in cpi_m:
-            cpi[i] = cpi_m[ym]
-        if np.isnan(r10[i]) and ym in r10_m:
-            r10[i] = r10_m[ym]
         mr = macro.get(ym)
         if mr:
             unrate[i] = f(mr.get("unrate"))
