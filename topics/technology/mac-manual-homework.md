@@ -23,6 +23,27 @@ last_updated: 2026-07-06
 
 ## 🔴 待辦（依急迫度）
 
+### 🆕 2026-09-17 第五批（本益比模型 `projects/pe-model/` 產生）
+
+**背景**：市場層（總體 → S&P 500 合理本益比）已用席勒 1950–2023 月資料回測完成。兩個東西雲端拿不到，一個影響「現在」的讀數、一個決定產業層能不能上線。
+
+- [ ] 🔴 **S&P 500 as-reported（GAAP）季 EPS，2023Q3～2026Q2，共 8 個數字。**
+      來源：S&P DJI `sp-500-eps-est.xlsx`（https://www.spglobal.com/spdji/en/documents/additional-material/sp-500-eps-est.xlsx ，「ESTIMATES & PEs」分頁，取 **AS REPORTED** 欄，不是 OPERATING）。spglobal.com 雲端被擋（HTTP 000）。
+      ⇒ 席勒 EPS 停在 2023-06。現在 `--now` 用的 **295.36（2026-07 移動 12 個月）是 multpl 的搜尋摘要值，未驗證**。
+      拿到後：把 8 個季值放進 `projects/pe-model/data/sp500_eps_recent.csv`（`quarter,eps_as_reported`），我會把線性內插換成真實序列。
+      **它只影響「盈餘循環」那一項與合理價換算，不影響任何係數。**
+- [ ] 🔴 **產業級本益比歷史序列（至少十年、月或季頻）**——沒有它，`sector_layer.py` 只有結構、出不了數字。
+      任一即可，越多越好：
+      ① **TWSE 月報「上市公司本益比（依產業）」**（twse.com.tw → 統計資料 → 月報），2005 起。**台股產業層直接靠這個。**
+      ② Damodaran `pedata.xls`（pages.stern.nyu.edu/~adamodar/ → Data → Archived），美股產業年頻 1999 起。
+      ③ FactSet Earnings Insight 各期 PDF 裡的板塊 forward P/E（factset.com 部分可達，但要逐期抓）。
+      格式：`date,sector,pe`，存 `projects/pe-model/data/sector_pe.csv`，然後跑 `python3 sector_layer.py calibrate`。
+- [ ] **BLS 2025-10 CPI-U 全項目指數**——政府關門未發布，鏡像沒有這一格，模型用前後月幾何內插（324.46）。若 BLS 事後有補值或官方說明，替換之。
+
+**本輪可達的鏡像**（都在 raw.githubusercontent.com）：`datasets/s-and-p-500`（席勒）、`datasets/bond-yields-us-10y`（GS10 到 2026-07）、`datasets/cpi-us`（CPI-U 到 2026-07）。
+
+---
+
 ### 🆕 2026-09-16 第四批（補核心商品那一段產生）
 
 **背景**：文章把核心 CPI 拆成三塊後，核心商品的數字**全部只到搜尋摘要層**，一個都沒從官方讀回來。
