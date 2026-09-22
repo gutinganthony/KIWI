@@ -98,3 +98,4 @@
 | 2026-09-07 | [全掃收尾：3013／3533／CEJN／GaN-SiC — 冷卻與 800VDC 兩線結案](./2026-09-07-scan-remaining-cooling-800vdc.md) | serenity, step5-9, cooling, 800VDC, UQD, CEJN, navitas, GaN, purity-filter, no-position |
 | 2026-09-07 | [SEMICON Taiwan 2026：從先進製程到 3D IC — 重點與對 KIWI 的意涵](./2026-09-07-semicon-taiwan-2026-3dic.md) | semicon-taiwan, 3DIC, advanced-packaging, hybrid-bonding, TCB, FOPLP, SoIC, system-integration, advantest |
 | 2026-09-22 | [「世界大戰風險警示器」上線前否證 — 為什麼 KIWI 不該蓋這個東西](./2026-09-22-war-risk-alerter-falsification.md) | risk-management, signal-verification, falsification, geopolitics, war, VIX, AFI, negative-result |
+| 2026-09-22 | [美國柴油出口管制、伊朗戰爭與「是否已在世界大戰」— 三題合一，含否證條件](./2026-09-22-us-diesel-export-ban-and-war-risk.md) | oil, diesel, export-ban, iran, hormuz, greenland, nato, war-risk, inflation, fed, taiwan-strait, portfolio |
