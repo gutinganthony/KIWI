@@ -34,7 +34,23 @@
 - [x] 2026-09-06 | ⭐ 全掃：冷卻／800VDC 兩線 ＋ 2492 | ✅ **2026-09-05～07 全部跑完**。**兩線結案：0 檔進入建倉候選池**（`2026-09-07-scan-remaining-cooling-800vdc.md`）。①**3324 雙鴻**：純度過關但過的是「液冷系統整合」非「UQD 瓶頸」（QD 是自製非外售），營收 +117% 同時毛利壓縮 ⇒ 定價權不過 ②**2492 華新科**：AI 純度僅 15–20%，新硬條件一票否決；獲利改善屬被動元件漲價循環（`2026-09-05-scan-3324-2492-step5-9.md`）③**3533 嘉澤**：補六季序列，營益率 31.6%→22.0% 單向下滑（對照奇鋐 +8.7pp），維持出局 ④**3013 晟銘電**：GM 20.5% 代工級、營益率停滯三季 ⇒ 不建倉 ⑤**CEJN 未上市（家族第三代）** ⑥**GaN/SiC：Navitas 為唯一「瓶頸＋純度」雙成立，但營收下滑且 P/S 約 53× ⇒ 觀察名單**。🔴 **最重要的結構性結論：UQD 是真瓶頸但沒有可投資的純標的**（三家最純的全未上市，三家上市的純度 <30%）。⚠️ 剩 ENPH 未跑（優先序最低）
 - [x] 2026-09-03 | COHX 出場規則裁決 | ✅ **Jake 裁決：只用 WT cross**。已寫進 `exit-playbook.md` §0 規則 2（COHR 週線 WT1 下穿 WT2 → 全出；看 COHR 不看 COHX；不設水位；**無停損**）。🔴 **記錄在案**：舊規則 2(b)「−30% 硬停損」在改版當下**已觸發未執行**（9/1 收盤 −35.38%）；配套認定 COHX 為「可歸零部位」。D7 連四週最高優先項結案
 - [x] 2026-09-05 | 信用利差監控接入管線 | ✅ **Jake 核准並已完成**。`projects/avi-v5/scripts/fetch_credit_spreads.py` 掛進 `update-dashboard.yml`（runner 已有 FRED_API_KEY，不需新 workflow）。抓 HY/BB/CCC 三條 ICE BofA OAS → `data/ext/credit/{hy_oas.csv, STATUS.md}`，**只在 🟡(≥100bp)/🔴(≥150bp) 推 Telegram，🟢 靜音**。這是 AI 追蹤系統裡**唯一通過歷史驗證**的訊號（2007 領先 S&P 見頂 4.4 個月）。⚠️ **首次 runner 執行後要驗收**：確認 STATUS.md 有產出且數字合理（現值應約 265bp）
-- [ ] 2026-09-08 | 🔴 **信用利差監控合併進 main（驗收未完成的唯一原因）** 【needs Jake】| **2026-09-07 驗收結果：這一格從來沒跑過，也不會跑。** 原因是機制性的——**GitHub Actions 的 schedule 只從 default branch 執行**，而 `update-dashboard.yml` 的 push trigger 也只認 `branches: [main]`。程式碼與 workflow 改動都在 `claude/kiwi-memory-supercycle-hgtt34` 上，**main 沒有 `fetch_credit_spreads.py`、workflow 也沒有那個步驟、`data/ext/credit/STATUS.md` 不存在**。管線本身是健康的（run #251 於 2026-09-07 07:04 UTC schedule 觸發、成功）。⚠️ **feature 落後 main 1170 個 commit**，且 main 剛併入 PR #39（三指數因子健檢＋殖利率曲線改版＋ECY）⇒ **合併需先 rebase／merge main 並處理衝突，不是一行指令**。**需要你一句話授權才動 main。**
+- [x] 2026-09-08 | ~~信用利差監控合併進 main~~ | ✅ **2026-09-22 查證：早就併進去了，這條是過期資訊。**
+  main 上 `projects/avi-v5/scripts/fetch_credit_spreads.py`、`data/ext/credit/{hy_oas.csv, STATUS.md}` 皆存在，
+  `update-dashboard.yml` 第 58–63 行有 fetch 步驟、第 85–94 行有 Telegram 警報步驟。
+  **STATUS.md 更新時間 2026-09-22（當天）、hy_oas.csv 786 行、資料到 2026-09-18 ⇒ 管線是活的。**
+  ⚠️ **這條 AGENDA 讓我在 2026-09-22 對話中對 Jake 複述了「它從來沒跑過也不會跑」——錯誤資訊被制度檔保存並二次散播。**
+  教訓：**AGENDA 上標 🔴 needs Jake 的項目，在提醒使用者之前要先驗一次現況**，否則制度檔會變成過期事實的擴音器。
+- [ ] 2026-09-29 | 🔴 **信用利差監控的警報盲區：CCC−BB 離散度沒有門檻** 【Claude 可做，needs Jake 核准上線】
+  **2026-09-22 發現。** STATUS.md 自己寫著「**CCC 走闊快於 BB ⇒ 品質分層惡化，通常比整體走闊更早**；
+  若 CCC−BB 價差擴大而 HY 整體還沒動，**優先查明原因**」，**但 🟡/🔴 門檻只看 HY_OAS**，
+  所以這個「更早」的訊號永遠不會觸發警報。**現在正是這個狀態**：
+  CCC 自 12M 低點 **+293bp**（10.83%，處 12M 高點），而 HY **+8bp**、BB **+5bp**（兩者都還在 12M 低點附近）；
+  **CCC−BB 離散度連續 12 個月單調走闊：6.19 → 9.28pp**（2025-08→2026-09，每月都更高，無一月回落），
+  且 9.28pp 就是 12 個月最高值。判定卻顯示 🟢。
+  🔧 **上線前必須先驗效力**（規矩同 war_lead_test）：需要 FRED 的 CCC/BB 長序列（BAMLH0A3HYC / BAMLH0A1HYBB，1997-）
+  回測 2000／2007／2015／2020 四次壓力事件，檢驗「CCC−BB 離散度是否領先 HY 整體走闊」。
+  ⚠️ **本 session 的 egress proxy 擋掉 fred.stlouisfed.org，主對話驗不了；runner 有 FRED_API_KEY 可以。**
+  ⇒ 下一步是寫一支 runner 上跑的驗證腳本，**驗過才加門檻**。
 
 ## 🎯 目標（里程碑，無硬到期日）
 
