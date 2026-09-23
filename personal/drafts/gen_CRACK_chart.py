@@ -1,15 +1,14 @@
 """
-摸魚記 記憶體對帳篇 圖 v2：極簡版
-主視覺只有一個：三條依序結束的橫條。其餘壓到最低。
-JPM Daily Guide 版型（白底、金色章頭方塊、Serif Bold 標題）
+摸魚記 記憶體篇 圖 v3：分層矩陣
+骨架已換（v2 的「三件事依序結束」已被推翻）。
+主視覺＝五層記憶體 × 兩問（還缺不缺／還在漲嗎），用圓形圖示承載鬆緊，文字只做註腳。
+JPM Daily Guide 版型（白底、金色章頭方塊、Serif Bold 標題、細線）
 """
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.font_manager as fm
-import numpy as np
-from matplotlib.colors import LinearSegmentedColormap
 
 SANS = '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
 SERIF_B = '/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc'
@@ -21,98 +20,127 @@ matplotlib.rcParams['font.family'] = sans.get_name()
 matplotlib.rcParams['axes.unicode_minus'] = False
 
 BG = "#ffffff"; INK = "#1a1a1a"; GREY = "#6b6b6b"; LGRID = "#dcdcdc"
-GOLD = "#b8954a"; RED = "#b23b32"; GREEN = "#2e7d4f"; SLATE = "#4a5d7a"
+GOLD = "#b8954a"; RED = "#b23b32"; SLATE = "#4a5d7a"
 
-fig = plt.figure(figsize=(13.6, 8.8), facecolor=BG)
+FW, FH = 15.5, 9.8
+fig = plt.figure(figsize=(FW, FH), facecolor=BG)
 
 # ══════════ 章頭 ══════════
-fig.text(0.05, 0.945, "■", color=GOLD, fontsize=16)
-fig.text(0.078, 0.937, "三件事會依序結束",
-         color=INK, fontsize=27, fontproperties=serif_b)
-fig.lines.append(plt.Line2D([0.05, 0.96], [0.915, 0.915],
+fig.text(0.05, 0.952, "■", color=GOLD, fontsize=17)
+fig.text(0.077, 0.944, "「記憶體」不是一個市場",
+         color=INK, fontsize=28, fontproperties=serif_b)
+fig.lines.append(plt.Line2D([0.05, 0.96], [0.918, 0.918],
                             transform=fig.transFigure, color=INK, lw=1.0))
+fig.text(0.077, 0.893, "同一個詞底下，是五個正在分岔的市場", color=GREY, fontsize=15)
 
-# ══════════ 主視覺：三條依序結束的橫條 ══════════
-axM = fig.add_axes([0.05, 0.455, 0.91, 0.425])
-axM.set_facecolor(BG); axM.axis('off')
-axM.set_xlim(0, 100); axM.set_ylim(0, 10)
+# ══════════ 主視覺 ══════════
+AX = [0.05, 0.158, 0.910, 0.705]
+ax = fig.add_axes(AX)
+ax.set_facecolor(BG); ax.axis('off')
+X0, X1, Y0, Y1 = 0, 100, 4, 104
+ax.set_xlim(X0, X1); ax.set_ylim(Y0, Y1)
 
-bars = [
-    ("① 缺貨", "拿不拿得到", 40, 58, SLATE),
-    ("② 漲價", "貴不貴", 58, 80, GOLD),
-    ("③ 還能漲幾季", "股價賭的是這個", 80, 100, RED),
+# 讓圓形不被座標系拉成橢圓
+x_in = AX[2] * FW / (X1 - X0)
+y_in = AX[3] * FH / (Y1 - Y0)
+ASPECT = x_in / y_in          # 一個 x 單位相當於幾個 y 單位
+
+RX = 1.75                      # 圖示半徑（x 單位）
+RY = RX * ASPECT
+
+
+def icon(cx, cy, state):
+    """state: 'tight' 實心／'easing' 下半實心／'loose' 空心"""
+    c = {'tight': RED, 'easing': GOLD, 'loose': GREY}[state]
+    ring = mpatches.Ellipse((cx, cy), 2 * RX, 2 * RY, facecolor='none',
+                            edgecolor=c, lw=2.4, zorder=5)
+    ax.add_patch(ring)
+    if state == 'tight':
+        ax.add_patch(mpatches.Ellipse((cx, cy), 2 * RX, 2 * RY,
+                                      facecolor=c, edgecolor='none', zorder=4))
+    elif state == 'easing':
+        half = mpatches.Rectangle((cx - RX, cy - RY), 2 * RX, RY,
+                                  facecolor=c, edgecolor='none', zorder=4)
+        ax.add_patch(half)
+        half.set_clip_path(ring)
+
+
+COL_ICON1, COL_TXT1 = 30.0, 34.6
+COL_ICON2, COL_TXT2 = 58.0, 62.6
+COL_WHO = 84.0
+
+# ── 欄標 ──
+ax.text(0, 100, "這一層是什麼", color=GREY, fontsize=13.5, va='center')
+ax.text(COL_ICON1 - RX, 100, "還缺不缺", color=INK, fontsize=15,
+        fontproperties=serif_b, va='center')
+ax.text(COL_ICON2 - RX, 100, "還在漲嗎", color=INK, fontsize=15,
+        fontproperties=serif_b, va='center')
+ax.text(COL_WHO, 100, "這兩週誰在講", color=INK, fontsize=15,
+        fontproperties=serif_b, va='center')
+ax.plot([0, 100], [95.5, 95.5], color=INK, lw=0.9, zorder=3)
+
+# ── 兩個群組的底色帶 ──
+ax.add_patch(mpatches.Rectangle((0, 52), 100, 42, facecolor=SLATE,
+                                alpha=0.055, zorder=0))
+ax.add_patch(mpatches.Rectangle((0, 17), 100, 31, facecolor=GREY,
+                                alpha=0.045, zorder=0))
+
+ax.text(0.9, 90, "AI 資料中心買的是這三層", color=SLATE, fontsize=14,
+        fontproperties=serif_b, va='center')
+ax.text(0.9, 44, "這兩層不是", color=GREY, fontsize=14,
+        fontproperties=serif_b, va='center')
+
+# ── 五列 ──
+#  (層名, 副註, y, 缺貨狀態, 缺貨註, 漲價狀態, 漲價註, 誰在講, 誰的顏色)
+rows = [
+    ("HBM", "貼在 GPU 旁邊", 82,
+     'tight', "2027 年產能已售完", 'tight', "客戶只拿到六到七成",
+     "輝達改評 8 層", SLATE),
+    ("伺服器 DRAM", "餵 CPU 的主記憶體", 70,
+     'tight', "企業級交期逾 40 週", 'tight', "傳 Q4 附約 +40~50%",
+     "沒有人說鬆", GREY),
+    ("企業級 SSD", "NAND，容量層", 58,
+     'easing', "資料中心需求仍旺", 'loose', "合約價走平、現貨弱",
+     "鎧俠「漲夠了」", RED),
+    ("PC DRAM", "筆電桌機用", 36,
+     'easing', "品牌廠庫存在高檔", 'easing', "漲幅收斂，未轉跌",
+     "宏碁「不缺了」", RED),
+    ("行動 DRAM", "手機用的 LPDDR", 24,
+     'easing', "陸廠產能持續投入", 'easing', "季增收斂到 8~13%",
+     "長鑫 G5 量產", RED),
 ]
 
-BAR_H = 1.55
-for i, (name, sub, solid, fade, c) in enumerate(bars):
-    y = 7.55 - i * 2.35
-    axM.add_patch(mpatches.Rectangle((22, y), solid - 22, BAR_H,
-                                     facecolor=c, zorder=3))
-    cmap = LinearSegmentedColormap.from_list('fade', [c, BG])
-    axM.imshow(np.linspace(0, 1, 512).reshape(1, -1),
-               extent=[solid, fade, y, y + BAR_H],
-               aspect='auto', cmap=cmap, zorder=3, interpolation='bilinear')
-    axM.text(0, y + BAR_H / 2 + 0.30, name, color=c, fontsize=17,
-             fontproperties=serif_b, va='center')
-    axM.text(0, y + BAR_H / 2 - 0.52, sub, color=GREY, fontsize=12, va='center')
+for name, sub, y, s1, t1, s2, t2, who, wc in rows:
+    ax.text(0, y + 1.5, name, color=INK, fontsize=16.5,
+            fontproperties=serif_b, va='center')
+    ax.text(0, y - 2.6, sub, color=GREY, fontsize=11.5, va='center')
+    icon(COL_ICON1, y, s1)
+    ax.text(COL_TXT1, y, t1, color=INK, fontsize=12.5, va='center')
+    icon(COL_ICON2, y, s2)
+    ax.text(COL_TXT2, y, t2, color=INK, fontsize=12.5, va='center')
+    ax.text(COL_WHO, y, who, color=wc, fontsize=13.5,
+            fontproperties=serif_b, va='center')
 
-axM.annotate("", xy=(100, 1.45), xytext=(22, 1.45),
-             arrowprops=dict(arrowstyle='-|>', color=LGRID, lw=1.6))
-axM.text(22, 0.62, "越往右，結束得越晚", color=GREY, fontsize=12, va='center')
-axM.text(100, 0.62, "多數人把這三件事當成同一件", color=INK, fontsize=12.5,
-         fontproperties=serif_b, va='center', ha='right')
+# ── 圖示說明 ──
+LEG_Y = 9.0
+ax.text(0, LEG_Y, "圖示", color=GREY, fontsize=12, va='center')
+for i, (st, lab) in enumerate((('tight', "還緊"), ('easing', "收斂中"),
+                               ('loose', "已鬆"))):
+    cx = COL_ICON1 + i * 13.5
+    icon(cx, LEG_Y, st)
+    ax.text(cx + 2.9, LEG_Y, lab, color=GREY, fontsize=12, va='center')
 
-# ══════════ 左下：三道裂縫 ══════════
-axL = fig.add_axes([0.05, 0.105, 0.42, 0.275])
-axL.set_facecolor(BG); axL.axis('off')
-axL.set_xlim(0, 100); axL.set_ylim(0, 10)
-
-axL.text(0, 9.5, "這兩週的三道裂縫", color=INK,
-         fontsize=14.5, fontproperties=serif_b, va='top')
-
-cracks = [("9/9", "鎧俠", "漲夠了"),
-          ("9/19", "宏碁", "不缺了"),
-          ("9/20", "長鑫", "我量產了")]
-for i, (d, who, what) in enumerate(cracks):
-    y = 6.5 - i * 2.35
-    axL.add_patch(mpatches.Circle((2.2, y), 0.62, color=RED, zorder=3))
-    axL.text(8, y, d, color=GREY, fontsize=13, va='center')
-    axL.text(24, y, who, color=INK, fontsize=15,
-             fontproperties=serif_b, va='center')
-    axL.text(48, y, f"「{what}」", color=RED, fontsize=15,
-             fontproperties=serif_b, va='center')
-    if i < 2:
-        axL.plot([2.2, 2.2], [y - 0.66, y - 1.69], color=LGRID, lw=1.4, zorder=1)
-
-# ══════════ 右下：反方 ══════════
-axR = fig.add_axes([0.545, 0.105, 0.415, 0.275])
-axR.set_facecolor(BG); axR.axis('off')
-axR.set_xlim(0, 100); axR.set_ylim(0, 10)
-
-axR.text(0, 9.5, "但反方一樣硬", color=INK,
-         fontsize=14.5, fontproperties=serif_b, va='top')
-
-counters = [("+259.4%", "韓國 9 月半導體出口年增"),
-            ("+7.05%", "喊煞車當天，海力士 ADR"),
-            ("逾 20%", "UBS 看第三季 ASP 再漲")]
-for i, (num, desc) in enumerate(counters):
-    y = 6.5 - i * 2.35
-    axR.add_patch(mpatches.Rectangle((0, y - 0.95), 0.9, 1.9,
-                                     color=GREEN, zorder=3))
-    axR.text(4, y, num, color=GREEN, fontsize=20,
-             fontproperties=serif_b, va='center')
-    axR.text(34, y, desc, color=INK, fontsize=12.5, va='center')
-
-# ══════════ 底線 ══════════
-fig.lines.append(plt.Line2D([0.05, 0.96], [0.088, 0.088],
+# ══════════ 底部 ══════════
+fig.lines.append(plt.Line2D([0.05, 0.96], [0.127, 0.127],
                             transform=fig.transFigure, color=LGRID, lw=0.9))
-fig.text(0.05, 0.058, "一家原廠喊煞車是個別策略，三家都喊才是循環轉折。目前是一家。",
-         color=INK, fontsize=14, fontproperties=serif_b)
-fig.text(0.05, 0.022,
-         "資料來源：彭博、中央社、長鑫存儲、韓國關稅廳、UBS，摸魚記整理。鎧俠社長發言僅涉 NAND 不涉 DRAM，三星與 SK 海力士未跟進。不構成投資建議。",
-         color=GREY, fontsize=9.5)
+fig.text(0.05, 0.090, "他們三個講的，是三條不同的線。",
+         color=INK, fontsize=17, fontproperties=serif_b)
+fig.text(0.05, 0.055,
+         "資料來源：集邦科技、彭博、中央社、長鑫存儲、韓國關稅廳，摸魚記整理。各層供需為 2026 年 9 月狀態。第四季附約漲幅為媒體引述之業界說法，非原廠公告；\n"
+         "長鑫 G5 官方未公布良率。反方觀點：另有報導引 PC 業界稱三大原廠第四季仍將調漲，韓國輸出入銀行預測 DRAM 短缺延續至 2027 下半年。不構成投資建議。",
+         color=GREY, fontsize=10, linespacing=1.75, va='top')
 
 out = '/home/user/KIWI/personal/drafts/CRACK-chart-memory.png'
-plt.savefig(out, dpi=170, facecolor=BG)
+plt.savefig(out, dpi=150, facecolor=BG)
 plt.close()
-print(f'Done -> {out}')
+print('Done -> ' + out)
