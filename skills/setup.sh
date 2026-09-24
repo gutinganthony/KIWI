@@ -23,6 +23,13 @@ for skill_path in "$SKILLS_DIR"/*/; do
     dest="$TARGET_DIR/$skill_name"
     mkdir -p "$dest"
     cp "$skill_path/SKILL.md" "$dest/SKILL.md"
+    # 有附程式的 skill（目前只有 llm-council 的 scripts/query_llms.py）要連程式一起裝，
+    # 否則 SKILL.md 裝好了、叫的腳本卻不存在。只複製 scripts/，不複製其他資料檔
+    # （例如 serenity 的 holdings.md／watchlist.md），避免在 ~/.claude 留下會過期的副本。
+    if [ -d "$skill_path/scripts" ]; then
+        rm -rf "$dest/scripts"
+        cp -R "$skill_path/scripts" "$dest/scripts"
+    fi
     echo "✓ 安裝：$skill_name"
     installed=$((installed + 1))
 done
