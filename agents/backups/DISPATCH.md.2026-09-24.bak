@@ -25,10 +25,6 @@
 **並行僅限互相獨立的問題域**（不同檔案/子系統、無 shared state）：唯讀搜尋/研究可放心並行；
 但**會寫到同一批檔案的實作或 applier subagent 必須串行**——兩個同時改同檔會互相覆蓋。
 
-**WebSearch 有 session 級上限約 200 次**（主對話＋所有 subagent 共用，用罄就全部不能搜；2026-07-26 實測撞到）：
-搜尋密集的研究派給 subagent，prompt 裡限定「最多 N 次搜尋、先列必查清單再搜」；接近上限先把已得結果落檔。
-要抓外部資料（行情、開示、鏈上）先看 §8 的實測可達清單，不要盲試。
-
 ## §2 可用兵力（本環境實測，2026-07-07）
 
 **內建 agent types**（Agent 工具的 `subagent_type`）：
@@ -37,13 +33,6 @@
 
 **自訂 agents**（`.claude/agents/*.md`，本 repo 已定義，若 session 的可用清單沒列出就退回用 general-purpose + TEMPLATES.md 模板）：
 `verifier`（驗收員，sonnet + 高 effort）、`applier`(批次套用員，haiku + 低 effort)。
-剛新增的 agent 定義要隔幾個回合（清單刷新後）才能派，剛建好就派會回「Agent type not found」。
-判斷自訂 agent 能做什麼要讀 `.claude/agents/<name>.md` 正文——frontmatter 的 tools 欄只列「能碰哪些工具」，
-約束寫在正文（例：verifier 有 Bash，但 rule 5 禁止改檔與動 git 狀態）。
-
-**claude-code-remote MCP 工具**（list_repos／add_repo／send_later／create_trigger 等）：可用性依 surface 與連線狀態而定
-（2026-07-12 整組失敗或卡在核准層；2026-09-24 list_repos 實測正常）。失敗一次就回報使用者並改用替代方案
-（repo metadata → `mcp__github__*`；排程/推播 → 檔案落地），不重試。
 
 **model 參數**（Agent 工具的 `model`）：`haiku`、`sonnet`、`opus`。
 以當下 session 工具 schema 實際列出的為準；不要指定清單外的值。
@@ -179,37 +168,3 @@ jq -r '(.d | index("2026-07-01")) as $i
 
 verifier 的 prompt 只給：驗收條件、受驗檔案路徑、回報格式。
 **不要**把你的推理過程或期望結論塞給它——那會把它變成橡皮圖章。
-
-## §8 外部資料可達性（實測事實；自 LEARNINGS 搬入，2026-09-24）
-
-有**兩個執行環境**，封鎖結論**不可互相沿用**——新站要在兩邊各自實測一次：
-
-- **雲端 session（主對話與 subagent）**：流量走 agent proxy，多數外站 CONNECT 回 403。已實測擋：polymarket、etherscan、t.me、x.com；
-  日本 TDnet、EDINET、irbank、kabutan、minkabu、finance.yahoo.co.jp、kabupro；台灣 mops、cnyes、moneydj、Yahoo 股市、goodinfo、
-  statementdog、TWSE、TPEx；CNBC 報價（2026-08-21）。WebFetch 走另一條 egress，但日本站實測一樣 403。
-  整體可用性依環境網路政策而定（有 session 連 example.com 都 403，也有 session 的 github.com／raw.githubusercontent.com 正常）。
-  **FinMind API 可用、免 token**（台股股價/月營收/三大法人/融資券/財報的主要活路）。
-  做法：先試 WebFetch，被 403 才退 WebSearch 多來源交叉；數字標「快照非即時」；做不到的頁面級驗證回寫 mac-manual-homework。
-  診斷：`curl -sS --cacert /root/.ccr/ca-bundle.crt "$HTTPS_PROXY/__agentproxy/status"` 看 `recentRelayFailures`，
-  分辨是政策拒絕還是連線問題——不要一直換 URL 硬試。
-- **GitHub Actions runner**：不走雲端 proxy。雲端抓不到的資料，先問「runner 抓不抓得到」；抓得到、且會重複用到，就寫進資料橋
-  （範例：`projects/avi-v5/scripts/fetch_jp_disclosures.py`，接在 `update-dashboard.yml` 本來就會跑的 `fetch_backtest_ext.py` 最後，
-  所以不用改 workflows），不要直接丟進 Mac 功課清單。資料橋的驗收規則見 LEARNINGS。
-
-**行情資料源鏈（runner 實測，週報重定價用；最後更新 2026-08-26）**。
-開工前先拿一檔（如 MU）試打本表來源，確認沒被限流；再用「各來源回傳的上週基準收盤 vs repo 快照，逐檔比對」當正確性驗收，全對才往下算：
-
-| 市場／用途 | 來源 | 注意 |
-|---|---|---|
-| 報價＋trailing P/E＋市值（美、日、英/法、台上市、匯率、指數） | CNBC quote cache `https://quote.cnbc.com/quote-html-webservice/restQuote/symbolType/symbol?requestMethod=itv&noform=1&partnerId=2&fund=1&exthrs=1&output=json&symbols=<SYM>`（桌面 UA） | 代碼：美股裸代碼、`6855.T-JP`、`IQE-GB`、`MRN-FR`、`2408.TW-TW`、`JPY=`／`KRW=`／`TWD=`／`EUR=`／`GBP=`、`.N225`／`.KS11`／`.SOX`。坑：①逗號批次不支援（靜默回空）②查不到韓股、台股上櫃 ③只有 `last`＋`previous_day_closing` 兩個價格點，週三場亞洲的 `last` 是盤中 → 做不出連兩收盤判定 ④日股 `pe` 忽 trailing 忽 forward ⑤ADR 的 `yrhiprice` 跟母公司口徑不同（SKHY −18% vs 母公司 −44%）→ ADR 的自高回檔改用母公司本地日線算 |
-| 日股日線 | 日經 NKD `https://www.nikkei.com/nkd/company/history/dprice/?scode=<4碼>&ba=1` | `<tr>` 第 5 欄＝終値 |
-| 歐股日線 | stockanalysis quote **HTML** 頁 `https://stockanalysis.com/quote/<epa 或 etr>/<SYM>/history/` | 同站國際代碼 API `/api/symbol/s/...` 全 400；`lse/`、`lon/` 404 |
-| 美股日線 | stockanalysis `/api/symbol/s/<US>/history`（報價另有 `/api/quotes/s/<US>/`） | 只接受美股代碼 |
-| 韓股日線 | Naver `https://api.finance.naver.com/siseJson.naver?symbol=<6碼>&requestType=1&startTime=YYYYMMDD&endTime=YYYYMMDD&timeframe=day` | 單引號轉雙引號才能 `json.loads`；12 個月最高價可當韓股與 ADR 的 52 週高 |
-| 台股（含上櫃） | FinMind `https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=<code>&start_date=...`＋TPEx `https://www.tpex.org.tw/openapi/v1/tpex_mainboard_quotes` | 兩源交叉；TPEx 的 `Capitals`（流通股數）可自算市值 |
-| 日本決算短信 | TDnet 一覽 `https://www.release.tdnet.info/inbs/I_list_<001..>_<YYYYMMDD>.html`＋原文 `/inbs/<docID>.pdf` | 一覽頁先 `re.split(r'<tr[^>]*>')` 再逐列解析 `td.kjTime/kjCode/kjName/kjTitle`；PDF 用 `pip install --user pypdf` 抽字 |
-| 日本有報 | `disclosure2.edinet-fsa.go.jp` 網頁介面 | 免金鑰（要金鑰的是 `api.edinet-fsa.go.jp`）；.NET WebForms，先存 HTML 樣本再寫解析器 |
-
-**已知不通，不要再試**：Yahoo Finance API（2026-08-02 起 runner 上 query1／query2／quoteSummary／getcrumb 全回 429）、
-Stooq（JS/PoW 挑戰）、kabutan（AWS WAF）、WSJ（DataDome）、minkabu、irbank（runner 也 403）。
-⚠️ `agents/loops/weekly-repricing-audit.md` 仍把 Yahoo 列為寫死主源、`agents/loops/mac-homework-clearing.md` 仍寫 runner「Yahoo/stooq 都通」——兩者都已過期，以本節為準。
