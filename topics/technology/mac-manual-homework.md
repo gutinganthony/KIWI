@@ -23,6 +23,19 @@ last_updated: 2026-07-06
 
 ## 🔴 待辦（依急迫度）
 
+### 🆕 2026-09-24 新增（前瞻本益比模型 session 產生）
+
+- [ ] **用 SEC 官方資料重跑 `projects/pe-forecast/`**（這一版的財報與股價來自 GitHub 公開鏡像，雲端連不到
+  data.sec.gov／Stooq／Yahoo）。Mac 上：①對 `projects/pe-forecast/data/universe.csv` 的 68 個 CIK 下載
+  `https://data.sec.gov/api/xbrl/companyfacts/CIK##########.json`（要帶 User-Agent，≤10 次/秒）
+  ②抓同一批 ticker 的**只做分割還原**的日收盤（例：yfinance `auto_adjust=False` 的 `Close`）存成 `<TICKER>.csv`
+  （欄位 date,close）③ `python3 build_data.py --facts <SEC目錄> --stooq <任意空目錄> --splitonly <股價目錄>` →
+  `python3 pe_forecast.py backtest && python3 report.py`，把新 `results/report.txt` 跟 repo 裡的比。
+  **目的**：確認鏡像沒有被動過、並把 54 家只到 2025 年中的公司延伸到 2026。差異 >2% 的格子回報給我。
+- [ ] **SNDK（SanDisk，2025-02 分拆上市）與 MRVL 的財報＋股價**：兩者不在任何找得到的鏡像裡，
+  所以「MU vs SNDK」目前只能用 MU vs WDC/STX 代替。CIK：SNDK 2023554、MRVL 1835632（舊 Marvell 1058057）。
+  抓完同上加進 `universe.csv`。（SNDK 上市才 6 季，回測用不上，但能跑 `implied` 看市場押注。）
+
 ### 🆕 2026-09-07 新增（主對話 session 產生）
 
 - [ ] **開 `insights.redef.tech` 那篇〈SEMICON Taiwan 最新發展分析之一：從先進製程到 3D IC〉**
