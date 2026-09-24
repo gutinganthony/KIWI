@@ -19,6 +19,7 @@ REV = ["Revenues", "RevenueFromContractWithCustomerExcludingAssessedTax", "Sales
        "RevenueFromContractWithCustomerIncludingAssessedTax", "SalesRevenueGoodsNet"]
 NI = ["NetIncomeLoss", "NetIncomeLossAvailableToCommonStockholdersBasic", "ProfitLoss"]
 GP = ["GrossProfit"]
+OI = ["OperatingIncomeLoss"]
 COST = ["CostOfRevenue", "CostOfGoodsAndServicesSold", "CostOfGoodsSold", "CostOfGoodsAndServiceExcludingDepreciationDepletionAndAmortization"]
 # 虧損季常用 BasicAndDiluted 標籤（稀釋＝基本），原始 10-Q 只在那裡，漏掉就只剩事後重述值
 SH = ["WeightedAverageNumberOfDilutedSharesOutstanding", "WeightedAverageNumberOfShareOutstandingBasicAndDiluted",
@@ -104,21 +105,59 @@ def instants(j, names):
     return d.set_index("end")["val"].sort_index()
 
 
-def detect_splits(sh):
+def restatement_ratios(j):
+    """分割的指紋：分割後的財報會把「分割前各季」的 EPS 重述成 ÷ 分割比例；併購不會。
+
+    回傳 [(比例, 第一次申報日, 重述申報日)]：同一季 EPS 的第一次申報值 ÷ 後來的申報值 ≈ 分割比例。
+    """
+    d = _facts(j, EPS, unit_pref=("USD/shares",))
+    if d.empty:
+        return []
+    d = d.dropna(subset=["start"])
+    d = d[((d["end"] - d["start"]).dt.days.between(80, 100)) & (d["val"].abs() >= 0.05)]
+    out = []
+    for _, g in d.sort_values("filed").groupby(["start", "end"]):
+        first = g.iloc[0]
+        for r in g.iloc[1:].itertuples():
+            if r.val != 0 and np.sign(r.val) == np.sign(first.val):
+                ratio = first.val / r.val
+                if ratio > 1.5:
+                    out.append((ratio, first.filed, r.filed))
+    return out
+
+
+def _nearest_ratio(r):
+    best = min((s for s in SPLIT_RATIOS if s >= 2), key=lambda s: abs(np.log(r / s)))
+    return best, abs(np.log(r / best))
+
+
+def detect_splits(sh, restated=None):
     """稀釋股數第一次申報值的跳動 = 分割。回傳 {季末: 比例}（該季起股數為分割後口徑）。
 
-    要求跳動「持續」：下一季也要維持在新水準，單季怪值不算。
+    兩種證據：
+    ① 股數跳動 ≈ 常見分割比例，而且下一季維持在新水準；
+    ② 有「EPS 重述」證據：某一季的 EPS 在跳動前第一次申報、跳動後被重述成 ÷ 同一個比例。
+    有 ② 時，① 的容忍度放寬到 ±25%（虧轉盈時稀釋股數會多出選擇權，例 PANW 3:1 呈現為 3.44 倍）；
+    沒有 ② 時只接受 ±4% 的乾淨倍數——避免把併購（LHX 2019 股數 ×1.87）當成分割。
     """
     splits = {}
     v = sh["val"].to_numpy(float)
+    filed = sh["filed"].to_numpy() if "filed" in sh else None
+    restated = restated or []
     for i in range(1, len(v)):
         r = v[i] / v[i - 1]
-        for s in SPLIT_RATIOS:
-            if s >= 2 and abs(r / s - 1) < 0.04:
-                if i + 1 < len(v) and abs(v[i + 1] / v[i - 1] / s - 1) > 0.06:
-                    break
-                splits[sh.index[i]] = float(s)
-                break
+        if r < 1.5:
+            continue
+        s, dist = _nearest_ratio(r)
+        if i + 1 < len(v) and abs(np.log(v[i + 1] / v[i - 1] / s)) > max(dist, 0.04) + 0.06:
+            continue                                   # 單季怪值，下一季又回去
+        evidence = False
+        if filed is not None:
+            f_prev, f_now = pd.Timestamp(filed[i - 1]), pd.Timestamp(filed[i])
+            evidence = any(abs(np.log(rr / s)) < 0.05 and fa <= f_prev + pd.Timedelta(days=5) and fb >= f_prev
+                           for rr, fa, fb in restated)
+        if dist < 0.04 or (evidence and dist < np.log(1.25)):
+            splits[sh.index[i]] = float(s)
     return splits
 
 
@@ -128,6 +167,7 @@ def company_quarters(path, ticker):
     if rev.empty:
         return None, None
     ni = flows(j, NI)
+    oi = flows(j, OI)
     gp = flows(j, GP)
     cost = flows(j, COST)
     dps = flows(j, DPS)
@@ -137,6 +177,7 @@ def company_quarters(path, ticker):
     q["rev"] = rev["val"]
     q["filed"] = rev["filed"]
     q["ni"] = ni["val"].reindex(q.index)
+    q["oi"] = oi["val"].reindex(q.index)       # 營業利益：只用來辨識一次性項目（淨利 ÷ 營業利益 異常），不進模型
     q["filed"] = pd.concat([q["filed"], ni["filed"].reindex(q.index)], axis=1).max(axis=1)
     gpv = gp["val"].reindex(q.index)
     gpv = gpv.fillna(q["rev"] - cost["val"].reindex(q.index))
@@ -156,7 +197,9 @@ def company_quarters(path, ticker):
     q["debt"] = lt.fillna(0) + st
     q = q[q.index >= "2007-01-01"].copy()
     q["sh"] = q["sh"].ffill()
-    splits = detect_splits(q[["sh"]].rename(columns={"sh": "val"}).dropna())
+    shf = q[["sh"]].rename(columns={"sh": "val"})
+    shf["filed"] = q["filed"]
+    splits = detect_splits(shf.dropna(subset=["val"]), restatement_ratios(j))
     # 換成「資料最後一天」的股數口徑：之後每一次分割都乘上去
     fac = pd.Series(1.0, index=q.index)
     for d, r in splits.items():

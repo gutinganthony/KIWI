@@ -42,6 +42,8 @@ class PEForecaster:
     def fit(self, panel, asof):
         asof = pd.Timestamp(asof)
         self.asof = asof
+        if "train" in panel:                       # 只從訓練名單（科技股）學；其他公司只被預測
+            panel = panel[panel["train"].astype(bool)]
         past = panel[panel["month_end"] <= asof]
         self.E1 = EarningsModel(self.rev_x, self.mar_x).fit(past, asof)
         self.E = self.E1

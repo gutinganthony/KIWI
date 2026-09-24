@@ -75,6 +75,7 @@ def main():
         print(pd.read_csv(os.path.join(RES, "fits.csv"))[["year", "gamma_12", "mu_hist_12"]].to_string(index=False))
         implied_test(df, pred)
         dcf_cross_section(df)
+        implied_timeline(df)
     txt = buf.getvalue()
     open(os.path.join(RES, "report.txt"), "w").write(txt)
     print(txt)
@@ -124,6 +125,29 @@ def dcf_cross_section(df):
         r["同業中位數"] = float(np.corrcoef(lnpe, np.log(peer))[0, 1])
         rows.append(r)
     print(pd.DataFrame(rows).round(2).to_string(index=False))
+
+
+def implied_timeline(df, tickers=("MU", "STX", "WDC"),
+                     months=("2017-06", "2018-06", "2019-06", "2020-06", "2021-06", "2022-06",
+                             "2023-06", "2024-06", "2025-06", "2026-09")):
+    """記憶體：每個時點（只用當時資料）市場隱含的長期淨利率，對照 24 個月後的實際淨利率。"""
+    print("\n## 表 10：記憶體的市場隱含長期淨利率時間序列")
+    f24 = attach_future(df, 24)[["ticker", "month", "ni_ttm_f24", "rev_ttm_f24"]]
+    rows = []
+    for t in tickers:
+        for m in months:
+            r = df[(df["ticker"] == t) & (df["month"] == pd.Timestamp(m + "-01")) & df["sigma"].notna()]
+            if r.empty:
+                continue
+            fc = PEForecaster().fit(df, r["month_end"].iloc[0])
+            p = fc.predict(r, (12,)).iloc[0]
+            fut = f24[(f24["ticker"] == t) & (f24["month"] == pd.Timestamp(m + "-01"))]
+            m24 = (fut["ni_ttm_f24"] / fut["rev_ttm_f24"]).iloc[0] if len(fut) else np.nan
+            rows.append({"公司": t, "時點": m, "PE": "虧損" if r["ni_ttm"].iloc[0] <= 0 else round(float(r["pe"].iloc[0]), 1),
+                         "TTM淨利率": f"{r['m_ttm'].iloc[0]:.1%}", "5年中位": f"{r['m_bar'].iloc[0]:.1%}",
+                         "市場隱含長期": f"{p['implied_m']:.1%}", "隱含/歷史": f"{p['implied_m'] / r['m_bar'].iloc[0]:.2f}x",
+                         "24個月後實際": "—" if not np.isfinite(m24) else f"{m24:.1%}"})
+    print(pd.DataFrame(rows).to_string(index=False))
 
 
 if __name__ == "__main__":

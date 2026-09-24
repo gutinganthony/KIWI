@@ -23,14 +23,16 @@ def main():
     ap.add_argument("--facts", required=True, nargs="+", help="companyfacts 目錄，較新的快照放前面")
     ap.add_argument("--stooq", required=True)
     ap.add_argument("--splitonly", default=None, help="只做分割還原的日股價目錄（<TICKER>.csv）")
+    ap.add_argument("--universe", default="universe.csv", help="data/ 底下的名單檔")
+    ap.add_argument("--tag", default="", help="輸出檔名後綴，例 _ext → quarters_ext.csv")
     a = ap.parse_args()
-    uni = pd.read_csv(os.path.join(DATA, "universe.csv"), keep_default_na=False)
+    uni = pd.read_csv(os.path.join(DATA, a.universe), keep_default_na=False)
     q, p, log = load_universe(a.facts, a.stooq, a.splitonly, uni)
-    cols = ["ticker", "period_end", "filed", "avail", "rev", "gp", "ni", "sh", "split_fac", "sh_now", "dps", "dps_now",
+    cols = ["ticker", "period_end", "filed", "avail", "rev", "gp", "oi", "ni", "sh", "split_fac", "sh_now", "dps", "dps_now",
             "inv", "equity", "cash", "debt"]
-    q[cols].to_csv(os.path.join(DATA, "quarters.csv"), index=False, float_format="%.6g")
-    p.to_csv(os.path.join(DATA, "prices_monthly.csv"), index=False, float_format="%.6g")
-    log.to_csv(os.path.join(DATA, "build_log.csv"), index=False)
+    q[cols].to_csv(os.path.join(DATA, f"quarters{a.tag}.csv"), index=False, float_format="%.6g")
+    p.to_csv(os.path.join(DATA, f"prices_monthly{a.tag}.csv"), index=False, float_format="%.6g")
+    log.to_csv(os.path.join(DATA, f"build_log{a.tag}.csv"), index=False)
     pd.set_option("display.width", 200)
     print(log.to_string())
     print(f"\nquarters: {len(q)} 列；prices: {len(p)} 列")
