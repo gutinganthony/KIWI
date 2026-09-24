@@ -186,7 +186,7 @@ verifier 的 prompt 只給：驗收條件、受驗檔案路徑、回報格式。
 
 - **雲端 session（主對話與 subagent）**：流量走 agent proxy，多數外站 CONNECT 回 403。已實測擋：polymarket、etherscan、t.me、x.com；
   日本 TDnet、EDINET、irbank、kabutan、minkabu、finance.yahoo.co.jp、kabupro；台灣 mops、cnyes、moneydj、Yahoo 股市、goodinfo、
-  statementdog、TWSE、TPEx；CNBC 報價（2026-08-21）。WebFetch 走另一條 egress，但日本站實測一樣 403。
+  statementdog、TWSE、TPEx；CNBC 報價（2026-08-21）；日經 NKD（2026-09-24 回 000）。WebFetch 走另一條 egress，但日本站實測一樣 403。
   整體可用性依環境網路政策而定（有 session 連 example.com 都 403，也有 session 的 github.com／raw.githubusercontent.com 正常）。
   **FinMind API 可用、免 token**（台股股價/月營收/三大法人/融資券/財報的主要活路）。
   做法：先試 WebFetch，被 403 才退 WebSearch 多來源交叉；數字標「快照非即時」；做不到的頁面級驗證回寫 mac-manual-homework。
@@ -207,7 +207,7 @@ verifier 的 prompt 只給：驗收條件、受驗檔案路徑、回報格式。
 | 美股日線 | stockanalysis `/api/symbol/s/<US>/history`（報價另有 `/api/quotes/s/<US>/`） | 只接受美股代碼 |
 | 韓股日線 | Naver `https://api.finance.naver.com/siseJson.naver?symbol=<6碼>&requestType=1&startTime=YYYYMMDD&endTime=YYYYMMDD&timeframe=day` | 單引號轉雙引號才能 `json.loads`；12 個月最高價可當韓股與 ADR 的 52 週高 |
 | 台股（含上櫃） | FinMind `https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=<code>&start_date=...`＋TPEx `https://www.tpex.org.tw/openapi/v1/tpex_mainboard_quotes` | 兩源交叉；TPEx 的 `Capitals`（流通股數）可自算市值 |
-| 日本決算短信 | TDnet 一覽 `https://www.release.tdnet.info/inbs/I_list_<001..>_<YYYYMMDD>.html`＋原文 `/inbs/<docID>.pdf` | 一覽頁先 `re.split(r'<tr[^>]*>')` 再逐列解析 `td.kjTime/kjCode/kjName/kjTitle`；PDF 用 `pip install --user pypdf` 抽字 |
+| 日本決算短信 | TDnet 一覽 `https://www.release.tdnet.info/inbs/I_list_<001..>_<YYYYMMDD>.html`＋原文 `/inbs/<docID>.pdf` | 一覽頁先 `re.split(r'<tr[^>]*>')` 再逐列解析 td；**class 是多 token（`class="oddnew-M kjCode"`），要按 token 找 `kjTime/kjCode/kjName/kjTitle`**（只認整串會 0 列，2026-08-19～09-24 因此空了五週）；PDF 用 `pip install --user pypdf` 抽字 |
 | 日本有報 | `disclosure2.edinet-fsa.go.jp` 網頁介面 | 免金鑰（要金鑰的是 `api.edinet-fsa.go.jp`）；.NET WebForms，先存 HTML 樣本再寫解析器 |
 
 **已知不通，不要再試**：Yahoo Finance API（2026-08-02 起 runner 上 query1／query2／quoteSummary／getcrumb 全回 429）、
