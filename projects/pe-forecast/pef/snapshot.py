@@ -36,6 +36,29 @@ def yen_quarters(path, ticker):
     return q.sort_values("period_end").reset_index(drop=True)
 
 
+def lg_quarters(path, ticker):
+    """loosygoosie/sec-dataset 的 companies/<CIK>.json（最近 12 季，companyfacts 整理版）→ 標準季表。
+
+    filed 是最後一次申報日（重述後的數字）——只能用在快照。季數只有 12，「結構淨利率」是 3 年中位不是 5 年。
+    """
+    j = json.load(open(path))
+    rows = []
+    for x in j["quarterly"]:
+        rows.append({"ticker": ticker, "period_end": pd.Timestamp(x["period_end"]), "filed": pd.Timestamp(x["filed"]),
+                     "rev": x.get("revenue"), "gp": x.get("gross_profit"), "oi": x.get("operating_income"),
+                     "ni": x.get("net_income_parent") if x.get("net_income_parent") is not None else x.get("net_income"),
+                     "sh": x.get("shares_diluted_filled") or x.get("shares_diluted"),
+                     "inv": x.get("inventory"), "equity": x.get("total_equity_parent") or x.get("total_equity"),
+                     "cash": (x.get("cash") or 0) + (x.get("short_term_investments") or 0), "debt": np.nan})
+    q = pd.DataFrame(rows).sort_values("period_end").reset_index(drop=True)
+    for c in ("rev", "gp", "oi", "ni", "sh", "inv", "equity", "cash"):
+        q[c] = pd.to_numeric(q[c], errors="coerce")
+    q["sh"] = q["sh"].ffill()
+    q["sh_now"] = q["sh"]
+    q["avail"] = q["period_end"] + pd.Timedelta(days=45)
+    return q
+
+
 def axiom_append(q, path):
     """在既有季表後面接上 AXIOM 的最近幾季（只有營收、淨利、稀釋股數；毛利與資產負債表沿用最後一季）。"""
     j = json.load(open(path))
@@ -105,6 +128,8 @@ def snapshot_rows(quarters, prices, macro, sectors, now):
             continue
         px, last_day = prices[t]
         r = g.iloc[-1].copy()
+        # 虧損季的「稀釋」股數＝基本股數（可轉債、選擇權不計入），會低估市值：取近兩季較大者
+        r["sh_now"] = g["sh_now"].iloc[-2:].max()
         age = (now - r["period_end"]).days
         p_now = px.iloc[-1]
         p_6m = px[px.index <= px.index[-1] - pd.DateOffset(months=6)]

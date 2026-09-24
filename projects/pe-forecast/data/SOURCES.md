@@ -31,6 +31,22 @@
 | `build_log.csv` | 每家公司：財報來源、季數、偵測到的分割、股價來源 |
 | `us10y_monthly.csv`、`cpi_us_monthly.csv` | 總體 |
 
+## 快照（`snapshot_run.py`）額外用的來源——只用於「現在」，不用於回測
+
+這些來源的數字是**最後申報值**（事後重述過），filed 欄也不是第一次申報日，所以不能拿來做時點正確的回測；
+快照只需要「今天的一列」，可以用。
+
+| 來源 | 內容 | 用在哪些公司 |
+|---|---|---|
+| `github.com/yennanliu/finance_data` `data/fundamentals/<t>.csv`、`data/prices/<t>.csv` | 逐季財報（含營業利益、Q4 已拆出）到 2026-06；只分割還原的日股價（含分割欄） | SNDK、WDC、VST、PLTR、AVAV、KTOS、MRVL |
+| `github.com/huangtop/AXIOM-RESEARCH-ENGINE` `canonical_financial_population/quarterly/` | 每家最近 3 季＋去年同期（營收、淨利、稀釋股數；**沒有 Q4、沒有營業利益**） | 接在 SEC 鏡像後面補最新季 |
+| `github.com/loosygoosie/sec-dataset` `data/companies/<CIK>.json` | companyfacts 整理版，最近 12 季（含毛利、營業利益、存貨、權益） | COHR、LITE、CIEN、FN、AAOI、CRDO |
+| `github.com/kotoba-lang/gov.sec.edgar` | 同上 2026-07-15 的 companyfacts 原檔 | TSLA（快照） |
+| `github.com/Stell0/financealerts2` `data/<T>.csv`、`github.com/natezone/market-tracker` | yfinance 日股價到 2026-09-23 | 沒有只分割還原序列的公司（只用最新價與 6 個月報酬） |
+
+財報落後的公司（最新季距今 >150 天）：錨點移回那一季仍是最新的月份，用那個月的股價——避免拿一年前的盈餘配今天的股價。
+財報截止後才分割的（NFLX 2025-11 10:1）：用 Stooq（2025-09 口徑）與新股價來源在 2025-05～08 的比值自動偵測、補乘。
+
 ## 已處理的資料陷阱（每一個都實測過）
 
 1. **Stooq 的價格同時做了股利還原**：MSFT 2004-11-15 的 $3 特別股利當天沒有跳空。直接用會把過去市值
@@ -40,8 +56,10 @@
 2. **Stooq 對分拆的處理不一致**：HPQ（2015 分拆 HPE）、EBAY（2015 PayPal）、DELL（2021 VMware）、
    WDC（2025 SanDisk）的價格在分拆日沒有斷點（被當成股利還原）；HPE 2017 的兩次分拆則有斷點。
    → `universe.csv` 把前四家的分拆前（WDC 是分拆後）期間排除。GEN（多次特別股利＋併購）整家剔除。
-3. **分割**：用稀釋股數第一次申報值的跳動偵測（容忍 15%，因為虧損季的「稀釋」股數＝基本股數，
-   轉盈後會多出選擇權稀釋，例 PANW 3:1 分割呈現為 3.44 倍）。偵測到的分割見 `build_log.csv`，
+3. **分割**：用稀釋股數第一次申報值的跳動偵測。乾淨倍數（±4%）直接認定；±25% 以內則要有「EPS 重述」證據——
+   分割後的財報會把分割前各季的 EPS 重述成 ÷ 分割比例，併購不會（LHX 2019 股數 ×1.87 是併購）。
+   虧損季的「稀釋」股數＝基本股數，轉盈後會多出選擇權稀釋，例 PANW 3:1 分割呈現為 3.44 倍——**第一版用 ±4% 漏掉了
+   PANW 2022 與 CRM 2013 的分割（2026-09-24 修正，回測 12 個月誤差不變）**。偵測到的分割見 `build_log.csv`，
    與已知分割（AAPL 7:1/4:1、NVDA 4:1/10:1、AMZN/GOOGL 20:1、AVGO/LRCX 10:1…）逐一吻合。
    偵測日期是「第一份用分割後口徑申報的季末」，不是分割生效日：SMCI 10:1（2024-10 生效）落在 2024-06-30，
    因為那季的 10-K 延遲到分割後才申報——股數與股價口徑仍一致。GOOGL 2014-04 的 Class C 分派不在偵測範圍，

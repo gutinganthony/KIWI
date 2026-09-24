@@ -130,9 +130,9 @@ def main():
         if t in YEN and os.path.exists(f"{raw}/yen/f/{t.lower()}.csv"):
             q = sn.yen_quarters(f"{raw}/yen/f/{t.lower()}.csv", t)
             src.append("yennanliu")
-        elif os.path.exists(f"{raw}/optical/{t}.csv"):
-            q = pd.read_csv(f"{raw}/optical/{t}.csv", parse_dates=["period_end", "filed", "avail"])
-            src.append("optical-mirror")
+        elif os.path.exists(f"{raw}/optical_probe/loosygoosie/{cik}.json") and t not in ("SNDK", "MRVL"):
+            q = sn.lg_quarters(f"{raw}/optical_probe/loosygoosie/{cik}.json", t)
+            src.append("loosygoosie(12季)")
         elif os.path.exists(f"{raw}/ext/facts/CIK{cik:010d}.json") and (
                 not (repo_q["ticker"] == t).any() or repo_q[repo_q["ticker"] == t]["period_end"].max() < pd.Timestamp("2025-12-01")):
             q = sn.facts_quarters(f"{raw}/ext/facts/CIK{cik:010d}.json", t)      # kotoba 2026-07 快照比 repo 新
@@ -201,7 +201,7 @@ def run_rows(Q, prices, macro, sectors, fc):
             if len(m) >= 7:
                 p = m.iloc[-1]
                 p6 = m[m.index <= m.index[-1] - pd.DateOffset(months=6)].iloc[-1]
-                rows.loc[i, "anchor_price"] = p
+                rows.loc[i, "price"] = p              # 錨點月的股價（市值、本益比都用這個）
                 rows.loc[i, "mc"] = p * r["sh_now"]
                 rows.loc[i, "ret6"] = np.log(p / p6)
                 rows.loc[i, "month"] = pd.Timestamp(m.index[-1].year, m.index[-1].month, 1)
@@ -257,9 +257,10 @@ def write_md(out, meta, notes):
     for t in sorted(notes):
         for pe_, ni, core, why in notes[t]:
             L.append(f"| {t} | {pd.Timestamp(pe_):%Y-%m-%d} | {ni / 1e9:,.2f} | {core / 1e9:,.2f} | {why} |")
-    L += ["", "## 資料來源", "", "| 公司 | 財報 | 股價 |", "|---|---|---|"]
+    L += ["", "## 資料來源", "", "| 公司 | 財報 | 可用季數 | 股價 |", "|---|---|---|---|"]
     for r in out.itertuples():
-        L.append(f"| {r.ticker} | {r.fin_src} | {r.px_src}（{pd.Timestamp(r.month_end):%Y-%m} 的月底收盤；最新 2026-09-23） |")
+        L.append(f"| {r.ticker} | {r.fin_src} | {r.n_quarters} | {r.px_src}（{pd.Timestamp(r.month_end):%Y-%m} 的月底收盤；最新 2026-09-23） |")
+    L += ["", "季數 < 20 的公司，「5 年中位淨利率」實際上是可用季數的中位（例：光通訊多數只有 12 季＝3 年）。"]
     miss = meta[meta["status"] != "ok"]
     if len(miss):
         L += ["", "## 沒跑到的", "", "| 公司 | 群組 | 原因 |", "|---|---|---|"]
