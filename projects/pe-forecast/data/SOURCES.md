@@ -43,6 +43,10 @@
 3. **分割**：用稀釋股數第一次申報值的跳動偵測（容忍 15%，因為虧損季的「稀釋」股數＝基本股數，
    轉盈後會多出選擇權稀釋，例 PANW 3:1 分割呈現為 3.44 倍）。偵測到的分割見 `build_log.csv`，
    與已知分割（AAPL 7:1/4:1、NVDA 4:1/10:1、AMZN/GOOGL 20:1、AVGO/LRCX 10:1…）逐一吻合。
+   偵測日期是「第一份用分割後口徑申報的季末」，不是分割生效日：SMCI 10:1（2024-10 生效）落在 2024-06-30，
+   因為那季的 10-K 延遲到分割後才申報——股數與股價口徑仍一致。GOOGL 2014-04 的 Class C 分派不在偵測範圍，
+   但 Alphabet（CIK 1652044）的財報從 2014-09 才開始，已在分派之後，不受影響。
+   MSI 2009 年那筆「8 倍」是 Motorola 分拆前的雜訊，2011-02 以前的 MSI 資料整段排除，不影響。
 4. **虧損季的 XBRL 標籤**：虧損季常只標 `EarningsPerShareBasicAndDiluted`／
    `WeightedAverageNumberOfShareOutstandingBasicAndDiluted`，只抓 Diluted 會漏掉原始申報、
    只剩事後重述值（PANW 2021 就是這樣）→ 三種標籤聯集取最早申報。

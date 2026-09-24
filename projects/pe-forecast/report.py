@@ -11,6 +11,9 @@ import pandas as pd
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from pef import backtest as bt          # noqa: E402
+from pef import value                   # noqa: E402
+from pef.features import attach_future  # noqa: E402
+from pef.forecast import PEForecaster, _inputs  # noqa: E402
 from pef.load import panel              # noqa: E402
 
 pd.set_option("display.width", 250)
@@ -70,9 +73,57 @@ def main():
             print(f"  h={h} 中位誤差：", {k: round(v, 3) for k, v in e.items()})
         print("\n## 表 7：價值缺口能不能預測報酬（γ12，每年重估）")
         print(pd.read_csv(os.path.join(RES, "fits.csv"))[["year", "gamma_12", "mu_hist_12"]].to_string(index=False))
+        implied_test(df, pred)
+        dcf_cross_section(df)
     txt = buf.getvalue()
     open(os.path.join(RES, "report.txt"), "w").write(txt)
     print(txt)
+
+
+def implied_test(df, pred):
+    """市場隱含長期淨利率，能不能預測 h 個月後的淨利率（超出『現在偏離歷史』的資訊）？"""
+    print("\n## 表 8：市場隱含利潤率 → 未來利潤率")
+    rows = []
+    for h in (12, 24):
+        f = attach_future(df, h)[["ticker", "month", f"ni_ttm_f{h}", f"rev_ttm_f{h}", "m_bar", "m_ttm"]]
+        d = pred[["ticker", "month", "implied_m"]].merge(f, on=["ticker", "month"])
+        d["m_act"] = d[f"ni_ttm_f{h}"] / d[f"rev_ttm_f{h}"]
+        d = d[np.isfinite(d["m_act"]) & np.isfinite(d["implied_m"]) & d["m_bar"].notna() & d["m_ttm"].notna()]
+        for per, (lo, hi) in (("選模期", bt.SELECT), ("保留期", bt.HOLDOUT)):
+            x = d[(d["month"] >= lo) & (d["month"] <= hi)]
+            y = (x["m_act"] - x["m_bar"]).clip(-0.5, 0.5).to_numpy()
+            now = (x["m_ttm"] - x["m_bar"]).clip(-0.5, 0.5).to_numpy()
+            imp = (x["implied_m"] - x["m_bar"]).clip(-0.5, 0.8).to_numpy()
+            r2 = lambda X: 1 - np.var(y - X @ np.linalg.lstsq(X, y, rcond=None)[0]) / np.var(y)
+            one = np.ones(len(x))
+            up = x[(x["implied_m"] > 1.5 * x["m_bar"]) & (x["m_bar"] > 0.05)]
+            dn = x[(x["implied_m"] < 0.67 * x["m_bar"]) & (x["m_bar"] > 0.05)]
+            rows.append(dict(h=h, 期間=per, n=len(x), R2_只用現在偏離=r2(np.column_stack([one, now])),
+                             R2_加市場隱含=r2(np.column_stack([one, now, imp])),
+                             押注變高後真的高於歷史=float(np.mean(up["m_act"] > up["m_bar"])), n_高=len(up),
+                             押注變差後真的低於歷史=float(np.mean(dn["m_act"] < dn["m_bar"])), n_差=len(dn)))
+    print(pd.DataFrame(rows).round(3).to_string(index=False))
+
+
+def dcf_cross_section(df):
+    """用歷史利潤率的 DCF，能不能解釋同一天各公司本益比的高低？（ln PE 與 ln(V/淨利) 的相關）"""
+    print("\n## 表 9：DCF（歷史利潤率）vs 橫斷面本益比：相關係數")
+    rows = []
+    for asof in ("2017-12-31", "2020-12-31", "2023-12-31", "2025-12-31"):
+        fc = PEForecaster(two_stage=False).fit(df, asof)
+        lo = pd.Timestamp(asof) - pd.DateOffset(months=11)
+        x = df[(df["month_end"] > lo) & (df["month_end"] <= asof) & df["sigma"].notna() & df["m_bar"].notna()
+               & (df["ni_ttm"] > 0)].groupby("ticker").tail(1)
+        args = _inputs(x, fc.E1.predict(x))
+        lnpe = np.log(x["mc"] / x["ni_ttm"]).to_numpy()
+        r = {"時點": asof, "n": len(x)}
+        for H in (1, 3, 5, 8, 12):
+            V, _ = value.intrinsic(*args, dict(theta0=0.05, theta1=0.0, H=H, g_inf=0.03), s=0)
+            r[f"H={H}"] = float(np.corrcoef(lnpe, np.log(V) - np.log(x["ni_ttm"].to_numpy()))[0, 1])
+        peer = x.groupby("sector")["pe"].transform("median")
+        r["同業中位數"] = float(np.corrcoef(lnpe, np.log(peer))[0, 1])
+        rows.append(r)
+    print(pd.DataFrame(rows).round(2).to_string(index=False))
 
 
 if __name__ == "__main__":

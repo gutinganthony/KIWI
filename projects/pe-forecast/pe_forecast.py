@@ -144,7 +144,7 @@ def cmd_backtest(a):
     bt.earnings_scores(df, pred).to_csv(os.path.join(RES, "scores_earnings.csv"), index=False, float_format="%.4f")
     bt.decompose(df, 12).to_csv(os.path.join(RES, "decompose_12m.csv"), index=False, float_format="%.4f")
     main = sc[(sc["期間"] == "全期")].pivot(index="方法", columns="h", values="中位絕對誤差")
-    print("\nln PE 中位絕對誤差（全期；越小越好）\n", main.round(3).to_string())
+    print("\nln PE 中位絕對誤差（全期；越小越好）\n", main.round(4).to_string())
     print(f"\n已寫入 {RES}/")
 
 

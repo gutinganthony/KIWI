@@ -12,11 +12,8 @@ import numpy as np
 from .features import HORIZONS_Q
 from .stats import huber_ols
 
-# 規格選擇紀錄（選模期 2015–2021，12 個月 ln PE 中位絕對誤差；保留期 2022–2026 不參與選擇）：
-#   E0 財報＋股價動能＋P/S        0.277（全期）
-#   E1 E0＋E/P                    0.285 vs 隨機漫步 0.322 ← 採用（24/36 個月改善最多）
-#   E2 只有財報（不看股價）        0.284（全期）——仍贏隨機漫步，股價資訊只是加分
-#   E3 E1＋循環性交互作用          0.286——沒有更好，不採用
+# 規格比較見 README §4 與 ablation.py（results/ablation.csv）。選模期 2015–2021 的本益比誤差各規格差距 <0.004；
+# 採用「E/P＋兩階段隱含利潤率」是因為它的 24／36 個月盈餘誤差在選模期與保留期都最低。
 REV_X = ["g_rev", "acc", "d_inv", "gm_slope", "ret6", "ln_ps", "ep_c"]
 MAR_X = ["gap", "q_vs_ttm", "gm_slope", "d_inv", "ret6", "ln_ps", "ep_c"]
 M_CLIP = (-1.0, 0.6)
