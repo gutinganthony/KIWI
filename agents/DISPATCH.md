@@ -212,4 +212,6 @@ verifier 的 prompt 只給：驗收條件、受驗檔案路徑、回報格式。
 
 **已知不通，不要再試**：Yahoo Finance API（2026-08-02 起 runner 上 query1／query2／quoteSummary／getcrumb 全回 429）、
 Stooq（JS/PoW 挑戰）、kabutan（AWS WAF）、WSJ（DataDome）、minkabu、irbank（runner 也 403）。
-⚠️ `agents/loops/weekly-repricing-audit.md` 仍把 Yahoo 列為寫死主源、`agents/loops/mac-homework-clearing.md` 仍寫 runner「Yahoo/stooq 都通」——兩者都已過期，以本節為準。
+注意區分：**yfinance 套件在 runner 仍可用**（每日 dashboard 管線 `fetch_data.py` 靠它，`docs/history.json` 至 2026-09-23 仍有新資料；未測過日韓小型股），
+**FRED 在 runner 可用**（`fetch_credit_spreads.py`；雲端 session 對 fred.stlouisfed.org 是 connect_rejected）。
+`agents/loops/weekly-repricing-audit.md`、`agents/loops/mac-homework-clearing.md` 已於 2026-09-24 改指向本節。

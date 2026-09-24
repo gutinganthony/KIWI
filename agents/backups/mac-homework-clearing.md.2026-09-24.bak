@@ -37,8 +37,7 @@
 
 **第 1 問：這件事的前提還在嗎？**
 標的已出場、判定已改、依賴的結論已被推翻 → **C 類**，刪除並在 Update Log 記一行理由。
-（範例：07-26 週報發現 runner 能直連行情 API 之後，一整批「補 live 現價」的功課當場全部作廢。
-當時用的 Yahoo API 後來在 runner 上 429，現行行情來源見 `agents/DISPATCH.md` §8——作廢的判準不變。）
+（範例：07-26 週報發現 runner 能直連行情 API 之後，一整批「補 live 現價」的功課當場全部作廢。）
 
 **第 2 問：雲端這輪能不能直接做掉？**
 試一次。**只試一次**——已知被擋的站不要反覆換 URL 硬試。
@@ -49,13 +48,8 @@ curl -sS --cacert /root/.ccr/ca-bundle.crt "$HTTPS_PROXY/__agentproxy/status"
 看 `recentRelayFailures`。做得到 → **B 類**。
 
 **第 3 問（最重要，最常被跳過）：GitHub Actions runner 抓不抓得到？**
-runner **不受雲端 agent proxy 限制**，但它**也有自己擋的站**——兩邊的封鎖結論不可互相沿用。
-**先查 `agents/DISPATCH.md` §8 的實測清單**（2026-09-24 版）：
-- runner 已實證可達：CNBC quote cache、日經 NKD、stockanalysis、Naver、FinMind、TPEx、TDnet、EDINET 網頁介面（免金鑰）、
-  FRED（信用利差管線在用）、yfinance 套件（每日 dashboard 管線在用）、Polymarket data-api。
-- runner 已實證**不通**：裸打 Yahoo 行情 API（2026-08-02 起 429）、stooq（JS 挑戰）、kabutan、minkabu、irbank。
-- 清單沒列到的站：寫一支 `--probe` 讓 runner 實測（放一個已知可達的對照組，例如 TDnet），不要憑印象答。
-若這一項是「抓某個網站的資料」，而該站在「可達」清單上，預設答案就是「抓得到」。
+runner **不受雲端 agent proxy 限制**（已實證：Yahoo 行情 API、Polymarket data-api、
+yfinance/FRED/stooq 都通）。若這一項是「抓某個網站的資料」，預設答案很可能是「抓得到」。
 
 搬進資料橋的判準（**兩條都要成立**）：
 1. 這份資料**會被重複需要**（每季／每月／每週要查一次），不是一次性查核
