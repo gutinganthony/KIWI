@@ -37,7 +37,8 @@
 | | ⑦ **UQD 交期與是否有新合格供應商**（見 `2026-09-03-cooling-800vdc-serenity-prescreen.md`） | 產業媒體、OCP | 每季 | **出現第 6 家以上合格供應商 ⇒ 瓶頸解除** | 手動 |
 | **WFE $8 / Packaging $2** | ⑧ HBM 堆疊層數、混合鍵合導入率 | 原廠技術發表、TechInsights、**每年 9 月 SEMICON Taiwan（固定觀察窗）** | 每季 | **層數停止增加 ⇒ 單位位元設備強度停止上升** | 手動／runner |
 | | 🔧 **⑧b 產能擴張對照項**（2026-09-07 新增）：三大記憶體廠合計 capex 與產能爬坡倍數；先進封裝產能擴張速度 | 券商估、原廠法說、台積電擴產公告 | 每季 | **2027H2 記憶體供給過剩警告成真 ⇒ 80% 毛利的租金期結束**。⚠️ **瓶頸論的否證來自產能追上，不是需求下滑** | 手動 |
-| **🆕 Phase 結構** | ⑪ **Prefill:Decode 配比的可觀測代理**（決定 Memory Bandwidth Bound 的權重） | ❌ **目前無可用來源** | — | **配比明顯往 Prefill 移 ⇒ Memory Bandwidth Bound 權重下降，記憶體租金結束但產能一片沒少** | 🔴 **未解決問題**（見 `2026-09-07-silicon-constraint-theory.md` §5.3） |
+| **🆕 Phase 結構** | ⑪ **Prefill:Decode 配比的可觀測代理**（決定 Memory Bandwidth Bound 的權重） | ⚠️ 仍無直接來源 | — | **配比往 Prefill 移 ⇒ Memory Bandwidth Bound 權重下降** | ⚠️ 未解決（見 `2026-09-07-silicon-constraint-theory.md` §5.3） |
+| | 🔧 **⑪b Agent 負載佔比**（2026-09-25 新增，**這一格是 ⑪ 的實際答案**） | 🔴 **已有錨**：CPU 端佔 agent 工作負載總延遲 **50–90%**（`arXiv:2511.00739`, 2026/4，經 Andrew Hu 2026-09-24 轉述）；可追蹤 hyperscaler 的 **CPU 採購與自研 CPU 部署量**（Grace／Vera／Graviton／Arm AGI） | 事件驅動 | **Agent 負載佔推論比重上升 ⇒ bound 往 CPU／延遲移，記憶體與 GPU 的相對租金被稀釋**。⚠️ **注意方向**：09-07 我假設 bound 會往 Prefill 移，**實際是往 CPU 移——第三個方向，不在原假設空間內** | 手動 |
 | **🆕 System Scaling**（2026-09-11 新增，來源見 `2026-09-11-semicon-taiwan-2026-stco-and-3dic.md`） | ⑫ **ALD 製程道數**（現 >100，預期 >120） | 原廠技術發表、SEMICON、ASMI/AMAT/TEL 法說 | 每年 | **道數停止成長 ⇒ 單位晶圓設備強度停止上升**（比 A1-⑧ 的 HBM 層數更前段） | 手動 |
 | | ⑬ **TSMC「2029 年 >48x 電晶體堆疊」目標** | TSMC 技術論壇、SEMICON | 每年 | **時程延後或倍數下修 ⇒ System Scaling 的速度假設要整體下修** | 手動 |
 | | ⑭ 🔴 **High NA EUV 的 Foundry 實際導入進度** | ASML 法說、foundry 技術發表 | 每季 | **原文明說 gating factor 是 Cost（單價高＋拼接誤差＋throughput）** ⇒ **導入持續延後 ⇒「先進製程仍是關鍵」鬆動，價值進一步往封裝移**。⚠️ 獨佔 ≠ 會被買單 | runner／手動 |

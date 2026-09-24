@@ -39,6 +39,12 @@
 | **Training** | **Compute Bound** |
 | **Inference — Prefill** | **Compute Bound** |
 | **Inference — Decode** | **Memory Bound** |
+| 🆕 **Agent**（🔧 2026-09-25 新增，本表原文沒有這一行） | 🔴 **CPU Bound / Latency Bound** — Agent 會「執行」（跑程式碼、用工具），需要 OS／檔案系統／網路／沙箱這個「環境」，**本質上必須由 CPU 承擔**；且 **Agent 迴圈是串行的**，延遲無法靠平行化掩蓋。**實測 CPU 端佔 agent 工作負載總延遲 50–90%**。來源：〈AI Agent 如何改寫 AI 伺服器 CPU 的設計〉Andrew Hu, 2026-09-24，詳 `2026-09-25-agent-cpu-bound-and-memory-interface.md` |
+
+> 🔴 **2026-09-25 補記：這一行的出現本身就是對本檔的一個否證。**
+> 我 09-07 把「Phase 結構會怎麼變」限縮在 Vince 給的三個 phase 之內（見 §5.3，我當時假設「**配比往 Prefill 移**」），
+> **沒想到會冒出一個新的 phase。實際方向是「往 CPU 移」——那不在我的假設空間裡。**
+> **⇒ phase 表本身是會被增補的東西，不是固定的座標軸。用它推論時要留這個餘地。**
 
 而且 Phase **還在繼續細分**，原文給了兩個已發生的證據：
 
