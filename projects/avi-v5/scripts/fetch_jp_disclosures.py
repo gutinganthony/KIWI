@@ -36,6 +36,7 @@ import re
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -106,11 +107,16 @@ def parse_list_page(htmls):
 
     LEARNINGS 2026-08-09：一覽頁是 <tr> 內多個 <td class="kjTime/kjCode/kjName/kjTitle">，
     **用單一大 regex 跨欄比對會抓不到**——必須先 split <tr> 再逐列解析 td。
+
+    ⚠️ 2026-09-24 修正：真實頁面的 class 是多個 token（`class="oddnew-M kjCode"`），
+    舊寫法 `class="(kj[A-Za-z]+)"` 要求整串等於 kjXxx → 每頁 0 列、清單空了五週。
+    現在在 class 屬性內找 kj token，不管它前後還有什麼。
     """
     rows = []
     for chunk in re.split(r"(?i)<tr[^>]*>", htmls)[1:]:
         cells = {}
-        for m in re.finditer(r'(?is)<td[^>]*class="(kj[A-Za-z]+)"[^>]*>(.*?)</td>', chunk):
+        for m in re.finditer(
+                r'(?is)<td[^>]*\bclass="(?:[^"]*\s)?(kj[A-Za-z]+)(?:\s[^"]*)?"[^>]*>(.*?)</td>', chunk):
             cells[m.group(1)] = m.group(2)
         if "kjCode" not in cells or "kjTitle" not in cells:
             continue
@@ -166,15 +172,16 @@ def _pdf_reader():
     return _PDF_READER
 
 
-def pdf_text(raw):
-    """決算短信 PDF → 文字。pypdf 不可用時回 None（不是空字串，要能分辨）。"""
+def pdf_text(raw, max_pages=12):
+    """決算短信 PDF → 文字。pypdf 不可用時回 None（不是空字串，要能分辨）。
+    有報的「相手先」表在二十幾頁之後，呼叫端可調高 max_pages。"""
     import io
     reader_cls = _pdf_reader()
     if reader_cls is None:
         return None
     try:
         reader = reader_cls(io.BytesIO(raw))
-        return "\n".join((p.extract_text() or "") for p in reader.pages[:12])
+        return "\n".join((p.extract_text() or "") for p in reader.pages[:max_pages])
     except BaseException:  # noqa: BLE001 — best-effort，同上：不可讓 panic 逃逸
         return None
 
@@ -344,6 +351,90 @@ PROBE_TARGETS = [
 ]
 
 
+JEM_IR_SEED = "https://www.jem-net.co.jp/"
+
+
+def _links(page_html, base):
+    """頁面上所有 <a href> → [(絕對網址, 連結文字)]。"""
+    out = []
+    for m in re.finditer(r'(?is)<a\b[^>]*\bhref="([^"#]+)"[^>]*>(.*?)</a>', page_html):
+        out.append((urllib.parse.urljoin(base, html.unescape(m.group(1).strip())), _txt(m.group(2))[:60]))
+    return list(dict.fromkeys(out))
+
+
+def discover_jem_ir():
+    """JEM 否證 #3（有報「主要な相手先別販売実績」）的下一步：在 JEM 官網（runner 可達，8/21 探測 200）
+    找有価証券報告書 PDF 的連結，並把 PDF 內「相手先」附近的**原文片段**存下來給人看。
+
+    刻意只「收集連結＋存原文片段」，**不做任何判定**——EDINET 網頁版是 GeneXus 的 JS 應用、
+    probe 存到的樣本只有 <head>，沒看過真實結構就寫判定邏輯＝再造一座沉默失敗的橋。
+    回傳 .md 行列；任何失敗都寫成明文，不丟例外。"""
+    lines = ["## JEM 官網 IR 連結探索（否證 #3：找有価証券報告書）", ""]
+    try:
+        home = get(JEM_IR_SEED, timeout=20)
+    except Exception as e:  # noqa: BLE001
+        return lines + [f"- ⚠️ 首頁取得失敗：{type(e).__name__}: {e}", ""]
+    host = urllib.parse.urlparse(JEM_IR_SEED).netloc
+    links = _links(home, JEM_IR_SEED)
+    ir_pages = [u for u, t in links
+                if urllib.parse.urlparse(u).netloc == host and not u.lower().endswith(".pdf")
+                and (re.search(r"(?i)/ir(?:/|\.|$|-)|investor", u) or re.search(r"IR|投資家|株主", t))][:6]
+    lines.append(f"- 首頁連結 {len(links)} 個；看起來是 IR 的頁面 {len(ir_pages)} 個（最多追 6 個）")
+    cands = [(u, t) for u, t in links if re.search(r"有価証券報告書|有報", t)]
+    offsite = []
+    for u in ir_pages:
+        try:
+            page = get(u, timeout=20)
+        except Exception as e:  # noqa: BLE001
+            lines.append(f"- `{u}` → ⚠️ {type(e).__name__}")
+            continue
+        pl = _links(page, u)
+        hits = [(h, t) for h, t in pl if re.search(r"有価証券報告書|有報", t + " " + h)]
+        lines.append(f"- `{u}` → 連結 {len(pl)} 個、有報候選 {len(hits)} 個")
+        cands += hits
+        offsite += [(h, t) for h, t in pl if urllib.parse.urlparse(h).netloc not in ("", host)]
+        time.sleep(1.2)
+    cands = list(dict.fromkeys(cands))
+    lines.append("")
+    if not cands:
+        lines += ["**有報候選 0 個**——JEM 官網可能只連到 EDINET 或外部 IR 服務、不自己放 PDF。"
+                  "IR 頁上指向站外的連結（下一輪從這裡追）：", ""]
+        lines += [f"- {t or '（無文字）'} → {h}" for h, t in list(dict.fromkeys(offsite))[:15]] or ["- （無）"]
+        return lines + [""]
+    lines.append("有報候選連結（連結文字 → 網址）：")
+    lines.append("")
+    for u, t in cands[:20]:
+        lines.append(f"- {t or '（無文字）'} → {u}")
+    lines.append("")
+    pdf = next((u for u, t in cands if u.lower().endswith(".pdf") and "有価証券報告書" in t + u), None)
+    if not pdf:
+        return lines + ["（候選中沒有直接的 PDF；下一輪依上列網址再追一層。）", ""]
+    lines.append(f"### 原文片段：`{pdf}`")
+    lines.append("")
+    try:
+        text = pdf_text(get(pdf, timeout=60, binary=True), max_pages=80)
+    except Exception as e:  # noqa: BLE001
+        return lines + [f"- ⚠️ PDF 取得失敗：{type(e).__name__}", ""]
+    if text is None:
+        return lines + ["- ⚠️ PDF 解析失敗（pypdf 缺席或 PDF 異常）", ""]
+    spots = []
+    for m in re.finditer(r"相手先", text):  # 相鄰 600 字內的重複出現只取第一處，避免片段重疊
+        if not spots or m.start() - spots[-1] > 600:
+            spots.append(m.start())
+    spots = spots[:3]
+    lines.append(f"- PDF 文字 {len(text):,} 字；「相手先」出現 {len(re.findall(r'相手先', text))} 次（列前 3 處，各 ±300 字，未判定）")
+    lines.append("")
+    for p in spots:
+        lines.append("```")
+        lines.append(text[max(0, p - 300):p + 300].replace("```", "'''"))
+        lines.append("```")
+        lines.append("")
+    if not spots:
+        lines.append("（PDF 裡找不到「相手先」——可能不是有報本文，或是掃描影像檔。）")
+        lines.append("")
+    return lines
+
+
 def probe_sources(now):
     """逐一探測候選來源，把結果寫成 .md（**必須是 .md**，見檔頭約束 1）。"""
     rows = []
@@ -402,6 +493,12 @@ def probe_sources(now):
             lines.append("```")
             lines.append("")
 
+    lines.append("")
+    try:
+        lines += discover_jem_ir()
+    except Exception as e:  # noqa: BLE001 — 探索是 best-effort，不可拖垮探測檔
+        lines += ["## JEM 官網 IR 連結探索", "", f"- ⚠️ 探索本身失敗：{type(e).__name__}: {e}", ""]
+
     # TDnet 解析診斷：2026-08-21 首輪五檔開示清單全空，無法分辨「真沒開示」與「解析沒對上」。
     lines.append("")
     lines.append("## TDnet 解析診斷")
@@ -443,7 +540,8 @@ def probe_sources(now):
         lines.append(", ".join(classes[:40]) if classes else "（頁面完全沒有 class 屬性）")
         lines.append("```")
         lines.append("")
-        kj = [c for c in classes if c.lower().startswith("kj")]
+        # class 屬性可能是多個 token（`oddnew-M kjCode`），要逐 token 看，不能看整串開頭。
+        kj = sorted({tok for c in classes for tok in c.split() if tok.lower().startswith("kj")})
         lines.append("其中以 `kj` 開頭者：**" + (", ".join(kj) if kj else "無 ← 這就是解析失敗的原因") + "**")
         lines.append("")
         lines.append("`<tr>` 標籤數：**" + str(len(re.split(r"(?i)<tr[^>]*>", raw_html)) - 1) + "**")
@@ -488,6 +586,30 @@ FIXTURE = """
 <td class="kjName">無関係</td><td class="kjTitle">その他</td></tr></table>
 """
 
+# 真實 TDnet 一覽頁的格式（2026-09-24 由 runner 診斷取得的 class 值）：class 屬性是
+# 「版面 class ＋ kj class」兩個 token（`oddnew-M kjCode`／`evennew-M kjCode`），且 td 帶 noWrap 等屬性。
+# 2026-08-19～09-24 本橋因只認「整串等於 kjXxx」而每頁解析 0 列、五檔清單全空達五週——這組 fixture 就是那個洞。
+FIXTURE_REAL = """
+<table id="main-list-table"><tr>
+<td class="oddnew-L kjTime" noWrap>15:30</td>
+<td class="oddnew-M kjCode" noWrap>68340</td>
+<td class="oddnew-M kjName" noWrap>精工技研</td>
+<td class="oddnew-M kjTitle" align="left"><a href="140120260806511916.pdf" target="_blank">2027年3月期　第1四半期決算短信〔日本基準〕（連結）</a></td>
+<td class="oddnew-M kjXbrl" noWrap><a href="081220260806511916.zip" target="_blank">XBRL</a></td>
+<td class="oddnew-M kjPlace" noWrap>東</td>
+<td class="oddnew-R kjHistroy" noWrap></td>
+</tr>
+<tr>
+<td class="evennew-L kjTime" noWrap>16:00</td>
+<td class="evennew-M kjCode" noWrap>68550</td>
+<td class="evennew-M kjName" noWrap>日本電子材料</td>
+<td class="evennew-M kjTitle" align="left"><a href="140120260805510578.pdf" target="_blank">業績予想の修正に関するお知らせ</a></td>
+<td class="evennew-M kjXbrl" noWrap></td>
+<td class="evennew-M kjPlace" noWrap>東</td>
+<td class="evennew-R kjHistroy" noWrap></td>
+</tr></table>
+"""
+
 FIXTURE_PDF_TEXT = """
 連結損益計算書
 売上高 　　　　　　 185,432
@@ -508,6 +630,13 @@ def selftest():
     jem = [r for r in rows if r["code4"] == "6855"][0]
     assert any("業績" in f for f in flags_for(jem["title"])), flags_for(jem["title"])
     assert [r for r in rows if r["code4"] == "1234"], "非目標代碼也應被解析（過濾在後段）"
+
+    real = parse_list_page(FIXTURE_REAL)
+    assert len(real) == 2, f"真實格式（多 class token）應解析 2 列，實得 {len(real)}"
+    sei = [r for r in real if r["code4"] == "6834"]
+    assert len(sei) == 1 and sei[0]["docid"] == "140120260806511916.pdf", sei
+    assert sei[0]["time"] == "15:30" and "決算短信" in sei[0]["title"], sei[0]
+    assert [r for r in real if r["code4"] == "6855"][0]["name"] == "日本電子材料", real
 
     m = extract_metrics(FIXTURE_PDF_TEXT)
     assert m["売上高"] == 185432 and m["売上総利益"] == 108765, m
@@ -550,8 +679,12 @@ def main():
     codes = [args.code] if args.code else list(TARGETS)
     seen_docids = {d["docid"] for c in state["disclosures"].values() for d in c if d.get("docid")}
 
-    new_rows, pages_ok, pages_fail = [], 0, 0
-    for back in range(args.days):
+    # 清單還是空的（初次執行，或 2026-09-24 修好解析器之前五週都是 0 列）→ 回補 TDnet 保留的整整 31 天，
+    # 否則只掃 --days 天會永遠補不回之前漏掉的開示。
+    days = args.days if any(state["disclosures"].values()) else max(args.days, 31)
+
+    new_rows, pages_ok, pages_fail, rows_parsed = [], 0, 0, 0
+    for back in range(days):
         ymd = (datetime.now(timezone.utc) - timedelta(days=back)).strftime("%Y%m%d")
         for page in range(1, 12):
             url = TDNET_LIST.format(page=page, ymd=ymd)
@@ -569,6 +702,7 @@ def main():
             rows = parse_list_page(htmls)
             if not rows:
                 break
+            rows_parsed += len(rows)
             for r in rows:
                 if r["code4"] in codes:
                     r["date"] = f"{ymd[:4]}-{ymd[4:6]}-{ymd[6:]}"
@@ -618,7 +752,10 @@ def main():
     MONITOR.write_text(render_monitor(state, now), encoding="utf-8")
     probe_sources(now)
     save_state(state, now)
-    print(f"jp_disclosures: 頁 {pages_ok} 成功/{pages_fail} 失敗、新增開示 {added} 筆 @ {now}")
+    print(f"jp_disclosures: 回掃 {days} 天、頁 {pages_ok} 成功/{pages_fail} 失敗、"
+          f"解析 {rows_parsed} 列、新增開示 {added} 筆 @ {now}")
+    if pages_ok and not rows_parsed:
+        print("⚠️ 頁面取得成功但解析 0 列——解析器與實際 HTML 不符，不是「沒有開示」（見 _SOURCE_PROBE.md 的 TDnet 解析診斷）")
     return 0
 
 
