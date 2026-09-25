@@ -365,6 +365,7 @@ python3 ood.py                      # §4b 非科技股樣本外測試 → resul
 python3 faq.py                      # §11 問答的 F1–F9（~30 秒）→ results/faq.txt
 python3 lab_run.py                  # §12 預測距離 × 方法（~6 分鐘；要先跑 backtest）→ results/lab*.{txt,csv}
 python3 snapshot_run.py --raw <原始資料目錄>   # §10 現在快照 → results/snapshot_2026-09.md
+python3 make_artifact.py <輸出.html>  # 互動網頁（邏輯、案例、回測、現在的預測、試算器）；樣板在 artifact/page.html，資料只讀 results/
 python3 make_charts.py              # 重畫圖
 ```
 

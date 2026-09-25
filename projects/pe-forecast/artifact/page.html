@@ -1,0 +1,1013 @@
+<title>前瞻本益比模型</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #F2F4F6; --surface: #FFFFFF; --surface-2: #F6F8F9; --ink: #11161C; --ink-2: #4B5560; --muted: #6F7984;
+  --line: #DCE1E6; --grid: #E8EBEE; --axis: #C4CAD0;
+  --accent: #0F5566; --accent-ink: #FFFFFF; --accent-soft: #E1EEF1;
+  --s-model: #2a78d6; --s-rw: #eb6834; --s-you: #1baf7a; --s-act: #39414A; --s-ref: #8A939C;
+  --band-model: rgba(42,120,214,0.13); --band-you: rgba(27,175,122,0.16);
+  --good: #0B6E0B; --bad: #B42F2F; --warn-bg: #FFF4DB; --warn-ink: #7A5200;
+  --f-display: "LXGW WenKai TC", "Kaiti TC", "STKaiti", "BiauKai", "DFKai-SB", serif;
+  --f-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0E1216; --surface: #161B21; --surface-2: #1B2128; --ink: #ECF0F3; --ink-2: #B5BEC7; --muted: #8C96A0;
+    --line: #2B333B; --grid: #232A31; --axis: #3A434C;
+    --accent: #6CC0D2; --accent-ink: #0E1216; --accent-soft: #1B3036;
+    --s-model: #3987e5; --s-rw: #d95926; --s-you: #199e70; --s-act: #D5DBE1; --s-ref: #7C8690;
+    --band-model: rgba(57,135,229,0.20); --band-you: rgba(25,158,112,0.22);
+    --good: #45C145; --bad: #F07C7C; --warn-bg: #3A2E12; --warn-ink: #F2C66B;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0E1216; --surface: #161B21; --surface-2: #1B2128; --ink: #ECF0F3; --ink-2: #B5BEC7; --muted: #8C96A0;
+  --line: #2B333B; --grid: #232A31; --axis: #3A434C;
+  --accent: #6CC0D2; --accent-ink: #0E1216; --accent-soft: #1B3036;
+  --s-model: #3987e5; --s-rw: #d95926; --s-you: #199e70; --s-act: #D5DBE1; --s-ref: #7C8690;
+  --band-model: rgba(57,135,229,0.20); --band-you: rgba(25,158,112,0.22);
+  --good: #45C145; --bad: #F07C7C; --warn-bg: #3A2E12; --warn-ink: #F2C66B;
+}
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.7; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 48px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 700; line-height: 1.25; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(34px, 6vw, 52px); letter-spacing: 0.02em; }
+h2 { font-size: 26px; }
+h3 { font-size: 19px; }
+p { margin: 0; }
+.prose { max-width: 68ch; display: grid; gap: 12px; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.mono, .num { font-family: var(--f-mono); }
+.num { font-variant-numeric: tabular-nums; }
+b, strong { font-weight: 700; }
+.eyebrow { font-size: 12px; letter-spacing: 0.12em; color: var(--ink-2); text-transform: uppercase; }
+
+/* 頁首 */
+.hero { display: grid; gap: 14px; padding-block: 8px 22px; }
+.lede { font-size: 17px; color: var(--ink-2); max-width: 60ch; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 8px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; display: grid; gap: 2px; align-content: start; }
+.stat .k { font-size: 13px; color: var(--ink-2); }
+.stat .v { font-size: 32px; font-weight: 700; line-height: 1.15; }
+.stat .s { font-size: 13px; color: var(--muted); }
+@media (max-width: 720px) { .stats { grid-template-columns: 1fr; } }
+
+/* 分頁 */
+.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); display: flex; gap: 4px; overflow-x: auto; border-bottom: 1px solid var(--line); margin-bottom: 26px; padding-top: 6px; }
+.tab { font: inherit; font-size: 15px; color: var(--ink-2); background: none; border: 0; border-bottom: 3px solid transparent; padding: 8px 14px 9px; cursor: pointer; white-space: nowrap; }
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 700; }
+.tab:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+section[role="tabpanel"] { display: grid; gap: 34px; }
+.block { display: grid; gap: 14px; }
+.block > h2 + p, .block > h3 + p { color: var(--ink-2); }
+
+/* 卡片、面板 */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px 20px; display: grid; gap: 12px; }
+.note { background: var(--accent-soft); border-radius: var(--r); padding: 14px 16px; display: grid; gap: 6px; }
+.warnbox { background: var(--warn-bg); color: var(--warn-ink); border-radius: var(--r); padding: 12px 16px; font-size: 14px; }
+
+/* 流程圖 */
+.flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 10px; align-items: stretch; }
+.flow .box { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; display: grid; gap: 4px; align-content: start; }
+.flow .box .t { font-weight: 700; }
+.flow .box .d { font-size: 13px; color: var(--ink-2); }
+.flow .arrow { align-self: center; color: var(--muted); font-size: 20px; }
+.flow .box.price { border-top: 3px solid var(--s-rw); }
+.flow .box.earn { border-top: 3px solid var(--s-model); }
+.flow .box.out { border-top: 3px solid var(--ink); }
+.flow .tag { font-size: 12px; color: var(--ink-2); }
+.flowresult .resultbox { background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--ink); border-radius: var(--r); padding: 12px 14px; display: grid; gap: 4px; }
+.flowresult .t { font-weight: 700; font-size: 17px; }
+.flowresult .d { font-size: 13px; color: var(--ink-2); }
+@media (max-width: 760px) { .flow { grid-template-columns: 1fr; } .flow .arrow { transform: rotate(90deg); justify-self: center; } }
+
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px 18px; display: grid; gap: 8px; align-content: start; }
+.card .role { font-size: 12px; color: var(--muted); letter-spacing: 0.06em; }
+.card .who { font-size: 14px; color: var(--ink-2); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 13px; padding: 3px 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); color: var(--ink-2); }
+.pill { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 500; }
+.pill.fail { background: rgba(180,47,47,0.12); color: var(--bad); }
+
+/* 橫條圖（HTML） */
+.hbars { display: grid; gap: 8px; }
+.hbar { display: grid; grid-template-columns: 9.5em 1fr 3.4em; gap: 10px; align-items: center; font-size: 14px; }
+.hbar .track { height: 14px; background: var(--grid); border-radius: 0 4px 4px 0; position: relative; }
+.hbar .fill { height: 100%; background: var(--s-ref); border-radius: 0 4px 4px 0; }
+.hbar.hi .fill { background: var(--s-model); }
+.hbar .val { text-align: right; }
+
+/* 表格 */
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { padding: 8px 12px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--grid); }
+th { font-weight: 500; color: var(--ink-2); background: var(--surface-2); font-size: 13px; position: sticky; top: 0; }
+td:first-child, th:first-child { text-align: left; }
+#tbMeth td:nth-child(2), #tbMeth th:nth-child(2) { text-align: left; }
+td { font-variant-numeric: tabular-nums; }
+tr.hl td { background: var(--accent-soft); }
+tbody tr.click { cursor: pointer; }
+tbody tr.click:hover td { background: var(--surface-2); }
+tbody tr.sel td { background: var(--accent-soft); }
+.grp td { background: var(--surface-2); color: var(--ink-2); font-size: 13px; font-weight: 500; text-align: left; }
+.good { color: var(--good); }
+.bad { color: var(--bad); }
+
+/* 控制列 */
+.controls { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: end; }
+.field { display: grid; gap: 4px; font-size: 13px; color: var(--ink-2); }
+select, input[type="number"] { font: inherit; font-size: 15px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; min-width: 0; }
+input[type="number"] { width: 7.5em; font-family: var(--f-mono); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.seg button { font: inherit; font-size: 14px; border: 0; background: none; color: var(--ink-2); padding: 6px 12px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.btn { font: inherit; font-size: 14px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.filterrow { display: flex; flex-wrap: wrap; gap: 6px; }
+.filterrow button { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+.filterrow button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+/* 圖表 */
+.chart { width: 100%; min-height: 200px; position: relative; }
+.chart svg { display: block; width: 100%; }
+.chart text { font-family: var(--f-body); font-size: 12px; fill: var(--muted); }
+.chart .gridline { stroke: var(--grid); stroke-width: 1; }
+.chart .axisline { stroke: var(--axis); stroke-width: 1; }
+.chart .cross { stroke: var(--ink-2); stroke-width: 1; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.key { display: inline-block; width: 18px; height: 0; border-top: 2px solid currentColor; }
+.key.dash { border-top-style: dashed; }
+.key.area { height: 10px; border: 0; border-radius: 2px; }
+.tip { position: fixed; z-index: 20; pointer-events: none; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 13px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); min-width: 150px; }
+.tip .tt { color: var(--ink-2); margin-bottom: 4px; }
+.tip .row { display: grid; grid-template-columns: 16px 1fr auto; gap: 6px; align-items: center; }
+.tip .row b { font-family: var(--f-mono); font-weight: 500; }
+
+/* 案例 */
+.cases { display: grid; gap: 16px; }
+.case { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px 20px; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 18px 26px; }
+.case .head { grid-column: 1 / -1; display: grid; gap: 4px; }
+.case .when { font-family: var(--f-mono); font-size: 13px; color: var(--ink-2); }
+.case .story { display: grid; gap: 10px; align-content: start; }
+.case table { font-size: 13px; }
+.case .members { font-size: 13px; color: var(--muted); }
+@media (max-width: 820px) { .case { grid-template-columns: 1fr; } }
+
+.foot { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); display: grid; gap: 6px; }
+details summary { cursor: pointer; color: var(--ink-2); font-size: 14px; }
+details .tablewrap { max-height: 360px; overflow: auto; margin-top: 8px; }
+.eq { font-family: var(--f-display); font-size: 21px; line-height: 1.5; }
+@media (prefers-reduced-motion: no-preference) { .tab, .btn, .seg button { transition: color .15s, background-color .15s, border-color .15s; } }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <p class="eyebrow">科技股 · 3 到 36 個月後 · 回測 2015–2026</p>
+    <h1>前瞻本益比模型</h1>
+    <p class="lede">站在今天，只用已經公告的財報和股價，推估一家公司幾個月後的本益比。會告訴你方向、區間，也會告訴你它有多常猜錯。</p>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="內容">
+    <button class="tab" role="tab" id="t-logic" aria-controls="logic" aria-selected="true">模型邏輯</button>
+    <button class="tab" role="tab" id="t-cases" aria-controls="cases" aria-selected="false">案例</button>
+    <button class="tab" role="tab" id="t-backtest" aria-controls="backtest" aria-selected="false">回測成績</button>
+    <button class="tab" role="tab" id="t-now" aria-controls="now" aria-selected="false">現在的預測</button>
+    <button class="tab" role="tab" id="t-calc" aria-controls="calc" aria-selected="false">自己試算</button>
+  </nav>
+
+  <main>
+    <!-- ───────────── 模型邏輯 ───────────── -->
+    <section id="logic" role="tabpanel" aria-labelledby="t-logic">
+      <div class="block">
+        <h2>一句話</h2>
+        <div class="prose">
+          <p class="eq">一年後的本益比 ＝ 一年後的市值 ÷ 一年後的盈餘</p>
+          <p>股價一年後在哪裡，沒有人猜得準。盈餘一年後在哪裡，從財報可以猜個大概。所以這個模型把力氣都花在<strong>預測盈餘</strong>，股價只給一個中性假設：照資金成本成長，每年約 <span id="coeTxt"></span>（10 年期公債殖利率 <span id="y10Txt"></span> 加 5%）。</p>
+        </div>
+        <div class="flow" aria-label="模型流程">
+          <div class="box price"><span class="tag">猜不準 → 中性假設</span><span class="t">今天的市值</span><span class="d">每年成長＝資金成本</span></div>
+          <div class="arrow" aria-hidden="true">→</div>
+          <div class="box price"><span class="tag">假設</span><span class="t">一年後的市值</span><span class="d">今天市值 × 約 1.10</span></div>
+          <div class="arrow" aria-hidden="true">÷</div>
+          <div class="box earn"><span class="tag">猜得準一些 → 模型的主力</span><span class="t">一年後的盈餘</span><span class="d">四個預測器看財報、股價、利率，投票平均</span></div>
+        </div>
+        <div class="flowresult"><div class="box resultbox"><span class="t">＝ 一年後的本益比</span><span class="d">3、6、9、18、24、36 個月也是同一個算法，只是把「一年」換成那個長度。</span></div></div>
+        <div class="panel">
+          <h3>算一次給你看</h3>
+          <p>一家公司市值 1,000 億、過去四季淨利 50 億，今天本益比 20 倍。模型預測一年後淨利 70 億（多 40%）。</p>
+          <p class="num">一年後本益比 ≈ 1,000 × 1.10 ÷ 70 ≈ <strong>15.7 倍</strong></p>
+          <p class="muted small">股價照資金成本漲了 10%，盈餘漲了 40%，所以本益比從 20 倍降到 15.7 倍。本益比的變化，就是「股價變化 ÷ 盈餘變化」。</p>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>為什麼盈餘是關鍵</h2>
+        <div class="prose">
+          <p>本益比會變，只有兩個原因：股價動了，或盈餘動了。股價漲 20%、盈餘漲 50%，本益比就變成原來的 1.2 ÷ 1.5 ＝ 0.8 倍。</p>
+          <p>在科技股，12 個月內本益比的變動有 <strong>73–91%</strong> 是盈餘造成的（IT 服務例外，47%）。盈餘可以預測，所以本益比有一大塊可以預測。</p>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>為什麼不用「歷史平均本益比」</h2>
+        <div class="prose">
+          <p>傳統做法是：這家公司過去平均 15 倍，所以未來也會回到 15 倍左右。問題是公司會變。記憶體股以前是典型的景氣循環股，本益比在 5 倍和 50 倍之間跳；AI 需求改變了它的利潤結構，舊的平均值就不再適用。</p>
+          <p>我們實際測過：把「自己過去 5 年的中位本益比、同業中位、全體中位」加進模型，準確度幾乎沒有變（R² 變化 −0.011 到 +0.010）。歷史本益比能告訴你的東西，今天的財報和股價已經告訴模型了。</p>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>四個預測器，投票平均</h2>
+        <p class="prose">每個預測器都在回答同一個問題：「h 個月後的盈餘會是多少」（最後一個直接回答本益比會變多少）。四個答案平均，就是模型的預測。</p>
+        <div class="grid2">
+          <div class="card"><span class="role">預測器 1</span><h3>盈餘模型</h3><p class="who">像分析師：先估營收成長，再估淨利率會不會回到常態，營收 × 淨利率 ＝ 盈餘。也會反推「市場現價隱含的長期利潤率」當參考。</p><p class="muted small">只有 6、12、24、36 個月</p></div>
+          <div class="card"><span class="role">預測器 2</span><h3>線性模型</h3><p class="who">像一套經驗法則：18 條線索（最新一季年化盈餘、營收加速、毛利率趨勢、存貨天數……）各給一個固定權重，加起來。穩，但不會分情況。</p></div>
+          <div class="card"><span class="role">預測器 3</span><h3>樹模型：盈餘</h3><p class="who">像會分情況的產業研究員：同樣的線索，但知道週期股在高點和低點的規律不一樣，軟體和記憶體也不一樣。</p></div>
+          <div class="card"><span class="role">預測器 4</span><h3>樹模型：本益比變化</h3><p class="who">不先估盈餘，直接學「在這種情況下，本益比一年後通常變多少」，連股價裡少數可以預測的部分一起學。</p></div>
+        </div>
+        <div class="panel">
+          <h3>為什麼要平均</h3>
+          <p>單獨看，每一個都只比「本益比不變」好一點；平均之後好很多，因為它們錯的方向不一樣，會互相抵銷。</p>
+          <p class="muted small">12 個月預測的 R²（2015–2021 選模期；0 ＝ 跟「本益比不變」一樣，越高越好）</p>
+          <div class="hbars" id="r2bars"></div>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>模型看哪些線索</h2>
+        <p class="prose">全部都是當時已經公告的資料，不偷看未來。</p>
+        <div class="chips" id="inputs"></div>
+      </div>
+
+      <div class="block">
+        <h2>怎麼讀結果</h2>
+        <div class="grid2">
+          <div class="card"><h3>主看 12 個月</h3><p class="who" id="read12"></p></div>
+          <div class="card"><h3>3 個月：用今天的本益比</h3><p class="who" id="read3"></p></div>
+          <div class="card"><h3>24–36 個月：看方向</h3><p class="who" id="read36"></p></div>
+          <div class="card"><h3>看方向和區間，不要只看一個數字</h3><p class="who" id="readHit"></p></div>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>它做不到的事</h2>
+        <div class="prose">
+          <p><strong>預測不了股價的大事件。</strong>2022 年中它不可能知道 ChatGPT 會引爆 AI 需求（見案例）。80% 區間的意思是：每 5 次有 1 次會跑到區間外。</p>
+          <p><strong>只學過 68 家美股科技公司、2015–2026 年。</strong>能源、電力、軍工、特斯拉是套用，不是訓練對象。</p>
+          <p><strong>盈餘是帳面淨利（GAAP）。</strong>有大額一次性項目（投資評價利得、併購攤銷、稅務）時，要搭配「營業利益口徑」一起看。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────────── 案例 ───────────── -->
+    <section id="cases" role="tabpanel" aria-labelledby="t-cases" hidden>
+      <div class="block">
+        <h2>五個真實案例</h2>
+        <p class="prose">每個案例都是當時真的做得出來的預測：站在那個月，只用那時候已經公告的財報和股價，模型也只用那之前的資料訓練。一年後再對答案。</p>
+        <div class="legend" aria-label="圖例">
+          <span><i class="key" style="color:var(--s-rw)"></i>本益比不變（當時的本益比）</span>
+          <span><i class="key" style="color:var(--s-model)"></i>模型預測</span>
+          <span><i class="key" style="color:var(--s-act)"></i>一年後實際</span>
+        </div>
+      </div>
+      <div class="cases" id="caseList"></div>
+    </section>
+
+    <!-- ───────────── 回測 ───────────── -->
+    <section id="backtest" role="tabpanel" aria-labelledby="t-backtest" hidden>
+      <div class="block">
+        <h2>怎麼測的</h2>
+        <div class="prose">
+          <p>2015 到 2026 年，每年 1 月只用當時已經公告的財報和股價重新訓練模型，預測接下來每個月的 3 到 36 個月後本益比，再和真正發生的本益比比較。68 家美股科技公司，12 個月的預測約 6,500 筆。</p>
+          <p>2015–2021 年用來選方法；2022–2026 年是「保留期」，方法定案後才看，不再調整。對照組是最簡單的預測：<strong>本益比不變</strong>（明年的本益比＝今天的本益比）。要贏過它並不容易。</p>
+        </div>
+      </div>
+
+      <div class="block">
+        <h3>典型誤差：預測距離越遠，誤差越大</h3>
+        <p class="muted small">誤差的中位數。±30% 的意思是：一半的預測離實際值在 ±30% 以內。「完全知道未來盈餘」＝假設盈餘預測百分之百準，只剩股價猜不準時的誤差。</p>
+        <div class="legend" id="lgErr"></div>
+        <div class="chart" id="chErr"></div>
+      </div>
+
+      <div class="block">
+        <h3>方向命中率：本益比會升還是會降，猜對幾成</h3>
+        <p class="muted small">「大變動」＝本益比實際變動超過 20% 的情況。</p>
+        <div class="legend" id="lgDir"></div>
+        <div class="chart" id="chDir"></div>
+      </div>
+
+      <div class="block">
+        <h3>完整成績表</h3>
+        <div class="tablewrap"><table id="tbHz"></table></div>
+        <p class="muted small">「推到現在」＝每家公司資料的最後 12 個月當作目標，站在 h 個月前預測，看模型比「本益比不變」準的公司比例。多數公司的股價資料到 2025-09，約 11 家到 2026-09。80% 區間實測＝每年用當時已經知道的誤差畫區間，當年實際落在裡面的比例。</p>
+      </div>
+
+      <div class="block" id="histBlock">
+        <h3>一家一家看：h 個月前的預測 vs 實際</h3>
+        <div class="controls">
+          <label class="field">公司<select id="hTicker"></select></label>
+          <div class="field">預測距離<div class="seg" id="hH" role="group" aria-label="預測距離"></div></div>
+        </div>
+        <p id="hStats" class="small"></p>
+        <div class="legend" id="lgHist"></div>
+        <div class="chart" id="chHist"></div>
+        <details><summary>看數字</summary><div class="tablewrap"><table id="tbHist"></table></div></details>
+        <p class="muted small">縱軸是對數刻度（本益比從 10 倍到 20 倍，和從 50 倍到 100 倍一樣高）。空白＝那段期間虧損，本益比沒有意義。</p>
+      </div>
+
+      <div class="block">
+        <h3>試過的方法（12 個月）</h3>
+        <div class="tablewrap"><table id="tbMeth"></table></div>
+        <p class="muted small" id="methNote"></p>
+      </div>
+
+      <div class="block">
+        <h3>各產業（12 個月）</h3>
+        <div class="tablewrap"><table id="tbSec"></table></div>
+      </div>
+    </section>
+
+    <!-- ───────────── 現在 ───────────── -->
+    <section id="now" role="tabpanel" aria-labelledby="t-now" hidden>
+      <div class="block">
+        <h2>現在的預測：46 檔</h2>
+        <div class="prose">
+          <p>站在 <span id="asofTxt"></span>。點一列看這家公司 3 到 36 個月的預測路徑。模型只從 68 家科技股學；能源、電力、軍工、特斯拉是套用。</p>
+          <p class="small muted">⏳ 財報比較舊：預測從「錨點月」起算，用那個月的股價。⚠️ 帳面盈餘含一次性項目：同時列出營業利益口徑的估計。「虧損或 >500」＝模型預測盈餘接近零或虧損，本益比沒有意義。不是投資建議。</p>
+        </div>
+        <div class="filterrow" id="grpFilter" role="group" aria-label="群組"></div>
+      </div>
+      <div class="panel" id="detail"></div>
+      <div class="tablewrap"><table id="tbNow"></table></div>
+    </section>
+
+    <!-- ───────────── 試算 ───────────── -->
+    <section id="calc" role="tabpanel" aria-labelledby="t-calc" hidden>
+      <div class="block">
+        <h2>自己試算：換成你的盈餘看法</h2>
+        <div class="prose">
+          <p>選一家公司，預設填的是<strong>模型自己預期的盈餘變化</strong>。改成你的看法，就能看到本益比會變成多少。也可以選「自訂」輸入任何一家公司。</p>
+          <p class="eq">h 個月後的本益比 ＝ 今天市值 × e<sup>報酬×h/12</sup> ÷ 你給的盈餘</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="controls">
+          <label class="field">公司<select id="cTicker"></select></label>
+          <label class="field">今天市值（十億美元）<input type="number" id="cMc" step="any" min="0"></label>
+          <label class="field">過去四季淨利（十億美元）<input type="number" id="cNi" step="any"></label>
+          <label class="field">年化報酬假設（%）<input type="number" id="cMu" step="0.1"></label>
+        </div>
+        <div class="controls">
+          <div class="field">盈餘輸入方式<div class="seg" id="cMode" role="group" aria-label="盈餘輸入方式">
+            <button type="button" data-m="g" aria-pressed="true">成長率 %</button><button type="button" data-m="a" aria-pressed="false">金額（十億美元）</button></div></div>
+          <label class="field"><span id="lb12">12 個月後淨利成長 %</span><input type="number" id="cE12" step="any"></label>
+          <label class="field"><span id="lb24">24 個月後</span><input type="number" id="cE24" step="any"></label>
+          <label class="field"><span id="lb36">36 個月後</span><input type="number" id="cE36" step="any"></label>
+          <button type="button" class="btn" id="cReset">改回模型的盈餘</button>
+        </div>
+        <p class="small" id="cMsg"></p>
+      </div>
+      <div class="block">
+        <div class="legend" id="lgCalc"></div>
+        <div class="chart" id="chCalc"></div>
+        <div class="tablewrap"><table id="tbCalc"></table></div>
+        <div class="note small" id="calcNote"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>資料：SEC XBRL 財報（公開鏡像，取當時第一次申報的數字）、月底股價、美國 10 年期公債殖利率。模型與回測程式：KIWI repo 的 projects/pe-forecast（README §12）。</p>
+    <p>本頁是模型輸出與回測紀錄，不是投資建議。</p>
+  </footer>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+const D=/*__DATA__*/null;
+(function () {
+  "use strict";
+  const H = [3, 6, 9, 12, 18, 24, 36];
+  const HZ = Object.fromEntries(D.horizons.map(r => [r.h, r]));
+  const COE = D.y10 + D.erp;
+  const SECTOR = { software: "軟體", internet: "網路", semis: "半導體", semicap: "半導體設備", memory: "記憶體", hardware: "硬體", itservices: "IT 服務" };
+  const NS = "http://www.w3.org/2000/svg";
+  const $ = id => document.getElementById(id);
+
+  // ── 格式 ──
+  const pm = x => "±" + Math.round((Math.exp(x) - 1) * 100) + "%";          // ln 誤差 → ±%
+  const pct = (x, d = 0) => x == null ? "—" : (x * 100).toFixed(d) + "%";
+  const spct = (x, d = 0) => x == null ? "—" : (x >= 0 ? "+" : "−") + Math.abs(x * 100).toFixed(d) + "%";
+  const fpe = x => x == null || !isFinite(x) ? "—" : (x >= 100 ? Math.round(x).toLocaleString("en-US") : x.toFixed(1));
+  const pe500 = x => x == null || !isFinite(x) || x <= 0 || x > 500 ? "虧損或 >500" : fpe(x);
+  const fB = x => x == null ? "—" : (Math.abs(x) >= 100 ? x.toLocaleString("en-US", { maximumFractionDigits: 0 }) : x.toFixed(2));
+  const median = a => { const s = a.filter(v => v != null && isFinite(v)).sort((x, y) => x - y); if (!s.length) return null; const m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+  function node(tag, attrs, parent, text) {
+    const e = document.createElement(tag);
+    if (attrs) for (const k in attrs) { if (k === "class") e.className = attrs[k]; else e.setAttribute(k, attrs[k]); }
+    if (text != null) e.textContent = text;
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function svg(tag, attrs, parent) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function legend(host, items) {
+    host.textContent = "";
+    for (const it of items) {
+      const s = node("span", null, host);
+      const k = node("i", { class: "key" + (it.dash ? " dash" : "") + (it.area ? " area" : "") }, s);
+      if (it.area) k.style.background = `var(${it.color})`; else k.style.color = `var(${it.color})`;
+      s.appendChild(document.createTextNode(it.name));
+    }
+  }
+
+  // ── 提示框 ──
+  const tip = $("tip");
+  function showTip(ev, title, rows) {
+    tip.textContent = "";
+    node("div", { class: "tt" }, tip, title);
+    for (const r of rows) {
+      const row = node("div", { class: "row" }, tip);
+      const k = node("i", { class: "key" + (r.dash ? " dash" : "") }, row);
+      k.style.color = `var(${r.color})`;
+      node("span", null, row, r.name);
+      node("b", null, row, r.value);
+    }
+    tip.hidden = false;
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    let x = ev.clientX + 14, y = ev.clientY + 14;
+    if (x + w > window.innerWidth - 8) x = ev.clientX - w - 14;
+    if (y + h > window.innerHeight - 8) y = ev.clientY - h - 14;
+    tip.style.left = Math.max(8, x) + "px"; tip.style.top = Math.max(8, y) + "px";
+  }
+  const hideTip = () => { tip.hidden = true; };
+
+  // ── 折線圖（SVG，自己畫） ──
+  // o: {x:[num], xTick:(v)=>str, xTicks:[num], yLog, yFmt, yMin, yMax, height,
+  //     series:[{name,color,values,dash,dots,fmt}], bands:[{lo,hi,color}], ref:{y,name}, title:(i)=>str}
+  function logTicks(lo, hi) {
+    const base = [1, 2, 5];
+    const out = [];
+    for (let e = -1; e <= 5; e++) for (const b of base) { const v = b * Math.pow(10, e); if (v >= lo && v <= hi) out.push(v); }
+    if (out.length < 3) { const more = []; for (let e = -1; e <= 5; e++) for (const b of [1, 1.5, 2, 3, 5, 7]) { const v = b * Math.pow(10, e); if (v >= lo && v <= hi) more.push(v); } return more; }
+    return out;
+  }
+  function linTicks(lo, hi, n = 5) {
+    const span = hi - lo, raw = span / n, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const step = [1, 2, 2.5, 5, 10].map(s => s * mag).find(s => span / s <= n) || mag * 10;
+    const out = []; for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(+v.toFixed(10));
+    return out;
+  }
+  function lineChart(host, o) {
+    let lastW = -1;
+    const draw = () => {
+      const W = host.clientWidth;
+      if (!W || W === lastW) return;
+      lastW = W;
+      host.textContent = "";
+      const Ht = o.height || 280, m = { l: 48, r: 16, t: 14, b: 30 };
+      const iw = W - m.l - m.r, ih = Ht - m.t - m.b;
+      const vals = [];
+      for (const s of o.series) for (const v of s.values) if (v != null && isFinite(v) && (!o.yLog || v > 0)) vals.push(v);
+      for (const b of o.bands || []) for (const arr of [b.lo, b.hi]) for (const v of arr) if (v != null && isFinite(v) && (!o.yLog || v > 0)) vals.push(v);
+      if (o.ref) vals.push(o.ref.y);
+      if (!vals.length) { node("p", { class: "muted small" }, host, "沒有可以畫的數字。"); return; }
+      let lo = o.yMin != null ? o.yMin : Math.min(...vals), hi = o.yMax != null ? o.yMax : Math.max(...vals);
+      if (o.yLog) { lo = lo / 1.15; hi = hi * 1.15; } else if (o.yMin == null) { const pad = (hi - lo) * 0.08 || 1; lo -= pad; hi += pad; }
+      const fy = o.yLog ? v => m.t + ih * (1 - (Math.log(v) - Math.log(lo)) / (Math.log(hi) - Math.log(lo)))
+                        : v => m.t + ih * (1 - (v - lo) / (hi - lo));
+      const x0 = Math.min(...o.x), x1 = Math.max(...o.x);
+      const fx = v => m.l + (x1 === x0 ? iw / 2 : iw * (v - x0) / (x1 - x0));
+      const s = svg("svg", { viewBox: `0 0 ${W} ${Ht}`, height: Ht, role: "img", "aria-label": o.label || "折線圖" }, host);
+      const yt = o.yLog ? logTicks(lo, hi) : linTicks(lo, hi);
+      for (const t of yt) {
+        svg("line", { x1: m.l, x2: W - m.r, y1: fy(t), y2: fy(t), class: "gridline" }, s);
+        const tx = svg("text", { x: m.l - 8, y: fy(t) + 4, "text-anchor": "end" }, s); tx.textContent = o.yLog ? (t >= 1000 ? t / 1000 + "k" : String(t)) : (o.yFmt || String)(t);
+      }
+      svg("line", { x1: m.l, x2: W - m.r, y1: m.t + ih, y2: m.t + ih, class: "axisline" }, s);
+      let xt = o.xTicks || o.x;
+      const maxT = Math.max(2, Math.floor(iw / 58));
+      if (xt.length > maxT) { const k = Math.ceil(xt.length / maxT); xt = xt.filter((_, i) => i % k === 0); }
+      for (const t of xt) { const px = fx(t), anc = px > W - m.r - 24 ? "end" : (px < m.l + 24 ? "start" : "middle"); const tx = svg("text", { x: anc === "end" ? W - 2 : px, y: Ht - 8, "text-anchor": anc }, s); tx.textContent = (o.xTick || String)(t); }
+      if (o.ref) {
+        svg("line", { x1: m.l, x2: W - m.r, y1: fy(o.ref.y), y2: fy(o.ref.y), stroke: "var(--s-ref)", "stroke-width": 1.5, "stroke-dasharray": "4 4" }, s);
+      }
+      for (const b of o.bands || []) {
+        let seg = [];
+        const flush = () => {
+          if (seg.length > 1) {
+            const up = seg.map(i => `${fx(o.x[i])},${fy(b.hi[i])}`), dn = seg.slice().reverse().map(i => `${fx(o.x[i])},${fy(b.lo[i])}`);
+            svg("polygon", { points: up.concat(dn).join(" "), fill: `var(${b.color})`, stroke: "none" }, s);
+          }
+          seg = [];
+        };
+        o.x.forEach((_, i) => { const a = b.lo[i], c = b.hi[i]; if (a != null && c != null && isFinite(a) && isFinite(c) && (!o.yLog || a > 0)) seg.push(i); else flush(); });
+        flush();
+      }
+      for (const se of o.series) {
+        let d = "", pen = false;
+        se.values.forEach((v, i) => {
+          if (v == null || !isFinite(v) || (o.yLog && v <= 0)) { pen = false; return; }
+          d += (pen ? "L" : "M") + fx(o.x[i]).toFixed(1) + "," + fy(v).toFixed(1); pen = true;
+        });
+        if (d) svg("path", { d, fill: "none", stroke: `var(${se.color})`, "stroke-width": se.width || 2, "stroke-linejoin": "round", "stroke-linecap": "round", "stroke-dasharray": se.dash ? "5 4" : "none" }, s);
+        if (se.dots) se.values.forEach((v, i) => {
+          if (v == null || !isFinite(v) || (o.yLog && v <= 0)) return;
+          svg("circle", { cx: fx(o.x[i]), cy: fy(v), r: 4, fill: `var(${se.color})`, stroke: "var(--surface)", "stroke-width": 2 }, s);
+        });
+      }
+      const cross = svg("line", { x1: 0, x2: 0, y1: m.t, y2: m.t + ih, class: "cross", visibility: "hidden" }, s);
+      const hot = svg("g", {}, s);
+      const hit = svg("rect", { x: m.l, y: m.t, width: iw, height: ih, fill: "transparent", tabindex: 0 }, s);
+      let cur = -1;
+      const pick = (clientX) => {
+        const r = s.getBoundingClientRect(), px = (clientX - r.left) * (W / r.width);
+        let best = 0, bd = Infinity; o.x.forEach((v, i) => { const dd = Math.abs(fx(v) - px); if (dd < bd) { bd = dd; best = i; } });
+        return best;
+      };
+      const show = (i, ev) => {
+        cur = i;
+        cross.setAttribute("x1", fx(o.x[i])); cross.setAttribute("x2", fx(o.x[i])); cross.setAttribute("visibility", "visible");
+        hot.textContent = "";
+        const rows = [];
+        for (const se of o.series) {
+          const v = se.values[i];
+          if (v != null && isFinite(v) && (!o.yLog || v > 0)) svg("circle", { cx: fx(o.x[i]), cy: fy(v), r: 5, fill: `var(${se.color})`, stroke: "var(--surface)", "stroke-width": 2 }, hot);
+          rows.push({ name: se.name, color: se.color, dash: se.dash, value: (se.fmt || o.yFmt || String)(v) });
+        }
+        for (const b of o.bands || []) if (b.name && b.lo[i] != null) rows.push({ name: b.name, color: b.keyColor || b.color, value: `${(o.yFmt || String)(b.lo[i])}–${(o.yFmt || String)(b.hi[i])}` });
+        showTip(ev, o.title ? o.title(i) : String(o.x[i]), rows);
+      };
+      hit.addEventListener("pointermove", ev => show(pick(ev.clientX), ev));
+      hit.addEventListener("pointerleave", () => { cross.setAttribute("visibility", "hidden"); hot.textContent = ""; hideTip(); cur = -1; });
+      hit.addEventListener("keydown", ev => {
+        if (ev.key !== "ArrowRight" && ev.key !== "ArrowLeft") return;
+        ev.preventDefault();
+        const i = Math.max(0, Math.min(o.x.length - 1, (cur < 0 ? 0 : cur) + (ev.key === "ArrowRight" ? 1 : -1)));
+        const r = s.getBoundingClientRect();
+        show(i, { clientX: r.left + fx(o.x[i]) * r.width / W, clientY: r.top + 20 });
+      });
+      hit.addEventListener("blur", () => { cross.setAttribute("visibility", "hidden"); hot.textContent = ""; hideTip(); });
+    };
+    if (host._ro) host._ro.disconnect();
+    host._ro = new ResizeObserver(() => requestAnimationFrame(draw));
+    host._ro.observe(host);
+    lastW = -1; draw();
+  }
+
+  // ── 分頁 ──
+  const TABS = ["logic", "cases", "backtest", "now", "calc"];
+  function activate(id, push) {
+    if (!TABS.includes(id)) id = "logic";
+    for (const t of TABS) {
+      $(t).hidden = t !== id;
+      $("t-" + t).setAttribute("aria-selected", t === id ? "true" : "false");
+      $("t-" + t).tabIndex = t === id ? 0 : -1;
+    }
+    hideTip();
+    if (push) { try { history.replaceState(null, "", "#" + id); } catch (e) {} try { localStorage.setItem("pe-tab", id); } catch (e) {} }
+  }
+  const toTabs = () => { const y = document.querySelector(".tabs").offsetTop - 4; if (window.scrollY > y) window.scrollTo({ top: y }); };
+  for (const t of TABS) $("t-" + t).addEventListener("click", () => { activate(t, true); toTabs(); });
+  document.querySelector(".tabs").addEventListener("keydown", ev => {
+    const i = TABS.findIndex(t => $("t-" + t).getAttribute("aria-selected") === "true");
+    if (ev.key === "ArrowRight" || ev.key === "ArrowLeft") {
+      const j = (i + (ev.key === "ArrowRight" ? 1 : TABS.length - 1)) % TABS.length;
+      activate(TABS[j], true); $("t-" + TABS[j]).focus();
+    }
+  });
+
+  // ── 頁首數字 ──
+  const h12 = HZ[12];
+  (function stats() {
+    const host = $("stats");
+    const add = (k, v, s) => { const d = node("div", { class: "stat" }, host); node("span", { class: "k" }, d, k); node("span", { class: "v" }, d, v); node("span", { class: "s" }, d, s); };
+    add("12 個月後的典型誤差", pm(h12.ens), `「本益比不變」是 ${pm(h12.rw)}`);
+    add("方向命中（12 個月）", pct(h12.dir), `本益比實際變動超過 20% 時是 ${pct(h12.big_dir, 1)}`);
+    add("用過去推到現在（12 個月）", pct(h12.now_win), "的公司，模型比「本益比不變」準");
+  })();
+
+  // ── 模型邏輯 ──
+  $("coeTxt").textContent = pct(COE, 1);
+  $("y10Txt").textContent = pct(D.y10, 1);
+  (function r2bars() {
+    const m = D.methods["選模期"];
+    const rows = [["最新一季 × 4", m.run_rate.r2], ["線性模型", m.huber.r2], ["樹模型：盈餘", m.gbm.r2], ["樹模型：本益比變化", m.gbm_z.r2], ["四個平均（組合）", m.ens.r2, true]];
+    const host = $("r2bars"), mx = Math.max(...rows.map(r => r[1]));
+    for (const [name, v, hl] of rows) {
+      const row = node("div", { class: "hbar" + (hl ? " hi" : "") }, host);
+      node("span", null, row, name);
+      const tr = node("div", { class: "track" }, row);
+      const f = node("div", { class: "fill" }, tr); f.style.width = Math.max(1, v / mx * 100) + "%";
+      node("span", { class: "val num" }, row, v.toFixed(2));
+    }
+  })();
+  for (const t of ["最新一季年化盈餘 ÷ 市值", "過去四季盈餘 ÷ 市值", "營業利益 ÷ 市值（排除一次性項目）", "營收 ÷ 市值", "營收成長與加速", "最近兩季營收的季變化", "毛利率趨勢", "淨利率 vs 過去 5 年常態", "單季 vs 四季淨利率", "存貨天數變化", "利潤率的波動", "股價 6 個月、12 個月漲跌", "市值大小", "資本密集度", "10 年期公債殖利率", "產業", "財報有多新"])
+    node("span", { class: "chip" }, $("inputs"), t);
+  $("read12").textContent = `誤差 ${pm(h12.ens)}，「本益比不變」是 ${pm(h12.rw)}。2015–2021、2022–2026 兩段都穩定贏，用過去推到現在時 ${pct(h12.now_win)} 的公司模型比較準。`;
+  $("read3").textContent = `3 個月的誤差 ${pm(HZ[3].ens)}，和「本益比不變」的 ${pm(HZ[3].rw)} 幾乎一樣。就算完全知道 3 個月後的盈餘，誤差也只能降到 ${pm(HZ[3].oracle)}：這麼短的時間裡，本益比的變化幾乎都是股價。`;
+  $("read36").textContent = `方向命中 ${pct(HZ[36].dir)}，和 12 個月差不多，但典型誤差 ${pm(HZ[36].ens)}，保留期只有 ${HZ[36].n_hold.toLocaleString()} 筆樣本。24 個月「推到現在」只贏 ${pct(-HZ[24].now_imp)}。`;
+  $("readHit").textContent = `12 個月後落在實際值 ±20% 以內只有 ${pct(h12.in20)}（本益比不變 ${pct(h12.in20_rw)}），但方向猜對 ${pct(h12.dir)}，80% 區間實際涵蓋 ${pct(h12.cover)}。四個預測器分歧很大時，代表不確定性高。`;
+
+  // ── 案例 ──
+  const CASE_TEXT = {
+    "NVDA 2021-07": "當時本益比 92 倍，看起來很貴。模型從財報看到營收和毛利率都在加速，預期一年後盈餘成長 {impl}。實際成長 {real}，股價一年跌了 7%。盈餘成長把本益比從 92 倍壓到 49 倍；只看「本益比不變」，會以為一年後還是 92 倍。",
+    "AMD 2023-11": "收購 Xilinx 後的無形資產攤銷，加上 2023 年的 PC 景氣谷底，把帳面淨利壓到只剩 2.1 億美元，本益比 949 倍。模型從營業利益和最新一季的盈餘看出真正的賺錢能力，預期一年後盈餘變成 {implx}（實際 {realx}）。本益比從 949 倍回到 123 倍，模型預測 109 倍。",
+    "HPQ 2022-11": "本益比 5.4 倍，看起來非常便宜，但那時的盈餘在疫情 PC 需求的高點。模型預期一年後盈餘減少 {implabs}（實際減少 {realabs}），股價只跌了 8%，本益比就從 5.4 倍升到 13.6 倍。低本益比不一定便宜，可能只是盈餘在高點。",
+    "MU 2025-09": "一年前美光本益比 30 倍，模型預測一年後 21 倍，實際 24 倍，「本益比不變」是 30 倍。結果接近，但原因要講清楚：模型預期盈餘成長 {impl}，實際變成 {realx}；模型假設股價漲 {coeg}，實際市值變成 {mcx}。兩個大誤差方向相反、互相抵銷，本益比才落在模型附近。超級週期裡盈餘和股價常常一起噴，本益比反而比兩者都穩。",
+    "NVDA 2022-07": "2022 年中，模型預期輝達一年後盈餘成長 {impl}、本益比約 48 倍。實際上盈餘先因為遊戲顯卡的庫存修正掉了 {realabs}，股價卻因為 ChatGPT 引爆的 AI 需求漲了 {mcg}，本益比衝到 243 倍。模型只看得到當時的財報，看不到還沒發生的需求爆發。這種事件就是 80% 區間外的那 20%。"
+  };
+  function caseViz(host, rows) {
+    let lastW = -1;
+    const draw = () => {
+      const W = host.clientWidth; if (!W || W === lastW) return; lastW = W;
+      host.textContent = "";
+      const rowH = 34, m = { l: 118, r: 58, t: 8, b: 26 }, Ht = m.t + rows.length * rowH + m.b;
+      const vals = rows.map(r => r.v), lo = Math.min(...vals) / 1.5, hi = Math.max(...vals) * 1.5;
+      const fx = v => m.l + (W - m.l - m.r) * (Math.log(v) - Math.log(lo)) / (Math.log(hi) - Math.log(lo));
+      const s = svg("svg", { viewBox: `0 0 ${W} ${Ht}`, height: Ht, role: "img", "aria-label": rows.map(r => `${r.name} ${fpe(r.v)} 倍`).join("，") }, host);
+      for (const t of logTicks(lo, hi)) {
+        svg("line", { x1: fx(t), x2: fx(t), y1: m.t, y2: Ht - m.b, class: "gridline" }, s);
+        const tx = svg("text", { x: fx(t), y: Ht - 8, "text-anchor": "middle" }, s); tx.textContent = t >= 1000 ? (t / 1000) + "k" : t;
+      }
+      rows.forEach((r, i) => {
+        const y = m.t + i * rowH + rowH / 2;
+        const a = svg("text", { x: 0, y: y + 4 }, s); a.textContent = r.name; a.style.fill = "var(--ink-2)"; a.style.fontSize = "13px";
+        svg("line", { x1: m.l, x2: fx(r.v), y1: y, y2: y, stroke: `var(${r.color})`, "stroke-width": 2, opacity: 0.35 }, s);
+        svg("circle", { cx: fx(r.v), cy: y, r: 6, fill: `var(${r.color})`, stroke: "var(--surface)", "stroke-width": 2 }, s);
+        const v = svg("text", { x: fx(r.v) + 11, y: y + 4 }, s); v.textContent = fpe(r.v) + " 倍"; v.style.fill = "var(--ink)"; v.style.fontFamily = "var(--f-mono)";
+      });
+    };
+    new ResizeObserver(() => requestAnimationFrame(draw)).observe(host); draw();
+  }
+  (function cases() {
+    const host = $("caseList");
+    for (const c of D.cases) {
+      const card = node("article", { class: "case" }, host);
+      const head = node("div", { class: "head" }, card);
+      const top = node("div", { class: "chips" }, head);
+      node("span", { class: "pill" + (c.kind === "失敗案例" ? " fail" : "") }, top, c.kind);
+      node("span", { class: "chip" }, top, SECTOR[c.sector] || c.sector);
+      node("h3", null, head, `${c.ticker}：${c.title}`);
+      node("span", { class: "when" }, head, `站在 ${c.month} 預測 ${c.target}`);
+      const left = node("div", { class: "story" }, card);
+      const viz = node("div", { class: "chart" }, left); viz.style.minHeight = "120px";
+      caseViz(viz, [{ name: "本益比不變", v: c.pe0, color: "--s-rw" }, { name: "模型預測", v: c.pred, color: "--s-model" }, { name: "一年後實際", v: c.act, color: "--s-act" }]);
+      const errM = Math.abs(Math.log(c.pred / c.act)), errR = Math.abs(Math.log(c.pe0 / c.act));
+      node("p", { class: "small" }, left, `模型誤差 ${Math.round((Math.exp(errM) - 1) * 100)}%，「本益比不變」誤差 ${Math.round((Math.exp(errR) - 1) * 100)}%。`);
+      const mem = c.members, parts = [];
+      if (mem.old != null) parts.push(`盈餘模型 ${fpe(mem.old)}`);
+      parts.push(`線性 ${fpe(mem.huber)}`, `樹-盈餘 ${fpe(mem.gbm)}`, `樹-變化 ${fpe(mem.gbm_z)}`);
+      node("p", { class: "members" }, left, "四個預測器：" + parts.join("、"));
+      const right = node("div", { class: "story" }, card);
+      const g = (a, b) => b / a - 1;
+      const implG = g(c.ni0, c.ni_impl), realG = g(c.ni0, c.ni1), mcG = g(c.mc0, c.mc1);
+      const txt = CASE_TEXT[`${c.ticker} ${c.month}`] || "";
+      node("p", null, right, txt.replace("{impl}", spct(implG)).replace("{real}", spct(realG))
+        .replace("{implx}", (c.ni_impl / c.ni0).toFixed(1) + " 倍").replace("{realx}", (c.ni1 / c.ni0).toFixed(1) + " 倍")
+        .replace("{implabs}", pct(-implG)).replace("{realabs}", pct(-realG))
+        .replace("{mcx}", (c.mc1 / c.mc0).toFixed(1) + " 倍").replace("{mcg}", pct(mcG)).replace("{coeg}", pct(Math.exp(c.coe) - 1)));
+      const tw = node("div", { class: "tablewrap" }, right), t = node("table", null, tw);
+      const th = node("tr", null, node("thead", null, t));
+      for (const h of ["", "模型的假設", "實際"]) node("th", null, th, h);
+      const tb = node("tbody", null, t);
+      const tr = (a, b, d) => { const r = node("tr", null, tb); node("td", null, r, a); node("td", null, r, b); node("td", null, r, d); };
+      tr("市值（股價）", spct(Math.exp(c.coe) - 1), spct(mcG));
+      tr("過去四季淨利", `${fB(c.ni0)} → ${fB(c.ni_impl)}（${spct(implG)}）`, `${fB(c.ni0)} → ${fB(c.ni1)}（${spct(realG)}）`);
+      tr("一年後本益比", fpe(c.pred), fpe(c.act));
+      node("p", { class: "muted small" }, right, "淨利單位：十億美元。模型對股價只假設照資金成本成長。");
+      const b = node("button", { type: "button", class: "btn" }, right, `看 ${c.ticker} 的完整回測 →`);
+      b.addEventListener("click", () => { activate("backtest", true); setHist(c.ticker, 12); $("histBlock").scrollIntoView({ block: "start" }); });
+    }
+  })();
+
+  // ── 回測 ──
+  legend($("lgErr"), [{ name: "模型（四個平均）", color: "--s-model" }, { name: "本益比不變", color: "--s-rw" }, { name: "完全知道未來盈餘", color: "--s-ref", dash: true }]);
+  lineChart($("chErr"), {
+    x: H, xTick: v => v + " 個月", label: "典型誤差 × 預測距離", height: 280, yMin: 0,
+    yFmt: v => v == null ? "—" : "±" + Math.round(v * 100) + "%",
+    series: [
+      { name: "模型", color: "--s-model", values: H.map(h => Math.exp(HZ[h].ens) - 1), dots: true },
+      { name: "本益比不變", color: "--s-rw", values: H.map(h => Math.exp(HZ[h].rw) - 1), dots: true },
+      { name: "完全知道未來盈餘", color: "--s-ref", values: H.map(h => Math.exp(HZ[h].oracle) - 1), dash: true, dots: true }],
+    title: i => `${H[i]} 個月後`
+  });
+  legend($("lgDir"), [{ name: "全部預測", color: "--s-model" }, { name: "本益比大變動時", color: "--s-model", dash: true }]);
+  lineChart($("chDir"), {
+    x: H, xTick: v => v + " 個月", label: "方向命中率 × 預測距離", height: 240, yMin: 0.5, yMax: 0.8,
+    yFmt: v => v == null ? "—" : Math.round(v * 100) + "%",
+    series: [
+      { name: "全部預測", color: "--s-model", values: H.map(h => HZ[h].dir), dots: true, fmt: v => pct(v, 1) },
+      { name: "本益比大變動時", color: "--s-model", values: H.map(h => HZ[h].big_dir), dash: true, dots: true, fmt: v => pct(v, 1) }],
+    title: i => `${H[i]} 個月後`
+  });
+  (function hzTable() {
+    const t = $("tbHz");
+    const hr = node("tr", null, node("thead", null, t));
+    for (const h of ["幾個月後", "誤差：模型", "誤差：本益比不變", "改善", "R² 選模期／保留期", "方向命中", "±20% 內：模型／不變", "80% 區間實測", "推到現在：模型較準的公司"]) node("th", null, hr, h);
+    const tb = node("tbody", null, t);
+    for (const h of H) {
+      const r = HZ[h], tr = node("tr", { class: h === 12 ? "hl" : "" }, tb);
+      [h + " 個月", pm(r.ens), pm(r.rw), spct(r.imp), `${r.r2_sel.toFixed(2)}／${r.r2_hold.toFixed(2)}`, pct(r.dir), `${pct(r.in20)}／${pct(r.in20_rw)}`, pct(r.cover), r.now_win == null ? "—" : pct(r.now_win)]
+        .forEach(v => node("td", null, tr, v));
+    }
+  })();
+
+  // 一家一家看
+  const HIST_H = Object.keys(D.history).map(Number).sort((a, b) => a - b);
+  let histState = { t: "MU", h: 12 };
+  (function histControls() {
+    const sel = $("hTicker");
+    const bySec = {};
+    for (const t of Object.keys(D.history["12"])) (bySec[D.sector_of[t]] = bySec[D.sector_of[t]] || []).push(t);
+    for (const sec of Object.keys(SECTOR)) {
+      if (!bySec[sec]) continue;
+      const g = node("optgroup", { label: SECTOR[sec] }, sel);
+      for (const t of bySec[sec].sort()) node("option", { value: t }, g, t);
+    }
+    sel.addEventListener("change", () => setHist(sel.value, histState.h));
+    const seg = $("hH");
+    for (const h of HIST_H) {
+      const b = node("button", { type: "button", "data-h": h, "aria-pressed": "false" }, seg, h + " 個月");
+      b.addEventListener("click", () => setHist(histState.t, h));
+    }
+  })();
+  function monthsFrom(s, n) { const [y, m] = s.split("-").map(Number); return Array.from({ length: n }, (_, i) => { const k = y * 12 + (m - 1) + i; return `${Math.floor(k / 12)}-${String(k % 12 + 1).padStart(2, "0")}`; }); }
+  function setHist(t, h) {
+    if (!D.history[String(h)][t]) h = 12;
+    histState = { t, h };
+    $("hTicker").value = t;
+    for (const b of $("hH").children) b.setAttribute("aria-pressed", String(Number(b.dataset.h) === h));
+    const x = D.history[String(h)][t];
+    const months = monthsFrom(x.s, x.pred.length);
+    const em = [], er = [], dir = [];
+    x.pred.forEach((p, i) => {
+      const a = x.act[i], r = x.rw[i];
+      if (p != null && a != null && r != null) {
+        em.push(Math.abs(Math.log(p / a))); er.push(Math.abs(Math.log(r / a)));
+        dir.push(Math.sign(Math.log(p / r)) === Math.sign(Math.log(a / r)) ? 1 : 0);
+      }
+    });
+    const st = $("hStats"); st.textContent = "";
+    if (em.length) {
+      const a = median(em), b = median(er);
+      st.append(`${t}（${SECTOR[D.sector_of[t]] || ""}），${h} 個月，${em.length} 筆有結果的預測：模型典型誤差 `);
+      node("strong", null, st, pm(a));
+      st.append(`，本益比不變 ${pm(b)}，方向命中 ${pct(dir.reduce((p, c) => p + c, 0) / dir.length)}。`);
+      node("span", { class: a < b ? "good" : "bad" }, st, a < b ? " 模型比較準。" : " 這家「本益比不變」比較準。");
+    } else st.textContent = `${t}：這個距離還沒有揭曉的結果。`;
+    legend($("lgHist"), [{ name: "實際本益比", color: "--s-act" }, { name: `模型 ${h} 個月前的預測`, color: "--s-model" }, { name: `本益比不變（${h} 個月前的本益比）`, color: "--s-rw" }]);
+    const xi = months.map((_, i) => i);
+    lineChart($("chHist"), {
+      x: xi, xTicks: xi.filter(i => months[i].endsWith("-01")), xTick: i => months[i].slice(0, 4), yLog: true, height: 300,
+      label: `${t} 的 ${h} 個月預測與實際`, yFmt: v => v == null ? "—" : fpe(v),
+      series: [
+        { name: "實際", color: "--s-act", values: x.act },
+        { name: "模型預測", color: "--s-model", values: x.pred },
+        { name: "本益比不變", color: "--s-rw", values: x.rw }],
+      title: i => `目標月 ${months[i]}（預測於 ${h} 個月前）`
+    });
+    const tb = $("tbHist"); tb.textContent = "";
+    const hr = node("tr", null, node("thead", null, tb));
+    for (const c of ["目標月", "實際", "模型預測", "本益比不變"]) node("th", null, hr, c);
+    const body = node("tbody", null, tb);
+    for (let i = months.length - 1; i >= 0; i--) {
+      const r = node("tr", null, body);
+      [months[i], x.act[i] == null ? "未揭曉／虧損" : fpe(x.act[i]), fpe(x.pred[i]), fpe(x.rw[i])].forEach(v => node("td", null, r, v));
+    }
+  }
+  setHist("MU", 12);
+
+  (function methTable() {
+    const S = D.methods["選模期"], O = D.methods["保留期"];
+    const t = $("tbMeth");
+    const hr = node("tr", null, node("thead", null, t));
+    for (const h of ["方法", "做法", "R² 選模期", "R² 保留期", "典型誤差（選模期）"]) node("th", null, hr, h);
+    const tb = node("tbody", null, t);
+    const rows = [["本益比不變", "明年＝今天", "rw"], ["最新一季 × 4", "未來盈餘＝現在的賺錢速度", "run_rate"], ["線性模型", "18 條線索加權", "huber"],
+      ["樹模型：盈餘", "分情況預測盈餘", "gbm"], ["樹模型：本益比變化", "直接預測本益比變化", "gbm_z"], ["三個平均", "不含盈餘模型", "ens3"], ["四個平均（採用）", "加上盈餘模型", "ens"]];
+    for (const [a, b, k] of rows) {
+      const tr = node("tr", { class: k === "ens" ? "hl" : "" }, tb);
+      [a, b, S[k].r2.toFixed(2), O[k].r2.toFixed(2), pm(S[k].err)].forEach(v => node("td", null, tr, v));
+    }
+    $("methNote").textContent = `同一批樣本比較。盈餘模型單獨：R² ${S.old_vs.old.toFixed(2)}／${O.old_vs.old.toFixed(2)}（6/12/24/36 個月的共同樣本）。加入「歷史本益比」特徵：選模期 ${S.hist_vs.ens3.toFixed(3)} → ${S.hist_vs.ens3_hist.toFixed(3)}，幾乎沒差，所以不採用。`;
+  })();
+  (function secTable() {
+    const t = $("tbSec");
+    const hr = node("tr", null, node("thead", null, t));
+    for (const h of ["產業", "預測筆數", "誤差：模型", "誤差：本益比不變", "改善"]) node("th", null, hr, h);
+    const tb = node("tbody", null, t);
+    for (const s of D.sectors.slice().sort((a, b) => a.ens - b.ens)) {
+      const tr = node("tr", null, tb);
+      [SECTOR[s.sector] || s.sector, s.n.toLocaleString(), pm(s.ens), pm(s.rw), spct(s.ens / s.rw - 1)].forEach(v => node("td", null, tr, v));
+    }
+  })();
+
+  // ── 現在的預測 ──
+  $("asofTxt").textContent = D.asof;
+  const GROUPS = [...new Set(D.current.map(r => r.group))];
+  let grp = "全部", selT = "MU";
+  (function filters() {
+    const host = $("grpFilter");
+    for (const g of ["全部"].concat(GROUPS)) {
+      const b = node("button", { type: "button", "aria-pressed": String(g === grp) }, host, g);
+      b.addEventListener("click", () => { grp = g; for (const x of host.children) x.setAttribute("aria-pressed", String(x.textContent === g)); nowTable(); });
+    }
+  })();
+  const cur = t => D.current.find(r => r.ticker === t);
+  function bandTxt(pe, h) { const b = D.bands[h]; return pe == null || !b ? "—" : `${fpe(pe * Math.exp(b[0]))}–${fpe(pe * Math.exp(b[1]))}`; }
+  function nowTable() {
+    const t = $("tbNow"); t.textContent = "";
+    const hr = node("tr", null, node("thead", null, t));
+    for (const h of ["公司", "目前本益比", "6 個月後", "12 個月後", "12 個月 80% 區間", "24 個月後", "36 個月後", "模型預期 12 個月盈餘變化", "錨點月"]) node("th", null, hr, h);
+    const tb = node("tbody", null, t);
+    let last = null;
+    for (const r of D.current) {
+      if (grp !== "全部" && r.group !== grp) continue;
+      if (r.group !== last) { const g = node("tr", { class: "grp" }, tb); node("td", { colspan: 9 }, g, r.group + (r.tech ? "" : "（套用，非訓練對象）")); last = r.group; }
+      const tr = node("tr", { class: "click" + (r.ticker === selT ? " sel" : ""), tabindex: 0 }, tb);
+      const name = node("td", null, tr); node("strong", null, name, r.ticker); if (r.stale) name.append(" ⏳"); if (r.adj) name.append(" ⚠️");
+      node("td", null, tr, r.pe == null ? "虧損" : fpe(r.pe));
+      node("td", null, tr, pe500(r.ens[6]));
+      const c12 = node("td", null, tr); node("strong", null, c12, pe500(r.ens[12]));
+      node("td", null, tr, r.ens[12] != null && r.ens[12] <= 500 ? bandTxt(r.ens[12], 12) : "—");
+      node("td", null, tr, pe500(r.ens[24]));
+      node("td", null, tr, pe500(r.ens[36]));
+      node("td", null, tr, r.impl[12] == null ? "—" : spct(r.impl[12]));
+      node("td", { class: "muted" }, tr, r.anchor);
+      const go = () => { selT = r.ticker; for (const x of tb.querySelectorAll("tr.sel")) x.classList.remove("sel"); tr.classList.add("sel"); nowDetail(); };
+      tr.addEventListener("click", go);
+      tr.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); go(); } });
+    }
+  }
+  function nowDetail() {
+    const r = cur(selT), host = $("detail");
+    host.textContent = "";
+    node("h3", null, host, `${r.ticker}　${r.group}`);
+    const p = node("p", { class: "small" }, host);
+    p.textContent = `錨點 ${r.anchor}（最新財報季末 ${r.fin}）。市值 ${fB(r.mc)} 十億美元，過去四季淨利 ${fB(r.ni)} 十億美元，目前本益比 ${r.pe == null ? "虧損" : fpe(r.pe) + " 倍"}。` +
+      (r.ens[12] != null && r.ens[12] <= 500 ? `模型預測 12 個月後 ${fpe(r.ens[12])} 倍（80% 區間 ${bandTxt(r.ens[12], 12)}）` + (r.impl[12] != null ? `，等於預期盈餘 ${spct(r.impl[12])}。` : "。") : "模型預測 12 個月後盈餘接近零或虧損，本益比沒有意義。");
+    if (r.adj && r.core_pe != null) node("p", { class: "warnbox" }, host, `⚠️ 帳面盈餘含一次性項目。換成「營業利益 × 0.85」的口徑：目前約 ${fpe(r.core_pe)} 倍，12 個月後 ${r.core12 != null && r.core12 <= 500 ? fpe(r.core12) + " 倍" : "虧損或 >500"}（估計值）。`);
+    if (!r.tech) node("p", { class: "muted small" }, host, "這家不在訓練名單（模型只學過科技股），是套用結果。");
+    const lg = node("div", { class: "legend" }, host);
+    legend(lg, [{ name: "模型預測", color: "--s-model" }, { name: "80% 區間", color: "--band-model", area: true }, { name: "目前本益比", color: "--s-ref", dash: true }]);
+    const ch = node("div", { class: "chart" }, host);
+    const xs = [0].concat(H);
+    const vals = [r.pe].concat(H.map(h => r.ens[h] != null && r.ens[h] <= 500 ? r.ens[h] : null));
+    const lo = [r.pe].concat(H.map(h => r.ens[h] != null && r.ens[h] <= 500 ? r.ens[h] * Math.exp(D.bands[h][0]) : null));
+    const hi = [r.pe].concat(H.map(h => r.ens[h] != null && r.ens[h] <= 500 ? r.ens[h] * Math.exp(D.bands[h][1]) : null));
+    lineChart(ch, {
+      x: xs, xTick: v => v === 0 ? "今天" : v + " 月", yLog: true, height: 260, label: `${r.ticker} 本益比預測路徑`,
+      yFmt: v => v == null ? "—" : fpe(v), ref: r.pe != null ? { y: r.pe } : null,
+      series: [{ name: "模型預測", color: "--s-model", values: vals, dots: true }],
+      bands: [{ lo, hi, color: "--band-model", keyColor: "--s-model", name: "80% 區間" }],
+      title: i => xs[i] === 0 ? `錨點 ${r.anchor}` : `${xs[i]} 個月後`
+    });
+    const b = node("button", { type: "button", class: "btn primary" }, host, `用 ${r.ticker} 試算你的盈餘 →`);
+    b.addEventListener("click", () => { activate("calc", true); calcLoad(r.ticker); toTabs(); });
+  }
+  nowTable(); nowDetail();
+
+  // ── 自己試算 ──
+  const C = { t: "MU", mode: "g" };
+  (function calcControls() {
+    const sel = $("cTicker");
+    for (const g of GROUPS) {
+      const og = node("optgroup", { label: g }, sel);
+      for (const r of D.current.filter(r => r.group === g)) node("option", { value: r.ticker }, og, r.ticker);
+    }
+    node("option", { value: "" }, sel, "自訂（自己輸入）");
+    sel.addEventListener("change", () => calcLoad(sel.value));
+    for (const b of $("cMode").children) b.addEventListener("click", () => setMode(b.dataset.m, true));
+    for (const id of ["cMc", "cNi", "cMu", "cE12", "cE24", "cE36"]) $(id).addEventListener("input", calcRun);
+    $("cReset").addEventListener("click", () => calcLoad($("cTicker").value));
+  })();
+  const numv = id => { const v = parseFloat($(id).value); return isFinite(v) ? v : null; };
+  function implNi(r, h) { const pe = r.ens[h]; return pe == null || pe > 500 ? null : r.mc * Math.exp(COE * h / 12) / pe; }
+  function setMode(m, convert) {
+    const old = C.mode; C.mode = m;
+    for (const b of $("cMode").children) b.setAttribute("aria-pressed", String(b.dataset.m === m));
+    $("lb12").textContent = m === "g" ? "12 個月後淨利成長 %" : "12 個月後淨利（十億美元）";
+    $("lb24").textContent = "24 個月後"; $("lb36").textContent = "36 個月後";
+    if (convert && old !== m) {
+      const ni = numv("cNi");
+      for (const id of ["cE12", "cE24", "cE36"]) {
+        const v = numv(id); if (v == null) continue;
+        if (m === "a" && ni != null && ni > 0) $(id).value = +(ni * (1 + v / 100)).toFixed(2);
+        else if (m === "g" && ni != null && ni > 0) $(id).value = Math.round((v / ni - 1) * 100);
+        else $(id).value = "";
+      }
+    }
+    calcRun();
+  }
+  function calcLoad(t) {
+    C.t = t; $("cTicker").value = t;
+    $("cMu").value = (COE * 100).toFixed(1);
+    const r = t ? cur(t) : null;
+    if (!r) { $("cMc").value = 1000; $("cNi").value = 50; C.mode = "g"; $("cE12").value = 40; $("cE24").value = 60; $("cE36").value = 70; setMode("g", false); return; }
+    $("cMc").value = r.mc; $("cNi").value = r.ni;
+    const ks = [12, 24, 36].map(h => implNi(r, h));
+    if (r.ni > 0) {
+      setModeSilently("g");
+      ["cE12", "cE24", "cE36"].forEach((id, i) => { $(id).value = ks[i] == null ? "" : Math.round((ks[i] / r.ni - 1) * 100); });
+    } else {
+      setModeSilently("a");
+      ["cE12", "cE24", "cE36"].forEach((id, i) => { $(id).value = ks[i] == null ? "" : +ks[i].toFixed(2); });
+    }
+    calcRun();
+  }
+  function setModeSilently(m) {
+    C.mode = m;
+    for (const b of $("cMode").children) b.setAttribute("aria-pressed", String(b.dataset.m === m));
+    $("lb12").textContent = m === "g" ? "12 個月後淨利成長 %" : "12 個月後淨利（十億美元）";
+  }
+  function calcRun() {
+    const mc = numv("cMc"), ni = numv("cNi"), muP = numv("cMu");
+    const msg = $("cMsg"); msg.textContent = ""; msg.className = "small";
+    const r = C.t ? cur(C.t) : null;
+    const fail = s => { msg.textContent = s; msg.className = "small bad"; $("tbCalc").textContent = ""; $("chCalc").textContent = ""; $("calcNote").textContent = ""; };
+    if (mc == null || mc <= 0) return fail("請輸入今天的市值（大於 0）。");
+    if (ni == null) return fail("請輸入過去四季淨利。");
+    if (muP == null) return fail("請輸入年化報酬假設。");
+    const mu = muP / 100;
+    if (C.mode === "g" && ni <= 0) return fail("過去四季淨利是虧損，成長率沒有意義。請切到「金額」直接輸入未來淨利。");
+    const knots = {};
+    [[12, "cE12"], [24, "cE24"], [36, "cE36"]].forEach(([h, id]) => { const v = numv(id); if (v != null) knots[h] = C.mode === "g" ? ni * (1 + v / 100) : v; });
+    if (!Object.keys(knots).length) return fail("至少輸入 12 個月後的盈餘。");
+    const pts = (ni > 0 ? [[0, ni]] : []).concat(Object.entries(knots).map(([h, v]) => [Number(h), v]).sort((a, b) => a[0] - b[0]));
+    const E = {};
+    for (const h of H) {
+      if (knots[h] != null) { E[h] = knots[h]; continue; }
+      const lo = pts.filter(p => p[0] < h).pop(), hi = pts.find(p => p[0] > h);
+      if (lo && hi && lo[1] > 0 && hi[1] > 0) E[h] = Math.exp(Math.log(lo[1]) + (Math.log(hi[1]) - Math.log(lo[1])) * (h - lo[0]) / (hi[0] - lo[0]));
+    }
+    const pe0 = ni > 0 ? mc / ni : null;
+    const rows = H.map(h => {
+      const e = E[h];
+      const ok = e != null && e > 0;
+      const you = ok ? mc * Math.exp(mu * h / 12) / e : null;
+      const center = ok ? mc * Math.exp(COE * h / 12) / e : null;
+      const b = D.ret_bands[h];
+      const model = r && r.ens[h] != null && r.ens[h] <= 500 ? r.ens[h] : null;
+      return { h, e, you, lo: center != null && b ? center * Math.exp(b[0]) : null, hi: center != null && b ? center * Math.exp(b[1]) : null,
+               flat: ok ? mc / e : null, model, impl: r ? implNi(r, h) : null, neg: e != null && e <= 0 };
+    });
+    const t = $("tbCalc"); t.textContent = "";
+    const hr = node("tr", null, node("thead", null, t));
+    const cols = ["幾個月後", "你的淨利（十億美元）", "你的淨利變化", "你的本益比", "80% 區間（盈餘正確時）", "若股價不動"].concat(r ? ["模型本益比", "模型預期淨利變化"] : []);
+    for (const c of cols) node("th", null, hr, c);
+    const tb = node("tbody", null, t);
+    for (const x of rows) {
+      const tr = node("tr", { class: x.h === 12 ? "hl" : "" }, tb);
+      const cells = [x.h + " 個月", x.e == null ? "—" : fB(x.e), x.e != null && ni > 0 ? spct(x.e / ni - 1) : "—",
+        x.neg ? "虧損" : (x.you == null ? "—" : fpe(x.you)), x.lo == null ? "—" : `${fpe(x.lo)}–${fpe(x.hi)}`, x.neg ? "虧損" : (x.flat == null ? "—" : fpe(x.flat))];
+      if (r) cells.push(pe500(x.model), x.impl != null && r.ni > 0 ? spct(x.impl / r.ni - 1) : (x.impl != null ? fB(x.impl) + "（金額）" : "—"));
+      cells.forEach((v, i) => { const td = node("td", null, tr); if (i === 3) node("strong", null, td, v); else td.textContent = v; });
+    }
+    const items = [{ name: "你的盈餘 → 本益比", color: "--s-you" }, { name: "80% 區間（盈餘正確時）", color: "--band-you", area: true }];
+    if (r) items.push({ name: "模型預測", color: "--s-model" });
+    if (pe0 != null) items.push({ name: "目前本益比", color: "--s-ref", dash: true });
+    legend($("lgCalc"), items);
+    const xs = [0].concat(H);
+    const series = [{ name: "你的盈餘", color: "--s-you", values: [pe0].concat(rows.map(x => x.you)), dots: true }];
+    if (r) series.push({ name: "模型預測", color: "--s-model", values: [pe0].concat(rows.map(x => x.model)), dots: true });
+    lineChart($("chCalc"), {
+      x: xs, xTick: v => v === 0 ? "今天" : v + " 月", yLog: true, height: 300, label: "你的情境本益比路徑",
+      yFmt: v => v == null ? "—" : fpe(v), ref: pe0 != null ? { y: pe0 } : null, series,
+      bands: [{ lo: [pe0].concat(rows.map(x => x.lo)), hi: [pe0].concat(rows.map(x => x.hi)), color: "--band-you", keyColor: "--s-you", name: "80% 區間" }],
+      title: i => xs[i] === 0 ? "今天" : `${xs[i]} 個月後`
+    });
+    const note = $("calcNote"); note.textContent = "";
+    node("p", null, note, `怎麼算：本益比 ＝ 今天市值 × e^(${pct(mu, 1)} × h/12) ÷ 你的淨利（連續複利，${pct(mu, 1)}/年約等於一年 ${spct(Math.exp(mu) - 1, 1)}）。12、24、36 個月之間的距離，用「淨利的對數」線性內插。`);
+    node("p", null, note, `80% 區間假設你的盈餘完全正確，只剩股價的不確定：用歷史上「實際報酬 − 資金成本」的 10% 和 90% 分位數畫出來，跟你填的報酬假設無關。回測實際涵蓋率 ${pct(Math.min(...H.map(h => HZ[h].sc_cover)))}–${pct(Math.max(...H.map(h => HZ[h].sc_cover)))}，比 80% 略低；再加上你的盈餘不會完全正確，真實的範圍要更寬。`);
+    node("p", null, note, "淨利每多 10%，本益比就少約 9%（1 ÷ 1.1）。你的本益比和模型差多少，就是你和模型對盈餘的看法差多少。這裡用的是淨利，不是每股盈餘；有買回庫藏股時，每股盈餘成長會比淨利成長略高。");
+    if (r && r.stale) node("p", null, note, `⏳ ${r.ticker} 的財報比較舊，這裡的「今天」是錨點月 ${r.anchor}。`);
+  }
+  calcLoad("MU");
+
+  // ── 啟動：網址 #分頁 > 上次看的分頁 > 模型邏輯 ──
+  let start = (location.hash || "").replace("#", "");
+  if (!TABS.includes(start)) { try { start = localStorage.getItem("pe-tab") || "logic"; } catch (e) { start = "logic"; } }
+  activate(start, false);
+})();
+</script>
