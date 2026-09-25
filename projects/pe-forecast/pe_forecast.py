@@ -62,6 +62,23 @@ def _row(df, ticker, asof):
     return g.tail(1)
 
 
+def _error_quantiles(df, asof):
+    """80% 區間：用回測裡「asof 以前已揭曉」的模型誤差（實際 − 預測，ln）的 10/90 分位數。先跑 backtest。"""
+    path = os.path.join(RES, "predictions.csv.gz")
+    if not os.path.exists(path):
+        return {}
+    pred = pd.read_csv(path, parse_dates=["month"])
+    out = {}
+    for h in H_ALL:
+        j = bt.joined(df, pred, h)
+        j = j[j[f"ln_pe_f{h}"].notna() & j[f"lnpe_hat_{h}"].notna()]
+        j = j[j["month"] + pd.offsets.MonthEnd(0) + pd.DateOffset(months=h) <= asof]
+        if len(j) >= 300:
+            e = j[f"ln_pe_f{h}"] - j[f"lnpe_hat_{h}"]
+            out[h] = (float(e.quantile(0.1)), float(e.quantile(0.9)))
+    return out
+
+
 def cmd_predict(a):
     df, _ = panel()
     row = _row(df, a.ticker, a.asof)
@@ -85,8 +102,10 @@ def cmd_predict(a):
     y10_note = f"，{r['y10_asof']:%Y-%m} 的值" if r["y10_asof"] < r["month"] else ""
     mu_txt = f"你給的 {a.mu:+.1%}/年" if a.mu is not None else f"資金成本 {y10 + fc.erp:.1%}/年（10 年期 {y10:.2%}{y10_note} + 5%）"
     print(f"  報酬假設：{mu_txt}；情境覆寫：{ov if ov else '無（用模型的盈餘預測）'}\n")
+    band = _error_quantiles(df, asof) if a.mu is None and not ov else {}
     rows = []
     for h in H_ALL:
+        pe_main = np.exp(p[f"lnpe_hat_{h}"]) if p[f"ni_hat_{h}"] > 0 else np.nan
         rows.append({"幾個月後": h,
                      "預測營收TTM $B": p[f"rev_hat_{h}"] / 1e9,
                      "預測淨利率": f"{p[f'm_hat_{h}']:.1%}",
@@ -94,8 +113,15 @@ def cmd_predict(a):
                      "盈餘變化": f"{p[f'ni_hat_{h}']/r['ni_ttm']-1:+.0%}" if r["ni_ttm"] > 0 else "—",
                      "預測PE（主）": "虧損" if p[f"ni_hat_{h}"] <= 0 else _pe(np.exp(p[f"lnpe_hat_{h}"])),
                      "若股價不動": "虧損" if p[f"ni_hat_{h}"] <= 0 else _pe(np.exp(p[f"lnpe_flat_{h}"])),
-                     "若照過去10年報酬": "虧損" if p[f"ni_hat_{h}"] <= 0 else _pe(np.exp(p[f"lnpe_hist_{h}"]))})
+                     "若照過去10年報酬": "虧損" if p[f"ni_hat_{h}"] <= 0 else _pe(np.exp(p[f"lnpe_hist_{h}"])),
+                     "80%區間": (f"{pe_main * np.exp(band[h][0]):.1f}–{pe_main * np.exp(band[h][1]):.1f}"
+                                if h in band and np.isfinite(pe_main) else "—")})
+        if a.target_pe and p[f"ni_hat_{h}"] > 0:
+            need = (np.log(a.target_pe) + np.log(p[f"ni_hat_{h}"]) - np.log(r["mc"])) * 12 / h
+            rows[-1][f"要到本益比{a.target_pe:g}需要的年報酬"] = f"{np.exp(need) - 1:+.0%}"
     print(pd.DataFrame(rows).round(2).to_string(index=False))
+    if band:
+        print("\n  80% 區間：回測裡同一預測距離、當時以前已揭曉的模型誤差 10%–90% 分位數（走動式實測涵蓋率 79–83%，README §11）。")
     print(f"\n  市場現價隱含的長期淨利率：{p['implied_m']:.1%}（公司 5 年中位 {r['m_bar']:.1%}）——{_implied_read(p['implied_m'], r['m_bar'])}")
     print("  讀法：本益比的變化 ＝ 股價報酬 − 盈餘成長。盈餘那一項是模型預測的；報酬那一項不可預測，")
     print("        所以同時列出三種報酬假設。回測誤差見 README §3。")
@@ -179,6 +205,7 @@ def main():
     p.add_argument("--rev-growth", help="未來 1/2/3 年營收成長，例 0.3,0.1,0.05")
     p.add_argument("--margin", help="未來 1/2/3 年 TTM 淨利率，例 0.35,0.3,0.25")
     p.add_argument("--m-bar", type=float, help="結構淨利率（覆寫 5 年中位數）")
+    p.add_argument("--target-pe", type=float, help="反推：要在各預測距離達到這個本益比，每年需要多少報酬")
     p.set_defaults(fn=cmd_predict)
     p = sp.add_parser("implied")
     p.add_argument("tickers", nargs="+")

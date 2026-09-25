@@ -108,6 +108,9 @@ class PEForecaster:
             return np.full(len(df), mu * h / 12)
         if mode == "coe":
             return (df["y10"].to_numpy(float) + self.erp) * h / 12
+        if mode == "beta":                        # CAPM：10 年期 + beta × 風險溢酬（beta 用過去 36 個月）
+            b = df["beta"].to_numpy(float) if "beta" in df else np.ones(len(df))
+            return (df["y10"].to_numpy(float) + np.where(np.isfinite(b), b, 1.0) * self.erp) * h / 12
         if mode == "hist":
             return np.full(len(df), self.diag[h]["mu_hist"])
         return np.zeros(len(df))

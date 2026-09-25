@@ -78,6 +78,14 @@ def monthly_panel(qf, prices, macro):
     df["ln_pe"] = np.where(df["ni_ttm"] > 0, np.log(df["mc"] / df["ni_ttm"].where(df["ni_ttm"] > 0)), np.nan)
     df["ep"] = df["ni_ttm"] / df["mc"]
     df["ep_c"] = df["ep"].clip(-0.3, 0.3)      # 市場對「現在盈餘」的定價：低 E/P ＝ 市場預期盈餘會長
+    # beta：過去 36 個月，公司月報酬對「全體等權平均月報酬」的斜率（只用 t 以前的月份）
+    df["mret"] = df.groupby("ticker")["mc"].transform(lambda s: np.log(s / s.shift(1)))
+    df["mkt"] = df.groupby("month")["mret"].transform("mean")
+    def _beta(g):
+        cov = g["mret"].rolling(36, min_periods=24).cov(g["mkt"])
+        var = g["mkt"].rolling(36, min_periods=24).var()
+        return (cov / var).clip(0.3, 3.0)
+    df["beta"] = df.groupby("ticker", group_keys=False)[["mret", "mkt"]].apply(_beta)
     return df
 
 
