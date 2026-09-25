@@ -2,10 +2,10 @@
 """任何美股代號的「現在」預測（網頁的代號查詢用）。
 
     python3 now_run.py --lg <loosygoosie data/companies> --oz <ozkanpakdil tickers/all.csv 對上 CIK 的表> \
-                       --ozm <月底股價表> --stooq <S&P 500 Stooq 目錄> [--train tech|sp500]
+                       --ozm <月底股價表> --stooq <S&P 500 Stooq 目錄> [--train tech|sp500] [--idx <indexkit 成分股目錄>]
 
 模型：組合模型（README §13），用 --train 指定的名單訓練到今天；財報來源與限制見 pef/now.py。
-輸出：results/now_all.csv（每家一列：市值、TTM 淨利、目前本益比、3–36 個月的組合預測與成員）。
+輸出：results/now_all.csv（每家一列：市值、TTM 淨利、目前本益比、3–36 個月的組合預測與成員；有 --idx 時加上所屬指數）。
 """
 import argparse
 import os
@@ -34,6 +34,7 @@ def main():
     ap.add_argument("--stooq", required=True)
     ap.add_argument("--price-date", default="2026-09-24")
     ap.add_argument("--train", default="sp500", choices=["tech", "sp500"])
+    ap.add_argument("--idx", default=None, help="kovagent/indexkit 的成分股 parquet 目錄（ndx/sp400/sp600/rut-2026-09.parquet）")
     a = ap.parse_args()
     sp = pd.read_csv(os.path.join(DATA, "universe_sp500.csv"), keep_default_na=False)
     tech = pd.read_csv(os.path.join(DATA, "universe.csv"), keep_default_na=False)
@@ -51,6 +52,11 @@ def main():
     out = v[keep].join(e.drop(columns=["ticker", "month"]))
     skipped = d[~ok][keep]
     out = pd.concat([out, skipped.assign(too_old=True)], ignore_index=True)
+    if a.idx:
+        tiers = now.index_tiers(a.idx, meta, sp["ticker"])
+        out = out.merge(tiers, on="ticker", how="left")
+        print("所屬指數：" + "、".join(f"{k or '不在主要指數'} {v}" for k, v in out["tier"].fillna("").value_counts().items())
+              + f"；Nasdaq-100 {int(out['in_ndx'].fillna(False).astype(bool).sum())}")
     out.to_csv(os.path.join(HERE, "results", "now_all.csv"), index=False, float_format="%.6g")
     # 沒有季報的代號（外國公司只交年報、ETF 以外的其他普通股）：網頁只帶入市值，淨利讓使用者自己填
     oz = pd.read_csv(a.oz)

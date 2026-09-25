@@ -156,6 +156,37 @@ def broad_block():
                 bands={int(h): [r(v.q10, 4), r(v.q90, 4)] for h, v in bd.iterrows()})
 
 
+def idx_block():
+    """中小型股（lab_small.py）、Nasdaq-100（lab_ndx.py）、最近一段依指數（lab_window.py）的成績，與中小型股的 80% 區間。
+    中小型股的區間只有 3–12 個月的回測；18–36 個月用 S&P 500 的區間乘上 12 個月的寬度比例（中小型股 ÷ S&P 500）。"""
+    sm = pd.read_csv(os.path.join(RES, "small_scores.csv"))
+    sb = pd.read_csv(os.path.join(RES, "small_bands.csv")).set_index("h")
+    bd = pd.read_csv(os.path.join(RES, "broad_bands.csv")).set_index("h")
+    nd = pd.read_csv(os.path.join(RES, "ndx_hist.csv"))
+    wn = pd.read_csv(os.path.join(RES, "window_scores.csv"))
+    small = []
+    for g in ("S&P 400 中型股", "S&P 600 小型股", "Russell 2000", "全部中小型股"):
+        for h in (3, 6, 9, 12):
+            x = sm[(sm["群組"] == g) & (sm["h"] == h)]
+            get = lambda per, m, c: float(x[(x["期間"] == per) & (x["方法"] == m)][c].iloc[0])
+            small.append(dict(g=g, h=h, n=int(get("全期", "V1", "n")), rw=r(get("全期", "rw", "中位絕對誤差")),
+                              m=r(get("全期", "V1", "中位絕對誤差")), r2s=r(get("選模期", "V1", "OOS_R2")),
+                              r2h=r(get("保留期", "V1", "OOS_R2")), dir=r(get("全期", "V1", "方向命中"))))
+    ndx = []
+    for g in ("Nasdaq-100", "S&P 500 其他"):
+        for h in (12, 36):
+            x = nd[(nd["群組"] == g) & (nd["h"] == h)].set_index("期間")
+            ndx.append(dict(g=g, h=h, firms=int(x.loc["全期", "公司數"]), rw=r(x.loc["全期", "本益比不變"]), m=r(x.loc["全期", "模型"]),
+                            r2s=r(x.loc["選模期", "OOS_R2"]), r2h=r(x.loc["保留期", "OOS_R2"]), dir=r(x.loc["全期", "方向命中"])))
+    win = [dict(g=x.群組, h=int(x.h), firms=int(x.公司數), rw=r(x.本益比不變), m=r(x.模型), r2=r(x.OOS_R2), dir=r(x.方向命中),
+                mc=r(x.市值中位_億美元, 1)) for x in wn.itertuples()]
+    k_lo, k_hi = sb.loc[12, "q10"] / bd.loc[12, "q10"], sb.loc[12, "q90"] / bd.loc[12, "q90"]
+    bands = {int(h): ([r(sb.loc[h, "q10"], 4), r(sb.loc[h, "q90"], 4)] if h in sb.index
+                      else [r(v.q10 * k_lo, 4), r(v.q90 * k_hi, 4)]) for h, v in bd.iterrows()}
+    cover = {int(h): [r(v["中小型股區間涵蓋率_保留期"]), r(v["S&P500區間涵蓋率_保留期"])] for h, v in sb.iterrows()}
+    return dict(small=small, ndx=ndx, window=win, bands_small=bands, cover=cover)
+
+
 def history_broad():
     p = pd.read_csv(os.path.join(RES, "broad_predictions.csv.gz"), parse_dates=["month"])
     out = {}
@@ -180,7 +211,9 @@ def now_block():
     d = pd.read_csv(os.path.join(RES, "now_all.csv"), parse_dates=["period_end"])
     coe = d["y10"] + lab.ERP
     cols = ["t", "n", "a", "sec", "sp", "px", "mc", "ni", "pe", "fe", "st", "e3", "e6", "e9", "e12", "e18", "e24", "e36",
-            "o12", "h12", "g12", "z12", "core", "oneoff", "grp", "old"]
+            "o12", "h12", "g12", "z12", "core", "oneoff", "grp", "old", "ix", "nd"]
+    if "tier" not in d:
+        d["tier"], d["in_ndx"] = "", False
     rows = []
     for x in d.itertuples():
         core_ni = x.oi_ttm * 0.85 if np.isfinite(x.oi_ttm) else np.nan
@@ -192,7 +225,7 @@ def now_block():
                      bool(x.in_sp500), r(x.px, 2), r(x.mc / 1e9, 2), r(x.ni_ttm / 1e9, 3), r(x.pe, 1) if x.ni_ttm > 0 else None,
                      x.period_end.strftime("%Y-%m-%d"), bool(x.stale)] + e + mem +
                     [r(x.mc / core_ni, 1) if np.isfinite(core_ni) and core_ni > 0 else None, oneoff, grp.get(x.ticker, ""),
-                     bool(getattr(x, "too_old", False) is True)])
+                     bool(getattr(x, "too_old", False) is True), x.tier if isinstance(x.tier, str) else "", bool(x.in_ndx is True)])
     mc_only = pd.read_csv(os.path.join(RES, "now_mc_only.csv"))
     extra = [[t, short(str(n)), r(m / 1e9, 2), r(p_, 2), str(ind)] for t, n, m, p_, ind in
              zip(mc_only["ticker"], mc_only["name"], mc_only["mc"], mc_only["px"], mc_only["industry"])]
@@ -215,7 +248,7 @@ def main():
         asof=ASOF.strftime("%Y-%m-%d"), y10=nw["y10"], erp=lab.ERP, n_firms=int(d["ticker"].nunique()),
         n_sp=int(db["ticker"].nunique()), ret_bands={h: [r(a, 4), r(b, 4)] for h, (a, b) in ret_b.items()},
         horizons=horizon_block(), methods=methods_block(), sectors=sector_block(p), cases=cases_block(p, d),
-        broad=broad_block(), now=nw, history=history_broad(),
+        broad=broad_block(), idx=idx_block(), now=nw, history=history_broad(),
         gics_of={t: GICS_ZH.get(g, g) for t, g in zip(u["ticker"], u["gics"])})
     tpl = open(os.path.join(HERE, "artifact", "page.html"), encoding="utf-8").read()
     blob = json.dumps(data, ensure_ascii=False, separators=(",", ":"))

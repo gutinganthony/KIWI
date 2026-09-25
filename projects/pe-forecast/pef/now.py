@@ -173,3 +173,26 @@ def rows(Q, prices, meta, macro, now):
     d["stale"] = d["fin_age_days"] > 150
     d["too_old"] = d["fin_age_days"] > STALE_DAYS
     return lab.add_features(d)
+
+
+IDX_FILES = (("ndx", "ndx"), ("sp400", "sp400"), ("sp600", "sp600"), ("rut", "rut"))
+
+
+def index_tiers(idx_dir, meta, sp500_tickers, month="2026-09"):
+    """每家公司屬於哪個指數（kovagent/indexkit 的成分股檔，<指數>-<月份>.parquet）。
+    回傳 DataFrame：ticker、in_ndx、in_sp400、in_sp600、in_rut、tier（S&P 500 > S&P 400 > S&P 600 > Russell 2000 > 空白）。
+    代號比對用主代號加別名（BRK.B / BRK-B 視為同一個）。"""
+    norm = lambda t: str(t).upper().replace(".", "-").replace("/", "-")
+    sets = {"sp500": {norm(t) for t in sp500_tickers}}
+    for k, f in IDX_FILES:
+        d = pd.read_parquet(os.path.join(idx_dir, f"{f}-{month}.parquet"))
+        sets[k] = {norm(t) for t in d["ticker"].dropna()}
+    rows = []
+    for r in meta.itertuples():
+        keys = {norm(r.ticker)} | {norm(x) for x in str(r.aliases).split() if x and x != "nan"}
+        x = {f"in_{k}": bool(keys & sets[k]) for k in ("ndx", "sp400", "sp600", "rut")}
+        sp5 = bool(r.in_sp500) or bool(keys & sets["sp500"])
+        x["tier"] = ("S&P 500" if sp5 else "S&P 400" if x["in_sp400"] else "S&P 600" if x["in_sp600"]
+                     else "Russell 2000" if x["in_rut"] else "")
+        rows.append(dict(ticker=r.ticker, **x))
+    return pd.DataFrame(rows)

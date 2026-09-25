@@ -295,7 +295,7 @@ details .tablewrap { max-height: 360px; overflow: auto; margin-top: 8px; }
         <h2>它做不到的事</h2>
         <div class="prose">
           <p><strong>預測不了股價的大事件。</strong>2022 年中它不可能知道 ChatGPT 會引爆 AI 需求（見案例）。80% 區間的意思是：每 5 次有 1 次會跑到區間外。</p>
-          <p><strong>學過的是 S&amp;P 500 的大型公司、2015–2026 年。</strong>S&amp;P 500 以外的中小型公司是套用，準確度沒有驗證過；越小、越不穩定的公司，參考價值越低。</p>
+          <p><strong>學過的是 S&amp;P 500 的大型公司、2015–2026 年。</strong>拿去預測 S&amp;P 400、S&amp;P 600、Russell 2000 的中小型股也有效（6–12 個月，回測見「回測」分頁），但誤差較大；不在這些指數裡的微型股，3–6 個月的預測反而比「本益比不變」差，參考價值很低。</p>
           <p><strong>只交年報的外國公司（例如台積電 TSM）沒有季報</strong>，模型沒辦法算，只能在試算裡自己輸入淨利。</p>
           <p><strong>盈餘是帳面淨利（GAAP）。</strong>有大額一次性項目（投資評價利得、併購攤銷、稅務）時，要搭配「營業利益口徑」一起看。</p>
         </div>
@@ -357,6 +357,16 @@ details .tablewrap { max-height: 360px; overflow: auto; margin-top: 8px; }
         <h3>各產業（12 個月）</h3>
         <div class="tablewrap"><table id="tbSec"></table></div>
         <p class="muted small">全期 2015–2026。誤差最小的是公用事業、必需消費（本益比本來就穩）；比「本益比不變」改善最多的是能源、醫療、原物料（誤差少兩成以上）；不動產和必需消費改善最少。</p>
+      </div>
+
+      <div class="block">
+        <h3>S&amp;P 500 以外：Nasdaq-100、中型股、小型股、Russell 2000</h3>
+        <p class="prose" id="idxLead"></p>
+        <div class="tablewrap"><table id="tbSmall"></table></div>
+        <p class="muted small" id="smallNote"></p>
+        <h3>最近一段（2025-12 → 2026-09），依現在的指數成分股分組</h3>
+        <div class="tablewrap"><table id="tbWin"></table></div>
+        <p class="muted small" id="winNote"></p>
       </div>
 
       <div class="block" id="histBlock">
@@ -884,6 +894,36 @@ const D=/*__DATA__*/null;
     }
   })();
 
+  (function idxTables() {
+    const I = D.idx, sm = (g, h) => I.small.find(x => x.g === g && x.h === h), nd = I.ndx.find(x => x.g === "Nasdaq-100" && x.h === 12);
+    const all12 = sm("全部中小型股", 12), r2k = sm("Russell 2000", 12);
+    $("idxLead").textContent = `同一個模型（只用 S&P 500 訓練、規格不改）直接拿去預測：Nasdaq-100 的 12 個月誤差 ${pm(nd.m)}（本益比不變 ${pm(nd.rw)}）；` +
+      `中小型股 12 個月 ${pm(all12.m)}（本益比不變 ${pm(all12.rw)}），Russell 2000 ${pm(r2k.m)}（${pm(r2k.rw)}）。3 個月一樣贏不了「本益比不變」。` +
+      `為中小型股另外做的三種版本（拿掉中小型股缺的毛利、營業利益、存貨特徵；把中小型股也放進訓練；往「本益比不變」縮一半）都沒有明確更好，所以不改模型，只把中小型股的 80% 區間換寬。`;
+    const t = $("tbSmall"), hr = node("tr", null, node("thead", null, t));
+    for (const h of ["群組", "樣本", "6 個月誤差：模型／不變", "12 個月誤差：模型／不變", "12 個月 R²：選模期／保留期", "12 個月方向命中"]) node("th", null, hr, h);
+    const tb = node("tbody", null, t);
+    const tr0 = node("tr", null, tb);
+    ["Nasdaq-100", `S&P 500 回測裡的成分股，${nd.firms} 家，2015–2026 月頻`, "—", `${pm(nd.m)}／${pm(nd.rw)}`, `${nd.r2s.toFixed(2)}／${nd.r2h.toFixed(2)}`, pct(nd.dir)].forEach(v => node("td", null, tr0, v));
+    for (const g of ["S&P 400 中型股", "S&P 600 小型股", "Russell 2000"]) {
+      const a = sm(g, 6), b = sm(g, 12), tr = node("tr", null, tb);
+      [g, `${b.n.toLocaleString()} 個公司季，2021–2026 季頻`, `${pm(a.m)}／${pm(a.rw)}`, `${pm(b.m)}／${pm(b.rw)}`, `${b.r2s.toFixed(2)}／${b.r2h.toFixed(2)}`, pct(b.dir)].forEach(v => node("td", null, tr, v));
+    }
+    const c12 = I.cover[12];
+    $("smallNote").textContent = `中小型股：選模期 2021–2023、保留期 2024–2026；股價來自指數 ETF 每季的持股申報，財報是之後申報的版本（略偏樂觀），名單只有活到 2026 年的公司。` +
+      `80% 區間：直接用 S&P 500 的區間，中小型股保留期只涵蓋 ${pct(c12[1])}（12 個月）；改用中小型股選模期的誤差畫區間，保留期涵蓋 ${pct(c12[0])}——網頁對 S&P 500 以外的公司用這個較寬的區間。`;
+    const w = $("tbWin"), wh = node("tr", null, node("thead", null, w));
+    for (const h of ["指數", "公司數", "市值中位（億美元）", "3 個月 R²", "6 個月 R²", "9 個月 R²", "9 個月誤差：模型／不變"]) node("th", null, wh, h);
+    const wb = node("tbody", null, w);
+    for (const g of ["S&P 500", "Nasdaq-100", "S&P 400 中型股", "S&P 600 小型股", "Russell 2000", "其他"]) {
+      const x = h => I.window.find(y => y.g === g && y.h === h);
+      if (!x(3)) continue;
+      const tr = node("tr", null, wb);
+      [g === "其他" ? "不在上面任何指數" : g, x(3).firms, Math.round(x(3).mc).toLocaleString(), x(3).r2.toFixed(2), x(6).r2.toFixed(2), x(9).r2.toFixed(2), `${pm(x(9).m)}／${pm(x(9).rw)}`].forEach(v => node("td", null, tr, v));
+    }
+    $("winNote").textContent = "模型用 2026-09-30 以前已揭曉的 S&P 500 資料訓練，預測 2025-12 到 2026-06 各月的 3、6、9 個月後本益比（9 個月只有 2025-12 一個起點）。R² 小於 0＝比「本益比不變」差。只有 9 個月的資料，當佐證不當證明。";
+  })();
+
   // 一家一家看（S&P 500）
   const HIST_H = Object.keys(D.history).map(Number).sort((a, b) => a - b);
   let histState = { t: "MU", h: 12 };
@@ -962,8 +1002,9 @@ const D=/*__DATA__*/null;
   // ── 現在的預測 ──
   $("pxDate").textContent = D.now.price_date;
   $("nNow").textContent = `${NOW.size.toLocaleString()} 家有季報（其中 ${nSp500} 家在 S&P 500），另外 ${MCO.size.toLocaleString()} 檔只有市值、沒有季報（例如只交年報的外國公司），可以在「自己試算」自己填淨利。`;
-  const BAND = D.broad.bands;
-  function bandTxt(pe, h) { const b = BAND[h]; return pe == null || !b ? "—" : `${fpe(pe * Math.exp(b[0]))}–${fpe(pe * Math.exp(b[1]))}`; }
+  const isSp = r => r.sp || r.ix === "S&P 500";
+  const bandOf = r => (isSp(r) ? D.broad.bands : D.idx.bands_small);
+  function bandTxt(pe, h, r) { const b = bandOf(r)[h]; return pe == null || !b ? "—" : `${fpe(pe * Math.exp(b[0]))}–${fpe(pe * Math.exp(b[1]))}`; }
   const okPE = x => x != null && x > 0 && x <= 500;
   function implNi(r, h) { const pe = r.e[h]; return okPE(pe) ? r.mc * Math.exp(COE * h / 12) / pe : null; }
   let selT = "MU", grp = "全部", spSec = "";
@@ -978,7 +1019,8 @@ const D=/*__DATA__*/null;
       node("h3", null, host, `${r.t}　${r.n}`);
       const tags = node("div", { class: "chips" }, host);
       node("span", { class: "chip" }, tags, r.sec);
-      node("span", { class: "chip" }, tags, r.sp ? "S&P 500（回測過）" : "S&P 500 以外（套用）");
+      node("span", { class: "chip" }, tags, isSp(r) ? "S&P 500（回測過）" : r.ix ? `${r.ix}（回測過：6–12 個月有效）` : "不在主要指數（微型股）");
+      if (r.nd) node("span", { class: "chip" }, tags, "Nasdaq-100");
       if (r.st) node("span", { class: "chip" }, tags, "⏳ 財報較舊");
       if (r.oneoff) node("span", { class: "chip" }, tags, "⚠️ 可能含一次性項目");
       const kv = node("div", { class: "kv" }, host);
@@ -989,9 +1031,12 @@ const D=/*__DATA__*/null;
       if (r.old) { node("p", { class: "warnbox" }, host, "最新一季季末超過 240 天，模型沒看過這麼舊的財報，不給預測。"); }
       else if (okPE(r.e[12])) {
         const ni12 = implNi(r, 12);
-        node("p", null, host, `模型預測 12 個月後 ${fpe(r.e[12])} 倍（80% 區間 ${bandTxt(r.e[12], 12)}）` + (r.ni > 0 && ni12 != null ? `，等於預期淨利 ${spct(ni12 / r.ni - 1)}。` : "。") +
+        node("p", null, host, `模型預測 12 個月後 ${fpe(r.e[12])} 倍（80% 區間 ${bandTxt(r.e[12], 12, r)}）` + (r.ni > 0 && ni12 != null ? `，等於預期淨利 ${spct(ni12 / r.ni - 1)}。` : "。") +
           `四個預測器：盈餘模型 ${pe500(r.o12)}、線性 ${pe500(r.h12)}、樹-盈餘 ${pe500(r.g12)}、樹-變化 ${pe500(r.z12)}。`);
       } else node("p", null, host, "模型預測 12 個月後的盈餘接近零或虧損，本益比沒有意義。");
+      if (!r.old && !isSp(r)) node("p", { class: r.ix ? "muted small" : "warnbox" }, host, r.ix
+        ? "S&P 500 以外的公司：80% 區間用中小型股回測的誤差畫（比 S&P 500 寬）。3 個月的預測不要用。"
+        : "⚠️ 這家不在 S&P 500／400／600 或 Russell 2000。這類微型股在最近一段的回測裡，3–6 個月的預測比「本益比不變」還差；區間用中小型股的，但實際可能更寬。");
       if (r.oneoff && r.core != null) node("p", { class: "warnbox" }, host, `⚠️ 帳面淨利和「營業利益 × 0.85」差很多（投資評價、出售資產、稅務或減損這類一次性項目），營業利益口徑的本益比約 ${fpe(r.core)} 倍，比帳面的本益比更能代表本業。`);
       if (!r.old) {
         const lg = node("div", { class: "legend" }, host);
@@ -1003,7 +1048,7 @@ const D=/*__DATA__*/null;
           x: xs, xTick: x => x === 0 ? "今天" : x + " 月", yLog: true, height: 260, label: `${r.t} 本益比預測路徑`,
           yFmt: x => x == null ? "—" : fpe(x), ref: pe0 != null ? { y: pe0 } : null,
           series: [{ name: "模型預測", color: "--s-model", values: v, dots: true }],
-          bands: [{ lo: [pe0].concat(H.map(h => okPE(r.e[h]) ? r.e[h] * Math.exp(BAND[h][0]) : null)), hi: [pe0].concat(H.map(h => okPE(r.e[h]) ? r.e[h] * Math.exp(BAND[h][1]) : null)),
+          bands: [{ lo: [pe0].concat(H.map(h => okPE(r.e[h]) ? r.e[h] * Math.exp(bandOf(r)[h][0]) : null)), hi: [pe0].concat(H.map(h => okPE(r.e[h]) ? r.e[h] * Math.exp(bandOf(r)[h][1]) : null)),
                     color: "--band-model", keyColor: "--s-model", name: "80% 區間" }],
           title: i => xs[i] === 0 ? "今天" : `${xs[i]} 個月後`
         });
@@ -1041,7 +1086,7 @@ const D=/*__DATA__*/null;
       node("td", null, tr, r.pe == null ? "虧損" : fpe(r.pe));
       node("td", null, tr, r.old ? "—" : pe500(r.e[6]));
       const c12 = node("td", null, tr); node("strong", null, c12, r.old ? "—" : pe500(r.e[12]));
-      node("td", null, tr, !r.old && okPE(r.e[12]) ? bandTxt(r.e[12], 12) : "—");
+      node("td", null, tr, !r.old && okPE(r.e[12]) ? bandTxt(r.e[12], 12, r) : "—");
       node("td", null, tr, r.old ? "—" : pe500(r.e[24]));
       node("td", null, tr, r.old ? "—" : pe500(r.e[36]));
       const ni12 = implNi(r, 12);
