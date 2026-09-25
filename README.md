@@ -35,6 +35,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |------|-------|-------|
 | 2026-08-28 | [T1 條件⑤ 檢核 — NVDA Q2 FY27：供應商融資擴散觸發](./topics/business/2026-08-28-t1-condition5-nvda-q2-fy27-trigger.md) | Business |
 | 2026-08-25 | [「中國曝險」紅旗的第一性原理重寫](./topics/business/2026-08-25-china-red-flag-first-principles-rewrite.md) | Business |
+| 2026-09-25 | [深度調查：BESI × 弘塑 3131 × Rambus — 為什麼跌、值不值得、何時進、怎麼進、何時認錯](./topics/business/2026-09-25-deep-dive-besi-3131-rambus-timing-strategy.md) | Business |
 | 2026-09-25 | [Agent CPU 五個瓶頸：誰先誰後，以及各自的標的](./topics/business/2026-09-25-agent-cpu-five-bottlenecks-sequencing-and-names.md) | Business |
 | 2026-09-25 | [〈AI Agent 如何改寫 AI 伺服器 CPU 的設計〉— 它把 bound 移到了我沒設想過的方向](./topics/business/2026-09-25-agent-cpu-bound-and-memory-interface.md) | Business |
 | 2026-09-15 | [族群輪動偵測器 v0 — 我一直在解錯的問題，以及現在建好的那台機器](./topics/business/2026-09-15-theme-rotation-detector-v0.md) | Business |
@@ -143,6 +144,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-09-15 | [族群輪動偵測器 v0 — 我一直在解錯的問題，以及現在建好的那台機器](./topics/business/2026-09-15-theme-rotation-detector-v0.md) | Business |
 | 2026-09-25 | [〈AI Agent 如何改寫 AI 伺服器 CPU 的設計〉— 它把 bound 移到了我沒設想過的方向](./topics/business/2026-09-25-agent-cpu-bound-and-memory-interface.md) | Business |
 | 2026-09-25 | [Agent CPU 五個瓶頸：誰先誰後，以及各自的標的](./topics/business/2026-09-25-agent-cpu-five-bottlenecks-sequencing-and-names.md) | Business |
+| 2026-09-25 | [深度調查：BESI × 弘塑 3131 × Rambus — 為什麼跌、值不值得、何時進、怎麼進、何時認錯](./topics/business/2026-09-25-deep-dive-besi-3131-rambus-timing-strategy.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
