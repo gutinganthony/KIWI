@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """前瞻本益比模型 —— 指令入口。
 
-  python3 pe_forecast.py predict MU                       # 用最新資料預測 6/12/24/36 個月後的本益比
+  python3 pe_forecast.py predict MU                       # 用最新資料預測 3–36 個月後的本益比（組合模型＋盈餘拆解）
   python3 pe_forecast.py predict MU --asof 2025-09        # 站在 2025-09（只用當時資料）預測
   python3 pe_forecast.py predict MU --rev-growth 0.3,0.1,0 --margin 0.35,0.3,0.25 --mu 0.0
                                                           # 用你自己的盈餘與報酬假設（情境）
   python3 pe_forecast.py implied MU NVDA MSFT GOOGL       # 市場現價隱含的長期淨利率 vs 公司歷史
   python3 pe_forecast.py backtest                          # 全部回測，寫進 results/
-  python3 pe_forecast.py history MU --h 12                 # 過去每個月「12 個月前的預測」vs 實際
+  python3 pe_forecast.py history MU --h 12                 # 過去每季「12 個月前的預測」vs 實際
+  python3 lab_run.py                                       # 改良實驗：哪個距離、哪個方法最有效（README §12）
 
 設計見 DESIGN.md，回測證據與限制見 README.md。
 """
@@ -22,6 +23,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 from pef import backtest as bt          # noqa: E402
+from pef import ensemble as en          # noqa: E402
+from pef.lab import HORIZONS            # noqa: E402
 from pef.features import attach_future  # noqa: E402
 from pef.forecast import PEForecaster   # noqa: E402
 from pef.load import panel              # noqa: E402
@@ -79,8 +82,37 @@ def _error_quantiles(df, asof):
     return out
 
 
+def _print_ensemble(df, qf, fc, r, asof):
+    """主預測：組合模型（README §12）。"""
+    ens = en.EnsembleForecaster().fit(df, qf, asof, old=fc)
+    rows = ens.panel[(ens.panel["ticker"] == r["ticker"]) & (ens.panel["month"] == r["month"])]
+    e = ens.predict(rows).iloc[0]
+    band = en.bands(asof)
+    st = en.horizon_stats()
+    out = []
+    for h in HORIZONS:
+        lp = e[f"ens_{h}"]
+        pe_h = np.exp(lp) if np.isfinite(lp) else np.nan
+        o = {"幾個月後": h, "組合預測PE": _pe(pe_h),
+             "80%區間": f"{pe_h * np.exp(band[h][0]):.1f}–{pe_h * np.exp(band[h][1]):.1f}" if h in band and np.isfinite(pe_h) else "—",
+             "相對今天": f"{pe_h / r['pe'] - 1:+.0%}" if np.isfinite(pe_h) and r["pe"] > 0 else "—"}
+        for m, nm in (("old", "盈餘模型"), ("huber", "線性"), ("gbm", "樹-盈餘"), ("gbm_z", "樹-變化")):
+            v = e.get(f"{m}_{h}", np.nan)
+            o[nm] = _pe(np.exp(v)) if np.isfinite(v) else ("—" if m == "old" and h not in en.OLD_H else "虧/>500")
+        if st is not None and h in st.index:
+            s = st.loc[h]
+            o["回測誤差：組合/不變"] = f"±{np.exp(s['組合_誤差']) - 1:.0%} / ±{np.exp(s['隨機漫步_誤差']) - 1:.0%}"
+            o["方向命中"] = f"{s['方向命中']:.0%}"
+        out.append(o)
+    print("【主預測】組合模型：四個預測器等權平均（盈餘模型 3/9/18 月沒有 → 三個平均）")
+    print(pd.DataFrame(out).to_string(index=False))
+    print("  回測誤差＝2015–2026 走動式樣本外的中位 |ln 誤差|，換成 ±%；「不變」＝直接拿今天的本益比當預測。")
+    print("  有效性（README §12）：3 個月幾乎贏不了「本益比不變」；9–12 個月是誤差與改善幅度的最佳平衡；")
+    print("  24–36 個月相對改善最大，但絕對誤差也最大（±34–36%）。\n")
+
+
 def cmd_predict(a):
-    df, _ = panel()
+    df, qf = panel()
     row = _row(df, a.ticker, a.asof)
     asof = row["month_end"].iloc[0]
     fc = PEForecaster().fit(df, asof)
@@ -102,6 +134,11 @@ def cmd_predict(a):
     y10_note = f"，{r['y10_asof']:%Y-%m} 的值" if r["y10_asof"] < r["month"] else ""
     mu_txt = f"你給的 {a.mu:+.1%}/年" if a.mu is not None else f"資金成本 {y10 + fc.erp:.1%}/年（10 年期 {y10:.2%}{y10_note} + 5%）"
     print(f"  報酬假設：{mu_txt}；情境覆寫：{ov if ov else '無（用模型的盈餘預測）'}\n")
+    if not a.no_ensemble:
+        _print_ensemble(df, qf, fc, r, asof)
+        if ov or a.mu is not None:
+            print("  （情境覆寫與 --mu 只作用在下面的盈餘拆解表；組合模型用的是模型自己的預測。）\n")
+    print("【盈餘拆解】兩階段盈餘模型：營收 × 淨利率 → 未來盈餘，再配上報酬假設")
     band = _error_quantiles(df, asof) if a.mu is None and not ov else {}
     rows = []
     for h in H_ALL:
@@ -175,24 +212,37 @@ def cmd_backtest(a):
 
 
 def cmd_history(a):
-    path = os.path.join(RES, "predictions.csv.gz")
-    if not os.path.exists(path):
-        sys.exit("先跑 python3 pe_forecast.py backtest")
-    pred = pd.read_csv(path, parse_dates=["month"])
-    df, _ = panel()
     h = a.h
-    f = attach_future(df, h)[["ticker", "month", f"ln_pe_f{h}", "ln_pe", "ep"]]
-    d = pred[pred["ticker"] == a.ticker].merge(f, on=["ticker", "month"])
+    df, _ = panel()
+    d = attach_future(df, h)
+    d = d[d["ticker"] == a.ticker][["ticker", "month", "ln_pe", "ep", f"ln_pe_f{h}", f"ep_f{h}"]]
+    have = False
+    lab_path = os.path.join(RES, "lab_predictions.csv.gz")
+    if os.path.exists(lab_path):
+        lp = pd.read_csv(lab_path, parse_dates=["month"])
+        d = d.merge(lp[(lp["h"] == h) & (lp["ticker"] == a.ticker)][["month", "ens"]], on="month", how="left")
+        have = True
+    old_path = os.path.join(RES, "predictions.csv.gz")
+    if h in H_ALL and os.path.exists(old_path):
+        pred = pd.read_csv(old_path, parse_dates=["month"])
+        d = d.merge(pred[pred["ticker"] == a.ticker][["month", f"lnpe_hat_{h}", f"ni_hat_{h}"]], on="month", how="left")
+        have = True
+    if not have:
+        sys.exit("先跑 python3 pe_forecast.py backtest 與 python3 lab_run.py")
     d["預測於"] = d["month"].dt.strftime("%Y-%m")
     d["目標月"] = (d["month"] + pd.DateOffset(months=h)).dt.strftime("%Y-%m")
     d["當時PE"] = np.where(d["ep"] <= 0, "虧損", np.exp(d["ln_pe"]).map(_pe))
-    d["模型預測PE"] = np.exp(d[f"lnpe_hat_{h}"]).map(_pe)
-    ep_f = attach_future(df, h)[["ticker", "month", f"ep_f{h}"]]
-    d = d.merge(ep_f, on=["ticker", "month"], how="left")
+    cols = ["預測於", "目標月", "當時PE"]
+    if "ens" in d:
+        d["組合預測PE"] = np.exp(d["ens"]).map(_pe)
+        cols.append("組合預測PE")
+    if f"lnpe_hat_{h}" in d:
+        d["盈餘模型PE"] = np.where(d[f"ni_hat_{h}"] <= 0, "虧損", np.exp(d[f"lnpe_hat_{h}"]).map(_pe))
+        cols.append("盈餘模型PE")
     d["實際PE"] = np.where(d[f"ep_f{h}"].isna(), "（未到）", np.where(d[f"ep_f{h}"] <= 0, "虧損", np.exp(d[f"ln_pe_f{h}"]).map(_pe)))
-    d["模型預測PE"] = np.where(d[f"ni_hat_{h}"] <= 0, "虧損", d["模型預測PE"])
-    d = d[d["month"].dt.month.isin([3, 6, 9, 12])]
-    print(d[["預測於", "目標月", "當時PE", "模型預測PE", "實際PE"]].to_string(index=False))
+    cols.append("實際PE")
+    d = d[d["month"].dt.month.isin([3, 6, 9, 12]) & (d["month"] >= "2015-01-01")]
+    print(d[cols].to_string(index=False))
 
 
 def main():
@@ -206,6 +256,7 @@ def main():
     p.add_argument("--margin", help="未來 1/2/3 年 TTM 淨利率，例 0.35,0.3,0.25")
     p.add_argument("--m-bar", type=float, help="結構淨利率（覆寫 5 年中位數）")
     p.add_argument("--target-pe", type=float, help="反推：要在各預測距離達到這個本益比，每年需要多少報酬")
+    p.add_argument("--no-ensemble", action="store_true", help="不跑組合模型（快；只看盈餘拆解）")
     p.set_defaults(fn=cmd_predict)
     p = sp.add_parser("implied")
     p.add_argument("tickers", nargs="+")
@@ -216,7 +267,7 @@ def main():
     p.set_defaults(fn=cmd_backtest)
     p = sp.add_parser("history")
     p.add_argument("ticker")
-    p.add_argument("--h", type=int, default=12, choices=H_ALL)
+    p.add_argument("--h", type=int, default=12, choices=HORIZONS)
     p.set_defaults(fn=cmd_history)
     a = ap.parse_args()
     a.fn(a)

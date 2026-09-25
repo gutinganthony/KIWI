@@ -15,7 +15,10 @@ import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+from pef import lab                                                   # noqa: E402
 from pef.data import load_macro, stooq_monthly, unadjust_dividends   # noqa: E402
+from pef.ensemble import EnsembleForecaster, bands, horizon_stats     # noqa: E402
+from pef.features import quarterly_features                           # noqa: E402
 from pef.forecast import PEForecaster                                 # noqa: E402
 from pef.load import panel                                            # noqa: E402
 from pef import snapshot as sn                                        # noqa: E402
@@ -40,7 +43,12 @@ LIST = [
     ("AMD", "那斯達克其他", 2488), ("TSLA", "那斯達克其他", 1318605), ("NFLX", "那斯達克其他", 1065280),
     ("CRWD", "那斯達克其他", 1535527), ("INTC", "那斯達克其他", 50863), ("CSCO", "那斯達克其他", 858877),
 ]
-YEN = {"SNDK", "WDC", "VST", "PLTR", "AVAV", "KTOS", "MRVL"}   # yennanliu 財報（到 2026 年中、Q4 已拆出）
+YEN = {"SNDK", "WDC", "VST", "PLTR", "AVAV", "KTOS", "MRVL"}
+# 組合模型的產業特徵：訓練名單裡的公司用 data/universe.csv 的產業；不在名單裡的科技股手動歸類；
+# 非科技股（能源、電力、軍工、TSLA）＝訓練時沒看過的產業（樹模型當缺值處理）
+EXTRA_SECTOR = {"SNDK": "memory", "COHR": "hardware", "LITE": "hardware", "CIEN": "hardware", "FN": "hardware",
+                "AAOI": "hardware", "CRDO": "semis", "MRVL": "semis"}
+ENS_H = (6, 12, 24)   # yennanliu 財報（到 2026 年中、Q4 已拆出）
 
 
 def load_repo_quarters():
@@ -173,15 +181,16 @@ def main():
     Q = pd.concat(quarters, ignore_index=True)
     Qc, notes = core_adjust(Q)
     sectors = {t: g for t, g, _ in LIST}
-    df, _ = panel()
+    df, qf = panel()
     fc = PEForecaster().fit(df, NOW)
+    ens = EnsembleForecaster().fit(df, qf, NOW, old=fc)
     res = {}
     for tag, QQ in (("gaap", Q), ("core", Qc)):
-        res[tag] = run_rows(QQ, prices, macro, sectors, fc)
+        res[tag] = run_rows(QQ, prices, macro, sectors, fc, ens)
     out = res["gaap"]
     core = res["core"].set_index("ticker")
     out["adj"] = out["ticker"].isin(notes)
-    for c in ("pe_now", "lnpe_hat_12", "lnpe_hat_24", "ni_hat_12", "ni_ttm", "implied_m"):
+    for c in ("pe_now", "lnpe_hat_12", "lnpe_hat_24", "ni_hat_12", "ni_ttm", "implied_m", "ens_12"):
         out[f"core_{c}"] = out["ticker"].map(core[c])
     meta = pd.DataFrame(meta)
     out = out.merge(meta, on="ticker", how="left")
@@ -189,7 +198,25 @@ def main():
     write_md(out, meta, notes)
 
 
-def run_rows(Q, prices, macro, sectors, fc):
+def ens_features(rows, Q, prices):
+    """把快照列補上組合模型要的特徵（和回測同一套：lab.quarter_extras + lab.add_features）。"""
+    ex = lab.quarter_extras(quarterly_features(Q))
+    f = rows.drop(columns=[c for c in ("g_qoq", "g_qoq_prev", "oi_ttm") if c in rows]).merge(
+        ex, on=["ticker", "period_end"], how="left")
+    ret12 = []
+    for r in f.itertuples():
+        m, _ = prices[r.ticker]
+        m = m[m.index <= r.month_end]
+        p12 = m[m.index <= m.index[-1] - pd.DateOffset(months=12)]
+        ret12.append(np.log(m.iloc[-1] / p12.iloc[-1]) if len(p12) else np.nan)
+    f["ret12"] = ret12
+    uni = pd.read_csv(os.path.join(DATA, "universe.csv"), keep_default_na=False).set_index("ticker")["sector"]
+    f["sector"] = f["ticker"].map(lambda t: uni.get(t, EXTRA_SECTOR.get(t, "other")))
+    f["ln_pe"] = np.log(f["mc"] / f["ni_ttm"].where(f["ni_ttm"] > 0))
+    return lab.add_features(f)
+
+
+def run_rows(Q, prices, macro, sectors, fc, ens):
     rows = sn.snapshot_rows(Q, prices, macro, sectors, NOW)
     # 財報落後的：把錨點移回「那一季還是最新」的月份，用那個月的股價，避免拿一年前的盈餘配今天的股價
     anchored = []
@@ -212,29 +239,40 @@ def run_rows(Q, prices, macro, sectors, fc):
     rows["ep"] = rows["ni_ttm"] / rows["mc"]
     rows["ep_c"] = rows["ep"].clip(-0.3, 0.3)
     rows = rows[rows["sigma"].notna() & rows["m_bar"].notna()].reset_index(drop=True)
-    p = fc.predict(rows, (6, 12, 24))
+    p = fc.predict(rows, (6, 12, 24, 36))
+    e = ens.predict(ens_features(rows, Q, prices), old_pred=p)
     return rows[["ticker", "sector", "period_end", "month_end", "price", "mc", "ni_ttm", "pe_now", "m_ttm", "m_bar",
                  "stale", "n_quarters", "fin_age_days"]].join(
         p[["implied_m", "ni_hat_12", "lnpe_hat_6", "lnpe_hat_12", "lnpe_hat_24", "lnpe_flat_12", "m_hat_12", "ni_hat_6",
-           "ni_hat_24"]])
+           "ni_hat_24"]]).join(e[[f"ens_{h}" for h in lab.HORIZONS]])
 
 
 def _pe(x):
     return "虧損" if not np.isfinite(x) or x <= 0 else f"{x:.1f}"
 
 
+def _ens_pe(x):
+    return _pe(np.exp(x)) if np.isfinite(x) else "虧損/>500"
+
+
 def write_md(out, meta, notes):
-    L = ["# 前瞻本益比快照：2026-09（最終模型，只從 68 家科技股學到的規律）", "",
-         "> 由 `snapshot_run.py` 產生。**不是投資建議，是模型輸出**：本益比 ＝ 市值 ÷ 預測盈餘，報酬假設＝資金成本 9.6%/年。",
-         "> 「若股價不動」那一欄＝純粹盈餘變化造成的本益比變化；兩欄的差＝報酬假設。",
+    bd = bands(NOW)
+    st = horizon_stats().loc[12]
+    L = ["# 前瞻本益比快照：2026-09（組合模型，只從 68 家科技股學到的規律）", "",
+         "> 由 `snapshot_run.py` 產生。**不是投資建議，是模型輸出**。",
+         f"> **主欄＝組合模型**（四個預測器等權平均，README §12）：2015–2026 走動式回測，12 個月誤差中位 ±{np.exp(st['組合_誤差']) - 1:.0%}"
+         f"（「本益比不變」是 ±{np.exp(st['隨機漫步_誤差']) - 1:.0%}），方向命中 {st['方向命中']:.0%}。80% 區間＝回測誤差的 10–90% 分位數。",
+         "> 「盈餘模型」欄＝兩階段盈餘模型（組合的成員之一，可拆成營收 × 淨利率）：12 月後盈餘變化與本益比，報酬假設＝資金成本 9.6%/年。",
          "> ⏳＝財報只到較早的季度：錨點移回那一季仍是最新的月份（「錨點」欄），用那個月的股價，預測期間從錨點起算。",
          "> ⚠️＝TTM 內有一次性項目（投資評價利得、出售資產、稅務或減損費用）：辨識方法與逐季明細見文末。",
          ">   「調整後」＝把那幾季換成「營業利益 × 0.85」（或營收 × 近 8 季中位淨利率）再跑一次模型——**是估計，不是財報數字**。",
          "> 能源、電力、軍工、TSLA 不在訓練名單裡（模型只學過科技股），樣本外測試結果見 README §4b。", ""]
-    for grp in out["group"].dropna().unique():
+    for grp in dict.fromkeys(g for _, g, _ in LIST):          # 照名單順序：CSP、記憶體、光通訊……
+        if grp not in set(out["group"]):
+            continue
         g = out[out["group"] == grp]
         L += [f"## {grp}", "",
-              "| 公司 | 錨點 | 最新財報季末 | 目前本益比 | 12 月後盈餘變化 | **12 月後本益比** | 若股價不動 | 24 月後本益比 | 隱含長期淨利率／5 年中位 | 調整後：目前 → 12 月後 |",
+              "| 公司 | 錨點 | 最新財報季末 | 目前本益比 | **組合：12 月後本益比** | 80% 區間 | 組合：6 月／24 月 | 盈餘模型：12 月後盈餘變化 → 本益比 | 隱含長期淨利率／5 年中位 | 調整後：目前 → 12 月後（組合） |",
               "|---|---|---|---|---|---|---|---|---|---|"]
         for r in g.itertuples():
             chg = f"{r.ni_hat_12 / r.ni_ttm - 1:+.0%}" if r.ni_ttm > 0 and r.ni_hat_12 > 0 else ("轉虧" if r.ni_hat_12 <= 0 else "由虧轉盈")
@@ -243,12 +281,14 @@ def write_md(out, meta, notes):
                 imp += "（框架失效）"
             adj = "—"
             if r.adj:
-                adj = f"{_pe(r.core_pe_now)} → {_pe(np.exp(r.core_lnpe_hat_12)) if r.core_ni_hat_12 > 0 else '虧損'}"
+                adj = f"{_pe(r.core_pe_now)} → {_ens_pe(r.core_ens_12)}"
             tag = ("⏳ " if r.stale else "") + ("⚠️ " if r.adj else "")
+            band = (f"{np.exp(r.ens_12 + bd[12][0]):.1f}–{np.exp(r.ens_12 + bd[12][1]):.1f}"
+                    if 12 in bd and np.isfinite(r.ens_12) else "—")
+            old12 = _pe(np.exp(r.lnpe_hat_12)) if r.ni_hat_12 > 0 else "虧損"
             L.append(f"| {tag}{r.ticker} | {pd.Timestamp(r.month_end):%Y-%m} | {pd.Timestamp(r.period_end):%Y-%m-%d} | "
-                     f"{_pe(r.pe_now)} | {chg} | **{_pe(np.exp(r.lnpe_hat_12)) if r.ni_hat_12 > 0 else '虧損'}** | "
-                     f"{_pe(np.exp(r.lnpe_flat_12)) if r.ni_hat_12 > 0 else '虧損'} | "
-                     f"{_pe(np.exp(r.lnpe_hat_24)) if r.ni_hat_24 > 0 else '虧損'} | {imp} | {adj} |")
+                     f"{_pe(r.pe_now)} | **{_ens_pe(r.ens_12)}** | {band} | {_ens_pe(r.ens_6)}／{_ens_pe(r.ens_24)} | "
+                     f"{chg} → {old12} | {imp} | {adj} |")
         L.append("")
     L += ["## 一次性項目明細（⚠️ 的依據）", "",
           "辨識：核心淨利 ＝ 營業利益 × 0.85（假設 15% 稅、忽略利息）。GAAP 淨利偏離核心淨利超過營收的 3% 且超過核心的 30% → 一次性項目",
