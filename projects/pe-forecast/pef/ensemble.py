@@ -86,6 +86,34 @@ def bands(asof, horizons=lab.HORIZONS, q=(0.1, 0.9)):
     return out
 
 
+def implied_earnings(lnpe, rows, h):
+    """組合預測的本益比「隱含」的 h 月後盈餘TTM：市值 × e^(資金成本×h/12) ÷ 本益比。"""
+    ret = (rows["y10"].to_numpy(float) + lab.ERP) * h / 12
+    return np.exp(np.log(rows["mc"].to_numpy(float)) + ret - np.asarray(lnpe, float))
+
+
+def return_surprise(d, h):
+    """實際報酬 − 資金成本假設（ln），只取今天與 h 月後都有正盈餘的列（本益比有定義）。
+
+    這正好是「盈餘完美預知」時本益比預測的誤差：ln PE(t+h) − [ln 市值 + 資金成本×h/12 − ln 真實盈餘]
+    ＝ ln(市值(t+h)/市值(t)) − 資金成本×h/12。你自己給的盈餘若完全正確，剩下的誤差就只有這一項。
+    """
+    g = d[(d["ni_ttm"] > 0) & (d[f"ni_ttm_f{h}"] > 0) & d[f"mc_f{h}"].notna() & (d["mc"] > 0)]
+    e = np.log(g[f"mc_f{h}"] / g["mc"]) - (g["y10"] + lab.ERP) * h / 12
+    return pd.DataFrame({"month": g["month"], "month_end": g["month_end"], "e": e})
+
+
+def return_bands(d, asof, horizons=lab.HORIZONS, q=(0.1, 0.9)):
+    """情境（你給盈餘）的 80% 區間：asof 以前已揭曉的「報酬 − 資金成本」分位數。d＝lab.build 的面板。"""
+    out = {}
+    for h in horizons:
+        r = return_surprise(d, h)
+        r = r[r["month_end"] + pd.DateOffset(months=h) <= pd.Timestamp(asof)]
+        if len(r) >= 300:
+            out[h] = (float(r["e"].quantile(q[0])), float(r["e"].quantile(q[1])))
+    return out
+
+
 def horizon_stats():
     """每個預測距離的回測成績（lab_run.py 產生），給 CLI 顯示可信度。"""
     path = os.path.join(RES, "lab_horizon.csv")

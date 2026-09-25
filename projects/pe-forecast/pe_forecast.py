@@ -3,8 +3,10 @@
 
   python3 pe_forecast.py predict MU                       # 用最新資料預測 3–36 個月後的本益比（組合模型＋盈餘拆解）
   python3 pe_forecast.py predict MU --asof 2025-09        # 站在 2025-09（只用當時資料）預測
+  python3 pe_forecast.py predict MU --earnings-growth 0.4,0.6,0.7
+                                                          # 你自己的盈餘：12/24/36 個月後淨利 +40%/+60%/+70%
   python3 pe_forecast.py predict MU --rev-growth 0.3,0.1,0 --margin 0.35,0.3,0.25 --mu 0.0
-                                                          # 用你自己的盈餘與報酬假設（情境）
+                                                          # 盈餘拆解表的情境：營收成長 × 淨利率、報酬假設
   python3 pe_forecast.py implied MU NVDA MSFT GOOGL       # 市場現價隱含的長期淨利率 vs 公司歷史
   python3 pe_forecast.py backtest                          # 全部回測，寫進 results/
   python3 pe_forecast.py history MU --h 12                 # 過去每季「12 個月前的預測」vs 實際
@@ -83,7 +85,7 @@ def _error_quantiles(df, asof):
 
 
 def _print_ensemble(df, qf, fc, r, asof):
-    """主預測：組合模型（README §12）。"""
+    """主預測：組合模型（README §12）。回傳 (EnsembleForecaster, 該列, 預測)，給情境表用。"""
     ens = en.EnsembleForecaster().fit(df, qf, asof, old=fc)
     rows = ens.panel[(ens.panel["ticker"] == r["ticker"]) & (ens.panel["month"] == r["month"])]
     e = ens.predict(rows).iloc[0]
@@ -95,7 +97,8 @@ def _print_ensemble(df, qf, fc, r, asof):
         pe_h = np.exp(lp) if np.isfinite(lp) else np.nan
         o = {"幾個月後": h, "組合預測PE": _pe(pe_h),
              "80%區間": f"{pe_h * np.exp(band[h][0]):.1f}–{pe_h * np.exp(band[h][1]):.1f}" if h in band and np.isfinite(pe_h) else "—",
-             "相對今天": f"{pe_h / r['pe'] - 1:+.0%}" if np.isfinite(pe_h) and r["pe"] > 0 else "—"}
+             "相對今天": f"{pe_h / r['pe'] - 1:+.0%}" if np.isfinite(pe_h) and r["pe"] > 0 else "—",
+             "隱含盈餘變化": _impl_txt(en.implied_earnings([lp], rows, h)[0], r["ni_ttm"]) if np.isfinite(pe_h) else "—"}
         for m, nm in (("old", "盈餘模型"), ("huber", "線性"), ("gbm", "樹-盈餘"), ("gbm_z", "樹-變化")):
             v = e.get(f"{m}_{h}", np.nan)
             o[nm] = _pe(np.exp(v)) if np.isfinite(v) else ("—" if m == "old" and h not in en.OLD_H else "虧/>500")
@@ -108,7 +111,73 @@ def _print_ensemble(df, qf, fc, r, asof):
     print(pd.DataFrame(out).to_string(index=False))
     print("  回測誤差＝2015–2026 走動式樣本外的中位 |ln 誤差|，換成 ±%；「不變」＝直接拿今天的本益比當預測。")
     print("  有效性（README §12）：3 個月幾乎贏不了「本益比不變」；9–12 個月是誤差與改善幅度的最佳平衡；")
-    print("  24–36 個月相對改善最大，但絕對誤差也最大（±34–36%）。\n")
+    print("  24–36 個月相對改善最大，但絕對誤差也最大（±34–36%）。")
+    print("  隱含盈餘變化＝組合的本益比換回盈餘（報酬＝資金成本）：想推翻這個假設，用 --earnings-growth 給你自己的盈餘。\n")
+    return ens, rows, e
+
+
+def _impl_txt(ni_h, ni0):
+    if ni0 > 0:
+        return f"{ni_h / ni0 - 1:+.0%}"
+    return f"${ni_h / 1e9:,.1f}B"
+
+
+def _user_earnings(a, ni0):
+    """--earnings-growth（相對今天 TTM 淨利）或 --ni（$B）→ {h: 盈餘TTM}。
+    給的是 12/24/36 個月的值；中間的距離在 ln 盈餘上線性內插（從今天的盈餘起算，今天要是正的）。"""
+    if a.earnings_growth:
+        if ni0 <= 0:
+            sys.exit("今天的 TTM 淨利 ≤ 0，不能用成長率；改用 --ni 直接給 12/24/36 個月後的 TTM 淨利（$B）")
+        E = [ni0 * (1 + float(x)) for x in a.earnings_growth.split(",")]
+    else:
+        E = [float(x) * 1e9 for x in a.ni.split(",")]
+    knots = {12 * (i + 1): v for i, v in enumerate(E[:3])}
+    out = dict(knots)
+    pts = ([(0, ni0)] if ni0 > 0 else []) + sorted(knots.items())
+    for h in HORIZONS:
+        if h in out:
+            continue
+        lo = [(k, v) for k, v in pts if k < h]
+        hi = [(k, v) for k, v in pts if k > h]
+        if lo and hi and lo[-1][1] > 0 and hi[0][1] > 0:
+            (k0, v0), (k1, v1) = lo[-1], hi[0]
+            out[h] = float(np.exp(np.log(v0) + (np.log(v1) - np.log(v0)) * (h - k0) / (k1 - k0)))
+    return out
+
+
+def _print_scenario(a, ens, rows, e, r, asof):
+    """你給盈餘：本益比(t+h) ＝ 今天市值 × e^(報酬×h/12) ÷ 你的盈餘。區間只剩股價那一項的不確定。"""
+    E = _user_earnings(a, r["ni_ttm"])
+    y10 = r["y10"]
+    mu = a.mu if a.mu is not None else y10 + en.lab.ERP
+    band = en.return_bands(ens.panel, asof)
+    out = []
+    for h in HORIZONS:
+        if h not in E:
+            continue
+        ni_h = E[h]
+        lp_e = e[f"ens_{h}"]
+        o = {"幾個月後": h, "你的盈餘TTM $B": ni_h / 1e9,
+             "你的盈餘變化": f"{ni_h / r['ni_ttm'] - 1:+.0%}" if r["ni_ttm"] > 0 else "—",
+             "組合隱含盈餘變化": _impl_txt(en.implied_earnings([lp_e], rows, h)[0], r["ni_ttm"]) if np.isfinite(lp_e) else "—"}
+        if ni_h <= 0:
+            o.update({"你的情境PE": "虧損", "80%區間（只剩股價）": "—", "若股價不動": "虧損"})
+        else:
+            pe_h = r["mc"] * np.exp(mu * h / 12) / ni_h
+            o["你的情境PE"] = _pe(pe_h)
+            o["80%區間（只剩股價）"] = (f"{pe_h * np.exp(band[h][0]):.1f}–{pe_h * np.exp(band[h][1]):.1f}"
+                                    if h in band and a.mu is None else "—")
+            o["若股價不動"] = _pe(r["mc"] / ni_h)
+        o["組合PE（對照）"] = _pe(np.exp(lp_e)) if np.isfinite(lp_e) else "虧/>500"
+        out.append(o)
+    mu_txt = f"你給的 {a.mu:+.1%}/年" if a.mu is not None else f"資金成本 {mu:.1%}/年"
+    print(f"【你的盈餘情境】本益比(t+h) ＝ 今天市值 × e^(報酬×h/12) ÷ 你給的盈餘；報酬＝{mu_txt}"
+          f"（連續複利，一年 ≈ {np.exp(mu) - 1:+.1%}）")
+    print(pd.DataFrame(out).round(2).to_string(index=False))
+    print("  12/24/36 個月以外的距離：在 ln 盈餘上線性內插。這裡是淨利 TTM，不是 EPS（有庫藏股時 EPS 成長會略高於淨利成長）。")
+    print("  80% 區間＝假設你的盈餘完全正確，剩下的只有股價：asof 以前已揭曉的「實際報酬 − 資金成本」10–90% 分位數（README §12.7）"
+          + ("；給了 --mu 就不畫。" if a.mu is not None else "。"))
+    print("  組合隱含盈餘變化 vs 你的盈餘變化：差多少，你的情境本益比就跟組合差多少——那就是你和模型的分歧。\n")
 
 
 def cmd_predict(a):
@@ -134,10 +203,13 @@ def cmd_predict(a):
     y10_note = f"，{r['y10_asof']:%Y-%m} 的值" if r["y10_asof"] < r["month"] else ""
     mu_txt = f"你給的 {a.mu:+.1%}/年" if a.mu is not None else f"資金成本 {y10 + fc.erp:.1%}/年（10 年期 {y10:.2%}{y10_note} + 5%）"
     print(f"  報酬假設：{mu_txt}；情境覆寫：{ov if ov else '無（用模型的盈餘預測）'}\n")
-    if not a.no_ensemble:
-        _print_ensemble(df, qf, fc, r, asof)
+    user_e = bool(a.earnings_growth or a.ni)
+    if not a.no_ensemble or user_e:
+        ens, erow, e = _print_ensemble(df, qf, fc, r, asof)
+        if user_e:
+            _print_scenario(a, ens, erow, e, r, asof)
         if ov or a.mu is not None:
-            print("  （情境覆寫與 --mu 只作用在下面的盈餘拆解表；組合模型用的是模型自己的預測。）\n")
+            print("  （--rev-growth / --margin / --m-bar 只作用在下面的盈餘拆解表；組合模型用的是模型自己的預測。）\n")
     print("【盈餘拆解】兩階段盈餘模型：營收 × 淨利率 → 未來盈餘，再配上報酬假設")
     band = _error_quantiles(df, asof) if a.mu is None and not ov else {}
     rows = []
@@ -257,6 +329,9 @@ def main():
     p.add_argument("--m-bar", type=float, help="結構淨利率（覆寫 5 年中位數）")
     p.add_argument("--target-pe", type=float, help="反推：要在各預測距離達到這個本益比，每年需要多少報酬")
     p.add_argument("--no-ensemble", action="store_true", help="不跑組合模型（快；只看盈餘拆解）")
+    g = p.add_mutually_exclusive_group()
+    g.add_argument("--earnings-growth", help="你的盈餘：12/24/36 個月後 TTM 淨利相對今天的成長，例 0.4,0.6,0.7（可只給前 1–2 個）")
+    g.add_argument("--ni", help="你的盈餘：12/24/36 個月後 TTM 淨利（$B），例 80,95,105；今天虧損時用這個")
     p.set_defaults(fn=cmd_predict)
     p = sp.add_parser("implied")
     p.add_argument("tickers", nargs="+")

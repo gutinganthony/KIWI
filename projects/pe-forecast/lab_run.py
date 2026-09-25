@@ -10,6 +10,7 @@
   results/lab.txt               人看的表
   results/lab_scores.csv        長表（期間 × 距離 × 方法）
   results/lab_horizon.csv       每個距離的組合模型成績（pe_forecast.py predict 會讀）
+  results/lab_hits.csv          命中率（±10/20/30% 內、方向）與「你給盈餘」情境區間的實測涵蓋率
   results/lab_predictions.csv.gz 每一筆走動式預測（predict 的 80% 區間用它）
 """
 import io
@@ -22,7 +23,7 @@ import pandas as pd
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from pef import lab                                     # noqa: E402
-from pef.ensemble import MEMBERS, OLD_H, combine, members_for   # noqa: E402
+from pef.ensemble import MEMBERS, OLD_H, combine, members_for, return_surprise   # noqa: E402
 from pef.load import panel                              # noqa: E402
 
 RES = os.path.join(HERE, "results")
@@ -118,6 +119,48 @@ def band_coverage(p, col="ens"):
     return pd.DataFrame(rows)
 
 
+def hit_rates(p, col="ens"):
+    """直覺版命中率（全期 2015–2026）：預測落在實際 ±10/20/30% 內的比例、方向命中、本益比大變動時的方向命中。"""
+    rows = []
+    g0 = period(p[p["actual"].notna() & p["ln_pe"].notna() & p[col].notna()], "全期")
+    for h, g in g0.groupby("h"):
+        em, er = (g[col] - g["actual"]).abs(), (g["ln_pe"] - g["actual"]).abs()
+        up_m, up_a = np.sign(g[col] - g["ln_pe"]), np.sign(g["actual"] - g["ln_pe"])
+        big = (g["actual"] - g["ln_pe"]).abs() > np.log(1.2)
+        r = {"h": h, "n": len(g)}
+        for k in (0.1, 0.2, 0.3):
+            r[f"組合_±{int(k * 100)}%內"] = float((em <= np.log(1 + k)).mean())
+            r[f"不變_±{int(k * 100)}%內"] = float((er <= np.log(1 + k)).mean())
+        r.update({"方向命中": float((up_m == up_a).mean()), "大變動占比": float(big.mean()),
+                  "大變動時方向命中": float((up_m == up_a)[big].mean()), "組合比不變準的比例": float((em < er).mean())})
+        rows.append(r)
+    return pd.DataFrame(rows)
+
+
+def return_band_coverage(d):
+    """你自己給盈餘時的 80% 區間（pef.ensemble.return_bands）：假設盈餘完全正確，只剩「實際報酬 − 資金成本」。
+    走動式實測：每年用當時已揭曉的分位數畫區間，看當年的實際落點。"""
+    rows = []
+    for h in lab.HORIZONS:
+        r = return_surprise(d, h)
+        tgt = r["month_end"] + pd.DateOffset(months=h)
+        hit, width = [], []
+        for Y in range(2015, 2027):
+            asof = pd.Timestamp(f"{Y}-01-01") - pd.Timedelta(days=1)
+            past = r[tgt <= asof]["e"]
+            cur = r[r["month_end"].dt.year == Y]["e"]
+            if len(past) < 300 or cur.empty:
+                continue
+            lo, hi = past.quantile(0.1), past.quantile(0.9)
+            hit += list(((cur >= lo) & (cur <= hi)).to_numpy())
+            width.append((np.exp(lo) - 1, np.exp(hi) - 1))
+        if hit:
+            w = np.array(width)
+            rows.append({"h": h, "n": len(hit), "實測涵蓋率": float(np.mean(hit)),
+                         "區間下緣中位": float(np.median(w[:, 0])), "區間上緣中位": float(np.median(w[:, 1]))})
+    return pd.DataFrame(rows)
+
+
 def near_now(p, d, col="ens"):
     """「用過去推到現在」：每家公司資料的最後 12 個月當目標月（以及只看最後一個月）。"""
     last = d.groupby("ticker")["month"].max()
@@ -197,6 +240,11 @@ def main():
         columns={"組合_誤差_舊模型": "舊模型_誤差", "組合_誤差_組合": "組合_誤差",
                  "組合贏的公司比例_舊模型": "舊模型贏RW的公司比例", "組合贏的公司比例_組合": "組合贏RW的公司比例"}).set_index(["窗口", "h"]).round(3))
 
+    hits = hit_rates(p)
+    table("命中率（全期 2015–2026）：落在實際 ±10/20/30% 內的比例；大變動＝實際本益比變動超過 20%", hits.set_index("h").round(3))
+    rcov = return_band_coverage(d)
+    table("你自己給盈餘（且完全正確）時的 80% 區間：只剩股價的不確定（走動式實測）", rcov.set_index("h").round(3))
+
     # 3) 產業（12 個月，全期）
     g = period(p[(p["h"] == 12) & p["actual"].notna() & p["ln_pe"].notna() & p["ens"].notna()], "全期")
     sec = g.assign(em=(g["ens"] - g["actual"]).abs(), er=(g["ln_pe"] - g["actual"]).abs()).groupby("sector").agg(
@@ -217,6 +265,8 @@ def main():
     full = hz[hz["期間"] == "全期"][["h", "n", "隨機漫步_誤差", "組合_誤差", "改善", "OOS_R2", "方向命中"]]
     full.merge(cov[["h", "實測涵蓋率"]], on="h", how="left").to_csv(os.path.join(RES, "lab_horizon.csv"), index=False, float_format="%.4f")
     nn.to_csv(os.path.join(RES, "lab_near_now.csv"), index=False, float_format="%.4f")
+    hits.merge(rcov.add_prefix("情境區間_").rename(columns={"情境區間_h": "h"}), on="h", how="left").to_csv(
+        os.path.join(RES, "lab_hits.csv"), index=False, float_format="%.4f")
     keep = ["ticker", "month", "h", "fit_year", "sector", "ln_pe", "actual", "old"] + list(MEMBERS) + ["ens"]
     p[keep].to_csv(os.path.join(RES, "lab_predictions.csv.gz"), index=False, float_format="%.4f")
     open(os.path.join(RES, "lab.txt"), "w").write(buf.getvalue())
