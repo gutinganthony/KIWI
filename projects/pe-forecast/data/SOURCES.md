@@ -47,6 +47,16 @@
 財報落後的公司（最新季距今 >150 天）：錨點移回那一季仍是最新的月份，用那個月的股價——避免拿一年前的盈餘配今天的股價。
 財報截止後才分割的（NFLX 2025-11 10:1）：用 Stooq（2025-09 口徑）與新股價來源在 2025-05～08 的比值自動偵測、補乘。
 
+## S&P 500 回測（`build_broad.py`）與任何代號的現在預測（`now_run.py`）
+
+| 來源 | 內容 | 用途 |
+|---|---|---|
+| `github.com/hanumantjain/sp500_agentic_ai` `data/company_facts/`、`data/sp500_stooq_ohcl/` | S&P 500 全部 500 家的 companyfacts 與 Stooq 日股價（到 2025-09） | 回測（§13） |
+| 同上 `data/sp500_corporate_actions_yfinance.csv` | 每一次除息（日期、金額）與分割；分拆被記成非整數比例的分割 | 股利還原、辨識分拆 |
+| 同上 `data/S_and_P_500_component_stocks.csv` | 名單、CIK、GICS 產業 | 名單 |
+| `github.com/loosygoosie/sec-dataset` `data/companies/<CIK>.json`、`data/tickers.json` | 約 7,400 家最近 12 季（重述後的最後申報值）、SEC 代號對照表；每天更新 | 只用於「現在」 |
+| `github.com/ozkanpakdil/top-us-stock-tickers` `tickers/all.csv` | 約 5,300 檔美股每日收盤與市值；git 歷史＝每日時間序列（2025-12-28 起） | 只用於「現在」 |
+
 ## 已處理的資料陷阱（每一個都實測過）
 
 1. **Stooq 的價格同時做了股利還原**：MSFT 2004-11-15 的 $3 特別股利當天沒有跳空。直接用會把過去市值

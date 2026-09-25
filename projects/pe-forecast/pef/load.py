@@ -31,3 +31,20 @@ def panel(include_ext=False):
     df = monthly_panel(qf, p, macro)
     df = df.merge(u[["ticker", "sector", "train"]], on="ticker", how="left")
     return df, qf
+
+
+def panel_sp500():
+    """S&P 500 全體（build_broad.py 產出）。sector：科技股名單內用細分產業，其餘用 GICS；in_tech＝在 68 家科技股名單裡。"""
+    q = pd.read_csv(os.path.join(DATA, "quarters_sp500.csv"), parse_dates=["period_end", "filed", "avail"])
+    p = pd.read_csv(os.path.join(DATA, "prices_monthly_sp500.csv"), parse_dates=["month"])
+    u = pd.read_csv(os.path.join(DATA, "universe_sp500.csv"), keep_default_na=False)
+    tech = set(pd.read_csv(os.path.join(DATA, "universe.csv"), keep_default_na=False)["ticker"])
+    u["train"] = True
+    u["in_tech"] = u["ticker"].isin(tech)
+    macro = load_macro(DATA)
+    qf = quarterly_features(q)
+    df = monthly_panel(qf, p, macro)
+    # 財報斷掉（例：銀行換了營收標籤）時不能一直沿用舊財報：最新一季季末超過 240 天就不用那個月
+    df = df[(df["month_end"] - df["period_end"]).dt.days <= 240].reset_index(drop=True)
+    df = df.merge(u[["ticker", "sector", "gics", "train", "in_tech"]], on="ticker", how="left")
+    return df, qf

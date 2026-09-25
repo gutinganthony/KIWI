@@ -161,9 +161,10 @@ def detect_splits(sh, restated=None):
     return splits
 
 
-def company_quarters(path, ticker):
+def company_quarters(path, ticker, rev_tags=None):
+    """rev_tags：營收概念清單（預設 REV；S&P 500 版加上銀行用的 RevenuesNetOfInterestExpense）。"""
     j = json.load(open(path))
-    rev = flows(j, REV)
+    rev = flows(j, rev_tags or REV)
     if rev.empty:
         return None, None
     ni = flows(j, NI)

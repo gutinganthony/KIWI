@@ -17,6 +17,9 @@ from .stats import huber_ols
 
 HORIZONS = (3, 6, 9, 12, 18, 24, 36)
 SECTORS = ["software", "internet", "semis", "semicap", "memory", "hardware", "itservices"]
+# S&P 500 版加上的 GICS 產業（科技股名單內的公司仍用上面的細分產業；舊的 7 個編號不變）
+SECTORS += ["gics_it", "gics_comm", "gics_discr", "gics_staples", "gics_health", "gics_fin", "gics_indu", "gics_energy",
+            "gics_util", "gics_re", "gics_mat"]
 ERP = 0.05
 
 
@@ -34,7 +37,11 @@ def quarter_extras(qf):
     q["g_qoq_prev"] = q.groupby("ticker")["g_qoq"].shift(1)
     span3 = (q["period_end"] - g["period_end"].shift(3)).dt.days
     q["oi_ttm"] = g["oi"].transform(lambda s: s.rolling(4, min_periods=4).sum()).where(span3.between(250, 300))
-    return q[["ticker", "period_end", "g_qoq", "g_qoq_prev", "oi_ttm"]]
+    cols = ["ticker", "period_end", "g_qoq", "g_qoq_prev", "oi_ttm"]
+    if "dps_now" in q:           # 每股股利 TTM（今日分割口徑；沒配息＝0）
+        q["dps_ttm"] = g["dps_now"].transform(lambda s: s.fillna(0).rolling(4, min_periods=4).sum()).where(span3.between(250, 300))
+        cols.append("dps_ttm")
+    return q[cols]
 
 
 def add_features(d):
@@ -51,6 +58,9 @@ def add_features(d):
     d["ln_mc"] = np.log(mc)
     d["info_age"] = (d["month_end"] - d["period_end"]).dt.days / 91.0
     d["sector_id"] = d["sector"].map({s: i for i, s in enumerate(SECTORS)}).fillna(len(SECTORS)).astype(int)
+    # S&P 500 版的兩個額外特徵：股利殖利率、淨負債 ÷ 市值（成熟公司、槓桿公司的本益比規律不同）
+    d["dy"] = (d["dps_ttm"] / d["px"]).clip(0, 0.2) if "dps_ttm" in d and "px" in d else np.nan
+    d["lev"] = ((d["debt"].fillna(0) - d["cash"].fillna(0)) / mc).clip(-1, 3) if "debt" in d else np.nan
     return d
 
 
@@ -78,6 +88,9 @@ FEATS_LIN = ["ey_ttm", "ey_run", "ey_core", "ey_core_run", "ln_sy", "ln_sy_run",
              "g_qoq_prev", "gap", "q_vs_ttm", "gm_slope", "d_inv", "sigma", "ret6", "ret12", "info_age"]
 FEATS_GBM = FEATS_LIN + ["m_ttm", "m_bar", "sc", "ln_mc", "y10", "sector_id"]
 FEATS_HIST = ["pe_own", "pe_rel_own", "pe_sec", "pe_rel_sec", "pe_mkt"]
+FEATS_B = ["dy", "lev"]
+GBM_PARAMS = dict(loss="absolute_error", learning_rate=0.05, max_iter=300, max_leaf_nodes=15, min_samples_leaf=80,
+                  l2_regularization=1.0, random_state=0)
 
 
 def _mat(d, cols, bounds=None):
@@ -107,7 +120,7 @@ def fit(method, tr, h):
         fm["beta"] = huber_ols(np.column_stack([np.ones(len(Xtr)), Xtr]), tr[f"y_{h}"].to_numpy(float))
         fm["bounds"] = b
         return fm
-    if method in ("gbm", "gbm_z", "gbm_z_stack", "gbm_hist", "gbm_z_hist"):
+    if method in ("gbm", "gbm_z", "gbm_z_stack", "gbm_hist", "gbm_z_hist", "gbm_b", "gbm_z_b"):
         from sklearn.ensemble import HistGradientBoostingRegressor
         feats = FEATS_GBM + ([c for c in ("old_ey_12", "old_ey_h", "imp_gap")
                               if c in tr and tr[c].notna().sum() >= 50] if method == "gbm_z_stack" else [])
@@ -115,10 +128,11 @@ def fit(method, tr, h):
         if method.endswith("_hist"):
             feats = feats + FEATS_HIST
             base = method[:-5]
+        if method.endswith("_b"):
+            feats = feats + FEATS_B
+            base = method[:-2]
         cat = [feats.index("sector_id")]
-        m = HistGradientBoostingRegressor(loss="absolute_error", learning_rate=0.05, max_iter=300, max_leaf_nodes=15,
-                                          min_samples_leaf=80, l2_regularization=1.0, categorical_features=cat,
-                                          random_state=0)
+        m = HistGradientBoostingRegressor(categorical_features=cat, **GBM_PARAMS)
         if base == "gbm":
             m.fit(tr[feats].to_numpy(float), tr[f"y_{h}"].to_numpy(float))
         else:
@@ -162,13 +176,15 @@ def add_old(d, pred):
     return d
 
 
-def walk(d, methods, horizons=HORIZONS, start=2015, end=2026):
-    """每年 1 月用當時已揭曉的配對（t+h ≤ asof）訓練，預測當年每個月。"""
+def walk(d, methods, horizons=HORIZONS, start=2015, end=2026, train_col=None):
+    """每年 1 月用當時已揭曉的配對（t+h ≤ asof）訓練，預測當年每個月。train_col：只用這欄為真的列訓練（預測仍是全部）。"""
     out = []
     for h in horizons:
         for Y in range(start, end + 1):
             asof = pd.Timestamp(f"{Y}-01-01") - pd.Timedelta(days=1)
             tr = d[(d["month_end"] + pd.DateOffset(months=h) <= asof) & d[f"y_{h}"].notna() & d["m_bar"].notna()]
+            if train_col:
+                tr = tr[tr[train_col].astype(bool)]
             te = d[(d["month_end"] > asof) & (d["month_end"] <= asof + pd.DateOffset(months=12)) & d["m_bar"].notna()
                    & (d["mc"] > 0)]
             if len(tr) < 500 or te.empty:
