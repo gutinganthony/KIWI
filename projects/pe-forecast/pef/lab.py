@@ -89,6 +89,10 @@ FEATS_LIN = ["ey_ttm", "ey_run", "ey_core", "ey_core_run", "ln_sy", "ln_sy_run",
 FEATS_GBM = FEATS_LIN + ["m_ttm", "m_bar", "sc", "ln_mc", "y10", "sector_id"]
 FEATS_HIST = ["pe_own", "pe_rel_own", "pe_sec", "pe_rel_sec", "pe_mkt"]
 FEATS_B = ["dy", "lev"]
+# 中小型股的財報（loosygoosie v2）沒有毛利、營業利益、存貨 → 「精簡」版拿掉用到它們的特徵
+REDUCED_OUT = {"gm_slope", "d_inv", "ey_core", "ey_core_run"}
+FEATS_LIN_R = [f for f in FEATS_LIN if f not in REDUCED_OUT]
+FEATS_GBM_R = [f for f in FEATS_GBM if f not in REDUCED_OUT]
 GBM_PARAMS = dict(loss="absolute_error", learning_rate=0.05, max_iter=300, max_leaf_nodes=15, min_samples_leaf=80,
                   l2_regularization=1.0, random_state=0)
 
@@ -114,13 +118,15 @@ def fit(method, tr, h):
     fm = dict(method=method, h=h)
     if method in ("run_rate", "core_run"):
         return fm
-    if method == "huber":
-        Xtr, b = _mat(tr, FEATS_LIN)
+    if method in ("huber", "huber_r"):
+        feats = FEATS_LIN_R if method == "huber_r" else FEATS_LIN
+        Xtr, b = _mat(tr, feats)
         Xtr = np.where(np.isfinite(Xtr), Xtr, 0.0)
         fm["beta"] = huber_ols(np.column_stack([np.ones(len(Xtr)), Xtr]), tr[f"y_{h}"].to_numpy(float))
         fm["bounds"] = b
+        fm["feats"] = feats
         return fm
-    if method in ("gbm", "gbm_z", "gbm_z_stack", "gbm_hist", "gbm_z_hist", "gbm_b", "gbm_z_b"):
+    if method in ("gbm", "gbm_z", "gbm_z_stack", "gbm_hist", "gbm_z_hist", "gbm_b", "gbm_z_b", "gbm_r", "gbm_z_r"):
         from sklearn.ensemble import HistGradientBoostingRegressor
         feats = FEATS_GBM + ([c for c in ("old_ey_12", "old_ey_h", "imp_gap")
                               if c in tr and tr[c].notna().sum() >= 50] if method == "gbm_z_stack" else [])
@@ -130,6 +136,9 @@ def fit(method, tr, h):
             base = method[:-5]
         if method.endswith("_b"):
             feats = feats + FEATS_B
+            base = method[:-2]
+        if method.endswith("_r"):
+            feats = list(FEATS_GBM_R)
             base = method[:-2]
         cat = [feats.index("sector_id")]
         m = HistGradientBoostingRegressor(categorical_features=cat, **GBM_PARAMS)
@@ -150,8 +159,8 @@ def apply(fm, te):
         return to_lnpe(te["ey_run"].to_numpy(float), te, h)
     if method == "core_run":
         return to_lnpe(te["ey_core_run"].fillna(te["ey_run"]).to_numpy(float), te, h)
-    if method == "huber":
-        Xte, _ = _mat(te, FEATS_LIN, fm["bounds"])
+    if method in ("huber", "huber_r"):
+        Xte, _ = _mat(te, fm.get("feats", FEATS_LIN), fm["bounds"])
         Xte = np.where(np.isfinite(Xte), Xte, 0.0)
         return to_lnpe(np.column_stack([np.ones(len(Xte)), Xte]) @ fm["beta"], te, h)
     pred = fm["model"].predict(te[fm["feats"]].to_numpy(float))

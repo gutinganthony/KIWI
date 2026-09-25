@@ -216,6 +216,44 @@ def company_quarters(path, ticker, rev_tags=None):
     return q, splits
 
 
+def fix_share_scale(q, px, years=3.0):
+    """SEC XBRL 的單位錯誤：有些季的稀釋股數以千股或百萬股申報（GRMN 2014-Q1 寫 195,860，實際 1.96 億股），
+    少數反過來大 10^3～10^6 倍（AIG 2008）。市值會跟著錯 1000 倍，本益比變成 0.01 或 3 萬。
+    規則：市銷率（股價 × 股數 ÷ 單季營收 × 4）落在 0.02～200 倍的季當「可信季」；某一季的股數跟前後 3 年可信季的
+    中位數差 10^3 或 10^6 倍（±0.5 個數量級內）→ 乘回來。完全沒有可信季時，改用前後 3 年的多數（6 成以上同一數量級才用）。真實的股數變化（分割已還原、增資、庫藏股）不會剛好差 1000 倍。
+    q：一家公司的季表（period_end、rev、sh_now）；px：月底股價 Series（index＝日期，跟 sh_now 同一口徑）。
+    回傳 (修正後的 sh_now Series, 修正了幾季)。"""
+    q = q.sort_values("period_end")
+    sh = q["sh_now"].to_numpy(float)
+    t = q["period_end"].to_numpy().astype("datetime64[D]").astype(float) / 365.25
+    p = px.dropna().sort_index()
+    pp = pd.DataFrame({"d": pd.DatetimeIndex(p.index).astype("datetime64[ns]"), "px": p.to_numpy(float)})
+    at = pd.merge_asof(pd.DataFrame({"period_end": q["period_end"].astype("datetime64[ns]").to_numpy()}), pp,
+                       left_on="period_end", right_on="d", direction="nearest", tolerance=pd.Timedelta(days=45))
+    with np.errstate(divide="ignore", invalid="ignore"):
+        l = np.log10(np.where(sh > 0, sh, np.nan))
+        ps = at["px"].to_numpy(float) * sh / (q["rev"].to_numpy(float) * 4)
+    ok = np.isfinite(ps) & (ps > 0.02) & (ps < 200) & np.isfinite(l)
+    k = np.zeros(len(sh))
+    for i in range(len(sh)):
+        if not np.isfinite(l[i]):
+            continue
+        near = (np.abs(t - t[i]) <= years) & np.isfinite(l)
+        w = ok & near
+        if not w.any():
+            w = ok
+        if not w.any():
+            # 沒有可信季（例：銀行的營收口徑讓市銷率失真）→ 用前後 3 年的多數，但要有 6 成以上的季落在同一個數量級
+            w = near
+            if np.mean(np.abs(l[w] - np.median(l[w])) < 0.5) < 0.6:
+                continue
+        d = np.median(l[w]) - l[i]
+        for kk in (3, 6, -3, -6):
+            if abs(d - kk) < 0.5:
+                k[i] = kk
+    return pd.Series(sh * 10.0 ** k, index=q.index).reindex(q.index), int((k != 0).sum())
+
+
 def stooq_monthly(path):
     d = pd.read_csv(path)
     d.columns = [c.strip("<>").lower() for c in d.columns]

@@ -20,7 +20,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from pef.data import REV, company_quarters
+from pef.data import REV, company_quarters, fix_share_scale
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "data")
@@ -116,10 +116,18 @@ def main():
         divs = a_t[a_t["event_type"] == "dividend"].set_index("ex_date")["cash_amount"].dropna()
         raw = unadjust_daily(adj, divs[divs.index > adj.index.min()])
         px_m = raw.resample("ME").last().dropna()
-        sh = q[["avail", "sh_now"]].dropna().sort_values("avail")
+        q = q.copy()
+        q["sh_now"], n_fix = fix_share_scale(q, px_m)          # 股數單位錯（千股／百萬股）→ 乘回來
+        q["sh"] = q["sh_now"] / q["split_fac"]
+        q["rev_ttm_chk"] = q["rev"].rolling(4, min_periods=4).sum()
+        sh = q[["avail", "sh_now", "rev_ttm_chk"]].dropna(subset=["sh_now"]).sort_values("avail")
         px = pd.DataFrame({"month_end": px_m.index, "px": px_m.values})
         px = pd.merge_asof(px, sh, left_on="month_end", right_on="avail", direction="backward")
         px["mc"] = px["px"] * px["sh_now"]
+        # 修不回來的股數（合併前空殼公司的 100 股之類）：市銷率 < 0.02 或 > 5000 倍 → 那個月不用
+        ps_chk = px["mc"] / px["rev_ttm_chk"]
+        px = px[~((ps_chk < 0.02) | (ps_chk > 5000))]
+        q = q.drop(columns=["rev_ttm_chk"])
         px["ticker"] = t
         px["month"] = px["month_end"] - pd.offsets.MonthBegin(1)
         if start is not None:
@@ -133,7 +141,8 @@ def main():
         log.append(dict(ticker=t, gics=r.gics, status="ok", quarters=int(q["rev"].notna().sum()),
                         first=str(q["period_end"].min().date()), last=str(q["period_end"].max().date()),
                         px_last=str(px["month_end"].max().date()) if len(px) else "",
-                        splits=";".join(f"{d.date()}:{v:g}" for d, v in splits.items()), note=row["note"]))
+                        splits=";".join(f"{d.date()}:{v:g}" for d, v in splits.items()), note=row["note"],
+                        share_scale_fixed=n_fix))
     cols = ["ticker", "period_end", "filed", "avail", "rev", "gp", "oi", "ni", "sh", "split_fac", "sh_now", "dps", "dps_now",
             "inv", "equity", "cash", "debt"]
     Q = pd.concat(qs, ignore_index=True)

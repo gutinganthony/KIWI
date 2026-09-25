@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 
 from . import lab
+from .data import fix_share_scale
 from .features import quarterly_features
 
 # Nasdaq 的產業分類 → 回測用的 GICS 代號（S&P 500 以外的公司用這個）
@@ -38,7 +39,7 @@ def lg_quarters(path, ticker):
                      "rev": x.get("revenue"), "gp": x.get("gross_profit"), "oi": x.get("operating_income"), "ni": ni,
                      "sh": sh, "inv": x.get("inventory"), "equity": x.get("total_equity_parent") or x.get("total_equity"),
                      "cash": (x.get("cash") or 0) + (x.get("short_term_investments") or 0), "debt": x.get("total_debt"),
-                     "div_paid": x.get("dividends_paid")})
+                     "div_paid": x.get("dividends_paid"), "form": x.get("form", "")})
     if not rows:
         return None, j
     q = pd.DataFrame(rows).sort_values("period_end").reset_index(drop=True)
@@ -47,7 +48,8 @@ def lg_quarters(path, ticker):
     q["sh"] = q["sh"].ffill()
     q["sh_now"] = q["sh"]
     q["dps_now"] = (q["div_paid"].fillna(0) / q["sh"]).where(q["sh"] > 0)
-    q["avail"] = q["period_end"] + pd.Timedelta(days=45)
+    # 可用日：季報（10-Q）季末 + 45 天，年報（10-K，第四季）+ 75 天（loosygoosie 的 filed 是最後一次申報，不能當可用日）
+    q["avail"] = q["period_end"] + pd.to_timedelta(np.where(q["form"].astype(str).str.startswith("10-K"), 75, 45), unit="D")
     return q, j
 
 
@@ -106,6 +108,8 @@ def build(lg_dir, oz_mapped, oz_monthly, stooq_dir, sp500_uni, tech_uni, price_d
             continue
         h = h.groupby(h.index + pd.offsets.MonthEnd(0)).last()      # 月底對齊（7 月是 07-16 的快照）
         h = _split_adjust(h, j.get("splits"))
+        q["sh_now"], _ = fix_share_scale(q, h)                  # 股數單位錯（千股／百萬股）→ 乘回來
+        q["sh"] = q["sh_now"]
         prices[t] = (h, pd.Timestamp(price_date))
         if t in tech.index:
             sector = tech.loc[t, "sector"]
