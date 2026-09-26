@@ -12,7 +12,7 @@
 分割：同一檔 ETF 持有股數在一季內跳成整數倍、股價反向跳 → 認定為分割，之前的股價換成最新口徑；股數同理。
 股數單位錯（有些季以千股、百萬股申報）：pef.data.fix_share_scale 用市銷率找出可信季，差 10^3／10^6 倍的季乘回來。
 S&P 500 公司不放進來（它們在 build_broad.py 的月頻資料裡）。
-產出：data/quarters_small.csv、prices_quarterly_small.csv、members_small.csv、universe_small.csv、build_log_small.csv
+產出：data/quarters_small.csv、prices_quarterly_small.csv、members_small.csv、universe_small.csv、build_log_small.csv、build_summary_small.txt
 """
 import argparse
 import glob
@@ -222,8 +222,10 @@ def main():
     pd.DataFrame(U).to_csv(os.path.join(DATA, "universe_small.csv"), index=False)
     lg = pd.DataFrame(log)
     lg.to_csv(os.path.join(DATA, "build_log_small.csv"), index=False)
-    print(lg["status"].value_counts().to_string())
-    print(f"持股明細對到公司的列：{H['cik'].notna().mean():.1%}；排除 S&P 500 後建檔 {len(U)} 家")
+    summary = (lg["status"].value_counts().to_string() + "\n"
+               + f"持股明細對到公司的列：{H['cik'].notna().mean():.1%}；排除 S&P 500 後建檔 {len(U)} 家\n")
+    print(summary, end="")
+    open(os.path.join(DATA, "build_summary_small.txt"), "w").write(summary)
 
 
 if __name__ == "__main__":
