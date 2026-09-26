@@ -328,7 +328,7 @@ details .tablewrap { max-height: 360px; overflow: auto; margin-top: 8px; }
 
       <div class="block">
         <h3>典型誤差：預測距離越遠，誤差越大</h3>
-        <p class="muted small">誤差的中位數。±26% 的意思是：一半的預測離實際值在 ±26% 以內。</p>
+        <p class="muted small">誤差的中位數。±25% 的意思是：一半的預測離實際值在 ±25% 以內。</p>
         <div class="legend" id="lgErr"></div>
         <div class="chart" id="chErr"></div>
       </div>
@@ -898,7 +898,7 @@ const D=/*__DATA__*/null;
     const I = D.idx, sm = (g, h) => I.small.find(x => x.g === g && x.h === h), nd = I.ndx.find(x => x.g === "Nasdaq-100" && x.h === 12);
     const all12 = sm("全部中小型股", 12), r2k = sm("Russell 2000", 12);
     $("idxLead").textContent = `同一個模型（只用 S&P 500 訓練、規格不改）直接拿去預測：Nasdaq-100 的 12 個月誤差 ${pm(nd.m)}（本益比不變 ${pm(nd.rw)}）；` +
-      `中小型股 12 個月 ${pm(all12.m)}（本益比不變 ${pm(all12.rw)}），Russell 2000 ${pm(r2k.m)}（${pm(r2k.rw)}）。3 個月一樣贏不了「本益比不變」。` +
+      `中小型股 12 個月 ${pm(all12.m)}（本益比不變 ${pm(all12.rw)}），Russell 2000 ${pm(r2k.m)}（${pm(r2k.rw)}）。3 個月一樣跟「本益比不變」幾乎沒差（中小型股 ${pm(sm("全部中小型股", 3).m)} vs ${pm(sm("全部中小型股", 3).rw)}）。` +
       `為中小型股另外做的三種版本（拿掉中小型股缺的毛利、營業利益、存貨特徵；把中小型股也放進訓練；往「本益比不變」縮一半）都沒有明確更好，所以不改模型，只把中小型股的 80% 區間換寬。`;
     const t = $("tbSmall"), hr = node("tr", null, node("thead", null, t));
     for (const h of ["群組", "樣本", "6 個月誤差：模型／不變", "12 個月誤差：模型／不變", "12 個月 R²：選模期／保留期", "12 個月方向命中"]) node("th", null, hr, h);
@@ -1002,7 +1002,7 @@ const D=/*__DATA__*/null;
   // ── 現在的預測 ──
   $("pxDate").textContent = D.now.price_date;
   $("nNow").textContent = `${NOW.size.toLocaleString()} 家有季報（其中 ${nSp500} 家在 S&P 500），另外 ${MCO.size.toLocaleString()} 檔只有市值、沒有季報（例如只交年報的外國公司），可以在「自己試算」自己填淨利。`;
-  const isSp = r => r.sp || r.ix === "S&P 500";
+  const isSp = r => r.sp || r.ix === "S&P 500" || r.ix === "大型股";
   const bandOf = r => (isSp(r) ? D.broad.bands : D.idx.bands_small);
   function bandTxt(pe, h, r) { const b = bandOf(r)[h]; return pe == null || !b ? "—" : `${fpe(pe * Math.exp(b[0]))}–${fpe(pe * Math.exp(b[1]))}`; }
   const okPE = x => x != null && x > 0 && x <= 500;
@@ -1019,7 +1019,7 @@ const D=/*__DATA__*/null;
       node("h3", null, host, `${r.t}　${r.n}`);
       const tags = node("div", { class: "chips" }, host);
       node("span", { class: "chip" }, tags, r.sec);
-      node("span", { class: "chip" }, tags, isSp(r) ? "S&P 500（回測過）" : r.ix ? `${r.ix}（回測過：6–12 個月有效）` : "不在主要指數（微型股）");
+      node("span", { class: "chip" }, tags, r.ix === "大型股" && !r.sp ? "大型股（不在 2025 年的 S&P 500 名單，比照 S&P 500）" : isSp(r) ? "S&P 500（回測過）" : r.ix ? `${r.ix}（回測過：6–12 個月有效）` : "不在主要指數");
       if (r.nd) node("span", { class: "chip" }, tags, "Nasdaq-100");
       if (r.st) node("span", { class: "chip" }, tags, "⏳ 財報較舊");
       if (r.oneoff) node("span", { class: "chip" }, tags, "⚠️ 可能含一次性項目");
@@ -1036,7 +1036,7 @@ const D=/*__DATA__*/null;
       } else node("p", null, host, "模型預測 12 個月後的盈餘接近零或虧損，本益比沒有意義。");
       if (!r.old && !isSp(r)) node("p", { class: r.ix ? "muted small" : "warnbox" }, host, r.ix
         ? "S&P 500 以外的公司：80% 區間用中小型股回測的誤差畫（比 S&P 500 寬）。3 個月的預測不要用。"
-        : "⚠️ 這家不在 S&P 500／400／600 或 Russell 2000。這類微型股在最近一段的回測裡，3–6 個月的預測比「本益比不變」還差；區間用中小型股的，但實際可能更寬。");
+        : "⚠️ 這家不在 S&P 500／400／600 或 Russell 2000（這一群多半是微型股、外國公司或股權集中的公司，市值中位約 20 億美元）。它們在最近一段的回測裡，3–6 個月的預測比「本益比不變」還差；區間用中小型股的，但實際可能更寬。");
       if (r.oneoff && r.core != null) node("p", { class: "warnbox" }, host, `⚠️ 帳面淨利和「營業利益 × 0.85」差很多（投資評價、出售資產、稅務或減損這類一次性項目），營業利益口徑的本益比約 ${fpe(r.core)} 倍，比帳面的本益比更能代表本業。`);
       if (!r.old) {
         const lg = node("div", { class: "legend" }, host);

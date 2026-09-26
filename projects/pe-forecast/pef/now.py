@@ -178,10 +178,14 @@ def rows(Q, prices, meta, macro, now):
 IDX_FILES = (("ndx", "ndx"), ("sp400", "sp400"), ("sp600", "sp600"), ("rut", "rut"))
 
 
+LARGE_CAP = 10e9   # 不在任何名單、市值 ≥ 100 億美元 → 當大型股（2025 年以後才加入 S&P 500 的公司、NASDAQ 上的大型股）
+
+
 def index_tiers(idx_dir, meta, sp500_tickers, month="2026-09"):
-    """每家公司屬於哪個指數（kovagent/indexkit 的成分股檔，<指數>-<月份>.parquet）。
-    回傳 DataFrame：ticker、in_ndx、in_sp400、in_sp600、in_rut、tier（S&P 500 > S&P 400 > S&P 600 > Russell 2000 > 空白）。
-    代號比對用主代號加別名（BRK.B / BRK-B 視為同一個）。"""
+    """每家公司屬於哪個指數（kovagent/indexkit 的成分股檔，<指數>-<月份>.parquet；S&P 500 用 2025 年的完整名單）。
+    回傳 DataFrame：ticker、in_ndx、in_sp400、in_sp600、in_rut、tier
+    （S&P 500 > S&P 400 > S&P 600 > Russell 2000 > 大型股（不在名單、市值 ≥ LARGE_CAP）> 空白＝不在主要指數）。
+    代號比對用主代號加別名（BRK.B / BRK/B / BRK-B 視為同一個）。"""
     norm = lambda t: str(t).upper().replace(".", "-").replace("/", "-")
     sets = {"sp500": {norm(t) for t in sp500_tickers}}
     for k, f in IDX_FILES:
@@ -193,6 +197,6 @@ def index_tiers(idx_dir, meta, sp500_tickers, month="2026-09"):
         x = {f"in_{k}": bool(keys & sets[k]) for k in ("ndx", "sp400", "sp600", "rut")}
         sp5 = bool(r.in_sp500) or bool(keys & sets["sp500"])
         x["tier"] = ("S&P 500" if sp5 else "S&P 400" if x["in_sp400"] else "S&P 600" if x["in_sp600"]
-                     else "Russell 2000" if x["in_rut"] else "")
+                     else "Russell 2000" if x["in_rut"] else "大型股" if r.mc_oz >= LARGE_CAP else "")
         rows.append(dict(ticker=r.ticker, **x))
     return pd.DataFrame(rows)

@@ -2,7 +2,7 @@
 """任何美股代號的「現在」預測（網頁的代號查詢用）。
 
     python3 now_run.py --lg <loosygoosie data/companies> --oz <ozkanpakdil tickers/all.csv 對上 CIK 的表> \
-                       --ozm <月底股價表> --stooq <S&P 500 Stooq 目錄> [--train tech|sp500] [--idx <indexkit 成分股目錄>]
+                       --ozm <月底股價表> --stooq <S&P 500 Stooq 目錄> [--train tech|sp500] [--idx <indexkit 成分股目錄>] [--sp500-list <S&P 500 名單>]
 
 模型：組合模型（README §13），用 --train 指定的名單訓練到今天；財報來源與限制見 pef/now.py。
 輸出：results/now_all.csv（每家一列：市值、TTM 淨利、目前本益比、3–36 個月的組合預測與成員；有 --idx 時加上所屬指數）。
@@ -35,6 +35,7 @@ def main():
     ap.add_argument("--price-date", default="2026-09-24")
     ap.add_argument("--train", default="sp500", choices=["tech", "sp500"])
     ap.add_argument("--idx", default=None, help="kovagent/indexkit 的成分股 parquet 目錄（ndx/sp400/sp600/rut-2026-09.parquet）")
+    ap.add_argument("--sp500-list", default=None, help="S&P 500 完整名單（hanumantjain 的 S_and_P_500_component_stocks.csv）；沒給就用建檔成功的 480 家")
     a = ap.parse_args()
     sp = pd.read_csv(os.path.join(DATA, "universe_sp500.csv"), keep_default_na=False)
     tech = pd.read_csv(os.path.join(DATA, "universe.csv"), keep_default_na=False)
@@ -53,7 +54,8 @@ def main():
     skipped = d[~ok][keep]
     out = pd.concat([out, skipped.assign(too_old=True)], ignore_index=True)
     if a.idx:
-        tiers = now.index_tiers(a.idx, meta, sp["ticker"])
+        sp_all = pd.read_csv(a.sp500_list, encoding="latin-1")["Symbol"] if a.sp500_list else sp["ticker"]
+        tiers = now.index_tiers(a.idx, meta, pd.concat([sp["ticker"], sp_all]))
         out = out.merge(tiers, on="ticker", how="left")
         print("所屬指數：" + "、".join(f"{k or '不在主要指數'} {v}" for k, v in out["tier"].fillna("").value_counts().items())
               + f"；Nasdaq-100 {int(out['in_ndx'].fillna(False).astype(bool).sum())}")

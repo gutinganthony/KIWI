@@ -152,16 +152,16 @@ def main():
             say(f"== {per}｜{gname}：典型誤差（中位 |ln|）")
             say(x.pivot(index="方法", columns="h", values="中位絕對誤差").round(3).to_string())
 
-    # 依市值分層（全期、12 個月、V3）：越小的公司越難？
-    x = p[(p["h"] == 12) & p["actual"].notna() & p["ln_pe"].notna() & p["V3"].notna() & (p["month"] >= "2021-01-01")].copy()
+    # 依市值分層（全期、12 個月、V1＝正式採用的版本）：越小的公司越難？
+    x = p[(p["h"] == 12) & p["actual"].notna() & p["ln_pe"].notna() & p["V1"].notna() & (p["month"] >= "2021-01-01")].copy()
     x["size"] = pd.qcut(x["mc"], 4, labels=["最小 1/4", "第 2", "第 3", "最大 1/4"])
     tiers = []
     for tname, y in x.groupby("size", observed=True):
-        em, er = y["V3"] - y["actual"], y["ln_pe"] - y["actual"]
+        em, er = y["V1"] - y["actual"], y["ln_pe"] - y["actual"]
         tiers.append({"市值分層": tname, "市值中位_億美元": y["mc"].median() / 1e8, "n": len(y), "本益比不變": er.abs().median(),
                       "模型": em.abs().median(), "OOS_R2": 1 - np.sum(np.minimum(em ** 2, 4)) / np.sum(np.minimum(er ** 2, 4))})
     tiers = pd.DataFrame(tiers)
-    say("\n== 12 個月｜依市值分層（V3，全期）")
+    say("\n== 12 個月｜依市值分層（V1，全期）")
     say(tiers.set_index("市值分層").round(3).to_string())
 
     # 80% 區間：S&P 500 的誤差分位數（broad_bands.csv）套到中小型股夠不夠寬？改用中小型股自己的誤差分位數呢？
