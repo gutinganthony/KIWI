@@ -1,6 +1,6 @@
 # _SOURCE_PROBE — 有価証券報告書來源探測（JEM 否證 #3）
 
-> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-09-26T07:09:29+00:00
+> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-09-27T07:42:05+00:00
 > **為什麼有這支**：2026-08-20 Jake 多次嘗試註冊 EDINET API key 失敗（登入問題）。
 > 與其讓他繼續跟註冊表單纏鬥，不如讓 runner 直接回報**哪一條路是通的**。
 
@@ -18,7 +18,12 @@
 <!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
 <!--[if IE 8]>` |
 | [JEM 公司 IR 站](https://www.jem-net.co.jp/) | **200** | 未驗證：雲端 403；runner 未測 | `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja-jp` |
-| [TDnet 一覽（對照組）](https://www.release.tdnet.info/inbs/I_list_001_20260818.html) | **200** | 已知：runner 可達 HTTP 200 —— 若這條也失敗，代表是 runner 網路問題不是站點問題 | `<!DOCTYPE html> <html> <head> <title>適時開示情報閲覧サービス - 開示情報一覧</title> <meta content="text/html" charset="UTF-8" http-equiv="content-type"> <meta name="robots" content="noindex,no` |
+| [TDnet 一覽（對照組）](https://www.release.tdnet.info/inbs/I_list_001_20260818.html) | **404** | 已知：runner 可達 HTTP 200 —— 若這條也失敗，代表是 runner 網路問題不是站點問題 | `<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>404 Not Found</title>
+</head><body>
+<h1>Not Found</h1>
+<p>The requested URL /inbs/I_list_001_20260818.html wa` |
 | [ufocatch 檢索頁（猜測）](https://ufocatch.com/Search.aspx?q=6855) | **404** | ⚠️ 猜測路徑。回 404 只代表這個路徑不對，不代表服務不可用 | `<!DOCTYPE html>
 <html>
     <head>
@@ -67,13 +72,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja-jp" lang="ja-jp" dir="ltr"> <head> <link rel="stylesheet" href="/templates/business/css/normalize.css" type="text/css" media="print,screen" /> <link rel="stylesheet" href="/templates/business/css/template.css" type="text/css" media="print,screen" /> <link rel="stylesheet" media="screen and (max-width: 640px)" href="/templates/business/css/responsive.css" type="text/css" /> <script type="text/javascript"> if ((navigator.userAgent.indexOf('iPhone') > 0) // navigator.userAgent.indexOf('iPod') > 0 // navigator.userAgent.indexOf('Android') > 0) { document.write('<meta name="viewport" content="width=device-width">'); }else{ document.write('<meta name="format-detection" content="telephone=no">');     } </script>  <base href="https://www.jem-net.co.jp/" /> 	<meta http-equiv="content-type" content="text/html; charset=utf-8" /> 	<meta name="keywords" content="半導体,プローブカード,研究,開発,検査用部品,製造" /> 	<meta name="robots" content="index, follow" /> 	<meta name="description" content="日本電子材料株式会社は、兵庫県尼崎市に本社を置くプローブカード（半導体検査用部品）のメーカーです。" /> 	<title>日本電子材料株式会社-半導体検査用部品プローブカードの研究開発製造</title> 	<link href="/templates/business/favic
 ```
 
-### TDnet 一覽（對照組）
-`https://www.release.tdnet.info/inbs/I_list_001_20260818.html`
-
-```html
-<!DOCTYPE html> <html> <head> <title>適時開示情報閲覧サービス - 開示情報一覧</title> <meta content="text/html" charset="UTF-8" http-equiv="content-type"> <meta name="robots" content="noindex,nofollow"> <meta http-equiv="Pragma" content="no-cache"> <meta http-equiv="Cache-Control" content="no-cache"> <meta http-equiv="Expires" content="0"> <script type="text/javascript" charset="UTF-8" src="./js/I_JAVASCRIPT.js"></script> <script type="text/javascript" charset="UTF-8" src="./js/I_MENSEKI.js"></script> <script type="text/javascript" charset="UTF-8" src="./runtime/jquery-1.8.3.min.js"></script> <script type="text/javascript"> <!--   $(document).ready(function(){     $(".pagerTd > DIV >  DIV[onClick]").mousedown(function(event){       event.currentTarget.setAttribute("id","pager_active");     });     $(".pagerTd > DIV > DIV[onClick]").mouseup(function(event){       event.currentTarget.removeAttribute("id");     });     $(".pagerTd > DIV > DIV[onClick]").mouseleave(function(event){       event.currentTarget.removeAttribute("id");     });      $(".xbrl-mask > DIV > A").mousedown(function(event){       event.currentTarget.setAttribute("id","xbrl-button_active");     });     $(".xbrl-mask > DIV > A").mouseup(function(event){       event.currentTarget.removeAttribute("id");     });     $(".xbrl-mask > DIV > A").mouseleave(function(event){       event.currentTarget.removeAttribute("id");     });   }); // --> </script> <link rel="st
-```
-
 ### ufocatch 說明頁（已知存在）
 `https://ufocatch.com/about.aspx`
 
@@ -91,7 +89,7 @@
 
 ## TDnet 解析診斷
 
-- 回溯嘗試：20260925(0列)
+- 回溯嘗試：20260926(空日) → 20260925(0列)
 - 測試頁：`https://www.release.tdnet.info/inbs/I_list_001_20260925.html`
 - HTML 長度：55,255 字元
 - `parse_list_page` 解析出的列數：**0**
