@@ -1,0 +1,567 @@
+{
+  "address": "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6",
+  "label": "james-wynn-blowup-groundtruth",
+  "date": "2026-09-27",
+  "probed_at": "2026-09-27T00:57:46.522168+00:00",
+  "ledger_window_days": 45,
+  "queries_ok": {
+    "perpDexs": true,
+    "clearinghouseState_native": true,
+    "clearinghouseState_dex": true,
+    "spotClearinghouseState": true,
+    "userNonFundingLedgerUpdates": false,
+    "portfolio": true,
+    "userFills": true
+  },
+  "dexs_detected": [
+    "xyz",
+    "flx",
+    "vntl",
+    "hyna",
+    "km",
+    "abcd",
+    "cash",
+    "para",
+    "mkts",
+    "io"
+  ],
+  "aborted": false,
+  "dexs_queried": [
+    "abcd",
+    "cash",
+    "flx",
+    "hyna",
+    "io",
+    "km",
+    "mkts",
+    "para",
+    "vntl",
+    "xyz"
+  ],
+  "portfolio_windows": {
+    "day": {
+      "account_value_last": 1.44,
+      "account_value_ts_iso": "2026-09-27T00:58:00.021000+00:00",
+      "pnl_last": 0.02,
+      "vlm": 0.0,
+      "n_points": 13
+    },
+    "week": {
+      "account_value_last": 1.44,
+      "account_value_ts_iso": "2026-09-27T00:58:00.021000+00:00",
+      "pnl_last": 0.06,
+      "vlm": 0.0,
+      "n_points": 66
+    },
+    "month": {
+      "account_value_last": 1.44,
+      "account_value_ts_iso": "2026-09-27T00:58:00.021000+00:00",
+      "pnl_last": -5656.16,
+      "vlm": 599458.55,
+      "n_points": 47
+    },
+    "allTime": {
+      "account_value_last": 1.44,
+      "account_value_ts_iso": "2026-09-27T00:58:00.021000+00:00",
+      "pnl_last": -22077996.3,
+      "vlm": 18940598665.68,
+      "n_points": 89
+    },
+    "perpDay": {
+      "account_value_last": 0.0,
+      "account_value_ts_iso": "2026-09-27T00:58:00.021000+00:00",
+      "pnl_last": 0.0,
+      "vlm": 0.0,
+      "n_points": 13
+    },
+    "perpWeek": {
+      "account_value_last": 0.0,
+      "account_value_ts_iso": "2026-09-27T00:58:00.021000+00:00",
+      "pnl_last": 0.0,
+      "vlm": 0.0,
+      "n_points": 66
+    },
+    "perpMonth": {
+      "account_value_last": 0.0,
+      "account_value_ts_iso": "2026-09-27T00:58:00.021000+00:00",
+      "pnl_last": -5656.27,
+      "vlm": 599458.55,
+      "n_points": 47
+    },
+    "perpAllTime": {
+      "account_value_last": 0.0,
+      "account_value_ts_iso": "2026-09-27T00:58:00.021000+00:00",
+      "pnl_last": -23394767.23,
+      "vlm": 18932591078.31,
+      "n_points": 87
+    }
+  },
+  "trading": {
+    "n_fills": 2000,
+    "truncated": true,
+    "last_fill_ts": 1788525102.409,
+    "last_fill_iso": "2026-09-04T12:31:42.409000+00:00",
+    "days_since_last_fill": 22.52,
+    "n_fills_7d": 0,
+    "n_fills_30d": 60,
+    "first_fill_iso": "2026-03-30T14:50:57.886000+00:00",
+    "top_coins": [
+      [
+        "xyz:SP500",
+        1118
+      ],
+      [
+        "BTC",
+        749
+      ],
+      [
+        "xyz:GOLD",
+        66
+      ],
+      [
+        "xyz:SPCX",
+        27
+      ],
+      [
+        "CASHCAT",
+        22
+      ],
+      [
+        "SOL",
+        9
+      ],
+      [
+        "ETH",
+        5
+      ],
+      [
+        "@166",
+        2
+      ]
+    ],
+    "by_venue": {
+      "builder:xyz": 1211,
+      "native": 785,
+      "spot": 4
+    },
+    "recent_fills": [
+      {
+        "time_iso": "2026-09-03T15:03:57.092000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.27248,
+        "sz": 443.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T15:03:57.092000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.27194,
+        "sz": 460.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T19:50:10.925000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.30485,
+        "sz": 296.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T19:50:10.925000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.30484,
+        "sz": 271.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T19:50:10.925000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.30473,
+        "sz": 370.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T19:50:10.925000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.30434,
+        "sz": 869.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T19:50:10.925000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.30432,
+        "sz": 869.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T19:50:10.925000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.30432,
+        "sz": 65.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T19:50:10.925000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.30427,
+        "sz": 328.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-03T19:50:10.925000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Open Long",
+        "px": 0.30426,
+        "sz": 492.0,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-09-04T12:31:42.409000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Close Long",
+        "px": 0.2687,
+        "sz": 625.0,
+        "closed_pnl": -12.76
+      },
+      {
+        "time_iso": "2026-09-04T12:31:42.409000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Close Long",
+        "px": 0.2687,
+        "sz": 70.0,
+        "closed_pnl": -1.43
+      },
+      {
+        "time_iso": "2026-09-04T12:31:42.409000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Close Long",
+        "px": 0.26876,
+        "sz": 3704.0,
+        "closed_pnl": -75.37
+      },
+      {
+        "time_iso": "2026-09-04T12:31:42.409000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Close Long",
+        "px": 0.26891,
+        "sz": 280.0,
+        "closed_pnl": -5.66
+      },
+      {
+        "time_iso": "2026-09-04T12:31:42.409000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Close Long",
+        "px": 0.26897,
+        "sz": 1000.0,
+        "closed_pnl": -20.14
+      },
+      {
+        "time_iso": "2026-09-04T12:31:42.409000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Close Long",
+        "px": 0.26897,
+        "sz": 70.0,
+        "closed_pnl": -1.41
+      },
+      {
+        "time_iso": "2026-09-04T12:31:42.409000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Close Long",
+        "px": 0.26924,
+        "sz": 1000.0,
+        "closed_pnl": -19.87
+      },
+      {
+        "time_iso": "2026-09-04T12:31:42.409000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Close Long",
+        "px": 0.26924,
+        "sz": 70.0,
+        "closed_pnl": -1.39
+      },
+      {
+        "time_iso": "2026-09-04T12:31:42.409000+00:00",
+        "coin": "CASHCAT",
+        "dir": "Close Long",
+        "px": 0.26933,
+        "sz": 58.0,
+        "closed_pnl": -1.15
+      },
+      {
+        "time_iso": "2026-09-04T12:31:42.409000+00:00",
+        "coin": "BTC",
+        "dir": "Close Long",
+        "px": 79680.0,
+        "sz": 0.61376,
+        "closed_pnl": -376.23
+      }
+    ]
+  },
+  "funds": {
+    "native": {
+      "n_positions": 0,
+      "account_value": 0.0,
+      "position_value": 0
+    },
+    "builder_dex": {
+      "xyz": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "flx": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "vntl": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "hyna": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "km": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "abcd": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "cash": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "para": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "mkts": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "io": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      }
+    },
+    "spot": {
+      "n_nonzero": 5,
+      "balances": [
+        {
+          "coin": "FARM",
+          "total": 0.8,
+          "hold": 0.0,
+          "entry_ntl": 4.68664,
+          "usd": 4.68664,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "VAPOR",
+          "total": 816.0,
+          "hold": 0.0,
+          "entry_ntl": 3.5849328,
+          "usd": 3.5849328,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "HYPE",
+          "total": 0.01437447,
+          "hold": 0.0,
+          "entry_ntl": 0.53857285,
+          "usd": 0.53857285,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "USDC",
+          "total": 4e-08,
+          "hold": 0.0,
+          "entry_ntl": 0.0,
+          "usd": 4e-08
+        },
+        {
+          "coin": "MAX",
+          "total": 2908.3048,
+          "hold": 0.0,
+          "entry_ntl": 0.0,
+          "usd": 0.0,
+          "usd_is_estimate": true
+        }
+      ],
+      "usd_stable": 0.0,
+      "usd_est_other": 8.81,
+      "usd_total_est": 8.81,
+      "estimated": true
+    },
+    "native_usd": 0.0,
+    "builder_usd": 0.0,
+    "spot_usd": 8.81,
+    "total_usd": 8.81,
+    "non_native_usd": 8.81,
+    "non_native_share": 1.0,
+    "positions": [],
+    "n_positions_total": 0,
+    "n_positions_native": 0,
+    "n_positions_builder": 0,
+    "known": true
+  },
+  "ledger": {},
+  "verdict": "同地址換戰場（builder dex/現貨）",
+  "verdict_reasons": [
+    "非原生資金 $8.81 占總資產 $8.81 的100%（builder dex $0.00／現貨 $8.81）",
+    "成交戰場分布：非原生 1215/2000 筆（61%）"
+  ],
+  "endpoint_health": [
+    {
+      "name": "perpDexs",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.3
+    },
+    {
+      "name": "clearinghouseState[native]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "clearinghouseState[xyz]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "clearinghouseState[flx]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "clearinghouseState[vntl]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "clearinghouseState[hyna]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "clearinghouseState[km]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "clearinghouseState[abcd]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "clearinghouseState[cash]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "clearinghouseState[para]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "clearinghouseState[mkts]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "clearinghouseState[io]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "spotClearinghouseState",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "userNonFundingLedgerUpdates",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": false,
+      "status": 429,
+      "error": "HTTP 429; body=null",
+      "elapsed_sec": 4.4
+    },
+    {
+      "name": "portfolio",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.48
+    },
+    {
+      "name": "userFills",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.25
+    }
+  ],
+  "notes": [],
+  "requests_ok": 15,
+  "requests_failed": 1
+}
