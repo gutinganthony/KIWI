@@ -97,3 +97,4 @@
 | 2026-09-05 | [全掃 Step 5–9：3324 雙鴻 × 2492 華新科 — 兩檔都有決定性發現](./2026-09-05-scan-3324-2492-step5-9.md) | serenity, step5-9, 3324, 2492, purity-filter, pricing-power, passive-components, liquid-cooling, UQD, payrolls, fed-correction |
 | 2026-09-07 | [全掃收尾：3013／3533／CEJN／GaN-SiC — 冷卻與 800VDC 兩線結案](./2026-09-07-scan-remaining-cooling-800vdc.md) | serenity, step5-9, cooling, 800VDC, UQD, CEJN, navitas, GaN, purity-filter, no-position |
 | 2026-09-07 | [SEMICON Taiwan 2026：從先進製程到 3D IC — 重點與對 KIWI 的意涵](./2026-09-07-semicon-taiwan-2026-3dic.md) | semicon-taiwan, 3DIC, advanced-packaging, hybrid-bonding, TCB, FOPLP, SoIC, system-integration, advantest |
+| 2026-09-29 | [Agentic AI → CPU 瓶頸：投資地圖（Redefine〈AI Agent 如何改寫伺服器 CPU〉分析）](./2026-09-29-agentic-cpu-bottleneck-investment-map.md) | agentic-AI, CPU, memory-interface, MRDIMM, SOCAMM, rambus, TSMC, 3533, catalyst-timeline, redefine |

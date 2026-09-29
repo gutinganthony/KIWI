@@ -23,6 +23,18 @@ last_updated: 2026-07-06
 
 ## 🔴 待辦（依急迫度）
 
+### 🆕 2026-09-29 新增（主對話 session 產生：agentic CPU 分析）
+
+- [ ] **🔴 Google Sheet「KIWI 持倉即時表」雲端讀取失敗**：`mcp__Google_Drive__read_file_content`（fileId `1tYg3PneDLrxXbtuoo1lsylFV8ehSpEblv9thEuAllns`）
+  回傳 `Requested entity was not found`。可能原因：檔案被移動/刪除/換 ID、分享權限變更、或 Drive 連接器授權的帳號不同。
+  **請在 Mac 上開一次該 Sheet 確認網址裡的 ID 還是這串**，並確認 Drive 連接器登入的是擁有該檔的帳號。
+  在修好之前，每個 session 只能讀 `skills/serenity/holdings.md`（最後同步 2026-08-28）。
+- [ ] **（低急迫）9/7 那篇 redef.tech〈SEMICON Taiwan：從先進製程到 3D IC〉可以用 PDF 結案**：
+  2026-09-29 證實，把 redef.tech 電子報從 Outlook/瀏覽器「列印成 PDF」再上傳，雲端就能讀原文。下方 09-07 那一項可以用同樣方法處理。
+- [ ] （僅在要一手核對時）本輪被 egress proxy 擋、只能讀搜尋摘要的網站：arxiv.org（論文 2511.00739 原文）、theregister、tomshardware、
+  ctee、cnyes、technews、vocus、stockanalysis、finviz、companiesmarketcap。
+  影響：`2026-09-29-agentic-cpu-bottleneck-investment-map.md` 的美日股估值只有 Yahoo 單一來源；若要加碼 RMBS／Renesas，建議在 Mac 上用第二來源核對 fwd P/E。
+
 ### 🆕 2026-09-07 新增（主對話 session 產生）
 
 - [ ] **開 `insights.redef.tech` 那篇〈SEMICON Taiwan 最新發展分析之一：從先進製程到 3D IC〉**
