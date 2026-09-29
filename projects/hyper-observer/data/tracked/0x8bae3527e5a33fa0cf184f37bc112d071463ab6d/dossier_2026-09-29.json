@@ -1,0 +1,433 @@
+{
+  "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+  "label": "scan-best-candidate-9M-lowdd",
+  "snapshot_date": "2026-09-29",
+  "classification": "choppy",
+  "classification_reasons": [
+    "目前槓桿 40.0 <= 20x"
+  ],
+  "followable": {
+    "ok": false,
+    "reasons": [
+      "槓桿過高：目前 40x > 10x"
+    ]
+  },
+  "metrics": {
+    "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+    "snapshot_date": "2026-09-29",
+    "pnl_source": "portfolio_curve",
+    "portfolio_window": "perpAllTime",
+    "low_confidence": false,
+    "total_pnl": 11524740.99,
+    "peak_pnl": 11554799.47,
+    "monthly_pnl": {
+      "2025-07": -73180.55,
+      "2025-08": -34288.37,
+      "2025-09": -8212.34,
+      "2025-10": 1435708.48,
+      "2025-11": 2045437.87,
+      "2025-12": 930544.52,
+      "2026-01": 638177.85,
+      "2026-02": 519822.91,
+      "2026-03": 1413004.59,
+      "2026-04": 1924051.99,
+      "2026-05": 106203.52,
+      "2026-06": -253202.61,
+      "2026-07": 1066691.25,
+      "2026-08": 1561347.95,
+      "2026-09": 252633.93
+    },
+    "active_months": 15,
+    "positive_month_ratio": 0.733,
+    "best_month_pnl": 2045437.87,
+    "max_drawdown_pct": 0.0554,
+    "current_drawdown_pct": 0.0026,
+    "max_single_day_crash_pct": 0.0331,
+    "span_days": 439.1,
+    "days_idle": 0.9,
+    "n_fills": 2000,
+    "profit_factor": 12.903,
+    "avg_win": 1673.42,
+    "avg_loss": 331.53,
+    "realized_win_rate": 0.719,
+    "avg_hold_hours": 245.998,
+    "net_direction_ratio": 0.0476,
+    "n_fills_truncated": true,
+    "n_fills_last_30d": 481,
+    "n_events": 43,
+    "n_events_last_30d": 7,
+    "n_events_last_30d_est": 7,
+    "events_30d_coverage_days": 30.0,
+    "median_fills_per_event": 22,
+    "median_event_notional": 433880.58,
+    "median_gap_between_events_hours": 0.8,
+    "p90_gap_between_events_hours": 93.37,
+    "had_liquidation": false,
+    "n_liquidations": 0,
+    "top_coin": "xyz:DRAM",
+    "vlm": 353698198.6,
+    "vlm_to_pnl_ratio": 30.69,
+    "funding_total": -249037.45,
+    "n_open_positions": 7,
+    "n_open_positions_native": 3,
+    "dexs_with_positions": [
+      "xyz"
+    ],
+    "account_value_native": 170114.45,
+    "account_value_by_dex": {
+      "": 170114.45,
+      "abcd": 0.0,
+      "cash": 0.0,
+      "flx": 0.0,
+      "hyna": 0.0,
+      "io": 0.0,
+      "km": 0.0,
+      "mkts": 0.0,
+      "para": 0.0,
+      "vntl": 0.0,
+      "xyz": 888920.09
+    },
+    "spot_value_usd": 4637692.62,
+    "spot_tokens": [
+      {
+        "coin": "USDC",
+        "qty": 4589477.3579533305,
+        "usd": 4589477.36,
+        "estimated": false
+      },
+      {
+        "coin": "USDT0",
+        "qty": 48215.25091058,
+        "usd": 48215.25,
+        "estimated": true
+      },
+      {
+        "coin": "USDH",
+        "qty": 0.01250805,
+        "usd": 0.01,
+        "estimated": false
+      }
+    ],
+    "total_value_all_venues": 5696727.16,
+    "non_native_share": 0.9701,
+    "current_max_leverage": 40.0,
+    "has_extreme_leverage": true,
+    "margin_types": [
+      "cross"
+    ],
+    "account_value": 1059034.54,
+    "fetch_errors": []
+  },
+  "position_value": 8937968.28,
+  "unrealized_pnl": 23416.27,
+  "n_open_positions": 7,
+  "open_positions": [
+    {
+      "coin": "BTC",
+      "szi": -10.74691,
+      "side": "short",
+      "entry_px": 83783.0,
+      "position_value": 892638.3446,
+      "unrealized_pnl": 7770.95789,
+      "leverage_value": 40.0,
+      "leverage_type": "cross",
+      "liquidation_px": 469699.0586342642,
+      "margin_used": 22315.958615,
+      "max_leverage": 40.0,
+      "cum_funding_all_time": -25156.768175,
+      "dex": ""
+    },
+    {
+      "coin": "DOGE",
+      "szi": 9756943.0,
+      "side": "long",
+      "entry_px": 0.092131,
+      "position_value": 904400.317499,
+      "unrealized_pnl": 5473.850691,
+      "leverage_value": 10.0,
+      "leverage_type": "cross",
+      "liquidation_px": null,
+      "margin_used": 90440.031749,
+      "max_leverage": 10.0,
+      "cum_funding_all_time": 4397.068764,
+      "dex": ""
+    },
+    {
+      "coin": "TNSR",
+      "szi": 862794.4,
+      "side": "long",
+      "entry_px": 0.03649,
+      "position_value": 32941.490192,
+      "unrealized_pnl": 1458.122536,
+      "leverage_value": 3.0,
+      "leverage_type": "cross",
+      "liquidation_px": null,
+      "margin_used": 10980.49673,
+      "max_leverage": 3.0,
+      "cum_funding_all_time": -1041.196428,
+      "dex": ""
+    },
+    {
+      "coin": "xyz:NVDA",
+      "szi": 5651.023,
+      "side": "long",
+      "entry_px": 222.92,
+      "position_value": 1294479.83861,
+      "unrealized_pnl": 34750.57879,
+      "leverage_value": 5.0,
+      "leverage_type": "cross",
+      "liquidation_px": null,
+      "margin_used": 258895.967722,
+      "max_leverage": 20.0,
+      "cum_funding_all_time": 9155.895999,
+      "dex": "xyz"
+    },
+    {
+      "coin": "xyz:GOOGL",
+      "szi": 219.928,
+      "side": "long",
+      "entry_px": 343.187,
+      "position_value": 75362.72776,
+      "unrealized_pnl": -113.893252,
+      "leverage_value": 10.0,
+      "leverage_type": "cross",
+      "liquidation_px": null,
+      "margin_used": 7536.272776,
+      "max_leverage": 20.0,
+      "cum_funding_all_time": 2825.865167,
+      "dex": "xyz"
+    },
+    {
+      "coin": "xyz:SKHX",
+      "szi": 2107.974,
+      "side": "long",
+      "entry_px": 1431.724,
+      "position_value": 2758494.7764,
+      "unrealized_pnl": -259543.4692,
+      "leverage_value": 10.0,
+      "leverage_type": "cross",
+      "liquidation_px": null,
+      "margin_used": 275849.47764,
+      "max_leverage": 10.0,
+      "cum_funding_all_time": 23692.499407,
+      "dex": "xyz"
+    },
+    {
+      "coin": "xyz:SKHY",
+      "szi": -16202.56,
+      "side": "short",
+      "entry_px": 198.3187,
+      "position_value": 2979650.784,
+      "unrealized_pnl": 233620.1241,
+      "leverage_value": 10.0,
+      "leverage_type": "cross",
+      "liquidation_px": 431.1571224163,
+      "margin_used": 297965.0784,
+      "max_leverage": 10.0,
+      "cum_funding_all_time": 15542.254562,
+      "dex": "xyz"
+    }
+  ],
+  "recent_fills": [
+    {
+      "time": "2026-09-26T07:55:54.112000+00:00",
+      "coin": "TNSR",
+      "dir": "Close Long",
+      "px": 0.04237,
+      "sz": 70488.7,
+      "closed_pnl": 414.47,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-26T07:55:54.112000+00:00",
+      "coin": "TNSR",
+      "dir": "Close Long",
+      "px": 0.04237,
+      "sz": 58740.6,
+      "closed_pnl": 345.39,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-26T07:55:54.112000+00:00",
+      "coin": "TNSR",
+      "dir": "Close Long",
+      "px": 0.04237,
+      "sz": 93984.9,
+      "closed_pnl": 552.63,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-26T07:55:54.112000+00:00",
+      "coin": "TNSR",
+      "dir": "Close Long",
+      "px": 0.04237,
+      "sz": 82236.8,
+      "closed_pnl": 483.55,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-26T07:55:54.112000+00:00",
+      "coin": "TNSR",
+      "dir": "Close Long",
+      "px": 0.04237,
+      "sz": 46992.4,
+      "closed_pnl": 276.32,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-26T07:55:54.112000+00:00",
+      "coin": "TNSR",
+      "dir": "Close Long",
+      "px": 0.04237,
+      "sz": 8000.0,
+      "closed_pnl": 47.04,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-26T07:55:54.112000+00:00",
+      "coin": "TNSR",
+      "dir": "Close Long",
+      "px": 0.04237,
+      "sz": 6940.3,
+      "closed_pnl": 40.81,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-26T07:55:54.112000+00:00",
+      "coin": "TNSR",
+      "dir": "Close Long",
+      "px": 0.04237,
+      "sz": 399907.7,
+      "closed_pnl": 2351.46,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-26T07:55:54.112000+00:00",
+      "coin": "TNSR",
+      "dir": "Close Long",
+      "px": 0.04237,
+      "sz": 590.0,
+      "closed_pnl": 3.47,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-26T07:55:54.112000+00:00",
+      "coin": "TNSR",
+      "dir": "Close Long",
+      "px": 0.04237,
+      "sz": 319926.2,
+      "closed_pnl": 1881.17,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-26T07:55:54.112000+00:00",
+      "coin": "TNSR",
+      "dir": "Close Long",
+      "px": 0.04237,
+      "sz": 157917.0,
+      "closed_pnl": 928.55,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-26T07:55:54.112000+00:00",
+      "coin": "TNSR",
+      "dir": "Close Long",
+      "px": 0.04237,
+      "sz": 127973.7,
+      "closed_pnl": 752.49,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-26T07:55:54.112000+00:00",
+      "coin": "TNSR",
+      "dir": "Close Long",
+      "px": 0.04237,
+      "sz": 8132.3,
+      "closed_pnl": 47.82,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-26T07:55:54.112000+00:00",
+      "coin": "TNSR",
+      "dir": "Close Long",
+      "px": 0.04237,
+      "sz": 8132.3,
+      "closed_pnl": 47.82,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-26T07:55:54.112000+00:00",
+      "coin": "TNSR",
+      "dir": "Close Long",
+      "px": 0.04237,
+      "sz": 32529.2,
+      "closed_pnl": 191.27,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-26T07:55:54.112000+00:00",
+      "coin": "TNSR",
+      "dir": "Close Long",
+      "px": 0.04237,
+      "sz": 65058.4,
+      "closed_pnl": 382.54,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-26T07:55:54.112000+00:00",
+      "coin": "TNSR",
+      "dir": "Close Long",
+      "px": 0.04237,
+      "sz": 1401.5,
+      "closed_pnl": 8.24,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-26T07:55:54.112000+00:00",
+      "coin": "TNSR",
+      "dir": "Close Long",
+      "px": 0.04237,
+      "sz": 11812.0,
+      "closed_pnl": 69.45,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-26T07:55:54.112000+00:00",
+      "coin": "TNSR",
+      "dir": "Close Long",
+      "px": 0.04237,
+      "sz": 11723.3,
+      "closed_pnl": 68.93,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-26T07:55:54.112000+00:00",
+      "coin": "TNSR",
+      "dir": "Close Long",
+      "px": 0.04237,
+      "sz": 9440.6,
+      "closed_pnl": 55.51,
+      "is_liquidation": false
+    }
+  ],
+  "new_positions": [],
+  "disappeared_positions": [],
+  "initialized": false,
+  "raw_source": "snapshot",
+  "funds_trend": {
+    "status": "持平",
+    "n_points": 7,
+    "days": 7,
+    "threshold": 0.05,
+    "first_date": "2026-09-23",
+    "last_date": "2026-09-29",
+    "spot_share_first": 0.8043,
+    "spot_share_last": 0.8141,
+    "spot_share_change": 0.0098,
+    "total_first": 5550449.19,
+    "total_last": 5696727.16,
+    "total_change_pct": 0.0264,
+    "perp_change_pct": -0.0252,
+    "position_value_change_pct": -0.0389
+  }
+}
