@@ -605,7 +605,8 @@ def build_poly_followability(po):
     評估）。理由文字本身是研究結論，但引用的兩個數字（偵測延遲、可成交率）沿用
     上面已經抓到的 shadow 即時數據，不在這裡重複硬編一份，避免兩處數字對不上。"""
     reasons = [
-        "真實下單速度約每 5–35 秒一筆（實測峰值單分鐘 11 筆），人工跟單在物理上不可行",
+        "成交間隔中位數約 3 秒（多數是它掛在多場進行中比賽的限價單被分批吃掉），"
+        "逐筆跟單人工上不可行",
     ]
     lag_median, lag_p90 = po.get("lag_median"), po.get("lag_p90")
     if lag_median is not None:
@@ -613,6 +614,10 @@ def build_poly_followability(po):
         if lag_p90 is not None:
             lag_txt += f"（p90 {lag_p90:.0f} 秒）"
         reasons.append(f"改走自動化，poly-shadow 實測偵測延遲仍有{lag_txt}，此時進場價常已劣化")
+    reasons.append(
+        "它主要當 maker 賺價差＋返佣（價差窄且盤口新鮮的 14,720 筆裡只有 18% 成交在 ask 或以上），"
+        "還常同場買兩邊調庫存；跟單者只能晚約 20 秒在 ask 側吃單，等於付掉它賺的價差、拿不到返佣，"
+        "跟到的多半是它被人挑走的成交，只跟一邊還會變成沒對沖的裸部位")
     fillable = po.get("fillable_ratio")
     fillable_txt = f"約 {fillable * 100:.0f}%" if fillable is not None else "查無實測"
     reasons.append(

@@ -620,7 +620,7 @@ def test_poly_followability(tmp):
           "shadow 延遲/可成交率正確透傳")
     check(po["watchlist_total"] == 2 and po["watchlist_active"] == 1, "watchlist 計數正確透傳")
     check(po["followability"]["verdict"] == "not_followable"
-          and len(po["followability"]["reasons"]) == 4, "可跟性評估固定為 4 條理由")
+          and len(po["followability"]["reasons"]) == 5, "可跟性評估固定為 5 條理由")
     lag_expect = f"{po['lag_median']:.0f}"
     check(lag_expect in po["followability"]["reasons"][1],
           "延遲數字引用自 shadow 實測值（同一個 lag_median 欄位），不是另外硬編的數字")
@@ -651,8 +651,8 @@ def test_poly_followability(tmp):
           "shadow 缺失 → 延遲/可成交率安全退化為 None")
     check(po3["watchlist_total"] is None and po3["watchlist_active"] is None,
           "watchlist.json 缺失 → 計數安全退化為 None")
-    check(len(po3["followability"]["reasons"]) == 3,
-          "shadow 數字缺失時，可跟性理由改用「查無實測」措辭，理由條數降為 3 條（不臆造延遲數字）")
+    check(len(po3["followability"]["reasons"]) == 4,
+          "shadow 數字缺失時，可跟性理由改用「查無實測」措辭，理由條數降為 4 條（不臆造延遲數字）")
 
     print("[16] 畸形資料（metrics 非 dict／reasons 混雜非字串／shadow 結構壞掉）→ 不炸，安全降級")
     skel4 = os.path.join(tmp, "poly-malformed")
