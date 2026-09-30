@@ -1,6 +1,6 @@
 # _SOURCE_PROBE — 有価証券報告書來源探測（JEM 否證 #3）
 
-> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-09-07T08:06:44+00:00
+> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-09-30T01:53:14+00:00
 > **為什麼有這支**：2026-08-20 Jake 多次嘗試註冊 EDINET API key 失敗（登入問題）。
 > 與其讓他繼續跟註冊表單纏鬥，不如讓 runner 直接回報**哪一條路是通的**。
 
@@ -18,7 +18,12 @@
 <!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
 <!--[if IE 8]>` |
 | [JEM 公司 IR 站](https://www.jem-net.co.jp/) | **200** | 未驗證：雲端 403；runner 未測 | `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja-jp` |
-| [TDnet 一覽（對照組）](https://www.release.tdnet.info/inbs/I_list_001_20260818.html) | **200** | 已知：runner 可達 HTTP 200 —— 若這條也失敗，代表是 runner 網路問題不是站點問題 | `<!DOCTYPE html> <html> <head> <title>適時開示情報閲覧サービス - 開示情報一覧</title> <meta content="text/html" charset="UTF-8" http-equiv="content-type"> <meta name="robots" content="noindex,no` |
+| [TDnet 一覽（對照組）](https://www.release.tdnet.info/inbs/I_list_001_20260818.html) | **404** | 已知：runner 可達 HTTP 200 —— 若這條也失敗，代表是 runner 網路問題不是站點問題 | `<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>404 Not Found</title>
+</head><body>
+<h1>Not Found</h1>
+<p>The requested URL /inbs/I_list_001_20260818.html wa` |
 | [ufocatch 檢索頁（猜測）](https://ufocatch.com/Search.aspx?q=6855) | **404** | ⚠️ 猜測路徑。回 404 只代表這個路徑不對，不代表服務不可用 | `<!DOCTYPE html>
 <html>
     <head>
@@ -26,7 +31,7 @@
         <meta name="viewport" content="width=device-width" />
         <style>
          body {font-fa` |
-| [ufocatch 說明頁（已知存在）](https://ufocatch.com/about.aspx) | **200** | 對照：此頁確實存在。若它 200 而檢索頁 404 → 站可用、只是路徑要找 | `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> <html xmlns="http://www.w3.org/1999/xhtml" > <head id="c` |
+| [ufocatch 說明頁（已知存在）](https://ufocatch.com/about.aspx) | **200** | 對照：此頁確實存在。若它 200 而檢索頁 404 → 站可用、只是路徑要找 | `<!DOCTYPE html> <html lang="ja"> <head>     <!-- Google Tag Manager -->     <script>(function(w,d,s,l,i){w[l]=w[l]//[];w[l].push({'gtm.start':     new Date().getTime(),event:'` |
 | [EDINET 書類検索（猜測）](https://disclosure2.edinet-fsa.go.jp/week0020.aspx) | **200** | ⚠️ 猜測路徑（WEEK0010 是首頁，書類検索可能是別的 aspx） | `<!DOCTYPE html> <html lang="ja"> <head> <meta name="viewport" content="width=device-width,initial-scale=1"/> <meta name="description" content="開示情報利用者用トップ画面（英語）"/> <meta name="appl` |
 
 ## 下一步（給未來 session）
@@ -57,7 +62,7 @@
 `https://ufocatch.com/`
 
 ```html
-<!DOCTYPE html> <html lang="ja"> <head>     <!-- Google Tag Manager -->     <script>(function(w,d,s,l,i){w[l]=w[l]//[];w[l].push({'gtm.start':     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);     })(window,document,'script','dataLayer','GTM-KQ5J3GZM');</script>     <!-- End Google Tag Manager -->     <meta charset="utf-8" />     <meta name="viewport" content="width=device-width, initial-scale=1.0" />     <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />     <meta name="google-site-verification" content="Me5AYZ0nFZgkYjEfhSMHKiX-3RtBCC4Pu3oj79fryxo" />     <meta name="description" content="EDINETやTDnetで公表された企業開示情報をご提供するサービスです。XBRLを活用し、会社属性情報などをデータ化しています。" />     <meta name="twitter:card" content="summary" />     <meta name="twitter:site" content="@ufocatch" />     <meta property="og:url" content="https://ufocatch.com/" />     <meta property="og:title" content="有報キャッチャー" />     <meta property="og:description" content="EDINETやTDnetで公表された企業開示情報をご提供するサービスです。XBRLを活用し、会社属性情報などをデータ化しています。" />     <meta property="og:image" content="http://ufocatc
+<!DOCTYPE html> <html lang="ja"> <head>     <!-- Google Tag Manager -->     <script>(function(w,d,s,l,i){w[l]=w[l]//[];w[l].push({'gtm.start':     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);     })(window,document,'script','dataLayer','GTM-KQ5J3GZM');</script>     <!-- End Google Tag Manager -->     <meta charset="utf-8" />     <meta name="viewport" content="width=device-width, initial-scale=1.0" />     <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />     <meta name="google-site-verification" content="Me5AYZ0nFZgkYjEfhSMHKiX-3RtBCC4Pu3oj79fryxo" />     <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />     <link rel="icon" type="image/png" sizes="192x192" href="/staticfiles/icons/icon-192.png" />     <link rel="apple-touch-icon" sizes="180x180" href="/staticfiles/icons/apple-touch-icon.png" />     <meta name="description" content="EDINET&#x3084;TDnet&#x3067;&#x516C;&#x8868;&#x3055;&#x308C;&#x305F;&#x4F01;&#x696D;&#x958B;&#x793A;&#x60C5;&#x5831;&#x3092;&#x3054;&#x63D0;&#x4F9B;&#x3059;&#x308B;&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x3067;&#x3059;&#x3002;XBRL&#x3092;&#x6D3B;&#x7528;&#x3057;&#x3001;&#x4F1A;&#x793E;&#x5C5E;&#x6027;&#x60C5;&#x5831;&#x306A;&#x3069;&#x3092;&#x30C7;&#x30FC;&#x30BF;&#x5316;&#x3057;&#x3066;&#x3044;&#x307E;&#x3059;&#x3
 ```
 
 ### JEM 公司 IR 站
@@ -67,18 +72,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja-jp" lang="ja-jp" dir="ltr"> <head> <link rel="stylesheet" href="/templates/business/css/normalize.css" type="text/css" media="print,screen" /> <link rel="stylesheet" href="/templates/business/css/template.css" type="text/css" media="print,screen" /> <link rel="stylesheet" media="screen and (max-width: 640px)" href="/templates/business/css/responsive.css" type="text/css" /> <script type="text/javascript"> if ((navigator.userAgent.indexOf('iPhone') > 0) // navigator.userAgent.indexOf('iPod') > 0 // navigator.userAgent.indexOf('Android') > 0) { document.write('<meta name="viewport" content="width=device-width">'); }else{ document.write('<meta name="format-detection" content="telephone=no">');     } </script>  <base href="https://www.jem-net.co.jp/" /> 	<meta http-equiv="content-type" content="text/html; charset=utf-8" /> 	<meta name="keywords" content="半導体,プローブカード,研究,開発,検査用部品,製造" /> 	<meta name="robots" content="index, follow" /> 	<meta name="description" content="日本電子材料株式会社は、兵庫県尼崎市に本社を置くプローブカード（半導体検査用部品）のメーカーです。" /> 	<title>日本電子材料株式会社-半導体検査用部品プローブカードの研究開発製造</title> 	<link href="/templates/business/favic
 ```
 
-### TDnet 一覽（對照組）
-`https://www.release.tdnet.info/inbs/I_list_001_20260818.html`
-
-```html
-<!DOCTYPE html> <html> <head> <title>適時開示情報閲覧サービス - 開示情報一覧</title> <meta content="text/html" charset="UTF-8" http-equiv="content-type"> <meta name="robots" content="noindex,nofollow"> <meta http-equiv="Pragma" content="no-cache"> <meta http-equiv="Cache-Control" content="no-cache"> <meta http-equiv="Expires" content="0"> <script type="text/javascript" charset="UTF-8" src="./js/I_JAVASCRIPT.js"></script> <script type="text/javascript" charset="UTF-8" src="./js/I_MENSEKI.js"></script> <script type="text/javascript" charset="UTF-8" src="./runtime/jquery-1.8.3.min.js"></script> <script type="text/javascript"> <!--   $(document).ready(function(){     $(".pagerTd > DIV >  DIV[onClick]").mousedown(function(event){       event.currentTarget.setAttribute("id","pager_active");     });     $(".pagerTd > DIV > DIV[onClick]").mouseup(function(event){       event.currentTarget.removeAttribute("id");     });     $(".pagerTd > DIV > DIV[onClick]").mouseleave(function(event){       event.currentTarget.removeAttribute("id");     });      $(".xbrl-mask > DIV > A").mousedown(function(event){       event.currentTarget.setAttribute("id","xbrl-button_active");     });     $(".xbrl-mask > DIV > A").mouseup(function(event){       event.currentTarget.removeAttribute("id");     });     $(".xbrl-mask > DIV > A").mouseleave(function(event){       event.currentTarget.removeAttribute("id");     });   }); // --> </script> <link rel="st
-```
-
 ### ufocatch 說明頁（已知存在）
 `https://ufocatch.com/about.aspx`
 
 ```html
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> <html xmlns="http://www.w3.org/1999/xhtml" > <head id="ctl00_Head1"> <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> <script>     (adsbygoogle = window.adsbygoogle // []).push({         google_ad_client: "ca-pub-4898449747359627",         enable_page_level_ads: true     }); </script>   <!-- Global site tag (gtag.js) - Google Analytics --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-XW2DDSJZ1G"></script> <script>     window.dataLayer = window.dataLayer // [];     function gtag() { dataLayer.push(arguments); }     gtag('js', new Date());      gtag('config', 'G-XW2DDSJZ1G'); </script>  <title> 	有価証券報告書、決算書、財務諸表の分析・ダウンロード - 有報キャッチャー </title><meta content="text/html; charset=utf-8" http-equiv="Content-Type" /><meta name="google-site-verification" content="Me5AYZ0nFZgkYjEfhSMHKiX-3RtBCC4Pu3oj79fryxo" /><meta name="description" content="EDINETやTDnetで公表された企業開示情報をご提供するサービスです。XBRLを活用し、会社属性情報などをデータ化しています。" />  <script src="//code.jquery.com/jquery-1.7.1.min.js" type="text/javascript"></script> <link rel="Stylesheet" href="css/master.css" /><link rel="Stylesheet" href="css/news.css" /><link rel="Stylesheet" href="
+<!DOCTYPE html> <html lang="ja"> <head>     <!-- Google Tag Manager -->     <script>(function(w,d,s,l,i){w[l]=w[l]//[];w[l].push({'gtm.start':     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);     })(window,document,'script','dataLayer','GTM-KQ5J3GZM');</script>     <!-- End Google Tag Manager -->     <meta charset="utf-8" />     <meta name="viewport" content="width=device-width, initial-scale=1.0" />     <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />     <meta name="google-site-verification" content="Me5AYZ0nFZgkYjEfhSMHKiX-3RtBCC4Pu3oj79fryxo" />     <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />     <link rel="icon" type="image/png" sizes="192x192" href="/staticfiles/icons/icon-192.png" />     <link rel="apple-touch-icon" sizes="180x180" href="/staticfiles/icons/apple-touch-icon.png" />     <meta name="description" content="EDINET&#x3084;TDnet&#x3067;&#x516C;&#x8868;&#x3055;&#x308C;&#x305F;&#x4F01;&#x696D;&#x958B;&#x793A;&#x60C5;&#x5831;&#x3092;&#x3054;&#x63D0;&#x4F9B;&#x3059;&#x308B;&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x3067;&#x3059;&#x3002;XBRL&#x3092;&#x6D3B;&#x7528;&#x3057;&#x3001;&#x4F1A;&#x793E;&#x5C5E;&#x6027;&#x60C5;&#x5831;&#x306A;&#x3069;&#x3092;&#x30C7;&#x30FC;&#x30BF;&#x5316;&#x3057;&#x3066;&#x3044;&#x307E;&#x3059;&#x3
 ```
 
 ### EDINET 書類検索（猜測）
@@ -91,9 +89,9 @@
 
 ## TDnet 解析診斷
 
-- 回溯嘗試：20260906(空日) → 20260905(空日) → 20260904(0列)
-- 測試頁：`https://www.release.tdnet.info/inbs/I_list_001_20260904.html`
-- HTML 長度：54,673 字元
+- 回溯嘗試：20260929(0列)
+- 測試頁：`https://www.release.tdnet.info/inbs/I_list_001_20260929.html`
+- HTML 長度：54,646 字元
 - `parse_list_page` 解析出的列數：**0**
 - 其中命中目標代碼：**0**
 

@@ -1,0 +1,366 @@
+{
+  "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+  "label": "scan-best-candidate-9M-lowdd",
+  "snapshot_date": "2026-09-09",
+  "classification": "consistent_winner",
+  "classification_reasons": [
+    "活動跨度 419.1 天 >= 60",
+    "總 PnL 11339965.51 > 10,000",
+    "回撤 0.0554 < 40% peak",
+    "目前槓桿 10.0 <= 20x",
+    "正月比率 0.733 >= 0.5",
+    "（fills 截斷 n>=2000，profit factor 11.795 樣本偏誤大，僅供低信心參考，不硬否決）"
+  ],
+  "followable": {
+    "ok": true,
+    "reasons": []
+  },
+  "metrics": {
+    "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+    "snapshot_date": "2026-09-09",
+    "pnl_source": "portfolio_curve",
+    "portfolio_window": "perpAllTime",
+    "low_confidence": false,
+    "total_pnl": 11339965.51,
+    "peak_pnl": 11373743.97,
+    "monthly_pnl": {
+      "2025-07": -73180.55,
+      "2025-08": -34288.37,
+      "2025-09": -8212.34,
+      "2025-10": 1435708.48,
+      "2025-11": 2045437.87,
+      "2025-12": 930544.52,
+      "2026-01": 638177.85,
+      "2026-02": 519822.91,
+      "2026-03": 1413004.59,
+      "2026-04": 1924051.99,
+      "2026-05": 106203.52,
+      "2026-06": -253202.61,
+      "2026-07": 1066691.25,
+      "2026-08": 1549918.25,
+      "2026-09": 79288.15
+    },
+    "active_months": 15,
+    "positive_month_ratio": 0.733,
+    "best_month_pnl": 2045437.87,
+    "max_drawdown_pct": 0.0554,
+    "current_drawdown_pct": 0.003,
+    "max_single_day_crash_pct": 0.0331,
+    "span_days": 419.1,
+    "days_idle": 1.0,
+    "n_fills": 2000,
+    "profit_factor": 11.795,
+    "avg_win": 1598.07,
+    "avg_loss": 293.19,
+    "realized_win_rate": 0.684,
+    "avg_hold_hours": 200.683,
+    "net_direction_ratio": 0.0879,
+    "n_fills_truncated": true,
+    "n_fills_last_30d": 1059,
+    "n_events": 40,
+    "n_events_last_30d": 26,
+    "n_events_last_30d_est": 26,
+    "events_30d_coverage_days": 30.0,
+    "median_fills_per_event": 24.5,
+    "median_event_notional": 416586.47,
+    "median_gap_between_events_hours": 1.11,
+    "p90_gap_between_events_hours": 65.52,
+    "had_liquidation": false,
+    "n_liquidations": 0,
+    "top_coin": "xyz:DRAM",
+    "vlm": 342683442.38,
+    "vlm_to_pnl_ratio": 30.22,
+    "funding_total": -173181.31,
+    "n_open_positions": 2,
+    "n_open_positions_native": 0,
+    "dexs_with_positions": [
+      "xyz"
+    ],
+    "account_value_native": 0.0,
+    "account_value_by_dex": {
+      "": 0.0,
+      "abcd": 0.0,
+      "cash": 0.0,
+      "flx": 0.0,
+      "hyna": 0.0,
+      "io": 0.0,
+      "km": 0.0,
+      "mkts": 0.0,
+      "para": 0.0,
+      "vntl": 0.0,
+      "xyz": 231294.16
+    },
+    "spot_value_usd": 4453439.34,
+    "spot_tokens": [
+      {
+        "coin": "USDC",
+        "qty": 4405224.080750329,
+        "usd": 4405224.08,
+        "estimated": false
+      },
+      {
+        "coin": "USDT0",
+        "qty": 48215.25091058,
+        "usd": 48215.25,
+        "estimated": true
+      },
+      {
+        "coin": "USDH",
+        "qty": 0.01250805,
+        "usd": 0.01,
+        "estimated": false
+      }
+    ],
+    "total_value_all_venues": 4684733.5,
+    "non_native_share": 1.0,
+    "current_max_leverage": 10.0,
+    "has_extreme_leverage": false,
+    "margin_types": [
+      "cross"
+    ],
+    "account_value": 231294.16,
+    "fetch_errors": []
+  },
+  "position_value": 1349869.67,
+  "unrealized_pnl": 14663.78,
+  "n_open_positions": 2,
+  "open_positions": [
+    {
+      "coin": "xyz:NVDA",
+      "szi": 5651.023,
+      "side": "long",
+      "entry_px": 222.92,
+      "position_value": 1275322.87064,
+      "unrealized_pnl": 15593.61082,
+      "leverage_value": 5.0,
+      "leverage_type": "cross",
+      "liquidation_px": null,
+      "margin_used": 255064.574128,
+      "max_leverage": 20.0,
+      "cum_funding_all_time": 5555.529647,
+      "dex": "xyz"
+    },
+    {
+      "coin": "xyz:GOOGL",
+      "szi": 219.928,
+      "side": "long",
+      "entry_px": 343.187,
+      "position_value": 74546.79488,
+      "unrealized_pnl": -929.826132,
+      "leverage_value": 10.0,
+      "leverage_type": "cross",
+      "liquidation_px": null,
+      "margin_used": 7454.679488,
+      "max_leverage": 20.0,
+      "cum_funding_all_time": 2518.193983,
+      "dex": "xyz"
+    }
+  ],
+  "recent_fills": [
+    {
+      "time": "2026-09-08T05:25:30.518000+00:00",
+      "coin": "xyz:INTC",
+      "dir": "Close Long",
+      "px": 99.89,
+      "sz": 39.85,
+      "closed_pnl": 478.62,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-08T05:25:30.518000+00:00",
+      "coin": "xyz:INTC",
+      "dir": "Close Long",
+      "px": 99.89,
+      "sz": 2.59,
+      "closed_pnl": 31.11,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-08T05:25:30.518000+00:00",
+      "coin": "xyz:INTC",
+      "dir": "Close Long",
+      "px": 99.891,
+      "sz": 6.72,
+      "closed_pnl": 80.72,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-08T05:25:30.518000+00:00",
+      "coin": "xyz:INTC",
+      "dir": "Close Long",
+      "px": 99.895,
+      "sz": 1.0,
+      "closed_pnl": 12.02,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-08T05:25:30.518000+00:00",
+      "coin": "xyz:INTC",
+      "dir": "Close Long",
+      "px": 99.896,
+      "sz": 20.97,
+      "closed_pnl": 251.99,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-08T05:25:30.518000+00:00",
+      "coin": "xyz:INTC",
+      "dir": "Close Long",
+      "px": 99.897,
+      "sz": 39.85,
+      "closed_pnl": 478.9,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-08T05:25:30.518000+00:00",
+      "coin": "xyz:INTC",
+      "dir": "Close Long",
+      "px": 99.898,
+      "sz": 5.99,
+      "closed_pnl": 71.99,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-08T05:25:30.518000+00:00",
+      "coin": "xyz:INTC",
+      "dir": "Close Long",
+      "px": 99.9,
+      "sz": 6.19,
+      "closed_pnl": 74.41,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-08T05:25:30.518000+00:00",
+      "coin": "xyz:INTC",
+      "dir": "Close Long",
+      "px": 99.9,
+      "sz": 1.8,
+      "closed_pnl": 21.64,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-08T05:25:30.518000+00:00",
+      "coin": "xyz:INTC",
+      "dir": "Close Long",
+      "px": 99.901,
+      "sz": 2.59,
+      "closed_pnl": 31.14,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-08T05:25:30.518000+00:00",
+      "coin": "xyz:INTC",
+      "dir": "Close Long",
+      "px": 99.904,
+      "sz": 1.8,
+      "closed_pnl": 21.64,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-08T05:25:30.518000+00:00",
+      "coin": "xyz:INTC",
+      "dir": "Close Long",
+      "px": 99.905,
+      "sz": 72.71,
+      "closed_pnl": 874.38,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-08T05:25:30.518000+00:00",
+      "coin": "xyz:INTC",
+      "dir": "Close Long",
+      "px": 99.905,
+      "sz": 39.85,
+      "closed_pnl": 479.22,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-08T05:25:30.518000+00:00",
+      "coin": "xyz:INTC",
+      "dir": "Close Long",
+      "px": 99.906,
+      "sz": 10.01,
+      "closed_pnl": 120.39,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-08T05:25:30.518000+00:00",
+      "coin": "xyz:INTC",
+      "dir": "Close Long",
+      "px": 99.906,
+      "sz": 8.08,
+      "closed_pnl": 97.17,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-08T05:25:30.518000+00:00",
+      "coin": "xyz:INTC",
+      "dir": "Close Long",
+      "px": 99.907,
+      "sz": 6.71,
+      "closed_pnl": 80.71,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-08T05:25:30.518000+00:00",
+      "coin": "xyz:INTC",
+      "dir": "Close Long",
+      "px": 99.908,
+      "sz": 10.01,
+      "closed_pnl": 120.41,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-08T05:25:30.518000+00:00",
+      "coin": "xyz:INTC",
+      "dir": "Close Long",
+      "px": 99.912,
+      "sz": 6.71,
+      "closed_pnl": 80.74,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-08T05:25:30.518000+00:00",
+      "coin": "xyz:INTC",
+      "dir": "Close Long",
+      "px": 99.913,
+      "sz": 1.8,
+      "closed_pnl": 21.66,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-09-08T05:25:30.518000+00:00",
+      "coin": "xyz:INTC",
+      "dir": "Close Long",
+      "px": 99.914,
+      "sz": 10.01,
+      "closed_pnl": 120.47,
+      "is_liquidation": false
+    }
+  ],
+  "new_positions": [],
+  "disappeared_positions": [
+    {
+      "key": "xyz:INTC:long",
+      "coin": "xyz:INTC"
+    }
+  ],
+  "initialized": false,
+  "raw_source": "snapshot",
+  "funds_trend": {
+    "status": "收手中（現金化＋資本外移）",
+    "n_points": 7,
+    "days": 7,
+    "threshold": 0.05,
+    "first_date": "2026-09-03",
+    "last_date": "2026-09-09",
+    "spot_share_first": 0.8589,
+    "spot_share_last": 0.9506,
+    "spot_share_change": 0.0917,
+    "total_first": 5134414.75,
+    "total_last": 4684733.5,
+    "total_change_pct": -0.0876,
+    "perp_change_pct": -0.6806,
+    "position_value_change_pct": -0.1079
+  }
+}
