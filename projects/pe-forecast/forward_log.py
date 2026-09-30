@@ -11,6 +11,7 @@ EPS 是使用者要給的輸入，驗收時用「那時實際公布的最近四�
 
 實際值.csv 的欄位：ticker, date（目標日）, px（目標日收盤價）, eps_ttm（目標日那時已公布的最近四季 GAAP 稀釋 EPS）
 每一列對上凍結日 + h 個月（h＝6、12、18、24、36；差 20 天以內）。
+最省事：到時候重跑 now_run.py，直接 --actuals results/now_all.csv（price_date→date、eps0→eps_ttm 自動對應，財報過舊的列略過）。
 """
 import argparse
 import json
@@ -54,7 +55,12 @@ def score(tag, actuals, tol_days=20):
     base = os.path.join(FWD, tag)
     inp = pd.read_csv(os.path.join(base, "inputs.csv"), parse_dates=["price_date"])
     model = json.load(open(os.path.join(base, "cond_model.json")))
-    act = pd.read_csv(actuals, parse_dates=["date"])
+    act = pd.read_csv(actuals)
+    if "eps_ttm" not in act and {"price_date", "px", "eps0"} <= set(act.columns):   # 直接用重跑後的 results/now_all.csv
+        if "too_old" in act:
+            act = act[~act["too_old"].fillna(False).astype(bool)]
+        act = act.rename(columns={"price_date": "date", "eps0": "eps_ttm"})
+    act["date"] = pd.to_datetime(act["date"])
     act["ticker"] = act["ticker"].str.upper().str.replace(".", "-", regex=False)
     rows, skipped = [], {"目標日虧損": 0, "對不到日期": 0}
     by = {t: g for t, g in act.groupby("ticker")}

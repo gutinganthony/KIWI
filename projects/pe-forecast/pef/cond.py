@@ -240,8 +240,8 @@ def fit_production(c, cutoff, horizons=HORIZONS):
     out = {"xs": {}, "xs2": {}}
     for h in horizons:
         v = view(c, h)
-        tr = v[v["lfpe"].notna() & v["px"].gt(0) & (v["month_end"] + pd.DateOffset(months=h) <= cutoff)
-               & v["target"].notna() & v["rp"].notna()]
+        tgt_end = v["month"] + pd.DateOffset(months=h) + pd.offsets.MonthEnd(0)      # 答案揭曉日（和 walk 一樣）
+        tr = v[v["lfpe"].notna() & v["px"].gt(0) & (tgt_end <= cutoff) & v["target"].notna() & v["rp"].notna()]
         for m in (("xs", "xs2") if h == 12 else ("xs",)):
             fm = fit(m, tr, h)
             out[m][h] = dict(feats=list(fm["feats"]), beta=[float(b) for b in fm["beta"]],

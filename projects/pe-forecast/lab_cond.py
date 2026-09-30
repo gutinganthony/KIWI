@@ -77,16 +77,18 @@ def interval_eval(p, method, mode, period, cal_start="2012-01-01", alpha=cond.BA
     for h, g in p.groupby("h"):
         g = g[g[method].notna() & g["actual"].notna()].copy()
         g["e"] = g["actual"] - g[method]                         # ln(實際 ÷ 預測)
-        vol = g["vol36"].fillna(g["vol36"].median())
-        s = ((vol * np.sqrt(h / 12)).clip(0.08, 1.5) if mode == "scale" else
-             pd.Series(cond.band_scale(vol, alpha), index=g.index) if mode == "pow_c" else pd.Series(1.0, index=g.index))
-        g["u"], g["s"], g["vol"] = g["e"] / s, s, vol
         out = []
         for Y, te in g[(g["origin"] >= period[0]) & (g["origin"] <= period[1])].groupby("training_cutoff"):
-            cal = g[(g["target_available_at"] <= Y) & (g["origin"] >= cal_start)]
+            cal = g[(g["target_available_at"] <= Y) & (g["origin"] >= cal_start)].copy()
             if len(cal) < 500:
                 continue
             te = te.copy()
+            vmed = cal["vol36"].median()                         # 沒有波動資料：用校準樣本（當時已揭曉）的中位數，和 calib_table 一樣
+            for x in (cal, te):
+                x["vol"] = x["vol36"].fillna(vmed)
+                x["s"] = ((x["vol"] * np.sqrt(h / 12)).clip(0.08, 1.5) if mode == "scale" else
+                          cond.band_scale(x["vol"], alpha) if mode == "pow_c" else 1.0)
+                x["u"] = x["e"] / x["s"]
             if mode in ("group", "group_c"):
                 cuts = cal["vol"].quantile([1 / 3, 2 / 3]).to_numpy()
                 gc = np.searchsorted(cuts, cal["vol"].to_numpy())

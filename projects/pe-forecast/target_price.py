@@ -5,6 +5,7 @@
     python3 target_price.py MU --eps 60 --eps2 75       # 另外給再下一年的 EPS（只有 12 個月用得到，通常比較準）
     python3 target_price.py MU --eps 50,60,70           # 悲觀／基準／樂觀：每個情境一列，另給合併的區間
     python3 target_price.py MU --eps-growth 0.4 --h 24  # 用 EPS 成長率（相對目前最近四季）
+    python3 target_price.py MU --eps-growth -0.3,0,0.3  # 負的也可以（悲觀情境）
     python3 target_price.py MU --eps 60 --h 18          # 其他距離：6、12、18、24、36 個月
 
 EPS 的口徑：GAAP 稀釋 EPS，「目標日那天已經公布的最近四季」加總（和報價網站的 trailing 本益比一樣）。
@@ -14,6 +15,7 @@ EPS 的口徑：GAAP 稀釋 EPS，「目標日那天已經公布的最近四季�
 import argparse
 import json
 import os
+import re
 import sys
 
 import numpy as np
@@ -35,6 +37,19 @@ def reported_through(period_end, target, lag_days=45):
 
 
 PROBS = np.array([0.0, 0.1, 0.25, 0.5, 0.75, 0.9, 1.0])
+
+
+def neg_values(argv):
+    """讓負數開頭的值也能用（--eps-growth -0.3,0,0.3、--eps -0.5,1）：argparse 會把它們當成選項名稱。"""
+    out, i = [], 0
+    while i < len(argv):
+        if argv[i] in ("--eps", "--eps-growth", "--eps2") and i + 1 < len(argv) and re.match(r"^-[\d.]", argv[i + 1]):
+            out.append(f"{argv[i]}={argv[i + 1]}")
+            i += 2
+        else:
+            out.append(argv[i])
+            i += 1
+    return out
 
 
 def _knots(r):
@@ -65,7 +80,7 @@ def main():
     ap.add_argument("--eps-growth", default=None, help="EPS 成長率（相對目前最近四季；可用逗號給多個）")
     ap.add_argument("--eps2", type=float, default=None, help="再下一年的 EPS（只有 --h 12 用得到）")
     ap.add_argument("--h", type=int, default=12, choices=list(cond.HORIZONS))
-    a = ap.parse_args()
+    a = ap.parse_args(neg_values(sys.argv[1:]))
     d = pd.read_csv(os.path.join(RES, "now_all.csv"), parse_dates=["period_end", "price_date"])
     model = json.load(open(os.path.join(RES, "cond_model.json")))
     t = a.ticker.upper().replace(".", "-")
@@ -93,7 +108,9 @@ def main():
     for e in eps_list:
         o = cond.predict_now(row, e, a.h, model, eps2=a.eps2)
         if o is None:
-            print(f"  EPS {e}：虧損或 0，本益比沒有定義。")
+            coe_px = px * np.exp((float(row["y10"]) + model["erp"]) * a.h / 12)
+            print(f"  EPS {e}：虧損或 0，本益比沒有定義。股價只能參考「照資金成本漲」≈ {coe_px:,.0f}；"
+                  "回測裡目標日虧損的公司，股價誤差比有盈餘的大 50–65%（results/cond_coverage.csv）。")
             continue
         o["eps"] = e
         res.append(o)
