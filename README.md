@@ -35,6 +35,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |------|-------|-------|
 | 2026-08-28 | [T1 條件⑤ 檢核 — NVDA Q2 FY27：供應商融資擴散觸發](./topics/business/2026-08-28-t1-condition5-nvda-q2-fy27-trigger.md) | Business |
 | 2026-08-25 | [「中國曝險」紅旗的第一性原理重寫](./topics/business/2026-08-25-china-red-flag-first-principles-rewrite.md) | Business |
+| 2026-09-30 | [WaveTrend 全市場掃描：美股與台股各自最適用的前 10 檔與共同特徵](./topics/business/2026-09-30-wavetrend-universe-scan-us-tw.md) | Business |
 | 2026-09-30 | [WaveTrend 回測：AMAT、KLAC、LRCX 的買賣訊號勝率與報酬](./topics/business/2026-09-30-wavetrend-backtest-amat-klac-lrcx.md) | Business |
 | 2026-09-30 | [嘉澤 3533：Serenity 完整 Step 1–9、WaveTrend 超賣回測、營益率連八季下滑原因、與弘塑誰更貼 Agent CPU 文章](./topics/business/2026-09-30-3533-serenity-full-wt-oversold-margin.md) | Business |
 | 2026-09-30 | [BESI × Intel 的關係，以及嘉澤 3533 vs 弘塑 3131 誰更具投資價值](./topics/business/2026-09-30-besi-intel-and-3533-vs-3131.md) | Business |
@@ -151,6 +152,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-09-30 | [BESI × Intel 的關係，以及嘉澤 3533 vs 弘塑 3131 誰更具投資價值](./topics/business/2026-09-30-besi-intel-and-3533-vs-3131.md) | Business |
 | 2026-09-30 | [嘉澤 3533：Serenity 完整 Step 1–9、WaveTrend 超賣回測、營益率連八季下滑原因、與弘塑誰更貼 Agent CPU 文章](./topics/business/2026-09-30-3533-serenity-full-wt-oversold-margin.md) | Business |
 | 2026-09-30 | [WaveTrend 回測：AMAT、KLAC、LRCX 的買賣訊號勝率與報酬](./topics/business/2026-09-30-wavetrend-backtest-amat-klac-lrcx.md) | Business |
+| 2026-09-30 | [WaveTrend 全市場掃描：美股與台股各自最適用的前 10 檔與共同特徵](./topics/business/2026-09-30-wavetrend-universe-scan-us-tw.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
