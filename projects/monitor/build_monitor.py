@@ -597,7 +597,37 @@ def build_gates(hl):
     return gates
 
 
-# ── Polymarket 一行狀態 ────────────────────────────────────────────
+# ── Polymarket 追蹤（旗艦錢包深度檢視） ──────────────────────────────
+
+def build_poly_followability(po):
+    """靜態可跟性結論（2026-09-30 深查：poly-observer 沒有內建可跟性判定，只有
+    持續獲利/做市機器人/曇花一現/閒置這幾種績效分類——「能不能實際跟單」要另外
+    評估）。理由文字本身是研究結論，但引用的兩個數字（偵測延遲、可成交率）沿用
+    上面已經抓到的 shadow 即時數據，不在這裡重複硬編一份，避免兩處數字對不上。"""
+    reasons = [
+        "成交間隔中位數約 3 秒（多數是它掛在多場進行中比賽的限價單被分批吃掉），"
+        "逐筆跟單人工上不可行",
+    ]
+    lag_median, lag_p90 = po.get("lag_median"), po.get("lag_p90")
+    if lag_median is not None:
+        lag_txt = f"中位數 {lag_median:.0f} 秒"
+        if lag_p90 is not None:
+            lag_txt += f"（p90 {lag_p90:.0f} 秒）"
+        reasons.append(f"改走自動化，poly-shadow 實測偵測延遲仍有{lag_txt}，此時進場價常已劣化")
+    reasons.append(
+        "它主要當 maker 賺價差＋返佣（價差窄且盤口新鮮的 14,720 筆裡只有 18% 成交在 ask 或以上），"
+        "還常同場買兩邊調庫存；跟單者只能晚約 20 秒在 ask 側吃單，等於付掉它賺的價差、拿不到返佣，"
+        "跟到的多半是它被人挑走的成交，只跟一邊還會變成沒對沖的裸部位")
+    fillable = po.get("fillable_ratio")
+    fillable_txt = f"約 {fillable * 100:.0f}%" if fillable is not None else "查無實測"
+    reasons.append(
+        f"市場深度只驗證過 $50 固定跟單規模（最佳價可成交率{fillable_txt}），"
+        "但此錢包近 8 成美金曝險集中在 $500 以上大單，這個規模的可成交率目前查無實測")
+    reasons.append(
+        "跟單損益模擬（copy_sim）連續多次自我標記不可靠：activity API 上限 1,500 筆，"
+        "以這種成交速度換算，永遠湊不到可靠所需的 72 小時觀察窗——是架構限制，不是樣本不足的暫時問題")
+    return {"verdict": "not_followable", "reasons": reasons}
+
 
 def collect_poly(root):
     base = os.path.join(root, "projects", "poly-observer", "data")
@@ -605,14 +635,29 @@ def collect_poly(root):
     try:
         dossier = load_json(latest_file(
             os.path.join(base, "tracked", POLY_11M, "dossier_*.json")))
-        m = dossier.get("metrics", {}) or {}
+        m = dossier.get("metrics")
+        m = m if isinstance(m, dict) else {}
+        reasons_raw = dossier.get("classification_reasons")
+        top_cat = m.get("top_category")
         out = {
             "available": True,
             "label": dossier.get("label"),
-            "total_pnl": clean(m.get("total_pnl")),
+            "classification": dossier.get("classification"),
+            "classifier_reasons": [r for r in reasons_raw if isinstance(r, str)]
+                                   if isinstance(reasons_raw, list) else [],
             "snapshot_date": dossier.get("snapshot_date"),
-            "reason": (f"月 {m.get('trades_per_month', 0):,.0f} 筆高頻連發、"
-                       "幽靈利潤偏誤＋逆選擇，跟單損益無法可靠重建"),
+            "total_pnl": clean(m.get("total_pnl")),
+            "recent_30d_pnl": clean(m.get("recent_30d_pnl")),
+            "best_month_pnl": clean(m.get("best_month_pnl")),
+            "positive_month_ratio": clean(m.get("positive_month_ratio")),
+            "max_drawdown_pct": clean(m.get("max_drawdown_pct")),
+            "span_days": clean(m.get("span_days")),
+            "active_months": fint(m.get("active_months")),
+            "n_trades": fint(m.get("n_trades")),
+            "trades_per_month": clean(m.get("trades_per_month")),
+            "activity_truncated": bool(m.get("activity_truncated")),
+            "top_category": top_cat if isinstance(top_cat, str) else None,
+            "top_category_share": clean(m.get("top_category_share")),
         }
     except Exception:
         return out
@@ -633,6 +678,8 @@ def collect_poly(root):
         out["fillable_ratio"] = clean(stats.get("fillable_at_best_ratio"))
     except Exception:
         out["lag_median"] = out["lag_p90"] = out["fillable_ratio"] = None
+
+    out["followability"] = build_poly_followability(out)
     return out
 
 

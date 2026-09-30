@@ -558,6 +558,128 @@ def test_fills_history_section(tmp):
           "型別錯誤的 by_dex/overall 被淨化成空/None，不臆造假數字")
 
 
+POLY_DIR = ("projects", "poly-observer", "data", "tracked", build_monitor.POLY_11M)
+
+# 真實欄位/數字逐字取自 2026-09-30 verification 報告與 dossier（見 §5 commit 說明）。
+POLY_DOSSIER_BASE = {
+    "label": "sports-syndicate-11M-winner",
+    "classification": "consistent_winner",
+    "snapshot_date": "2026-09-30",
+    "classification_reasons": ["活躍月數 15 >= 3", "正月比率 1.0 >= 0.6", "總 PnL 13925641.56 > 10,000",
+                                "回撤 0.1009 < 50% peak", "頻率 1301.0 在 5–1500 筆/月"],
+    "metrics": {
+        "total_pnl": 13925641.56, "recent_30d_pnl": 638406.0, "best_month_pnl": 2018064.2,
+        "positive_month_ratio": 1.0, "max_drawdown_pct": 0.1009, "span_days": 447.1,
+        "active_months": 15, "n_trades": 1301, "trades_per_month": 1301.0,
+        "activity_truncated": True, "top_category": "other", "top_category_share": 0.847,
+    },
+}
+
+POLY_SHADOW_FIXTURE = {
+    "sessions": [{"stats": {"detect_lag_sec": {"median": 19.5, "p90": 22.8},
+                            "fillable_at_best_ratio": 0.78}}]}
+
+
+def _write_poly(skel, dossier, shadow_summary=None, watchlist=None):
+    d = os.path.join(skel, *POLY_DIR)
+    os.makedirs(d, exist_ok=True)
+    with open(os.path.join(d, "dossier_%s.json" % dossier["snapshot_date"]),
+              "w", encoding="utf-8") as f:
+        json.dump(dossier, f, ensure_ascii=False)
+    base = os.path.join(skel, "projects", "poly-observer", "data")
+    if shadow_summary is not None:
+        shadow_dir = os.path.join(base, "shadow", build_monitor.POLY_11M)
+        os.makedirs(shadow_dir, exist_ok=True)
+        with open(os.path.join(shadow_dir, "summary_%s.json" % dossier["snapshot_date"]),
+                  "w", encoding="utf-8") as f:
+            json.dump(shadow_summary, f, ensure_ascii=False)
+    if watchlist is not None:
+        with open(os.path.join(base, "watchlist.json"), "w", encoding="utf-8") as f:
+            json.dump(watchlist, f, ensure_ascii=False)
+    return d
+
+
+def test_poly_followability(tmp):
+    print("[13] Polymarket 旗艦錢包深度檢視：正常資料＋可跟性評估")
+    skel = os.path.join(tmp, "poly-normal")
+    _write_poly(skel, json.loads(json.dumps(POLY_DOSSIER_BASE)),
+                shadow_summary=json.loads(json.dumps(POLY_SHADOW_FIXTURE)),
+                watchlist={"0xabc": {"active": True}, "0xdef": {"active": False}})
+    out = os.path.join(skel, "index.html")
+    build_monitor.render(skel, out)
+    html = open(out, encoding="utf-8").read()
+    d = extract_data(html)
+    po = d["poly"]
+    check(po["available"] is True, "poly.available=True")
+    check(po["classification"] == "consistent_winner" and len(po["classifier_reasons"]) == 5,
+          "分類與分類理由正確透傳")
+    check(po["total_pnl"] == 13925641.56 and po["positive_month_ratio"] == 1.0
+          and po["max_drawdown_pct"] == 0.1009, "績效數字正確透傳")
+    check(po["activity_truncated"] is True, "activity 截斷旗標正確透傳（頻率為下限估計）")
+    check(po["lag_median"] == 19.5 and po["lag_p90"] == 22.8 and po["fillable_ratio"] == 0.78,
+          "shadow 延遲/可成交率正確透傳")
+    check(po["watchlist_total"] == 2 and po["watchlist_active"] == 1, "watchlist 計數正確透傳")
+    check(po["followability"]["verdict"] == "not_followable"
+          and len(po["followability"]["reasons"]) == 5, "可跟性評估固定為 5 條理由")
+    lag_expect = f"{po['lag_median']:.0f}"
+    check(lag_expect in po["followability"]["reasons"][1],
+          "延遲數字引用自 shadow 實測值（同一個 lag_median 欄位），不是另外硬編的數字")
+    # 以下為 JS 源碼字面常數檢查（client-side 執行才渲染 DOM，這裡沒有無頭瀏覽器，
+    # 只能靜態比對原始檔案文字——見 test_fills_history_section 開頭同型註解）。
+    for s in ("Polymarket 追蹤（旗艦錢包深度檢視）", "可跟性評估", "分類理由：",
+              "主類別（不穩定，僅供參考）", "跟單損益模擬（copy_sim）"):
+        check(s in html, f"頁面含「{s}」")
+
+    print("[14] dossier 缺失 → poly.available=False（不拖累其餘頁面）")
+    skel2 = os.path.join(tmp, "poly-missing")
+    os.makedirs(skel2, exist_ok=True)
+    out2 = os.path.join(skel2, "index.html")
+    build_monitor.render(skel2, out2)
+    d2 = extract_data(open(out2, encoding="utf-8").read())
+    check(d2["poly"]["available"] is False and "placeholder" in d2["poly"],
+          "dossier 缺失 → available=False，有佔位文案")
+
+    print("[15] shadow summary 缺失 → poly 仍可用，只有延遲/可成交率退化成 None")
+    skel3 = os.path.join(tmp, "poly-noshadow")
+    _write_poly(skel3, json.loads(json.dumps(POLY_DOSSIER_BASE)))
+    out3 = os.path.join(skel3, "index.html")
+    build_monitor.render(skel3, out3)
+    d3 = extract_data(open(out3, encoding="utf-8").read())
+    po3 = d3["poly"]
+    check(po3["available"] is True, "shadow 缺失不拖累 dossier 數據")
+    check(po3["lag_median"] is None and po3["lag_p90"] is None and po3["fillable_ratio"] is None,
+          "shadow 缺失 → 延遲/可成交率安全退化為 None")
+    check(po3["watchlist_total"] is None and po3["watchlist_active"] is None,
+          "watchlist.json 缺失 → 計數安全退化為 None")
+    check(len(po3["followability"]["reasons"]) == 4,
+          "shadow 數字缺失時，可跟性理由改用「查無實測」措辭，理由條數降為 4 條（不臆造延遲數字）")
+
+    print("[16] 畸形資料（metrics 非 dict／reasons 混雜非字串／shadow 結構壞掉）→ 不炸，安全降級")
+    skel4 = os.path.join(tmp, "poly-malformed")
+    bad_dossier = {"label": "x", "classification": "consistent_winner",
+                   "snapshot_date": "2026-09-30", "metrics": "壞掉",
+                   "classification_reasons": ["正常字串", 123, None, {"也是壞的": 1}]}
+    d_dir4 = _write_poly(skel4, bad_dossier)
+    shadow_dir4 = os.path.join(skel4, "projects", "poly-observer", "data",
+                                "shadow", build_monitor.POLY_11M)
+    os.makedirs(shadow_dir4, exist_ok=True)
+    with open(os.path.join(shadow_dir4, "summary_2026-09-30.json"), "w", encoding="utf-8") as f:
+        json.dump({"sessions": []}, f)  # sessions[-1] 會 IndexError，走 except 分支
+    out4 = os.path.join(skel4, "index.html")
+    build_monitor.render(skel4, out4)
+    html4 = open(out4, encoding="utf-8").read()
+    d4 = extract_data(html4)
+    po4 = d4["poly"]
+    check(po4["available"] is True, "metrics 非 dict 不炸整個 poly 區塊（退化成空 metrics）")
+    check(po4["total_pnl"] is None and po4["positive_month_ratio"] is None,
+          "metrics 非 dict → 各數字欄位安全退化為 None，不臆造")
+    check(po4["classifier_reasons"] == ["正常字串"],
+          "reasons 混雜非字串項 → 只留下真正的字串，不讓壞型別滲入頁面")
+    check(po4["lag_median"] is None and po4["fillable_ratio"] is None,
+          "壞掉的 shadow sessions（空陣列）→ 安全退化為 None，不炸")
+    check("聰明錢系統監控" in html4, "壞資料不影響頁面其餘部分完整產出")
+
+
 def main():
     tmp = tempfile.mkdtemp(prefix="monitor-test-")
     try:
@@ -569,6 +691,7 @@ def main():
         test_venue_share_math(tmp)
         test_diagnostic_edge_cases(tmp)
         test_fills_history_section(tmp)
+        test_poly_followability(tmp)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     print(f"ALL TESTS PASSED ({CHECKS} checks)")
