@@ -367,7 +367,8 @@ def main():
             "target_month", "target_available_at", "target_quarter_end", "eps0", "eps_target", "px0", "px_target", "shares_basis",
             "ln_pe", "lfpe", "actual", "vol36", "y10", "dy", "sp500_member_at_origin", "xs_rule", "model_version"] + MAIN + ["xs2"]
     out = p[p["origin"] >= "2012-01-01"][keep]
-    out.to_csv(os.path.join(RES, "cond_predictions.csv.gz"), index=False, float_format="%.6g", date_format="%Y-%m-%d")
+    out.to_csv(os.path.join(RES, "cond_predictions.csv.gz"), index=False, float_format="%.6g", date_format="%Y-%m-%d",
+               compression={"method": "gzip", "mtime": 0})      # mtime＝0：內容一樣時檔案位元組也一樣，重跑不會在 git 多存一份
     open(os.path.join(RES, "cond.txt"), "w").write(buf.getvalue())
 
 
