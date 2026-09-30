@@ -187,6 +187,18 @@ def idx_block():
     return dict(small=small, ndx=ndx, window=win, bands_small=bands, cover=cover)
 
 
+def cond_block():
+    """給定 EPS 的本益比模型（cond_fit.py → results/cond_model.json）＋事實表、逐年表，網頁的「輸入 EPS」分頁用。"""
+    m = json.load(open(os.path.join(RES, "cond_model.json")))
+    facts = pd.read_csv(os.path.join(RES, "cond_facts.csv"))
+    m["facts"] = [dict(lo=r(x.EPS變化下限), hi=r(x.EPS變化上限), n=int(x.n), px=r(x.股價變化中位), pe=r(x.本益比變化中位))
+                  for x in facts.itertuples()]
+    yr = pd.read_csv(os.path.join(RES, "cond_years.csv"))
+    m["years"] = [dict(h=int(x.h), y=int(x.預測起點年), unch=r(x.unch), coe=r(x.coe), xs=r(x.xs), gbm_abs=r(x.gbm_abs),
+                       mkt=r(x.股價報酬中位)) for x in yr.itertuples()]
+    return m
+
+
 def history_broad():
     p = pd.read_csv(os.path.join(RES, "broad_predictions.csv.gz"), parse_dates=["month"])
     out = {}
@@ -211,7 +223,8 @@ def now_block():
     d = pd.read_csv(os.path.join(RES, "now_all.csv"), parse_dates=["period_end"])
     coe = d["y10"] + lab.ERP
     cols = ["t", "n", "a", "sec", "sp", "px", "mc", "ni", "pe", "fe", "st", "e3", "e6", "e9", "e12", "e18", "e24", "e36",
-            "o12", "h12", "g12", "z12", "core", "oneoff", "grp", "old", "ix", "nd"]
+            "o12", "h12", "g12", "z12", "core", "oneoff", "grp", "old", "ix", "nd",
+            "e0", "prs", "r12", "grv", "dy", "vol", "vn"]
     if "tier" not in d:
         d["tier"], d["in_ndx"] = "", False
     rows = []
@@ -225,7 +238,9 @@ def now_block():
                      bool(x.in_sp500), r(x.px, 2), r(x.mc / 1e9, 2), r(x.ni_ttm / 1e9, 3), r(x.pe, 1) if x.ni_ttm > 0 else None,
                      x.period_end.strftime("%Y-%m-%d"), bool(x.stale)] + e + mem +
                     [r(x.mc / core_ni, 1) if np.isfinite(core_ni) and core_ni > 0 else None, oneoff, grp.get(x.ticker, ""),
-                     bool(getattr(x, "too_old", False) is True), x.tier if isinstance(x.tier, str) else "", bool(x.in_ndx is True)])
+                     bool(getattr(x, "too_old", False) is True), x.tier if isinstance(x.tier, str) else "", bool(x.in_ndx is True),
+                     r(x.eps0, 4), r(x.pe_rel_sec, 4), r(x.ret12, 4), r(x.g_rev, 4), r(x.dy, 5), r(x.vol36, 4),
+                     int(x.vol_n) if np.isfinite(x.vol_n) else 0])
     mc_only = pd.read_csv(os.path.join(RES, "now_mc_only.csv"))
     extra = [[t, short(str(n)), r(m / 1e9, 2), r(p_, 2), str(ind)] for t, n, m, p_, ind in
              zip(mc_only["ticker"], mc_only["name"], mc_only["mc"], mc_only["px"], mc_only["industry"])]
@@ -248,7 +263,7 @@ def main():
         asof=ASOF.strftime("%Y-%m-%d"), y10=nw["y10"], erp=lab.ERP, n_firms=int(d["ticker"].nunique()),
         n_sp=int(db["ticker"].nunique()), ret_bands={h: [r(a, 4), r(b, 4)] for h, (a, b) in ret_b.items()},
         horizons=horizon_block(), methods=methods_block(), sectors=sector_block(p), cases=cases_block(p, d),
-        broad=broad_block(), idx=idx_block(), now=nw, history=history_broad(),
+        broad=broad_block(), idx=idx_block(), cond=cond_block(), now=nw, history=history_broad(),
         gics_of={t: GICS_ZH.get(g, g) for t, g in zip(u["ticker"], u["gics"])})
     tpl = open(os.path.join(HERE, "artifact", "page.html"), encoding="utf-8").read()
     blob = json.dumps(data, ensure_ascii=False, separators=(",", ":"))

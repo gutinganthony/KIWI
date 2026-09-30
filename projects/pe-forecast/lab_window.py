@@ -98,6 +98,8 @@ def main():
         f"{g} {sum(1 for t in d['ticker'].unique() if g in groups_of(t))}/{len(mem[g])}" for g in GROUPS[:-1]))
 
     tr_df, tr_qf = panel_sp500()
+    # 時間界線：訓練面板（S&P 500 歷史）最後一個月是 2025-09，所有訓練答案都在樣本外期間（2025-12 以後的起點）之前揭曉
+    assert tr_df["month"].max() < pd.Timestamp("2025-12-01"), "訓練資料和樣本外期間重疊"
     fc = PEForecaster().fit(tr_df, ASOF)
     ens = EnsembleForecaster(horizons=H).fit(tr_df, tr_qf, ASOF, old=fc)
     te = d[(d["month"] >= "2025-12-01") & (d["month"] <= "2026-06-01") & d["sigma"].notna() & d["m_bar"].notna() & (d["mc"] > 0)]

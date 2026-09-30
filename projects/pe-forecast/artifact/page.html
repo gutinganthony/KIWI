@@ -188,28 +188,90 @@ details .tablewrap { max-height: 360px; overflow: auto; margin-top: 8px; }
 
 <div class="wrap">
   <header class="hero">
-    <p class="eyebrow">美股 · 3 到 36 個月後 · S&amp;P 500 回測 2015–2026</p>
+    <p class="eyebrow">美股 · 6 到 36 個月後 · S&amp;P 500 走動式回測（預測起點 2015–2024，答案到 2025-09）</p>
     <h1>前瞻本益比模型</h1>
-    <p class="lede">站在今天，只用已經公告的財報和股價，推估一家公司幾個月後的本益比。輸入任何美股代號就能查，也可以換成你自己對盈餘的看法。會告訴你方向、區間，也會告訴你它有多常猜錯。</p>
+    <p class="lede">輸入你對一年後（或更久以後）EPS 的預估，模型告訴你那時市場大概給幾倍本益比、股價落在什麼區間。沒有 EPS 預估也可以：模型自己估盈餘。每個數字都附上回測時有多常猜錯。</p>
     <div class="stats" id="stats"></div>
   </header>
 
   <nav class="tabs" role="tablist" aria-label="內容">
-    <button class="tab" role="tab" id="t-logic" aria-controls="logic" aria-selected="true">模型邏輯</button>
+    <button class="tab" role="tab" id="t-eps" aria-controls="eps" aria-selected="true">輸入 EPS → 股價區間</button>
+    <button class="tab" role="tab" id="t-logic" aria-controls="logic" aria-selected="false">模型邏輯</button>
     <button class="tab" role="tab" id="t-cases" aria-controls="cases" aria-selected="false">案例</button>
     <button class="tab" role="tab" id="t-backtest" aria-controls="backtest" aria-selected="false">回測成績</button>
-    <button class="tab" role="tab" id="t-now" aria-controls="now" aria-selected="false">現在的預測</button>
-    <button class="tab" role="tab" id="t-calc" aria-controls="calc" aria-selected="false">自己試算</button>
+    <button class="tab" role="tab" id="t-now" aria-controls="now" aria-selected="false">沒有 EPS：模型自己估</button>
   </nav>
 
   <main>
-    <!-- ───────────── 模型邏輯 ───────────── -->
-    <section id="logic" role="tabpanel" aria-labelledby="t-logic">
+    <!-- ───────────── 輸入 EPS → 股價區間 ───────────── -->
+    <section id="eps" role="tabpanel" aria-labelledby="t-eps">
       <div class="block">
-        <h2>一句話</h2>
+        <h2>給我你預估的 EPS，我給你那時的本益比和股價區間</h2>
+        <div class="prose">
+          <p class="eq">那時的本益比 ＝ 今天股價 × e<sup>資金成本＋個股調整</sup> ÷ 你的 EPS</p>
+          <p class="eq">那時的股價 ＝ 本益比 × 你的 EPS</p>
+          <p id="epsKey"></p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="controls">
+          <div class="search"><label class="field" for="eTicker">美股代號或公司名稱</label>
+            <input type="text" id="eTicker" autocomplete="off" spellcheck="false" placeholder="例如 MU">
+            <ul class="sugg" id="sgEps" role="listbox" hidden></ul></div>
+          <div class="field">幾個月後<div class="seg" id="eH" role="group" aria-label="幾個月後"></div></div>
+        </div>
+        <div class="controls">
+          <label class="field">今天股價（美元）<input type="number" id="ePx" step="any" min="0"></label>
+          <label class="field">目前最近四季 EPS<input type="number" id="eEps0" step="any"></label>
+          <div class="field">EPS 輸入方式<div class="seg" id="eMode" role="group" aria-label="EPS 輸入方式">
+            <button type="button" data-m="v" aria-pressed="true">EPS 金額</button><button type="button" data-m="g" aria-pressed="false">成長率 %</button></div></div>
+        </div>
+        <div class="controls">
+          <label class="field"><span id="lbLow">悲觀 EPS（可空白）</span><input type="number" id="eLow" step="any"></label>
+          <label class="field"><span id="lbBase">基準 EPS</span><input type="number" id="eBase" step="any"></label>
+          <label class="field"><span id="lbHigh">樂觀 EPS（可空白）</span><input type="number" id="eHigh" step="any"></label>
+          <label class="field" id="fNext"><span id="lbNext">再下一年 EPS（可空白）</span><input type="number" id="eNext" step="any"></label>
+        </div>
+        <p class="small" id="eMsg"></p>
+        <p class="small bad" id="eErr"></p>
+      </div>
+      <div class="block">
+        <div class="kv" id="eSummary"></div>
+        <div class="legend" id="lgEps"></div>
+        <div class="chart" id="chEps"></div>
+        <div class="tablewrap"><table id="tbEps"></table></div>
+        <details><summary>模型怎麼算出這個數字（逐項拆解）</summary><div class="tablewrap"><table id="tbEpsParts"></table></div><p class="muted small" id="epsPartsNote"></p></details>
+        <div class="note small" id="epsNote"></div>
+      </div>
+      <div class="block">
+        <h3>回測：假設你的 EPS 完全正確，準不準？</h3>
+        <p class="prose" id="epsBtLead"></p>
+        <div class="tablewrap"><table id="tbEpsBt"></table></div>
+        <p class="muted small" id="epsBtNote"></p>
+      </div>
+      <div class="block">
+        <h3>為什麼股價幾乎不跟著 EPS 變</h3>
+        <p class="prose" id="factsLead"></p>
+        <div class="tablewrap"><table id="tbFacts"></table></div>
+        <p class="muted small" id="factsNote"></p>
+      </div>
+    </section>
+
+    <!-- ───────────── 模型邏輯 ───────────── -->
+    <section id="logic" role="tabpanel" aria-labelledby="t-logic" hidden>
+      <div class="block">
+        <h2>兩種用法</h2>
+        <div class="grid2">
+          <div class="card"><span class="role">你有 EPS 預估</span><h3>給定 EPS → 本益比與股價</h3><p class="who">第一個分頁。EPS 給定後，要預測的只剩「那段期間股價怎麼走」。回測發現股價幾乎不跟著同期 EPS 變（盈餘變化多半早就反映在今天的股價裡），所以本益比大約是「今天股價漲一點點 ÷ 你的 EPS」，再加上幾個個股調整。</p></div>
+          <div class="card"><span class="role">你沒有 EPS 預估</span><h3>模型自己估盈餘 → 本益比</h3><p class="who">「沒有 EPS：模型自己估」分頁。下面這一頁講的是這個版本：四個預測器估未來盈餘，再換成本益比。</p></div>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>沒有 EPS 時：模型怎麼估</h2>
         <div class="prose">
           <p class="eq">一年後的本益比 ＝ 一年後的市值 ÷ 一年後的盈餘</p>
-          <p>股價一年後在哪裡，沒有人猜得準。盈餘一年後在哪裡，從財報可以猜個大概。所以這個模型把力氣都花在<strong>預測盈餘</strong>，股價只給一個中性假設：照資金成本成長，每年約 <span class="coeTxt"></span>（10 年期公債殖利率 <span class="y10Txt"></span> 加 5%，下面有說明）。</p>
+          <p>股價一年後在哪裡，沒有人猜得準。盈餘一年後在哪裡，從財報可以猜個大概。所以這個模型把力氣都花在<strong>預測盈餘</strong>，股價只給一個中性假設：照資金成本成長，每年約 <span class="coeTxt"></span>（10 年期公債殖利率 <span class="y10Txt"></span> 加 5%；這是連續複利的年率，一年實際約 <span class="coeSimple"></span>，下面有說明）。</p>
         </div>
         <div class="flow" aria-label="模型流程">
           <div class="box price"><span class="tag">猜不準 → 中性假設</span><span class="t">今天的市值</span><span class="d">每年成長＝資金成本</span></div>
@@ -231,7 +293,7 @@ details .tablewrap { max-height: 360px; overflow: auto; margin-top: 8px; }
         <h2>為什麼盈餘是關鍵</h2>
         <div class="prose">
           <p>本益比會變，只有兩個原因：股價動了，或盈餘動了。股價漲 20%、盈餘漲 50%，本益比就變成原來的 1.2 ÷ 1.5 ＝ 0.8 倍。</p>
-          <p>在科技股，12 個月內本益比的變動有 <strong>73–91%</strong> 是盈餘造成的（IT 服務例外，47%）。盈餘可以預測，所以本益比有一大塊可以預測。</p>
+          <p>在科技股，盈餘那一邊的波動比股價大很多：每家公司算「盈餘成長的變異 ÷（股價報酬的變異 ＋ 盈餘成長的變異）」，各產業的中位數是 <strong>73–91%</strong>（IT 服務例外，47%）。這個比例沒有算兩者的共變異，也不是「可以預測的比例」；它說的是：<strong>只要知道盈餘，本益比的變化大半就決定了</strong>——「輸入 EPS」分頁就是這個用法。</p>
         </div>
       </div>
 
@@ -244,9 +306,9 @@ details .tablewrap { max-height: 360px; overflow: auto; margin-top: 8px; }
         </div>
         <div class="tablewrap"><table id="tbRet"></table></div>
         <div class="prose">
-          <p class="small muted">R²：相對「本益比不變」的改善程度，越高越好。「同產業過去 10 年」＝每年只用當時已經知道的報酬中位數，不偷看未來。</p>
+          <p class="small muted">R² ＝ 1 − Σmin(e², 4) ÷ Σmin(e_本益比不變², 4)，e ＝ ln(預測 ÷ 實際)；越高越好。「同產業過去 10 年」＝每年只用當時已經知道的報酬中位數，不偷看未來。</p>
           <p><strong>結果：幾乎一樣，資金成本最好或打平。</strong>原因有兩個。第一，報酬假設每差 1 個百分點，12 個月後的本益比只差約 1%，而模型的典型誤差是 <span id="retErr"></span>，這個差距被淹沒了。第二，「波動大的公司報酬比較高」「這個產業過去漲比較多」這些規律，放到未來都不穩定。</p>
-          <p>個別公司的差異放在其他地方處理：盈餘那一項由四個預測器針對每家公司預測；第四個預測器「樹模型：本益比變化」直接學「這種公司的本益比通常怎麼變」，股價裡少數可以預測的部分也在裡面。如果你對某家公司的報酬有自己的看法，可以在「自己試算」改報酬假設。</p>
+          <p>個別公司的差異放在其他地方處理：盈餘那一項由四個預測器針對每家公司預測；第四個預測器「樹模型：本益比變化」直接學「這種公司的本益比通常怎麼變」，股價裡少數可以預測的部分也在裡面。如果你對某家公司的盈餘有自己的看法，到「輸入 EPS → 股價區間」分頁輸入你的 EPS。</p>
         </div>
       </div>
 
@@ -260,7 +322,7 @@ details .tablewrap { max-height: 360px; overflow: auto; margin-top: 8px; }
 
       <div class="block">
         <h2>四個預測器，投票平均</h2>
-        <p class="prose">每個預測器都在回答同一個問題：「h 個月後的盈餘會是多少」（最後一個直接回答本益比會變多少）。四個答案平均，就是模型的預測。</p>
+        <p class="prose">每個預測器都在回答同一個問題：「h 個月後的盈餘會是多少」（最後一個直接回答本益比會變多少）。四個答案在對數上平均（等於本益比的幾何平均），就是模型的預測。</p>
         <div class="grid2">
           <div class="card"><span class="role">預測器 1</span><h3>盈餘模型</h3><p class="who">像分析師：先估營收成長，再估淨利率會不會回到常態，營收 × 淨利率 ＝ 盈餘。也會反推「市場現價隱含的長期利潤率」當參考。</p><p class="muted small">只有 6、12、24、36 個月</p></div>
           <div class="card"><span class="role">預測器 2</span><h3>線性模型</h3><p class="who">像一套經驗法則：18 條線索（最新一季年化盈餘、營收加速、毛利率趨勢、存貨天數……）各給一個固定權重，加起來。穩，但不會分情況。</p></div>
@@ -294,9 +356,9 @@ details .tablewrap { max-height: 360px; overflow: auto; margin-top: 8px; }
       <div class="block">
         <h2>它做不到的事</h2>
         <div class="prose">
-          <p><strong>預測不了股價的大事件。</strong>2022 年中它不可能知道 ChatGPT 會引爆 AI 需求（見案例）。80% 區間的意思是：每 5 次有 1 次會跑到區間外。</p>
+          <p><strong>預測不了股價的大事件。</strong>2022 年中它不可能知道 ChatGPT 會引爆 AI 需求（見案例）。80% 區間是名目值：長期平均大約每 5 次有 1 次跑到區間外；大盤整年往同一邊偏的時候會更多（實測見「回測成績」）。</p>
           <p><strong>學過的是 S&amp;P 500 的大型公司、2015–2026 年。</strong>拿去預測 S&amp;P 400、S&amp;P 600、Russell 2000 的中小型股也有效（6–12 個月，回測見「回測」分頁），但誤差較大；不在這些指數裡的微型股，3–6 個月的預測反而比「本益比不變」差，參考價值很低。</p>
-          <p><strong>只交年報的外國公司（例如台積電 TSM）沒有季報</strong>，模型沒辦法算，只能在試算裡自己輸入淨利。</p>
+          <p><strong>透過 20-F 申報的外國公司（例如台積電 TSM）</strong>在 SEC 沒有逐季的 XBRL 財報，目前的資料管線不支援（台積電本身有公布季報，是我們沒有接那個來源）。可以在第一個分頁自己輸入股價和 EPS。</p>
           <p><strong>盈餘是帳面淨利（GAAP）。</strong>有大額一次性項目（投資評價利得、併購攤銷、稅務）時，要搭配「營業利益口徑」一起看。</p>
         </div>
       </div>
@@ -321,21 +383,21 @@ details .tablewrap { max-height: 360px; overflow: auto; margin-top: 8px; }
       <div class="block">
         <h2>怎麼測的</h2>
         <div class="prose">
-          <p>2015 到 2026 年，每年 1 月只用當時已經公告的財報和股價重新訓練模型，預測接下來每個月的 3 到 36 個月後本益比，再和真正發生的本益比比較。樣本是 <span id="nSp"></span> 家 S&amp;P 500 公司，12 個月的預測約 <span id="nSp12"></span> 筆。</p>
+          <p>預測起點 2015 年 1 月起，每年 1 月只用當時已經公告的財報和股價、而且「答案已經揭曉」的配對重新訓練模型，預測接下來每個月的 3 到 36 個月後本益比，再和真正發生的本益比比較。股價資料到 2025-09，所以 12 個月的預測起點到 2024-09 為止，36 個月到 2022-09。樣本是 <span id="nSp"></span> 家 S&amp;P 500 公司，12 個月的預測約 <span id="nSp12"></span> 筆。</p>
           <p>2015–2021 年用來選方法；2022–2026 年是「保留期」，方法定案後才看，不再調整。對照組是最簡單的預測：<strong>本益比不變</strong>（明年的本益比＝今天的本益比）。要贏過它並不容易。</p>
         </div>
       </div>
 
       <div class="block">
         <h3>典型誤差：預測距離越遠，誤差越大</h3>
-        <p class="muted small">誤差的中位數。±25% 的意思是：一半的預測離實際值在 ±25% 以內。</p>
+        <p class="muted small">誤差的中位數。「0.80–1.25×」的意思是：一半的預測，實際值落在預測的 0.80 到 1.25 倍之間（誤差是對數，所以上下不對稱）。</p>
         <div class="legend" id="lgErr"></div>
         <div class="chart" id="chErr"></div>
       </div>
 
       <div class="block">
         <h3>方向命中率：本益比會升還是會降，猜對幾成</h3>
-        <p class="muted small">「大變動」＝本益比實際變動超過 20% 的情況。</p>
+        <p class="muted small">「大變動」＝本益比實際變動超過 20% 的情況。平手（預測不變）算錯。對照：12 個月「永遠猜本益比會跌」猜對 51%（預測起點 2015–2021）／49%（2022 以後），「永遠猜會漲」49%／51%；36 個月 52%／46% 與 48%／54%（S&amp;P 500，<code>review_checks.py</code>）。</p>
         <div class="legend" id="lgDir"></div>
         <div class="chart" id="chDir"></div>
       </div>
@@ -350,7 +412,7 @@ details .tablewrap { max-height: 360px; overflow: auto; margin-top: 8px; }
         <h3>這一輪試過的優化</h3>
         <p class="prose">從第一階段（只用 68 家科技股）出發，在 S&amp;P 500 上試了四件事。規則不變：選模期決定，保留期只看。</p>
         <div class="tablewrap"><table id="tbImp"></table></div>
-        <p class="muted small">R²：相對「本益比不變」的改善，越高越好。只有第一項（訓練資料擴大到全部 S&amp;P 500）有明確改善，已經採用；其他三項改善都在 ±0.01 以內，不採用。</p>
+        <p class="muted small">R² ＝ 1 − Σmin(e², 4) ÷ Σmin(e_本益比不變², 4)，e ＝ ln(預測 ÷ 實際)，每筆誤差平方上限 4（避免幾筆盈餘近零的極端值主導）；越高越好。只有第一項（訓練資料擴大到全部 S&amp;P 500）有明確改善，已經採用；其他三項改善都在 ±0.01 以內，不採用。</p>
       </div>
 
       <div class="block">
@@ -398,7 +460,7 @@ details .tablewrap { max-height: 360px; overflow: auto; margin-top: 8px; }
         <h2>查任何美股代號</h2>
         <div class="prose">
           <p>股價 <span id="pxDate"></span>，財報是每家公司最新公告的一季。<span id="nNow"></span></p>
-          <p class="small muted">⏳ 最新一季季末超過 150 天。⚠️ 帳面淨利和「營業利益 × 0.85」差很多，可能含一次性項目，同時看營業利益口徑的本益比。「虧損或 >500」＝模型預測盈餘接近零或虧損。不是投資建議。</p>
+          <p class="small muted">⏳ 最新一季季末超過 150 天。⚠️ 帳面淨利和「營業利益 × 0.85」差很多，可能含一次性項目，同時看營業利益口徑的本益比（這只是簡化的代理：沒扣利息、固定 15% 稅率、沒處理少數股權，不是「更真實的盈餘」）。「虧損」＝模型預測的盈餘是負的或零；「>500」＝預測盈餘接近零、本益比超過 500 倍；兩種都代表本益比區間不可靠，要看股價或盈餘本身。不是投資建議。</p>
         </div>
         <div class="search">
           <label class="field" for="qNow">美股代號或公司名稱</label>
@@ -417,42 +479,6 @@ details .tablewrap { max-height: 360px; overflow: auto; margin-top: 8px; }
       </div>
     </section>
 
-    <!-- ───────────── 試算 ───────────── -->
-    <section id="calc" role="tabpanel" aria-labelledby="t-calc" hidden>
-      <div class="block">
-        <h2>自己試算：換成你的盈餘看法</h2>
-        <div class="prose">
-          <p>輸入任何美股代號，預設填的是<strong>模型自己預期的盈餘變化</strong>。改成你的看法，就能看到本益比會變成多少。沒有季報的公司（例如只交年報的外國公司）會帶入市值，淨利請自己填；清空代號就能輸入任何一家公司的數字。</p>
-          <p class="eq">h 個月後的本益比 ＝ 今天市值 × e<sup>報酬×h/12</sup> ÷ 你給的盈餘</p>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="controls">
-          <div class="search"><label class="field" for="cTicker">美股代號或公司名稱</label>
-            <input type="text" id="cTicker" autocomplete="off" spellcheck="false" placeholder="例如 MU">
-            <ul class="sugg" id="sgCalc" role="listbox" hidden></ul></div>
-          <label class="field">今天市值（十億美元）<input type="number" id="cMc" step="any" min="0"></label>
-          <label class="field">過去四季淨利（十億美元）<input type="number" id="cNi" step="any"></label>
-          <label class="field">年化報酬假設（%）<input type="number" id="cMu" step="0.1"></label>
-        </div>
-        <div class="controls">
-          <div class="field">盈餘輸入方式<div class="seg" id="cMode" role="group" aria-label="盈餘輸入方式">
-            <button type="button" data-m="g" aria-pressed="true">成長率 %</button><button type="button" data-m="a" aria-pressed="false">金額（十億美元）</button></div></div>
-          <label class="field"><span id="lb12">12 個月後淨利成長 %</span><input type="number" id="cE12" step="any"></label>
-          <label class="field"><span id="lb24">24 個月後</span><input type="number" id="cE24" step="any"></label>
-          <label class="field"><span id="lb36">36 個月後</span><input type="number" id="cE36" step="any"></label>
-          <button type="button" class="btn" id="cReset">改回模型的盈餘</button>
-        </div>
-        <p class="small" id="cMsg"></p>
-        <p class="small bad" id="cErr"></p>
-      </div>
-      <div class="block">
-        <div class="legend" id="lgCalc"></div>
-        <div class="chart" id="chCalc"></div>
-        <div class="tablewrap"><table id="tbCalc"></table></div>
-        <div class="note small" id="calcNote"></div>
-      </div>
-    </section>
   </main>
 
   <footer class="foot">
@@ -474,11 +500,11 @@ const D=/*__DATA__*/null;
   const $ = id => document.getElementById(id);
 
   // ── 格式 ──
-  const pm = x => "±" + Math.round((Math.exp(x) - 1) * 100) + "%";          // ln 誤差 → ±%
+  const pm = x => Math.exp(-x).toFixed(2) + "–" + Math.exp(x).toFixed(2) + "×";   // 中位 |ln 誤差| → 「一半落在預測的 a–b 倍之間」（不對稱）
   const pct = (x, d = 0) => x == null ? "—" : (x * 100).toFixed(d) + "%";
   const spct = (x, d = 0) => x == null ? "—" : (x >= 0 ? "+" : "−") + Math.abs(x * 100).toFixed(d) + "%";
   const fpe = x => x == null || !isFinite(x) ? "—" : (x >= 100 ? Math.round(x).toLocaleString("en-US") : x.toFixed(1));
-  const pe500 = x => x == null || !isFinite(x) || x <= 0 || x > 500 ? "虧損或 >500" : fpe(x);
+  const pe500 = x => x == null || !isFinite(x) ? "—" : x <= 0 ? "虧損" : x > 500 ? ">500" : fpe(x);
   const fB = x => x == null ? "—" : (Math.abs(x) >= 100 ? x.toLocaleString("en-US", { maximumFractionDigits: 0 }) : x.toFixed(2));
   const median = a => { const s = a.filter(v => v != null && isFinite(v)).sort((x, y) => x - y); if (!s.length) return null; const m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
   function node(tag, attrs, parent, text) {
@@ -639,9 +665,9 @@ const D=/*__DATA__*/null;
   }
 
   // ── 分頁 ──
-  const TABS = ["logic", "cases", "backtest", "now", "calc"];
+  const TABS = ["eps", "logic", "cases", "backtest", "now"];
   function activate(id, push) {
-    if (!TABS.includes(id)) id = "logic";
+    if (!TABS.includes(id)) id = "eps";
     for (const t of TABS) {
       $(t).hidden = t !== id;
       $("t-" + t).setAttribute("aria-selected", t === id ? "true" : "false");
@@ -720,13 +746,15 @@ const D=/*__DATA__*/null;
   (function stats() {
     const host = $("stats");
     const add = (k, v, s) => { const d = node("div", { class: "stat" }, host); node("span", { class: "k" }, d, k); node("span", { class: "v" }, d, v); node("span", { class: "s" }, d, s); };
-    add("12 個月後的典型誤差", pm(b12.ens), `「本益比不變」是 ${pm(b12.rw)}（S&P 500 回測）`);
-    add("方向命中（12 個月）", pct(b12.dir), `本益比實際變動超過 20% 時是 ${pct(b12.big_dir)}`);
-    add("用過去推到現在（12 個月）", pct(b12.now_win), "的公司，模型比「本益比不變」準");
+    const cb = D.cond.backtest["保留期"], cc = D.cond.coverage;
+    add("你的 EPS 正確時，12 個月後股價", pm(cb.xs["12"].err), "一半的情況落在預測的這個倍數之間（S&P 500，預測起點 2022 以後）");
+    add("80% 區間實際涵蓋（12 個月）", `${pct(cc["選模期"]["12"].cover80)}／${pct(cc["保留期"]["12"].cover80)}`, "預測起點 2015–2021／2022 以後");
+    add("EPS 多 10%，12 個月後股價多", "約 " + pct((() => { const c = D.cond.xs["12"], b = f => c.beta[c.feats.indexOf(f) + 1]; return Math.exp((b("geps") - b("lfpe")) * Math.log(1.1)) - 1; })(), 1), "盈餘變化大多早就反映在今天的股價裡");
   })();
 
   // ── 模型邏輯 ──
   document.querySelectorAll(".coeTxt").forEach(e => { e.textContent = pct(COE, 1); });
+  document.querySelectorAll(".coeSimple").forEach(e => { e.textContent = "+" + pct(Math.exp(COE) - 1, 1); });
   document.querySelectorAll(".y10Txt").forEach(e => { e.textContent = pct(D.y10, 1); });
   $("retErr").textContent = pm(b12.ens);
   (function retTable() {
@@ -757,9 +785,9 @@ const D=/*__DATA__*/null;
   for (const t of ["最新一季年化盈餘 ÷ 市值", "過去四季盈餘 ÷ 市值", "營業利益 ÷ 市值（排除一次性項目）", "營收 ÷ 市值", "營收成長與加速", "最近兩季營收的季變化", "毛利率趨勢", "淨利率 vs 過去 5 年常態", "單季 vs 四季淨利率", "存貨天數變化", "利潤率的波動", "股價 6 個月、12 個月漲跌", "市值大小", "資本密集度", "10 年期公債殖利率", "產業", "財報有多新"])
     node("span", { class: "chip" }, $("inputs"), t);
   $("read12").textContent = `S&P 500 回測：誤差 ${pm(b12.ens)}，「本益比不變」是 ${pm(b12.rw)}。2015–2021、2022–2026 兩段都穩定贏，用過去推到現在時 ${pct(b12.now_win)} 的公司模型比較準。`;
-  $("read3").textContent = `3 個月的誤差 ${pm(BZ[3].ens)}，和「本益比不變」的 ${pm(BZ[3].rw)} 幾乎一樣。第一階段研究發現，就算完全知道 3 個月後的盈餘，誤差也只能降到 ${pm(HZ[3].oracle)}：這麼短的時間裡，本益比的變化幾乎都是股價。`;
+  $("read3").textContent = `3 個月的誤差 ${pm(BZ[3].ens)}，和「本益比不變」的 ${pm(BZ[3].rw)} 幾乎一樣。第一階段研究發現，就算完全知道 3 個月後的盈餘、股價照資金成本成長，誤差也還有 ${pm(HZ[3].oracle)}：這麼短的時間裡，本益比的變化幾乎都是股價。（這是那個股價假設下的結果，不是任何模型的下限。）`;
   $("read36").textContent = `方向命中 ${pct(BZ[36].dir)}，和 12 個月差不多；典型誤差 ${pm(BZ[36].ens)}，比 12 個月大，保留期只有 ${BZ[36].n_hold.toLocaleString()} 筆樣本。`;
-  $("readHit").textContent = `12 個月後落在實際值 ±20% 以內只有 ${pct(b12.in20)}（本益比不變 ${pct(b12.in20_rw)}），但方向猜對 ${pct(b12.dir)}，80% 區間實際涵蓋 ${pct(b12.cover)}。四個預測器分歧很大時，代表不確定性高。`;
+  $("readHit").textContent = `12 個月後預測落在實際值 0.83–1.2 倍之間的只有 ${pct(b12.in20)}（本益比不變 ${pct(b12.in20_rw)}），但方向猜對 ${pct(b12.dir)}，80% 區間實際涵蓋 ${pct(b12.cover)}。四個預測器分歧很大時，代表不確定性高。`;
 
   // ── 案例 ──
   const CASE_TEXT = {
@@ -824,10 +852,10 @@ const D=/*__DATA__*/null;
       for (const h of ["", "模型的假設", "實際"]) node("th", null, th, h);
       const tb = node("tbody", null, t);
       const tr = (a, b, d) => { const r = node("tr", null, tb); node("td", null, r, a); node("td", null, r, b); node("td", null, r, d); };
-      tr("市值（股價）", spct(Math.exp(c.coe) - 1), spct(mcG));
+      tr("市值", spct(Math.exp(c.coe) - 1), spct(mcG));
       tr("過去四季淨利", `${fB(c.ni0)} → ${fB(c.ni_impl)}（${spct(implG)}）`, `${fB(c.ni0)} → ${fB(c.ni1)}（${spct(realG)}）`);
       tr("一年後本益比", fpe(c.pred), fpe(c.act));
-      node("p", { class: "muted small" }, right, "淨利單位：十億美元。模型對股價只假設照資金成本成長。");
+      node("p", { class: "muted small" }, right, "淨利單位：十億美元。這個舊模型用市值（總額）÷ 淨利算本益比，對市值只假設照資金成本成長（連續複利）；市值和股價不完全一樣——回購、增發會讓兩者分開。「輸入 EPS」分頁改用每股的股價 ÷ EPS。");
       const b = node("button", { type: "button", class: "btn" }, right, `看 ${c.ticker} 的完整回測 →`);
       b.addEventListener("click", () => { activate("backtest", true); setHist(c.ticker, 12); $("histBlock").scrollIntoView({ block: "start" }); });
     }
@@ -857,7 +885,7 @@ const D=/*__DATA__*/null;
   (function hzTable() {
     const t = $("tbHz");
     const hr = node("tr", null, node("thead", null, t));
-    for (const h of ["幾個月後", "誤差：模型", "誤差：本益比不變", "改善", "R² 選模期／保留期", "方向命中", "±20% 內：模型／不變", "80% 區間實測", "推到現在：模型較準的公司"]) node("th", null, hr, h);
+    for (const h of ["幾個月後", "誤差：模型", "誤差：本益比不變", "改善", "R² 選模期／保留期", "方向命中", "落在實際 0.83–1.2 倍：模型／不變", "80% 區間實測", "推到現在：模型較準的公司"]) node("th", null, hr, h);
     const tb = node("tbody", null, t);
     for (const h of H) {
       const r = BZ[h], tr = node("tr", { class: h === 12 ? "hl" : "" }, tb);
@@ -921,7 +949,7 @@ const D=/*__DATA__*/null;
       const tr = node("tr", null, wb);
       [g === "其他" ? "不在上面任何指數" : g, x(3).firms, Math.round(x(3).mc).toLocaleString(), x(3).r2.toFixed(2), x(6).r2.toFixed(2), x(9).r2.toFixed(2), `${pm(x(9).m)}／${pm(x(9).rw)}`].forEach(v => node("td", null, tr, v));
     }
-    $("winNote").textContent = "模型用 2026-09-30 以前已揭曉的 S&P 500 資料訓練，預測 2025-12 到 2026-06 各月的 3、6、9 個月後本益比（9 個月只有 2025-12 一個起點）。R² 小於 0＝比「本益比不變」差。只有 9 個月的資料，當佐證不當證明。";
+    $("winNote").textContent = "模型只用 S&P 500 的歷史資料訓練，那份資料的最後一個月是 2025-09（訓練答案全部在 2025-09 以前揭曉），所以 2025-12 以後的預測起點對它完全是樣本外。預測 2025-12 到 2026-06 各月的 3、6、9 個月後本益比（9 個月只有 2025-12 一個起點）。這一段的財報是事後重述過的最後申報值、成分股用 2026-09 的名單。R² 小於 0＝比「本益比不變」差。只有 9 個月的行情，當佐證不當證明。";
   })();
 
   // 一家一家看（S&P 500）
@@ -984,7 +1012,7 @@ const D=/*__DATA__*/null;
   setHist("MU", 12);
 
   (function techSection() {
-    $("techSum").textContent = `第一階段只用 68 家科技股訓練、只測科技股：12 個月誤差 ${pm(h12.ens)}，本益比不變 ${pm(h12.rw)}，方向命中 ${pct(h12.dir)}。就算完全知道 12 個月後的真實盈餘，誤差也只能降到 ${pm(h12.oracle)}：剩下的是股價，任何模型都拿不到。下表是那時試過的方法；四個預測器平均的做法，這一輪原封不動用在 S&P 500 上。`;
+    $("techSum").textContent = `第一階段只用 68 家科技股訓練、只測科技股：12 個月誤差 ${pm(h12.ens)}，本益比不變 ${pm(h12.rw)}，方向命中 ${pct(h12.dir)}。就算完全知道 12 個月後的真實盈餘、股價照資金成本成長，誤差也還有 ${pm(h12.oracle)}：剩下的主要是股價。這是那個股價假設下的結果，不是下限——「輸入 EPS」分頁的模型在同樣知道盈餘時，又把股價那一塊小幅改善了一點。下表是那時試過的方法；四個預測器平均的做法，這一輪原封不動用在 S&P 500 上。`;
     const S = D.methods["選模期"], O = D.methods["保留期"];
     const t = $("tbMeth");
     const hr = node("tr", null, node("thead", null, t));
@@ -1001,7 +1029,7 @@ const D=/*__DATA__*/null;
 
   // ── 現在的預測 ──
   $("pxDate").textContent = D.now.price_date;
-  $("nNow").textContent = `${NOW.size.toLocaleString()} 家有季報（其中 ${nSp500} 家在 S&P 500），另外 ${MCO.size.toLocaleString()} 檔只有市值、沒有季報（例如只交年報的外國公司），可以在「自己試算」自己填淨利。`;
+  $("nNow").textContent = `${NOW.size.toLocaleString()} 家有季報（其中 ${nSp500} 家在 S&P 500），另外 ${MCO.size.toLocaleString()} 檔只有市值：資料管線抓不到它們的季度財報（例如向 SEC 交 20-F 年報、季報另外發布的外國公司，或剛上市），可以在「輸入 EPS → 股價區間」自己輸入 EPS。`;
   const isSp = r => r.sp || r.ix === "S&P 500" || r.ix === "大型股";
   const bandOf = r => (isSp(r) ? D.broad.bands : D.idx.bands_small);
   function bandTxt(pe, h, r) { const b = bandOf(r)[h]; return pe == null || !b ? "—" : `${fpe(pe * Math.exp(b[0]))}–${fpe(pe * Math.exp(b[1]))}`; }
@@ -1011,10 +1039,10 @@ const D=/*__DATA__*/null;
   function nowDetail() {
     const host = $("detail"); host.textContent = "";
     const r = NOW.get(selT), m = MCO.get(selT);
-    if (!r && !m) { node("p", null, host, "找不到這個代號。請確認是美股代號，或在「自己試算」直接輸入數字。"); return; }
+    if (!r && !m) { node("p", null, host, "找不到這個代號。請確認是美股代號，或在「輸入 EPS → 股價區間」直接輸入股價與 EPS。"); return; }
     if (!r) {
       node("h3", null, host, `${m.t}　${m.n}`);
-      node("p", null, host, `市值 ${fB(m.mc)} 十億美元（股價 ${m.px}，${D.now.price_date}）。這家沒有季報資料（例如只交年報的外國公司，或新上市），模型沒辦法預測；可以在「自己試算」輸入它的淨利。`);
+      node("p", null, host, `市值 ${fB(m.mc)} 十億美元（股價 ${m.px}，${D.now.price_date}）。資料管線抓不到這家的季度財報（例如向 SEC 交 20-F 年報、季報另外發布的外國公司，或剛上市），模型沒辦法自己估；可以在「輸入 EPS → 股價區間」輸入它的 EPS。`);
     } else {
       node("h3", null, host, `${r.t}　${r.n}`);
       const tags = node("div", { class: "chips" }, host);
@@ -1031,13 +1059,13 @@ const D=/*__DATA__*/null;
       if (r.old) { node("p", { class: "warnbox" }, host, "最新一季季末超過 240 天，模型沒看過這麼舊的財報，不給預測。"); }
       else if (okPE(r.e[12])) {
         const ni12 = implNi(r, 12);
-        node("p", null, host, `模型預測 12 個月後 ${fpe(r.e[12])} 倍（80% 區間 ${bandTxt(r.e[12], 12, r)}）` + (r.ni > 0 && ni12 != null ? `，等於預期淨利 ${spct(ni12 / r.ni - 1)}。` : "。") +
+        node("p", null, host, `模型預測 12 個月後 ${fpe(r.e[12])} 倍（80% 區間 ${bandTxt(r.e[12], 12, r)}）` + (r.ni > 0 && ni12 != null ? `；換算的「等效隱含淨利」${spct(ni12 / r.ni - 1)}（用本益比和資金成本反推，不是獨立的盈餘預測）。` : "。") +
           `四個預測器：盈餘模型 ${pe500(r.o12)}、線性 ${pe500(r.h12)}、樹-盈餘 ${pe500(r.g12)}、樹-變化 ${pe500(r.z12)}。`);
       } else node("p", null, host, "模型預測 12 個月後的盈餘接近零或虧損，本益比沒有意義。");
       if (!r.old && !isSp(r)) node("p", { class: r.ix ? "muted small" : "warnbox" }, host, r.ix
         ? "S&P 500 以外的公司：80% 區間用中小型股回測的誤差畫（比 S&P 500 寬）。3 個月的預測不要用。"
         : "⚠️ 這家不在 S&P 500／400／600 或 Russell 2000（這一群多半是微型股、外國公司或股權集中的公司，市值中位約 20 億美元）。它們在最近一段的回測裡，3–6 個月的預測比「本益比不變」還差；區間用中小型股的，但實際可能更寬。");
-      if (r.oneoff && r.core != null) node("p", { class: "warnbox" }, host, `⚠️ 帳面淨利和「營業利益 × 0.85」差很多（投資評價、出售資產、稅務或減損這類一次性項目），營業利益口徑的本益比約 ${fpe(r.core)} 倍，比帳面的本益比更能代表本業。`);
+      if (r.oneoff && r.core != null) node("p", { class: "warnbox" }, host, `⚠️ 帳面淨利和「營業利益 × 0.85」差很多（投資評價、出售資產、稅務或減損這類一次性項目），營業利益口徑的本益比約 ${fpe(r.core)} 倍，可以當作本業的參考。「營業利益 × 0.85」只是簡化的代理（沒扣利息、固定稅率），不是更真實的盈餘。`);
       if (!r.old) {
         const lg = node("div", { class: "legend" }, host);
         legend(lg, [{ name: "模型預測", color: "--s-model" }, { name: "80% 區間", color: "--band-model", area: true }, { name: "目前本益比", color: "--s-ref", dash: true }]);
@@ -1054,8 +1082,8 @@ const D=/*__DATA__*/null;
         });
       }
     }
-    const b = node("button", { type: "button", class: "btn primary" }, host, `用 ${selT} 試算你的盈餘 →`);
-    b.addEventListener("click", () => { activate("calc", true); calcLoad(selT); toTabs(); });
+    const b = node("button", { type: "button", class: "btn primary" }, host, `用 ${selT} 輸入你的 EPS →`);
+    b.addEventListener("click", () => { activate("eps", true); epsLoad(selT); toTabs(); });
   }
   (function nowControls() {
     makeSearch($("qNow"), $("sgNow"), (t, raw) => { if (t) { selT = t; nowDetail(); } else { selT = raw; nowDetail(); } });
@@ -1101,117 +1129,278 @@ const D=/*__DATA__*/null;
   $("qNow").value = "MU";
   nowTable(); nowDetail();
 
-  // ── 自己試算 ──
-  const C = { t: "MU", mode: "g" };
-  (function calcControls() {
-    makeSearch($("cTicker"), $("sgCalc"), (t, raw) => { if (t) calcLoad(t); else { C.t = null; $("cMsg").className = "small bad"; $("cMsg").textContent = raw && raw.trim() ? `找不到「${raw.trim()}」。可以直接在下面輸入市值和淨利。` : ""; if (!raw || !raw.trim()) calcLoad(""); } });
-    for (const b of $("cMode").children) b.addEventListener("click", () => setMode(b.dataset.m, true));
-    for (const id of ["cMc", "cNi", "cMu", "cE12", "cE24", "cE36"]) $(id).addEventListener("input", calcRun);
-    $("cReset").addEventListener("click", () => calcLoad(C.t || ""));
-  })();
+  // ── 輸入 EPS → 股價區間（給定 EPS 的本益比模型；README §15；算法和 pef/cond.py 的 predict_now 一樣） ──
+  const M = D.cond, EH = M.horizons;
+  const E = { t: "MU", h: 12, mode: "v" };
+  const FNAME = { "常數": "常數", geps: "EPS 成長（對數）", gpos: "EPS 成長：增加的部分", gneg: "EPS 成長：減少的部分",
+    g2pos: "再下一年 EPS 成長：增加的部分", g2neg: "再下一年 EPS 成長：減少的部分", lfpe: "今天股價 ÷ 你的 EPS（對數）",
+    pe_rel_sec: "本益比相對 S&P 500 同產業（對數）", ret12: "過去 12 個月股價漲跌（對數）", g_rev: "營收成長（對數）",
+    dy: "股利殖利率", vol36: "股價波動（年化）" };
+  const clip = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
   const numv = id => { const v = parseFloat($(id).value); return isFinite(v) ? v : null; };
-  function modeLabels(m) { $("lb12").textContent = m === "g" ? "12 個月後淨利成長 %" : "12 個月後淨利（十億美元）"; }
-  function setMode(m, convert) {
-    const old = C.mode; C.mode = m;
-    for (const b of $("cMode").children) b.setAttribute("aria-pressed", String(b.dataset.m === m));
-    modeLabels(m);
-    if (convert && old !== m) {
-      const ni = numv("cNi");
-      for (const id of ["cE12", "cE24", "cE36"]) {
-        const v = numv(id); if (v == null) continue;
-        if (m === "a" && ni != null && ni > 0) $(id).value = +(ni * (1 + v / 100)).toFixed(2);
-        else if (m === "g" && ni != null && ni > 0) $(id).value = Math.round((v / ni - 1) * 100);
-        else $(id).value = "";
+  const fpx = x => x == null || !isFinite(x) ? "—" : (x >= 1000 ? Math.round(x).toLocaleString("en-US") : x >= 100 ? x.toFixed(0) : x.toFixed(2));
+  function linRel(coef, x) {
+    let tot = coef.beta[0];
+    const parts = [{ f: "常數", v: null, c: null, b: coef.beta[0], d: coef.beta[0] }];
+    coef.feats.forEach((f, i) => {
+      const raw = x[f] == null ? NaN : x[f];
+      let c = clip(raw, coef.bounds[i][0], coef.bounds[i][1]);   // 無限大 → 上下限；缺值 → 0（和訓練一樣）
+      if (!isFinite(c)) c = 0;
+      const d = coef.beta[i + 1] * c;
+      tot += d;
+      parts.push({ f, v: raw, c, b: coef.beta[i + 1], d });
+    });
+    return { tot, parts };
+  }
+  function condPredict(px, eps0, feats, eps, h, eps2) {
+    if (!(eps > 0) || !(px > 0)) return null;
+    const lfpe = Math.log(px / eps);
+    const geps = eps0 > 0 ? Math.log(eps / eps0) : NaN;
+    const x = Object.assign({}, feats, { lfpe, geps, gpos: clip(geps, 0, 1.5), gneg: clip(geps, -1.5, 0) });
+    const use2 = h === 12 && eps2 > 0 && eps0 > 0;
+    if (use2) { const g2 = Math.log(eps2 / eps0); x.g2pos = clip(g2, 0, 1.5); x.g2neg = clip(g2, -1.5, 0); }
+    const coef = use2 ? M.xs2["12"] : M.xs[String(h)], band = use2 ? M.bands2["12"] : M.bands[String(h)];
+    const lr = eps0 > 0 ? linRel(coef, x) : { tot: 0, parts: [] };    // 今天虧損：EPS 成長沒有定義 → 只用資金成本
+    const mk = (D.y10 + M.erp) * h / 12;
+    const lpe = lfpe + mk + lr.tot;
+    // 區間：ln 誤差 ÷ 波動^alpha 的分位數（置中），乘回這家的 波動^alpha；沒有波動資料 → S&P 500 中位波動
+    const volKnown = feats.vol36 != null && isFinite(feats.vol36);
+    const vol = volKnown ? feats.vol36 : band.vol_median;
+    const scl = v => Math.pow(clip(v, band.vol_clip[0], band.vol_clip[1]), band.alpha);
+    const sc = scl(vol);
+    const o = { model: use2 ? "xs2" : "xs", vol, volKnown, width: sc / scl(band.vol_median), mk, rel: lr.tot, parts: lr.parts, lpe,
+                pe: Math.exp(lpe), px: Math.exp(lpe) * eps, eps, geps };
+    ["lo80", "lo50", "hi50", "hi80"].forEach((k, i) => { o["pe_" + k] = Math.exp(lpe + sc * band.q[i]); o["px_" + k] = Math.exp(lpe + sc * band.q[i]) * eps; });
+    return o;
+  }
+  // 多個 EPS 情境等權合併：每個情境的 ln 股價用 7 個節點（80%、50% 區間端點、中位、兩端再放寬）的分段線性分布，
+  // 合併後的分位數用二分法求（和 target_price.py 的 mixture 一樣）
+  const PROBS = [0, 0.1, 0.25, 0.5, 0.75, 0.9, 1];
+  function knots(o) { const l = [o.px_lo80, o.px_lo50, o.px, o.px_hi50, o.px_hi80].map(Math.log), span = l[4] - l[0]; return [l[0] - 0.6 * span].concat(l, [l[4] + 0.6 * span]); }
+  function cdfAt(k, x) {
+    if (x <= k[0]) return 0;
+    if (x >= k[6]) return 1;
+    for (let i = 1; i < 7; i++) if (x <= k[i]) return PROBS[i - 1] + (PROBS[i] - PROBS[i - 1]) * (x - k[i - 1]) / Math.max(k[i] - k[i - 1], 1e-12);
+    return 1;
+  }
+  function mixQ(list, p) {
+    const ks = list.map(knots);
+    let lo = Math.min(...ks.map(k => k[0])), hi = Math.max(...ks.map(k => k[6]));
+    for (let it = 0; it < 80; it++) { const mid = (lo + hi) / 2, F = ks.reduce((a, k) => a + cdfAt(k, mid), 0) / ks.length; if (F < p) lo = mid; else hi = mid; }
+    return Math.exp((lo + hi) / 2);
+  }
+  function addMonths(d, n) {
+    const y = d.getUTCFullYear(), m = d.getUTCMonth() + n, day = d.getUTCDate(), last = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+    return new Date(Date.UTC(y, m, Math.min(day, last)));
+  }
+  function reportedThrough(fe, target) {           // 季報在季末 45 天內公布（年報可能晚到 60–75 天）
+    let q = new Date(fe + "T00:00:00Z");
+    for (let i = 0; i < 60; i++) { const n = addMonths(q, 3); if (n.getTime() + 45 * 864e5 <= target.getTime()) q = n; else break; }
+    return q;
+  }
+  const ym = d => d.toISOString().slice(0, 7), ymd = d => d.toISOString().slice(0, 10);
+  const elastic = h => { const c = M.xs[String(h)], b = f => c.beta[c.feats.indexOf(f) + 1]; return Math.exp((b("geps") - b("lfpe")) * Math.log(1.1)) - 1; };
+
+  // 區間圖：每個情境一列，點＝中位、粗段＝50%、細線＝80%；虛線＝今天股價（橫軸是對數）
+  function rangeChart(host, rows, ref) {
+    let lastW = -1;
+    const draw = () => {
+      const W = host.clientWidth;
+      if (!W || W === lastW) return;
+      lastW = W; host.textContent = "";
+      const rowH = 44, m = { l: Math.min(150, W * 0.34), r: 18, t: 22, b: 30 }, Ht = m.t + m.b + rowH * rows.length;
+      const vals = rows.flatMap(r => [r.lo80, r.hi80]).concat([ref.x]).filter(v => v > 0 && isFinite(v));
+      const lo = Math.min(...vals) / 1.08, hi = Math.max(...vals) * 1.08, iw = W - m.l - m.r;
+      const fx = v => m.l + iw * (Math.log(v) - Math.log(lo)) / (Math.log(hi) - Math.log(lo));
+      const s = svg("svg", { viewBox: `0 0 ${W} ${Ht}`, height: Ht, role: "img", "aria-label": "股價區間圖" }, host);
+      for (const t of logTicks(lo, hi)) {
+        svg("line", { x1: fx(t), x2: fx(t), y1: m.t - 6, y2: Ht - m.b, class: "gridline" }, s);
+        const tx = svg("text", { x: fx(t), y: Ht - 10, "text-anchor": "middle" }, s); tx.textContent = t >= 1000 ? (t / 1000) + "k" : String(t);
       }
-    }
-    calcRun();
+      svg("line", { x1: fx(ref.x), x2: fx(ref.x), y1: m.t - 10, y2: Ht - m.b, stroke: "var(--s-ref)", "stroke-width": 1.5, "stroke-dasharray": "4 4" }, s);
+      const rt = svg("text", { x: fx(ref.x), y: m.t - 12, "text-anchor": fx(ref.x) > W - 80 ? "end" : "middle" }, s); rt.textContent = ref.name;
+      rows.forEach((r, i) => {
+        const y = m.t + rowH * i + rowH / 2, col = r.color || "--s-you";
+        const lb = svg("text", { x: 4, y: y + 4, "text-anchor": "start" }, s); lb.textContent = r.label;
+        svg("line", { x1: fx(r.lo80), x2: fx(r.hi80), y1: y, y2: y, stroke: `var(${col})`, "stroke-width": 2, "stroke-linecap": "round" }, s);
+        svg("rect", { x: fx(r.lo50), y: y - 5, width: Math.max(2, fx(r.hi50) - fx(r.lo50)), height: 10, rx: 4, fill: `var(${col})`, opacity: 0.45 }, s);
+        svg("circle", { cx: fx(r.mid), cy: y, r: 6, fill: `var(${col})`, stroke: "var(--surface)", "stroke-width": 2 }, s);
+        const hit = svg("rect", { x: m.l - 4, y: y - rowH / 2, width: iw + 8, height: rowH, fill: "transparent", tabindex: 0 }, s);
+        const show = ev => showTip(ev, r.label, [{ name: "中位", color: col, value: fpx(r.mid) }, { name: "50% 區間", color: col, value: `${fpx(r.lo50)}–${fpx(r.hi50)}` },
+          { name: "80% 區間", color: col, value: `${fpx(r.lo80)}–${fpx(r.hi80)}` }].concat(r.pe ? [{ name: "那時本益比", color: col, value: fpe(r.pe) + " 倍" }] : []));
+        hit.addEventListener("pointermove", show);
+        hit.addEventListener("pointerleave", hideTip);
+        hit.addEventListener("focus", () => { const b = hit.getBoundingClientRect(); show({ clientX: b.left + b.width / 2, clientY: b.top }); });
+        hit.addEventListener("blur", hideTip);
+      });
+    };
+    if (host._ro) host._ro.disconnect();
+    host._ro = new ResizeObserver(() => requestAnimationFrame(draw));
+    host._ro.observe(host);
+    lastW = -1; draw();
   }
-  function setModeSilently(m) { C.mode = m; for (const b of $("cMode").children) b.setAttribute("aria-pressed", String(b.dataset.m === m)); modeLabels(m); }
-  function calcLoad(t) {
-    C.t = t || null; $("cTicker").value = t || "";
-    $("cMu").value = (COE * 100).toFixed(1);
+
+  (function epsControls() {
+    const seg = $("eH");
+    for (const h of EH) {
+      const b = node("button", { type: "button", "aria-pressed": String(h === E.h), "aria-label": h + " 個月" }, seg, String(h));
+      b.dataset.h = h;
+      b.addEventListener("click", () => { E.h = h; for (const x of seg.children) x.setAttribute("aria-pressed", String(Number(x.dataset.h) === h)); epsRun(); });
+    }
+    makeSearch($("eTicker"), $("sgEps"), (t, raw) => {
+      if (t) epsLoad(t);
+      else if (!raw || !raw.trim()) epsLoad("");
+      else { E.t = null; $("eMsg").className = "small bad"; $("eMsg").textContent = `找不到「${raw.trim()}」。可以直接在下面輸入股價和 EPS。`; epsRun(); }
+    });
+    for (const b of $("eMode").children) b.addEventListener("click", () => epsMode(b.dataset.m, true));
+    for (const id of ["ePx", "eEps0", "eLow", "eBase", "eHigh", "eNext"]) $(id).addEventListener("input", epsRun);
+  })();
+  function epsLabels(m) {
+    const u = m === "g" ? "成長率 %" : "EPS";
+    $("lbLow").textContent = `悲觀 ${u}（可空白）`; $("lbBase").textContent = `基準 ${u}`; $("lbHigh").textContent = `樂觀 ${u}（可空白）`;
+    $("lbNext").textContent = `再下一年 ${u}（可空白，只用在 12 個月）`;
+  }
+  function epsModeSilently(m) { E.mode = m; for (const b of $("eMode").children) b.setAttribute("aria-pressed", String(b.dataset.m === m)); epsLabels(m); }
+  function epsMode(m, convert) {
+    const old = E.mode, e0 = numv("eEps0");
+    epsModeSilently(m);
+    if (convert && old !== m) for (const id of ["eLow", "eBase", "eHigh", "eNext"]) {
+      const v = numv(id); if (v == null) continue;
+      if (!(e0 > 0)) { $(id).value = ""; continue; }
+      $(id).value = m === "g" ? Math.round((v / e0 - 1) * 1000) / 10 : +(e0 * (1 + v / 100)).toFixed(2);
+    }
+    epsRun();
+  }
+  function epsLoad(t) {
+    E.t = t || null; $("eTicker").value = t || "";
     const r = t ? NOW.get(t) : null, m = t ? MCO.get(t) : null;
-    const msg = $("cMsg"); msg.className = "small"; msg.textContent = "";
+    const msg = $("eMsg"); msg.className = "small"; msg.textContent = "";
+    epsModeSilently("v");
+    $("eNext").value = "";
     if (r) {
-      $("cMc").value = r.mc; $("cNi").value = r.ni;
-      const ks = [12, 24, 36].map(h => r.old ? null : implNi(r, h));
-      if (r.ni > 0) { setModeSilently("g"); ["cE12", "cE24", "cE36"].forEach((id, i) => { $(id).value = ks[i] == null ? "" : Math.round((ks[i] / r.ni - 1) * 100); }); }
-      else { setModeSilently("a"); ["cE12", "cE24", "cE36"].forEach((id, i) => { $(id).value = ks[i] == null ? "" : +ks[i].toFixed(2); }); }
-      msg.textContent = `${r.t}　${r.n}：市值、淨利是 ${D.now.price_date} 股價與最新一季（季末 ${r.fe}）的數字；預設的盈餘變化是模型的預期。` + (ks[0] == null ? "模型沒有給 12 個月的預測（盈餘接近零、虧損或財報過舊），請自己填。" : "");
+      const e0 = r.e0;
+      $("ePx").value = r.px; $("eEps0").value = e0 == null ? "" : +e0.toFixed(2);
+      if (e0 > 0) { $("eLow").value = +(e0 * 0.8).toFixed(2); $("eBase").value = +e0.toFixed(2); $("eHigh").value = +(e0 * 1.25).toFixed(2); }
+      else { $("eLow").value = ""; $("eBase").value = ""; $("eHigh").value = ""; }
+      msg.textContent = `${r.t}　${r.n}：股價是 ${D.now.price_date} 的收盤；目前最近四季 EPS 到 ${r.fe} 那一季（GAAP 稀釋）。` +
+        (e0 > 0 ? "三個 EPS 先填成「−20%／不變／+25%」當範例——請改成你的預估。" : "最近四季是虧損：請直接輸入你預估的 EPS。");
     } else if (m) {
-      $("cMc").value = m.mc; $("cNi").value = ""; setModeSilently("a");
-      ["cE12", "cE24", "cE36"].forEach(id => { $(id).value = ""; });
-      msg.textContent = `${m.t}　${m.n}：只有市值（${D.now.price_date}），沒有季報。請輸入過去四季淨利和你預期的未來淨利（十億美元）。`;
+      $("ePx").value = m.px; $("eEps0").value = ""; $("eLow").value = ""; $("eBase").value = ""; $("eHigh").value = "";
+      msg.textContent = `${m.t}　${m.n}：只有股價（${D.now.price_date}），資料管線抓不到它的季度財報。請輸入目前最近四季 EPS 和你的預估；個股調整的線索都當 0，區間寬度用 S&P 500 的中位波動。`;
     } else {
-      $("cMc").value = 1000; $("cNi").value = 50; setModeSilently("g"); $("cE12").value = 40; $("cE24").value = 60; $("cE36").value = 70;
-      msg.textContent = "自訂：直接輸入任何一家公司的市值和淨利（十億美元）。";
+      $("ePx").value = 100; $("eEps0").value = 5; $("eLow").value = 4; $("eBase").value = 5; $("eHigh").value = 6.25;
+      msg.textContent = "自訂：直接輸入任何一家公司的股價和 EPS。個股調整的線索都當 0，區間寬度用 S&P 500 的中位波動。";
     }
-    calcRun();
+    epsRun();
   }
-  function calcRun() {
-    const mc = numv("cMc"), ni = numv("cNi"), muP = numv("cMu");
-    const r = C.t ? NOW.get(C.t) : null;
-    const fail = s => { const e = $("cErr"); e.textContent = s; $("tbCalc").textContent = ""; $("chCalc").textContent = ""; $("calcNote").textContent = ""; $("lgCalc").textContent = ""; };
-    $("cErr").textContent = "";
-    if (mc == null || mc <= 0) return fail("請輸入今天的市值（大於 0）。");
-    if (ni == null) return fail("請輸入過去四季淨利。");
-    if (muP == null) return fail("請輸入年化報酬假設。");
-    const mu = muP / 100;
-    if (C.mode === "g" && ni <= 0) return fail("過去四季淨利是虧損，成長率沒有意義。請切到「金額」直接輸入未來淨利。");
-    const knots = {};
-    [[12, "cE12"], [24, "cE24"], [36, "cE36"]].forEach(([h, id]) => { const v = numv(id); if (v != null) knots[h] = C.mode === "g" ? ni * (1 + v / 100) : v; });
-    if (!Object.keys(knots).length) return fail("至少輸入 12 個月後的盈餘。");
-    const pts = (ni > 0 ? [[0, ni]] : []).concat(Object.entries(knots).map(([h, v]) => [Number(h), v]).sort((a, b) => a[0] - b[0]));
-    const E = {};
-    for (const h of H) {
-      if (knots[h] != null) { E[h] = knots[h]; continue; }
-      const lo = pts.filter(p => p[0] < h).pop(), hi = pts.find(p => p[0] > h);
-      if (lo && hi && lo[1] > 0 && hi[1] > 0) E[h] = Math.exp(Math.log(lo[1]) + (Math.log(hi[1]) - Math.log(lo[1])) * (h - lo[0]) / (hi[0] - lo[0]));
-    }
-    const pe0 = ni > 0 ? mc / ni : null;
-    const rows = H.map(h => {
-      const e = E[h], ok = e != null && e > 0;
-      const you = ok ? mc * Math.exp(mu * h / 12) / e : null, center = ok ? mc * Math.exp(COE * h / 12) / e : null, b = D.ret_bands[h];
-      const model = r && !r.old && okPE(r.e[h]) ? r.e[h] : null;
-      return { h, e, you, lo: center != null && b ? center * Math.exp(b[0]) : null, hi: center != null && b ? center * Math.exp(b[1]) : null,
-               flat: ok ? mc / e : null, model, impl: r && !r.old ? implNi(r, h) : null, neg: e != null && e <= 0 };
-    });
-    const t = $("tbCalc"); t.textContent = "";
+  function epsRun() {
+    const fail = s => { $("eErr").textContent = s; for (const id of ["eSummary", "tbEps", "chEps", "lgEps", "tbEpsParts", "epsNote", "epsPartsNote"]) $(id).textContent = ""; };
+    $("eErr").textContent = "";
+    $("fNext").style.opacity = E.h === 12 ? "1" : "0.45";
+    $("eNext").disabled = E.h !== 12;
+    const px = numv("ePx"), e0 = numv("eEps0");
+    if (px == null || px <= 0) return fail("請輸入今天的股價（大於 0）。");
+    const r = E.t ? NOW.get(E.t) : null;
+    const feats = r ? { pe_rel_sec: r.prs, ret12: r.r12, g_rev: r.grv, dy: r.dy, vol36: r.vol } : {};
+    // 手動改了股價或目前 EPS：「本益比相對同業」跟著改
+    if (r && r.prs != null && r.e0 > 0 && e0 > 0) feats.pe_rel_sec = r.prs + Math.log((px / e0) / (r.px / r.e0));
+    const toEps = v => v == null ? null : (E.mode === "g" ? (e0 > 0 ? e0 * (1 + v / 100) : null) : v);
+    const scen = [["悲觀", toEps(numv("eLow"))], ["基準", toEps(numv("eBase"))], ["樂觀", toEps(numv("eHigh"))]].filter(x => x[1] != null);
+    if (!scen.length) return fail(E.mode === "g" && !(e0 > 0) ? "目前 EPS 是虧損或空白，成長率沒有意義；請切到「EPS 金額」。" : "至少輸入基準 EPS。");
+    const eps2 = E.h === 12 ? toEps(numv("eNext")) : null;
+    const res = [];
+    for (const [name, eps] of scen) { const o = condPredict(px, e0 == null ? NaN : e0, feats, eps, E.h, eps2); if (o) { o.name = name; res.push(o); } }
+    if (!res.length) return fail("輸入的 EPS 是 0 或虧損：本益比沒有意義。");
+    const base = res.find(o => o.name === "基準") || res[Math.floor(res.length / 2)];
+    const target = addMonths(new Date(D.now.price_date + "T00:00:00Z"), E.h);
+    // 摘要
+    const kv = $("eSummary"); kv.textContent = "";
+    const add = (k, v) => { const d = node("div", null, kv); node("span", null, d, k); node("b", null, d, v); };
+    add(`${E.h} 個月後股價（${base.name}，中位）`, fpx(base.px));
+    add("80% 區間", `${fpx(base.px_lo80)}–${fpx(base.px_hi80)}`);
+    add("那時本益比（中位）", `${fpe(base.pe)} 倍（80%：${fpe(base.pe_lo80)}–${fpe(base.pe_hi80)}）`);
+    add("今天", `股價 ${fpx(px)}` + (e0 > 0 ? `、本益比 ${fpe(px / e0)} 倍` : ""));
+    let mix = null;
+    if (res.length > 1) { mix = [0.1, 0.25, 0.5, 0.75, 0.9].map(p => mixQ(res, p)); add(`${res.length} 個情境合併的 80% 區間`, `${fpx(mix[0])}–${fpx(mix[4])}`); }
+    // 圖
+    legend($("lgEps"), [{ name: "中位", color: "--s-you" }, { name: "50% 區間（粗段）／80% 區間（細線）", color: "--s-you" }].concat(mix ? [{ name: "情境合併", color: "--s-model" }] : []).concat([{ name: "今天股價", color: "--s-ref", dash: true }]));
+    const rows = res.map(o => ({ label: `${o.name}：EPS ${fB(o.eps)}`, lo80: o.px_lo80, lo50: o.px_lo50, mid: o.px, hi50: o.px_hi50, hi80: o.px_hi80, pe: o.pe }));
+    if (mix) rows.push({ label: "情境合併", lo80: mix[0], lo50: mix[1], mid: mix[2], hi50: mix[3], hi80: mix[4], color: "--s-model" });
+    rangeChart($("chEps"), rows, { x: px, name: "今天" });
+    // 表
+    const t = $("tbEps"); t.textContent = "";
     const hr = node("tr", null, node("thead", null, t));
-    const cols = ["幾個月後", "你的淨利（十億美元）", "你的淨利變化", "你的本益比", "80% 區間（盈餘正確時）", "若股價不動"].concat(r ? ["模型本益比", "模型預期淨利變化"] : []);
-    for (const c of cols) node("th", null, hr, c);
+    for (const h of ["情境", "EPS", "EPS 變化", "那時本益比（中位）", "本益比 50%／80% 區間", "股價（中位）", "股價 50% 區間", "股價 80% 區間", "對照：本益比不變的股價"]) node("th", null, hr, h);
     const tb = node("tbody", null, t);
-    for (const x of rows) {
-      const tr = node("tr", { class: x.h === 12 ? "hl" : "" }, tb);
-      const cells = [x.h + " 個月", x.e == null ? "—" : fB(x.e), x.e != null && ni > 0 ? spct(x.e / ni - 1) : "—",
-        x.neg ? "虧損" : (x.you == null ? "—" : fpe(x.you)), x.lo == null ? "—" : `${fpe(x.lo)}–${fpe(x.hi)}`, x.neg ? "虧損" : (x.flat == null ? "—" : fpe(x.flat))];
-      if (r) cells.push(x.model == null ? "虧損或 >500" : fpe(x.model), x.impl != null && r.ni > 0 ? spct(x.impl / r.ni - 1) : (x.impl != null ? fB(x.impl) + "（金額）" : "—"));
-      cells.forEach((v, i) => { const td = node("td", null, tr); if (i === 3) node("strong", null, td, v); else td.textContent = v; });
+    for (const o of res) {
+      const tr = node("tr", { class: o === base ? "hl" : "" }, tb);
+      [o.name, fB(o.eps), e0 > 0 ? spct(o.eps / e0 - 1) : "—", fpe(o.pe) + " 倍", `${fpe(o.pe_lo50)}–${fpe(o.pe_hi50)}／${fpe(o.pe_lo80)}–${fpe(o.pe_hi80)}`,
+       fpx(o.px), `${fpx(o.px_lo50)}–${fpx(o.px_hi50)}`, `${fpx(o.px_lo80)}–${fpx(o.px_hi80)}`, e0 > 0 ? fpx(px / e0 * o.eps) : "—"].forEach(v => node("td", null, tr, v));
     }
-    const items = [{ name: "你的盈餘 → 本益比", color: "--s-you" }, { name: "80% 區間（盈餘正確時）", color: "--band-you", area: true }];
-    if (r) items.push({ name: "模型預測", color: "--s-model" });
-    if (pe0 != null) items.push({ name: "目前本益比", color: "--s-ref", dash: true });
-    legend($("lgCalc"), items);
-    const xs = [0].concat(H);
-    const series = [{ name: "你的盈餘", color: "--s-you", values: [pe0].concat(rows.map(x => x.you)), dots: true }];
-    if (r) series.push({ name: "模型預測", color: "--s-model", values: [pe0].concat(rows.map(x => x.model)), dots: true });
-    lineChart($("chCalc"), {
-      x: xs, xTick: v => v === 0 ? "今天" : v + " 月", yLog: true, height: 300, label: "你的情境本益比路徑",
-      yFmt: v => v == null ? "—" : fpe(v), ref: pe0 != null ? { y: pe0 } : null, series,
-      bands: [{ lo: [pe0].concat(rows.map(x => x.lo)), hi: [pe0].concat(rows.map(x => x.hi)), color: "--band-you", keyColor: "--s-you", name: "80% 區間" }],
-      title: i => xs[i] === 0 ? "今天" : `${xs[i]} 個月後`
-    });
-    const note = $("calcNote"); note.textContent = "";
-    node("p", null, note, `怎麼算：本益比 ＝ 今天市值 × e^(${pct(mu, 1)} × h/12) ÷ 你的淨利（連續複利，${pct(mu, 1)}/年約等於一年 ${spct(Math.exp(mu) - 1, 1)}）。12、24、36 個月之間的距離，用「淨利的對數」線性內插。`);
-    node("p", null, note, "80% 區間假設你的盈餘完全正確，只剩股價的不確定：用 S&P 500 歷史上「實際報酬 − 資金成本」的 10% 和 90% 分位數畫出來，跟你填的報酬假設無關。你的盈餘不會完全正確，真實的範圍要更寬。");
-    node("p", null, note, "淨利每多 10%，本益比就少約 9%（1 ÷ 1.1）。你的本益比和模型差多少，就是你和模型對盈餘的看法差多少。這裡用的是淨利，不是每股盈餘；有買回庫藏股時，每股盈餘成長會比淨利成長略高。");
+    if (mix) { const tr = node("tr", null, tb); ["情境合併", "—", "—", "—", "—", fpx(mix[2]), `${fpx(mix[1])}–${fpx(mix[3])}`, `${fpx(mix[0])}–${fpx(mix[4])}`, "—"].forEach(v => node("td", null, tr, v)); }
+    // 拆解（基準情境）
+    const pt = $("tbEpsParts"); pt.textContent = "";
+    const ph = node("tr", null, node("thead", null, pt));
+    for (const h of ["項目", "輸入值", "截斷後", "係數", "對股價的影響"]) node("th", null, ph, h);
+    const pb = node("tbody", null, pt);
+    const prow = (a, b, c, d, e) => { const tr = node("tr", null, pb); [a, b, c, d, e].forEach(v => node("td", null, tr, v)); };
+    prow(`大盤部分：資金成本 ${pct(D.y10 + M.erp, 1)}/年（連續複利）× ${E.h / 12} 年`, "—", "—", "—", spct(Math.exp(base.mk) - 1, 1));
+    for (const p of base.parts) prow(FNAME[p.f] || p.f, p.v == null || !isFinite(p.v) ? "缺" : p.v.toFixed(3), p.c == null ? "—" : p.c.toFixed(3), p.b.toFixed(3), spct(Math.exp(p.d) - 1, 1));
+    prow("合計：股價相對今天", "—", "—", "—", spct(Math.exp(base.mk + base.rel) - 1, 1));
+    $("epsPartsNote").textContent = `股價中位 ＝ 今天股價 × e^(大盤部分 ＋ 各項影響)；本益比 ＝ 股價 ÷ 你的 EPS。係數是用 S&P 500 在 ${M.cutoff} 以前已揭曉的全部配對估的（${base.model === "xs2" ? "12 個月＋再下一年 EPS 版" : E.h + " 個月版"}）；「截斷後」＝超出訓練資料 1%～99% 範圍的值拉回邊界，缺值當 0。今天虧損時沒有個股調整，只用資金成本。`;
+    // 說明
+    const note = $("epsNote"); note.textContent = "";
+    const thru = r ? reportedThrough(r.fe, target) : null;
+    node("p", null, note, `EPS 的口徑：目標日 ${ymd(target)} 那天「已經公布」的最近四季 GAAP 稀釋 EPS 合計（和報價網站的 trailing 本益比一樣）。` +
+      (thru ? `依 ${r.t} 最新一季季末 ${r.fe} 往後推（季報在季末 45 天內公布，年報可能晚一點），那時大概已公布到 ${ym(thru)} 那一季 → 四季是 ${ym(addMonths(thru, -9))}～${ym(thru)}。` : "") +
+      "非 GAAP（調整後）EPS 通常比 GAAP 高；直接輸入會讓本益比偏低，股價幾乎不受影響。");
+    const lowS = res[0], highS = res[res.length - 1];
+    if (res.length > 1) node("p", null, note, `EPS 從 ${fB(lowS.eps)} 到 ${fB(highS.eps)}（差 ${spct(highS.eps / lowS.eps - 1)}），股價中位只從 ${fpx(lowS.px)} 到 ${fpx(highS.px)}（差 ${spct(highS.px / lowS.px - 1)}）；變的主要是那時的本益比（${fpe(lowS.pe)} → ${fpe(highS.pe)} 倍）。回測裡盈餘變化大多早就反映在起點的股價；你的 EPS 如果和市場共識差很多，那個差距市場會反映多少，模型不知道（沒有共識資料）。`);
+    const cv = M.coverage;
+    node("p", null, note, `區間寬度看過去 36 個月的股價波動（這家：${base.volKnown ? `年化 ${pct(base.vol)}` : "沒有資料，用 S&P 500 中位數"}，區間是中位波動股票的 ${base.width.toFixed(2)} 倍寬；寬度 ∝ 波動^${M.bands[String(E.h)].alpha}），用 2012–2025 的樣本外誤差畫、已扣掉歷史的平均偏差。回測實測：${E.h} 個月的 80% 區間涵蓋 ${pct(cv["選模期"][E.h].cover80)}（預測起點 2015–2021）、${pct(cv["保留期"][E.h].cover80)}（2022 以後），波動 45% 以上的股票 ${pct(cv["選模期"][E.h].vol45)}／${pct(cv["保留期"][E.h].vol45)}；50% 區間約 ${pct(cv["選模期"][E.h].cover50)}／${pct(cv["保留期"][E.h].cover50)}。名目 80% 不是保證：多頭或空頭延續的年份，實際涵蓋會偏離。`);
+    if (base.model === "xs2") node("p", null, note, `用了再下一年 EPS（${fB(eps2)}）：回測（12 個月、保留期）誤差 ${M.backtest["保留期"].f2.xs2.err.toFixed(3)}，只給一年 EPS 是 ${M.backtest["保留期"].f2.xs.err.toFixed(3)}——一年後的股價，看的是再下一年的盈餘。`);
+    else if (E.h === 12) node("p", null, note, "如果你也有再下一年的 EPS 預估，填進去通常比較準（一年後的股價看的是再下一年的盈餘）。");
+    if (r && !isSp(r)) node("p", null, note, `${r.t} 不在 S&P 500：模型是用 S&P 500 學的，${r.r12 == null ? "沒有 12 個月股價（這一項當 0）、" : ""}區間可能偏窄。` + (r.vn && r.vn < 24 ? `股價波動只用 ${r.vn} 個月估。` : ""));
     if (r && r.st) node("p", null, note, `⏳ ${r.t} 的最新一季季末是 ${r.fe}，財報比較舊。`);
   }
-  calcLoad("MU");
+  (function epsEvidence() {
+    const bt = M.backtest, cv = M.coverage, nz = M.noise;
+    $("epsKey").textContent = `回測的結論：EPS 給定之後，那時的股價大約是今天的股價照資金成本（${pct(D.y10 + M.erp, 1)}/年，連續複利）成長，再加減幾個個股調整；12 個月後的股價，EPS 每多 10% 只多約 ${pct(elastic(12), 1)}。所以你的 EPS 決定的主要是「那時的本益比」，股價區間主要來自股價本身的波動。`;
+    const e12 = bt["保留期"].xs["12"].err;
+    $("epsBtLead").textContent = `用 S&P 500 ${D.n_sp} 家公司，每年 1 月只用當時已揭曉的資料重估模型，EPS 直接用事後實際公布的數字（＝假設你的 EPS 完全正確）。12 個月後股價（＝本益比 × EPS）一半落在預測的 ${pm(e12)} 之間。比「股價照資金成本漲」只準一點點，但遠比「本益比不變」準。`;
+    const t = $("tbEpsBt");
+    const hr = node("tr", null, node("thead", null, t));
+    for (const h of ["幾個月後", "模型：一半落在（保留期）", "相對「股價照資金成本漲」：選模期／保留期", "相對「本益比不變」（保留期）", "預測 ÷ 實際在 0.8–1.2 倍（保留期）", "80% 區間實測涵蓋：選模期／保留期"]) node("th", null, hr, h);
+    const tb = node("tbody", null, t);
+    for (const h of EH) {
+      const k = String(h), sel = bt["選模期"], ho = bt["保留期"];
+      const tr = node("tr", { class: h === 12 ? "hl" : "" }, tb);
+      [h + " 個月", pm(ho.xs[k].err), `${spct(sel.xs[k].err / sel.coe[k].err - 1, 1)}／${spct(ho.xs[k].err / ho.coe[k].err - 1, 1)}`,
+       spct(ho.xs[k].err / ho.unch[k].err - 1), pct(ho.xs[k].hit20), `${pct(cv["選模期"][k].cover80)}／${pct(cv["保留期"][k].cover80)}`].forEach(v => node("td", null, tr, v));
+    }
+    const f2 = bt["保留期"].f2, f2s = bt["選模期"].f2;
+    $("epsBtNote").textContent = `誤差 e ＝ ln(預測 ÷ 實際)；「一半落在 a–b×」＝ |e| 的中位數換成倍數。選模期＝預測起點 2015–2021；保留期＝2022 以後（股價資料到 2025-09，所以 12 個月的起點到 2024-09、36 個月只有 2022-01～2022-09）。` +
+      `12 個月也給再下一年 EPS：誤差 ${f2s.xs2.err.toFixed(3)}／${f2.xs2.err.toFixed(3)}（選模期／保留期），只給一年 EPS 是 ${f2s.xs.err.toFixed(3)}／${f2.xs.err.toFixed(3)}。` +
+      `EPS 有誤差時：12 個月的股價誤差幾乎不變（EPS 錯 ±30% 仍是 ${nz["12"]["0.3"].px.toFixed(3)}，完全正確是 ${nz["12"]["0.0"].px.toFixed(3)}），本益比的誤差變大（${nz["12"]["0.1"].pe.toFixed(3)}、${nz["12"]["0.2"].pe.toFixed(3)}、${nz["12"]["0.3"].pe.toFixed(3)}）。` +
+      "「只學相對大盤、大盤部分用資金成本」這個設計是看過保留期的年度結果之後才定的（直接學整體報酬的版本在選模期看起來較好，但好處幾乎全來自 2016、2020 兩次大盤反彈，保留期就失效），所以保留期對它不算完全沒碰過；2026-09 的預測另存紀錄，之後對答案。";
+    const ft = $("tbFacts");
+    const fh = node("tr", null, node("thead", null, ft));
+    for (const h of ["12 個月後的 EPS 變化", "公司月數", "同期股價（中位）", "同期本益比（中位）"]) node("th", null, fh, h);
+    const fb = node("tbody", null, ft);
+    for (const f of M.facts) {
+      const tr = node("tr", null, fb);
+      [f.lo == null ? `${spct(f.hi)} 以下` : f.hi == null ? `${spct(f.lo)} 以上` : `${spct(f.lo)} ～ ${spct(f.hi)}`, f.n.toLocaleString(), spct(f.px), spct(f.pe)].forEach(v => node("td", null, tr, v));
+    }
+    $("factsLead").textContent = "把 2009–2024 年每個月的每一家 S&P 500 公司當起點，看 12 個月後的 EPS 變化和同期的股價、本益比變化：";
+    $("factsNote").textContent = "EPS 掉三成以上的公司，股價中位還漲 5%；EPS 翻倍以上的公司，股價中位只漲 16%——盈餘變化大多早就反映在起點的股價裡了，所以「本益比不變」（股價跟 EPS 一比一）錯得很多。名單是現在還在 S&P 500 的公司（倖存者偏差：跌到被踢出的公司不在裡面，所以股價的中位數偏高）。";
+  })();
+  epsLoad("MU");
 
-  // ── 啟動：網址 #分頁 > 上次看的分頁 > 模型邏輯 ──
+  // ── 啟動：網址 #分頁 > 上次看的分頁 > 輸入 EPS ──
   let start = (location.hash || "").replace("#", "");
-  if (!TABS.includes(start)) { try { start = localStorage.getItem("pe-tab") || "logic"; } catch (e) { start = "logic"; } }
+  if (start === "calc") start = "eps";
+  if (!TABS.includes(start)) { try { start = localStorage.getItem("pe-tab") || "eps"; } catch (e) { start = "eps"; } }
+  if (!TABS.includes(start)) start = "eps";
   activate(start, false);
 })();
 </script>

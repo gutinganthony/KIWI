@@ -45,11 +45,19 @@ def main():
     df, qf = panel_sp500() if a.train == "sp500" else panel()
     fc = PEForecaster().fit(df, ASOF)
     ens = EnsembleForecaster().fit(df, qf, ASOF, old=fc)
+    # 給定 EPS 的本益比模型（pef/cond.py，README §15）要的線索：每股盈餘（股數＝市值 ÷ 股價）、本益比相對 S&P 500 同產業中位數、
+    # 12 個月動能、營收成長、股利殖利率、股價波動
+    d["eps0"] = d["ni_ttm"] * d["px"] / d["mc"]
+    sp_pe = d[d["in_sp500"].astype(bool) & np.isfinite(d["ln_pe"]) & ~d["too_old"]]
+    sec_med = sp_pe.groupby("sector")["ln_pe"].median()
+    d["pe_sec"] = d["sector"].map(sec_med).fillna(float(sp_pe["ln_pe"].median()))
+    d["pe_rel_sec"] = d["ln_pe"] - d["pe_sec"]
     ok = ~d["too_old"] & d["sigma"].notna() & d["m_bar"].notna() & (d["mc"] > 0)
     v = d[ok].reset_index(drop=True)
     e = ens.predict(v)
     keep = ["ticker", "name", "aliases", "cik", "sector", "gics", "industry", "in_sp500", "in_tech", "price_date", "px", "mc",
-            "mc_check", "ni_ttm", "rev_ttm", "oi_ttm", "pe", "period_end", "fin_age_days", "n_quarters", "stale", "y10"]
+            "mc_check", "ni_ttm", "rev_ttm", "oi_ttm", "pe", "period_end", "fin_age_days", "n_quarters", "stale", "y10",
+            "eps0", "ln_pe", "pe_rel_sec", "g_rev", "ret12", "dy", "vol36", "vol_n"]
     out = v[keep].join(e.drop(columns=["ticker", "month"]))
     skipped = d[~ok][keep]
     out = pd.concat([out, skipped.assign(too_old=True)], ignore_index=True)
@@ -60,7 +68,7 @@ def main():
         print("所屬指數：" + "、".join(f"{k or '不在主要指數'} {v}" for k, v in out["tier"].fillna("").value_counts().items())
               + f"；Nasdaq-100 {int(out['in_ndx'].fillna(False).astype(bool).sum())}")
     out.to_csv(os.path.join(HERE, "results", "now_all.csv"), index=False, float_format="%.6g")
-    # 沒有季報的代號（外國公司只交年報、ETF 以外的其他普通股）：網頁只帶入市值，淨利讓使用者自己填
+    # 抓不到季度財報的代號（交 20-F 的外國公司、剛上市等）：網頁只帶入市值與股價，EPS 讓使用者自己填
     oz = pd.read_csv(a.oz)
     oz = oz[~oz["name"].fillna("").str.contains(now.NOT_COMMON) & (oz["marketCap"] > 0)]
     have = set(out["ticker"]) | {x for s_ in out["aliases"].fillna("") for x in s_.split()}
@@ -68,7 +76,7 @@ def main():
     mc_only = mc_only.assign(px=mc_only["close"] if "close" in mc_only else mc_only["price"])[["symbol", "name", "marketCap", "px", "industry"]]
     mc_only.columns = ["ticker", "name", "mc", "px", "industry"]
     mc_only.to_csv(os.path.join(HERE, "results", "now_mc_only.csv"), index=False, float_format="%.6g")
-    print(f"只有市值（沒有季報）：{len(mc_only)} 檔 → results/now_mc_only.csv")
+    print(f"只有市值（抓不到季度財報）：{len(mc_only)} 檔 → results/now_mc_only.csv")
     print(f"給預測：{int(ok.sum())} 家；財報過舊或季數不足：{int((~ok).sum())} 家 → results/now_all.csv")
 
 

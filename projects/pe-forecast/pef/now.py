@@ -102,7 +102,7 @@ def build(lg_dir, oz_mapped, oz_monthly, stooq_dir, sp500_uni, tech_uni, price_d
             d.columns = [c.strip("<>").lower() for c in d.columns]
             d["date"] = pd.to_datetime(d["date"].astype(str), format="%Y%m%d")
             old = d.set_index("date")["close"].resample("ME").last().dropna()
-            old = old[(old.index >= "2024-06-30") & (old.index < h.index.min() if len(h) else True)]
+            old = old[(old.index >= "2022-09-30") & (old.index < h.index.min() if len(h) else True)]   # 36 個月波動要 3 年股價
             h = pd.concat([old, h]).sort_index()
         if len(h) < 2:
             continue
@@ -153,6 +153,13 @@ def rows(Q, prices, meta, macro, now):
         p12 = px[px.index <= px.index[-1] - pd.DateOffset(months=12)]
         r["ret6"] = np.log(p_now / p6.iloc[-1]) if len(p6) and p6.index[-1] >= px.index[-1] - pd.DateOffset(months=8) else np.nan
         r["ret12"] = np.log(p_now / p12.iloc[-1]) if len(p12) and p12.index[-1] >= px.index[-1] - pd.DateOffset(months=14) else np.nan
+        # 股價波動：最近 36 個月「相鄰月份」的月報酬標準差 × √12（中間缺月的那一段不算）；少於 6 個月報酬就不給
+        w = px[px.index > px.index[-1] - pd.DateOffset(months=36)]
+        gap_ok = (w.index.to_series().diff().dt.days.between(20, 40)).to_numpy()
+        mr = np.log(w / w.shift(1)).to_numpy()[gap_ok]
+        mr = mr[np.isfinite(mr)]
+        r["vol_n"] = len(mr)
+        r["vol36"] = float(np.std(mr, ddof=1) * np.sqrt(12)) if len(mr) >= 6 else np.nan
         r["y10"] = y["y10"]
         r["month"] = pd.Timestamp(now.year, now.month, 1)
         r["month_end"] = r["month"] + pd.offsets.MonthEnd(0)

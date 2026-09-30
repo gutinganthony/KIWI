@@ -65,6 +65,7 @@
 | 同上 `ndx-2026-09.parquet`、`sp400/sp600/rut-2026-09.parquet` | 2026-09 的成分股代號 | 最近一段依指數分組、網頁標出每家公司屬於哪個指數 |
 | `github.com/loosygoosie/sec-dataset` `data/v2/companies/<CIK>.json` 的 `v2_quarterly` | 2008 起逐季營收、淨利、稀釋股數、現金、權益、負債（**重述後的最後申報值**，沒有毛利、營業利益、存貨） | 中小型股的財報；可用日＝季末 +45 天、年報 +75 天 |
 | `github.com/jmccarrell/n100tickers` `src/nasdaq_100_ticker_history/n100-ticker-changes-<年>.yaml` | 每年 1 月 1 日的 Nasdaq-100 成分股與年中異動 | 把 S&P 500 回測依「當年是否 Nasdaq-100」重新分組 |
+| `github.com/fja05680/sp500` `sp500_ticker_start_end.csv` → `data/sp500_membership_spells.csv`（原檔複製，28 KB） | S&P 500 歷史成分股：每個代號每一段在指數裡的起訖日（1996 起；代號是當時的代號） | 倖存者偏誤檢查（README §15.4）：預測當時是不是成分股。改過代號的 21 家在 `pef/universe.py` 對回舊代號 |
 
 持股明細只有公司名稱與 CUSIP：用正規化名稱對到 SEC 公司代碼（79% 的列對得到），再用 CUSIP 串起不同季。
 對不到的多半是已下市或被併購的公司 → 中小型股回測只有「活到 2026 年」的公司。YAML 要用 BaseLoader 讀：代號 `ON`（安森美）會被一般讀法變成布林值 True。
