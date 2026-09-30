@@ -396,19 +396,8 @@ function placeholderHTML(msg){
     html += '<div class="small" style="color:var(--muted)">掃描報告缺失。</div>';
   }
 
-  /* Polymarket 一行狀態 */
-  var po = D.poly || {};
-  html += '<h3>Polymarket 追蹤（一行狀態）</h3>';
-  if(po.available){
-    html += '<div class="small">$'+esc((po.total_pnl/1e6).toFixed(1))+'M 戶（'+esc(po.label)+'）：'
-      + '<b>已判不可跟</b>——'+esc(po.reason)+'；影子持續採樣：偵測延遲中位 '
-      + esc(po.lag_median==null?'—':po.lag_median.toFixed(1))+'s／p90 '
-      + esc(po.lag_p90==null?'—':po.lag_p90.toFixed(1))+'s、最佳價可成交率 '
-      + esc(fmtPct(po.fillable_ratio,0))+'（$50 固定額）。watchlist 共 '
-      + esc(po.watchlist_total)+' 錢包、active '+esc(po.watchlist_active)+' 個。</div>';
-  } else {
-    html += '<div class="small" style="color:var(--muted)">'+esc(po.placeholder||'Polymarket 數據缺失。')+'</div>';
-  }
+  /* Polymarket 追蹤（旗艦錢包深度檢視） */
+  html += renderPolyFollowability(D.poly || {});
 
   el.innerHTML = html;
   if(hl.monthly_pnl) renderMonthly('hl-chart','hl-tip','hl-chart-table', hl.monthly_pnl);
@@ -547,6 +536,49 @@ function renderRoundTrips(fh){
   html += '<div class="note">回合＝用 startPosition 追蹤的 flat→flat 完整交易（非逐筆），'
         + '賠率＝平均賺÷平均虧（越高越好，＜1 代表贏的沒有顯著大於輸的）；'
         + 'carry-in＝資料視窗開始時已有倉、起點成本不明的損益，不計入回合統計但仍記入對帳。</div>';
+  return html;
+}
+
+/* ── Polymarket 追蹤（旗艦錢包深度檢視） ────────────────────── */
+function renderPolyFollowability(po){
+  if(!po || !po.available) return '';
+  var html = '<h3>Polymarket 追蹤（旗艦錢包深度檢視）</h3>';
+  html += '<div class="small">'+esc(po.label)+'（分類：'+esc(po.classification)+'）・'
+        + esc(po.snapshot_date)+' 快照</div>';
+  html += '<div class="table-scroll"><table><tbody>'
+        + '<tr><td>總 PnL</td><td class="num">'+esc(signedUsd(po.total_pnl))+'</td></tr>'
+        + '<tr><td>近 30 天 PnL</td><td class="num">'+esc(signedUsd(po.recent_30d_pnl))+'</td></tr>'
+        + '<tr><td>最佳月份 PnL</td><td class="num">'+esc(signedUsd(po.best_month_pnl))+'</td></tr>'
+        + '<tr><td>正月比率</td><td class="num">'+esc(fmtPct(po.positive_month_ratio))+'</td></tr>'
+        + '<tr><td>最大回撤</td><td class="num">'+esc(fmtPct(po.max_drawdown_pct))+'</td></tr>'
+        + '<tr><td>活躍月數／活動跨度</td><td class="num">'+esc(po.active_months)+' 個月・'
+          + esc(po.span_days==null?'—':po.span_days.toFixed(0))+' 天</td></tr>'
+        + '<tr><td>成交筆數／估計頻率</td><td class="num">'+esc(fmtNum(po.n_trades))+' 筆・約 '
+          + esc(fmtNum(po.trades_per_month))+' 筆/月'
+          + (po.activity_truncated ? '（⚠︎ 頻率為下限估計，activity 抓取已截斷）' : '')
+          + '</td></tr>'
+        + '</tbody></table></div>';
+  if(po.classifier_reasons && po.classifier_reasons.length){
+    html += '<div class="note">分類理由：'+po.classifier_reasons.map(function(r){ return esc(r); }).join('・')+'</div>';
+  }
+  if(po.top_category){
+    html += '<div class="note">主類別（不穩定，僅供參考）：'+esc(po.top_category)+' '
+          + esc(fmtPct(po.top_category_share,0))
+          + '——賽事常用隊名而非聯賽關鍵字命名，分類器不同快照日會漏抓，同一批交易曾被歸到不同類別，不是穩定統計量。</div>';
+  }
+  var fw = po.followability;
+  if(fw && fw.reasons && fw.reasons.length){
+    html += '<div class="callout"><b>可跟性評估：'
+          + (fw.verdict==='not_followable' ? '不建議跟單' : esc(fw.verdict)) + '</b>'
+          + '<ul style="margin:6px 0 0 18px;padding:0">'
+          + fw.reasons.map(function(r){ return '<li>'+esc(r)+'</li>'; }).join('')
+          + '</ul></div>';
+  }
+  html += '<div class="small">影子持續採樣：偵測延遲中位 '
+        + esc(po.lag_median==null?'—':po.lag_median.toFixed(1))+'s／p90 '
+        + esc(po.lag_p90==null?'—':po.lag_p90.toFixed(1))+'s、最佳價可成交率 '
+        + esc(fmtPct(po.fillable_ratio,0))+'（$50 固定額）。watchlist 共 '
+        + esc(po.watchlist_total)+' 錢包、active '+esc(po.watchlist_active)+' 個。</div>';
   return html;
 }
 
