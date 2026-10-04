@@ -1,6 +1,6 @@
 # _SOURCE_PROBE — 有価証券報告書來源探測（JEM 否證 #3）
 
-> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-10-03T07:43:17+00:00
+> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-10-04T07:52:43+00:00
 > **為什麼有這支**：2026-08-20 Jake 多次嘗試註冊 EDINET API key 失敗（登入問題）。
 > 與其讓他繼續跟註冊表單纏鬥，不如讓 runner 直接回報**哪一條路是通的**。
 
@@ -25,12 +25,11 @@
 <h1>Not Found</h1>
 <p>The requested URL /inbs/I_list_001_20260818.html wa` |
 | [ufocatch 檢索頁（猜測）](https://ufocatch.com/Search.aspx?q=6855) | **404** | ⚠️ 猜測路徑。回 404 只代表這個路徑不對，不代表服務不可用 | `<!DOCTYPE html>
-<html>
-    <head>
-        <title>リソースが見つかりませんでした。</title>
-        <meta name="viewport" content="width=device-width" />
-        <style>
-         body {font-fa` |
+<html lang="ja">
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]//[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'` |
 | [ufocatch 說明頁（已知存在）](https://ufocatch.com/about.aspx) | **200** | 對照：此頁確實存在。若它 200 而檢索頁 404 → 站可用、只是路徑要找 | `<!DOCTYPE html> <html lang="ja"> <head>     <!-- Google Tag Manager -->     <script>(function(w,d,s,l,i){w[l]=w[l]//[];w[l].push({'gtm.start':     new Date().getTime(),event:'` |
 | [EDINET 書類検索（猜測）](https://disclosure2.edinet-fsa.go.jp/week0020.aspx) | **200** | ⚠️ 猜測路徑（WEEK0010 是首頁，書類検索可能是別的 aspx） | `<!DOCTYPE html> <html lang="ja"> <head> <meta name="viewport" content="width=device-width,initial-scale=1"/> <meta name="description" content="開示情報利用者用トップ画面（英語）"/> <meta name="appl` |
 
@@ -89,7 +88,7 @@
 
 ## TDnet 解析診斷
 
-- 回溯嘗試：20261002(0列)
+- 回溯嘗試：20261003(空日) → 20261002(0列)
 - 測試頁：`https://www.release.tdnet.info/inbs/I_list_001_20261002.html`
 - HTML 長度：54,835 字元
 - `parse_list_page` 解析出的列數：**0**
