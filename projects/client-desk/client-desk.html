@@ -1,0 +1,1075 @@
+<title>客戶資產管理台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap">
+<style>
+/* Layout: ledger shell. Client roster on the left, one client's books on the right; the monthly report renders as A4 paper sheets. */
+:root {
+  --bg: #eff3f1;
+  --surface: #ffffff;
+  --surface-2: #f5f8f7;
+  --line: #d6dfdb;
+  --fg: #14201c;
+  --fg-2: #4a5a55;
+  --fg-3: #7a8a85;
+  --accent: #0d6b5e;
+  --accent-ink: #ffffff;
+  --accent-soft: #dcefea;
+  --tw: #2a78d6;
+  --us: #eb6834;
+  --cash: #94a19c;
+  --up: #c8323a;
+  --down: #17804a;
+  --warn: #9a5b00;
+  --warn-soft: #fbefd9;
+  --gain: var(--up);
+  --loss: var(--down);
+  --font-display: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  --font-body: "IBM Plex Sans", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1513; --surface: #151d1a; --surface-2: #1b2522; --line: #2a3632;
+    --fg: #e6eeeb; --fg-2: #a6b5b0; --fg-3: #7b8b86;
+    --accent: #45b5a1; --accent-ink: #062019; --accent-soft: #163631;
+    --tw: #3987e5; --us: #d95926; --cash: #7d8a86;
+    --up: #f06b6b; --down: #3dba73; --warn: #e3a74a; --warn-soft: #33281a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1513; --surface: #151d1a; --surface-2: #1b2522; --line: #2a3632;
+  --fg: #e6eeeb; --fg-2: #a6b5b0; --fg-3: #7b8b86;
+  --accent: #45b5a1; --accent-ink: #062019; --accent-soft: #163631;
+  --tw: #3987e5; --us: #d95926; --cash: #7d8a86;
+  --up: #f06b6b; --down: #3dba73; --warn: #e3a74a; --warn-soft: #33281a;
+  color-scheme: dark;
+}
+:root[data-updown="intl"] { --gain: var(--down); --loss: var(--up); }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 14px; line-height: 1.5; }
+button, input, select, textarea { font: inherit; color: inherit; }
+.num, td.n, th.n { font-variant-numeric: tabular-nums; }
+.gain { color: var(--gain); }
+.loss { color: var(--loss); }
+.muted { color: var(--fg-3); }
+.small { font-size: 12px; }
+
+/* top bar */
+.top { display: flex; align-items: center; gap: 16px; padding: 12px 20px; background: var(--surface); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.brand { display: flex; flex-direction: column; min-width: 0; }
+.brand b { font-family: var(--font-display); font-size: 18px; letter-spacing: .02em; }
+.brand span { font-size: 12px; color: var(--fg-3); letter-spacing: .08em; }
+.top .spacer { flex: 1; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); font-size: 12px; color: var(--fg-2); white-space: nowrap; }
+.chip.ok { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+.chip.warn { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-weight: 500; white-space: nowrap; }
+.btn:hover { border-color: var(--fg-3); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.ghost { background: transparent; border-color: transparent; color: var(--fg-2); }
+.btn.ghost:hover { background: var(--surface-2); }
+.btn.danger { color: var(--up); }
+.btn:disabled { opacity: .55; cursor: default; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* shell */
+.shell { display: grid; grid-template-columns: 250px minmax(0, 1fr); min-height: calc(100vh - 60px); }
+aside { border-right: 1px solid var(--line); background: var(--surface-2); padding: 16px 12px; display: flex; flex-direction: column; gap: 6px; }
+aside .label { font-size: 11px; letter-spacing: .12em; color: var(--fg-3); padding: 6px 8px 2px; }
+.cl { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; padding: 9px 10px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; text-align: left; background: transparent; width: 100%; }
+.cl:hover { background: var(--surface); }
+.cl.on { background: var(--surface); border-color: var(--line); }
+.cl .nm { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cl .aum { grid-column: 1; font-size: 12px; color: var(--fg-3); }
+.cl .rt { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-size: 12px; font-weight: 600; }
+.side-note { margin-top: auto; font-size: 11px; color: var(--fg-3); padding: 8px; line-height: 1.6; }
+main { padding: 20px 24px 48px; min-width: 0; display: flex; flex-direction: column; gap: 18px; }
+
+@media (max-width: 860px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  aside { border-right: 0; border-bottom: 1px solid var(--line); flex-direction: row; overflow-x: auto; padding: 10px 16px; }
+  aside .label, .side-note { display: none; }
+  .cl { min-width: 150px; }
+  main { padding: 16px 16px 40px; }
+}
+
+/* headings & panels */
+.head { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+.head h1 { font-family: var(--font-display); font-size: 26px; margin: 0; line-height: 1.2; text-wrap: balance; }
+.head .meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.head .actions { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; min-width: 0; }
+.panel h2 { font-size: 13px; margin: 0 0 12px; letter-spacing: .06em; color: var(--fg-2); font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.panel h2 .r { margin-left: auto; font-weight: 400; letter-spacing: 0; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 1100px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+.tab { padding: 9px 14px; border: 0; background: transparent; cursor: pointer; color: var(--fg-2); border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+.tab.on { color: var(--fg); border-bottom-color: var(--accent); font-weight: 600; }
+
+/* KPI tiles */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.kpi .k { font-size: 12px; color: var(--fg-3); letter-spacing: .04em; }
+.kpi .v { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.25; overflow-wrap: anywhere; }
+.kpi .s { font-size: 12px; color: var(--fg-2); font-variant-numeric: tabular-nums; }
+
+/* tables */
+.tw { overflow-x: auto; }
+table.t { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.t th { text-align: left; font-weight: 500; color: var(--fg-3); font-size: 12px; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.t td { padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; white-space: nowrap; }
+table.t th.n, table.t td.n { text-align: right; }
+table.t tr.total td { font-weight: 600; border-bottom: 0; }
+table.t tr.click { cursor: pointer; }
+table.t tr.click:hover td { background: var(--surface-2); }
+.cell { width: 100%; min-width: 64px; padding: 4px 6px; border: 1px solid transparent; border-radius: 6px; background: transparent; }
+.cell:hover { border-color: var(--line); }
+.cell:focus { border-color: var(--accent); background: var(--surface); outline: none; }
+.cell.num { text-align: right; font-variant-numeric: tabular-nums; }
+.mk { display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 4px; color: #fff; }
+.mk.TW { background: var(--tw); }
+.mk.US { background: var(--us); }
+
+/* forms */
+.form { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+.f { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.f label { font-size: 12px; color: var(--fg-2); }
+.f input, .f select, .f textarea, textarea.box { padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); width: 100%; }
+.f .hint { font-size: 11px; color: var(--fg-3); }
+.f.wide { grid-column: 1 / -1; }
+textarea.box { min-height: 110px; resize: vertical; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.note { font-size: 12px; color: var(--fg-2); background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; line-height: 1.7; }
+.note.warn { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+details.tool { border: 1px solid var(--line); border-radius: 8px; padding: 0 12px; background: var(--surface-2); }
+details.tool > summary { cursor: pointer; padding: 10px 0; font-weight: 500; }
+details.tool[open] { padding-bottom: 12px; }
+
+/* allocation bar */
+.alloc { display: flex; gap: 2px; height: 14px; border-radius: 4px; overflow: hidden; }
+.alloc > div { min-width: 2px; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--fg-2); margin-top: 10px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.chartbox { position: relative; }
+.chartbox canvas { width: 100%; height: 240px; display: block; }
+.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.12); white-space: nowrap; font-variant-numeric: tabular-nums; z-index: 3; }
+.tip b { display: block; margin-bottom: 2px; }
+.empty { text-align: center; padding: 48px 16px; color: var(--fg-2); display: flex; flex-direction: column; gap: 12px; align-items: center; }
+.empty h2 { font-family: var(--font-display); font-size: 20px; margin: 0; color: var(--fg); }
+.empty p { margin: 0; max-width: 44ch; }
+
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 9px 16px; border-radius: 8px; font-size: 13px; z-index: 50; max-width: calc(100vw - 32px); }
+
+/* ===== report paper (deliberately single-theme: it is a printed document) ===== */
+.sheets { overflow-x: auto; padding: 4px 2px 12px; display: flex; flex-direction: column; gap: 20px; align-items: flex-start; }
+.sheet { box-shadow: 0 2px 18px rgba(10, 30, 25, .16); }
+.page {
+  --p-ink: #17221f; --p-ink2: #52605c; --p-ink3: #85918d; --p-line: #d7dfdc; --p-accent: #0d5c51; --p-soft: #eef4f2;
+  --p-tw: #2a78d6; --p-us: #eb6834; --p-cash: #9aa5a1; --p-gain: #c8323a; --p-loss: #17804a;
+  width: 794px; height: 1123px; background: #ffffff; color: var(--p-ink); position: relative; overflow: hidden;
+  padding: 0 44px 40px; display: flex; flex-direction: column; gap: 18px;
+  font-family: var(--font-body); font-size: 11px; line-height: 1.5;
+}
+.page.intl { --p-gain: #17804a; --p-loss: #c8323a; }
+.page .pg { color: var(--p-gain); }
+.page .pl { color: var(--p-loss); }
+.page .band { margin: 0 -44px; padding: 26px 44px 20px; background: var(--p-accent); color: #ffffff; display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; }
+.page .band .firm { font-size: 11px; letter-spacing: .2em; color: #cfe5df; }
+.page .band h1 { font-family: var(--font-display); font-size: 28px; margin: 4px 0 0; font-weight: 700; letter-spacing: .04em; }
+.page .band h1 small { font-family: var(--font-body); font-size: 12px; font-weight: 400; letter-spacing: .1em; margin-left: 10px; color: #cfe5df; }
+.page .band .who { text-align: right; font-size: 12px; color: #e4f1ed; }
+.page .band .who b { display: block; font-size: 17px; color: #ffffff; font-weight: 600; }
+.page .slim { margin: 0 -44px; padding: 18px 44px 12px; border-bottom: 2px solid var(--p-accent); display: flex; justify-content: space-between; color: var(--p-ink2); font-size: 11px; }
+.page .slim b { color: var(--p-accent); font-family: var(--font-display); font-size: 14px; }
+.page .facts { display: grid; grid-template-columns: repeat(6, 1fr); border: 1px solid var(--p-line); }
+.page .facts > div { padding: 10px 12px; border-right: 1px solid var(--p-line); }
+.page .facts > div:last-child { border-right: 0; }
+.page .facts .k { font-size: 10px; color: var(--p-ink3); letter-spacing: .06em; }
+.page .facts .v { font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.page h3 { font-family: var(--font-display); font-size: 13px; margin: 0 0 8px; color: var(--p-accent); padding-bottom: 5px; border-bottom: 1px solid var(--p-line); display: flex; justify-content: space-between; align-items: baseline; }
+.page h3 span { font-family: var(--font-body); font-size: 10px; color: var(--p-ink3); font-weight: 400; }
+.page .two { display: grid; grid-template-columns: 1.55fr 1fr; gap: 22px; }
+.page .two.eq { grid-template-columns: 1fr 1fr; }
+.page table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.page th { font-weight: 500; color: var(--p-ink3); font-size: 10px; text-align: right; padding: 4px 6px; border-bottom: 1px solid var(--p-line); white-space: nowrap; }
+.page td { padding: 5px 6px; border-bottom: 1px solid var(--p-line); text-align: right; white-space: nowrap; }
+.page th:first-child, .page td:first-child, .page .l { text-align: left; }
+.page tr.hl td { background: var(--p-soft); font-weight: 600; }
+.page .kv td { text-align: left; }
+.page .kv td:first-child { color: var(--p-ink3); width: 38%; }
+.page .kv td:last-child { white-space: normal; }
+.page .lg { display: flex; flex-direction: column; gap: 6px; justify-content: center; }
+.page .lg div { display: flex; align-items: center; gap: 8px; }
+.page .lg i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.page .lg b { margin-left: auto; font-variant-numeric: tabular-nums; }
+.page .bars { display: flex; flex-direction: column; gap: 5px; }
+.page .bar { display: grid; grid-template-columns: 84px 1fr 44px; align-items: center; gap: 8px; }
+.page .bar .tr { height: 9px; background: var(--p-soft); border-radius: 0 3px 3px 0; }
+.page .bar .fl { height: 9px; background: var(--p-accent); border-radius: 0 3px 3px 0; }
+.page .bar span:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+.page .cal td, .page .cal th { padding: 4px 3px; font-size: 10px; }
+.page .comm { flex: 1; min-height: 0; overflow: hidden; }
+.page .comm p { margin: 0 0 7px; font-size: 11.5px; line-height: 1.85; white-space: pre-wrap; text-align: justify; }
+.page .disc { font-size: 9px; color: var(--p-ink3); line-height: 1.7; border-top: 1px solid var(--p-line); padding-top: 8px; }
+.page .foot { position: absolute; left: 44px; right: 44px; bottom: 16px; display: flex; justify-content: space-between; font-size: 9px; color: var(--p-ink3); }
+.page .nodata { color: var(--p-ink3); padding: 16px 0; }
+.page .legend2 { display: flex; gap: 14px; font-size: 10px; color: var(--p-ink2); margin-top: 4px; }
+.page .legend2 i { display: inline-block; width: 14px; height: 0; border-top: 2px solid; vertical-align: 3px; margin-right: 5px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<header class="top">
+  <div class="brand"><b id="firmName">我的投資管理</b><span>客戶資產管理台</span></div>
+  <div class="spacer"></div>
+  <span class="chip" id="fxChip">USD/TWD —</span>
+  <button class="btn ghost" data-act="settings" id="btnSettings">設定與基準指數</button>
+</header>
+<div class="shell">
+  <aside id="side">
+    <div class="label">客戶</div>
+    <div class="muted small" style="padding:8px">載入中…</div>
+  </aside>
+  <main id="main">
+    <div class="empty"><h2>正在連線資料庫</h2><p>客戶資料存在這個頁面的私人資料庫裡，只有你本人能讀寫。</p></div>
+  </main>
+</div>
+<div id="toast" class="toast" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(() => {
+'use strict';
+/* ---------------- state ---------------- */
+const S = {
+  db: null, ready: { settings: false, bench: false, clients: false },
+  settings: { firm: '', manager: '', fx: 32, rf: 1.5, updown: 'tw' }, settingsExists: false,
+  bench: {}, benchExists: false,
+  clients: {}, months: {}, monthSubs: {},
+  view: 'home', sel: null, tab: 'overview', reportMonth: null,
+  closeForm: null, confirmDel: false, pendingRender: false,
+};
+const SECTORS = ['半導體','IC 設計','電子零組件','伺服器/AI','網通','軟體','網路平台','消費','金融','醫療','能源','傳產','ETF','其他'];
+
+/* ---------------- helpers ---------------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const nf0 = new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 0 });
+const nf2 = new Intl.NumberFormat('zh-TW', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const ok = v => v != null && isFinite(v);
+const money = v => ok(v) ? 'NT$ ' + nf0.format(Math.round(v)) : '—';
+const moneyShort = v => !ok(v) ? '—' : Math.abs(v) >= 1e8 ? (v / 1e8).toFixed(2) + ' 億' : Math.abs(v) >= 1e4 ? nf0.format(Math.round(v / 1e4)) + ' 萬' : nf0.format(Math.round(v));
+const pct = (v, d = 2, sign = true) => { if (!ok(v)) return '—'; const t = (v * 100).toFixed(d); return +t === 0 ? (0).toFixed(d) + '%' : (sign && v > 0 ? '+' : '') + t + '%'; };
+const signed = v => ok(v) ? (v > 0 ? '+' : '') + nf0.format(Math.round(v)) : '—';
+const cls = v => ok(v) ? (v > 0 ? 'gain' : v < 0 ? 'loss' : '') : '';
+const pcls = v => ok(v) ? (v > 0 ? 'pg' : v < 0 ? 'pl' : '') : '';
+const price = v => ok(v) ? nf2.format(v) : '—';
+const ymOf = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+function addM(m, k) { let [y, mo] = m.split('-').map(Number); mo += k; y += Math.floor((mo - 1) / 12); mo = ((mo - 1) % 12 + 12) % 12 + 1; return y + '-' + String(mo).padStart(2, '0'); }
+const lastDay = m => { const [y, mo] = m.split('-').map(Number); return new Date(y, mo, 0).getDate(); };
+const mLabel = m => { const [y, mo] = m.split('-'); return `${y} 年 ${+mo} 月`; };
+const defaultCloseMonth = () => { const d = new Date(); return d.getDate() <= 20 ? addM(ymOf(d), -1) : ymOf(d); };
+const uid = () => Math.random().toString(36).slice(2, 10);
+const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function hexA(hex, a) { const h = hex.replace('#', ''); const n = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16); return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`; }
+function toast(msg, ms = 2600) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => t.hidden = true, ms); }
+const numIn = v => { const n = parseFloat(String(v).replace(/[,\s]/g, '')); return isFinite(n) ? n : 0; };
+
+/* ---------------- db writes: one at a time per doc ---------------- */
+const chains = {};
+function write(path, fn) {
+  chains[path] = (chains[path] || Promise.resolve()).then(() => fn(S.db.doc(path))).catch(e => {
+    console.error(e);
+    toast(e && e.code === 'quota_exceeded' ? '資料庫容量已滿，請刪除舊資料後再試' : '儲存失敗：' + (e && e.message || e));
+  });
+  return chains[path];
+}
+
+/* ---------------- valuation & performance ---------------- */
+function valuate(c, fx) {
+  fx = fx || S.settings.fx || 0;
+  let tw = 0, us = 0;
+  const rows = (c.holdings || []).map(h => {
+    const f = h.m === 'US' ? fx : 1;
+    const v = (+h.px || 0) * (+h.sh || 0) * f;
+    const costV = (+h.cost || 0) * (+h.sh || 0) * f;
+    if (h.m === 'US') us += v; else tw += v;
+    return { ...h, v, costV, pl: v - costV, plPct: costV ? v / costV - 1 : null };
+  });
+  const cash = (+c.cashTWD || 0) + (+c.cashUSD || 0) * fx;
+  const total = tw + us + cash;
+  rows.forEach(r => r.w = total ? r.v / total : 0);
+  rows.sort((a, b) => b.v - a.v);
+  return { rows, tw, us, cash, total, cost: rows.reduce((a, r) => a + r.costV, 0), pl: rows.reduce((a, r) => a + r.pl, 0) };
+}
+function benchRet(m, w) {
+  const a = S.bench[m], p = S.bench[addM(m, -1)];
+  if (!a || !p || !a.taiex || !p.taiex || !a.spx || !p.spx || !a.fx || !p.fx) return null;
+  return w * (a.taiex / p.taiex - 1) + (1 - w) * ((a.spx * a.fx) / (p.spx * p.fx) - 1);
+}
+function series(cid) {
+  const c = S.clients[cid]; const ms = S.months[cid] || [];
+  const w = (ok(+c?.benchTW) ? +c.benchTW : 50) / 100;
+  let unit = 10, bunit = 10, bAlive = true;
+  return ms.map((d, i) => {
+    const V1 = +d.value || 0, F = +d.flow || 0;
+    let r;
+    if (i) { const V0 = +ms[i - 1].value || 0; const den = V0 + 0.5 * F; r = den > 0 ? (V1 - V0 - F) / den : 0; }
+    else r = F > 0 ? (V1 - F) / F : 0;
+    unit *= 1 + r;
+    const br = benchRet(d.id, w);
+    if (br == null) bAlive = false; else if (bAlive) bunit *= 1 + br;
+    return { m: d.id, value: V1, flow: F, r, unit, br, bunit: bAlive ? bunit : null, doc: d };
+  });
+}
+function chain(arr) { return arr.length && !arr.some(v => v == null) ? arr.reduce((a, v) => a * (1 + v), 1) - 1 : null; }
+function stats(s, k, rf) {
+  const sub = s.slice(0, k + 1), R = sub.map(x => x.r), B = sub.map(x => x.br), n = sub.length;
+  const lastN = (a, N) => a.length >= N ? chain(a.slice(-N)) : null;
+  const y = s[k].m.slice(0, 4); const yi = sub.map((x, i) => x.m.startsWith(y) ? i : -1).filter(i => i >= 0);
+  const per = a => ({ m1: lastN(a, 1), m3: lastN(a, 3), m6: lastN(a, 6), ytd: chain(yi.map(i => a[i])), y1: lastN(a, 12), si: chain(a) });
+  const P = per(R), BB = per(B);
+  const ann = v => v != null && n >= 12 ? Math.pow(1 + v, 12 / n) - 1 : null;
+  P.ann = ann(P.si); BB.ann = ann(BB.si);
+  const mean = R.reduce((a, v) => a + v, 0) / n;
+  const sd = n >= 2 ? Math.sqrt(R.reduce((a, v) => a + (v - mean) ** 2, 0) / (n - 1)) : null;
+  const vol = n >= 3 && sd != null ? sd * Math.sqrt(12) : null;
+  const annRet = n >= 12 ? P.ann : mean * 12;
+  const sharpe = vol ? (annRet - (rf || 0) / 100) / vol : null;
+  let peak = 10, mdd = 0; [10, ...sub.map(x => x.unit)].forEach(u => { peak = Math.max(peak, u); mdd = Math.min(mdd, u / peak - 1); });
+  return { P, B: BB, n, vol, sharpe, mdd, best: Math.max(...R), worst: Math.min(...R), win: R.filter(v => v > 0).length / n };
+}
+function fees(c, s, k) {
+  if (k < 0) return null;
+  const y = s[k].m.slice(0, 4); let hwm = 10;
+  s.slice(0, k + 1).forEach(x => { if (x.m.endsWith('-12') && x.m.slice(0, 4) < y) hwm = Math.max(hwm, x.unit); });
+  const units = s[k].value / s[k].unit;
+  return { hwm, mgmt: s[k].value * (+c.mgmtFee || 0) / 100 / 12, perf: Math.max(0, s[k].unit - hwm) * units * (+c.perfFee || 0) / 100 };
+}
+const benchName = c => { const w = ok(+c.benchTW) ? +c.benchTW : 50; return w >= 100 ? '台灣加權指數' : w <= 0 ? 'S&P 500（新台幣計價）' : `台灣加權指數 ${w}% ＋ S&P 500 ${100 - w}%（新台幣計價）`; };
+
+/* ---------------- charts (canvas, so the PDF export copies them exactly) ---------------- */
+function niceTicks(min, max, n = 4) {
+  if (min === max) { min -= 1; max += 1; }
+  const step0 = (max - min) / n, mag = Math.pow(10, Math.floor(Math.log10(step0))), f = step0 / mag;
+  const step = (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * mag;
+  const out = []; for (let v = Math.floor(min / step) * step; v <= Math.ceil(max / step) * step + step / 2; v += step) out.push(+v.toFixed(10));
+  return out;
+}
+function drawLine(cv, o) {
+  const W = o.width || cv.clientWidth || 600, H = o.height || cv.clientHeight || 240, sc = o.scale || window.devicePixelRatio || 1;
+  if (cv.width !== Math.round(W * sc) || cv.height !== Math.round(H * sc)) { cv.width = Math.round(W * sc); cv.height = Math.round(H * sc); }
+  if (o.width) { cv.style.width = W + 'px'; cv.style.height = H + 'px'; }
+  const ctx = cv.getContext('2d'); ctx.setTransform(sc, 0, 0, sc, 0, 0); ctx.clearRect(0, 0, W, H);
+  const c = o.colors, font = `${o.fs || 11}px "IBM Plex Sans","Noto Sans TC",sans-serif`;
+  const pad = { l: 40, r: 14, t: 10, b: 22 };
+  const vals = o.series.flatMap(s => s.values.filter(ok));
+  if (!vals.length) return;
+  const ticks = niceTicks(Math.min(...vals), Math.max(...vals), 4), lo = ticks[0], hi = ticks[ticks.length - 1];
+  const n = o.labels.length;
+  const x = i => pad.l + (n <= 1 ? (W - pad.l - pad.r) / 2 : i * (W - pad.l - pad.r) / (n - 1));
+  const y = v => pad.t + (hi - v) / (hi - lo || 1) * (H - pad.t - pad.b);
+  ctx.font = font; ctx.lineWidth = 1; ctx.textBaseline = 'middle';
+  ticks.forEach(t => { ctx.strokeStyle = c.grid; ctx.beginPath(); ctx.moveTo(pad.l, Math.round(y(t)) + .5); ctx.lineTo(W - pad.r, Math.round(y(t)) + .5); ctx.stroke(); ctx.fillStyle = c.text; ctx.textAlign = 'right'; ctx.fillText(o.yFmt ? o.yFmt(t) : t, pad.l - 6, y(t)); });
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  const step = Math.max(1, Math.ceil(n / 7));
+  for (let i = 0; i < n; i++) { if (i === n - 1 || (i % step === 0 && n - 1 - i >= Math.max(1, step * 0.75))) ctx.fillText(o.labels[i], Math.min(Math.max(x(i), pad.l + 14), W - pad.r - 14), H - pad.b + 6); }
+  o.series.forEach((s, si) => {
+    const pts = s.values.map((v, i) => ok(v) ? [x(i), y(v)] : null).filter(Boolean);
+    if (!pts.length) return;
+    if (si === 0 && pts.length > 1) {
+      const g = ctx.createLinearGradient(0, pad.t, 0, H - pad.b); g.addColorStop(0, hexA(s.color, .16)); g.addColorStop(1, hexA(s.color, 0));
+      ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(pts[0][0], H - pad.b); pts.forEach(p => ctx.lineTo(p[0], p[1])); ctx.lineTo(pts[pts.length - 1][0], H - pad.b); ctx.closePath(); ctx.fill();
+    }
+    ctx.setLineDash(s.dash || []); ctx.strokeStyle = s.color; ctx.lineWidth = 2; ctx.lineJoin = 'round';
+    ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.stroke(); ctx.setLineDash([]);
+    const e = o.hi != null && ok(s.values[o.hi]) ? [x(o.hi), y(s.values[o.hi])] : pts[pts.length - 1];
+    ctx.fillStyle = s.color; ctx.strokeStyle = c.surface; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(e[0], e[1], 4, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  });
+  if (o.hi != null) { ctx.strokeStyle = c.text; ctx.globalAlpha = .5; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(Math.round(x(o.hi)) + .5, pad.t); ctx.lineTo(Math.round(x(o.hi)) + .5, H - pad.b); ctx.stroke(); ctx.globalAlpha = 1; }
+  cv._geom = { x, n, W, pad };
+}
+function drawDonut(cv, o) {
+  const Sz = o.size, sc = o.scale || 2; cv.width = Sz * sc; cv.height = Sz * sc; cv.style.width = Sz + 'px'; cv.style.height = Sz + 'px';
+  const ctx = cv.getContext('2d'); ctx.setTransform(sc, 0, 0, sc, 0, 0); ctx.clearRect(0, 0, Sz, Sz);
+  const tot = o.parts.reduce((a, p) => a + Math.max(0, p.v), 0); if (!tot) return;
+  const cx = Sz / 2, R = Sz / 2 - 2, th = Sz * 0.17; let a = -Math.PI / 2;
+  o.parts.forEach(p => { if (p.v <= 0) return; const da = p.v / tot * Math.PI * 2; ctx.beginPath(); ctx.strokeStyle = p.color; ctx.lineWidth = th; ctx.arc(cx, cx, R - th / 2, a, a + da); ctx.stroke(); a += da; });
+  a = -Math.PI / 2; ctx.strokeStyle = o.surface; ctx.lineWidth = 2;
+  o.parts.forEach(p => { if (p.v <= 0) return; ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * (R - th - 1), cx + Math.sin(a) * (R - th - 1)); ctx.lineTo(cx + Math.cos(a) * (R + 1), cx + Math.sin(a) * (R + 1)); ctx.stroke(); a += p.v / tot * Math.PI * 2; });
+  ctx.fillStyle = o.ink; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.font = `600 13px "IBM Plex Sans","Noto Sans TC",sans-serif`; ctx.fillText(o.center[0], cx, cx - 7);
+  ctx.font = `10px "IBM Plex Sans","Noto Sans TC",sans-serif`; ctx.fillStyle = o.ink2; ctx.fillText(o.center[1], cx, cx + 10);
+}
+function themeColors() { return { grid: cssv('--line'), text: cssv('--fg-3'), surface: cssv('--surface'), accent: cssv('--accent'), bench: cssv('--fg-3') }; }
+
+/* ---------------- rendering ---------------- */
+function render() {
+  const a = document.activeElement;
+  if (a && $('#main').contains(a) && /INPUT|TEXTAREA|SELECT/.test(a.tagName)) { S.pendingRender = true; renderSide(); return; }
+  S.pendingRender = false;
+  document.documentElement.dataset.updown = S.settings.updown === 'intl' ? 'intl' : 'tw';
+  $('#firmName').textContent = S.settings.firm || '我的投資管理';
+  $('#fxChip').textContent = 'USD/TWD ' + (ok(+S.settings.fx) ? (+S.settings.fx).toFixed(2) : '—');
+  renderSide(); renderMain();
+}
+// A deferred re-render must not replace a button between pointerdown and click, or the click is lost.
+let ptrDown = false;
+const flush = () => { if (S.pendingRender && !ptrDown) render(); };
+document.addEventListener('pointerdown', () => { ptrDown = true; }, true);
+document.addEventListener('pointerup', () => { ptrDown = false; setTimeout(flush, 0); }, true);
+document.addEventListener('focusout', () => setTimeout(flush, 0));
+
+function clientSummary(cid) {
+  const c = S.clients[cid]; const v = valuate(c); const s = series(cid); const k = s.length - 1;
+  const st = k >= 0 ? stats(s, k, S.settings.rf) : null;
+  return { c, v, s, k, st, last: k >= 0 ? s[k] : null };
+}
+function sortedIds() { return Object.keys(S.clients).sort((a, b) => (S.clients[a].code || '').localeCompare(S.clients[b].code || '') || (S.clients[a].name || '').localeCompare(S.clients[b].name || '')); }
+
+function renderSide() {
+  const ids = sortedIds();
+  const loading = !S.ready.clients;
+  $('#side').innerHTML = `
+    <div class="label">總覽</div>
+    <button class="cl ${S.view === 'home' ? 'on' : ''}" data-act="home"><span class="nm">全部客戶</span><span class="aum">${ids.length} 位 · ${moneyShort(ids.reduce((a, id) => a + valuate(S.clients[id]).total, 0))}</span></button>
+    <div class="label">客戶</div>
+    ${loading ? '<div class="muted small" style="padding:8px">載入中…</div>' : ids.map(id => {
+      const { c, v, last } = clientSummary(id);
+      return `<button class="cl ${S.view === 'client' && S.sel === id ? 'on' : ''}" data-act="pick" data-id="${id}">
+        <span class="nm">${esc(c.name || '未命名')}${c.demo ? ' <span class="muted small">範例</span>' : ''}</span>
+        <span class="rt ${cls(last?.r)}">${last ? pct(last.r, 1) : ''}</span>
+        <span class="aum">${esc(c.code || '')} · ${moneyShort(v.total)}</span></button>`;
+    }).join('')}
+    <button class="btn" data-act="newClient" style="margin-top:6px">＋ 新增客戶</button>
+    <div class="side-note">資料存在此頁面的私人資料庫，存取規則只允許你本人讀寫。<br>本工具刻意不提供券商帳密欄位，請把密碼放在密碼管理器。</div>`;
+}
+
+function renderMain() {
+  const m = $('#main');
+  if (!S.db) {
+    m.innerHTML = `<div class="empty"><h2>${S.noDb ? '這個檢視無法存取資料庫' : '正在連線資料庫'}</h2><p>${S.noDb ? '請在 claude.ai 登入後開啟此頁面。客戶資料只存在這個頁面的私人資料庫裡。' : '客戶資料存在這個頁面的私人資料庫裡，只有你本人能讀寫。'}</p></div>`;
+    return;
+  }
+  if (S.view === 'settings') return renderSettings(m);
+  if (S.view === 'newClient') return renderClientForm(m, null);
+  if (S.view === 'client' && S.clients[S.sel]) return renderClient(m);
+  return renderHome(m);
+}
+
+/* ---------- home ---------- */
+function renderHome(m) {
+  const ids = sortedIds();
+  if (!S.ready.clients) { m.innerHTML = `<div class="empty"><h2>載入客戶資料中</h2></div>`; return; }
+  if (!ids.length) {
+    m.innerHTML = `<div class="empty"><h2>還沒有客戶</h2><p>按「新增客戶」建立第一位。建好之後輸入持股，每月月底做一次「月結」，就能產出給客戶的月報 PDF。</p><button class="btn primary" data-act="newClient">＋ 新增客戶</button></div>`;
+    return;
+  }
+  const cm = defaultCloseMonth();
+  const sums = ids.map(id => ({ id, ...clientSummary(id) }));
+  const aum = sums.reduce((a, x) => a + x.v.total, 0);
+  const closed = sums.filter(x => (S.months[x.id] || []).some(d => d.id === cm)).length;
+  const tw = sums.reduce((a, x) => a + x.v.tw, 0), us = sums.reduce((a, x) => a + x.v.us, 0), cash = sums.reduce((a, x) => a + x.v.cash, 0);
+  m.innerHTML = `
+    <div class="head"><h1>全部客戶</h1><div class="meta"><span class="chip ${closed === ids.length ? 'ok' : 'warn'}">${+cm.slice(5)} 月月結 ${closed}/${ids.length} 完成</span></div>
+      <div class="actions"><button class="btn primary" data-act="newClient">＋ 新增客戶</button></div></div>
+    <div class="kpis">
+      <div class="kpi"><span class="k">管理總資產（即時估值）</span><span class="v">${money(aum)}</span><span class="s">${ids.length} 位客戶</span></div>
+      <div class="kpi"><span class="k">台股部位</span><span class="v">${pct(aum ? tw / aum : null, 1, false)}</span><span class="s">${money(tw)}</span></div>
+      <div class="kpi"><span class="k">美股部位</span><span class="v">${pct(aum ? us / aum : null, 1, false)}</span><span class="s">${money(us)}</span></div>
+      <div class="kpi"><span class="k">現金</span><span class="v">${pct(aum ? cash / aum : null, 1, false)}</span><span class="s">${money(cash)}</span></div>
+    </div>
+    <div class="panel"><h2>客戶一覽 <span class="r muted small">報酬率為時間加權，截至各自最近一次月結</span></h2>
+      <div class="tw"><table class="t"><thead><tr><th>客戶</th><th class="n">目前資產</th><th class="n">占比</th><th>最近月結</th><th class="n">當月</th><th class="n">今年以來</th><th class="n">成立以來</th><th class="n">未實現損益</th><th></th></tr></thead><tbody>
+      ${sums.map(x => `<tr class="click" data-act="pick" data-id="${x.id}">
+        <td><b>${esc(x.c.name)}</b> <span class="muted small">${esc(x.c.code || '')}</span>${x.c.demo ? ' <span class="chip">範例</span>' : ''}</td>
+        <td class="n">${money(x.v.total)}</td><td class="n">${pct(aum ? x.v.total / aum : null, 1, false)}</td>
+        <td>${x.last ? x.last.m : '<span class="muted">尚無</span>'}</td>
+        <td class="n ${cls(x.st?.P.m1)}">${pct(x.st?.P.m1)}</td><td class="n ${cls(x.st?.P.ytd)}">${pct(x.st?.P.ytd)}</td><td class="n ${cls(x.st?.P.si)}">${pct(x.st?.P.si)}</td>
+        <td class="n ${cls(x.v.pl)}">${signed(x.v.pl)}</td>
+        <td>${(S.months[x.id] || []).some(d => d.id === cm) ? '<span class="chip ok">已月結</span>' : '<span class="chip warn">待月結</span>'}</td></tr>`).join('')}
+      </tbody></table></div></div>
+    <div class="note">每月流程：① 在「持股」更新現價與股數 → ② 在「月結紀錄」記錄月底資產與當月出入金 → ③ 在「月報」寫評論、下載 PDF 給客戶。基準指數月底收盤在右上「設定與基準指數」維護，所有客戶共用。</div>`;
+}
+
+/* ---------- client ---------- */
+const TABS = [['overview', '總覽'], ['holdings', '持股'], ['months', '月結紀錄'], ['report', '月報'], ['profile', '客戶資料']];
+function renderClient(m) {
+  const cid = S.sel, c = S.clients[cid];
+  m.innerHTML = `
+    <div class="head"><h1>${esc(c.name)}</h1>
+      <div class="meta"><span class="chip">${esc(c.code || '')}</span><span class="chip">${esc(c.risk || '未設定風險屬性')}</span>${c.start ? `<span class="chip">自 ${esc(c.start)} 起</span>` : ''}${c.demo ? '<span class="chip warn">範例資料，可刪除</span>' : ''}</div>
+      <div class="actions"><button class="btn" data-act="tab" data-tab="months">月結</button><button class="btn primary" data-act="tab" data-tab="report">產出月報</button></div></div>
+    <div class="tabs">${TABS.map(([k, l]) => `<button class="tab ${S.tab === k ? 'on' : ''}" data-act="tab" data-tab="${k}">${l}</button>`).join('')}</div>
+    <div id="tabBody" style="display:flex;flex-direction:column;gap:16px"></div>`;
+  const b = $('#tabBody');
+  ({ overview: tabOverview, holdings: tabHoldings, months: tabMonths, report: tabReport, profile: (b, cid) => renderClientForm(b, cid) })[S.tab](b, cid);
+}
+
+function tabOverview(b, cid) {
+  const { c, v, s, k, st, last } = clientSummary(cid);
+  const fe = fees(c, s, k);
+  const sinceClose = last ? v.total / last.value - 1 : null;
+  b.innerHTML = `
+    <div class="kpis">
+      <div class="kpi"><span class="k">目前資產（即時估值）</span><span class="v">${money(v.total)}</span><span class="s">${last ? `較 ${last.m} 月結 <span class="${cls(sinceClose)}">${pct(sinceClose)}</span>（未扣出入金）` : '尚未月結'}</span></div>
+      <div class="kpi"><span class="k">未實現損益</span><span class="v ${cls(v.pl)}">${signed(v.pl)}</span><span class="s">持股成本 ${money(v.cost)}</span></div>
+      <div class="kpi"><span class="k">今年以來（至 ${last ? last.m : '—'}）</span><span class="v ${cls(st?.P.ytd)}">${pct(st?.P.ytd)}</span><span class="s">基準 ${pct(st?.B.ytd)}</span></div>
+      <div class="kpi"><span class="k">成立以來</span><span class="v ${cls(st?.P.si)}">${pct(st?.P.si)}</span><span class="s">單位淨值 ${last ? last.unit.toFixed(4) : '—'} · 基準 ${pct(st?.B.si)}</span></div>
+    </div>
+    <div class="grid2">
+      <div class="panel"><h2>單位淨值走勢 <span class="r small muted">起始 10.00 ・ ${esc(benchName(c))}</span></h2>
+        ${s.length ? `<div class="chartbox" id="navBox"><canvas id="navChart" role="img" aria-label="單位淨值與比較基準走勢"></canvas><div class="tip" id="navTip" hidden></div></div>
+        <div class="legend"><span><i style="background:var(--accent)"></i>投資組合</span><span><i style="background:var(--fg-3)"></i>比較基準（虛線）</span></div>`
+        : `<div class="empty" style="padding:28px"><p>還沒有月結紀錄。到「月結紀錄」建立第一筆後，這裡會出現淨值走勢。</p><button class="btn" data-act="tab" data-tab="months">去建立月結</button></div>`}
+      </div>
+      <div class="panel"><h2>資產配置</h2>
+        ${allocBar(v)}
+        <table class="t" style="margin-top:14px"><tbody>
+          ${v.rows.slice(0, 6).map(r => `<tr><td><span class="mk ${r.m}">${r.m}</span> ${esc(r.n || r.t)}</td><td class="n">${pct(r.w, 1, false)}</td><td class="n ${cls(r.plPct)}">${pct(r.plPct, 1)}</td></tr>`).join('') || '<tr><td class="muted">尚無持股</td></tr>'}
+        </tbody></table>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="panel"><h2>風險指標 <span class="r small muted">${st ? `${st.n} 個月資料` : ''}</span></h2>
+        ${st ? `<div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(120px,1fr))">
+          ${[['年化波動度', pct(st.vol, 1, false)], ['夏普比率', ok(st.sharpe) ? st.sharpe.toFixed(2) : '—'], ['最大回撤', pct(st.mdd, 1)], ['最佳月', pct(st.best, 1)], ['最差月', pct(st.worst, 1)], ['正報酬月', pct(st.win, 0, false)]].map(([k2, v2]) => `<div class="kpi"><span class="k">${k2}</span><span class="v" style="font-size:18px">${v2}</span></div>`).join('')}</div>` : '<p class="muted">月結後計算。</p>'}
+      </div>
+      <div class="panel"><h2>費用估算 <span class="r small muted">內部參考，不出現在月報</span></h2>
+        ${fe ? `<div class="tw"><table class="t"><tbody>
+          <tr><td style="white-space:normal">管理費（年 ${+c.mgmtFee || 0}%，按月）</td><td class="n">${money(fe.mgmt)}</td></tr>
+          <tr><td style="white-space:normal">績效分潤（${+c.perfFee || 0}%，高水位 ${fe.hwm.toFixed(4)}）</td><td class="n">${money(fe.perf)}</td></tr>
+          <tr><td class="muted small" colspan="2" style="white-space:normal">分潤以「上一年底以前最高的單位淨值」為高水位，只對超過的部分計算，以 ${last.m} 月結估算。</td></tr>
+        </tbody></table></div>` : '<p class="muted">月結後計算。</p>'}
+      </div>
+    </div>`;
+  if (s.length) drawNav(cid, s);
+}
+function allocBar(v) {
+  const t = v.total || 1;
+  const parts = [['台股', v.tw, 'var(--tw)'], ['美股', v.us, 'var(--us)'], ['現金', v.cash, 'var(--cash)']].filter(p => p[1] > 0);
+  return `<div class="alloc">${parts.map(p => `<div style="flex:${p[1] / t};background:${p[2]}" title="${p[0]}"></div>`).join('')}</div>
+    <div class="legend">${parts.map(p => `<span><i style="background:${p[2]}"></i>${p[0]} ${pct(p[1] / t, 1, false)}</span>`).join('')}</div>`;
+}
+function drawNav(cid, s) {
+  const cv = $('#navChart'); if (!cv) return;
+  const labels = [addM(s[0].m, -1), ...s.map(x => x.m)].map(m => m.slice(2).replace('-', '/'));
+  const p = [10, ...s.map(x => x.unit)], bm = [10, ...s.map(x => x.bunit)];
+  const col = themeColors();
+  const opts = { labels, colors: col, series: [{ values: p, color: col.accent }, { values: bm, color: col.bench, dash: [5, 4] }], yFmt: v => v.toFixed(1) };
+  const draw = hi => drawLine(cv, { ...opts, hi });
+  draw(null);
+  const tip = $('#navTip'), box = $('#navBox');
+  cv.onpointermove = e => {
+    const g = cv._geom; if (!g) return; const rect = cv.getBoundingClientRect(); const px = e.clientX - rect.left;
+    const i = Math.max(0, Math.min(g.n - 1, Math.round((px - g.pad.l) / ((g.W - g.pad.l - g.pad.r) / Math.max(1, g.n - 1)))));
+    draw(i);
+    const x = s[i - 1];
+    tip.innerHTML = i === 0 ? `<b>起始</b>單位淨值 10.0000` : `<b>${x.m}</b>投資組合 ${x.unit.toFixed(4)}（<span class="${cls(x.r)}">${pct(x.r)}</span>）<br>比較基準 ${ok(x.bunit) ? x.bunit.toFixed(4) : '—'}（${pct(x.br)}）<br>期末資產 ${money(x.value)}`;
+    tip.hidden = false; const tx = g.x(i); tip.style.left = Math.min(tx + 12, box.clientWidth - tip.offsetWidth) + 'px'; tip.style.top = '6px';
+  };
+  cv.onpointerleave = () => { tip.hidden = true; draw(null); };
+}
+
+/* ---------- holdings ---------- */
+function tabHoldings(b, cid) {
+  const c = S.clients[cid]; const v = valuate(c);
+  b.innerHTML = `
+    <div class="panel"><h2>持股明細 <span class="r small muted">台股股數以「股」計（1 張 = 1,000 股）・美股以美元計價，市值按 USD/TWD ${(+S.settings.fx || 0).toFixed(2)} 換算${c.pxAt ? ` ・ 現價更新於 ${esc(c.pxAt)}` : ''}</span></h2>
+      <div class="tw"><table class="t"><thead><tr><th>市場</th><th>代號</th><th>名稱</th><th>產業</th><th class="n">股數</th><th class="n">平均成本</th><th class="n">現價</th><th class="n">市值 (NT$)</th><th class="n">未實現損益</th><th class="n">報酬率</th><th class="n">權重</th><th></th></tr></thead><tbody>
+      ${v.rows.map(r => `<tr>
+        <td><span class="mk ${r.m}">${r.m}</span></td><td><b>${esc(r.t)}</b></td>
+        <td><input class="cell" id="h-${r.id}-n" data-h="${r.id}" data-k="n" value="${esc(r.n)}"></td>
+        <td><input class="cell" id="h-${r.id}-sec" data-h="${r.id}" data-k="sec" value="${esc(r.sec)}" list="secList"></td>
+        <td class="n"><input class="cell num" id="h-${r.id}-sh" data-h="${r.id}" data-k="sh" value="${r.sh}" inputmode="decimal"></td>
+        <td class="n"><input class="cell num" id="h-${r.id}-cost" data-h="${r.id}" data-k="cost" value="${r.cost}" inputmode="decimal"></td>
+        <td class="n"><input class="cell num" id="h-${r.id}-px" data-h="${r.id}" data-k="px" value="${r.px}" inputmode="decimal"></td>
+        <td class="n">${nf0.format(Math.round(r.v))}</td><td class="n ${cls(r.pl)}">${signed(r.pl)}</td><td class="n ${cls(r.plPct)}">${pct(r.plPct, 1)}</td><td class="n">${pct(r.w, 1, false)}</td>
+        <td><button class="btn ghost small" data-act="delH" data-h="${r.id}" aria-label="刪除 ${esc(r.t)}">×</button></td></tr>`).join('')}
+      <tr><td colspan="2">現金</td><td colspan="2"><div class="row"><span class="muted small">台幣</span><input class="cell num" style="width:130px" id="cashTWD" data-cash="cashTWD" value="${+c.cashTWD || 0}" inputmode="decimal"></div></td>
+        <td colspan="3"><div class="row"><span class="muted small">美元</span><input class="cell num" style="width:110px" id="cashUSD" data-cash="cashUSD" value="${+c.cashUSD || 0}" inputmode="decimal"></div></td>
+        <td class="n">${nf0.format(Math.round(v.cash))}</td><td></td><td></td><td class="n">${pct(v.total ? v.cash / v.total : null, 1, false)}</td><td></td></tr>
+      <tr class="total"><td colspan="7">合計</td><td class="n">${nf0.format(Math.round(v.total))}</td><td class="n ${cls(v.pl)}">${signed(v.pl)}</td><td class="n ${cls(v.cost ? v.pl / v.cost : null)}">${pct(v.cost ? v.pl / v.cost : null, 1)}</td><td class="n">100%</td><td></td></tr>
+      </tbody></table></div>
+      <datalist id="secList">${SECTORS.map(s => `<option value="${s}">`).join('')}</datalist>
+    </div>
+    <div class="panel"><h2>新增持股</h2>
+      <div class="form">
+        <div class="f"><label for="nh-m">市場</label><select id="nh-m"><option value="TW">台股</option><option value="US">美股</option></select></div>
+        <div class="f"><label for="nh-t">代號</label><input id="nh-t" placeholder="2330 或 NVDA"></div>
+        <div class="f"><label for="nh-n">名稱</label><input id="nh-n" placeholder="台積電"></div>
+        <div class="f"><label for="nh-sec">產業</label><input id="nh-sec" list="secList" placeholder="半導體"></div>
+        <div class="f"><label for="nh-sh">股數</label><input id="nh-sh" inputmode="decimal" placeholder="1000"></div>
+        <div class="f"><label for="nh-cost">平均成本</label><input id="nh-cost" inputmode="decimal"></div>
+        <div class="f"><label for="nh-px">現價</label><input id="nh-px" inputmode="decimal"></div>
+        <div class="f" style="justify-content:flex-end"><button class="btn primary" data-act="addH">加入</button></div>
+      </div>
+      <p class="muted small" style="margin:10px 0 0">同一市場同代號已存在時，會改為更新那一筆。</p>
+    </div>
+    <details class="tool"><summary>批次更新現價</summary>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <p class="muted small" style="margin:0">一行一檔：代號 空白 價格。例如<br><code>2330 2500</code><br><code>NVDA 233.95</code></p>
+        <textarea class="box" id="bulkPx" placeholder="2330 2500&#10;NVDA 233.95"></textarea>
+        <label class="row small"><input type="checkbox" id="bulkAll" checked> 同時更新其他客戶的同代號持股</label>
+        <div class="row"><button class="btn primary" data-act="bulkPx">更新現價</button></div>
+        <p class="muted small" style="margin:0">也可以在 Claude Code 對話裡說「幫我更新客戶管理台的股價」，Claude 會抓最新收盤價寫進來。</p>
+      </div></details>
+    <details class="tool"><summary>從試算表貼上匯入持股</summary>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <p class="muted small" style="margin:0">欄位順序：市場, 代號, 名稱, 產業, 股數, 平均成本, 現價（逗號或 Tab 分隔，可直接從 Excel/Google Sheet 複製）。已存在的代號會被更新，其餘新增。</p>
+        <textarea class="box" id="csvIn" placeholder="TW,2330,台積電,半導體,3000,1100,2500&#10;US,NVDA,輝達,IC 設計,300,120,233.95"></textarea>
+        <div class="row"><button class="btn primary" data-act="importCsv">匯入</button></div>
+      </div></details>`;
+}
+function saveHoldings(cid, holdings, extra = {}) {
+  const c = S.clients[cid]; S.clients[cid] = { ...c, holdings, ...extra }; render();
+  return write('clients/' + cid, ref => ref.update({ holdings, ...extra }));
+}
+function upsertHolding(list, h) {
+  const i = list.findIndex(x => x.m === h.m && String(x.t).toUpperCase() === String(h.t).toUpperCase());
+  if (i >= 0) { list[i] = { ...list[i], ...Object.fromEntries(Object.entries(h).filter(([k, v]) => k !== 'id' && v !== '' && v != null)) }; return 'upd'; }
+  list.push({ id: uid(), ...h }); return 'add';
+}
+const nowStamp = () => { const d = new Date(); return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
+
+/* ---------- months (month-end close) ---------- */
+function tabMonths(b, cid) {
+  const c = S.clients[cid]; const s = series(cid); const v = valuate(c);
+  const f = S.closeForm && S.closeForm.cid === cid ? S.closeForm : null;
+  const m = f?.m || defaultCloseMonth();
+  const ex = (S.months[cid] || []).find(d => d.id === m);
+  const bm = S.bench[m] || {};
+  const val = f?.value ?? (ex ? ex.value : Math.round(v.total));
+  b.innerHTML = `
+    <div class="panel"><h2>${ex ? '修改月結' : '建立月結'} <span class="r small muted">每月一筆，報酬率以修正 Dietz 法計算（出入金視為月中發生）</span></h2>
+      <div class="form">
+        <div class="f"><label for="cf-m">月份</label><input type="month" id="cf-m" value="${m}"></div>
+        <div class="f"><label for="cf-v">月底總資產 (NT$)</label><input id="cf-v" inputmode="decimal" value="${val}"><span class="hint">預設為目前持股即時估值 ${money(v.total)}</span></div>
+        <div class="f"><label for="cf-f">當月淨入金 (NT$)</label><input id="cf-f" inputmode="decimal" value="${f?.flow ?? (ex ? ex.flow : 0)}"><span class="hint">入金填正數、出金填負數；第一個月請填初始資金</span></div>
+        <div class="f"><label for="cf-fx">月底 USD/TWD</label><input id="cf-fx" inputmode="decimal" value="${f?.fx ?? (bm.fx || ex?.fx || S.settings.fx || '')}"></div>
+        <div class="f"><label for="cf-ti">加權指數月底收盤</label><input id="cf-ti" inputmode="decimal" value="${f?.taiex ?? (bm.taiex || '')}"><span class="hint">所有客戶共用</span></div>
+        <div class="f"><label for="cf-sp">S&amp;P 500 月底收盤</label><input id="cf-sp" inputmode="decimal" value="${f?.spx ?? (bm.spx || '')}"></div>
+        <div class="f wide"><label class="row"><input type="checkbox" id="cf-snap" ${!ex || !ex.holdings ? 'checked' : ''}> 以目前持股與現金存成這個月的持股快照（月報的配置、前十大持股都取自快照）</label></div>
+      </div>
+      <div class="row" style="margin-top:12px"><button class="btn primary" data-act="saveClose">${ex ? '更新' : '儲存'} ${esc(m)} 月結</button>${f ? '<button class="btn ghost" data-act="cancelClose">清除表單</button>' : ''}</div>
+      ${!S.bench[addM(m, -1)] ? `<p class="note warn" style="margin:12px 0 0">缺少 ${addM(m, -1)} 的基準指數，這個月的比較基準報酬會顯示「—」。到「設定與基準指數」補上即可。</p>` : ''}
+    </div>
+    <div class="panel"><h2>月結紀錄</h2>
+      ${s.length ? `<div class="tw"><table class="t"><thead><tr><th>月份</th><th class="n">月底資產</th><th class="n">淨入出金</th><th class="n">月報酬</th><th class="n">單位淨值</th><th class="n">基準報酬</th><th>持股快照</th><th></th></tr></thead><tbody>
+      ${s.slice().reverse().map(x => `<tr><td><b>${x.m}</b></td><td class="n">${nf0.format(Math.round(x.value))}</td><td class="n">${signed(x.flow)}</td><td class="n ${cls(x.r)}">${pct(x.r)}</td><td class="n">${x.unit.toFixed(4)}</td><td class="n ${cls(x.br)}">${pct(x.br)}</td>
+        <td>${x.doc.holdings ? `<span class="chip ok">${x.doc.holdings.length} 檔</span>` : '<span class="muted small">無</span>'}</td>
+        <td><div class="row" style="flex-wrap:nowrap"><button class="btn ghost" data-act="editClose" data-m="${x.m}">編輯</button><button class="btn ghost" data-act="openReport" data-m="${x.m}">月報</button>${S.confirmDel === 'm:' + x.m ? `<button class="btn danger" data-act="delMonthYes" data-m="${x.m}">確定刪除</button>` : `<button class="btn ghost danger" data-act="delMonth" data-m="${x.m}">刪除</button>`}</div></td></tr>`).join('')}
+      </tbody></table></div>` : '<p class="muted">還沒有月結紀錄。第一筆請填「初始資金」為當月淨入金，之後每月底記一次。過去的月份也可以補登（只填月底資產與出入金，不勾快照）。</p>'}
+    </div>`;
+}
+function readCloseForm(cid) {
+  return { cid, m: $('#cf-m').value, value: $('#cf-v').value, flow: $('#cf-f').value, fx: $('#cf-fx').value, taiex: $('#cf-ti').value, spx: $('#cf-sp').value, snap: $('#cf-snap').checked };
+}
+async function saveClose(cid) {
+  const f = readCloseForm(cid);
+  if (!/^\d{4}-\d{2}$/.test(f.m)) return toast('請選擇月份');
+  const value = numIn(f.value); if (value <= 0) return toast('月底總資產需大於 0');
+  const c = S.clients[cid]; const ex = (S.months[cid] || []).find(d => d.id === f.m);
+  const fx = numIn(f.fx) || +S.settings.fx || 0;
+  const doc = { value, flow: numIn(f.flow), fx, commentary: ex?.commentary || '', closedAt: new Date().toISOString() };
+  if (f.snap) { Object.assign(doc, { holdings: (c.holdings || []).map(({ m, t, n, sec, sh, cost, px }) => ({ m, t, n: n || '', sec: sec || '', sh: +sh || 0, cost: +cost || 0, px: +px || 0 })), cashTWD: +c.cashTWD || 0, cashUSD: +c.cashUSD || 0 }); }
+  else if (ex?.holdings) Object.assign(doc, { holdings: ex.holdings, cashTWD: ex.cashTWD, cashUSD: ex.cashUSD });
+  const ti = numIn(f.taiex), sp = numIn(f.spx);
+  S.closeForm = null;
+  await write(`clients/${cid}/months/${f.m}`, ref => ref.set(doc));
+  if (ti || sp || numIn(f.fx)) {
+    const row = { ...(S.bench[f.m] || {}), ...(ti ? { taiex: ti } : {}), ...(sp ? { spx: sp } : {}), ...(numIn(f.fx) ? { fx } : {}) };
+    await saveBenchRows({ [f.m]: row });
+  }
+  toast(`${f.m} 月結已儲存`);
+}
+async function saveBenchRows(rows) {
+  S.bench = { ...S.bench, ...rows };
+  const exists = S.benchExists; S.benchExists = true;
+  return write('settings/bench', ref => exists ? ref.update({ rows }) : ref.set({ rows: S.bench }));
+}
+
+/* ---------- report ---------- */
+function tabReport(b, cid) {
+  const s = series(cid);
+  if (!s.length) { b.innerHTML = `<div class="empty"><h2>還沒有可出報告的月份</h2><p>月報以月結資料編製。先到「月結紀錄」建立一筆月結。</p><button class="btn primary" data-act="tab" data-tab="months">去建立月結</button></div>`; return; }
+  if (!S.reportMonth || !s.some(x => x.m === S.reportMonth)) S.reportMonth = s[s.length - 1].m;
+  const k = s.findIndex(x => x.m === S.reportMonth); const d = s[k].doc;
+  b.innerHTML = `
+    <div class="panel"><div class="form" style="align-items:end">
+      <div class="f"><label for="rp-m">報告月份</label><select id="rp-m">${s.slice().reverse().map(x => `<option value="${x.m}" ${x.m === S.reportMonth ? 'selected' : ''}>${mLabel(x.m)}</option>`).join('')}</select></div>
+      <div class="f" style="grid-column:span 2"><div class="row"><button class="btn primary" data-act="pdf" id="btnPdf">下載 PDF 月報</button><button class="btn" data-act="draft" id="btnDraft">請 Claude 草擬評論</button></div></div>
+      <div class="f wide"><label for="rp-c">經理人評論（會印在月報第 2 頁，自動儲存）</label><textarea id="rp-c" rows="7" placeholder="本月市場回顧、組合表現與主要調整、下月觀察重點…">${esc(d.commentary || '')}</textarea><span class="hint" id="rp-cs"></span></div>
+    </div>
+    ${!d.holdings ? '<p class="note warn" style="margin:12px 0 0">這個月沒有持股快照，月報的配置與前十大持股會留白。若要補上，到「月結紀錄」編輯這個月並勾選快照。</p>' : ''}
+    <p class="note warn" id="ovf" style="margin:12px 0 0" hidden>評論超出第 2 頁可用空間，PDF 會被截斷，請精簡文字。</p>
+    </div>
+    <div class="sheets" id="report">${reportHTML(cid, S.reportMonth)}</div>`;
+  drawReportCharts(cid, S.reportMonth);
+}
+function reportHTML(cid, m) {
+  const c = S.clients[cid]; const s = series(cid); const k = s.findIndex(x => x.m === m); const x = s[k]; const d = x.doc;
+  const st = stats(s, k, S.settings.rf); const fx = +d.fx || +S.settings.fx || 0;
+  const intl = S.settings.updown === 'intl' ? ' intl' : '';
+  const firm = esc(S.settings.firm || '我的投資管理'); const mgr = esc(S.settings.manager || '');
+  const asOf = `${m.replace('-', '/')}/${lastDay(m)}`;
+  const snap = d.holdings ? valuate({ holdings: d.holdings, cashTWD: d.cashTWD, cashUSD: d.cashUSD }, fx) : null;
+  const flows = s.slice(0, k + 1).reduce((a, y) => a + y.flow, 0);
+  const P = st.P, B = st.B;
+  const prow = (label, o, cl = '') => `<tr class="${cl}"><td>${label}</td>${['m1', 'm3', 'm6', 'ytd', 'y1', 'si', 'ann'].map(key => `<td class="${cl ? pcls(o[key]) : ''}">${pct(o[key])}</td>`).join('')}</tr>`;
+  const ex = {}; ['m1', 'm3', 'm6', 'ytd', 'y1', 'si', 'ann'].forEach(key => ex[key] = ok(P[key]) && ok(B[key]) ? P[key] - B[key] : null);
+  // sectors
+  let secs = [];
+  if (snap) { const g = {}; snap.rows.forEach(r => { const key = r.sec || '未分類'; g[key] = (g[key] || 0) + r.w; }); secs = Object.entries(g).sort((a, b) => b[1] - a[1]); if (secs.length > 7) { const rest = secs.slice(6).reduce((a, e) => a + e[1], 0); secs = [...secs.slice(0, 6), ['其他', rest]]; } }
+  const maxSec = secs.length ? Math.max(...secs.map(e => e[1])) : 1;
+  // calendar
+  const years = [...new Set(s.slice(0, k + 1).map(y => y.m.slice(0, 4)))];
+  const cal = years.map(y => { const row = []; for (let i = 1; i <= 12; i++) { const mm = `${y}-${String(i).padStart(2, '0')}`; const e = s.slice(0, k + 1).find(z => z.m === mm); row.push(e ? e.r : null); } return { y, row, full: chain(row.filter(v => v != null)) }; });
+  const foot = n => `<div class="foot"><span>${firm} ・ 僅供 ${esc(c.name)} 本人參閱</span><span>${n} / 2</span></div>`;
+  const comm = (d.commentary || '').trim();
+  return `
+  <div class="sheet"><div class="page${intl}" id="pg1">
+    <div class="band"><div><div class="firm">${firm.toUpperCase()}</div><h1>投資組合月報<small>MONTHLY FACTSHEET</small></h1></div>
+      <div class="who"><b>${esc(c.name)}</b>${esc(c.code || '')} ・ ${mLabel(m)}<br>資料截至 ${asOf}</div></div>
+    <div class="facts">
+      <div><div class="k">月底總資產</div><div class="v">${moneyShort(x.value)}</div></div>
+      <div><div class="k">單位淨值</div><div class="v">${x.unit.toFixed(4)}</div></div>
+      <div><div class="k">本月報酬</div><div class="v ${pcls(x.r)}">${pct(x.r)}</div></div>
+      <div><div class="k">今年以來</div><div class="v ${pcls(P.ytd)}">${pct(P.ytd)}</div></div>
+      <div><div class="k">成立以來</div><div class="v ${pcls(P.si)}">${pct(P.si)}</div></div>
+      <div><div class="k">累計投資損益</div><div class="v ${pcls(x.value - flows)}">${moneyShort(x.value - flows)}</div></div>
+    </div>
+    <div class="two">
+      <div><h3>淨值走勢<span>起始單位淨值 10.00</span></h3><canvas id="rpNav"></canvas>
+        <div class="legend2"><span><i style="border-color:#0d5c51"></i>投資組合</span><span><i style="border-color:#85918d;border-top-style:dashed"></i>比較基準</span></div></div>
+      <div><h3>組合概況</h3><table class="kv"><tbody>
+        <tr><td>委託起始</td><td>${esc(c.start || s[0].m)}</td></tr>
+        <tr><td>風險屬性</td><td>${esc(c.risk || '—')}</td></tr>
+        <tr><td>投資範圍</td><td>台灣及美國上市股票、ETF</td></tr>
+        <tr><td>計價幣別</td><td>新台幣（美股以月底匯率 ${fx ? fx.toFixed(2) : '—'} 換算）</td></tr>
+        <tr><td>比較基準</td><td>${esc(benchName(c))}</td></tr>
+        <tr><td>持股檔數</td><td>${snap ? snap.rows.length + ' 檔' : '—'}</td></tr>
+        ${mgr ? `<tr><td>投資經理人</td><td>${mgr}</td></tr>` : ''}
+      </tbody></table></div>
+    </div>
+    <div><h3>績效表現<span>時間加權報酬率，已排除資金進出影響</span></h3>
+      <table><thead><tr><th></th><th>1 個月</th><th>3 個月</th><th>6 個月</th><th>今年以來</th><th>1 年</th><th>成立以來</th><th>年化</th></tr></thead><tbody>
+        ${prow('投資組合', P, 'hl')}${prow('比較基準', B)}${prow('超額報酬', ex)}
+      </tbody></table>
+      <div style="font-size:9px;color:#85918d;margin-top:4px">「—」表示期間未滿或缺少資料；未滿 12 個月不計算年化報酬。</div></div>
+    <div class="two eq">
+      <div><h3>資產配置</h3>${snap ? `<div style="display:flex;gap:22px;align-items:center"><canvas id="rpDonut"></canvas><div class="lg" style="flex:1">
+        ${[['台股', snap.tw, '#2a78d6'], ['美股', snap.us, '#eb6834'], ['現金', snap.cash, '#9aa5a1']].map(p => `<div><i style="background:${p[2]}"></i>${p[0]}<b>${pct(snap.total ? p[1] / snap.total : 0, 1, false)}</b></div>`).join('')}
+        </div></div>` : '<div class="nodata">此月無持股快照</div>'}</div>
+      <div><h3>產業配置<span>占總資產</span></h3>${secs.length ? `<div class="bars">${secs.map(([n2, w]) => `<div class="bar"><span>${esc(n2)}</span><div class="tr"><div class="fl" style="width:${(w / maxSec * 100).toFixed(1)}%"></div></div><span>${pct(w, 1, false)}</span></div>`).join('')}</div>` : '<div class="nodata">此月無持股快照</div>'}</div>
+    </div>
+    <div><h3>月報酬率<span>%</span></h3><table class="cal"><thead><tr><th>年度</th>${[...Array(12)].map((_, i) => `<th>${i + 1} 月</th>`).join('')}<th>全年</th></tr></thead><tbody>
+      ${cal.map(r => `<tr><td>${r.y}</td>${r.row.map(v => `<td class="${pcls(v)}">${ok(v) ? (v * 100).toFixed(2) : ''}</td>`).join('')}<td class="${pcls(r.full)}" style="font-weight:600">${ok(r.full) ? (r.full * 100).toFixed(2) : ''}</td></tr>`).join('')}
+    </tbody></table></div>
+    ${foot(1)}
+  </div></div>
+  <div class="sheet"><div class="page${intl}" id="pg2">
+    <div class="slim"><b>投資組合月報</b><span>${esc(c.name)} ・ ${mLabel(m)}</span></div>
+    <div class="two">
+      <div><h3>前十大持股<span>占總資產</span></h3>${snap ? `<table><thead><tr><th>名稱</th><th class="l">代號</th><th class="l">市場</th><th class="l">產業</th><th>權重</th></tr></thead><tbody>
+        ${snap.rows.slice(0, 10).map(r => `<tr><td>${esc(r.n || r.t)}</td><td class="l">${esc(r.t)}</td><td class="l">${r.m === 'US' ? '美股' : '台股'}</td><td class="l">${esc(r.sec || '—')}</td><td>${pct(r.w, 1, false)}</td></tr>`).join('')}
+        <tr class="hl"><td>前十大合計</td><td></td><td></td><td></td><td>${pct(snap.rows.slice(0, 10).reduce((a, r) => a + r.w, 0), 1, false)}</td></tr></tbody></table>` : '<div class="nodata">此月無持股快照</div>'}</div>
+      <div><h3>風險指標<span>${st.n} 個月資料</span></h3><table class="kv"><tbody>
+        <tr><td>年化波動度</td><td>${pct(st.vol, 2, false)}</td></tr>
+        <tr><td>夏普比率</td><td>${ok(st.sharpe) ? st.sharpe.toFixed(2) : '—'}</td></tr>
+        <tr><td>最大回撤</td><td>${pct(st.mdd)}</td></tr>
+        <tr><td>最佳單月</td><td>${pct(st.best)}</td></tr>
+        <tr><td>最差單月</td><td>${pct(st.worst)}</td></tr>
+        <tr><td>正報酬月份</td><td>${Math.round(st.win * st.n)} / ${st.n}</td></tr>
+      </tbody></table><div style="font-size:9px;color:#85918d;margin-top:4px">夏普比率無風險利率以年 ${(+S.settings.rf || 0).toFixed(2)}% 計；未滿 12 個月以月均報酬 ×12 年化。</div></div>
+    </div>
+    <div><h3>資金與損益<span>新台幣</span></h3><table><thead><tr><th></th><th>本月淨入出金</th><th>累計淨投入</th><th>月底總資產</th><th>累計投資損益</th></tr></thead><tbody>
+      <tr><td>金額</td><td>${signed(x.flow)}</td><td>${nf0.format(Math.round(flows))}</td><td>${nf0.format(Math.round(x.value))}</td><td class="${pcls(x.value - flows)}">${signed(x.value - flows)}</td></tr></tbody></table></div>
+    <div class="comm" id="rpComm"><h3>經理人評論${mgr ? `<span>${mgr}</span>` : ''}</h3>${comm ? comm.split(/\n\s*\n/).map(p => `<p>${esc(p.trim())}</p>`).join('') : '<p style="color:#85918d">（尚未撰寫本月評論）</p>'}</div>
+    <div class="disc">重要聲明：本報告僅提供予上述客戶參考，內容依截至報告日之帳戶資料編製，未經會計師查核。過去績效不代表未來表現；投資涉及風險，資產價值可能上下波動，客戶可能損失部分或全部本金。報酬率採時間加權（修正 Dietz 法）逐月計算並連乘，已排除客戶資金進出之影響；美股部位以月底匯率換算新台幣；比較基準為價格指數，未含股利再投入。</div>
+    ${foot(2)}
+  </div></div>`;
+}
+function drawReportCharts(cid, m) {
+  const s = series(cid); const k = s.findIndex(x => x.m === m); if (k < 0) return;
+  const sub = s.slice(0, k + 1);
+  const nav = $('#rpNav');
+  if (nav) drawLine(nav, { width: 400, height: 190, scale: 3, fs: 10, labels: [addM(sub[0].m, -1), ...sub.map(x => x.m)].map(mm => mm.slice(2).replace('-', '/')),
+    colors: { grid: '#e3e9e7', text: '#85918d', surface: '#ffffff' }, yFmt: v => v.toFixed(1),
+    series: [{ values: [10, ...sub.map(x => x.unit)], color: '#0d5c51' }, { values: [10, ...sub.map(x => x.bunit)], color: '#85918d', dash: [5, 4] }] });
+  const dn = $('#rpDonut'); const d = s[k].doc;
+  if (dn && d.holdings) { const v = valuate({ holdings: d.holdings, cashTWD: d.cashTWD, cashUSD: d.cashUSD }, +d.fx || +S.settings.fx); drawDonut(dn, { size: 128, scale: 3, surface: '#ffffff', ink: '#17221f', ink2: '#85918d', center: [moneyShort(v.total), '總資產 NT$'], parts: [{ v: v.tw, color: '#2a78d6' }, { v: v.us, color: '#eb6834' }, { v: v.cash, color: '#9aa5a1' }] }); }
+  checkOverflow();
+}
+function checkOverflow() { const c = $('#rpComm'); const o = $('#ovf'); if (c && o) o.hidden = !(c.scrollHeight > c.clientHeight + 2); }
+async function exportPdf(cid) {
+  const btn = $('#btnPdf'); const c = S.clients[cid]; const m = S.reportMonth;
+  const dl = await window.claude?.use?.('downloads');
+  if (!dl) return toast('這個檢視無法下載檔案，請在 claude.ai 開啟此頁面');
+  if (!window.html2canvas || !window.jspdf) return toast('PDF 元件未載入，請重新整理頁面');
+  btn.disabled = true; btn.textContent = '產生 PDF 中…';
+  try {
+    await document.fonts.ready;
+    const pdf = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
+    const pages = [...document.querySelectorAll('#report .page')];
+    for (let i = 0; i < pages.length; i++) {
+      const canvas = await window.html2canvas(pages[i], { scale: 2, backgroundColor: '#ffffff', logging: false, useCORS: true });
+      if (i) pdf.addPage();
+      pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 210, 297);
+    }
+    await dl.save({ filename: `${c.name}_${m}_投資月報.pdf`, data: pdf.output('blob') });
+    toast('PDF 已下載');
+  } catch (e) {
+    if (e && e.code === 'declined') toast('已取消下載');
+    else { console.error(e); toast('PDF 產生失敗：' + (e && e.message || e)); }
+  } finally { btn.disabled = false; btn.textContent = '下載 PDF 月報'; }
+}
+async function draftCommentary(cid) {
+  const sample = await window.claude?.use?.('sample');
+  if (!sample) return toast('這個檢視無法使用 Claude 草擬');
+  const s = series(cid); const m = S.reportMonth; const k = s.findIndex(x => x.m === m); const x = s[k]; const st = stats(s, k, S.settings.rf); const c = S.clients[cid];
+  const snap = x.doc.holdings ? valuate({ holdings: x.doc.holdings, cashTWD: x.doc.cashTWD, cashUSD: x.doc.cashUSD }, +x.doc.fx || +S.settings.fx) : null;
+  const prev = k > 0 && s[k - 1].doc.holdings ? s[k - 1].doc.holdings.map(h => h.t) : null;
+  const facts = [
+    `報告月份：${mLabel(m)}`,
+    `本月組合報酬 ${pct(x.r)}，比較基準（${benchName(c)}）${pct(x.br)}`,
+    `今年以來 ${pct(st.P.ytd)}（基準 ${pct(st.B.ytd)}）；成立以來 ${pct(st.P.si)}（基準 ${pct(st.B.si)}）`,
+    `本月淨入出金 NT$ ${signed(x.flow)}`,
+    snap ? `資產配置：台股 ${pct(snap.tw / snap.total, 1, false)}、美股 ${pct(snap.us / snap.total, 1, false)}、現金 ${pct(snap.cash / snap.total, 1, false)}` : '',
+    snap ? `前五大持股：${snap.rows.slice(0, 5).map(r => `${r.n || r.t}(${r.t}) ${pct(r.w, 1, false)}，持有報酬 ${pct(r.plPct, 1)}`).join('；')}` : '',
+    snap && prev ? `本月新增持股：${snap.rows.filter(r => !prev.includes(r.t)).map(r => r.n || r.t).join('、') || '無'}；本月出清：${prev.filter(t => !snap.rows.some(r => r.t === t)).join('、') || '無'}` : '',
+    S.bench[m] && S.bench[addM(m, -1)] ? `加權指數 ${S.bench[addM(m, -1)].taiex} → ${S.bench[m].taiex}；S&P 500 ${S.bench[addM(m, -1)].spx} → ${S.bench[m].spx}；USD/TWD ${S.bench[addM(m, -1)].fx} → ${S.bench[m].fx}` : '',
+  ].filter(Boolean).join('\n');
+  const prompt = `你是一位代客操作的投資經理人，要為客戶的投資組合月報撰寫「經理人評論」。
+請用繁體中文、專業但平實的語氣，寫 3 段、總共 220 到 300 字：
+1. 市場回顧：只能根據下面提供的指數與匯率數字描述；具體的市場事件你不知道，請用「[待補：本月主要市場事件]」標記讓經理人自行填入，絕對不要編造新聞、數據或事件。
+2. 組合表現：說明本月與比較基準的差距，以及配置與主要持股的貢獻方向。
+3. 後續佈局：描述配置原則與風險控管，不承諾報酬、不預測點位。
+段落之間空一行。只輸出評論本文，不要標題、不要問候語。
+
+資料：
+${facts}`;
+  const ta = $('#rp-c'); const btn = $('#btnDraft');
+  btn.disabled = true; btn.textContent = 'Claude 撰寫中…';
+  try {
+    const res = await sample(prompt, { onText: ({ text }) => { ta.value = text; syncComm(text); } });
+    ta.value = res.text.trim(); syncComm(ta.value); saveComm(cid, m, ta.value);
+  } catch (e) {
+    if (e && e.text) { ta.value = e.text; syncComm(e.text); }
+    toast(e && e.code === 'not_granted' ? '未允許使用 Claude' : e && e.code === 'rate_limited' ? '請稍後再試' : '草擬失敗：' + (e && e.message || e));
+  } finally { btn.disabled = false; btn.textContent = '請 Claude 草擬評論'; }
+}
+function syncComm(text) {
+  const box = $('#rpComm'); if (!box) return;
+  const h = box.querySelector('h3').outerHTML; const t = text.trim();
+  box.innerHTML = h + (t ? t.split(/\n\s*\n/).map(p => `<p>${esc(p.trim())}</p>`).join('') : '<p style="color:#85918d">（尚未撰寫本月評論）</p>');
+  checkOverflow();
+}
+let commTimer = null;
+function saveComm(cid, m, text) {
+  clearTimeout(commTimer);
+  const ms = S.months[cid] || []; const d = ms.find(x => x.id === m); if (d) d.commentary = text;
+  $('#rp-cs') && ($('#rp-cs').textContent = '儲存中…');
+  write(`clients/${cid}/months/${m}`, ref => ref.update({ commentary: text })).then(() => { $('#rp-cs') && ($('#rp-cs').textContent = '已儲存'); });
+}
+
+/* ---------- client form ---------- */
+function renderClientForm(m, cid) {
+  const c = cid ? S.clients[cid] : { benchTW: 50, mgmtFee: 1, perfFee: 10, risk: '穩健型', start: ymOf(new Date()) };
+  const nextCode = 'C' + String(Object.keys(S.clients).filter(id => !S.clients[id].demo).length + 1).padStart(3, '0');
+  m.innerHTML = `
+    ${cid ? '' : '<div class="head"><h1>新增客戶</h1></div>'}
+    <div class="panel"><h2>${cid ? '客戶資料' : '基本資料'}</h2>
+      <div class="form">
+        <div class="f"><label for="cl-name">客戶姓名或稱呼</label><input id="cl-name" value="${esc(c.name || '')}" placeholder="王先生"></div>
+        <div class="f"><label for="cl-code">客戶代號</label><input id="cl-code" value="${esc(c.code || nextCode)}"></div>
+        <div class="f"><label for="cl-start">委託起始月份</label><input type="month" id="cl-start" value="${esc(c.start || '')}"></div>
+        <div class="f"><label for="cl-risk">風險屬性</label><select id="cl-risk">${['保守型', '穩健型', '積極型'].map(r => `<option ${c.risk === r ? 'selected' : ''}>${r}</option>`).join('')}</select></div>
+        <div class="f"><label for="cl-mg">管理費（年 %）</label><input id="cl-mg" inputmode="decimal" value="${c.mgmtFee ?? ''}"></div>
+        <div class="f"><label for="cl-pf">績效分潤（%）</label><input id="cl-pf" inputmode="decimal" value="${c.perfFee ?? ''}"><span class="hint">只對超過高水位的部分計算</span></div>
+        <div class="f"><label for="cl-bw">比較基準中台股權重（%）</label><input id="cl-bw" inputmode="decimal" value="${c.benchTW ?? 50}"><span class="hint">其餘為 S&amp;P 500（換算新台幣）</span></div>
+        <div class="f"><label for="cl-btw">台股券商／帳號末四碼</label><input id="cl-btw" value="${esc(c.brokerTW || '')}" placeholder="元大 ****1234"></div>
+        <div class="f"><label for="cl-bus">美股券商／帳號末四碼</label><input id="cl-bus" value="${esc(c.brokerUS || '')}" placeholder="複委託 或 Firstrade"></div>
+        <div class="f wide"><label for="cl-note">備註（只有你看得到，不會出現在月報）</label><textarea id="cl-note" rows="3">${esc(c.note || '')}</textarea></div>
+      </div>
+      <p class="note" style="margin:12px 0 0">這裡刻意不放密碼欄位。券商帳密請存在密碼管理器（例如 1Password、Bitwarden），帳號只記末四碼即可辨識。</p>
+      <div class="row" style="margin-top:12px"><button class="btn primary" data-act="saveClient" data-id="${cid || ''}">${cid ? '儲存變更' : '建立客戶'}</button>${cid ? '' : '<button class="btn ghost" data-act="home">取消</button>'}</div>
+    </div>
+    ${cid ? `<div class="panel"><h2>刪除客戶</h2>
+      ${S.confirmDel === 'c:' + cid ? `<p style="margin:0 0 10px">確定刪除「${esc(c.name)}」？會一併刪除 ${(S.months[cid] || []).length} 筆月結紀錄，無法復原。</p><div class="row"><button class="btn danger" data-act="delClientYes" data-id="${cid}">確定刪除</button><button class="btn ghost" data-act="cancelDel">取消</button></div>`
+        : `<button class="btn danger" data-act="delClient" data-id="${cid}">刪除這位客戶</button>`}</div>` : ''}`;
+}
+async function saveClient(cid) {
+  const g = id => $('#' + id).value.trim();
+  const data = { name: g('cl-name'), code: g('cl-code'), start: g('cl-start'), risk: g('cl-risk'), mgmtFee: numIn(g('cl-mg')), perfFee: numIn(g('cl-pf')), benchTW: Math.min(100, Math.max(0, numIn(g('cl-bw')))), brokerTW: g('cl-btw'), brokerUS: g('cl-bus'), note: g('cl-note') };
+  if (!data.name) return toast('請填客戶姓名或稱呼');
+  if (cid) { S.clients[cid] = { ...S.clients[cid], ...data }; await write('clients/' + cid, ref => ref.update(data)); toast('已儲存'); render(); return; }
+  const ref = S.db.collection('clients').doc(); const id = ref.id;
+  const full = { ...data, holdings: [], cashTWD: 0, cashUSD: 0, createdAt: new Date().toISOString() };
+  S.clients[id] = full; subMonths(id);
+  S.view = 'client'; S.sel = id; S.tab = 'holdings'; render();
+  await write('clients/' + id, r => r.set(full));
+  toast('已建立客戶，接著輸入持股');
+}
+async function deleteClient(cid) {
+  const ms = (S.months[cid] || []).map(d => d.id);
+  S.view = 'home'; S.sel = null; S.confirmDel = false;
+  const c = S.clients[cid]; delete S.clients[cid]; render();
+  for (const m of ms) await write(`clients/${cid}/months/${m}`, ref => ref.delete());
+  await write('clients/' + cid, ref => ref.delete());
+  if (S.monthSubs[cid]) { S.monthSubs[cid](); delete S.monthSubs[cid]; delete S.months[cid]; }
+  toast(`已刪除 ${c?.name || '客戶'}`);
+}
+
+/* ---------- settings ---------- */
+function renderSettings(m) {
+  const st = S.settings; const rows = Object.keys(S.bench).sort().reverse();
+  m.innerHTML = `
+    <div class="head"><h1>設定與基準指數</h1></div>
+    <div class="panel"><h2>月報抬頭與參數</h2>
+      <div class="form">
+        <div class="f"><label for="st-firm">工作室／品牌名稱（月報抬頭）</label><input id="st-firm" value="${esc(st.firm || '')}" placeholder="例如：Jake 資產管理"></div>
+        <div class="f"><label for="st-mgr">投資經理人</label><input id="st-mgr" value="${esc(st.manager || '')}"></div>
+        <div class="f"><label for="st-fx">目前 USD/TWD（即時估值用）</label><input id="st-fx" inputmode="decimal" value="${st.fx || ''}"></div>
+        <div class="f"><label for="st-rf">無風險利率（年 %，夏普比率用）</label><input id="st-rf" inputmode="decimal" value="${st.rf ?? 1.5}"></div>
+        <div class="f"><label for="st-ud">漲跌顏色</label><select id="st-ud"><option value="tw" ${st.updown !== 'intl' ? 'selected' : ''}>台灣慣例：紅漲綠跌</option><option value="intl" ${st.updown === 'intl' ? 'selected' : ''}>國際慣例：綠漲紅跌</option></select></div>
+      </div>
+      <div class="row" style="margin-top:12px"><button class="btn primary" data-act="saveSettings">儲存設定</button></div>
+    </div>
+    <div class="panel"><h2>基準指數月底收盤 <span class="r small muted">所有客戶共用；某月報酬需要該月與前一月兩筆</span></h2>
+      <details class="tool" style="margin-bottom:12px"><summary>批次貼上</summary><div style="display:flex;flex-direction:column;gap:10px">
+        <p class="muted small" style="margin:0">一行一月：月份 加權指數 S&amp;P500 USD/TWD，例如 <code>2026-09 47940.13 7651.54 31.85</code></p>
+        <textarea class="box" id="benchIn"></textarea><div class="row"><button class="btn primary" data-act="importBench">匯入</button></div></div></details>
+      ${rows.length ? `<div class="tw"><table class="t"><thead><tr><th>月份</th><th class="n">加權指數</th><th class="n">S&amp;P 500</th><th class="n">USD/TWD</th><th class="n">加權月變動</th><th class="n">S&amp;P 月變動（台幣）</th><th></th></tr></thead><tbody>
+        ${rows.map(r => { const a = S.bench[r], p = S.bench[addM(r, -1)]; const tw = p && a.taiex && p.taiex ? a.taiex / p.taiex - 1 : null; const us = p && a.spx && p.spx && a.fx && p.fx ? a.spx * a.fx / (p.spx * p.fx) - 1 : null;
+          return `<tr><td><b>${r}</b></td><td class="n">${price(a.taiex)}</td><td class="n">${price(a.spx)}</td><td class="n">${ok(a.fx) ? (+a.fx).toFixed(4) : '—'}</td><td class="n ${cls(tw)}">${pct(tw)}</td><td class="n ${cls(us)}">${pct(us)}</td>
+          <td>${S.confirmDel === 'b:' + r ? `<button class="btn danger" data-act="delBenchYes" data-m="${r}">確定刪除</button>` : `<button class="btn ghost danger" data-act="delBench" data-m="${r}">刪除</button>`}</td></tr>`; }).join('')}
+      </tbody></table></div>` : '<p class="muted">尚無資料。建立月結時填入，或用上方批次貼上。</p>'}
+    </div>`;
+}
+
+/* ---------------- events ---------------- */
+document.addEventListener('click', async e => {
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  const act = el.dataset.act, cid = S.sel;
+  if (act !== 'delMonthYes' && act !== 'delClientYes' && act !== 'delBenchYes' && !/^del/.test(act)) S.confirmDel = false;
+  switch (act) {
+    case 'home': S.view = 'home'; S.sel = null; render(); break;
+    case 'pick': S.view = 'client'; S.sel = el.dataset.id; S.tab = 'overview'; S.closeForm = null; S.reportMonth = null; render(); break;
+    case 'tab': S.tab = el.dataset.tab; render(); break;
+    case 'settings': S.view = 'settings'; render(); break;
+    case 'newClient': S.view = 'newClient'; render(); break;
+    case 'saveClient': saveClient(el.dataset.id || null); break;
+    case 'delClient': S.confirmDel = 'c:' + el.dataset.id; render(); break;
+    case 'delClientYes': deleteClient(el.dataset.id); break;
+    case 'cancelDel': S.confirmDel = false; render(); break;
+    case 'addH': {
+      const g = id => $('#' + id).value.trim();
+      const h = { m: g('nh-m'), t: g('nh-t').toUpperCase(), n: g('nh-n'), sec: g('nh-sec'), sh: numIn(g('nh-sh')), cost: numIn(g('nh-cost')), px: numIn(g('nh-px')) };
+      if (!h.t) return toast('請填代號');
+      const list = (S.clients[cid].holdings || []).map(x => ({ ...x }));
+      const r = upsertHolding(list, h); saveHoldings(cid, list); toast(r === 'add' ? `已加入 ${h.t}` : `已更新 ${h.t}`); break;
+    }
+    case 'delH': saveHoldings(cid, (S.clients[cid].holdings || []).filter(h => h.id !== el.dataset.h)); break;
+    case 'bulkPx': {
+      const lines = $('#bulkPx').value.split('\n').map(l => l.trim().split(/[\s,，\t]+/)).filter(p => p.length >= 2 && isFinite(parseFloat(p[1])));
+      if (!lines.length) return toast('沒有可辨識的「代號 價格」');
+      const map = Object.fromEntries(lines.map(p => [p[0].toUpperCase(), parseFloat(p[1])]));
+      const targets = $('#bulkAll').checked ? Object.keys(S.clients) : [cid];
+      let hit = 0; const seen = new Set();
+      for (const id of targets) {
+        const list = (S.clients[id].holdings || []).map(h => { const p = map[String(h.t).toUpperCase()]; if (p != null) { hit++; seen.add(String(h.t).toUpperCase()); return { ...h, px: p }; } return h; });
+        if (list.some((h, i) => h !== S.clients[id].holdings[i])) await saveHoldings(id, list, { pxAt: nowStamp() });
+      }
+      const miss = Object.keys(map).filter(t => !seen.has(t));
+      toast(`已更新 ${hit} 筆持股現價${miss.length ? `；找不到：${miss.join('、')}` : ''}`, 4000); break;
+    }
+    case 'importCsv': {
+      const rows = $('#csvIn').value.split('\n').map(l => l.split(/\t|,/).map(x => x.trim())).filter(r => r.length >= 5 && isFinite(parseFloat(String(r[4]).replace(/,/g, ''))));
+      if (!rows.length) return toast('沒有可辨識的資料列');
+      const list = (S.clients[cid].holdings || []).map(x => ({ ...x })); let a = 0, u = 0;
+      rows.forEach(r => { const m = /^us|美/i.test(r[0]) ? 'US' : 'TW'; const res = upsertHolding(list, { m, t: r[1].toUpperCase(), n: r[2], sec: r[3], sh: numIn(r[4]), cost: numIn(r[5] || 0), px: numIn(r[6] || 0) }); res === 'add' ? a++ : u++; });
+      saveHoldings(cid, list, { pxAt: nowStamp() }); toast(`新增 ${a} 筆、更新 ${u} 筆`); break;
+    }
+    case 'saveClose': saveClose(cid); break;
+    case 'cancelClose': S.closeForm = null; render(); break;
+    case 'editClose': { const d = (S.months[cid] || []).find(x => x.id === el.dataset.m); const bm = S.bench[d.id] || {}; S.closeForm = { cid, m: d.id, value: d.value, flow: d.flow, fx: bm.fx || d.fx, taiex: bm.taiex || '', spx: bm.spx || '' }; render(); $('#main').scrollTo?.(0, 0); window.scrollTo(0, 0); break; }
+    case 'openReport': S.reportMonth = el.dataset.m; S.tab = 'report'; render(); break;
+    case 'delMonth': S.confirmDel = 'm:' + el.dataset.m; render(); break;
+    case 'delMonthYes': { const m = el.dataset.m; S.confirmDel = false; S.months[cid] = (S.months[cid] || []).filter(d => d.id !== m); render(); await write(`clients/${cid}/months/${m}`, ref => ref.delete()); toast(`已刪除 ${m} 月結`); break; }
+    case 'pdf': exportPdf(cid); break;
+    case 'draft': draftCommentary(cid); break;
+    case 'saveSettings': {
+      const data = { firm: $('#st-firm').value.trim(), manager: $('#st-mgr').value.trim(), fx: numIn($('#st-fx').value), rf: numIn($('#st-rf').value), updown: $('#st-ud').value };
+      S.settings = { ...S.settings, ...data }; const exists = S.settingsExists; S.settingsExists = true;
+      await write('settings/main', ref => exists ? ref.update(data) : ref.set(data)); toast('設定已儲存'); render(); break;
+    }
+    case 'importBench': {
+      const rows = {}; $('#benchIn').value.split('\n').forEach(l => { const p = l.trim().split(/[\s,\t]+/); if (/^\d{4}[-/]\d{1,2}$/.test(p[0] || '') && p.length >= 4) { const [y, mo] = p[0].split(/[-/]/); rows[`${y}-${mo.padStart(2, '0')}`] = { taiex: numIn(p[1]), spx: numIn(p[2]), fx: numIn(p[3]) }; } });
+      if (!Object.keys(rows).length) return toast('格式：2026-09 47940.13 7651.54 31.85');
+      await saveBenchRows(rows); toast(`已匯入 ${Object.keys(rows).length} 個月`); render(); break;
+    }
+    case 'delBench': S.confirmDel = 'b:' + el.dataset.m; render(); break;
+    case 'delBenchYes': { const m = el.dataset.m; S.confirmDel = false; const rows = { ...S.bench }; delete rows[m]; S.bench = rows; render(); await write('settings/bench', ref => ref.set({ rows })); break; }
+  }
+});
+document.addEventListener('change', e => {
+  const el = e.target, cid = S.sel;
+  if (el.dataset.h && el.dataset.k) {
+    const k = el.dataset.k; const val = ['sh', 'cost', 'px'].includes(k) ? numIn(el.value) : el.value.trim();
+    const list = (S.clients[cid].holdings || []).map(h => h.id === el.dataset.h ? { ...h, [k]: val } : h);
+    saveHoldings(cid, list, k === 'px' ? { pxAt: nowStamp() } : {});
+  } else if (el.dataset.cash) {
+    const data = { [el.dataset.cash]: numIn(el.value) }; S.clients[cid] = { ...S.clients[cid], ...data }; render();
+    write('clients/' + cid, ref => ref.update(data));
+  } else if (el.id === 'cf-m') {
+    S.closeForm = { cid, m: el.value }; render();
+  } else if (el.id === 'rp-m') {
+    S.reportMonth = el.value; render();
+  }
+});
+document.addEventListener('input', e => {
+  if (e.target.id === 'rp-c') {
+    const t = e.target.value; syncComm(t); $('#rp-cs').textContent = '編輯中…';
+    clearTimeout(commTimer); const cid = S.sel, m = S.reportMonth; commTimer = setTimeout(() => saveComm(cid, m, t), 900);
+  }
+});
+let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (S.view === 'client' && S.tab === 'overview' && S.sel) drawNav(S.sel, series(S.sel)); }, 150); });
+const redrawTheme = () => { if (S.view === 'client' && S.tab === 'overview') render(); };
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', redrawTheme);
+new MutationObserver(redrawTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+/* ---------------- subscriptions ---------------- */
+function subMonths(cid) {
+  if (S.monthSubs[cid]) return;
+  S.monthSubs[cid] = S.db.collection(`clients/${cid}/months`).onSnapshot(snap => {
+    S.months[cid] = snap.docs.filter(d => /^\d{4}-\d{2}$/.test(d.id)).map(d => ({ id: d.id, ...d.data() })).sort((a, b) => a.id.localeCompare(b.id));
+    render();
+  }, err => console.error(err));
+}
+async function boot() {
+  render();
+  const db = window.claude?.use ? await window.claude.use('db') : null;
+  if (!db) { S.noDb = true; render(); return; }
+  S.db = db; render();
+  db.doc('settings/main').onSnapshot(d => { S.settingsExists = d.exists; if (d.exists) S.settings = { ...S.settings, ...d.data() }; S.ready.settings = true; render(); }, err => console.error(err));
+  db.doc('settings/bench').onSnapshot(d => { S.benchExists = d.exists; S.bench = d.exists ? { ...(d.data().rows || {}) } : {}; S.ready.bench = true; render(); }, err => console.error(err));
+  db.collection('clients').onSnapshot(snap => {
+    const next = {}; snap.docs.forEach(d => { next[d.id] = { ...d.data() }; });
+    Object.keys(S.monthSubs).forEach(id => { if (!next[id]) { S.monthSubs[id](); delete S.monthSubs[id]; delete S.months[id]; } });
+    S.clients = next; Object.keys(next).forEach(subMonths);
+    S.ready.clients = true;
+    if (S.view === 'client' && !next[S.sel]) { S.view = 'home'; S.sel = null; }
+    render();
+  }, err => { console.error(err); toast('讀取客戶資料失敗'); });
+}
+boot();
+})();
+</script>
