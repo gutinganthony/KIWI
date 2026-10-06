@@ -6,6 +6,9 @@
 |---|---|
 | `01_theory_lineage.md` | 第 1 步（理論）：Graham & Dodd、Williams、Gordon、Miller-Modigliani、Leibowitz-Kogelman、Ohlson／AEG、Penman、Campbell-Shiller、Vuolteenaho 的推導、公式、假設與總表 |
 | `02_empirical_evidence.md` | 第 1 步（實證）：什麼真的決定個股本益比、盈餘消息 vs 折現率消息、倍數估值與 12 個月目標價的已知準確度 |
+| `03_tech_valuation_evidence.md` | 科技股相關：Pástor-Veronesi 不確定性、Schwartz-Moon、研發費用化與 SBC、各估值模型的準確度賽馬、成長衰減速度 |
+| `04_theory_comparison_for_tech.md` | **理論比較的結論**：各理論逐項評分、三種典型科技公司試算、建議的模型骨架與可驗證的假說 |
+| `tech_archetypes.py` | 三種典型科技公司（穩定巨頭、高成長、週期）套 Gordon、PVGO、AEG、兩階段軌道的試算 |
 | `pe_check.py`、`cs_check.py` | 理論公式的數值驗算（Gordon＝MM＝L&K、兩階段、OJ、Penman、Ohlson、Campbell-Shiller） |
 
 **限制**：研究時 WebFetch 被網路代理擋下，所有出處都只看到期刊／出版社頁面與搜尋摘要，沒有逐字核對原文全文；
