@@ -136,6 +136,16 @@ table.t tr.click:hover td { background: var(--surface-2); }
 .mk { display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 4px; color: #fff; }
 .mk.TW { background: var(--tw); }
 .mk.US { background: var(--us); }
+.mk.CASH { background: var(--cash); }
+.tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 0 5px; border-radius: 4px; margin-left: 6px; vertical-align: 1px; letter-spacing: .02em; }
+.tag.auto { background: var(--accent-soft); color: var(--accent); }
+.tag.man { background: var(--warn-soft); color: var(--warn); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin-left: 8px; }
+.seg button { border: 0; background: transparent; padding: 4px 12px; cursor: pointer; color: var(--fg-2); font-size: 12px; }
+.seg button.on { background: var(--accent); color: var(--accent-ink); }
+tr.cashrow td { background: var(--surface-2); }
+.eff { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--fg-2); margin-bottom: 10px; }
+.eff input { padding: 4px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
 
 /* forms */
 .form { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
@@ -228,7 +238,9 @@ details.tool[open] { padding-bottom: 12px; }
 <header class="top">
   <div class="brand"><b id="firmName">我的投資管理</b><span>客戶資產管理台</span></div>
   <div class="spacer"></div>
+  <span class="chip" id="qChip">報價 —</span>
   <span class="chip" id="fxChip">USD/TWD —</span>
+  <button class="btn" data-act="refreshQuotes" id="btnQuotes">更新報價</button>
   <button class="btn ghost" data-act="settings" id="btnSettings">設定與基準指數</button>
 </header>
 <div class="shell">
@@ -255,6 +267,8 @@ const S = {
   clients: {}, months: {}, monthSubs: {},
   view: 'home', sel: null, tab: 'overview', reportMonth: null,
   closeForm: null, confirmDel: false, pendingRender: false,
+  quotes: null, histDocs: {}, hist: {}, pos: {}, posSubs: {}, effDate: null, navMonth: null, txMode: 'stock',
+  q: { busy: false, err: '', autoTried: false },
 };
 const SECTORS = ['半導體','IC 設計','電子零組件','伺服器/AI','網通','軟體','網路平台','消費','金融','醫療','能源','傳產','ETF','其他'];
 
@@ -281,6 +295,23 @@ const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n)
 function hexA(hex, a) { const h = hex.replace('#', ''); const n = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16); return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`; }
 function toast(msg, ms = 2600) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => t.hidden = true, ms); }
 const numIn = v => { const n = parseFloat(String(v).replace(/[,\s]/g, '')); return isFinite(n) ? n : 0; };
+const todayStr = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Taipei' });
+const ymdNum = ds => +ds.replace(/-/g, '');
+const ymdMs = n => Date.UTC(Math.floor(n / 10000), Math.floor(n / 100) % 100 - 1, n % 100);
+const cleanT = t => String(t || '').toUpperCase().replace(/[^A-Z0-9.\-]/g, '');
+const keyOf = h => (h.m === 'US' ? 'US:' : 'TW:') + cleanT(h.t);
+const fkey = k => k.replace(/[^A-Za-z0-9]/g, '_');
+const gsym = k => k.startsWith('TW:') ? 'TPE:' + k.slice(3) : k.slice(3);
+const liveFx = () => { const f = +S.quotes?.fx; return f > 0 ? f : (+S.settings.fx || 0); };
+const quoteOf = h => { const q = +S.quotes?.px?.[fkey(keyOf(h))]; return q > 0 ? q : null; };
+const pxOf = h => quoteOf(h) ?? (+h.px || 0);
+function closeAt(k, n, maxDays = 12) {
+  const a = S.hist[k]; if (!a || !a.length) return null;
+  let lo = 0, hi = a.length - 1, r = -1;
+  while (lo <= hi) { const mid = (lo + hi) >> 1; if (a[mid][0] <= n) { r = mid; lo = mid + 1; } else hi = mid - 1; }
+  if (r < 0 || (ymdMs(n) - ymdMs(a[r][0])) / 864e5 > maxDays) return null;
+  return a[r][1];
+}
 
 /* ---------------- db writes: one at a time per doc ---------------- */
 const chains = {};
@@ -293,21 +324,22 @@ function write(path, fn) {
 }
 
 /* ---------------- valuation & performance ---------------- */
-function valuate(c, fx) {
-  fx = fx || S.settings.fx || 0;
+function valuate(c, fx, live = true) {
+  fx = fx || liveFx();
   let tw = 0, us = 0;
   const rows = (c.holdings || []).map(h => {
     const f = h.m === 'US' ? fx : 1;
-    const v = (+h.px || 0) * (+h.sh || 0) * f;
+    const q = live ? quoteOf(h) : null; const px = q ?? (+h.px || 0);
+    const v = px * (+h.sh || 0) * f;
     const costV = (+h.cost || 0) * (+h.sh || 0) * f;
     if (h.m === 'US') us += v; else tw += v;
-    return { ...h, v, costV, pl: v - costV, plPct: costV ? v / costV - 1 : null };
+    return { ...h, px, auto: q != null, v, costV, pl: v - costV, plPct: costV ? v / costV - 1 : null };
   });
   const cash = (+c.cashTWD || 0) + (+c.cashUSD || 0) * fx;
   const total = tw + us + cash;
   rows.forEach(r => r.w = total ? r.v / total : 0);
   rows.sort((a, b) => b.v - a.v);
-  return { rows, tw, us, cash, total, cost: rows.reduce((a, r) => a + r.costV, 0), pl: rows.reduce((a, r) => a + r.pl, 0) };
+  return { rows, tw, us, cash, total, fx, cost: rows.reduce((a, r) => a + r.costV, 0), pl: rows.reduce((a, r) => a + r.pl, 0) };
 }
 function benchRet(m, w) {
   const a = S.bench[m], p = S.bench[addM(m, -1)];
@@ -417,7 +449,8 @@ function render() {
   S.pendingRender = false;
   document.documentElement.dataset.updown = S.settings.updown === 'intl' ? 'intl' : 'tw';
   $('#firmName').textContent = S.settings.firm || '我的投資管理';
-  $('#fxChip').textContent = 'USD/TWD ' + (ok(+S.settings.fx) ? (+S.settings.fx).toFixed(2) : '—');
+  $('#fxChip').textContent = 'USD/TWD ' + (liveFx() ? liveFx().toFixed(2) : '—');
+  renderQuoteChip();
   renderSide(); renderMain();
 }
 // A deferred re-render must not replace a button between pointerdown and click, or the click is lost.
@@ -485,6 +518,7 @@ function renderHome(m) {
       <div class="kpi"><span class="k">台股部位</span><span class="v">${pct(aum ? tw / aum : null, 1, false)}</span><span class="s">${money(tw)}</span></div>
       <div class="kpi"><span class="k">美股部位</span><span class="v">${pct(aum ? us / aum : null, 1, false)}</span><span class="s">${money(us)}</span></div>
       <div class="kpi"><span class="k">現金</span><span class="v">${pct(aum ? cash / aum : null, 1, false)}</span><span class="s">${money(cash)}</span></div>
+      <div class="kpi"><span class="k">本月管理費（日計提至今）</span><span class="v">${money(ids.reduce((a, id) => a + feeAccrual(id, todayStr().slice(0, 7)).fee, 0))}</span><span class="s">依每日淨值 × 年費率 ÷ 365</span></div>
     </div>
     <div class="panel"><h2>客戶一覽 <span class="r muted small">報酬率為時間加權，截至各自最近一次月結</span></h2>
       <div class="tw"><table class="t"><thead><tr><th>客戶</th><th class="n">目前資產</th><th class="n">占比</th><th>最近月結</th><th class="n">當月</th><th class="n">今年以來</th><th class="n">成立以來</th><th class="n">未實現損益</th><th></th></tr></thead><tbody>
@@ -500,7 +534,7 @@ function renderHome(m) {
 }
 
 /* ---------- client ---------- */
-const TABS = [['overview', '總覽'], ['holdings', '持股'], ['months', '月結紀錄'], ['report', '月報'], ['profile', '客戶資料']];
+const TABS = [['overview', '總覽'], ['holdings', '持股與資金'], ['nav', '每日淨值'], ['months', '月結紀錄'], ['report', '月報'], ['profile', '客戶資料']];
 function renderClient(m) {
   const cid = S.sel, c = S.clients[cid];
   m.innerHTML = `
@@ -510,7 +544,7 @@ function renderClient(m) {
     <div class="tabs">${TABS.map(([k, l]) => `<button class="tab ${S.tab === k ? 'on' : ''}" data-act="tab" data-tab="${k}">${l}</button>`).join('')}</div>
     <div id="tabBody" style="display:flex;flex-direction:column;gap:16px"></div>`;
   const b = $('#tabBody');
-  ({ overview: tabOverview, holdings: tabHoldings, months: tabMonths, report: tabReport, profile: (b, cid) => renderClientForm(b, cid) })[S.tab](b, cid);
+  ({ overview: tabOverview, holdings: tabHoldings, nav: tabNav, months: tabMonths, report: tabReport, profile: (b, cid) => renderClientForm(b, cid) })[S.tab](b, cid);
 }
 
 function tabOverview(b, cid) {
@@ -543,8 +577,13 @@ function tabOverview(b, cid) {
           ${[['年化波動度', pct(st.vol, 1, false)], ['夏普比率', ok(st.sharpe) ? st.sharpe.toFixed(2) : '—'], ['最大回撤', pct(st.mdd, 1)], ['最佳月', pct(st.best, 1)], ['最差月', pct(st.worst, 1)], ['正報酬月', pct(st.win, 0, false)]].map(([k2, v2]) => `<div class="kpi"><span class="k">${k2}</span><span class="v" style="font-size:18px">${v2}</span></div>`).join('')}</div>` : '<p class="muted">月結後計算。</p>'}
       </div>
       <div class="panel"><h2>費用估算 <span class="r small muted">內部參考，不出現在月報</span></h2>
+        ${(() => { const cur = todayStr().slice(0, 7), prev = addM(cur, -1); const a = feeAccrual(cid, cur), p = feeAccrual(cid, prev);
+          return a.days || p.days ? `<div class="tw"><table class="t" style="margin-bottom:10px"><tbody>
+          <tr><td style="white-space:normal">本月管理費（日計提，${a.days} 天）</td><td class="n">${money(a.fee)}</td></tr>
+          ${p.days ? `<tr><td style="white-space:normal">${prev} 管理費（${p.days} 天，平均淨值 ${moneyShort(p.avg)}）</td><td class="n">${money(p.fee)}</td></tr>` : ''}
+          </tbody></table></div>` : ''; })()}
         ${fe ? `<div class="tw"><table class="t"><tbody>
-          <tr><td style="white-space:normal">管理費（年 ${+c.mgmtFee || 0}%，按月）</td><td class="n">${money(fe.mgmt)}</td></tr>
+          <tr><td style="white-space:normal">管理費（年 ${+c.mgmtFee || 0}%，以月結資產 ÷ 12 粗估）</td><td class="n">${money(fe.mgmt)}</td></tr>
           <tr><td style="white-space:normal">績效分潤（${+c.perfFee || 0}%，高水位 ${fe.hwm.toFixed(4)}）</td><td class="n">${money(fe.perf)}</td></tr>
           <tr><td class="muted small" colspan="2" style="white-space:normal">分潤以「上一年底以前最高的單位淨值」為高水位，只對超過的部分計算，以 ${last.m} 月結估算。</td></tr>
         </tbody></table></div>` : '<p class="muted">月結後計算。</p>'}
@@ -578,64 +617,317 @@ function drawNav(cid, s) {
   cv.onpointerleave = () => { tip.hidden = true; draw(null); };
 }
 
-/* ---------- holdings ---------- */
+/* ---------- holdings & cash ---------- */
 function tabHoldings(b, cid) {
-  const c = S.clients[cid]; const v = valuate(c);
+  const c = S.clients[cid]; const v = valuate(c); const fx = v.fx; const today = todayStr();
+  const eff = S.effDate || today;
+  const flows = (c.flows || []).slice().sort((a, b) => b.date.localeCompare(a.date));
+  const cashRow = (ccy) => { const usd = ccy === 'USD'; const amt = +c[usd ? 'cashUSD' : 'cashTWD'] || 0; const val = usd ? amt * fx : amt;
+    return `<tr class="cashrow"><td><span class="mk CASH">${ccy}</span></td><td><b>現金</b></td><td class="muted">${usd ? '美元' : '台幣'}</td><td></td>
+      <td class="n"><input class="cell num" id="cash${ccy}" data-cash="${usd ? 'cashUSD' : 'cashTWD'}" value="${amt}" inputmode="decimal" aria-label="${usd ? '美元' : '台幣'}現金"></td>
+      <td class="n muted">—</td><td class="n">${usd ? `<span class="muted small">匯率</span> ${fx ? fx.toFixed(2) : '—'}` : '<span class="muted">—</span>'}</td>
+      <td class="n">${nf0.format(Math.round(val))}</td><td></td><td></td><td class="n">${pct(v.total ? val / v.total : null, 1, false)}</td><td></td></tr>`; };
   b.innerHTML = `
-    <div class="panel"><h2>持股明細 <span class="r small muted">台股股數以「股」計（1 張 = 1,000 股）・美股以美元計價，市值按 USD/TWD ${(+S.settings.fx || 0).toFixed(2)} 換算${c.pxAt ? ` ・ 現價更新於 ${esc(c.pxAt)}` : ''}</span></h2>
-      <div class="tw"><table class="t"><thead><tr><th>市場</th><th>代號</th><th>名稱</th><th>產業</th><th class="n">股數</th><th class="n">平均成本</th><th class="n">現價</th><th class="n">市值 (NT$)</th><th class="n">未實現損益</th><th class="n">報酬率</th><th class="n">權重</th><th></th></tr></thead><tbody>
+    <div class="panel"><h2>持股與現金 <span class="r small muted">台股以「股」計（1 張 = 1,000 股）・美股以美元計價，市值按 USD/TWD ${fx ? fx.toFixed(2) : '—'} 換算</span></h2>
+      <div class="eff"><label for="effDate">異動生效日</label><input type="date" id="effDate" value="${eff}" max="${today}">
+        <span>改股數、新增或刪除持股、改現金時，從這天起計入每日淨值。${eff !== today ? '<b>（目前為補登模式）</b>' : ''}</span></div>
+      <div class="tw"><table class="t"><thead><tr><th>市場</th><th>代號</th><th>名稱</th><th>產業</th><th class="n">股數／金額</th><th class="n">平均成本</th><th class="n">現價</th><th class="n">市值 (NT$)</th><th class="n">未實現損益</th><th class="n">報酬率</th><th class="n">權重</th><th></th></tr></thead><tbody>
       ${v.rows.map(r => `<tr>
         <td><span class="mk ${r.m}">${r.m}</span></td><td><b>${esc(r.t)}</b></td>
         <td><input class="cell" id="h-${r.id}-n" data-h="${r.id}" data-k="n" value="${esc(r.n)}"></td>
-        <td><input class="cell" id="h-${r.id}-sec" data-h="${r.id}" data-k="sec" value="${esc(r.sec)}" list="secList"></td>
+        <td><input class="cell" id="h-${r.id}-sec" data-h="${r.id}" data-k="sec" value="${esc(r.sec)}" list="secList" style="min-width:104px"></td>
         <td class="n"><input class="cell num" id="h-${r.id}-sh" data-h="${r.id}" data-k="sh" value="${r.sh}" inputmode="decimal"></td>
         <td class="n"><input class="cell num" id="h-${r.id}-cost" data-h="${r.id}" data-k="cost" value="${r.cost}" inputmode="decimal"></td>
-        <td class="n"><input class="cell num" id="h-${r.id}-px" data-h="${r.id}" data-k="px" value="${r.px}" inputmode="decimal"></td>
+        <td class="n">${r.auto ? `${price(r.px)}<span class="tag auto" title="Google Finance 報價">自動</span>` : `<div class="row" style="flex-wrap:nowrap;justify-content:flex-end"><input class="cell num" style="width:90px" id="h-${r.id}-px" data-h="${r.id}" data-k="px" value="${+r.px || ''}" inputmode="decimal" placeholder="手動"><span class="tag man" title="Google Finance 沒有這檔的報價（例如上櫃股票），請手動輸入">手動</span></div>`}</td>
         <td class="n">${nf0.format(Math.round(r.v))}</td><td class="n ${cls(r.pl)}">${signed(r.pl)}</td><td class="n ${cls(r.plPct)}">${pct(r.plPct, 1)}</td><td class="n">${pct(r.w, 1, false)}</td>
         <td><button class="btn ghost small" data-act="delH" data-h="${r.id}" aria-label="刪除 ${esc(r.t)}">×</button></td></tr>`).join('')}
-      <tr><td colspan="2">現金</td><td colspan="2"><div class="row"><span class="muted small">台幣</span><input class="cell num" style="width:130px" id="cashTWD" data-cash="cashTWD" value="${+c.cashTWD || 0}" inputmode="decimal"></div></td>
-        <td colspan="3"><div class="row"><span class="muted small">美元</span><input class="cell num" style="width:110px" id="cashUSD" data-cash="cashUSD" value="${+c.cashUSD || 0}" inputmode="decimal"></div></td>
-        <td class="n">${nf0.format(Math.round(v.cash))}</td><td></td><td></td><td class="n">${pct(v.total ? v.cash / v.total : null, 1, false)}</td><td></td></tr>
+      ${cashRow('TWD')}${cashRow('USD')}
       <tr class="total"><td colspan="7">合計</td><td class="n">${nf0.format(Math.round(v.total))}</td><td class="n ${cls(v.pl)}">${signed(v.pl)}</td><td class="n ${cls(v.cost ? v.pl / v.cost : null)}">${pct(v.cost ? v.pl / v.cost : null, 1)}</td><td class="n">100%</td><td></td></tr>
       </tbody></table></div>
+      <p class="muted small" style="margin:10px 0 0">現價由 Google Finance 自動更新（約延遲 20 分鐘）；標「手動」的是 Google Finance 沒有報價的標的（例如上櫃股票），請自行輸入。直接改現金金額只用於更正；客戶新入金或出金請用下方「資金入出」記錄，月結才會自動帶入出入金。</p>
       <datalist id="secList">${SECTORS.map(s => `<option value="${s}">`).join('')}</datalist>
     </div>
-    <div class="panel"><h2>新增持股</h2>
-      <div class="form">
+    <div class="panel"><h2>新增<span class="seg"><button data-act="txMode" data-v="stock" class="${S.txMode === 'stock' ? 'on' : ''}">股票</button><button data-act="txMode" data-v="cash" class="${S.txMode === 'cash' ? 'on' : ''}">資金入出</button></span></h2>
+      ${S.txMode === 'cash' ? `<div class="form">
+        <div class="f"><label for="nf-type">類型</label><select id="nf-type"><option value="in">入金（客戶匯入）</option><option value="out">出金（客戶提領）</option></select></div>
+        <div class="f"><label for="nf-ccy">幣別</label><select id="nf-ccy"><option value="TWD">台幣</option><option value="USD">美元</option></select></div>
+        <div class="f"><label for="nf-amt">金額</label><input id="nf-amt" inputmode="decimal" placeholder="1000000"></div>
+        <div class="f"><label for="nf-date">日期</label><input type="date" id="nf-date" value="${today}" max="${today}"></div>
+        <div class="f"><label for="nf-fx">USD/TWD（美元才需要）</label><input id="nf-fx" inputmode="decimal" value="${fx ? fx.toFixed(4) : ''}"></div>
+        <div class="f"><label for="nf-note">備註</label><input id="nf-note" placeholder="例：第二筆加碼資金"></div>
+        <div class="f" style="justify-content:flex-end"><button class="btn primary" data-act="addFlow">記錄資金</button></div>
+      </div>
+      <p class="muted small" style="margin:10px 0 0">記錄後現金餘額會自動加減，該月月結的「淨入金」與每日淨值也會自動帶入。</p>`
+      : `<div class="form">
         <div class="f"><label for="nh-m">市場</label><select id="nh-m"><option value="TW">台股</option><option value="US">美股</option></select></div>
         <div class="f"><label for="nh-t">代號</label><input id="nh-t" placeholder="2330 或 NVDA"></div>
         <div class="f"><label for="nh-n">名稱</label><input id="nh-n" placeholder="台積電"></div>
         <div class="f"><label for="nh-sec">產業</label><input id="nh-sec" list="secList" placeholder="半導體"></div>
         <div class="f"><label for="nh-sh">股數</label><input id="nh-sh" inputmode="decimal" placeholder="1000"></div>
         <div class="f"><label for="nh-cost">平均成本</label><input id="nh-cost" inputmode="decimal"></div>
-        <div class="f"><label for="nh-px">現價</label><input id="nh-px" inputmode="decimal"></div>
         <div class="f" style="justify-content:flex-end"><button class="btn primary" data-act="addH">加入</button></div>
       </div>
-      <p class="muted small" style="margin:10px 0 0">同一市場同代號已存在時，會改為更新那一筆。</p>
+      <p class="muted small" style="margin:10px 0 0">只要輸入成本，現價會自動抓。同一市場同代號已存在時，會改為更新那一筆。</p>`}
     </div>
-    <details class="tool"><summary>批次更新現價</summary>
+    <div class="panel"><h2>資金進出紀錄 <span class="r small muted">${flows.length} 筆</span></h2>
+      ${flows.length ? `<div class="tw"><table class="t"><thead><tr><th>日期</th><th>類型</th><th>幣別</th><th class="n">金額</th><th class="n">匯率</th><th class="n">折合台幣</th><th>備註</th><th></th></tr></thead><tbody>
+        ${flows.map(f => `<tr><td>${f.date}</td><td class="${f.amt >= 0 ? '' : 'loss'}">${f.amt >= 0 ? '入金' : '出金'}</td><td>${f.ccy}</td><td class="n">${nf2.format(Math.abs(f.amt))}</td><td class="n">${f.ccy === 'USD' ? (+f.fx).toFixed(4) : '—'}</td><td class="n">${signed(f.twd)}</td><td style="white-space:normal">${esc(f.note || '')}</td>
+          <td>${S.confirmDel === 'f:' + f.id ? `<button class="btn danger" data-act="delFlowYes" data-id="${f.id}">確定刪除並沖回現金</button>` : `<button class="btn ghost danger" data-act="delFlow" data-id="${f.id}">刪除</button>`}</td></tr>`).join('')}
+      </tbody></table></div>` : '<p class="muted" style="margin:0">尚無紀錄。客戶匯入新資金時，用上方「資金入出」記一筆。</p>'}
+    </div>
+    <details class="tool"><summary>手動更新現價（Google Finance 沒有報價的標的）</summary>
       <div style="display:flex;flex-direction:column;gap:10px">
-        <p class="muted small" style="margin:0">一行一檔：代號 空白 價格。例如<br><code>2330 2500</code><br><code>NVDA 233.95</code></p>
-        <textarea class="box" id="bulkPx" placeholder="2330 2500&#10;NVDA 233.95"></textarea>
+        <p class="muted small" style="margin:0">一行一檔：代號 空白 價格，例如 <code>8299 512</code>。有自動報價的標的會以自動報價為準。</p>
+        <textarea class="box" id="bulkPx" placeholder="8299 512"></textarea>
         <label class="row small"><input type="checkbox" id="bulkAll" checked> 同時更新其他客戶的同代號持股</label>
         <div class="row"><button class="btn primary" data-act="bulkPx">更新現價</button></div>
-        <p class="muted small" style="margin:0">也可以在 Claude Code 對話裡說「幫我更新客戶管理台的股價」，Claude 會抓最新收盤價寫進來。</p>
       </div></details>
     <details class="tool"><summary>從試算表貼上匯入持股</summary>
       <div style="display:flex;flex-direction:column;gap:10px">
-        <p class="muted small" style="margin:0">欄位順序：市場, 代號, 名稱, 產業, 股數, 平均成本, 現價（逗號或 Tab 分隔，可直接從 Excel/Google Sheet 複製）。已存在的代號會被更新，其餘新增。</p>
-        <textarea class="box" id="csvIn" placeholder="TW,2330,台積電,半導體,3000,1100,2500&#10;US,NVDA,輝達,IC 設計,300,120,233.95"></textarea>
+        <p class="muted small" style="margin:0">欄位順序：市場, 代號, 名稱, 產業, 股數, 平均成本（逗號或 Tab 分隔，可直接從 Excel/Google Sheet 複製）。已存在的代號會被更新，其餘新增。</p>
+        <textarea class="box" id="csvIn" placeholder="TW,2330,台積電,半導體,3000,1100&#10;US,NVDA,輝達,IC 設計,300,120"></textarea>
         <div class="row"><button class="btn primary" data-act="importCsv">匯入</button></div>
       </div></details>`;
 }
-function saveHoldings(cid, holdings, extra = {}) {
-  const c = S.clients[cid]; S.clients[cid] = { ...c, holdings, ...extra }; render();
-  return write('clients/' + cid, ref => ref.update({ holdings, ...extra }));
+/* Position log: clients/{cid}/pos/{YYYY-MM-DD} holds the full position (shares + cash) in force from that day.
+   Every change is applied as a delta from its effective date onward, so back-dated edits flow into later days. */
+function posState(c) { return { h: (c.holdings || []).filter(h => +h.sh).map(h => [keyOf(h), +h.sh]), cashTWD: +c.cashTWD || 0, cashUSD: +c.cashUSD || 0 }; }
+function posDelta(oldC, newC) {
+  const d = {}; (oldC.holdings || []).forEach(h => { const k = keyOf(h); d[k] = (d[k] || 0) - (+h.sh || 0); });
+  (newC.holdings || []).forEach(h => { const k = keyOf(h); d[k] = (d[k] || 0) + (+h.sh || 0); });
+  Object.keys(d).forEach(k => { if (Math.abs(d[k]) < 1e-9) delete d[k]; });
+  return { h: d, twd: (+newC.cashTWD || 0) - (+oldC.cashTWD || 0), usd: (+newC.cashUSD || 0) - (+oldC.cashUSD || 0) };
+}
+function applyPosDelta(cid, D, delta, fallback) {
+  if (!Object.keys(delta.h).length && !delta.twd && !delta.usd) return;
+  const P = (S.pos[cid] || []).slice();
+  const addTo = p => { const m = new Map(p.h || []); for (const [k, v] of Object.entries(delta.h)) { const nv = (m.get(k) || 0) + v; if (Math.abs(nv) < 1e-9) m.delete(k); else m.set(k, nv); }
+    return { h: [...m.entries()], cashTWD: (+p.cashTWD || 0) + delta.twd, cashUSD: (+p.cashUSD || 0) + delta.usd }; };
+  const out = [];
+  if (!P.some(p => p.id === D)) { const base = P.filter(p => p.id < D).pop() || P.find(p => p.id > D); out.push([D, base ? addTo(base) : fallback]); }
+  P.forEach(p => { if (p.id >= D) out.push([p.id, addTo(p)]); });
+  const map = new Map(P.map(p => [p.id, p])); out.forEach(([id, doc]) => map.set(id, { id, ...doc }));
+  S.pos[cid] = [...map.values()].sort((a, b) => a.id.localeCompare(b.id));
+  out.forEach(([id, doc]) => write(`clients/${cid}/pos/${id}`, ref => ref.set({ ...doc, at: new Date().toISOString() })));
+}
+function saveHoldings(cid, holdings, extra = {}, date) {
+  const old = S.clients[cid]; const next = { ...old, holdings, ...extra }; S.clients[cid] = next;
+  applyPosDelta(cid, date || S.effDate || todayStr(), posDelta(old, next), posState(next));
+  render();
+  const p = write('clients/' + cid, ref => ref.update({ holdings, ...extra }));
+  if (holdings.some(h => !(S.settings.quoteKeys || []).includes(keyOf(h)))) setTimeout(() => refreshQuotes(false), 300);
+  return p;
+}
+async function addFlow(cid) {
+  const c = S.clients[cid]; const g = id => $('#' + id).value.trim();
+  const amt0 = numIn(g('nf-amt')); if (!(amt0 > 0)) return toast('請輸入大於 0 的金額');
+  const date = g('nf-date') || todayStr(); if (date > todayStr()) return toast('日期不能晚於今天');
+  const ccy = g('nf-ccy'); const amt = g('nf-type') === 'out' ? -amt0 : amt0;
+  const fx = ccy === 'USD' ? (numIn(g('nf-fx')) || closeAt('FX', ymdNum(date)) || liveFx()) : 1;
+  if (ccy === 'USD' && !fx) return toast('請輸入匯率');
+  const f = { id: uid(), date, ccy, amt, fx, twd: Math.round(amt * fx), note: g('nf-note') };
+  const field = ccy === 'USD' ? 'cashUSD' : 'cashTWD';
+  const upd = { flows: [...(c.flows || []), f], [field]: +((+c[field] || 0) + amt).toFixed(2) };
+  const next = { ...c, ...upd }; S.clients[cid] = next;
+  applyPosDelta(cid, date, { h: {}, twd: ccy === 'TWD' ? amt : 0, usd: ccy === 'USD' ? amt : 0 }, posState(next));
+  render(); await write('clients/' + cid, ref => ref.update(upd));
+  toast(`已記錄 ${date} ${amt > 0 ? '入金' : '出金'} ${ccy} ${nf2.format(amt0)}`);
+}
+async function delFlow(cid, id) {
+  const c = S.clients[cid]; const f = (c.flows || []).find(x => x.id === id); if (!f) return;
+  const field = f.ccy === 'USD' ? 'cashUSD' : 'cashTWD';
+  const upd = { flows: (c.flows || []).filter(x => x.id !== id), [field]: +((+c[field] || 0) - f.amt).toFixed(2) };
+  const next = { ...c, ...upd }; S.clients[cid] = next; S.confirmDel = false;
+  applyPosDelta(cid, f.date, { h: {}, twd: f.ccy === 'TWD' ? -f.amt : 0, usd: f.ccy === 'USD' ? -f.amt : 0 }, posState(next));
+  render(); await write('clients/' + cid, ref => ref.update(upd)); toast('已刪除並沖回現金');
 }
 function upsertHolding(list, h) {
-  const i = list.findIndex(x => x.m === h.m && String(x.t).toUpperCase() === String(h.t).toUpperCase());
+  const i = list.findIndex(x => x.m === h.m && cleanT(x.t) === cleanT(h.t));
   if (i >= 0) { list[i] = { ...list[i], ...Object.fromEntries(Object.entries(h).filter(([k, v]) => k !== 'id' && v !== '' && v != null)) }; return 'upd'; }
   list.push({ id: uid(), ...h }); return 'add';
+}
+
+/* ---------- daily NAV ---------- */
+function dailyNav(cid, from, to) {
+  const c = S.clients[cid]; const P = S.pos[cid] || []; if (!c || !P.length) return [];
+  if (from < P[0].id) from = P[0].id; const today = todayStr(); if (to > today) to = today;
+  const manual = {}; (c.holdings || []).forEach(h => { manual[keyOf(h)] = +h.px || 0; });
+  const flowsBy = {}; (c.flows || []).forEach(f => { flowsBy[f.date] = (flowsBy[f.date] || 0) + f.twd; });
+  const out = []; let pi = -1;
+  for (let t = Date.parse(from + 'T00:00:00Z'), end = Date.parse(to + 'T00:00:00Z'); t <= end; t += 864e5) {
+    const ds = new Date(t).toISOString().slice(0, 10); const n = ymdNum(ds);
+    while (pi + 1 < P.length && P[pi + 1].id <= ds) pi++;
+    if (pi < 0) continue;
+    const pos = P[pi]; const live = ds === today;
+    const fx = (live && +S.quotes?.fx) || closeAt('FX', n) || liveFx();
+    let tw = 0, us = 0; const notes = new Set();
+    for (const [k, sh] of pos.h || []) {
+      let px = (live && +S.quotes?.px?.[fkey(k)]) || closeAt(fkey(k), n);
+      if (!px) { px = manual[k] || 0; notes.add(px ? '含手動價' : '缺價'); }
+      const v = px * sh * (k.startsWith('US:') ? fx : 1); if (k.startsWith('US:')) us += v; else tw += v;
+    }
+    const wd = new Date(t).getUTCDay(); if (wd === 0 || wd === 6) notes.add('週末沿用'); if (live) notes.add('盤中／最新');
+    const cash = (+pos.cashTWD || 0) + (+pos.cashUSD || 0) * fx;
+    out.push({ d: ds, tw, us, cash, nav: tw + us + cash, fx, flow: flowsBy[ds] || 0, notes: [...notes] });
+  }
+  return out;
+}
+function feeAccrual(cid, ym) {
+  const c = S.clients[cid]; const rows = dailyNav(cid, ym + '-01', ym + '-' + String(lastDay(ym)).padStart(2, '0'));
+  const rate = (+c?.mgmtFee || 0) / 100 / 365; const fee = rows.reduce((a, r) => a + r.nav * rate, 0);
+  return { rows, days: rows.length, fee, avg: rows.length ? rows.reduce((a, r) => a + r.nav, 0) / rows.length : 0, rate };
+}
+function tabNav(b, cid) {
+  const c = S.clients[cid]; const P = S.pos[cid] || []; const today = todayStr();
+  if (!P.length) { b.innerHTML = `<div class="empty"><h2>還沒有每日淨值</h2><p>從你在「持股與資金」輸入持股的那天開始，系統會用每天的收盤價自動算出淨值，不用另外操作。要補登過去的持股，先把「異動生效日」改成當時的日期再輸入。</p><button class="btn" data-act="tab" data-tab="holdings">去輸入持股</button></div>`; return; }
+  const months = []; for (let m = P[0].id.slice(0, 7); m <= today.slice(0, 7); m = addM(m, 1)) months.push(m);
+  if (!S.navMonth || !months.includes(S.navMonth)) S.navMonth = months[months.length - 1];
+  const A = feeAccrual(cid, S.navMonth); const rows = A.rows; const last = rows[rows.length - 1];
+  const flags = new Set(rows.flatMap(r => r.notes.filter(n => n === '缺價' || n === '含手動價')));
+  b.innerHTML = `
+    <div class="panel"><div class="form" style="align-items:end">
+      <div class="f"><label for="nv-m">月份</label><select id="nv-m">${months.slice().reverse().map(m => `<option value="${m}" ${m === S.navMonth ? 'selected' : ''}>${mLabel(m)}</option>`).join('')}</select></div>
+      <div class="f" style="grid-column:span 2"><div class="row"><button class="btn" data-act="navCsv">下載 CSV</button></div></div>
+    </div></div>
+    <div class="kpis">
+      <div class="kpi"><span class="k">${last && last.d === today ? '最新淨值' : '月底淨值'}（${last ? last.d.slice(5).replace('-', '/') : '—'}）</span><span class="v">${money(last?.nav)}</span></div>
+      <div class="kpi"><span class="k">平均每日淨值</span><span class="v">${money(A.avg)}</span><span class="s">${A.days} 個日曆日</span></div>
+      <div class="kpi"><span class="k">管理費（年 ${+c.mgmtFee || 0}%，日計提）</span><span class="v">${money(A.fee)}</span><span class="s">Σ 每日淨值 × ${+c.mgmtFee || 0}% ÷ 365</span></div>
+      <div class="kpi"><span class="k">當月入出金</span><span class="v">${signed(rows.reduce((a, r) => a + r.flow, 0))}</span></div>
+    </div>
+    ${flags.size ? `<p class="note warn" style="margin:0">${flags.has('缺價') ? '部分日期有標的抓不到收盤價，以 0 計算，管理費會偏低；請到「持股與資金」補上手動現價。' : '部分標的沒有 Google Finance 報價，以手動輸入的現價計算。'}</p>` : ''}
+    <div class="panel"><h2>每日淨值 <span class="r small muted">週末與休市日沿用前一交易日收盤；美股用當日美東收盤、匯率用當日收盤</span></h2>
+      <div class="tw"><table class="t"><thead><tr><th>日期</th><th class="n">台股市值</th><th class="n">美股市值</th><th class="n">現金</th><th class="n">淨值</th><th class="n">入出金</th><th class="n">日管理費</th><th>備註</th></tr></thead><tbody>
+      ${rows.slice().reverse().map(r => `<tr><td>${r.d}</td><td class="n">${nf0.format(Math.round(r.tw))}</td><td class="n">${nf0.format(Math.round(r.us))}</td><td class="n">${nf0.format(Math.round(r.cash))}</td><td class="n"><b>${nf0.format(Math.round(r.nav))}</b></td><td class="n">${r.flow ? signed(r.flow) : ''}</td><td class="n">${nf0.format(Math.round(r.nav * A.rate))}</td><td class="muted small">${r.notes.join('、')}</td></tr>`).join('')}
+      <tr class="total"><td>合計／平均</td><td></td><td></td><td></td><td class="n">${nf0.format(Math.round(A.avg))}</td><td class="n">${signed(rows.reduce((a, r) => a + r.flow, 0))}</td><td class="n">${nf0.format(Math.round(A.fee))}</td><td></td></tr>
+      </tbody></table></div>
+    </div>`;
+}
+async function navCsv(cid) {
+  const dl = await window.claude?.use?.('downloads'); if (!dl) return toast('這個檢視無法下載檔案');
+  const c = S.clients[cid]; const A = feeAccrual(cid, S.navMonth);
+  const lines = ['日期,台股市值,美股市值,現金,淨值,入出金,USD/TWD,日管理費,備註', ...A.rows.map(r => [r.d, Math.round(r.tw), Math.round(r.us), Math.round(r.cash), Math.round(r.nav), Math.round(r.flow), r.fx.toFixed(4), (r.nav * A.rate).toFixed(2), r.notes.join('／')].join(','))];
+  try { await dl.save({ filename: `${c.name}_${S.navMonth}_每日淨值.csv`, data: '﻿' + lines.join('\n') }); toast('CSV 已下載'); }
+  catch (e) { toast(e && e.code === 'declined' ? '已取消下載' : '下載失敗：' + (e && e.message || e)); }
+}
+
+/* ---------- quotes: Google Sheet with GOOGLEFINANCE, read through the viewer's Google Drive connector ---------- */
+const GD = 'Google Drive';
+const SHEET_TITLE = 'KIWI 客戶管理台報價表（自動產生，請勿編輯）';
+function neededKeys() { const s = new Set(); Object.values(S.clients).forEach(c => (c.holdings || []).forEach(h => cleanT(h.t) && s.add(keyOf(h)))); return [...s].sort(); }
+function buildCsv(keys) {
+  const q = f => '"' + f.replace(/"/g, '""') + '"';
+  const hist = (sym, a, b2) => `=IFERROR(JOIN(";",ARRAYFORMULA(TEXT(INDEX(GOOGLEFINANCE("${sym}","close",TODAY()-${a},TODAY()-${b2}),0,1),"yyyymmdd")&"="&INDEX(GOOGLEFINANCE("${sym}","close",TODAY()-${a},TODAY()-${b2}),0,2))),"")`;
+  const W = [[14, 0], [29, 15], [44, 30], [59, 45]];
+  const rows = ['key,sym,price,time,h0,h1,h2,h3'];
+  [...keys.map(k => [k, gsym(k)]), ['FX:USDTWD', 'CURRENCY:USDTWD'], ['IX:SPX', 'INDEXSP:.INX']].forEach(([k, sym]) => {
+    const cur = sym.startsWith('CURRENCY:');
+    rows.push([k, sym, q(cur ? `=IFERROR(GOOGLEFINANCE("${sym}"),"NA")` : `=IFERROR(GOOGLEFINANCE("${sym}","price"),"NA")`),
+      cur ? '' : q(`=IFERROR(TEXT(GOOGLEFINANCE("${sym}","tradetime"),"yyyy-mm-dd hh:mm"),"")`), ...W.map(([a, b2]) => q(hist(sym, a, b2)))].join(','));
+  });
+  rows.push(['META:NOW', '', q('=TEXT(NOW(),"yyyy-mm-dd hh:mm:ss")')].join(','));
+  return rows.join('\n') + '\n';
+}
+const payloadOf = r => { let p = r?.payload ?? r?.content?.[0]?.text; if (typeof p === 'string') { try { p = JSON.parse(p); } catch (_) {} } return p; };
+function parseSheet(p) {
+  const text = typeof p === 'string' ? p : (p?.fileContent || '');
+  const rows = {};
+  text.split('\n').forEach(line => {
+    if (!line.startsWith('|')) return;
+    const cells = line.split('|').slice(1, -1).map(x => x.trim().replace(/\\(.)/g, '$1'));
+    if (/^(TW|US|FX|IX|META):/.test(cells[0] || '') && !rows[cells[0]]) rows[cells[0]] = cells;
+  });
+  return rows;
+}
+async function rebuildSheet(mcp, keys) {
+  const r = await mcp.callTool(GD, 'create_file', { title: SHEET_TITLE, contentMimeType: 'text/csv', textContent: buildCsv(keys) });
+  const id = payloadOf(r)?.id; if (!id) throw { code: 'tool_error', message: '建立報價表失敗' };
+  const old = S.settings.quoteSheetId;
+  await saveSettings({ quoteSheetId: id, quoteKeys: keys, quoteNow: '', quoteReadAt: '' });
+  if (old && old !== id) mcp.callTool(GD, 'trash_file', { fileId: old }).catch(() => {});
+  return id;
+}
+async function readSheet(mcp, id) { return parseSheet(payloadOf(await mcp.callTool(GD, 'read_file_content', { fileId: id }, { cache: false }))); }
+async function saveSettings(data) {
+  S.settings = { ...S.settings, ...data }; const exists = S.settingsExists; S.settingsExists = true;
+  return write('settings/main', ref => exists ? ref.update(data) : ref.set({ ...S.settings }));
+}
+function renderQuoteChip() {
+  const chip = $('#qChip'), btn = $('#btnQuotes'); if (!chip) return;
+  const q = S.quotes; btn.disabled = S.q.busy;
+  if (S.q.busy) { chip.className = 'chip'; chip.textContent = '報價更新中…'; return; }
+  if (S.q.err) { chip.className = 'chip warn'; chip.textContent = S.q.err; chip.title = S.q.err; return; }
+  if (q?.at) { const d = new Date(q.at); chip.className = 'chip ok'; chip.textContent = `報價 ${d.toLocaleString('zh-TW', { timeZone: 'Asia/Taipei', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })} · Google Finance`; chip.title = ''; return; }
+  chip.className = 'chip'; chip.textContent = '報價 —';
+}
+const MCP_MSG = { server_not_connected: '請先在 claude.ai 設定 → 連接器 加入 Google Drive', needs_reauth: 'Google Drive 授權過期，請到 claude.ai 設定 → 連接器 重新連接', not_in_manifest: '你沒有允許這個頁面使用 Google Drive，可從頁面的權限選單開啟', blocked_by_policy: '組織政策不允許使用 Google Drive', selection_required: '請選擇要使用的 Google Drive 連接器' };
+async function refreshQuotes(manual) {
+  if (S.q.busy || !S.db) return;
+  const keys = neededKeys(); if (!keys.length) { if (manual) toast('還沒有持股，不需要報價'); return; }
+  S.q.busy = true; S.q.err = ''; renderQuoteChip();
+  const mcp = await window.claude?.use?.('mcp');
+  if (!mcp) { S.q.busy = false; S.q.err = '此檢視無法連 Google Drive，現價維持手動'; renderQuoteChip(); return; }
+  try {
+    let id = S.settings.quoteSheetId, rows = null, fresh = false;
+    const have = new Set(S.settings.quoteKeys || []);
+    if (!id || keys.some(k => !have.has(k))) { id = await rebuildSheet(mcp, keys); fresh = true; }
+    try { rows = await readSheet(mcp, id); } catch (e) { if (fresh || e?.code !== 'tool_error') throw e; }
+    const nowCell = rows?.['META:NOW']?.[2];
+    const stale = !rows || !nowCell || (nowCell === S.settings.quoteNow && Date.now() - Date.parse(S.settings.quoteReadAt || 0) > 20 * 60e3);
+    if (stale && !fresh) { id = await rebuildSheet(mcp, keys); rows = await readSheet(mcp, id); }
+    const res = await applyQuotes(rows || {}, keys);
+    await saveSettings({ quoteNow: rows?.['META:NOW']?.[2] || '', quoteReadAt: new Date().toISOString() });
+    if (manual) toast(`已更新 ${res.n} 檔報價${res.na.length ? `；無報價：${res.na.map(k => k.slice(3)).join('、')}（請手動輸入）` : ''}`, 5000);
+  } catch (e) {
+    console.error(e);
+    S.q.err = MCP_MSG[e?.code] || (e?.code === 'server_unavailable' ? 'Google Drive 暫時無回應，稍後再按「更新報價」' : '報價更新失敗：' + (e?.message || e));
+  } finally { S.q.busy = false; render(); }
+}
+async function applyQuotes(rows, keys) {
+  const px = {}, t = {}, na = []; let fx = null; const H = {};
+  const put = (bucket, k, ymd, v) => { const ym = ymd.slice(0, 6), dd = ymd.slice(6); const h = H[ym] || (H[ym] = { p: {}, fx: {}, spx: {} }); if (bucket === 'p') (h.p[k] || (h.p[k] = {}))[dd] = v; else h[bucket][dd] = v; };
+  const num = x => { const n = parseFloat(String(x || '').replace(/,/g, '')); return n > 0 ? n : null; };
+  for (const [key, cells] of Object.entries(rows)) {
+    if (key === 'META:NOW') continue;
+    const price = num(cells[2]);
+    const hs = cells.slice(4).join(';').split(';').map(x => x.match(/^(\d{8})=(\d+(?:\.\d+)?)$/)).filter(Boolean);
+    if (key === 'FX:USDTWD') { if (price) fx = price; hs.forEach(m => put('fx', null, m[1], +m[2])); }
+    else if (key === 'IX:SPX') hs.forEach(m => put('spx', null, m[1], +m[2]));
+    else { const fk = fkey(key); if (price) { px[fk] = price; t[fk] = cells[3] || ''; } else na.push(key); hs.forEach(m => put('p', fk, m[1], +m[2])); }
+  }
+  keys.forEach(k => { if (!rows[k] && !na.includes(k)) na.push(k); });
+  const latest = { px, t, fx: fx || S.quotes?.fx || null, na, at: new Date().toISOString() };
+  S.quotes = latest;
+  await write('quotes/latest', ref => ref.set(latest));
+  for (const [ym, h] of Object.entries(H)) {
+    const id = 'h-' + ym; const cur = S.histDocs[id];
+    if (!cur) { S.histDocs[id] = h; await write('quotes/' + id, ref => ref.set(h)); continue; }
+    const diff = { p: {}, fx: {}, spx: {} }; let changed = false;
+    for (const [k, o] of Object.entries(h.p)) for (const [dd, v] of Object.entries(o)) if (cur.p?.[k]?.[dd] !== v) { (diff.p[k] || (diff.p[k] = {}))[dd] = v; changed = true; }
+    for (const b2 of ['fx', 'spx']) for (const [dd, v] of Object.entries(h[b2])) if (cur[b2]?.[dd] !== v) { diff[b2][dd] = v; changed = true; }
+    if (changed) await write('quotes/' + id, ref => ref.update(diff));
+  }
+  rebuildHist(); autofillBench();
+  return { n: Object.keys(px).length, na };
+}
+function rebuildHist() {
+  const H = {};
+  const add = (k, ym, o) => { const a = H[k] || (H[k] = []); for (const [dd, v] of Object.entries(o || {})) if (+v > 0) a.push([+(ym + dd), +v]); };
+  for (const [id, d] of Object.entries(S.histDocs)) { const ym = id.slice(2); for (const [k, o] of Object.entries(d.p || {})) add(k, ym, o); add('FX', ym, d.fx); add('SPX', ym, d.spx); }
+  for (const a of Object.values(H)) a.sort((x, y) => x[0] - y[0]);
+  S.hist = H;
+}
+function autofillBench() {
+  // S&P 500 and USD/TWD month-end closes come from the price history; TAIEX has no Google Finance feed and stays manual.
+  const cur = todayStr().slice(0, 7); const rows = {};
+  const lastIn = (k, ym) => { const a = (S.hist[k] || []).filter(x => String(x[0]).startsWith(ym.replace('-', ''))); return a.length ? a[a.length - 1][1] : null; };
+  const yms = new Set(Object.keys(S.histDocs).map(id => id.slice(2, 6) + '-' + id.slice(6)));
+  yms.forEach(ym => {
+    if (ym >= cur) return; const b0 = S.bench[ym] || {};
+    const spx = b0.spx || lastIn('SPX', ym), fx = b0.fx || lastIn('FX', ym);
+    if ((spx && !b0.spx) || (fx && !b0.fx)) rows[ym] = { ...b0, ...(spx ? { spx } : {}), ...(fx ? { fx } : {}) };
+  });
+  if (Object.keys(rows).length) saveBenchRows(rows);
 }
 const nowStamp = () => { const d = new Date(); return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
 
@@ -646,17 +938,20 @@ function tabMonths(b, cid) {
   const m = f?.m || defaultCloseMonth();
   const ex = (S.months[cid] || []).find(d => d.id === m);
   const bm = S.bench[m] || {};
-  const val = f?.value ?? (ex ? ex.value : Math.round(v.total));
+  const mEnd = m + '-' + String(lastDay(m)).padStart(2, '0'); const navEnd = mEnd < todayStr() ? dailyNav(cid, mEnd, mEnd)[0] : null;
+  const autoVal = navEnd && !navEnd.notes.includes('缺價') ? Math.round(navEnd.nav) : Math.round(v.total);
+  const autoFlow = (c.flows || []).filter(x => x.date.startsWith(m)).reduce((a, x) => a + x.twd, 0);
+  const val = f?.value ?? (ex ? ex.value : autoVal);
   b.innerHTML = `
     <div class="panel"><h2>${ex ? '修改月結' : '建立月結'} <span class="r small muted">每月一筆，報酬率以修正 Dietz 法計算（出入金視為月中發生）</span></h2>
       <div class="form">
         <div class="f"><label for="cf-m">月份</label><input type="month" id="cf-m" value="${m}"></div>
-        <div class="f"><label for="cf-v">月底總資產 (NT$)</label><input id="cf-v" inputmode="decimal" value="${val}"><span class="hint">預設為目前持股即時估值 ${money(v.total)}</span></div>
-        <div class="f"><label for="cf-f">當月淨入金 (NT$)</label><input id="cf-f" inputmode="decimal" value="${f?.flow ?? (ex ? ex.flow : 0)}"><span class="hint">入金填正數、出金填負數；第一個月請填初始資金</span></div>
-        <div class="f"><label for="cf-fx">月底 USD/TWD</label><input id="cf-fx" inputmode="decimal" value="${f?.fx ?? (bm.fx || ex?.fx || S.settings.fx || '')}"></div>
-        <div class="f"><label for="cf-ti">加權指數月底收盤</label><input id="cf-ti" inputmode="decimal" value="${f?.taiex ?? (bm.taiex || '')}"><span class="hint">所有客戶共用</span></div>
+        <div class="f"><label for="cf-v">月底總資產 (NT$)</label><input id="cf-v" inputmode="decimal" value="${val}"><span class="hint">${navEnd ? `預設為 ${mEnd.slice(5).replace('-', '/')} 每日淨值 ${money(navEnd.nav)}` : `預設為目前即時估值 ${money(v.total)}`}</span></div>
+        <div class="f"><label for="cf-f">當月淨入金 (NT$)</label><input id="cf-f" inputmode="decimal" value="${f?.flow ?? (ex ? ex.flow : autoFlow)}"><span class="hint">${autoFlow ? `已依資金進出紀錄帶入 ${signed(autoFlow)}` : '入金填正數、出金填負數；第一個月請填初始資金'}</span></div>
+        <div class="f"><label for="cf-fx">月底 USD/TWD</label><input id="cf-fx" inputmode="decimal" value="${f?.fx ?? (bm.fx || ex?.fx || (navEnd ? navEnd.fx.toFixed(4) : liveFx()) || '')}"></div>
+        <div class="f"><label for="cf-ti">加權指數月底收盤</label><input id="cf-ti" inputmode="decimal" value="${f?.taiex ?? (bm.taiex || '')}"><span class="hint">所有客戶共用；Google Finance 沒有加權指數，需手動填</span></div>
         <div class="f"><label for="cf-sp">S&amp;P 500 月底收盤</label><input id="cf-sp" inputmode="decimal" value="${f?.spx ?? (bm.spx || '')}"></div>
-        <div class="f wide"><label class="row"><input type="checkbox" id="cf-snap" ${!ex || !ex.holdings ? 'checked' : ''}> 以目前持股與現金存成這個月的持股快照（月報的配置、前十大持股都取自快照）</label></div>
+        <div class="f wide"><label class="row"><input type="checkbox" id="cf-snap" ${!ex || !ex.holdings ? 'checked' : ''}> 存成這個月的持股快照（月報的配置、前十大持股都取自快照；有每日紀錄時用月底的持股與收盤價）</label></div>
       </div>
       <div class="row" style="margin-top:12px"><button class="btn primary" data-act="saveClose">${ex ? '更新' : '儲存'} ${esc(m)} 月結</button>${f ? '<button class="btn ghost" data-act="cancelClose">清除表單</button>' : ''}</div>
       ${!S.bench[addM(m, -1)] ? `<p class="note warn" style="margin:12px 0 0">缺少 ${addM(m, -1)} 的基準指數，這個月的比較基準報酬會顯示「—」。到「設定與基準指數」補上即可。</p>` : ''}
@@ -679,7 +974,7 @@ async function saveClose(cid) {
   const c = S.clients[cid]; const ex = (S.months[cid] || []).find(d => d.id === f.m);
   const fx = numIn(f.fx) || +S.settings.fx || 0;
   const doc = { value, flow: numIn(f.flow), fx, commentary: ex?.commentary || '', closedAt: new Date().toISOString() };
-  if (f.snap) { Object.assign(doc, { holdings: (c.holdings || []).map(({ m, t, n, sec, sh, cost, px }) => ({ m, t, n: n || '', sec: sec || '', sh: +sh || 0, cost: +cost || 0, px: +px || 0 })), cashTWD: +c.cashTWD || 0, cashUSD: +c.cashUSD || 0 }); }
+  if (f.snap) Object.assign(doc, snapshotAt(cid, f.m, fx));
   else if (ex?.holdings) Object.assign(doc, { holdings: ex.holdings, cashTWD: ex.cashTWD, cashUSD: ex.cashUSD });
   const ti = numIn(f.taiex), sp = numIn(f.spx);
   S.closeForm = null;
@@ -689,6 +984,13 @@ async function saveClose(cid) {
     await saveBenchRows({ [f.m]: row });
   }
   toast(`${f.m} 月結已儲存`);
+}
+function snapshotAt(cid, m, fx) {
+  const c = S.clients[cid]; const mEnd = m + '-' + String(lastDay(m)).padStart(2, '0');
+  const pos = mEnd < todayStr() ? (S.pos[cid] || []).filter(p => p.id <= mEnd).pop() : null;
+  if (!pos) return { holdings: (c.holdings || []).map(h => ({ m: h.m, t: h.t, n: h.n || '', sec: h.sec || '', sh: +h.sh || 0, cost: +h.cost || 0, px: pxOf(h) })), cashTWD: +c.cashTWD || 0, cashUSD: +c.cashUSD || 0 };
+  const info = Object.fromEntries((c.holdings || []).map(h => [keyOf(h), h])); const n = ymdNum(mEnd);
+  return { holdings: (pos.h || []).map(([k, sh]) => { const h = info[k] || {}; return { m: k.slice(0, 2), t: k.slice(3), n: h.n || '', sec: h.sec || '', sh, cost: +h.cost || 0, px: closeAt(fkey(k), n) || +h.px || 0 }; }), cashTWD: +pos.cashTWD || 0, cashUSD: +pos.cashUSD || 0 };
 }
 async function saveBenchRows(rows) {
   S.bench = { ...S.bench, ...rows };
@@ -720,7 +1022,7 @@ function reportHTML(cid, m) {
   const intl = S.settings.updown === 'intl' ? ' intl' : '';
   const firm = esc(S.settings.firm || '我的投資管理'); const mgr = esc(S.settings.manager || '');
   const asOf = `${m.replace('-', '/')}/${lastDay(m)}`;
-  const snap = d.holdings ? valuate({ holdings: d.holdings, cashTWD: d.cashTWD, cashUSD: d.cashUSD }, fx) : null;
+  const snap = d.holdings ? valuate({ holdings: d.holdings, cashTWD: d.cashTWD, cashUSD: d.cashUSD }, fx, false) : null;
   const flows = s.slice(0, k + 1).reduce((a, y) => a + y.flow, 0);
   const P = st.P, B = st.B;
   const prow = (label, o, cl = '') => `<tr class="${cl}"><td>${label}</td>${['m1', 'm3', 'm6', 'ytd', 'y1', 'si', 'ann'].map(key => `<td class="${cl ? pcls(o[key]) : ''}">${pct(o[key])}</td>`).join('')}</tr>`;
@@ -805,7 +1107,7 @@ function drawReportCharts(cid, m) {
     colors: { grid: '#e3e9e7', text: '#85918d', surface: '#ffffff' }, yFmt: v => v.toFixed(1),
     series: [{ values: [10, ...sub.map(x => x.unit)], color: '#0d5c51' }, { values: [10, ...sub.map(x => x.bunit)], color: '#85918d', dash: [5, 4] }] });
   const dn = $('#rpDonut'); const d = s[k].doc;
-  if (dn && d.holdings) { const v = valuate({ holdings: d.holdings, cashTWD: d.cashTWD, cashUSD: d.cashUSD }, +d.fx || +S.settings.fx); drawDonut(dn, { size: 128, scale: 3, surface: '#ffffff', ink: '#17221f', ink2: '#85918d', center: [moneyShort(v.total), '總資產 NT$'], parts: [{ v: v.tw, color: '#2a78d6' }, { v: v.us, color: '#eb6834' }, { v: v.cash, color: '#9aa5a1' }] }); }
+  if (dn && d.holdings) { const v = valuate({ holdings: d.holdings, cashTWD: d.cashTWD, cashUSD: d.cashUSD }, +d.fx || +S.settings.fx, false); drawDonut(dn, { size: 128, scale: 3, surface: '#ffffff', ink: '#17221f', ink2: '#85918d', center: [moneyShort(v.total), '總資產 NT$'], parts: [{ v: v.tw, color: '#2a78d6' }, { v: v.us, color: '#eb6834' }, { v: v.cash, color: '#9aa5a1' }] }); }
   checkOverflow();
 }
 function checkOverflow() { const c = $('#rpComm'); const o = $('#ovf'); if (c && o) o.hidden = !(c.scrollHeight > c.clientHeight + 2); }
@@ -835,7 +1137,7 @@ async function draftCommentary(cid) {
   const sample = await window.claude?.use?.('sample');
   if (!sample) return toast('這個檢視無法使用 Claude 草擬');
   const s = series(cid); const m = S.reportMonth; const k = s.findIndex(x => x.m === m); const x = s[k]; const st = stats(s, k, S.settings.rf); const c = S.clients[cid];
-  const snap = x.doc.holdings ? valuate({ holdings: x.doc.holdings, cashTWD: x.doc.cashTWD, cashUSD: x.doc.cashUSD }, +x.doc.fx || +S.settings.fx) : null;
+  const snap = x.doc.holdings ? valuate({ holdings: x.doc.holdings, cashTWD: x.doc.cashTWD, cashUSD: x.doc.cashUSD }, +x.doc.fx || +S.settings.fx, false) : null;
   const prev = k > 0 && s[k - 1].doc.holdings ? s[k - 1].doc.holdings.map(h => h.t) : null;
   const facts = [
     `報告月份：${mLabel(m)}`,
@@ -913,7 +1215,7 @@ async function saveClient(cid) {
   if (cid) { S.clients[cid] = { ...S.clients[cid], ...data }; await write('clients/' + cid, ref => ref.update(data)); toast('已儲存'); render(); return; }
   const ref = S.db.collection('clients').doc(); const id = ref.id;
   const full = { ...data, holdings: [], cashTWD: 0, cashUSD: 0, createdAt: new Date().toISOString() };
-  S.clients[id] = full; subMonths(id);
+  S.clients[id] = full; subMonths(id); subPos(id);
   S.view = 'client'; S.sel = id; S.tab = 'holdings'; render();
   await write('clients/' + id, r => r.set(full));
   toast('已建立客戶，接著輸入持股');
@@ -922,7 +1224,10 @@ async function deleteClient(cid) {
   const ms = (S.months[cid] || []).map(d => d.id);
   S.view = 'home'; S.sel = null; S.confirmDel = false;
   const c = S.clients[cid]; delete S.clients[cid]; render();
+  const ps = (S.pos[cid] || []).map(p => p.id);
   for (const m of ms) await write(`clients/${cid}/months/${m}`, ref => ref.delete());
+  for (const p of ps) await write(`clients/${cid}/pos/${p}`, ref => ref.delete());
+  if (S.posSubs[cid]) { S.posSubs[cid](); delete S.posSubs[cid]; delete S.pos[cid]; }
   await write('clients/' + cid, ref => ref.delete());
   if (S.monthSubs[cid]) { S.monthSubs[cid](); delete S.monthSubs[cid]; delete S.months[cid]; }
   toast(`已刪除 ${c?.name || '客戶'}`);
@@ -937,11 +1242,15 @@ function renderSettings(m) {
       <div class="form">
         <div class="f"><label for="st-firm">工作室／品牌名稱（月報抬頭）</label><input id="st-firm" value="${esc(st.firm || '')}" placeholder="例如：Jake 資產管理"></div>
         <div class="f"><label for="st-mgr">投資經理人</label><input id="st-mgr" value="${esc(st.manager || '')}"></div>
-        <div class="f"><label for="st-fx">目前 USD/TWD（即時估值用）</label><input id="st-fx" inputmode="decimal" value="${st.fx || ''}"></div>
+        <div class="f"><label for="st-fx">備用 USD/TWD（自動匯率抓不到時使用）</label><input id="st-fx" inputmode="decimal" value="${st.fx || ''}"></div>
         <div class="f"><label for="st-rf">無風險利率（年 %，夏普比率用）</label><input id="st-rf" inputmode="decimal" value="${st.rf ?? 1.5}"></div>
         <div class="f"><label for="st-ud">漲跌顏色</label><select id="st-ud"><option value="tw" ${st.updown !== 'intl' ? 'selected' : ''}>台灣慣例：紅漲綠跌</option><option value="intl" ${st.updown === 'intl' ? 'selected' : ''}>國際慣例：綠漲紅跌</option></select></div>
       </div>
       <div class="row" style="margin-top:12px"><button class="btn primary" data-act="saveSettings">儲存設定</button></div>
+    </div>
+    <div class="panel"><h2>自動報價</h2>
+      <p style="margin:0 0 8px">現價、匯率與 S&amp;P 500 來自 Google Finance：頁面會在你的 Google Drive 建立一份試算表「${SHEET_TITLE}」，用 GOOGLEFINANCE 公式取價，再透過你的 Google Drive 連接器讀回來。開頁面時自動更新，持股新增代號時會自動重建這份試算表。</p>
+      <p class="muted small" style="margin:0">${st.quoteSheetId ? `目前報價表：<a href="https://docs.google.com/spreadsheets/d/${esc(st.quoteSheetId)}/edit" target="_blank" rel="noopener">在 Google 試算表開啟</a> ・ 涵蓋 ${(st.quoteKeys || []).length} 檔` : '尚未建立報價表，按右上「更新報價」建立。'}${S.quotes?.na?.length ? ` ・ 無報價：${S.quotes.na.map(k => k.slice(3)).join('、')}` : ''}</p>
     </div>
     <div class="panel"><h2>基準指數月底收盤 <span class="r small muted">所有客戶共用；某月報酬需要該月與前一月兩筆</span></h2>
       <details class="tool" style="margin-bottom:12px"><summary>批次貼上</summary><div style="display:flex;flex-direction:column;gap:10px">
@@ -972,12 +1281,18 @@ document.addEventListener('click', async e => {
     case 'cancelDel': S.confirmDel = false; render(); break;
     case 'addH': {
       const g = id => $('#' + id).value.trim();
-      const h = { m: g('nh-m'), t: g('nh-t').toUpperCase(), n: g('nh-n'), sec: g('nh-sec'), sh: numIn(g('nh-sh')), cost: numIn(g('nh-cost')), px: numIn(g('nh-px')) };
+      const h = { m: g('nh-m'), t: cleanT(g('nh-t')), n: g('nh-n'), sec: g('nh-sec'), sh: numIn(g('nh-sh')), cost: numIn(g('nh-cost')) };
       if (!h.t) return toast('請填代號');
       const list = (S.clients[cid].holdings || []).map(x => ({ ...x }));
       const r = upsertHolding(list, h); saveHoldings(cid, list); toast(r === 'add' ? `已加入 ${h.t}` : `已更新 ${h.t}`); break;
     }
     case 'delH': saveHoldings(cid, (S.clients[cid].holdings || []).filter(h => h.id !== el.dataset.h)); break;
+    case 'txMode': S.txMode = el.dataset.v; render(); break;
+    case 'addFlow': addFlow(cid); break;
+    case 'delFlow': S.confirmDel = 'f:' + el.dataset.id; render(); break;
+    case 'delFlowYes': delFlow(cid, el.dataset.id); break;
+    case 'refreshQuotes': refreshQuotes(true); break;
+    case 'navCsv': navCsv(cid); break;
     case 'bulkPx': {
       const lines = $('#bulkPx').value.split('\n').map(l => l.trim().split(/[\s,，\t]+/)).filter(p => p.length >= 2 && isFinite(parseFloat(p[1])));
       if (!lines.length) return toast('沒有可辨識的「代號 價格」');
@@ -995,7 +1310,7 @@ document.addEventListener('click', async e => {
       const rows = $('#csvIn').value.split('\n').map(l => l.split(/\t|,/).map(x => x.trim())).filter(r => r.length >= 5 && isFinite(parseFloat(String(r[4]).replace(/,/g, ''))));
       if (!rows.length) return toast('沒有可辨識的資料列');
       const list = (S.clients[cid].holdings || []).map(x => ({ ...x })); let a = 0, u = 0;
-      rows.forEach(r => { const m = /^us|美/i.test(r[0]) ? 'US' : 'TW'; const res = upsertHolding(list, { m, t: r[1].toUpperCase(), n: r[2], sec: r[3], sh: numIn(r[4]), cost: numIn(r[5] || 0), px: numIn(r[6] || 0) }); res === 'add' ? a++ : u++; });
+      rows.forEach(r => { const m = /^us|美/i.test(r[0]) ? 'US' : 'TW'; const res = upsertHolding(list, { m, t: cleanT(r[1]), n: r[2], sec: r[3], sh: numIn(r[4]), cost: numIn(r[5] || 0), ...(r[6] ? { px: numIn(r[6]) } : {}) }); res === 'add' ? a++ : u++; });
       saveHoldings(cid, list, { pxAt: nowStamp() }); toast(`新增 ${a} 筆、更新 ${u} 筆`); break;
     }
     case 'saveClose': saveClose(cid); break;
@@ -1008,8 +1323,7 @@ document.addEventListener('click', async e => {
     case 'draft': draftCommentary(cid); break;
     case 'saveSettings': {
       const data = { firm: $('#st-firm').value.trim(), manager: $('#st-mgr').value.trim(), fx: numIn($('#st-fx').value), rf: numIn($('#st-rf').value), updown: $('#st-ud').value };
-      S.settings = { ...S.settings, ...data }; const exists = S.settingsExists; S.settingsExists = true;
-      await write('settings/main', ref => exists ? ref.update(data) : ref.set(data)); toast('設定已儲存'); render(); break;
+      await saveSettings(data); toast('設定已儲存'); render(); break;
     }
     case 'importBench': {
       const rows = {}; $('#benchIn').value.split('\n').forEach(l => { const p = l.trim().split(/[\s,\t]+/); if (/^\d{4}[-/]\d{1,2}$/.test(p[0] || '') && p.length >= 4) { const [y, mo] = p[0].split(/[-/]/); rows[`${y}-${mo.padStart(2, '0')}`] = { taiex: numIn(p[1]), spx: numIn(p[2]), fx: numIn(p[3]) }; } });
@@ -1027,8 +1341,13 @@ document.addEventListener('change', e => {
     const list = (S.clients[cid].holdings || []).map(h => h.id === el.dataset.h ? { ...h, [k]: val } : h);
     saveHoldings(cid, list, k === 'px' ? { pxAt: nowStamp() } : {});
   } else if (el.dataset.cash) {
-    const data = { [el.dataset.cash]: numIn(el.value) }; S.clients[cid] = { ...S.clients[cid], ...data }; render();
+    const data = { [el.dataset.cash]: numIn(el.value) }; const old = S.clients[cid]; const next = { ...old, ...data }; S.clients[cid] = next;
+    applyPosDelta(cid, S.effDate || todayStr(), posDelta(old, next), posState(next)); render();
     write('clients/' + cid, ref => ref.update(data));
+  } else if (el.id === 'effDate') {
+    S.effDate = el.value && el.value < todayStr() ? el.value : null; render();
+  } else if (el.id === 'nv-m') {
+    S.navMonth = el.value; render();
   } else if (el.id === 'cf-m') {
     S.closeForm = { cid, m: el.value }; render();
   } else if (el.id === 'rp-m') {
@@ -1054,18 +1373,35 @@ function subMonths(cid) {
     render();
   }, err => console.error(err));
 }
+function subPos(cid) {
+  if (S.posSubs[cid]) return;
+  S.posSubs[cid] = S.db.collection(`clients/${cid}/pos`).onSnapshot(snap => {
+    S.pos[cid] = snap.docs.filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d.id)).map(d => ({ id: d.id, ...d.data() })).sort((a, b) => a.id.localeCompare(b.id));
+    render();
+  }, err => console.error(err));
+}
+function maybeAutoRefresh() {
+  if (S.q.autoTried || !S.ready.settings || !S.ready.clients || !S.ready.quotes) return;
+  S.q.autoTried = true;
+  if (!S.quotes?.at || Date.now() - Date.parse(S.quotes.at) > 10 * 60e3) refreshQuotes(false);
+}
 async function boot() {
   render();
   const db = window.claude?.use ? await window.claude.use('db') : null;
   if (!db) { S.noDb = true; render(); return; }
   S.db = db; render();
-  db.doc('settings/main').onSnapshot(d => { S.settingsExists = d.exists; if (d.exists) S.settings = { ...S.settings, ...d.data() }; S.ready.settings = true; render(); }, err => console.error(err));
+  db.doc('settings/main').onSnapshot(d => { S.settingsExists = d.exists; if (d.exists) S.settings = { ...S.settings, ...d.data() }; S.ready.settings = true; render(); maybeAutoRefresh(); }, err => console.error(err));
+  db.collection('quotes').onSnapshot(snap => {
+    const hd = {}; snap.docs.forEach(d => { if (d.id === 'latest') S.quotes = { ...d.data() }; else if (/^h-\d{6}$/.test(d.id)) hd[d.id] = d.data(); });
+    S.histDocs = hd; rebuildHist(); S.ready.quotes = true; render(); maybeAutoRefresh();
+  }, err => console.error(err));
   db.doc('settings/bench').onSnapshot(d => { S.benchExists = d.exists; S.bench = d.exists ? { ...(d.data().rows || {}) } : {}; S.ready.bench = true; render(); }, err => console.error(err));
   db.collection('clients').onSnapshot(snap => {
     const next = {}; snap.docs.forEach(d => { next[d.id] = { ...d.data() }; });
     Object.keys(S.monthSubs).forEach(id => { if (!next[id]) { S.monthSubs[id](); delete S.monthSubs[id]; delete S.months[id]; } });
-    S.clients = next; Object.keys(next).forEach(subMonths);
-    S.ready.clients = true;
+    Object.keys(S.posSubs).forEach(id => { if (!next[id]) { S.posSubs[id](); delete S.posSubs[id]; delete S.pos[id]; } });
+    S.clients = next; Object.keys(next).forEach(id => { subMonths(id); subPos(id); });
+    S.ready.clients = true; maybeAutoRefresh();
     if (S.view === 'client' && !next[S.sel]) { S.view = 'home'; S.sel = null; }
     render();
   }, err => { console.error(err); toast('讀取客戶資料失敗'); });
