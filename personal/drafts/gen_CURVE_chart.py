@@ -106,14 +106,14 @@ axL.text(2.08, 5.3, "二年期 +5", color=SLATE, fontsize=13.5,
          fontproperties=serif_b, va='center')
 axL.text(2.08, 3.4, "十年期 +4", color=RED, fontsize=13.5,
          fontproperties=serif_b, va='center')
-axL.text(1, -7.2, "兩條都約 −6", color=GREY, fontsize=12.5,
+axL.text(1, -7.2, "盤中先跌（各家報價不一）", color=GREY, fontsize=12.5,
          ha='center', va='top')
 axL.set_xticks(xs)
 axL.set_xticklabels(["前一日收盤", "公布後盤中", "當日收盤"])
 axL.set_xlim(-0.25, 2.75)
 axL.set_ylim(-10, 8)
-axL.set_yticks([-6, 0, 4])
-axL.set_yticklabels(["−6", "0", "+4"])
+axL.set_yticks([0, 4])
+axL.set_yticklabels(["0", "+4"])
 axL.grid(axis='y', color=LGRID, lw=0.6, zorder=0)
 
 # ══════════ 右下：升息機率 ══════════
