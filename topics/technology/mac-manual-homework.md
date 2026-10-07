@@ -23,6 +23,14 @@ last_updated: 2026-07-06
 
 ## 🔴 待辦（依急迫度）
 
+### 🆕 2026-10-07 新增（本益比軌道模型 session）
+
+- [ ] **讓雲端拿得到分析師共識 EPS**（`projects/pe-forecast/orbit_price.py` 的「市場共識」輸入，README §16.5）。
+  雲端 2026-10-07 實測：Yahoo `query1…/v8/finance/chart`（股價）**可用**；`quoteSummary`（含 earningsTrend 共識）回 **401**，
+  因為要先從 `fc.yahoo.com` 拿 cookie，而該網域被環境的網路政策擋（CONNECT 403）。
+  → 在 claude.ai 這個雲端環境的網路設定加允許：`fc.yahoo.com`、`query2.finance.yahoo.com`、`finance.yahoo.com`。
+  在那之前：共識手動抄到 `projects/pe-forecast/data/consensus.csv`（格式見檔頭；GAAP 稀釋口徑），或命令列 `--cons／--fy-cons`。
+
 ### 🆕 2026-09-24 新增（前瞻本益比模型 session 產生）
 
 - [ ] **用 SEC 官方資料重跑 `projects/pe-forecast/`**（這一版的財報與股價來自 GitHub 公開鏡像，雲端連不到
@@ -197,6 +205,7 @@ last_updated: 2026-07-06
   → 決定 T5 燈（AI 電力確認）與 Mersen 是否進入分批（現價 €37.24，已低於觸發 B 的 €38 價格條件）。
 - [ ] **Yahoo Finance 行情 API 是否恢復**（制度層，影響每週重定價）。
   本 runner 2026-08-02 實測 **query1／query2／quoteSummary／getcrumb 四個端點全數回 HTTP 429 "Too Many Requests"**，`agents/loops/weekly-repricing-audit.md` 寫死的主源全掛。
+  （2026-10-07 雲端 session 實測：`query1…/v8/finance/chart` 已恢復可用；quoteSummary 401（缺 cookie）。runner 是否恢復未測。）
   本週已建立並實測通過的備援鏈：**CNBC quote cache**（`source="Exchange"`，美/日/英/法/台上市＋匯率，附 trailing P/E 與市值；**坑：逗號批次不支援、查不到韓股、查不到台股上櫃**）＋ **Naver `siseJson`**（韓股）＋ **FinMind `TaiwanStockPrice` + TPEx openapi**（台股含上櫃）。
   → 若 Yahoo 持續 429，該把備援鏈正式寫進 loop 憲章 §HOW TO WORK（本 session 未自行改憲章，改制度檔前依 `agents/MAINTENANCE.md` 應先確認）。
 - [ ] **Ayar Labs 到底有沒有被 NVIDIA 收購**（兩說並存，影響 IPO 管線判斷）。
