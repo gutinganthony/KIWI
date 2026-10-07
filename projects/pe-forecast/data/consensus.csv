@@ -1,0 +1,5 @@
+# 市場共識 EPS（orbit_price.py 沒給 --cons／--fy-cons 時讀這裡；你在命令列給的永遠優先）
+# 一列＝一家公司一個會計年度的共識 EPS（GAAP 稀釋口徑；分析師常報的是 non-GAAP，要自己換算或註明在 source）
+# fy_end＝會計年度結束月（YYYY-MM）；asof＝抄下來的日期；同一年度有多筆時取 asof 最新的。累積下來就是我們自己的共識歷史。
+# 例：MU,2027-08,72.5,某網站 FY27 平均,2026-10-07
+ticker,fy_end,eps,source,asof
