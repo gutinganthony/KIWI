@@ -9,6 +9,9 @@
 | `03_tech_valuation_evidence.md` | 科技股相關：Pástor-Veronesi 不確定性、Schwartz-Moon、研發費用化與 SBC、各估值模型的準確度賽馬、成長衰減速度 |
 | `04_theory_comparison_for_tech.md` | **理論比較的結論**：各理論逐項評分、三種典型科技公司試算、建議的模型骨架與可驗證的假說 |
 | `05_aeg_orbit_test_and_design.md` | 第 2 步：AEG 與本益比軌道詳解、在 S&P 500 上的實測（AEG 照理論失敗、軌道＝舊模型基準）、反推長期成長的示範與實作規劃、週期股與虧損股方案 |
+| `06_consensus_data_sources.md` | 市場共識 EPS 可以從哪裡拿（這個環境能連什麼、要使用者幫忙開什麼、手動輸入與自建歷史的做法） |
+| 第 3 步（實作）→ `../README.md` §16 | 本益比軌道＋看法參數（你的 EPS／市場共識、a＝h 個月後、b＝再下一年）：6／12／24 個月走動式回測、2022 以後與最近一段（目標日到 2026-09）的驗證、週期股與虧損股方案、CLI `orbit_price.py` |
+| `orbit_window_test.py` | §16.3 第 4 點：β 用最近幾年 vs 全部歷史估（輸出 `results/orbit_window.txt`） |
 | `aeg_lab.py`、`reverse_demo.py` | 第 2 步的回測與示範程式（輸出在 `results/aeg_lab*`） |
 | `tech_archetypes.py` | 三種典型科技公司（穩定巨頭、高成長、週期）套 Gordon、PVGO、AEG、兩階段軌道的試算 |
 | `pe_check.py`、`cs_check.py` | 理論公式的數值驗算（Gordon＝MM＝L&K、兩階段、OJ、Penman、Ohlson、Campbell-Shiller） |

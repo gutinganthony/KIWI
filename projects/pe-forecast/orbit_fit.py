@@ -120,7 +120,7 @@ def main():
             if g in s.index:
                 bt[f"軌道（{g}）"] = float(s.loc[g, "orbit"])
                 bt[f"＋你的 EPS（{g}）"] = float(s.loc[g, "原始成長ab"])
-                bt[f"＋共識＋你的 EPS（{g}）"] = float(s.loc[g, "預期b＋修正ab"])
+                bt[f"＋預期（代理）＋你的 EPS（{g}）"] = float(s.loc[g, "預期b＋修正ab"])
         model["backtest"][str(h)] = bt
     rp = os.path.join(RES, "orbit_recent_scores.csv")
     if os.path.exists(rp):
