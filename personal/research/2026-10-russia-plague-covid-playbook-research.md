@@ -143,6 +143,7 @@
 - 10/6 WHO：俄方回覆「伊爾庫茨克沒有記錄到鼠疫病例」，起初症狀像典型急性呼吸道病毒感染；接觸者驗出 2 例新冠、2 例鼻病毒，無鼠疫或其他高威脅病原，無人有症狀；風險評估不變（UN News、NBC、CBC、Newsweek）
 - 接觸者檢驗比例衝突：NBC 引俄方官員「約六成已驗」vs 另有報導稱俄方經 IHR 通報監測已結束 → 不寫比例
 - 10/6 美股：Novavax 跌約一成（Yahoo、Benzinga、TipRanks、24/7 Wall St）；Moderna 方向衝突（Yahoo −7% vs 24/7 Wall St 小漲）→ 不寫
+- **10/7 FinMind 收盤價定案**（USStockPrice）：NVAX 10/2 10.46 → 10/5 12.56（+20.08%）→ 10/6 11.32（−9.87%）；MRNA 190.01 → 203.21（+6.95%）→ 187.46（−7.75%，與 Yahoo 一致，Moderna 衝突解決）；EBS 6.33 → 7.24（**+14.38%**，底稿 15.3% 有誤）→ 6.95（−4.01%）。NVAX 2021/2/9 盤中高 331.68、收 315.87
 - 10/6 美方：川普說很快與普丁通話（NBC、CNN）；魯比歐要求俄方公開更多資訊（WaPo、CNN）；CNN 稱俄方「stonewalling」（僅 CNN 系統）
 - 專家質疑俄方動員規模不像一般鼠疫調查（Newsweek、PBS），但無證據；STAT「Panic is getting ahead of evidence」
 - 單一來源未用：研究所 60 人隔離（CNN 引地方媒體）、中亞四國邊境檢疫（CNN）、iStories「半世紀首例鼠疫死亡」vs BFM「鼠疫未證實」、PBS 專家稱該所蘇聯時期曾做生物武器研發
