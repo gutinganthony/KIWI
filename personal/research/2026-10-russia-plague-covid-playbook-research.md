@@ -148,6 +148,12 @@
 - 單一來源未用：研究所 60 人隔離（CNN 引地方媒體）、中亞四國邊境檢疫（CNN）、iStories「半世紀首例鼠疫死亡」vs BFM「鼠疫未證實」、PBS 專家稱該所蘇聯時期曾做生物武器研發
 - WebFetch 對 news.un.org、unognewsroom.org、newsweek.com、washingtontimes.com 全部被擋，以上為搜尋摘要交叉比對
 
+**#1 補充｜台北 10/7 13:45｜UN News 原文（Jake 提供 PDF）**
+- 有：死因未正式確認、檢驗進行中；俄方訊息「no pathogens of dangerous infectious diseases were detected among any of the contacts」、起初「typical acute respiratory viral infection」；所有接觸者已找到、仍在監測、無人有症狀；**初步**風險評估三級，會再更新；WHO 若俄方要求隨時支援
+- WHO 時間線：10/2 內部監測從媒體報導得知；10/3 依 IHR 向俄方查證
+- 沒有：「伊爾庫茨克沒有記錄到鼠疫病例」（NBC、CBC、Newsweek 轉述）、兩例新冠兩例鼻病毒、六成比例、「一般大眾」字樣
+- 排除「接觸者監測已結束」一說
+
 ## 九、可接的素材
 
 - 本週曲線篇（兩塊框架）→ 2020 vs 現在
