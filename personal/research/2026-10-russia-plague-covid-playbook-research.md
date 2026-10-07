@@ -25,6 +25,7 @@
 ## 二、市場反應（10/5 美股）
 
 - Novavax **+22～24%**（約 12.73 美元，盤中 52 週新高 11.99 以上）。**同日另有利多**：Sanofi 銷售 Nuvaxovid、多市場核准、權利金。Benzinga 稱「放空者緊張」＝**軋空**
+  - **10/7 修正**：Yahoo/Zacks 寫正規盤 **+20.08%**；Benzinga 10/6「−10.59% 報 11.24 美元」反推 10/5 收盤約 **12.57**。22～24% 與 12.73 可能含盤後。正文已改「兩成多」「還不到 13 美元」
 - Moderna **+7.1～8%**（約 203～204 美元）
 - BioNTech **+0.5%**
 - Emergent BioSolutions **+15.3%**（生物防禦，高放空）
@@ -135,6 +136,17 @@
 - 2020/4/20 WTI 負油價精確值
 - IHR 附件二條文
 - **發文前最新疫情進度**（觀察期內是否有新增病例、病原體是否確認）
+
+## 八之一、發佈前監控紀錄
+
+**#1｜台北 10/7 08:00**（日期為美東／事件當地）
+- 10/6 WHO：俄方回覆「伊爾庫茨克沒有記錄到鼠疫病例」，起初症狀像典型急性呼吸道病毒感染；接觸者驗出 2 例新冠、2 例鼻病毒，無鼠疫或其他高威脅病原，無人有症狀；風險評估不變（UN News、NBC、CBC、Newsweek）
+- 接觸者檢驗比例衝突：NBC 引俄方官員「約六成已驗」vs 另有報導稱俄方經 IHR 通報監測已結束 → 不寫比例
+- 10/6 美股：Novavax 跌約一成（Yahoo、Benzinga、TipRanks、24/7 Wall St）；Moderna 方向衝突（Yahoo −7% vs 24/7 Wall St 小漲）→ 不寫
+- 10/6 美方：川普說很快與普丁通話（NBC、CNN）；魯比歐要求俄方公開更多資訊（WaPo、CNN）；CNN 稱俄方「stonewalling」（僅 CNN 系統）
+- 專家質疑俄方動員規模不像一般鼠疫調查（Newsweek、PBS），但無證據；STAT「Panic is getting ahead of evidence」
+- 單一來源未用：研究所 60 人隔離（CNN 引地方媒體）、中亞四國邊境檢疫（CNN）、iStories「半世紀首例鼠疫死亡」vs BFM「鼠疫未證實」、PBS 專家稱該所蘇聯時期曾做生物武器研發
+- WebFetch 對 news.un.org、unognewsroom.org、newsweek.com、washingtontimes.com 全部被擋，以上為搜尋摘要交叉比對
 
 ## 九、可接的素材
 
