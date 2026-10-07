@@ -90,16 +90,10 @@ def main():
     notes = []
     use_auto = str(a.cons or "").lower() == "auto"
     snap, snap_src = consensus.get_row(t, os.path.join(HERE, "data", "consensus_snapshots"), live=use_auto)
-    if snap is not None:                       # 快照比 now_all.csv 新：有新公布的一季就更新今天的 EPS（Yahoo 的 TTM 是 GAAP 稀釋）
-        when, past = consensus.last_earnings(snap)
-        ttm = snap.get("epsTrailingTwelveMonths")
-        # 最近一次公布日在「下一季的季末」之後 → now_all.csv 之後又公布了一季
-        if past and ttm is not None and pd.notna(ttm) and when > pd.Timestamp(row["period_end"]) + pd.DateOffset(months=3):
-            old_e, old_q = float(row["eps0"]), pd.Timestamp(row["period_end"])
-            row["eps0"] = float(ttm)
-            row["period_end"] = old_q + pd.DateOffset(months=3)
-            notes.append(f"今天的 EPS 已更新：{when.date()} 公布了新的一季 → 最近四季 EPS {old_e:,.2f} → {float(ttm):,.2f}"
-                         f"（Yahoo，GAAP 稀釋；最新一季季末約 {row['period_end'].date()}）")
+    rf = consensus.refresh_eps(row, snap)       # 快照比 now_all.csv 新、又公布了新的季 → 改用 Yahoo 的 GAAP 最近四季
+    if rf["n_new"]:
+        row["eps0"], row["period_end"] = rf["eps0"], rf["period_end"]
+        notes.append(rf["note"])
     asof = pd.Timestamp(row["price_date"])
     ta, tb = asof + pd.DateOffset(months=a.h), asof + pd.DateOffset(months=a.h + 12)
     eps0 = float(row["eps0"])
@@ -121,14 +115,23 @@ def main():
             sys.exit("--eps2 的個數要和 --eps 一樣")
         mine = [(v, lb[i] if lb else None) for i, v in enumerate(la)]
 
-    # 市場共識：命令列 > data/consensus.csv > --cons auto（Yahoo）
-    ca = None if (a.cons is None or use_auto) else float(a.cons)
+    # 市場共識：命令列數字（--cons／--cons2）> --fy-cons > data/consensus.csv > --cons auto（Yahoo）
+    ca = None
+    if a.cons is not None and not use_auto:
+        try:
+            ca = float(a.cons)
+        except ValueError:
+            sys.exit(f"--cons 要給數字或 auto（收到 {a.cons!r}）")
     cb, csrc = a.cons2, "命令列"
     fyc = parse_fy(a.fy_cons) if a.fy_cons else {}
+    if fyc and ca is not None:
+        notes.append("同時給了 --cons 和 --fy-cons：EPS_a 用 --cons，--fy-cons 只用在沒給 --cons2 時的 EPS_b")
     if not fyc and ca is None:
         fyc, src = consensus_from_file(t)
         if fyc:
             csrc = f"data/consensus.csv（{src}）"
+            if use_auto:
+                notes.append("data/consensus.csv 有這一檔 → 用檔案裡的共識，--cons auto 略過（要用 Yahoo 就先刪掉檔案裡那幾列）")
     if not fyc and ca is None and use_auto:
         au = consensus.auto(t, snap, snap_src, os.path.join(HERE, ".cache", "yahoo"))
         if au is None:
@@ -147,7 +150,10 @@ def main():
                              "「你和共識的差距」會被系統性低估 → 用 --cons-scale、或手動給 GAAP 口徑的共識")
             notes += ["⚠ " + w for w in au["warn"]]
     if fyc:
-        ca, how_ca = orbit.calendarize(fyc, ta, row["period_end"], eps0, extrapolate=True)
+        if ca is None:
+            ca, how_ca = orbit.calendarize(fyc, ta, row["period_end"], eps0, extrapolate=True)
+        else:
+            how_ca = "命令列"
         if cb is None:
             cb, how_cb = orbit.calendarize(fyc, tb, row["period_end"], eps0, extrapolate=True)
         else:

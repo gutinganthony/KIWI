@@ -1263,15 +1263,18 @@ S&P 500 走動式回測，假設 EPS 完全正確；中位 |ln 誤差|（本益�
 
 - **自動（`--cons auto`）**：Yahoo 的「預設產業選股器」不用 cookie、crumb、key，這個雲端環境就連得到（2026-10-07 實測；`research/06`）。
   每檔有本財年（0y）、下一財年（+1y）的共識、GAAP 最近四季 EPS、下次／最近一次財報日。11 個類股約 3,600 檔。
-  - `pef/consensus.py` 判斷 0y 是哪一年：最近一個已結束的年度，結束超過 100 天、或財報日已過，就算已公布 → 0y＝下一年。
-    （Yahoo 的年度財報介面會晚幾週才加上剛公布的年度，所以只拿它判斷「幾月結束」。）
+  - `pef/consensus.py` 判斷 0y 是哪一年：最近一個已結束的年度，結束超過 100 天就算已公布 → 0y＝下一年；100 天內看財報日——
+    已過而且在年度結束之後 → 已公布；**還沒到、但距離年度結束超過 95 天 → 那是下一年第一季（Yahoo 公布後會把日期滾到下一次，例：COST）→ 已公布**；
+    95 天內 → 那一次就是年報，還沒公布。（Yahoo 的年度財報介面會晚幾週才加上剛公布的年度，所以只拿它判斷「幾月結束」。）
   - 再用會計年度換算（§16.6）成 EPS_a、EPS_b；超出 +1y 的季用 0y→+1y 的成長率外推（每年截在 −30%～+50%，會標「外推」）。
-  - **今天的 EPS 也會順便更新**：快照的財報日晚於 `now_all.csv` 最新一季的下一季季末，就改用 Yahoo 的 GAAP 最近四季
-    （例：MU 2026-09-30 公布新一季，44.08 → 74.33）。沒有 7 天內的快照時，`--cons auto` 會即時抓並存檔。
+  - **今天的 EPS 也會順便更新**（有 7 天內的快照就會，不限 `--cons auto`）：用財報日推「現在已公布到哪一季」，
+    比 `now_all.csv` 多了幾季，就改用 Yahoo 的 GAAP 最近四季，季末也往後推幾季（例：MU 9/30 公布新一季 44.08 → 74.33；COST 19.89 → 20.76）。
+    只在美元報價、美元財報時更新；新舊差 3 倍以上或正負號改變會加註（2026-10-07 全樣本：1,982 家裡更新 42 家，異常 2 家：CALM、NEOG）。
+    沒有 7 天內的快照時，`--cons auto` 會即時抓並存檔。
 - **快照＝自己的歷史時點資料**：`python3 consensus_snapshot.py` 把全部類股存成 `data/consensus_snapshots/yahoo_YYYY-MM-DD.csv.gz`（約 160KB）。
   每週存一次，2–3 年後就能用真正的共識重估 β_e、β_s（現在是用代理預期估的）。
-- **一定保留手動輸入**：命令列 `--cons`／`--cons2`／`--fy-cons` 最優先，其次 `data/consensus.csv`（ticker, fy_end, eps, source, asof；
-  同一年度取 asof 最新的），最後才是 `--cons auto`。
+- **一定保留手動輸入**：命令列數字 `--cons`／`--cons2` 最優先，其次 `--fy-cons`，再其次 `data/consensus.csv`（ticker, fy_end, eps, source, asof；
+  同一年度取 asof 最新的），最後才是 `--cons auto`。被蓋掉的來源會印出提示。
 - **口徑**：模型的 EPS 是 GAAP 稀釋；Yahoo 的 TTM 是 GAAP，但共識多半是調整後（street）口徑——軟體、股票報酬費用高的公司可差 30% 以上。
   程式會印「本財年共識 ÷ 目前 GAAP 最近四季」，今天 GAAP 虧損但共識是正的也會警告；用 `--cons-scale 0.8` 之類的係數換算，或手動給 GAAP 口徑的共識。
   ADR／外幣財報的共識可能和股價不同幣別（例：BABA），程式會警告。
@@ -1306,7 +1309,14 @@ MU（2026-10-06，股價 1,045.56、最近四季 EPS 74.33（已更新）、波�
 拆解（第一列）：軌道 +9.6%；市場預期的成長 ln(198.8 ÷ 74.33)＝0.98 × β 0.148 ＝ +14.5%（半導體類過去「預期成長高」的股價比軌道多漲）；
 你比共識低 25%（b）× β 0.204 ＝ −5.8%。你的 EPS 從 120 到 180（+50%），股價中位只從 1,248 到 1,401（+12%）——本益比主要由你的 EPS 決定。
 
-### 16.7 限制
+### 16.7 前瞻紀錄：真正沒碰過的驗收
+
+`results/forward/orbit-2026-10-06/`（`python3 forward_log.py freeze-orbit`）：1,982 家（S&P 500 448 家），股價＝2026-10-06 收盤（共識快照），
+凍結了今天的輸入、`orbit_model.json`、各家 6／12／24 個月的軌道股價，以及當天的共識（0y、+1y）。
+到 2027-04、2027-10、2028-10 重跑 `now_run.py` 後：`python3 forward_log.py score-orbit --tag orbit-2026-10-06 --actuals results/now_all.csv`，
+會算「軌道」「軌道＋實際 EPS」「本益比不變」的中位誤差與區間涵蓋率。這是唯一完全沒被看過的樣本（模型在 2026-10-07 定案）。
+
+### 16.8 限制
 
 - β 和區間只在 S&P 500 估過；中小型股沒驗證。倖存者偏誤同 §15.11。
 - 回測裡「你的 EPS」＝事後實際值（上限）；EPS 有誤差時改善會再縮小（§15.6 的雜訊測試：σ＝0.3 時仍不比軌道差）。
@@ -1315,12 +1325,14 @@ MU（2026-10-06，股價 1,045.56、最近四季 EPS 74.33（已更新）、波�
 - 「市場預期」是代理，不是真正的分析師共識（§16.5）。
 - 不是投資建議。
 
-### 16.8 重現
+### 16.9 重現
 
 ```
 python3 lab_orbit.py --cache <暫存目錄>        # 走動式回測 6／12／24 個月（第一次約 10 分鐘，訓練樹模型：不要和其他訓練程式同時跑）
 python3 lab_orbit_recent.py --lg <loosygoosie data/companies> --yahoo-cache <快取目錄>   # 延伸到目標日 2026-09
 python3 orbit_fit.py --cache <同上暫存目錄>     # 正式版 β＋區間＋命中率 → results/orbit_model.json、results/orbit_fit.txt
 python3 research/orbit_window_test.py <同上暫存目錄>/orbit_x2.pkl > results/orbit_window.txt   # 滾動窗 vs 擴張窗
-python3 orbit_price.py MU --eps 70 --eps2 90   # 用法
+python3 orbit_price.py MU --eps 150 --eps2 200 --cons auto   # 用法
+python3 consensus_snapshot.py                  # 每週一份共識快照
+python3 forward_log.py freeze-orbit            # 凍結前瞻紀錄（同一個股價日只能凍結一次）
 ```

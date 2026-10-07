@@ -86,20 +86,66 @@ def last_earnings(row, now=None):
     return when, when <= now
 
 
+REPORT_GAP = 95           # 年度結束後多少天內的財報日，算是「這一年的年報」；更晚的是下一年第一季
+
+
 def fy0_end(month, row, now=None):
     """Yahoo 的 epsCurrentYear（0y）指的是哪一個會計年度：還沒公布的最早那一年。
-    E＝最近一個已經結束的年度結束日；結束超過 100 天一定已公布 → 0y＝E＋12 個月；
-    100 天內：最近一次公布日在 E 之後且已過 → 已公布 → E＋12 個月，否則 0y＝E。"""
+    E＝最近一個已經結束的年度結束日。結束超過 100 天一定已公布 → 0y＝E＋12 個月。100 天內看財報日：
+      已經過去、而且在 E 之後 → 年報已公布；
+      還沒到（Yahoo 公布後會把日期滾到「下一次」）：距離 E 超過 95 天 → 那是下一年第一季 → 年報已公布；
+      95 天內 → 那一次就是年報 → 還沒公布，0y＝E。沒有財報日 → 當作還沒公布。"""
     now = pd.Timestamp.now() if now is None else now
     e = pd.Timestamp(year=now.year, month=month, day=1) + pd.offsets.MonthEnd(0)
     if e > now:
         e = pd.Timestamp(year=now.year - 1, month=month, day=1) + pd.offsets.MonthEnd(0)
+    nxt = e + pd.DateOffset(months=12) + pd.offsets.MonthEnd(0)
     if (now - e).days > 100:
-        return e + pd.DateOffset(months=12) + pd.offsets.MonthEnd(0)
+        return nxt
     when, past = last_earnings(row, now)
-    if when is not None and past and when > e:
-        return e + pd.DateOffset(months=12) + pd.offsets.MonthEnd(0)
-    return e
+    if when is None:
+        return e
+    if past:
+        return nxt if when > e else e
+    return nxt if (when - e).days > REPORT_GAP else e
+
+
+def last_reported_quarter(period_end, row, now=None):
+    """快照的財報日推「現在已公布到哪一季」：從 period_end 每次加 3 個月往後找。
+    財報日已過 → 公布的是財報日前最後一個季末；財報日還沒到 → 那一次要公布的季再往前一季。回傳 (季末, 比 period_end 多幾季)。"""
+    when, past = last_earnings(row, now)
+    q = pd.Timestamp(period_end)
+    if when is None:
+        return q, 0
+    lim = when - pd.Timedelta(days=10)
+    chain = [q]
+    while chain[-1] + pd.DateOffset(months=3) <= lim:
+        chain.append(chain[-1] + pd.DateOffset(months=3))
+    if not past and len(chain) > 1:
+        chain = chain[:-1]                                # 下一次要公布的那一季還沒公布
+    return chain[-1], len(chain) - 1
+
+
+def refresh_eps(row, snap, now=None):
+    """repo 的最近四季 EPS（row["eps0"]、row["period_end"]）比快照舊時，改用快照的 GAAP 最近四季（epsTrailingTwelveMonths）。
+    只在美元報價、美元財報時更新。回傳 dict(eps0, period_end, n_new, ratio, note)；不更新時 n_new＝0。"""
+    out = dict(eps0=float(row["eps0"]), period_end=pd.Timestamp(row["period_end"]), n_new=0, ratio=None, note=None)
+    if snap is None:
+        return out
+    ttm = snap.get("epsTrailingTwelveMonths")
+    cur, fcur = str(snap.get("currency") or ""), str(snap.get("financialCurrency") or "")
+    if ttm is None or pd.isna(ttm) or cur != "USD" or fcur not in ("USD", "nan", ""):
+        return out
+    q, n = last_reported_quarter(out["period_end"], snap, now)
+    if n < 1:
+        return out
+    old = out["eps0"]
+    ratio = float(ttm) / old if old else None
+    note = (f"今天的 EPS 已更新：repo 之後又公布了 {n} 季（推到季末約 {q.date()}）→ 最近四季 EPS {old:,.2f} → {float(ttm):,.2f}"
+            "（Yahoo，GAAP 稀釋）")
+    if ratio is not None and (ratio <= 0 or ratio > 3 or ratio < 1 / 3):
+        note += f"　⚠ 新舊相差 {ratio:.2f} 倍（或正負號改變），請確認"
+    return dict(eps0=float(ttm), period_end=q, n_new=n, ratio=ratio, note=note)
 
 
 def latest_snapshot(snap_dir, ticker, max_age_days=7):

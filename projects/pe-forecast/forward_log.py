@@ -26,7 +26,7 @@ import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from pef import cond, orbit                              # noqa: E402
+from pef import cond, consensus, orbit                   # noqa: E402
 from pef.yahoo import yahoo_symbol                       # noqa: E402
 
 RES = os.path.join(HERE, "results")
@@ -101,7 +101,7 @@ def score(tag, actuals, tol_days=20):
 
 
 ORBIT_H = (6, 12, 24)
-ORBIT_COLS = ["ticker", "name", "tier", "in_sp500", "sector", "price_date", "px", "eps0", "period_end", "eps_refreshed",
+ORBIT_COLS = ["ticker", "name", "tier", "in_sp500", "sector", "price_date", "px", "eps0", "period_end", "eps_refreshed", "eps_refresh_ratio",
               "dy", "vol36", "y10", "cons_0y", "cons_1y", "earnings_ts", "currency"]
 
 
@@ -123,13 +123,12 @@ def freeze_orbit():
     d["price_date"] = pd.to_datetime(q["regularMarketTime"].to_numpy(), unit="s").normalize()
     d["cons_0y"], d["cons_1y"] = q["epsCurrentYear"].to_numpy(float), q["epsForward"].to_numpy(float)
     d["earnings_ts"], d["currency"] = q["earningsTimestamp"].to_numpy(float), q["currency"].to_numpy()
-    when = pd.to_datetime(d["earnings_ts"], unit="s")
-    ttm = q["epsTrailingTwelveMonths"].to_numpy(float)
     snap_time = pd.Timestamp(sn["asof_utc"].iloc[0]).tz_localize(None)
-    new_q = (when <= snap_time) & (when > d["period_end"] + pd.DateOffset(months=3)) & np.isfinite(ttm) & (d["currency"] == "USD")
-    d["eps_refreshed"] = new_q.to_numpy()
-    d.loc[new_q, "eps0"] = ttm[new_q.to_numpy()]
-    d.loc[new_q, "period_end"] = d.loc[new_q, "period_end"] + pd.DateOffset(months=3)
+    rf = [consensus.refresh_eps(r, sn.loc[r["sym"]].to_dict(), snap_time) for r in d.to_dict("records")]
+    d["eps_refreshed"] = [x["n_new"] > 0 for x in rf]
+    d["eps_refresh_ratio"] = [x["ratio"] if x["n_new"] else np.nan for x in rf]
+    d["eps0"] = [x["eps0"] for x in rf]
+    d["period_end"] = [x["period_end"] for x in rf]
     d = d[(d["px"] > 0) & d["price_date"].notna()]
     tag = "orbit-" + str(d["price_date"].mode().iloc[0].date())
     out = os.path.join(FWD, tag)
