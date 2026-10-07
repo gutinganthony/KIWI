@@ -152,7 +152,13 @@
 - 有：死因未正式確認、檢驗進行中；俄方訊息「no pathogens of dangerous infectious diseases were detected among any of the contacts」、起初「typical acute respiratory viral infection」；所有接觸者已找到、仍在監測、無人有症狀；**初步**風險評估三級，會再更新；WHO 若俄方要求隨時支援
 - WHO 時間線：10/2 內部監測從媒體報導得知；10/3 依 IHR 向俄方查證
 - 沒有：「伊爾庫茨克沒有記錄到鼠疫病例」（NBC、CBC、Newsweek 轉述）、兩例新冠兩例鼻病毒、六成比例、「一般大眾」字樣
-- 排除「接觸者監測已結束」一說
+- ~~排除「接觸者監測已結束」一說~~ 錯，見補充二
+
+**#1 補充二｜台北 10/7 16:00｜白名單開通後讀 plagueintel 與其來源**
+- plagueintel：德國明斯特軟體工程師 Thomas Kraaibeek 的個人專案，10/5 建站（自述，有 Impressum）；官方與報導分開標示、每個數字附來源。當線索用，不當引用來源
+- 齊傑諾夫 10/2 貼文「死於鼠疫」當天改為「可能死於鼠疫」（Radio Svoboda、Newsweek、plagueintel）
+- 俄方 10/6 依 IHR 回覆 WHO：100% 接觸者觀察已結束、約 200 人無危險病原（Global News 引 WHO 聲明、Tedros X 發文、印度通訊社）。10/5 晚間國內說法是六成已結束觀察；NBC 的「已驗六成」應為翻譯差異
+- WHO 發言人較早曾依非官方資訊說對一般民眾風險「看來低」
 
 ## 九、可接的素材
 
