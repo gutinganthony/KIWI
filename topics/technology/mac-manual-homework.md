@@ -25,11 +25,11 @@ last_updated: 2026-07-06
 
 ### 🆕 2026-10-07 新增（本益比軌道模型 session）
 
-- [ ] **讓雲端拿得到分析師共識 EPS**（`projects/pe-forecast/orbit_price.py` 的「市場共識」輸入，README §16.5）。
-  雲端 2026-10-07 實測：Yahoo `query1…/v8/finance/chart`（股價）**可用**；`quoteSummary`（含 earningsTrend 共識）回 **401**，
-  因為要先從 `fc.yahoo.com` 拿 cookie，而該網域被環境的網路政策擋（CONNECT 403）。
-  → 在 claude.ai 這個雲端環境的網路設定加允許：`fc.yahoo.com`、`query2.finance.yahoo.com`、`finance.yahoo.com`。
-  在那之前：共識手動抄到 `projects/pe-forecast/data/consensus.csv`（格式見檔頭；GAAP 稀釋口徑），或命令列 `--cons／--fy-cons`。
+- [ ] **（選配）讓 pe-forecast 的共識更完整**：雲端已能免 cookie 抓 Yahoo 選股器的本財年／下一財年共識（`orbit_price.py --cons auto`，README §16.5）。
+  還缺的兩樣，要你做：①在 claude.ai 這個雲端環境的網路設定允許 `fc.yahoo.com`、`query2.finance.yahoo.com`、`finance.yahoo.com`
+  → 可抓分析師人數與 7／30／60／90 天前的修正（quoteSummary 現在 401）②Mac 上 `pip install openassetpricing` 下載 OSAP 的
+  `FEPS`／`sfe`／`AnalystRevision`（I/B/E/S FY1 月度歷史，1983 起；步驟見 `projects/pe-forecast/research/06_consensus_data_sources.md` §4.1），
+  CSV 放 `projects/pe-forecast/data/`（不是 docs/）→ 下一輪用真正的共識重估 β。
 
 ### 🆕 2026-09-24 新增（前瞻本益比模型 session 產生）
 
