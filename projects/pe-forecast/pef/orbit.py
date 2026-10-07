@@ -34,25 +34,38 @@ def reported_quarter(last_qend, target, lag_days=45):
     return q
 
 
-def calendarize(fy, target, last_qend, eps_ttm_now=None, lag_days=45):
+def calendarize(fy, target, last_qend, eps_ttm_now=None, lag_days=45, extrapolate=False):
     """會計年度 EPS 換算成「target 那天已公布的最近四季」EPS。
     fy：{會計年度結束日: EPS}（例如分析師 FY1、FY2 預估，可含已公布的 FY0 實際值）。
     做法：找出 target 那天已公布的最近四季（4 個季度），每一季算它落在哪個會計年度，按季數加權平均各年度 EPS。
-    落在已知年度以外的季（例如比 FY0 還早）用 eps_ttm_now 補；都沒有就回傳 None。回傳 (EPS, 用到的年度權重說明)。"""
+    比最早的已知年度還早、而且已經公布的季（≤ last_qend），用 eps_ttm_now（目前最近四季）補；還沒公布又不在已知年度的季 → None；
+    比最晚的已知年度還晚的季：
+    extrapolate=True 時用最後兩年的成長率外推（每年截在 −30%～+50%），否則回傳 None（不要拿今天的 EPS 冒充未來）。
+    回傳 (EPS, 用到的年度權重說明)。"""
     qr = reported_quarter(last_qend, target, lag_days)
     quarters = [qr - pd.DateOffset(months=3 * k) for k in range(4)]
     ends = sorted(pd.Timestamp(k) for k in fy)
+    val = {pd.Timestamp(k): float(v) for k, v in fy.items()}
+    tol = pd.Timedelta(days=15)
     tot, parts = 0.0, {}
     for q in quarters:
         # 這一季屬於「結束日 e」的年度：e − 12 個月 < 季末 ≤ e（兩邊各容許 15 天：52／53 週制的季末可能差幾天）
-        hit = [e for e in ends if e - pd.DateOffset(months=12) + pd.Timedelta(days=15) < q <= e + pd.Timedelta(days=15)]
+        hit = [e for e in ends if e - pd.DateOffset(months=12) + tol < q <= e + tol]
         if hit:
             e = hit[0]
-            tot += fy[e] / 4 if e in fy else fy[str(e.date())] / 4
+            tot += val[e] / 4
             parts[str(e.date())] = parts.get(str(e.date()), 0) + 1
-        elif eps_ttm_now is not None:
+        elif ends and q <= ends[0] + tol and q <= pd.Timestamp(last_qend) + tol and eps_ttm_now is not None:  # 只補「已公布」的季
             tot += eps_ttm_now / 4
             parts["目前最近四季"] = parts.get("目前最近四季", 0) + 1
+        elif extrapolate and len(ends) >= 2 and q > ends[-1] and val[ends[-1]] > 0 and val[ends[-2]] > 0:
+            g = float(np.clip(val[ends[-1]] / val[ends[-2]], 0.7, 1.5))
+            n = 1
+            while q > ends[-1] + pd.DateOffset(months=12 * n) + tol:
+                n += 1
+            tot += val[ends[-1]] * g ** n / 4
+            k = f"外推 {(ends[-1] + pd.DateOffset(months=12 * n)).date()}（年成長 {g - 1:+.0%}）"
+            parts[k] = parts.get(k, 0) + 1
         else:
             return None, None
     return tot, "、".join(f"{k}×{v}/4" for k, v in parts.items())

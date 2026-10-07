@@ -7,8 +7,11 @@
                                                                        # 用會計年度 EPS（年度結束月:EPS），自動換算成目標日的最近四季
     python3 orbit_price.py MU --eps 55,70,85 --eps2 70,85,100          # 悲觀／基準／樂觀（逗號分隔，一一對應）
     python3 orbit_price.py NVDA --eps 9 --h 24                         # 6、12、24 個月
+    python3 orbit_price.py MU --eps 70 --eps2 90 --cons auto           # 自動抓 Yahoo 共識（本財年、下一財年；pef/consensus.py）
 共識 EPS 也可以放在 data/consensus.csv（欄位：ticker, fy_end, eps, source, asof；同一年度取 asof 最新的一筆），
-沒給 --cons／--fy-cons 時自動讀；你在命令列給的永遠優先。今天的股價：先試 Yahoo（今天收盤），失敗就用 results/now_all.csv。
+沒給 --cons／--fy-cons 時自動讀；你在命令列給的永遠優先。--cons auto：先用 7 天內的快照（data/consensus_snapshots/），
+沒有就即時抓並存成今天的快照。Yahoo 共識多半是調整後口徑，--cons-scale 可換算成 GAAP（例如 0.8）。
+今天的股價：先試 Yahoo（今天收盤），失敗就用 results/now_all.csv。
 不是投資建議。
 """
 import argparse
@@ -21,7 +24,7 @@ import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from pef import orbit, yahoo                            # noqa: E402
+from pef import consensus, orbit, yahoo                 # noqa: E402
 
 RES = os.path.join(HERE, "results")
 
@@ -74,27 +77,42 @@ def main():
     ap.add_argument("--h", type=int, default=12, choices=[6, 12, 24])
     ap.add_argument("--eps", help="你的 h 個月後 EPS（那時已公布的最近四季；逗號＝多個情境）")
     ap.add_argument("--eps2", help="你的 h＋12 個月後 EPS（同上；和 --eps 一一對應）")
-    ap.add_argument("--cons", type=float, help="市場共識：h 個月後的最近四季 EPS")
+    ap.add_argument("--cons", help="市場共識：h 個月後的最近四季 EPS；或 auto＝自動抓 Yahoo 共識")
     ap.add_argument("--cons2", type=float, help="市場共識：h＋12 個月後的最近四季 EPS")
     ap.add_argument("--fy", help="你的會計年度 EPS，例如 \"2027-08:72,2028-08:90\"")
     ap.add_argument("--fy-cons", help="市場共識的會計年度 EPS，格式同 --fy")
+    ap.add_argument("--cons-scale", type=float, default=1.0, help="共識乘上這個數（調整後口徑 → GAAP，例如 0.8）")
     ap.add_argument("--erp", type=float, default=None, help="股權風險溢酬（預設 0.05）")
     a = ap.parse_args(sys.argv[1:])
     t = a.ticker.upper().replace(".", "-")
     model = json.load(open(os.path.join(RES, "orbit_model.json")))
     row = today_row(t)
+    notes = []
+    use_auto = str(a.cons or "").lower() == "auto"
+    snap, snap_src = consensus.get_row(t, os.path.join(HERE, "data", "consensus_snapshots"), live=use_auto)
+    if snap is not None:                       # 快照比 now_all.csv 新：有新公布的一季就更新今天的 EPS（Yahoo 的 TTM 是 GAAP 稀釋）
+        when, past = consensus.last_earnings(snap)
+        ttm = snap.get("epsTrailingTwelveMonths")
+        # 最近一次公布日在「下一季的季末」之後 → now_all.csv 之後又公布了一季
+        if past and ttm is not None and pd.notna(ttm) and when > pd.Timestamp(row["period_end"]) + pd.DateOffset(months=3):
+            old_e, old_q = float(row["eps0"]), pd.Timestamp(row["period_end"])
+            row["eps0"] = float(ttm)
+            row["period_end"] = old_q + pd.DateOffset(months=3)
+            notes.append(f"今天的 EPS 已更新：{when.date()} 公布了新的一季 → 最近四季 EPS {old_e:,.2f} → {float(ttm):,.2f}"
+                         f"（Yahoo，GAAP 稀釋；最新一季季末約 {row['period_end'].date()}）")
     asof = pd.Timestamp(row["price_date"])
     ta, tb = asof + pd.DateOffset(months=a.h), asof + pd.DateOffset(months=a.h + 12)
     eps0 = float(row["eps0"])
-    notes = []
 
     # 你的 EPS
     if a.fy:
         fy = parse_fy(a.fy)
         ea, how_a = orbit.calendarize(fy, ta, row["period_end"], eps0)
         eb, how_b = orbit.calendarize(fy, tb, row["period_end"], eps0)
+        if ea is None:
+            sys.exit(f"--fy 換算不出 {a.h} 個月後的最近四季 EPS：請多給一個會計年度，或直接用 --eps")
         mine = [(ea, eb)]
-        notes.append(f"你的 EPS 由會計年度換算：a＝{how_a}；b＝{how_b}")
+        notes.append(f"你的 EPS 由會計年度換算：a＝{how_a}；b＝{how_b or '換算不出（請多給一年或用 --eps2）'}")
     else:
         la, lb = parse_list(a.eps), parse_list(a.eps2)
         if not la:
@@ -103,27 +121,53 @@ def main():
             sys.exit("--eps2 的個數要和 --eps 一樣")
         mine = [(v, lb[i] if lb else None) for i, v in enumerate(la)]
 
-    # 市場共識
-    ca, cb, csrc = a.cons, a.cons2, "命令列"
+    # 市場共識：命令列 > data/consensus.csv > --cons auto（Yahoo）
+    ca = None if (a.cons is None or use_auto) else float(a.cons)
+    cb, csrc = a.cons2, "命令列"
     fyc = parse_fy(a.fy_cons) if a.fy_cons else {}
     if not fyc and ca is None:
         fyc, src = consensus_from_file(t)
         if fyc:
             csrc = f"data/consensus.csv（{src}）"
+    if not fyc and ca is None and use_auto:
+        au = consensus.auto(t, snap, snap_src, os.path.join(HERE, ".cache", "yahoo"))
+        if au is None:
+            notes.append("--cons auto：Yahoo 沒有這一檔的共識（或抓不到會計年度），改用沒有共識的寫法")
+        else:
+            fyc, csrc = au["fy"], au["source"]
+            k = [f"{e.date()} {v:,.2f}" for e, v in sorted(au["fy"].items())]
+            notes.append(f"Yahoo 共識：本財年／下一財年 {'、'.join(k)}（本財年＝還沒公布的最早那一年）")
+            v0 = sorted(au["fy"].items())[0][1]
+            if eps0 > 0:
+                notes.append(f"口徑對照：本財年共識 ÷ 目前 GAAP 最近四季 ＝ {v0 / eps0:.2f}"
+                             + ("（> 1.5：可能是高成長，也可能是共識用調整後口徑——軟體、股票報酬費用高的公司通常是後者，"
+                                "那就用 --cons-scale 換算）" if v0 / eps0 > 1.5 else ""))
+            elif v0 > 0:
+                notes.append("⚠ 今天 GAAP 虧損、共識卻是正的：共識幾乎一定是調整後口徑。你的 EPS 若是 GAAP，"
+                             "「你和共識的差距」會被系統性低估 → 用 --cons-scale、或手動給 GAAP 口徑的共識")
+            notes += ["⚠ " + w for w in au["warn"]]
     if fyc:
-        ca, how_ca = orbit.calendarize(fyc, ta, row["period_end"], eps0)
-        cb, how_cb = orbit.calendarize(fyc, tb, row["period_end"], eps0)
+        ca, how_ca = orbit.calendarize(fyc, ta, row["period_end"], eps0, extrapolate=True)
+        if cb is None:
+            cb, how_cb = orbit.calendarize(fyc, tb, row["period_end"], eps0, extrapolate=True)
+        else:
+            how_cb = "命令列"
         notes.append(f"共識由會計年度換算：a＝{how_ca}；b＝{how_cb}")
+    if a.cons_scale != 1.0:
+        ca = ca * a.cons_scale if ca is not None else None
+        cb = cb * a.cons_scale if cb is not None else None
+        notes.append(f"共識已乘上 {a.cons_scale}（--cons-scale）")
     if not mine:
         if ca is None:
-            sys.exit("請給你的 EPS（--eps／--fy），或提供市場共識（--cons／--fy-cons／data/consensus.csv）")
+            sys.exit("請給你的 EPS（--eps／--fy），或提供市場共識（--cons 數字或 auto／--fy-cons／data/consensus.csv）")
         mine = [(ca, cb)]
         notes.append("沒有給你自己的 EPS：用市場共識當你的看法（模型只算「市場預期」那一項）")
 
     qa = orbit.reported_quarter(row["period_end"], ta)
     print(f"{row['ticker']}　{row['name']}")
-    print(f"  今天（{asof.date()}）：股價 {row['px']:,.2f}、最近四季 EPS {eps0:,.2f}、本益比 "
-          f"{row['px'] / eps0 if eps0 > 0 else float('nan'):,.1f}；類型：{orbit.GNAME[orbit.group_of(row.get('sector'))]}")
+    pe0 = f"{row['px'] / eps0:,.1f}" if eps0 > 0 else "無定義（虧損）"
+    print(f"  今天（{asof.date()}）：股價 {row['px']:,.2f}、最近四季 EPS {eps0:,.2f}、本益比 {pe0}；"
+          f"類型：{orbit.GNAME[orbit.group_of(row.get('sector'))]}")
     print(f"  {a.h} 個月後（{ta.date()}）：那時大概已公布到 {qa.date()} 那一季 → EPS_a＝季末 "
           f"{(qa - pd.DateOffset(months=9)).strftime('%Y-%m')}～{qa.strftime('%Y-%m')} 的四季合計；EPS_b＝再往後 12 個月（若公司實際公布得比 45 天快，可能多含一季）")
     if ca is not None:
@@ -152,6 +196,11 @@ def main():
     if o0["widen"] > 1:
         print(f"  ⚠ EPS_a ≤ 0：本益比沒有定義（方案 A：只看股價），區間依回測放寬 ×{o0['widen']:.2f}；"
               "有給 EPS_b 時看最右欄的 forward 本益比（方案 B）")
+    if o0["spec"] == "軌道" and eps0 <= 0 and o0["pe"] is not None:
+        print("  注意：今天虧損、又沒有共識 → 算不了 EPS 成長率，股價只用軌道（你的 EPS 只用在本益比的分母）；"
+              "給共識（--cons）時可以用「你和共識的差距」")
+    if ca is None and not use_auto:
+        print("  提示：加 --cons auto 可以自動抓 Yahoo 共識，模型會分開算「市場已預期的成長」和「你和市場的差距」")
     if o0["group_key"] == "cyclical" and o0["eps_b"] is None and o0["spec"] != "軌道":
         print("  提示：半導體／設備／記憶體的股價主要看「再下一年」的 EPS（回測 β_b ≈ 0.17、β_a ≈ 0）→ 建議加 --eps2")
     bt = model["backtest"].get(str(a.h), {})

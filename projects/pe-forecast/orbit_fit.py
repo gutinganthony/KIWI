@@ -93,7 +93,7 @@ def main():
             if early.sum() > 300 and late.sum() > 300:
                 qe = band(ev[early.to_numpy()], vv[early.to_numpy()], vmed)
                 u = ev[late.to_numpy()] / scale(vv[late.to_numpy()], vmed)
-                u = u - np.median(u)                    # 只檢查寬度（大盤偏差另外報）
+                u = u - np.median(u)                    # 只檢查寬度：檢查期用自己的中位數置中（大盤偏差另外報，見「檢查期偏差中位」）
                 cov.append(dict(寫法=name, n_校準=int(early.sum()), n_檢查=int(late.sum()),
                                 涵蓋50=float(np.mean((u >= qe[1]) & (u <= qe[2]))),
                                 涵蓋80=float(np.mean((u >= qe[0]) & (u <= qe[3]))),
@@ -108,6 +108,22 @@ def main():
         say(f"\n== {h} 個月：區間（2021 以前校準 → 2022 以後檢查；目標 50%／80%）；目標日虧損放寬 ×{model['loss_widen'][str(h)]:.2f}"
             f"（虧損 {int(lossm.sum()):,} 列）")
         say(pd.DataFrame(cov).round(3).to_string(index=False))
+
+    say("\n== 落在實際 ±10%／±20% 內的比例（預測起點 2022 以後；同一批列：a、b 時點 EPS 都有）")
+    hit = []
+    for h in lo.HS:
+        a_ = lo.PAIR[h][0]
+        d = p[(p["month"] >= "2022-01-01") & p[f"y{h}"].notna() & p[f"p{h}_原始成長ab"].notna() & p[f"p{h}_預期b＋修正ab"].notna()]
+        for gl, dd in (("全部", d), ("科技", d[d["grp"] != "other"])):
+            r = dict(h=h, 組別=gl, n=len(dd))
+            errs = {"本益比不變": dd[f"g{a_}"] - (dd[f"y{h}"] + dd["orbit_lr"] * h / 12), "軌道": -dd[f"y{h}"],
+                    "＋你的EPS(ab)": dd[f"p{h}_原始成長ab"] - dd[f"y{h}"], "＋預期代理＋你的EPS": dd[f"p{h}_預期b＋修正ab"] - dd[f"y{h}"]}
+            for k, e in errs.items():
+                r[f"{k}_±10%"] = float(np.mean(np.abs(np.exp(e) - 1) <= 0.1))
+                r[f"{k}_±20%"] = float(np.mean(np.abs(np.exp(e) - 1) <= 0.2))
+            hit.append(r)
+    say(pd.DataFrame(hit).round(3).to_string(index=False))
+    model["hit_rates"] = hit
 
     say("\n== 正式版 β（EPS 多 10% → 股價約 β×10%；順序同「線索」）")
     say(pd.DataFrame(rows).to_string(index=False))
