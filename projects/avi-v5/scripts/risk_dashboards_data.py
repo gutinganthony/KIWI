@@ -20,6 +20,7 @@ import os
 import re
 import sys
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 
 import numpy as np
@@ -33,14 +34,17 @@ DOCS_INDEX = os.path.join(REPO, "docs", "index.html")
 MANUAL = {"margin_debt": {"value": "1.50 兆美元（6 月紀錄）；7 月 −850 億", "asof": "2026-07", "status": "warn"},
           "top10_weight": {"value": "手動", "asof": None, "status": "na"},
           "nvda_dso": {"value": "53→51→45→60 天", "asof": "Q2 FY27（2026-07-26）", "status": "hot"}}
-UA = {"User-Agent": "Mozilla/5.0"}
+# FRED 會把 "Mozilla/5.0" 這種假瀏覽器 UA 拖到逾時（2026-10-08 實測）；Yahoo 反而要它。所以依網站分開設。
+UA_YAHOO = {"User-Agent": "Mozilla/5.0"}
+UA_DEFAULT = {"User-Agent": "KIWI-risk-board/1.0 (+https://github.com/gutinganthony/KIWI)"}
 
 
-def _get(url, path):
+def _get(url, path, timeout=20):
     if path and os.path.exists(path) and os.path.getsize(path) > 0:
         with open(path, "rb") as f:
             return f.read()
-    with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=60) as r:
+    headers = UA_YAHOO if "yahoo.com" in url else UA_DEFAULT
+    with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=timeout) as r:
         raw = r.read()
     if path:
         with open(path, "wb") as f:
@@ -49,9 +53,17 @@ def _get(url, path):
 
 
 def fred(sid, cache):
-    raw = _get(f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={sid}",
-               os.path.join(cache, f"{sid}.csv") if cache else None).decode()
-    rows = [l.split(",") for l in raw.splitlines()[1:]]
+    """有 FRED_API_KEY（GitHub runner）走官方 API，否則用免金鑰的 fredgraph.csv。"""
+    key = os.environ.get("FRED_API_KEY", "").strip()
+    path = os.path.join(cache, f"{sid}.csv") if cache else None
+    if key and not (path and os.path.exists(path)):
+        url = (f"https://api.stlouisfed.org/fred/series/observations?series_id={sid}"
+               f"&api_key={key}&file_type=json&observation_start=1950-01-01")
+        obs = json.loads(_get(url, None))["observations"]
+        rows = [(o["date"], o["value"]) for o in obs]
+    else:
+        raw = _get(f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={sid}", path).decode()
+        rows = [l.split(",") for l in raw.splitlines()[1:]]
     s = pd.Series({pd.Timestamp(d): float(v) for d, v in rows if v not in ("", ".")})
     return s.sort_index()
 
@@ -142,12 +154,18 @@ def main():
             prev = {}
 
     F = {}
-    for k in ["GS10", "FEDFUNDS", "CPIAUCSL", "UNRATE", "BAA", "M2SL", "WTISPLC", "TB3MS", "FYFSGDA188S",
+    series = ["GS10", "FEDFUNDS", "CPIAUCSL", "UNRATE", "BAA", "M2SL", "WTISPLC", "TB3MS", "FYFSGDA188S",
               "TWEXMMTH", "DTWEXBGS", "DGS10", "DGS30", "VXOCLS", "VIXCLS", "BAMLH0A0HYM2", "BAMLC0A0CM",
               "BAMLH0A3HYC", "T10Y3M", "SOFR", "IORB", "RRPONTSYD", "WRESBAL", "DCOILBRENTEU", "DCOILWTICO",
-              "DEXJPUS", "NFCI", "STLFSI4", "IRLTLT01JPM156N", "SP500"]:
-        s = safe(fred, k, C)
-        F[k] = s if s is not None else pd.Series(dtype=float)
+              "DEXJPUS", "NFCI", "STLFSI4", "IRLTLT01JPM156N", "SP500"]
+    # 並行下載：單一請求最多 20 秒，整批不會因為一個慢來源卡住整個 workflow
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        res = dict(zip(series, ex.map(lambda k: safe(fred, k, C), series)))
+    for k in series:
+        F[k] = res[k] if res[k] is not None else pd.Series(dtype=float)
+    if not len(F["DGS10"]) or not len(F["FEDFUNDS"]):
+        print("  ⚠️ FRED 關鍵序列抓不到，保留上次的 data.json 不覆寫", file=sys.stderr)
+        return 0
     kd = kiwi_data()
     km = kd.get("market", {})
     cape_hist = safe(shiller, C)
@@ -258,8 +276,9 @@ def main():
     def ylast(s):
         return (r(s.iloc[-1], 2), s.index[-1].date().isoformat()) if s is not None and len(s) else (None, None)
 
-    yq = {t: safe(yahoo, t, C) for t in ["^MOVE", "^SKEW", "^VIX3M", "BIZD", "ARCC", "OWL", "BX", "APO", "KKR",
-                                         "BKLN", "SMH", "NVDA"]}
+    tks = ["^MOVE", "^SKEW", "^VIX3M", "BIZD", "ARCC", "OWL", "BX", "APO", "KKR", "BKLN", "SMH", "NVDA"]
+    with ThreadPoolExecutor(max_workers=6) as ex:
+        yq = dict(zip(tks, ex.map(lambda t: safe(yahoo, t, C), tks)))
     vix_now = last(F["VIXCLS"])[0]
     sofr, iorb = last(F["SOFR"])[0], last(F["IORB"])[0]
     pcs = [x for x in (dd_from_high(yq[t]) for t in ("OWL", "BX", "APO", "KKR")) if x is not None]
