@@ -22,8 +22,8 @@
 import argparse
 import json
 import os
-import sys
 import time
+import warnings
 from pathlib import Path
 
 import numpy as np
@@ -221,15 +221,48 @@ def our_momentum(prices, grid, lag):
     return m12, m6
 
 
-def match_permnos(prices, mom12, mom6):
-    ym_lo = int(prices["ym"].min())
-    grid = ym_range(ym_lo, int(min(prices["ym"].max(), mom12["yyyymm"].max())))
+def _osap_wide(mom12, mom6, grid):
     O12 = mom12[mom12["yyyymm"].isin(grid)].pivot(index="permno", columns="yyyymm", values="Mom12m").reindex(columns=grid)
     O6 = mom6[mom6["yyyymm"].isin(grid)].pivot(index="permno", columns="yyyymm", values="Mom6m").reindex(columns=grid)
     O12 = O12[O12.notna().sum(axis=1) >= MIN_OVERLAP]
-    O6 = O6.reindex(O12.index)
+    return O12, O6.reindex(O12.index)
 
+
+def _corr_table(prices, mom12, mom6, lag):
+    """prices：ticker, ym, px。每個 ticker 對所有 permno 的 Mom12m 相關，取最高與次高。"""
+    grid = ym_range(int(prices["ym"].min()), int(min(prices["ym"].max(), mom12["yyyymm"].max())))
+    O12, O6 = _osap_wide(mom12, mom6, grid)
+    m12, m6 = our_momentum(prices, grid, lag)
+    r12, n12 = masked_corr(m12.to_numpy(float), O12.to_numpy(float))
+    r12[n12 < MIN_OVERLAP] = np.nan
+    permnos = O12.index.to_numpy()
+    rows = []
+    for i, t in enumerate(m12.index):
+        row = r12[i]
+        if not np.isfinite(row).any():
+            rows.append(dict(ticker=t, permno=np.nan, corr=np.nan, n_overlap=int(n12[i].max()) if n12.size else 0,
+                             second_best_corr=np.nan, second_permno=np.nan, corr6=np.nan, mad12=np.nan,
+                             coverage=np.nan))
+            continue
+        order = np.argsort(-np.nan_to_num(row, nan=-9))
+        j, j2 = order[0], order[1]
+        c6, _ = masked_corr(m6.iloc[i].to_numpy(float)[None, :], O6.iloc[j].to_numpy(float)[None, :])
+        a12, b12 = m12.iloc[i].to_numpy(float), O12.iloc[j].to_numpy(float)
+        ok = np.isfinite(a12) & np.isfinite(b12)
+        rows.append(dict(ticker=t, permno=int(permnos[j]), corr=row[j], n_overlap=int(n12[i, j]),
+                         second_best_corr=row[j2] if np.isfinite(row[j2]) else np.nan,
+                         second_permno=int(permnos[j2]) if np.isfinite(row[j2]) else np.nan,
+                         corr6=float(c6[0, 0]), mad12=float(np.median(np.abs(a12[ok] - b12[ok]))),
+                         coverage=n12[i, j] / max(int(np.isfinite(a12).sum()), 1)))
+    return pd.DataFrame(rows)
+
+
+def match_permnos(prices, fetch_yahoo, mom12, mom6):
+    """先用面板股價配；配不到（重疊 < 36 個月或相關 < 0.95，多半是面板股價起點太晚）再用 Yahoo 月線
+    （含息還原收盤，抓分割時順便拿到）重配一次，note 會註明。"""
     # 日期對齊驗證：抽查名單上各種 lag 的中位相關
+    grid = ym_range(int(prices["ym"].min()), int(min(prices["ym"].max(), mom12["yyyymm"].max())))
+    O12, _ = _osap_wide(mom12, mom6, grid)
     lag_tab = {}
     for lag in (-1, 0, 1):
         m12, _ = our_momentum(prices, grid, lag)
@@ -241,31 +274,18 @@ def match_permnos(prices, mom12, mom6):
     print("  [對齊] 抽查 10 家的最佳相關中位數（lag 0＝照 SignalDoc 定義）：",
           ", ".join(f"lag {k:+d}: {v:.4f}" for k, v in lag_tab.items()), f"→ 用 lag {best_lag:+d}")
 
-    m12, m6 = our_momentum(prices, grid, best_lag)
-    r12, n12 = masked_corr(m12.to_numpy(float), O12.to_numpy(float))
-    r12[n12 < MIN_OVERLAP] = np.nan
-    permnos = O12.index.to_numpy()
-    rows = []
-    for i, t in enumerate(m12.index):
-        row = r12[i]
-        if not np.isfinite(row).any():
-            rows.append(dict(ticker=t, permno=np.nan, corr=np.nan, n_overlap=0, second_best_corr=np.nan,
-                             second_permno=np.nan, corr6=np.nan, mad12=np.nan, coverage=np.nan))
-            continue
-        order = np.argsort(-np.nan_to_num(row, nan=-9))
-        j, j2 = order[0], order[1]
-        a6 = m6.iloc[i].to_numpy(float)
-        b6 = O6.iloc[j].to_numpy(float)
-        c6, _ = masked_corr(a6[None, :], b6[None, :])
-        a12, b12 = m12.iloc[i].to_numpy(float), O12.iloc[j].to_numpy(float)
-        ok = np.isfinite(a12) & np.isfinite(b12)
-        ours_n = int(np.isfinite(a12).sum())
-        rows.append(dict(ticker=t, permno=int(permnos[j]), corr=row[j], n_overlap=int(n12[i, j]),
-                         second_best_corr=row[j2] if np.isfinite(row[j2]) else np.nan,
-                         second_permno=int(permnos[j2]), corr6=float(c6[0, 0]),
-                         mad12=float(np.median(np.abs(a12[ok] - b12[ok]))),
-                         coverage=n12[i, j] / max(ours_n, 1)))
-    M = pd.DataFrame(rows)
+    M = _corr_table(prices, mom12, mom6, best_lag)
+    M["src"] = "panel"
+    bad = M[~((M["corr"] >= MIN_CORR) & (M["n_overlap"] >= MIN_OVERLAP))]["ticker"]
+    if len(bad) and fetch_yahoo is not None:
+        yp = fetch_yahoo(sorted(bad))
+        if len(yp):
+            Y = _corr_table(yp, mom12, mom6, best_lag)
+            Y["src"] = "yahoo"
+            better = Y[(Y["corr"] >= MIN_CORR) & (Y["n_overlap"] >= MIN_OVERLAP)]
+            M = pd.concat([M[~M["ticker"].isin(better["ticker"])], better], ignore_index=True)
+            print(f"  [配對] 面板股價配不到 {len(bad)} 家 → Yahoo 月線補配成功 {len(better)} 家")
+    M = M.sort_values("ticker").reset_index(drop=True)
     M["ok"] = (M["corr"] >= MIN_CORR) & (M["n_overlap"] >= MIN_OVERLAP)
     # 同一個 permno 被兩個 ticker 配到 → 只留相關高的
     dup = M[M["ok"]].sort_values("corr", ascending=False).duplicated("permno", keep="first")
@@ -275,11 +295,13 @@ def match_permnos(prices, mom12, mom6):
     for _, x in M.iterrows():
         nt = []
         if not np.isfinite(x["corr"]):
-            nt.append("OSAP 找不到重疊≥36 個月的 permno")
+            nt.append(f"OSAP 找不到重疊≥{MIN_OVERLAP} 個月的 permno（面板股價太短或 OSAP 沒收）")
         elif not x["ok"] and not x["conflict"]:
             nt.append(f"最佳相關 {x['corr']:.3f} < {MIN_CORR}，不採用")
         if x["conflict"]:
             nt.append("permno 已被相關更高的 ticker 配走，不採用")
+        if x["src"] == "yahoo":
+            nt.append("面板股價太短，配對改用 Yahoo 月線（含息還原）")
         if np.isfinite(x["second_best_corr"]) and x["second_best_corr"] >= MIN_CORR:
             nt.append(f"次佳 permno {int(x['second_permno'])} 相關也有 {x['second_best_corr']:.3f}"
                       f"（多半是同公司另一股別或前身）")
@@ -289,8 +311,8 @@ def match_permnos(prices, mom12, mom6):
             nt.append(f"只覆蓋我們動能月份的 {x['coverage']:.0%}（可能換過 permno）")
         notes.append("；".join(nt))
     M["note"] = notes
-    M.loc[M["ticker"] == "GOOGL", "note"] = (M.loc[M["ticker"] == "GOOGL", "note"] +
-                                            "；GOOGL＝Class A（GOOG＝Class C 是另一個 permno，2014-04 起）").str.lstrip("；")
+    g = M["ticker"] == "GOOGL"
+    M.loc[g, "note"] = (M.loc[g, "note"] + "；GOOGL＝Class A（GOOG＝Class C 是另一個 permno，2014-04 起）").str.lstrip("；")
     return M, best_lag
 
 
@@ -339,6 +361,45 @@ def yahoo_splits(tickers, raw_dir, refresh):
     return S, fail
 
 
+def yahoo_monthly(tickers, raw_dir, refresh):
+    """Yahoo 20 年月線的含息還原收盤（range=max 對老股票會降成 3 個月一根，所以另抓 range=20y）。
+    只給面板股價太短的公司補配對用。回傳 ticker, ym, px。"""
+    d = raw_dir / "yahoo_monthly"
+    d.mkdir(parents=True, exist_ok=True)
+    sess = session()
+    out = []
+    for t in tickers:
+        for sym in [str(t).upper().replace(".", "-")] + ([YAHOO_ALIAS[t]] if t in YAHOO_ALIAS else []):
+            f = d / f"{sym}_20y.json"
+            if refresh or not f.exists():
+                try:
+                    r = sess.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{sym}?range=20y&interval=1mo",
+                                 timeout=30)
+                    if r.status_code == 200:
+                        f.write_bytes(r.content)
+                except requests.RequestException:
+                    pass
+                time.sleep(0.6)
+            if f.exists():
+                break
+        if not f.exists():
+            continue
+        try:
+            res = json.loads(f.read_text())["chart"]["result"][0]
+            ts = res["timestamp"]
+            adj = res["indicators"]["adjclose"][0]["adjclose"]
+        except Exception:
+            continue
+        d0 = pd.to_datetime(pd.Series(ts), unit="s", utc=True).dt.tz_convert("America/New_York")
+        x = pd.DataFrame({"ticker": t, "ym": (d0.dt.year * 100 + d0.dt.month).to_numpy(),
+                          "px": pd.to_numeric(pd.Series(adj), errors="coerce").to_numpy()})
+        x = x[x["px"] > 0].drop_duplicates("ym", keep="last")
+        gaps = np.diff([ (v // 100) * 12 + v % 100 for v in x["ym"]])
+        if len(gaps) and np.median(gaps) == 1:      # 確認是真的月線
+            out.append(x)
+    return pd.concat(out, ignore_index=True) if out else pd.DataFrame(columns=["ticker", "ym", "px"])
+
+
 def statpers(ym):
     """I/B/E/S 月度彙總的統計日：每月第三個星期五的前一天（星期四）。"""
     first = pd.Timestamp(year=ym // 100, month=ym % 100, day=1)
@@ -346,22 +407,55 @@ def statpers(ym):
     return first + pd.Timedelta(days=fri + 14 - 1 - 1)
 
 
+def quarter_splits(q, tickers):
+    """Yahoo 查不到（已下市）的公司：用季報 split_fac 的跳動當分割（日期只知道落在兩個季末之間，
+    之後由 FEPS 跳動定月份）。"""
+    rows = []
+    for t in tickers:
+        g = q[q["ticker"] == t].sort_values("period_end")
+        sf, pe = g["split_fac"].to_numpy(float), list(g["period_end"])
+        for i in range(1, len(g)):
+            if sf[i - 1] > 0 and sf[i] > 0 and abs(np.log(sf[i - 1] / sf[i])) > 0.01:
+                lo = pe[i - 1].year * 100 + pe[i - 1].month
+                hi = pe[i].year * 100 + pe[i].month
+                rows.append(dict(ticker=t, date=pe[i], ratio=sf[i - 1] / sf[i], src="quarters",
+                                 lo=ym_add(lo, 1), hi=ym_add(hi, 4)))
+    return pd.DataFrame(rows, columns=["ticker", "date", "ratio", "src", "lo", "hi"])
+
+
 def split_months(S, feps_by_ticker):
-    """每次分割「第一個反映新股數的 FEPS 月份」：分割日 ≤ 當月統計日 → 當月，否則下個月；
-    再用 FEPS 本身的跳動驗證（跳動倍數 ≈ 1/分割倍數的月份），規則月份明顯不對時改用資料月份。"""
-    out, stat = [], {"rule": 0, "data_override": 0, "no_check": 0}
+    """每次分割「第一個反映新股數的 FEPS 月份」。
+    Yahoo 分割：分割日 ≤ 當月統計日 → 當月，否則下個月（規則）；再看 FEPS 本身的跳動（≈ 1/分割倍數）驗證，
+    規則月份明顯不對、前後一個月明顯對時改用資料月份。季報推得的分割：在視窗內找 FEPS 跳動最吻合的月份。"""
+    out, stat = [], {"rule_confirmed": 0, "rule_kept": 0, "data_override": 0, "no_check": 0, "quarters": 0}
     for _, s in S.iterrows():
+        f = feps_by_ticker.get(s["ticker"])
+        lr = np.log(s["ratio"])
+
+        def jump(c):
+            a, b = f.get(ym_add(c, -1)), f.get(c)
+            if a is None or b is None or not (a > 0 and b > 0):
+                return np.nan
+            return abs(np.log(b / a) + lr)
+
+        checkable = f is not None and abs(lr) >= np.log(1.25)
+        if s.get("src") == "quarters":
+            stat["quarters"] += 1
+            cands = ym_range(int(s["lo"]), int(s["hi"]))
+            first = ym_add(s["date"].year * 100 + s["date"].month, 1)
+            if checkable:
+                errs = [jump(c) for c in cands]
+                if np.isfinite(errs).any() and np.nanmin(errs) < 0.3 * abs(lr):
+                    first = cands[int(np.nanargmin(errs))]
+            out.append(first)
+            continue
         ym0 = s["date"].year * 100 + s["date"].month
         rule = ym0 if s["date"] <= statpers(ym0) else ym_add(ym0, 1)
         first = rule
-        f = feps_by_ticker.get(s["ticker"])
-        lr = np.log(s["ratio"])
-        if f is not None and abs(lr) >= np.log(1.25):
-            def jump(c):
-                a, b = f.get(ym_add(c, -1)), f.get(c)
-                if a is None or b is None or not (a > 0 and b > 0):
-                    return np.nan
-                return abs(np.log(b / a) + lr)
+        if rule <= YM_MIN:          # 2009 年以前的分割：只影響係數，不在輸出期間內，不驗證
+            out.append(first)
+            continue
+        if checkable:
             cands = [ym_add(rule, k) for k in (-1, 0, 1)]
             errs = [jump(c) for c in cands]
             if np.isfinite(errs).any():
@@ -370,8 +464,10 @@ def split_months(S, feps_by_ticker):
                 if k != 1 and errs[k] < 0.3 * abs(lr) and not (np.isfinite(e_rule) and e_rule < 0.5 * abs(lr)):
                     first = cands[k]
                     stat["data_override"] += 1
+                elif k == 1 and e_rule < 0.3 * abs(lr):
+                    stat["rule_confirmed"] += 1
                 else:
-                    stat["rule"] += 1
+                    stat["rule_kept"] += 1
             else:
                 stat["no_check"] += 1
         else:
@@ -407,7 +503,7 @@ def fy_eps_table(q):
     q = q.copy()
     q["eps"] = q["ni"] / q["sh_now"]
     q["lag"] = (q["filed"] - q["period_end"]).dt.days
-    q["pm"] = q["period_end"].dt.month
+    q["pm"] = (q["period_end"] + pd.Timedelta(days=7)).dt.month   # 52/53 週制（季末在月底前後幾天跳）歸到同一個月
     out = {}
     for t, g in q.groupby("ticker"):
         g = g.sort_values("period_end").dropna(subset=["eps"])
@@ -436,6 +532,7 @@ def fy1_eps(fy, t, ym):
 # ───────────────────────── main ─────────────────────────
 
 def main():
+    warnings.filterwarnings("ignore", category=RuntimeWarning)
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--raw-dir", type=Path, default=None)
     ap.add_argument("--release", default="202510")
@@ -443,7 +540,10 @@ def main():
     ap.add_argument("--wait-min", type=float, default=0)
     ap.add_argument("--download-only", action="store_true")
     ap.add_argument("--splits-only", action="store_true")
+    ap.add_argument("--out-dir", type=Path, default=None, help="輸出目錄（預設 data/osap；測試用）")
     a = ap.parse_args()
+    global OUT
+    OUT = a.out_dir or OUT
     raw = (a.raw_dir or default_raw_dir()).resolve()
     raw.mkdir(parents=True, exist_ok=True)
     print(f"[osap_fetch] release {a.release}  raw dir: {raw}")
@@ -472,15 +572,16 @@ def main():
     for k, d in sig.items():
         print(f"    {k}: {len(d):,} 列（2000 年起）、{d['permno'].nunique():,} 個 permno、{d['yyyymm'].min()}～{d['yyyymm'].max()}")
 
-    # 3. 配對
-    M, best_lag = match_permnos(prices, sig["Mom12m"], sig["Mom6m"])
+    # 3. 配對（面板股價配不到的再用 Yahoo 20 年月線補）
+    M, best_lag = match_permnos(prices, lambda ts: yahoo_monthly(ts, raw, a.refresh), sig["Mom12m"], sig["Mom6m"])
     ok = M[M["ok"]]
     print(f"  [配對] 成功 {len(ok)}／{len(tickers)} 家（{len(ok) / len(tickers):.1%}）；"
           f"相關中位數 {ok['corr'].median():.4f}，最低 {ok['corr'].min():.4f}")
     cols = ["ticker", "permno", "corr", "n_overlap", "second_best_corr", "note",
-            "second_permno", "corr6", "mad12", "coverage", "ok"]
+            "second_permno", "corr6", "mad12", "coverage", "src", "ok"]
     Mo = M[cols].copy()
     Mo["permno"] = Mo["permno"].astype("Int64")
+    Mo["second_permno"] = Mo["second_permno"].astype("Int64")
     Mo.round({"corr": 4, "second_best_corr": 4, "corr6": 4, "mad12": 4, "coverage": 3}).to_csv(
         OUT / "permno_map.csv", index=False)
 
@@ -495,50 +596,60 @@ def main():
     F = pm.merge(base, on="permno", how="inner")
     F = F[F["yyyymm"] >= YM_MIN].sort_values(["ticker", "yyyymm"]).reset_index(drop=True)
 
+    q = pd.read_csv(DATA / "quarters_sp500.csv", parse_dates=["period_end", "filed", "avail"])
     S, fail = yahoo_splits(sorted(pm["ticker"]), raw, a.refresh)
+    S["src"] = "yahoo"
+    QS = quarter_splits(q, fail)
+    S = pd.concat([S, QS], ignore_index=True) if len(QS) else S
     feps_by = {t: dict(zip(g["yyyymm"], g["feps_raw"])) for t, g in F.dropna(subset=["feps_raw"]).groupby("ticker")}
     S, sstat = split_months(S, feps_by)
-    print(f"  [分割] Yahoo：{len(S)} 筆分割、{S['ticker'].nunique()} 家（抓不到：{fail or '無'}）；"
-          f"月份判定：規則 {sstat['rule']}、FEPS 跳動改判 {sstat['data_override']}、無法驗證 {sstat['no_check']}")
+    s09 = S[S["first_ym"] > YM_MIN]
+    print(f"  [分割] Yahoo：{(S['src'] == 'yahoo').sum()} 筆分割事件（2009 年後影響輸出的 {len(s09)} 筆、"
+          f"{s09['ticker'].nunique()} 家）；Yahoo 查不到 {fail or '無'} → 改用季報 split_fac（{len(QS)} 筆）")
+    print(f"  [分割] 月份判定（只計 Yahoo、可驗證者）：FEPS 跳動證實規則 {sstat['rule_confirmed']}、"
+          f"證據不明沿用規則 {sstat['rule_kept']}、改判前後一月 {sstat['data_override']}、無 FEPS 可驗 {sstat['no_check']}")
     F["split_factor"] = split_factor(S, F[["ticker", "yyyymm"]])
     F["feps"] = F["feps_raw"] / F["split_factor"]
 
-    # 分割調整診斷：相鄰月份 FEPS 跳超過 2.5 倍的次數（調整前 vs 後）
-    def big_jumps(col):
-        g = F.dropna(subset=[col])
-        g = g[g[col] > 0]
-        prev = g.groupby("ticker")[col].shift(1)
-        same = g.groupby("ticker")["yyyymm"].shift(1).map(lambda v: ym_add(int(v), 1) if pd.notna(v) else -1) == g["yyyymm"]
-        return int((np.abs(np.log(g[col] / prev)) > np.log(2.5))[same].sum())
-    print(f"  [診斷] 相鄰月份 FEPS 跳 >2.5 倍：調整前 {big_jumps('feps_raw')} 次 → 調整後 {big_jumps('feps')} 次")
-
-    # Yahoo 分割 vs 季報 split_fac（2009 年起的累積倍數）交叉核對
-    q = pd.read_csv(DATA / "quarters_sp500.csv", parse_dates=["period_end", "filed", "avail"])
-    q09 = q[q["period_end"] >= "2009-01-01"].sort_values("period_end").groupby("ticker").first()
-    mism = []
-    for t in pm["ticker"]:
-        if t not in q09.index:
+    # 分割調整診斷 1：每次分割的「第一個新口徑月份」前後，FEPS 有沒有變平滑（|跳動| < 分割倍數的 30%）
+    sm_raw = sm_adj = n_sp = 0
+    Fi = F.set_index(["ticker", "yyyymm"])
+    for _, x in S[(S["first_ym"] > YM_MIN) & (np.abs(np.log(S["ratio"])) >= np.log(1.25))].iterrows():
+        k0, k1 = (x["ticker"], ym_add(int(x["first_ym"]), -1)), (x["ticker"], int(x["first_ym"]))
+        if k0 not in Fi.index or k1 not in Fi.index:
             continue
-        e = q09.loc[t, "period_end"]
-        y = S[(S["ticker"] == t) & (S["date"] > e)]["ratio"].prod()
-        sf = q09.loc[t, "split_fac"]
-        if np.isfinite(sf) and sf > 0 and abs(np.log(y / sf)) > 0.05:
-            mism.append(f"{t}(Yahoo {y:g} vs 季報 {sf:g})")
-    print(f"  [核對] Yahoo 累積分割 vs 季報 split_fac 不一致：{len(mism)} 家 {mism[:12]}")
+        r0, r1 = Fi.loc[k0], Fi.loc[k1]
+        if not (r0["feps_raw"] > 0 and r1["feps_raw"] > 0):
+            continue
+        n_sp += 1
+        tol = 0.3 * abs(np.log(x["ratio"]))
+        sm_raw += abs(np.log(r1["feps_raw"] / r0["feps_raw"])) < tol
+        sm_adj += abs(np.log(r1["feps"] / r0["feps"])) < tol
+    print(f"  [診斷] 分割月前後 FEPS 平滑（跳動 < 分割倍數的 30%）：調整前 {sm_raw}/{n_sp} → 調整後 {sm_adj}/{n_sp}")
+
+    # 分割調整診斷 2：FEPS（今天口徑）÷ 季報 FY1 GAAP EPS 的每家中位數；偏離 1.8 倍以上的列出來
+    fy = fy_eps_table(q)
+    g1 = np.array([fy1_eps(fy, t, ym)[1] for t, ym in zip(F["ticker"], F["yyyymm"])])
+    with np.errstate(divide="ignore", invalid="ignore"):
+        lr = np.where((F["feps"] > 0) & (g1 > 0), np.log(F["feps"] / g1), np.nan)
+    R = pd.DataFrame({"ticker": F["ticker"], "lr": lr}).dropna().groupby("ticker")["lr"].agg(["median", "count"])
+    R = R[R["count"] >= 12]
+    off = R[np.abs(R["median"]) > np.log(1.8)].sort_values("median")
+    print(f"  [診斷] FEPS÷GAAP FY1 EPS 的每家中位數：{len(R)} 家可比，全體中位 {np.exp(R['median'].median()):.3f}；"
+          f"偏離 >1.8 倍 {len(off)} 家：" + ", ".join(f"{t}×{np.exp(v):.2f}" for t, v in off["median"].items()))
 
     outc = ["ticker", "permno", "yyyymm", "feps_raw", "split_factor", "feps", "analyst_revision", "fgr5y"]
     F = F[outc]
     F.to_csv(OUT / "feps_sp500.csv.gz", index=False, float_format="%.6g", compression="gzip")
 
     # 5. 抽查
-    fy = fy_eps_table(q)
     spot = []
     for t in SPOT:
         r = M[M["ticker"] == t]
         if r.empty:
             continue
         r = r.iloc[0]
-        d = {"ticker": t, "permno": r["permno"], "corr": round(r["corr"], 4),
+        d = {"ticker": t, "permno": int(r["permno"]) if np.isfinite(r["permno"]) else None, "corr": round(r["corr"], 4),
              "second_best_corr": round(r["second_best_corr"], 4), "ok": bool(r["ok"])}
         for ym in (201501, 202301):
             v = F[(F["ticker"] == t) & (F["yyyymm"] == ym)]
