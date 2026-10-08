@@ -277,7 +277,8 @@ def build_message(data, weekend=False):
     html_lines += ["", signal_html, "",
                    "<i>觸發條件：TSI&gt;55 減倉 · CRI&gt;35 避險 · 雙高立即行動 · CRI≥50 規則 3（槓桿全賣；跌破 200 日線則全出清）</i>",
                    "",
-                   '🌐 <a href="https://gutinganthony.github.io/KIWI/">查看完整 Dashboard</a>']
+                   '🌐 <a href="https://gutinganthony.github.io/KIWI/">查看完整 Dashboard</a>',
+                   '🧭 <a href="https://gutinganthony.github.io/KIWI/risk/">崩盤風險對照台</a>']
 
     # ── LINE (plain text) ──
     plain_lines = [
@@ -296,7 +297,8 @@ def build_message(data, weekend=False):
     plain_lines += ["", signal_plain, "",
                     "觸發條件：TSI>55 減倉 · CRI>35 避險 · 雙高立即行動 · CRI≥50 規則 3（槓桿全賣；跌破 200 日線則全出清）",
                     "",
-                    "🌐 查看完整 Dashboard：https://gutinganthony.github.io/KIWI/"]
+                    "🌐 查看完整 Dashboard：https://gutinganthony.github.io/KIWI/",
+                    "🧭 崩盤風險對照台：https://gutinganthony.github.io/KIWI/risk/"]
 
     return "\n".join(html_lines), "\n".join(plain_lines)
 

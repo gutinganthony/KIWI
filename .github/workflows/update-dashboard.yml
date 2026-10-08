@@ -62,11 +62,19 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: python scripts/fetch_credit_spreads.py || true
 
+      # 崩盤風險對照台（docs/risk/）：1973/1987/2000 對照、Fed 循環位置、系統性風險監控。
+      # 2026-10-08 Jake 核准接入。讀上面剛更新的 docs/index.html（CAPE、CRI/AVI/TSI），所以必須排在 update_dashboard.py 之後。
+      # Yahoo 偶爾擋 runner：腳本會沿用上次的歷史對照，只更新現值。best-effort，永不擋 dashboard。
+      - name: Update crash-risk board data (best-effort)
+        working-directory: projects/avi-v5
+        run: python scripts/risk_dashboards_data.py || true
+
       - name: Commit and push if changed
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/index.html docs/taiwan_data.json docs/history.json
+          git add docs/risk/data.json 2>/dev/null || true
           git add projects/avi-v5/data/ext/*.csv 2>/dev/null || true
           # 日本開示資料橋（fetch_jp_disclosures.py）的產出是 .md，不被上面的 *.csv glob 涵蓋。
           # 2026-07-27 前這行不存在 → 橋有跑但產出從未入版控、隨 runner 回收消失。
