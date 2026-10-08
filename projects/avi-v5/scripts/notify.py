@@ -22,6 +22,7 @@ Usage:
 """
 
 import argparse
+import html
 import json
 import logging
 import os
@@ -96,6 +97,83 @@ def load_dashboard_data():
     return json.loads(match.group(1))
 
 
+HISTORY_JSON = PROJECT_ROOT.parent.parent / "docs" / "history.json"
+
+
+def fetch_sp500_ma200():
+    """S&P 500 最新收盤與 200 日均線。只用標準函式庫（daily-alert 不裝 pip 套件）。
+    先試 FRED（免金鑰 CSV），失敗再試 Yahoo。都失敗回 (None, None)，由呼叫端標示「需手動確認」。"""
+    closes = []
+    try:
+        url = "https://fred.stlouisfed.org/graph/fredgraph.csv?id=SP500"
+        with urllib.request.urlopen(url, timeout=20) as r:
+            for line in r.read().decode().splitlines()[1:]:
+                parts = line.split(",")
+                if len(parts) == 2 and parts[1] not in ("", "."):
+                    closes.append(float(parts[1]))
+    except Exception as e:
+        logger.warning(f"FRED SP500 fetch failed: {e}")
+    if len(closes) < 200:
+        try:
+            url = "https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?range=2y&interval=1d"
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=20) as r:
+                raw = json.loads(r.read().decode())
+            closes = [c for c in raw["chart"]["result"][0]["indicators"]["quote"][0]["close"] if c is not None]
+        except Exception as e:
+            logger.warning(f"Yahoo ^GSPC fetch failed: {e}")
+            return None, None
+    if len(closes) < 200:
+        return None, None
+    return closes[-1], sum(closes[-200:]) / 200
+
+
+RULE3_START = "2026-10-08"   # 規則 3 生效日；之前的 CRI 不算觸發
+
+
+def load_cri_history():
+    """docs/history.json 的 CRI 日序列（舊→新），只取規則 3 生效日之後；讀不到回空 list。"""
+    try:
+        h = json.loads(HISTORY_JSON.read_text(encoding="utf-8"))
+        return [c for d, c in zip(h.get("d", []), h.get("c", [])) if c is not None and d >= RULE3_START]
+    except Exception as e:
+        logger.warning(f"history.json unreadable: {e}")
+        return []
+
+
+def rule3_status(cri_val, cri_hist, ma_fetcher=fetch_sp500_ma200):
+    """出場規則 3（skills/serenity/exit-playbook.md §0）。回傳 (html_line, plain_line) 或 None。
+    A 段：CRI≥50 → 槓桿全賣。B 段：CRI≥50 且 S&P<200 日線 → 股票全賣。
+    解除：CRI 連續 10 日 <35 且 S&P>200 日線（只在近 60 日曾 ≥50 時才顯示）。"""
+    recently_hot = any(c >= 50 for c in cri_hist[-60:])
+    if cri_val < 50 and not recently_hot:
+        return None
+    spx, ma = ma_fetcher()
+    ma_known = spx is not None
+    below = ma_known and spx < ma
+    ma_txt = f"S&P {spx:,.0f} vs 200日線 {ma:,.0f}" if ma_known else "200日線無法自動取得，請手動確認"
+    ma_html = html.escape(ma_txt)
+
+    if cri_val >= 50 and below:
+        return (f"🔴🔴 <b>規則 3 B 段觸發：所有股票全賣</b>（台股今天、美股今晚，3 個交易日內賣完）\n<i>{ma_html}</i>",
+                f"🔴🔴 規則 3 B 段觸發：所有股票全賣（台股今天、美股今晚，3 個交易日內賣完）\n{ma_txt}")
+    if cri_val >= 50:
+        extra = "" if ma_known else "；B 段待確認"
+        return (f"🔴 <b>規則 3 A 段觸發：槓桿部位全賣</b>（COHX 等，美股今晚）{extra}\n<i>{ma_html}</i>",
+                f"🔴 規則 3 A 段觸發：槓桿部位全賣（COHX 等，美股今晚）{extra}\n{ma_txt}")
+    calm = len(cri_hist) >= 10 and all(c < 35 for c in cri_hist[-10:])
+    if calm and ma_known and not below:
+        return (f"✅ <b>規則 3 解除條件成立</b>：CRI 連續 10 日 &lt;35 且 S&amp;P 在 200 日線上，回到正常流程\n<i>{ma_html}</i>",
+                f"✅ 規則 3 解除條件成立：CRI 連續 10 日 <35 且 S&P 在 200 日線上，回到正常流程\n{ma_txt}")
+    n_calm = 0
+    for c in reversed(cri_hist):
+        if c >= 35:
+            break
+        n_calm += 1
+    return (f"⏳ 規則 3 仍在防守中：CRI 已連續 {n_calm}/10 日 &lt;35；{ma_html}",
+            f"⏳ 規則 3 仍在防守中：CRI 已連續 {n_calm}/10 日 <35；{ma_txt}")
+
+
 def level_emoji(score, system):
     if score is None:
         return "⚪"
@@ -166,6 +244,10 @@ def build_message(data, weekend=False):
         signal_html  = "🟢 <b>正常</b>：照常操作"
         signal_plain = "🟢 正常：照常操作"
 
+    rule3 = rule3_status(cri_val, load_cri_history()) if cri_score is not None else None
+    if rule3:
+        signal_html, signal_plain = rule3[0] + "\n" + signal_html, rule3[1] + "\n" + signal_plain
+
     cri_d = f"{cri_val:.0f}" if cri_score is not None else "──"
     tsi_d = f"{tsi_val:.0f}" if tsi_score is not None else "──"
     avi_d = f"{avi_val:.1f}" if avi_score is not None else "──"
@@ -193,7 +275,7 @@ def build_message(data, weekend=False):
     if snap_line:
         html_lines += ["", snap_line.replace("S&P", "S&amp;P")]
     html_lines += ["", signal_html, "",
-                   "<i>觸發條件：TSI&gt;55 減倉 · CRI&gt;35 避險 · 雙高立即行動</i>",
+                   "<i>觸發條件：TSI&gt;55 減倉 · CRI&gt;35 避險 · 雙高立即行動 · CRI≥50 規則 3（槓桿全賣；跌破 200 日線則全出清）</i>",
                    "",
                    '🌐 <a href="https://gutinganthony.github.io/KIWI/">查看完整 Dashboard</a>']
 
@@ -212,7 +294,7 @@ def build_message(data, weekend=False):
     if snap_line:
         plain_lines += ["", snap_line]
     plain_lines += ["", signal_plain, "",
-                    "觸發條件：TSI>55 減倉 · CRI>35 避險 · 雙高立即行動",
+                    "觸發條件：TSI>55 減倉 · CRI>35 避險 · 雙高立即行動 · CRI≥50 規則 3（槓桿全賣；跌破 200 日線則全出清）",
                     "",
                     "🌐 查看完整 Dashboard：https://gutinganthony.github.io/KIWI/"]
 
