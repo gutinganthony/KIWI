@@ -67,6 +67,10 @@ jobs:
       # Yahoo 偶爾擋 runner：腳本會沿用上次的歷史對照，只更新現值。best-effort，永不擋 dashboard。
       - name: Update crash-risk board data (best-effort)
         working-directory: projects/avi-v5
+        timeout-minutes: 8
+        continue-on-error: true
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: python scripts/risk_dashboards_data.py || true
 
       - name: Commit and push if changed
