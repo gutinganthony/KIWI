@@ -3,7 +3,8 @@
 
     python3 lab_orbit_consensus.py         # 要先跑過 osap_fetch.py（data/osap/feps_sp500.csv.gz）與 lab_orbit.py
 
-共識：OSAP 的 FEPS＝I/B/E/S 每月 FY1（還沒公布的本財年）共識平均，分割調整到今天的股數（osap_fetch.py）。口徑是調整後（street）。
+共識：OSAP 的 FEPS＝I/B/E/S 每月 FY1（還沒公布的本財年）共識平均（osap_fetch.py），用面板季報的 split_fac 換到面板的股數口徑。
+  口徑是調整後（street）：股票報酬費用高的公司、REIT（FFO）會比 GAAP 高很多——這就是「拿共識當 EPS」實際會遇到的誤差，照算。
 挑起點：本財年的年報在「起點後 10.5～12 個月」之間公布 → 12 個月後的最近四季 EPS 剛好就是本財年 EPS，FY1 共識不用換算。
   年報公布日＝那一季財報的可用日（data/quarters_sp500.csv 的 avail）；會計年度結束月份＝Yahoo 年度資料（pef/consensus.fy_month，有快取）。
 比較（都用 lab_orbit.py 的走動式「原始成長a」β：起點那一年 1 月的版本）：
@@ -57,6 +58,15 @@ def fy_report_dates(q, month):
 def main():
     fe = pd.read_csv(os.path.join(DATA, "osap", "feps_sp500.csv.gz"))
     fe["month"] = pd.to_datetime(fe["yyyymm"].astype(int).astype(str) + "01")
+    # 換到「面板的股數口徑」：osap_fetch.py 的 feps 用 Yahoo 分割事件換到 2026-10 的股數，但面板（eps0、eps_f12）的股數口徑是
+    # 建表時（季報的 split_fac）。2025 年以後才分割的公司（NFLX、BKNG、KLAC 等）兩者會差一個分割倍數，所以改用面板自己的係數：
+    # 共識（面板口徑）＝I/B/E/S 原值 ÷ 那個月最近一季的 split_fac。
+    qs = pd.read_csv(os.path.join(DATA, "quarters_sp500.csv"), parse_dates=["period_end"])[["ticker", "period_end", "split_fac"]]
+    qs = qs.rename(columns={"period_end": "me"}).sort_values("me")
+    fe["me"] = fe["month"] + pd.offsets.MonthEnd(0)
+    fe = pd.merge_asof(fe.sort_values("me"), qs, on="me", by="ticker", direction="backward")
+    fe["split_fac"] = fe["split_fac"].fillna(fe["ticker"].map(qs.groupby("ticker")["split_fac"].first()))
+    fe["feps"] = fe["feps_raw"] / fe["split_fac"]
     fe = fe[fe["feps"].notna()][["ticker", "month", "feps"]]
     p = pd.read_csv(os.path.join(RES, "orbit_predictions.csv.gz"), parse_dates=["month"])
     beta = pd.read_csv(os.path.join(RES, "orbit_beta.csv"))
@@ -82,14 +92,20 @@ def main():
             if fut.empty:
                 continue
             f1 = fut.iloc[0]
+            prev = fy[fy["report"] <= r.month + pd.offsets.MonthEnd(0)]["report"]
             lead = (f1["report"] - (r.month + pd.offsets.MonthEnd(0))).days / 30.44
-            rows.append((r.Index, f1["fy_end"], f1["report"], lead))
-    meta = pd.DataFrame(rows, columns=["idx", "fy_end", "report", "lead"]).set_index("idx")
+            rows.append((r.Index, f1["fy_end"], f1["report"], lead, prev.iloc[-1] if len(prev) else pd.NaT))
+    meta = pd.DataFrame(rows, columns=["idx", "fy_end", "report", "lead", "prev_report"]).set_index("idx")
     x = x.join(meta, how="inner")
     say(f"對上會計年度：{len(x):,} 列、{x['ticker'].nunique()} 家")
 
     # 校正係數：過去（報告日 ≤ 起點）「實際 GAAP 本財年 EPS ÷ 那一年 lead≈11 個月時的共識」
-    one = x[(x["lead"] > 10.5) & (x["lead"] <= 12.0)].copy()          # 每家每年約一個起點
+    # 每家每年約一個起點。I/B/E/S 每月中旬（約第三個星期四）結算：上一份年報要在起點月份 14 號以前公布，
+    # 那個月的 FY1 才確定已經換到下一年（否則 FY1 可能還是剛結束的那一年，共識會對錯年度）
+    win = (x["lead"] > 10.5) & (x["lead"] <= 12.0)
+    okprev = x["prev_report"].notna() & (x["prev_report"] <= x["month"] + pd.Timedelta(days=13))
+    say(f"起點視窗內 {int(win.sum()):,} 列；上一份年報在當月 14 號以後才公布、剔除 {int((win & ~okprev).sum()):,} 列")
+    one = x[win & okprev].copy()
     one = one[one["y12"].notna() & one["eps_f12"].notna()]
     one["ratio"] = one["eps_f12"] / one["feps"]
     ks = []
@@ -154,7 +170,7 @@ def main():
 
     # 2. 用真正的共識重估 β（y12 ~ e + s）
     brow = []
-    z = x[(x["eps0"] > 0) & (x["feps"] > 0) & (x["eps_f12"] > 0) & x["y12"].notna() & (x["lead"] > 10.5) & (x["lead"] <= 12.0)].copy()
+    z = x[(x["eps0"] > 0) & (x["feps"] > 0) & (x["eps_f12"] > 0) & x["y12"].notna() & win & okprev].copy()
     z["e"] = np.log(z["feps"] / z["eps0"]).clip(-2, 2)
     z["s"] = np.log(z["eps_f12"] / z["feps"]).clip(-2, 2)
     z["g"] = np.log(z["eps_f12"] / z["eps0"]).clip(-2, 2)

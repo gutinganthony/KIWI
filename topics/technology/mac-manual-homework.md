@@ -27,8 +27,7 @@ last_updated: 2026-07-06
 
 - [x] ~~雲端允許 `fc.yahoo.com`、`query2.finance.yahoo.com`、`finance.yahoo.com`~~（2026-10-08 Jake 已加；quoteSummary 實測 200，已接進 `orbit_price.py --cons auto`）
 - [x] ~~雲端允許 `drive.google.com`、`drive.usercontent.google.com`~~（2026-10-08 Jake 已加；連線正常）。
-  OSAP 的訊號檔被 Google Drive 回「Quota exceeded」（檔案擁有者的下載配額，別的公開 Drive 檔可以下載），雲端 session 會自己重試
-  （`projects/pe-forecast/osap_fetch.py --wait-min 120`）。**不需要你做什麼**；若連續兩天都下載不了，再考慮改在 Mac 上下載（步驟見 research/06 §4.1）。
+  OSAP 歷史共識已在雲端下載完成（2026-10-08 15:59 重試成功，`projects/pe-forecast/data/osap/`），回測見 README §18。
 
 ### 🆕 2026-09-24 新增（前瞻本益比模型 session 產生）
 

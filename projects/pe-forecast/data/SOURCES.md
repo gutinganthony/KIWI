@@ -118,9 +118,10 @@
 
 ## I/B/E/S 歷史共識（`osap_fetch.py` → `data/osap/`）
 
-> **狀態（2026-10-08）：腳本已就緒，產出還沒生成。** Google Drive 對 OSAP 的訊號檔一直回「Quota exceeded」
-> （07:58–09:53 每 5 分鐘重試；只有 SignalDoc.csv 在 09:01 下載成功）。別的公開 Drive 檔照樣能下載，
-> 所以擋住的是檔案擁有者的下載配額，不是這個環境。配額恢復後重跑：`python3 osap_fetch.py --wait-min 120`。
+> **狀態（2026-10-08 16:00 UTC）：已生成。** 第一次（07:58–09:53）被 Google Drive 回「Quota exceeded」（檔案擁有者的下載配額）；
+> 15:59 重試成功。`data/osap/feps_sp500.csv.gz`：81,111 列、448 家、2009-01～2025-05（FEPS 最後月份中位 2024-11）；
+> 配對 448／476 家（94.1%），相關中位 0.9994、最低 0.9519。注意：`feps` 用 Yahoo 分割事件換到 2026-10 的股數；
+> 和面板（`quarters_sp500.csv` 的 split_fac 口徑）比較時要用 `feps_raw ÷ split_fac`（`lab_orbit_consensus.py` 的做法）。
 
 - **來源**：Open Source Asset Pricing（Chen & Zimmermann）2025.10 release，Google Drive 資料夾
   `1qQDuTsnyvWfEJR6nPBQZ8xxlq6bkLG_y`。檔案 ID 用 `openassetpricing` 套件的 Drive 解析器取得（內建一份備用 ID），

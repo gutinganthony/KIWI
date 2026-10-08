@@ -270,6 +270,14 @@ python3 consensus_snapshot.py --detail    # 存一份共識快照</div>
     <div class="panel stack"><h3>5. 逐家公司</h3><div id="firms" class="stack" style="gap:10px"></div></div>
   </div>
 
+  <div class="panel stack" id="cons-panel">
+    <h3>6. 拿真正的分析師共識當 EPS（I/B/E/S 歷史共識）</h3>
+    <p class="note prose">上面都假設你的 EPS 完全正確。這裡改用當時的分析師共識（本財年平均，2012–2024；來源 Open Source Asset Pricing）當 EPS，
+      看 12 個月後的本益比實際差多少。「校正」＝乘上這家公司過去「實際 GAAP ÷ 一年前共識」的中位數（只用當時已揭曉的年度）。</p>
+    <div class="tbl"><table id="t-cons"></table></div>
+    <p class="note prose" id="cons-sum"></p>
+  </div>
+
   <details class="panel"><summary>看完整數字表（全部預測距離、期間、樣本）</summary><div class="tbl" style="margin-top:12px"><table id="t-all"></table></div>
     <p class="note" style="margin-top:8px">樣本 a＝只需 h 個月後的 EPS（含較新的起點）；最近＝起點 2024-10～2025-09、目標日到 2026-09（股價 Yahoo、EPS 最新申報值）。
       重現：<code>python3 lab_orbit.py</code> → <code>lab_orbit_recent.py</code> → <code>lab_orbit_index.py</code>（results/orbit_index.txt）。</p></details>
@@ -321,7 +329,10 @@ $("meta").innerHTML = [`股價與共識：Yahoo ${esc(DATA.snap || "")}`, `${DAT
     [`${pct(a.模型)} <small>／ ${pct(b.模型)}</small>`, `12 個月後本益比的典型誤差（S&P 500／Nasdaq-100，2022 以後，EPS 完全正確）。本益比不變是 ${pct(a.本益比不變)}／${pct(b.本益比不變)}。`],
     [`${pct(a["＋你的EPS(a)_±20%"])} <small>／ ${pct(b["＋你的EPS(a)_±20%"])}</small>`, `落在實際 ±20% 內的比例（同樣假設 EPS 完全正確）。本益比不變只有 ${pct(a["本益比不變_±20%"])}／${pct(b["本益比不變_±20%"])}。`],
     [`${pct(fa.勝不變)} <small>／ ${pct(fb.勝不變)}</small>`, `逐家公司裡，模型比本益比不變準的比例（S&P 500 ${fa.家數} 家／Nasdaq-100 ${fb.家數} 家，2015 以後）。`],
-    [`≈ 20%`, `你的 EPS 典型誤差到這裡，優勢就消失（σ＝0.3 時 ${pct(nz["σ=0.3"], 1)} vs 本益比不變 ${pct(nz.本益比不變, 1)}）。準不準主要看 EPS。`],
+    (() => { const c = (BT.cons || []).find((r) => r.期間 === "2022 以後" && r.群組 === SP);
+      return c ? [`${pct(c.共識校正)} <small>／ ${pct(c.本益比不變)}</small>`,
+        `實際拿分析師共識（口徑校正後）當 EPS 的典型誤差／同一批起點的本益比不變（S&P 500，2022 以後）。EPS 完全正確是 ${pct(c.EPS完全正確)}：準不準主要看 EPS。`]
+        : [`≈ 20%`, `你的 EPS 典型誤差到這裡，優勢就消失（σ＝0.3 時 ${pct(nz["σ=0.3"], 1)} vs 本益比不變 ${pct(nz.本益比不變, 1)}）。準不準主要看 EPS。`]; })(),
   ];
   $("kpis").innerHTML = tiles.map(([v, l]) => `<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
 })();
@@ -571,6 +582,22 @@ drawC1();
   }).join("");
 })();
 
+// 6. 拿共識當 EPS
+(() => {
+  const C2 = BT.cons || [];
+  if (!C2.length) { $("cons-panel").hidden = true; return; }
+  const rs = C2.filter((r) => r.期間 !== "全期" && r.群組 !== "全部");
+  const nm = (g) => g.replace("（當時成分股）", "").replace("（當年成分股）", "").replace("（S&P 500 面板）", "");
+  $("t-cons").innerHTML = `<tr><th>群組</th><th>期間</th><th>起點數</th><th>本益比不變</th><th>共識原樣</th><th>共識校正</th><th>EPS 完全正確</th><th>±20% 命中（不變 → 校正）</th></tr>` +
+    rs.map((r) => `<tr><td>${esc(nm(r.群組))}</td><td>${esc(r.期間)}</td><td>${r.n.toLocaleString()}</td><td>${pct(r.本益比不變, 1)}</td><td>${pct(r.共識原樣, 1)}</td>
+      <td><b>${pct(r.共識校正, 1)}</b></td><td>${pct(r.EPS完全正確, 1)}</td><td>${pct(r["本益比不變_±20%"])} → ${pct(r["共識校正_±20%"])}</td></tr>`).join("");
+  const g = (grp) => C2.find((r) => r.期間 === "2022 以後" && r.群組 === grp);
+  const a = g("S&P 500（當時成分股）"), b = g("Nasdaq-100（當年成分股）"), t = g("科技（S&P 500 面板）");
+  $("cons-sum").textContent = `2022 以後：拿共識（校正後）當 EPS，12 個月本益比典型誤差 S&P 500 ${pct(a.共識校正)}、Nasdaq-100 ${pct(b.共識校正)}、科技 ${pct(t.共識校正)}；` +
+    `本益比不變是 ${pct(a.本益比不變)}、${pct(b.本益比不變)}、${pct(t.本益比不變)}，EPS 完全正確是 ${pct(a.EPS完全正確)}、${pct(b.EPS完全正確)}、${pct(t.EPS完全正確)}。` +
+    `共識比實際 GAAP EPS 系統性偏高（中位 ${sgn(Math.exp(a.共識偏高中位) - 1, 0)}，科技 ${sgn(Math.exp(t.共識偏高中位) - 1, 0)}），所以原樣使用會低估本益比；你的研究能改進的空間，就是共識和「EPS 完全正確」之間的那一段。`;
+})();
+
 // 完整表
 (() => {
   const rs = BT.scores.filter((r) => r.指數 === SP || r.指數 === ND || r.指數 === "S&P 500（2025 名單）");
@@ -596,7 +623,9 @@ drawC1();
     `<b>預測不了產業被重新定價</b>：最近一段科技股的誤差約 ${pct(rt.模型)}（全部 ${pct(ra.模型)}、Nasdaq-100 ${pct(rb.模型)}），主因是 AI 記憶體行情（半導體類比軌道多漲約 61%）和軟體股修正。NVDA、WDC、ENPH 這類公司最不準。`,
     "<b>你的 EPS 對股價影響很小</b>：β 小，EPS 從悲觀到樂觀差 50%，股價中位通常只差 10% 左右。想靠這個模型找「被低估的股價」不適合，它比較適合回答「如果 EPS 是 X，本益比會是多少」。",
     "<b>倖存者與覆蓋</b>：面板是 2025 年的 S&P 500 名單（已另算「當時成分股」）；Nasdaq-100 只有同時在 S&P 500 面板裡的 51–85 家（早年較少），ASML、PDD 這類外國公司沒有。中小型股沒有驗證。",
-    "<b>共識的係數還是代理</b>：「市場已預期」那一項的 β 是用模型自己的預期估的，不是真正的歷史分析師共識；歷史共識資料正在接，之後要重估。",
+    (() => { const c = (BT.cons || []).find((r) => r.期間 === "2022 以後" && r.群組 === SP), t = (BT.cons || []).find((r) => r.期間 === "2022 以後" && r.群組 === "科技（S&P 500 面板）");
+      return c ? `<b>實際用共識當 EPS，誤差大約 ${pct(c.共識校正)}（科技 ${pct(t.共識校正)}）</b>：比本益比不變好，但離「EPS 完全正確」的 ${pct(c.EPS完全正確)} 還遠。共識本身比實際 GAAP 高約 ${sgn(Math.exp(c.共識偏高中位) - 1, 0)}。「市場已預期」的 β 用真共識重估，量級和目前的代理差不多，暫不更換。`
+        : "<b>共識的係數還是代理</b>：「市場已預期」那一項的 β 是用模型自己的預期估的，不是真正的歷史分析師共識。"; })(),
     "<b>大盤是固定的資金成本</b>：r＝10 年期＋5%。大盤整年往同一邊走時，所有預測一起偏。",
     "<b>2022 以後的資料在設計時看過</b>：真正沒碰過的驗收是 2026-10-06 凍結的前瞻紀錄（1,982 家，2027-04、2027-10 驗收）。",
   ];

@@ -1,0 +1,6 @@
+Acronym,Cat.Signal,Cat.Data,LongDescription,Detailed Definition,Authors,Year,Journal,SampleStartYear,SampleEndYear
+AnalystRevision,Predictor,Analyst,EPS forecast revision,"keep fpi == ""1"", last obs each month.  Signal is meanest / last month's meanest.","Hawkins, Chamberlin, Daniel",1984,FAJ,1975,1980
+FEPS,Predictor,Analyst,Analyst earnings per share,"Using IBES unadjusted forecasts, keep fpi == 1, signal is meanest.","Cen, Wei, and Zhang",2006,WP,1983,2002
+fgr5yrLag,Predictor,Analyst,Long-term EPS forecast,"Lag long-term earnings forecast (fgr5yr) by 6 months.   Then keep only June observations, and fill in missing with most recent obs.  Exclude if book equity (ceq), net income (ib), deferred taxes (txdi), dividends (dvp), revenue (sale) or depreciation (dp) is missing.  Keep only",La Porta,1996,JF,1983,1990
+Mom12m,Predictor,Price,Momentum (12 month),Stock return between months t-12 and t-1,Jegadeesh and Titman,1993,JF,1964,1989
+Mom6m,Predictor,Price,Momentum (6 month),Stock return between months t-6 and t-1,Jegadeesh and Titman,1993,JF,1964,1989

@@ -94,7 +94,9 @@ def backtest():
                        類型={k: dict(模型=round(float(d["model"].median()), 3), 不變=round(float(d["unch"].median()), 3), 家數=len(d))
                            for k, d in g.groupby("grp")}))
     rec = lambda d: json.loads(d.to_json(orient="records", force_ascii=False, double_precision=5))
-    return dict(scores=rec(sc), years=rec(yrs), bands=rec(bands), noise=rec(noise), firms=fs)
+    cp = os.path.join(RES, "orbit_consensus_scores.csv")
+    cons = rec(pd.read_csv(cp)) if os.path.exists(cp) else []
+    return dict(scores=rec(sc), years=rec(yrs), bands=rec(bands), noise=rec(noise), firms=fs, cons=cons)
 
 
 def main():
