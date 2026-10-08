@@ -610,6 +610,10 @@ def main():
           f"證據不明沿用規則 {sstat['rule_kept']}、改判前後一月 {sstat['data_override']}、無 FEPS 可驗 {sstat['no_check']}")
     F["split_factor"] = split_factor(S, F[["ticker", "yyyymm"]])
     F["feps"] = F["feps_raw"] / F["split_factor"]
+    # AnalystRevision＝本月 meanest ÷ 上月 meanest（都是未調整口徑）→ 分割那個月會變成 ≈1/分割倍數；換成同口徑
+    prev = pd.DataFrame({"ticker": F["ticker"], "yyyymm": [ym_add(int(v), -1) for v in F["yyyymm"]]})
+    F["analyst_revision_raw"] = F["analyst_revision"]
+    F["analyst_revision"] = F["analyst_revision_raw"] * split_factor(S, prev) / F["split_factor"]
 
     # 分割調整診斷 1：每次分割的「第一個新口徑月份」前後，FEPS 有沒有變平滑（|跳動| < 分割倍數的 30%）
     sm_raw = sm_adj = n_sp = 0
@@ -638,7 +642,8 @@ def main():
     print(f"  [診斷] FEPS÷GAAP FY1 EPS 的每家中位數：{len(R)} 家可比，全體中位 {np.exp(R['median'].median()):.3f}；"
           f"偏離 >1.8 倍 {len(off)} 家：" + ", ".join(f"{t}×{np.exp(v):.2f}" for t, v in off["median"].items()))
 
-    outc = ["ticker", "permno", "yyyymm", "feps_raw", "split_factor", "feps", "analyst_revision", "fgr5y"]
+    outc = ["ticker", "permno", "yyyymm", "feps_raw", "split_factor", "feps", "analyst_revision", "fgr5y",
+            "analyst_revision_raw"]
     F = F[outc]
     F.to_csv(OUT / "feps_sp500.csv.gz", index=False, float_format="%.6g", compression="gzip")
 
