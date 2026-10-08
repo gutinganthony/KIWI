@@ -49,6 +49,8 @@ YM_MIN = 200901          # 輸出只留 2009 年以後
 MIN_OVERLAP = 36         # 配對至少重疊 36 個月
 MIN_CORR = 0.95          # 相關係數門檻
 UA = "Mozilla/5.0"       # 請求 header 只放這個；不帶任何個資
+# 面板建好之後在 Yahoo 改了代號的公司（舊代號 404）
+YAHOO_ALIAS = {"FI": "FISV", "MMC": "MRSH", "BK": "BNY"}
 
 
 def default_raw_dir():
@@ -300,9 +302,11 @@ def yahoo_splits(tickers, raw_dir, refresh):
     sess = session()
     rows, fail = [], []
     for t in tickers:
-        sym = str(t).upper().replace(".", "-")
-        f = d / f"{sym}.json"
-        if refresh or not f.exists():
+        f = None
+        for sym in [str(t).upper().replace(".", "-")] + ([YAHOO_ALIAS[t]] if t in YAHOO_ALIAS else []):
+            f = d / f"{sym}.json"
+            if f.exists() and not refresh:
+                break
             url = f"https://query1.finance.yahoo.com/v8/finance/chart/{sym}?range=max&interval=1mo&events=split"
             for attempt in range(3):
                 try:
@@ -316,7 +320,9 @@ def yahoo_splits(tickers, raw_dir, refresh):
                 if r is not None and r.status_code == 404:
                     break
                 time.sleep(5 * (attempt + 1))
-        if not f.exists():
+            if f.exists():
+                break
+        if f is None or not f.exists():
             fail.append(t)
             continue
         try:
