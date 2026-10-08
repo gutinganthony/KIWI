@@ -9,7 +9,7 @@ S&P 500 歷史面板（SEC 第一次申報值、Stooq 股價）只到 2025-09，
 起點的線索、市場預期（代理）、β 用 lab_orbit.py 的走動式結果（results/orbit_predictions.csv.gz、orbit_beta.csv），
 同一個起點年用同一組 β（2024 年的起點用 2024 年 1 月版，2025 年的起點用 2025 年 1 月版）。
 限制：EPS 是重述後的版本（略偏樂觀）；只能評「只需 a 時點 EPS」的寫法（b 時點的 EPS 還沒揭曉）。
-輸出：results/orbit_recent.txt、orbit_recent_scores.csv
+輸出：results/orbit_recent.txt、orbit_recent_scores.csv、orbit_recent_rows.csv.gz（逐筆，給 lab_orbit_index.py 依指數分組）
 """
 import argparse
 import io
@@ -122,6 +122,9 @@ def main():
         say(f"  {mth:%Y-%m} n={len(d):4d}  軌道 {np.median(np.abs(d['e_orbit'])):.3f}  ＋原始成長 {np.nanmedian(np.abs(d['e_raw'])):.3f}"
             f"  本益比不變 {np.median(np.abs(d['e_unch'])):.3f}  市場偏離軌道 {np.median(d['y']):+.3f}")
     sc.to_csv(os.path.join(RES, "orbit_recent_scores.csv"), index=False, float_format="%.6f")
+    x[["ticker", "grp", "month", "h", "p0", "p1", "eps0", "eps1", "orbit_lr", "e_exp", "lr", "y", "g", "s",
+       "e_unch", "e_orbit", "e_raw", "e_es"]].to_csv(os.path.join(RES, "orbit_recent_rows.csv.gz"), index=False,
+                                                    float_format="%.6g", compression={"method": "gzip", "mtime": 0})
     open(os.path.join(RES, "orbit_recent.txt"), "w").write(buf.getvalue())
 
 

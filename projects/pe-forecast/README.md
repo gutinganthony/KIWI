@@ -1358,3 +1358,49 @@ python3 orbit_price.py MU --eps 150 --eps2 200 --cons auto   # 用法
 python3 consensus_snapshot.py                  # 每週一份共識快照
 python3 forward_log.py freeze-orbit            # 凍結前瞻紀錄（同一個股價日只能凍結一次）
 ```
+
+---
+
+## 17. 依指數的回測報告與網頁（2026-10-08）
+
+網頁（試算器＋模型說明＋回測報告＋優勢與限制）：`python3 make_orbit_page.py <輸出.html>`（預設 `artifact/orbit.html`）。
+試算器的計算核心 `web/orbit_core.js` 和 `pef/orbit.py` 相同，`python3 web/test_orbit_core.py` 用 node 對照（72 組預測、6 組年度換算全部一致）。
+資料：約 3,000 檔美股今天的股價與最近四季 EPS（有新財報時用 Yahoo 更新），S&P 500＋科技＋Nasdaq-100 約 460 檔自動帶入分析師共識（GAAP 口徑換算）。
+
+### 17.1 回測設計（`lab_orbit_index.py`，幾秒；只讀既有的走動式結果）
+
+預測完全沒變（`lab_orbit.py` 的走動式樣本外預測），只換分組評分：
+- **S&P 500（當時成分股）**：起點那個月真的在 S&P 500（`data/sp500_membership_spells.csv`），減少倖存者偏誤；另列 2025 名單全體。
+- **Nasdaq-100（當年成分股）**：起點那一年 1 月 1 日的名單（`data/ndx_members_jan1.csv`，來源 jmccarrell/n100tickers）。
+  只有同時在 S&P 500 面板裡的公司有資料：每年 101–105 家裡有 51–85 家（ASML、PDD 等外國公司與不在 S&P 500 的公司沒有）。
+- 假設 EPS 完全正確；另列 EPS 有誤差時。區間涵蓋率用 2021 以前校準、2022 以後檢查。
+- 最近一段（`lab_orbit_recent.py` 的逐筆結果 `results/orbit_recent_rows.csv.gz`）也依指數分組。
+
+### 17.2 結果（12 個月，中位 |ln 誤差|；完整表 `results/orbit_index.txt`）
+
+| 指數 | 期間 | 本益比不變 | 軌道 | 模型（軌道＋你的 EPS） | ±20% 命中（不變 → 模型） |
+|---|---|---|---|---|---|
+| S&P 500（當時成分股） | 2015–2021 | 0.282 | 0.158 | 0.157 | 39% → 62% |
+| S&P 500（當時成分股） | 2022 以後 | 0.246 | 0.152 | 0.149 | 43% → 63% |
+| S&P 500（當時成分股） | 最近（目標日到 2026-09） | 0.257 | 0.179 | 0.177 | — → 55% |
+| Nasdaq-100 | 2015–2021 | 0.309 | 0.186 | 0.185 | 37% → 55% |
+| Nasdaq-100 | 2022 以後 | 0.242 | 0.163 | 0.160 | 44% → 60% |
+| Nasdaq-100 | 最近（目標日到 2026-09） | 0.311 | 0.242 | 0.239 | — → 44% |
+
+- 6 個月：S&P 500 0.111、Nasdaq-100 0.120（2022 以後；本益比不變 0.169、0.165）。24 個月：0.208、0.211（不變 0.288、0.291）。
+- 逐家（12 個月、至少 12 個起點）：模型比本益比不變準的公司，S&P 500 445 家裡 86%，Nasdaq-100 98 家裡 77%。
+  最不準的是被重新定價的公司（NVDA、WDC、AXON、ENPH、META、AMD、MTCH）；最準的是穩定的必需消費與公用事業（PG、DUK、KO、JNJ）。
+- 依類型（各家中位的中位，S&P 500）：半導體類 0.26（不變 0.38）、軟體／網路 0.19（0.29）、其他科技 0.17（0.32）、非科技 0.15（0.28）。
+- EPS 有誤差時（12 個月、2022 以後）：S&P 500 σ＝0.1／0.2／0.3（EPS 中位差約 7%／13%／20%）→ 0.156／0.197／0.249，本益比不變 0.251；
+  Nasdaq-100 → 0.170／0.209／0.258，不變 0.255。EPS 差到 20% 左右，優勢消失。
+- 區間（2022 以後實際涵蓋，含大盤偏差）：12 個月 80% 區間 S&P 500 87%、Nasdaq-100 87%；50% 區間 58%、55%。
+- Nasdaq-100 在 2022 以後「也給 EPS_b」沒有比只給 EPS_a 好（0.163 vs 0.156，樣本 1,379 筆），和 S&P 500 不同；樣本小，先不改規格。
+
+### 17.3 重現
+
+```
+python3 lab_orbit_recent.py --lg ... --yahoo-cache ...   # 存逐筆（results/orbit_recent_rows.csv.gz）
+python3 lab_orbit_index.py                               # results/orbit_index*.csv、orbit_index.txt
+python3 make_orbit_page.py artifact/orbit.html           # 網頁
+python3 web/test_orbit_core.py                           # 網頁計算＝命令列計算
+```

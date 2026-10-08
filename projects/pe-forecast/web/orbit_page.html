@@ -1,0 +1,599 @@
+<title>本益比軌道模型</title>
+<meta name="description" content="給你的 EPS 預估，算 6／12／24 個月後的本益比與股價區間；S&P 500 與 Nasdaq-100 回測報告。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap">
+<style>
+/* 版面：一欄閱讀寬度（約 46rem），圖表與試算器放寬到 72rem；頂部固定目錄。冷色紙面＋墨藍字，藍色＝模型、橘＝軌道、青綠＝本益比不變（全頁一致）。 */
+:root {
+  --bg: #f4f6f9; --surface: #ffffff; --sunk: #eef1f5; --ink: #121820; --ink-2: #4a5462; --muted: #7b8593;
+  --line: #dde2e9; --line-2: #c9d0da; --accent: #1f6fd0; --accent-soft: #e3eefb;
+  --s-model: #2a78d6; --s-orbit: #eb6834; --s-unch: #1baf7a; --good: #0b7a3e; --warn: #9a5b00; --bad: #b4282a;
+  --f-display: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  --f-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e1116; --surface: #161b22; --sunk: #1c222b; --ink: #eef1f5; --ink-2: #b6bfcb; --muted: #7f8a98;
+  --line: #29303a; --line-2: #3a4350; --accent: #5aa0f0; --accent-soft: #1a2a40;
+  --s-model: #3987e5; --s-orbit: #d95926; --s-unch: #199e70; --good: #3fbf72; --warn: #e0a440; --bad: #ef6b6b; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0e1116; --surface: #161b22; --sunk: #1c222b; --ink: #eef1f5; --ink-2: #b6bfcb; --muted: #7f8a98;
+  --line: #29303a; --line-2: #3a4350; --accent: #5aa0f0; --accent-soft: #1a2a40;
+  --s-model: #3987e5; --s-orbit: #d95926; --s-unch: #199e70; --good: #3fbf72; --warn: #e0a440; --bad: #ef6b6b; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.75 var(--f-body); margin: 0; font-variant-numeric: tabular-nums; }
+a { color: var(--accent); }
+.wrap { max-width: 72rem; margin: 0 auto; padding-inline: 20px; padding-block: 0 72px; }
+.prose { max-width: 46rem; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; line-height: 1.3; margin: 0; }
+h1 { font-size: clamp(30px, 5vw, 44px); letter-spacing: 0.01em; }
+h2 { font-size: 26px; }
+h3 { font-size: 18px; font-family: var(--f-body); font-weight: 700; }
+p { margin: 0; }
+code, .mono { font-family: var(--f-mono); font-size: 0.92em; }
+nav.toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(6px); border-bottom: 1px solid var(--line); }
+nav.toc .in { max-width: 72rem; margin: 0 auto; padding-inline: 20px; display: flex; gap: 4px 18px; flex-wrap: wrap; padding-block: 10px; font-size: 14px; }
+nav.toc a { color: var(--ink-2); text-decoration: none; white-space: nowrap; }
+nav.toc a:hover, nav.toc a:focus-visible { color: var(--accent); }
+header.top { padding-block: 44px 28px; display: grid; gap: 14px; }
+.eyebrow { font: 500 12px/1.4 var(--f-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lede { font-size: 17px; color: var(--ink-2); max-width: 44rem; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--muted); }
+section { padding-block: 40px 8px; border-top: 1px solid var(--line); display: grid; gap: 18px; scroll-margin-top: 56px; }
+.sec-head { display: grid; gap: 6px; }
+.sec-head .eyebrow { color: var(--accent); }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(13.5rem, 1fr)); gap: 12px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; display: grid; gap: 4px; align-content: start; }
+.kpi .v { font: 600 26px/1.2 var(--f-mono); letter-spacing: -0.01em; }
+.kpi .v small { font-size: 14px; color: var(--muted); font-weight: 400; }
+.kpi .l { font-size: 13px; color: var(--ink-2); line-height: 1.55; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; min-width: 0; }
+.flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr)); gap: 10px; align-items: stretch; }
+.node { border: 1px solid var(--line-2); border-radius: 8px; padding: 12px; background: var(--surface); display: grid; gap: 4px; position: relative; }
+.node b { font-size: 14px; }
+.node .f { font: 13px/1.5 var(--f-mono); color: var(--ink-2); }
+.node .d { font-size: 13px; color: var(--muted); line-height: 1.55; }
+.node.k-orbit { border-top: 3px solid var(--s-orbit); }
+.node.k-view { border-top: 3px solid var(--s-model); }
+.node.k-out { background: var(--accent-soft); border-color: transparent; }
+.formula { font: 15px/1.9 var(--f-mono); background: var(--sunk); border-radius: 8px; padding: 14px 16px; overflow-x: auto; white-space: pre; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 23rem) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 860px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+label { font-size: 13px; color: var(--ink-2); display: grid; gap: 4px; }
+input[type="text"], input[type="number"], input:not([type]) { font: 15px var(--f-mono); padding: 8px 10px; border: 1px solid var(--line-2);
+  border-radius: 7px; background: var(--surface); color: var(--ink); width: 100%; min-width: 0; }
+input:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.seg { display: inline-flex; border: 1px solid var(--line-2); border-radius: 8px; overflow: hidden; }
+.seg button { font: 500 14px var(--f-body); padding: 7px 14px; border: 0; background: var(--surface); color: var(--ink-2); cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line-2); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.btn { font: 500 13px var(--f-body); padding: 7px 12px; border-radius: 7px; border: 1px solid var(--line-2); background: var(--surface); color: var(--ink); cursor: pointer; }
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.stack { display: grid; gap: 14px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.scen { display: grid; grid-template-columns: 3.2rem minmax(0, 1fr) minmax(0, 1fr); gap: 6px 8px; align-items: center; font-size: 13px; }
+.scen .hd { color: var(--muted); font-size: 12px; }
+.note { font-size: 13px; color: var(--ink-2); line-height: 1.65; }
+.note.warn { color: var(--warn); }
+.chip { display: inline-block; font: 500 12px/1.6 var(--f-mono); padding: 0 8px; border-radius: 999px; background: var(--sunk); color: var(--ink-2); }
+.chip.ex { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); }
+.tbl { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font-weight: 500; color: var(--muted); font-size: 12.5px; }
+tr.base td { font-weight: 700; }
+.today { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 14px; }
+.today span b { font-family: var(--f-mono); font-weight: 500; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.chart { width: 100%; overflow-x: auto; }
+.chart svg { display: block; max-width: 100%; height: auto; }
+.chart text { fill: var(--ink-2); font: 12px var(--f-body); }
+.chart .axis { stroke: var(--line-2); }
+.chart .grid { stroke: var(--line); }
+.chart .val { fill: var(--ink); font: 500 11.5px var(--f-mono); }
+.chart .lab { fill: var(--ink); font: 500 12.5px var(--f-body); }
+.small-mult { display: grid; grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr)); gap: 16px; }
+.tip { position: fixed; pointer-events: none; z-index: 20; background: var(--ink); color: var(--bg); font: 12.5px/1.5 var(--f-body);
+  padding: 6px 9px; border-radius: 6px; max-width: 18rem; box-shadow: 0 4px 14px rgb(0 0 0 / 0.18); }
+details { font-size: 14px; }
+details summary { cursor: pointer; color: var(--accent); }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); gap: 18px; }
+ul.list { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; }
+ul.list li { line-height: 1.65; }
+.pro h3 { color: var(--good); } .con h3 { color: var(--bad); }
+.cmd { font: 13px/1.7 var(--f-mono); background: var(--sunk); border-radius: 8px; padding: 12px 14px; overflow-x: auto; white-space: pre; }
+.range { margin-top: 6px; }
+footer { padding-block: 30px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); margin-top: 40px; }
+@media (prefers-reduced-motion: no-preference) { .bar { transition: width 0.25s ease; } }
+</style>
+
+<nav class="toc" aria-label="目錄"><div class="in">
+  <a href="#model">模型長什麼樣子</a><a href="#calc">試算器</a><a href="#howto">怎麼用</a><a href="#report">回測報告</a><a href="#limits">優勢與限制</a>
+</div></nav>
+
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow" id="hdr-meta">pe-forecast · orbit-1</div>
+  <h1>本益比軌道模型</h1>
+  <p class="lede">給它你對一家公司「h 個月後」和「再下一年」的 EPS 預估，它算出那時的本益比和股價區間（h＝6、12、24 個月）。
+    骨架是 Leibowitz 的本益比軌道：市場看法不變時，股價照資金成本漲；你的 EPS 和市場預期的差別，再按歷史上的平均反應調整。</p>
+  <div class="meta" id="meta"></div>
+</header>
+
+<div class="kpis" id="kpis"></div>
+
+<section id="model">
+  <div class="sec-head"><div class="eyebrow">模型長什麼樣子</div><h2>三個零件：軌道、看法調整、區間</h2></div>
+  <div class="flow" aria-label="模型流程">
+    <div class="node"><b>今天</b><span class="f">股價 P₀、最近四季 EPS₀</span><span class="d">10 年期公債殖利率、股利殖利率、過去 36 個月波動</span></div>
+    <div class="node k-orbit"><b>① 軌道</b><span class="f">× e^((r − 股利) × h/12)</span><span class="d">r＝10 年期＋5%。市場看法不變時股價的預期路徑。</span></div>
+    <div class="node k-view"><b>② 看法調整</b><span class="f">× e^(β × ln 成長)</span><span class="d">你的 EPS_a、EPS_b；有共識時拆成「市場已預期」＋「你和共識的差距」。β 依公司類型與 h 估。</span></div>
+    <div class="node"><b>③ 區間</b><span class="f">× e^(波動^0.7 × 分位數)</span><span class="d">回測的樣本外誤差校準；目標日虧損再放寬約 1.3 倍。</span></div>
+    <div class="node k-out"><b>h 個月後</b><span class="f">股價 Pₕ；本益比＝Pₕ ÷ EPS_a</span><span class="d">另給 forward 本益比＝Pₕ ÷ EPS_b。</span></div>
+  </div>
+  <div class="formula">h 個月後股價 ＝ P₀ × exp[ (r − 股利殖利率) × h/12  ＋  調整 ]
+沒有共識：調整 ＝ β_a × ln(EPS_a ÷ EPS₀) ＋ β_b × ln(EPS_b ÷ EPS₀)
+有共識：  調整 ＝ β_e × ln(共識_b ÷ EPS₀) ＋ β_sa × ln(EPS_a ÷ 共識_a) ＋ β_sb × ln(EPS_b ÷ 共識_b)
+本益比   ＝ h 個月後股價 ÷ EPS_a</div>
+  <div class="prose stack">
+    <p><b>EPS_a</b>＝h 個月後「那時已經公布」的最近四季 GAAP 稀釋 EPS，也就是本益比的分母。<b>EPS_b</b>＝再往後 12 個月的同一個口徑。
+      h 個月後的股價看的是那時的「下一年」，所以 EPS_b 往往比 EPS_a 重要：半導體類 12 個月的 β_a 約 0、β_b 約 0.17。</p>
+    <p>β 都很小。12 個月的「你和共識的差距」每差 10%，股價大約只差 0.3–2%。所以<b>本益比主要由你給的 EPS 決定</b>，
+      股價主要跟著軌道走。這和學術文獻（盈餘反應係數低、股價領先盈餘）一致。</p>
+  </div>
+  <div class="panel tbl"><table id="beta-tbl" aria-label="12 個月的 β"></table></div>
+</section>
+
+<section id="calc">
+  <div class="sec-head"><div class="eyebrow">試算器</div><h2>輸入你的 EPS，看本益比與股價區間</h2>
+    <p class="note" id="calc-sub"></p></div>
+  <div class="grid2">
+    <div class="panel stack" id="calc-in">
+      <label for="tk">股票代號<input id="tk" list="tk-list" autocomplete="off" spellcheck="false" value="MU"></label>
+      <datalist id="tk-list"></datalist>
+      <div class="stack" style="gap:6px"><span class="note">預測距離</span>
+        <div class="seg" role="group" aria-label="預測距離" id="hseg">
+          <button type="button" data-h="6" aria-pressed="false">6 個月</button><button type="button" data-h="12" aria-pressed="true">12 個月</button><button type="button" data-h="24" aria-pressed="false">24 個月</button>
+        </div></div>
+      <div class="stack" style="gap:6px">
+        <div class="row" style="justify-content:space-between"><span class="note">你的 EPS（GAAP 稀釋、最近四季口徑）</span><span class="chip ex" id="ex-chip" hidden>範例數字</span></div>
+        <div class="scen">
+          <span></span><span class="hd" id="hd-a">EPS_a</span><span class="hd" id="hd-b">EPS_b（可空白）</span>
+          <span>悲觀</span><input id="a0" type="number" step="any" inputmode="decimal"><input id="b0" type="number" step="any" inputmode="decimal">
+          <span><b>基準</b></span><input id="a1" type="number" step="any" inputmode="decimal"><input id="b1" type="number" step="any" inputmode="decimal">
+          <span>樂觀</span><input id="a2" type="number" step="any" inputmode="decimal"><input id="b2" type="number" step="any" inputmode="decimal">
+        </div>
+        <div class="row"><button type="button" class="btn" id="fill-cons">用共識填（±10%）</button><button type="button" class="btn" id="fill-flat">用今天 EPS 填（±10%）</button></div>
+      </div>
+      <div class="stack" style="gap:8px">
+        <label class="row" style="display:flex;gap:8px;align-items:center;color:var(--ink)"><input type="checkbox" id="use-cons" checked> 放入市場共識（模型分開算「市場已預期」和「你的差距」）</label>
+        <div class="row" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+          <label for="ca">共識 EPS_a<input id="ca" type="number" step="any"></label>
+          <label for="cb">共識 EPS_b<input id="cb" type="number" step="any"></label>
+          <label for="ck">口徑係數<input id="ck" type="number" step="any"></label>
+        </div>
+        <p class="note" id="cons-note"></p>
+      </div>
+    </div>
+    <div class="stack" style="min-width:0">
+      <div class="panel stack" id="calc-out">
+        <div class="today" id="today"></div>
+        <p class="note" id="window"></p>
+        <div class="tbl"><table id="res"></table></div>
+        <div class="range chart" id="range" aria-label="股價區間"></div>
+        <div id="decomp" class="note"></div>
+        <div id="notes" class="stack" style="gap:6px"></div>
+      </div>
+      <p class="note">80% 區間＝回測裡 10 次大約 8 次落在裡面（2022 以後實測 80–89%，略偏寬）。區間已含產業被重新定價的風險，所以很寬。不是投資建議。</p>
+    </div>
+  </div>
+</section>
+
+<section id="howto">
+  <div class="sec-head"><div class="eyebrow">怎麼用</div><h2>使用步驟與輸入的定義</h2></div>
+  <div class="cols">
+    <div class="stack prose">
+      <h3>在這個網頁</h3>
+      <ul class="list">
+        <li>輸入代號（S&P 500、Nasdaq-100 與其他約 3,000 檔美股）。今天的股價、最近四季 EPS、波動會自動帶入；有新財報時 EPS 已用 Yahoo 更新。</li>
+        <li>選預測距離。填你的 <b>EPS_a</b>（h 個月後那時已公布的最近四季 EPS），最好也填 <b>EPS_b</b>（再往後 12 個月）。三個情境可以只填基準。</li>
+        <li>S&P 500、科技股與 Nasdaq-100 約 460 檔有分析師共識，會自動帶入並換算成 GAAP 口徑。可以改，也可以取消勾選。</li>
+        <li>看結果：本益比中位與 80% 區間、股價 50%／80% 區間、h 個月後的 forward 本益比，以及每一項對股價的影響。</li>
+      </ul>
+      <h3>在雲端 session（命令列）</h3>
+      <div class="cmd">cd projects/pe-forecast
+python3 orbit_price.py MU --eps 150 --eps2 200 --cons auto
+python3 orbit_price.py MU --eps 120,150,180 --eps2 150,200,250
+python3 orbit_price.py MU --fy "2027-08:170,2028-08:210"
+python3 orbit_price.py AAPL --eps 9 --eps2 10 --h 24
+python3 consensus_snapshot.py --detail    # 存一份共識快照</div>
+      <p class="note">命令列多了：會計年度 EPS 自動換算（<code>--fy</code>）、即時抓共識與分析師修正（<code>--cons auto</code>）、自己指定口徑係數（<code>--cons-scale</code>）。</p>
+    </div>
+    <div class="stack prose">
+      <h3>輸入要注意</h3>
+      <ul class="list">
+        <li><b>口徑一定要是 GAAP 稀釋、最近四季</b>。分析師常報調整後（non-GAAP）EPS，軟體公司兩者可差 30% 以上。共識的「口徑係數」＝GAAP 最近四季 ÷ 調整後最近四季，例如 CRM 約 0.65。</li>
+        <li><b>EPS_a 不是會計年度 EPS</b>。12 個月後的 EPS_a 通常跨兩個會計年度；網頁會寫出它涵蓋哪四季。手上只有年度預估時，用命令列 <code>--fy</code> 自動換算。</li>
+        <li><b>週期股（半導體／設備／記憶體）一定要填 EPS_b</b>，股價看的是下一個週期的盈利。</li>
+        <li><b>虧損</b>：EPS_a ≤ 0 時本益比沒有定義，只給股價（區間放寬約 1.3 倍）；EPS_b &gt; 0 時看 forward 本益比。</li>
+      </ul>
+      <h3>怎麼讀結果</h3>
+      <ul class="list">
+        <li>本益比 ≈ 股價 ÷ 你的 EPS。EPS 改 10%，本益比大約改 10%，股價只動一點點。</li>
+        <li>模型的價值是把「一個好的 EPS 預估」轉成可靠的本益比與股價區間；EPS 本身要靠你的研究或分析師共識。</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="report">
+  <div class="sec-head"><div class="eyebrow">回測報告</div><h2>S&P 500 與 Nasdaq-100：準不準？</h2>
+    <p class="prose note">走動式回測：每年 1 月只用當時已揭曉的資料估係數，再預測接下來一年的每個月份起點。
+      預測起點 2015–2025，目標日到 2025-09；另用 Yahoo 股價延伸到目標日 2026-09。假設你的 EPS 完全正確（＝事後實際公布的值），
+      所以這是上限；EPS 有誤差時見下方第三張圖。誤差＝中位 |ln(預測 ÷ 實際)|，0.15 大約等於差 15%。</p></div>
+
+  <div class="panel stack">
+    <div class="row" style="justify-content:space-between">
+      <h3>1. 三種方法的典型誤差</h3>
+      <div class="row">
+        <div class="seg" role="group" aria-label="預測距離" id="c1h"><button type="button" data-v="6" aria-pressed="false">6 個月</button><button type="button" data-v="12" aria-pressed="true">12 個月</button><button type="button" data-v="24" aria-pressed="false">24 個月</button></div>
+        <div class="seg" role="group" aria-label="公司類型" id="c1t"><button type="button" data-v="全部" aria-pressed="true">全部</button><button type="button" data-v="科技" aria-pressed="false">科技</button></div>
+      </div>
+    </div>
+    <div class="legend"><span><i style="background:var(--s-unch)"></i>本益比不變（今天的本益比）</span><span><i style="background:var(--s-orbit)"></i>軌道（不用 EPS）</span><span><i style="background:var(--s-model)"></i>模型（軌道＋你的 EPS）</span></div>
+    <div class="chart" id="c1"></div>
+    <p class="note" id="c1-note"></p>
+  </div>
+
+  <div class="panel stack">
+    <h3>2. 逐年：12 個月誤差，依預測起點年份</h3>
+    <div class="legend"><span><i style="background:var(--s-unch)"></i>本益比不變</span><span><i style="background:var(--s-model)"></i>模型</span></div>
+    <div class="small-mult" id="c2"></div>
+    <p class="note">2016、2020 年模型誤差變大，是整個市場或產業被重新定價（2020 疫情後的反彈）。那一年股價比軌道多漲的幅度標在圖下方。</p>
+  </div>
+
+  <div class="panel stack">
+    <h3>3. 實際用起來：你的 EPS 準度決定本益比準度</h3>
+    <div class="legend"><span><i style="background:var(--s-model)"></i>S&P 500（當時成分股）</span><span><i style="background:var(--s-orbit)"></i>Nasdaq-100</span><span><i style="background:transparent;border:1px dashed var(--muted)"></i>虛線＝本益比不變</span></div>
+    <div class="chart" id="c3"></div>
+    <p class="note">12 個月、預測起點 2022 以後。橫軸是你的 EPS 的典型誤差（中位）。大約到 20%，模型就和「本益比不變」差不多了。</p>
+  </div>
+
+  <div class="cols">
+    <div class="panel stack"><h3>4. 區間誠不誠實</h3><div class="tbl"><table id="t-bands"></table></div>
+      <p class="note">用 2021 以前的誤差校準、拿 2022 以後檢查。實際涵蓋率略高於目標，區間偏寬、偏保守。</p></div>
+    <div class="panel stack"><h3>5. 逐家公司</h3><div id="firms" class="stack" style="gap:10px"></div></div>
+  </div>
+
+  <details class="panel"><summary>看完整數字表（全部預測距離、期間、樣本）</summary><div class="tbl" style="margin-top:12px"><table id="t-all"></table></div>
+    <p class="note" style="margin-top:8px">樣本 a＝只需 h 個月後的 EPS（含較新的起點）；最近＝起點 2024-10～2025-09、目標日到 2026-09（股價 Yahoo、EPS 最新申報值）。
+      重現：<code>python3 lab_orbit.py</code> → <code>lab_orbit_recent.py</code> → <code>lab_orbit_index.py</code>（results/orbit_index.txt）。</p></details>
+</section>
+
+<section id="limits">
+  <div class="sec-head"><div class="eyebrow">優勢與限制</div><h2>什麼時候可以信，什麼時候不要</h2></div>
+  <div class="cols">
+    <div class="stack pro"><h3>優勢</h3><ul class="list" id="pros"></ul></div>
+    <div class="stack con"><h3>限制（缺陷）</h3><ul class="list" id="cons"></ul></div>
+  </div>
+</section>
+
+<footer>
+  <p>資料：SEC 財報鏡像、Stooq、Yahoo Finance（股價、分析師共識）、FRED 10 年期殖利率。S&P 500 名單與 Nasdaq-100 名單見 projects/pe-forecast/data/。
+    程式與說明：projects/pe-forecast/README.md §16–17。不是投資建議。</p>
+</footer>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+/*__CORE__*/
+</script>
+<script>
+/*__DATA__*/
+</script>
+<script>
+(() => {
+const C = OrbitCore, M = DATA.model, BT = DATA.bt;
+const $ = (id) => document.getElementById(id);
+const GN = { cyclical: "半導體／設備／記憶體", growth: "軟體／網路", tech_other: "其他科技", other: "非科技" };
+const f2 = (v, d = 2) => (v === null || v === undefined || !Number.isFinite(v)) ? "—" : v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+const f0 = (v) => f2(v, v >= 100 ? 0 : 2);
+const pct = (v, d = 0) => (v === null || !Number.isFinite(v)) ? "—" : (v * 100).toFixed(d) + "%";
+const sgn = (v, d = 1) => (v >= 0 ? "+" : "−") + Math.abs(v * 100).toFixed(d) + "%";
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const SP = "S&P 500（當時成分股）", ND = "Nasdaq-100（當年成分股）";
+const sc = (h, per, idx, typ = "全部", samp = "a") => BT.scores.find((r) => r.h === h && r.期間 === per && r.指數 === idx && r.類型 === typ && r.樣本 === samp);
+
+// ---- 頁首與摘要 ----
+$("hdr-meta").textContent = `pe-forecast · ${M.version} · β 用目標日 ≤ ${M.fit_cutoff} 的資料`;
+$("meta").innerHTML = [`股價與共識：Yahoo ${esc(DATA.snap || "")}`, `${DATA.tickers.length.toLocaleString()} 檔美股`,
+  `有分析師共識 ${DATA.tickers.filter((t) => t.c).length} 檔`, "不是投資建議"].map((s) => `<span>${s}</span>`).join("");
+(() => {
+  const a = sc(12, "2022 以後", SP), b = sc(12, "2022 以後", ND);
+  const fa = BT.firms.find((x) => x.指數 === SP), fb = BT.firms.find((x) => x.指數 === ND);
+  const nz = BT.noise.find((x) => x.指數 === SP);
+  const tiles = [
+    [`${pct(a.模型)} <small>／ ${pct(b.模型)}</small>`, `12 個月後本益比的典型誤差（S&P 500／Nasdaq-100，2022 以後，EPS 完全正確）。本益比不變是 ${pct(a.本益比不變)}／${pct(b.本益比不變)}。`],
+    [`${pct(a["＋你的EPS(a)_±20%"])} <small>／ ${pct(b["＋你的EPS(a)_±20%"])}</small>`, `落在實際 ±20% 內的比例。本益比不變只有 ${pct(a["本益比不變_±20%"])}／${pct(b["本益比不變_±20%"])}。`],
+    [`${pct(fa.勝不變)} <small>／ ${pct(fb.勝不變)}</small>`, `逐家公司裡，模型比本益比不變準的比例（S&P 500 ${fa.家數} 家／Nasdaq-100 ${fb.家數} 家，2015 以後）。`],
+    [`≈ 20%`, `你的 EPS 典型誤差到這裡，優勢就消失（σ＝0.3 時 ${pct(nz["σ=0.3"], 1)} vs 本益比不變 ${pct(nz.本益比不變, 1)}）。準不準主要看 EPS。`],
+  ];
+  $("kpis").innerHTML = tiles.map(([v, l]) => `<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+})();
+
+// ---- β 表 ----
+(() => {
+  const b = M.h["12"].beta;
+  const row = (g) => `<tr><td>${GN[g]}</td><td>${f2(b["原始成長a"][g][0], 3)}</td><td>${f2(b["原始成長ab"][g][0], 3)}、${f2(b["原始成長ab"][g][1], 3)}</td>
+    <td>${b["預期b＋修正ab"][g].map((v) => f2(v, 3)).join("、")}</td></tr>`;
+  $("beta-tbl").innerHTML = `<caption style="text-align:left;padding-bottom:8px;font-size:13px;color:var(--muted)">12 個月的 β（EPS 多 10% → 股價約 β × 10%）</caption>
+    <tr><th>類型</th><th>只給 EPS_a</th><th>EPS_a、EPS_b</th><th>有共識：市場預期_b、差距_a、差距_b</th></tr>` +
+    ["cyclical", "growth", "tech_other", "other"].map(row).join("");
+})();
+
+// ---- 試算器 ----
+const byT = new Map(DATA.tickers.map((t) => [t.t, t]));
+$("tk-list").innerHTML = DATA.tickers.map((t) => `<option value="${esc(t.t)}">${esc(t.n)}</option>`).join("");
+let H = 12, cur = null;
+const num = (id) => { const v = parseFloat($(id).value); return Number.isFinite(v) ? v : null; };
+const setv = (id, v, d = 2) => { $(id).value = (v === null || v === undefined || !Number.isFinite(v)) ? "" : String(+v.toFixed(d)); };
+
+function consFor(t, h) {
+  if (!t || !t.c || t.c.c0 === null) return null;
+  const asof = C.utc(t.d), lastQ = C.utc(t.q);
+  const fy = [[C.utc(t.c.f0), t.c.c0]].concat(t.c.c1 !== null ? [[C.utc(t.c.f1), t.c.c1]] : []);
+  const a = C.calendarize(fy, C.addMonths(asof, h), lastQ, t.e, true);
+  const b = C.calendarize(fy, C.addMonths(asof, h + 12), lastQ, t.e, true);
+  const kOk = t.c.k !== null && t.c.k >= 0.4 && t.c.k <= 1.15;
+  return { a, b, k: kOk ? (Math.abs(t.c.k - 1) > 0.03 ? t.c.k : 1) : 1, kRaw: t.c.k, kOk };
+}
+function fillFrom(base, baseB, ex) {
+  [0.9, 1, 1.1].forEach((m, i) => { setv("a" + i, base === null ? null : base * m); setv("b" + i, baseB === null ? null : baseB * m); });
+  $("ex-chip").hidden = !ex;
+}
+function loadTicker(sym) {
+  const t = byT.get(String(sym || "").trim().toUpperCase().replace(".", "-"));
+  if (!t) {
+    cur = null;
+    $("today").innerHTML = `<span>找不到「${esc(sym)}」。這裡只有有季報資料的美股（約 ${DATA.tickers.length.toLocaleString()} 檔），ADR 與外國公司多半沒有。</span>`;
+    ["window", "res", "range", "decomp", "notes", "cons-note"].forEach((id) => { $(id).innerHTML = ""; });
+    return;
+  }
+  cur = t;
+  const cs = consFor(t, H);
+  $("use-cons").checked = !!cs; $("use-cons").disabled = !t.c;
+  if (cs) { setv("ck", cs.k, 2); setv("ca", cs.a ? cs.a.eps * cs.k : null); setv("cb", cs.b ? cs.b.eps * cs.k : null);
+    fillFrom(cs.a ? cs.a.eps * cs.k : null, cs.b ? cs.b.eps * cs.k : null, true); }
+  else { setv("ck", null); setv("ca", null); setv("cb", null); fillFrom(t.e > 0 ? t.e : null, null, true); }
+  render();
+}
+function render() {
+  const t = cur; if (!t) return;
+  const asof = C.utc(t.d), lastQ = C.utc(t.q);
+  const ta = C.addMonths(asof, H), qa = C.reportedQuarter(lastQ, ta);
+  const pe0 = t.e > 0 ? f2(t.px / t.e, 1) + " 倍" : "無定義（虧損）";
+  $("today").innerHTML = `<span><b>${esc(t.t)}</b> ${esc(t.n)}</span><span>股價 <b>${f2(t.px)}</b>（${t.d}）</span>
+    <span>最近四季 EPS <b>${f2(t.e)}</b>${t.u ? "（已用新財報更新）" : ""}</span><span>本益比 <b>${pe0}</b></span><span>${GN[t.g]}</span>
+    <span>波動 <b>${Number.isFinite(t.v) && t.v !== null ? pct(t.v) : "—"}</b></span>`;
+  $("window").textContent = `${H} 個月後（${C.iso(ta)}）大概已公布到季末 ${C.iso(qa)} 那一季 → EPS_a＝季末 ${C.iso(C.addMonths(qa, -9)).slice(0, 7)}～${C.iso(qa).slice(0, 7)} 的四季合計；EPS_b＝再往後 12 個月。`;
+  $("hd-a").textContent = `EPS_a（${C.iso(ta).slice(0, 7)} 時）`; $("hd-b").textContent = `EPS_b（${C.iso(C.addMonths(ta, 12)).slice(0, 7)} 時，可空白）`;
+  const cs = consFor(t, H);
+  if (t.c) {
+    const c = t.c;
+    $("cons-note").innerHTML = `Yahoo 共識（${c.d}）：本財年（至 ${c.f0}）${f2(c.c0)}${c.n0 ? `，${c.n0} 位分析師` : ""}${c.r0 !== null ? `，90 天 ${sgn(c.r0)}` : ""}；
+      下一財年 ${f2(c.c1)}${c.r1 !== null ? `，90 天 ${sgn(c.r1)}` : ""}。` +
+      (cs && cs.kOk ? (cs.k !== 1 ? `已乘口徑係數 ${cs.k.toFixed(2)}（GAAP ÷ 調整後最近四季）換成 GAAP。` : "口徑：GAAP 和調整後差不到 3%，不換算。")
+        : (c.k === null ? "Yahoo 缺少調整後的實際 EPS，算不出口徑係數，沒有換算；若這家的調整後和 GAAP 差很多，請自己改口徑係數。"
+                         : `口徑係數 ${c.k.toFixed(2)} 不合理（虧損或一次性損益），沒有換算；你的 EPS 若是 GAAP，請自己調整共識。`)) +
+      (cs && cs.b && /外推/.test(cs.b.how) ? " 共識 EPS_b 有一部分是用成長率外推的。" : "");
+  } else $("cons-note").textContent = "這一檔沒有自動共識（只有 S&P 500、科技股與 Nasdaq-100 約 460 檔有）。可以自己輸入共識，或不勾選。";
+  const useC = $("use-cons").checked;
+  const ca = useC ? num("ca") : null, cb = useC ? num("cb") : null;
+  const row = { px: t.px, e: t.e, y: t.y, dy: t.dy, v: t.v === null ? NaN : t.v, g: t.g };
+  const sc_ = [0, 1, 2].map((i) => ({ i, ea: num("a" + i), eb: num("b" + i) })).filter((s) => s.ea !== null);
+  const res = sc_.map((s) => ({ ...s, o: C.predict(row, H, M, s.ea, s.eb, ca, cb) }));
+  const lab = ["悲觀", "基準", "樂觀"];
+  if (!res.length) {
+    $("res").innerHTML = `<tr><td class="note" style="white-space:normal;text-align:left">${t.e > 0 ? "請填至少一個情境的 EPS_a。" :
+      "這家今天虧損，沒有可以當範例的 EPS。請在左邊填你預估的 EPS_a（可以是負的），有轉盈的話也填 EPS_b。"}</td></tr>`;
+    drawRange(null); $("decomp").textContent = ""; $("notes").innerHTML = ""; return;
+  }
+  $("res").innerHTML = `<tr><th>情境</th><th>EPS_a</th><th>EPS_b</th><th>本益比中位</th><th>本益比 80% 區間</th><th>股價中位</th><th>股價 50% 區間</th><th>股價 80% 區間</th><th>forward 本益比</th></tr>` +
+    res.map(({ i, ea, eb, o }) => `<tr class="${i === 1 ? "base" : ""}"><td>${lab[i]}</td><td>${f2(ea)}</td><td>${eb === null ? "—" : f2(eb)}</td>
+      <td>${o.pe === null ? "無定義" : f2(o.pe, 1)}</td><td>${o.pe === null ? "—" : f2(o.pe_lo80, 1) + "–" + f2(o.pe_hi80, 1)}</td>
+      <td>${f0(o.px)}</td><td>${f0(o.px_lo50)}–${f0(o.px_hi50)}</td><td>${f0(o.px_lo80)}–${f0(o.px_hi80)}</td><td>${o.fwd === null ? "—" : f2(o.fwd, 1)}</td></tr>`).join("");
+  const base = (res.find((r) => r.i === 1) || res[0]);
+  drawRange(base ? base.o : null, t.px);
+  if (base) {
+    const o = base.o;
+    const terms = o.parts.map((p) => `${p.name}：${p.x >= 0 ? "+" : ""}${p.x.toFixed(3)} × β ${p.beta.toFixed(3)} ＝ ${sgn(p.effect)}`).join("<br>");
+    $("decomp").innerHTML = `<b>拆解（${lab[base.i]}）</b>　寫法：${o.spec}<br>軌道：${sgn(Math.exp(o.mk) - 1)}（資金成本 − 股利，${H} 個月）${terms ? "<br>" + terms : ""}<br>
+      區間寬度：波動 ${pct(o.vol)}${o.volKnown ? "" : "（沒有資料，用中位數）"}，是中位波動股票的 ${o.width.toFixed(2)} 倍${o.widen > 1 ? `；目標日虧損，再放寬 ×${o.widen.toFixed(2)}` : ""}`;
+  } else $("decomp").textContent = "請至少填基準情境的 EPS_a。";
+  const notes = [];
+  if (t.g === "cyclical" && base && base.eb === null) notes.push(["warn", "半導體／設備／記憶體的股價主要看「再下一年」的 EPS，建議填 EPS_b。"]);
+  if (base && base.o.pe === null) notes.push(["warn", "EPS_a ≤ 0：本益比沒有定義，只看股價（方案 A）；有 EPS_b 時看 forward 本益比（方案 B）。"]);
+  if (t.e <= 0 && base && base.o.spec === "軌道" && base.o.pe !== null) notes.push(["", "今天虧損、沒有共識：算不了成長率，股價只用軌道；你的 EPS 只用在本益比的分母。"]);
+  notes.push(["", `回測（12 個月、2022 以後、EPS 完全正確）：S&P 500 典型誤差 ${pct(sc(12, "2022 以後", SP).模型)}，Nasdaq-100 ${pct(sc(12, "2022 以後", ND).模型)}；你的 EPS 若有誤差，誤差會跟著放大。`]);
+  $("notes").innerHTML = notes.map(([k, s]) => `<p class="note ${k}">${s}</p>`).join("");
+}
+function drawRange(o, px0) {
+  const el = $("range");
+  if (!o) { el.innerHTML = ""; return; }
+  const W = 640, Hh = 74, L = 14, R = 14;
+  const lo = Math.min(o.px_lo80, px0) * 0.97, hi = Math.max(o.px_hi80, px0) * 1.03;
+  const x = (v) => L + ((Math.log(v) - Math.log(lo)) / (Math.log(hi) - Math.log(lo))) * (W - L - R);
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="基準情境的股價區間">
+    <rect x="${x(o.px_lo80)}" y="22" width="${x(o.px_hi80) - x(o.px_lo80)}" height="18" rx="4" fill="var(--s-model)" opacity="0.22"></rect>
+    <rect x="${x(o.px_lo50)}" y="22" width="${x(o.px_hi50) - x(o.px_lo50)}" height="18" rx="4" fill="var(--s-model)" opacity="0.5"></rect>
+    <line x1="${x(o.px)}" x2="${x(o.px)}" y1="17" y2="45" stroke="var(--s-model)" stroke-width="2.5"></line>
+    <line x1="${x(px0)}" x2="${x(px0)}" y1="14" y2="48" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="3 3"></line>
+    <text x="${x(px0)}" y="10" text-anchor="middle" class="val">今天 ${f0(px0)}</text>
+    <text x="${x(o.px)}" y="62" text-anchor="middle" class="val">中位 ${f0(o.px)}</text>
+    <text x="${x(o.px_lo80)}" y="62" text-anchor="start" class="val">${f0(o.px_lo80)}</text>
+    <text x="${x(o.px_hi80)}" y="62" text-anchor="end" class="val">${f0(o.px_hi80)}</text>
+  </svg><p class="note">基準情境的股價：深色＝50% 區間、淺色＝80% 區間、藍線＝中位、虛線＝今天（對數刻度）。</p>`;
+}
+document.querySelectorAll("#hseg button").forEach((b) => b.addEventListener("click", () => {
+  H = +b.dataset.h; document.querySelectorAll("#hseg button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  const cs = consFor(cur, H);
+  if (cs && $("use-cons").checked) { setv("ca", cs.a ? cs.a.eps * (num("ck") || 1) : null); setv("cb", cs.b ? cs.b.eps * (num("ck") || 1) : null); }
+  render();
+}));
+$("tk").addEventListener("change", () => loadTicker($("tk").value));
+$("tk").addEventListener("keydown", (e) => { if (e.key === "Enter") loadTicker($("tk").value); });
+["a0", "a1", "a2", "b0", "b1", "b2", "ca", "cb"].forEach((id) => $(id).addEventListener("input", () => { $("ex-chip").hidden = true; render(); }));
+$("ck").addEventListener("input", () => { const cs = consFor(cur, H), k = num("ck") || 1;
+  if (cs) { setv("ca", cs.a ? cs.a.eps * k : null); setv("cb", cs.b ? cs.b.eps * k : null); } render(); });
+$("use-cons").addEventListener("change", render);
+$("fill-cons").addEventListener("click", () => { const ca = num("ca"), cb = num("cb"); if (ca !== null) { fillFrom(ca, cb, false); render(); } });
+$("fill-flat").addEventListener("click", () => { if (cur && cur.e > 0) { fillFrom(cur.e, null, false); render(); } });
+$("calc-sub").textContent = "預設是 MU，你的 EPS 先用「共識 ±10%」當範例，請改成你的看法。";
+loadTicker("MU");
+
+// ---- 圖表共用 ----
+const tip = $("tip");
+document.addEventListener("pointermove", (e) => {
+  const m = e.target.closest && e.target.closest("[data-tip]");
+  if (!m) { tip.hidden = true; return; }
+  tip.innerHTML = m.getAttribute("data-tip"); tip.hidden = false;
+  const r = tip.getBoundingClientRect();
+  tip.style.left = Math.min(window.innerWidth - r.width - 8, e.clientX + 12) + "px"; tip.style.top = Math.max(8, e.clientY - r.height - 10) + "px";
+});
+const COL = { 本益比不變: "var(--s-unch)", 軌道: "var(--s-orbit)", 模型: "var(--s-model)" };
+
+// 1. 三種方法
+let c1h = 12, c1t = "全部";
+function drawC1() {
+  const groups = [];
+  [[SP, "S&P 500"], [ND, "Nasdaq-100"]].forEach(([idx, short]) => ["2015–2021", "2022 以後", "最近（目標日到 2026-09）"].forEach((per) => {
+    const r = sc(c1h, per, idx, c1t);
+    if (r) groups.push({ lab: `${short}｜${per.replace("最近（目標日到 2026-09）", "最近一段")}`, r });
+  }));
+  const W = 720, rowH = 18, gap = 3, gH = rowH * 3 + gap * 2 + 22, L = 170, R = 56, T = 8;
+  const Hh = T + groups.length * gH + 26;
+  const max = Math.max(...groups.flatMap((g) => ["本益比不變", "軌道", "模型"].map((k) => g.r[k] || 0))) * 1.08;
+  const x = (v) => L + (v / max) * (W - L - R);
+  let s = `<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="三種方法的中位誤差">`;
+  for (let v = 0; v <= max; v += 0.05) s += `<line class="grid" x1="${x(v)}" x2="${x(v)}" y1="${T}" y2="${Hh - 22}"></line><text x="${x(v)}" y="${Hh - 6}" text-anchor="middle">${Math.round(v * 100)}%</text>`;
+  groups.forEach((g, gi) => {
+    const y0 = T + gi * gH;
+    s += `<text class="lab" x="0" y="${y0 + rowH * 1.5 + gap + 4}">${esc(g.lab)}</text>`;
+    s += `<text x="0" y="${y0 + rowH * 1.5 + gap + 20}" style="fill:var(--muted);font-size:11px">${g.r.n.toLocaleString()} 筆、${g.r.家數} 家</text>`;
+    ["本益比不變", "軌道", "模型"].forEach((k, i) => {
+      const v = g.r[k]; if (v === null || v === undefined) return;
+      const y = y0 + i * (rowH + gap);
+      s += `<rect class="bar" x="${L}" y="${y}" width="${Math.max(0, x(v) - L)}" height="${rowH}" rx="4" fill="${COL[k]}"
+        data-tip="${esc(g.lab)}<br>${k}：${pct(v, 1)}"></rect><text class="val" x="${x(v) + 5}" y="${y + rowH - 4}">${pct(v, 1)}</text>`;
+    });
+  });
+  $("c1").innerHTML = s + "</svg>";
+  const a = sc(c1h, "2022 以後", SP, c1t), b = sc(c1h, "2022 以後", ND, c1t);
+  $("c1-note").textContent = a && b ? `${c1h} 個月、${c1t}、2022 以後：模型比本益比不變少錯 ${pct(1 - a.模型 / a.本益比不變)}（S&P 500）、${pct(1 - b.模型 / b.本益比不變)}（Nasdaq-100）。` +
+    "模型和軌道很接近，代表大部分功勞來自軌道本身；你的 EPS 主要決定本益比，對股價只是小調整。" : "";
+}
+[["c1h", (v) => (c1h = +v)], ["c1t", (v) => (c1t = v)]].forEach(([id, set]) => document.querySelectorAll(`#${id} button`).forEach((b) =>
+  b.addEventListener("click", () => { set(b.dataset.v); document.querySelectorAll(`#${id} button`).forEach((x) => x.setAttribute("aria-pressed", String(x === b))); drawC1(); })));
+drawC1();
+
+// 2. 逐年（小倍數）
+(() => {
+  const panels = [[SP, "S&P 500（當時成分股）"], [ND, "Nasdaq-100（當年成分股）"]];
+  const all = BT.years.filter((r) => r.指數 === SP || r.指數 === ND);
+  const max = Math.max(...all.map((r) => Math.max(r.本益比不變, r.模型))) * 1.1;
+  $("c2").innerHTML = panels.map(([idx, title]) => {
+    const rs = BT.years.filter((r) => r.指數 === idx).sort((a, b) => a.起點年 - b.起點年);
+    const W = 400, Hh = 230, L = 38, R = 12, T = 22, B = 46;
+    const x = (i) => L + (i / (rs.length - 1)) * (W - L - R), y = (v) => T + (1 - v / max) * (Hh - T - B);
+    let s = `<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="${title} 逐年誤差"><text class="lab" x="0" y="13">${title}</text>`;
+    for (let v = 0; v <= max; v += 0.1) s += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"></line><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${Math.round(v * 100)}%</text>`;
+    [["本益比不變", "var(--s-unch)"], ["模型", "var(--s-model)"]].forEach(([k, c]) => {
+      s += `<polyline fill="none" stroke="${c}" stroke-width="2" points="${rs.map((r, i) => `${x(i)},${y(r[k])}`).join(" ")}"></polyline>`;
+      rs.forEach((r, i) => { s += `<circle cx="${x(i)}" cy="${y(r[k])}" r="4.5" fill="${c}" stroke="var(--surface)" stroke-width="2"
+        data-tip="${title} ${r.起點年} 年起點<br>${k}：${pct(r[k], 1)}<br>股價偏離軌道：${sgn(Math.exp(r.股價偏離軌道中位) - 1, 0)}（${r.n.toLocaleString()} 筆）"></circle>`; });
+    });
+    rs.forEach((r, i) => { s += `<text x="${x(i)}" y="${Hh - B + 16}" text-anchor="middle">${String(r.起點年).slice(2)}</text>
+      <text x="${x(i)}" y="${Hh - B + 32}" text-anchor="middle" style="fill:${r.股價偏離軌道中位 > 0.1 ? "var(--warn)" : "var(--muted)"};font-size:10.5px">${sgn(Math.exp(r.股價偏離軌道中位) - 1, 0)}</text>`; });
+    s += `<text x="0" y="${Hh - B + 32}" style="fill:var(--muted);font-size:10.5px">偏離</text>`;
+    return `<div class="chart">${s}</svg></div>`;
+  }).join("");
+})();
+
+// 3. EPS 誤差 → 本益比誤差
+(() => {
+  const xs = [["σ=0.0", 0], ["σ=0.1", 0.067], ["σ=0.2", 0.135], ["σ=0.3", 0.202]];
+  const ser = [[SP, "var(--s-model)", "S&P 500"], [ND, "var(--s-orbit)", "Nasdaq-100"]].map(([idx, c, n]) => ({ r: BT.noise.find((x) => x.指數 === idx), c, n }));
+  const W = 720, Hh = 260, L = 46, R = 40, T = 14, B = 40;
+  const max = 0.3, x = (v) => L + (v / 0.21) * (W - L - R), y = (v) => T + (1 - v / max) * (Hh - T - B);
+  let s = `<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="EPS 誤差與本益比誤差">`;
+  for (let v = 0; v <= max + 1e-9; v += 0.05) s += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"></line><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${Math.round(v * 100)}%</text>`;
+  xs.forEach(([, v]) => { s += `<text x="${x(v)}" y="${Hh - 18}" text-anchor="middle">${v === 0 ? "完全正確" : "約 " + Math.round(v * 100) + "%"}</text>`; });
+  s += `<text x="${(L + W - R) / 2}" y="${Hh - 2}" text-anchor="middle" style="fill:var(--muted)">你的 EPS 的典型誤差</text>`;
+  ser.forEach(({ r, c, n }, si) => {
+    s += `<line x1="${L}" x2="${W - R}" y1="${y(r.本益比不變)}" y2="${y(r.本益比不變)}" stroke="${c}" stroke-dasharray="5 4" stroke-width="1.5" opacity="0.8"></line>`;
+    s += `<polyline fill="none" stroke="${c}" stroke-width="2.2" points="${xs.map(([k, v]) => `${x(v)},${y(r[k])}`).join(" ")}"></polyline>`;
+    xs.forEach(([k, v]) => { s += `<circle cx="${x(v)}" cy="${y(r[k])}" r="5" fill="${c}" stroke="var(--surface)" stroke-width="2" data-tip="${n}<br>EPS 誤差 ${v === 0 ? "0" : "約 " + Math.round(v * 100) + "%"} → 本益比誤差 ${pct(r[k], 1)}"></circle>`; });
+  });
+  $("c3").innerHTML = s + "</svg>" + `<div class="tbl"><table><tr><th>12 個月本益比誤差</th><th>本益比不變</th>${xs.map(([, v]) =>
+    `<th>EPS ${v === 0 ? "完全正確" : "差約 " + Math.round(v * 100) + "%"}</th>`).join("")}</tr>` +
+    ser.map(({ r, n }) => `<tr><td>${n}</td><td>${pct(r.本益比不變, 1)}</td>${xs.map(([k]) => `<td>${pct(r[k], 1)}</td>`).join("")}</tr>`).join("") + "</table></div>";
+})();
+
+// 4. 區間
+(() => {
+  const rs = BT.bands.filter((r) => r.指數 === SP || r.指數 === ND);
+  $("t-bands").innerHTML = `<tr><th>指數</th><th>h</th><th>50% 區間實際涵蓋</th><th>80% 區間實際涵蓋</th></tr>` +
+    rs.map((r) => `<tr><td>${r.指數 === SP ? "S&P 500" : "Nasdaq-100"}</td><td>${r.h} 個月</td><td>${pct(r["不置中_涵蓋50"])}</td><td>${pct(r["不置中_涵蓋80"])}</td></tr>`).join("");
+})();
+
+// 5. 逐家
+(() => {
+  $("firms").innerHTML = BT.firms.filter((f) => f.指數 === SP || f.指數 === ND).map((f) => {
+    const nm = f.指數 === SP ? "S&P 500（當時成分股）" : "Nasdaq-100";
+    const ty = Object.entries(f.類型).map(([k, v]) => `${GN[k]} ${pct(v.模型)}（不變 ${pct(v.不變)}）`).join("、");
+    return `<div class="stack" style="gap:4px"><p><b>${nm}</b>：${f.家數} 家裡 <b>${pct(f.勝不變)}</b> 模型比本益比不變準。</p>
+      <p class="note">各類型典型誤差：${ty}</p>
+      <p class="note">最準：${f.最準.map(([t, v]) => `${t} ${pct(v)}`).join("、")}</p>
+      <p class="note">最不準：${f.最不準.map(([t, v]) => `${t} ${pct(v)}`).join("、")}（大多是被重新定價的公司）</p></div>`;
+  }).join("");
+})();
+
+// 完整表
+(() => {
+  const rs = BT.scores.filter((r) => r.指數 === SP || r.指數 === ND || r.指數 === "S&P 500（2025 名單）");
+  $("t-all").innerHTML = `<tr><th>指數</th><th>h</th><th>期間</th><th>類型</th><th>樣本</th><th>家數</th><th>筆數</th><th>本益比不變</th><th>軌道</th><th>模型</th><th>＋EPS_b</th><th>＋共識代理</th></tr>` +
+    rs.map((r) => `<tr><td>${esc(r.指數)}</td><td>${r.h}</td><td>${esc(r.期間)}</td><td>${r.類型}</td><td>${r.樣本}</td><td>${r.家數}</td><td>${r.n.toLocaleString()}</td>
+      <td>${f2(r.本益比不變, 3)}</td><td>${f2(r.軌道, 3)}</td><td>${f2(r.模型, 3)}</td><td>${f2(r["＋你的EPS(a,b)"], 3)}</td><td>${f2(r["＋共識代理＋你的EPS"], 3)}</td></tr>`).join("");
+})();
+
+// 優勢與限制
+(() => {
+  const a = sc(12, "2022 以後", SP), b = sc(12, "2022 以後", ND), ra = sc(12, "最近（目標日到 2026-09）", SP), rb = sc(12, "最近（目標日到 2026-09）", ND);
+  const rt = sc(12, "最近（目標日到 2026-09）", SP, "科技");
+  const pros = [
+    `<b>骨架穩</b>：軌道在每一段都大勝「本益比不變」：2015–2021、2022 以後、到 2026-09 的最近一段都成立（12 個月 S&P 500 ${pct(a.本益比不變)} → ${pct(a.模型)}，Nasdaq-100 ${pct(b.本益比不變)} → ${pct(b.模型)}）。`,
+    "<b>每個數字都說得出意思</b>：只有軌道和 1–3 個 β，看得出你的 EPS、共識、時間各貢獻多少，不是黑盒子。",
+    "<b>能放入你的看法</b>：你的 EPS（三個情境）、再下一年的 EPS、市場共識，都可以自己改；共識自動換成 GAAP 口徑。",
+    "<b>區間誠實</b>：用 2021 以前校準、2022 以後檢查，80% 區間實際涵蓋 80–89%，不會假裝很準。",
+    "<b>週期股與虧損股有處理</b>：週期股另一組 β 並強調再下一年的 EPS；虧損時改給股價與 forward 本益比。",
+    "<b>關係穩定</b>：只用最近 3／5／8 年估 β 並沒有比較準，代表 EPS 和股價的關係在 2022 前後沒變。",
+  ];
+  const cons = [
+    `<b>準不準主要看你的 EPS</b>：回測假設 EPS 完全正確。你的 EPS 典型誤差約 13% 時，12 個月本益比誤差約 ${pct(BT.noise.find((x) => x.指數 === SP)["σ=0.2"])}；到 20% 左右就和本益比不變差不多。`,
+    `<b>預測不了產業被重新定價</b>：最近一段科技股的誤差約 ${pct(rt.模型)}（全部 ${pct(ra.模型)}、Nasdaq-100 ${pct(rb.模型)}），主因是 AI 記憶體行情（半導體類比軌道多漲約 61%）和軟體股修正。NVDA、WDC、ENPH 這類公司最不準。`,
+    "<b>你的 EPS 對股價影響很小</b>：β 小，EPS 從悲觀到樂觀差 50%，股價中位通常只差 10% 左右。想靠這個模型找「被低估的股價」不適合，它比較適合回答「如果 EPS 是 X，本益比會是多少」。",
+    "<b>倖存者與覆蓋</b>：面板是 2025 年的 S&P 500 名單（已另算「當時成分股」）；Nasdaq-100 只有同時在 S&P 500 面板裡的約 70–85 家，ASML、PDD 這類外國公司沒有。中小型股沒有驗證。",
+    "<b>共識的係數還是代理</b>：「市場已預期」那一項的 β 是用模型自己的預期估的，不是真正的歷史分析師共識；歷史共識資料正在接，之後要重估。",
+    "<b>大盤是固定的資金成本</b>：r＝10 年期＋5%。大盤整年往同一邊走時，所有預測一起偏。",
+    "<b>2022 以後的資料在設計時看過</b>：真正沒碰過的驗收是 2026-10-06 凍結的前瞻紀錄（1,982 家，2027-04、2027-10 驗收）。",
+  ];
+  $("pros").innerHTML = pros.map((s) => `<li>${s}</li>`).join("");
+  $("cons").innerHTML = cons.map((s) => `<li>${s}</li>`).join("");
+})();
+})();
+</script>
