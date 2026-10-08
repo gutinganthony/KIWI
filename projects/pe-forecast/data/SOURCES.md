@@ -115,3 +115,38 @@
 - **SNDK、MRVL 不在任何找得到的鏡像裡**（SNDK 2025-02 才上市；MRVL 不是 S&P 500 成分股）。
 - **倖存者偏誤**：名單是 2025 年的 S&P 500 成分股——全部是活下來、而且變大的公司。
 - 54 家公司的財報只到 2025 年中、股價只到 2025-09；只有 14 家延伸到 2026。
+
+## I/B/E/S 歷史共識（`osap_fetch.py` → `data/osap/`）
+
+> **狀態（2026-10-08）：腳本已就緒，產出還沒生成。** Google Drive 對 OSAP 的訊號檔一直回「Quota exceeded」
+> （07:58–09:53 每 5 分鐘重試；只有 SignalDoc.csv 在 09:01 下載成功）。別的公開 Drive 檔照樣能下載，
+> 所以擋住的是檔案擁有者的下載配額，不是這個環境。配額恢復後重跑：`python3 osap_fetch.py --wait-min 120`。
+
+- **來源**：Open Source Asset Pricing（Chen & Zimmermann）2025.10 release，Google Drive 資料夾
+  `1qQDuTsnyvWfEJR6nPBQZ8xxlq6bkLG_y`。檔案 ID 用 `openassetpricing` 套件的 Drive 解析器取得（內建一份備用 ID），
+  下載用 `requests` 自己做，**不碰 WRDS**（不請求 Price／Size／STreversal）。原始檔放 raw dir（預設 scratchpad/osap_raw，
+  可用 `--raw-dir` 或 `$OSAP_RAW_DIR` 指定），不進版控。
+- **訊號定義（SignalDoc 原文）**：
+  `FEPS`＝I/B/E/S 未調整（statsumu）、fpi=1 的 meanest，**只收股價 > $5 的股票**；
+  `AnalystRevision`＝本月 meanest ÷ 上月 meanest（fpi=1）；
+  `fgr5yrLag`＝長期成長預估 fgr5yr 落後 6 個月、只取 6 月的值、之後沿用（等於每年更新一次的舊資料）；
+  `Mom12m`＝t−12 到 t−1 的報酬，`Mom6m`＝t−6 到 t−1（都跳過當月）。
+- **產出欄位**：`feps_sp500.csv.gz`：ticker, permno, yyyymm, feps_raw（I/B/E/S 原值，當時的股數口徑）,
+  split_factor（之後所有分割倍數的乘積）, feps（＝feps_raw ÷ split_factor，今天的股數口徑，跟 `quarters_sp500.csv`
+  的 ni/sh_now 同口徑）, analyst_revision（已修正分割月：×上月係數÷本月係數）, fgr5y, analyst_revision_raw。
+  只留配對成功的公司、2009-01 以後的月份。`permno_map.csv`：ticker, permno, corr, n_overlap, second_best_corr, note
+  （再加 second_permno、corr6＝Mom6m 相關、mad12＝Mom12m 差的中位數、coverage、src）。
+- **permno → ticker 配對**（沒有 CRSP 對照表）：用面板月底股價算同定義的動能
+  （Mom12m＝P(t−1)/P(t−12)−1），對所有 permno 算逐月相關，取相關最高、重疊 ≥ 36 個月、相關 ≥ 0.95 的那個。
+  另外試 ±1 個月的錯位，用抽查 10 家的相關確認日期對齊。面板股價太短的公司改用 Yahoo 20 年月線（含息還原）重配，
+  note 會寫。同一個 permno 被兩個 ticker 配到時，只留相關高的那個。我們的股價不含股利、CRSP 含，所以相關不會剛好是 1。
+  GOOGL＝Class A；Class C（GOOG）是另一個 permno，次佳相關會很高。
+- **分割調整**：Yahoo `v8/finance/chart?range=max&interval=1mo&events=split`（請求間隔 0.6 秒、header 只放
+  `Mozilla/5.0`）。I/B/E/S 月度統計日是第三個星期五的前一天：分割日 ≤ 當月統計日 → 當月起算新口徑，否則從下個月起算。
+  再拿 FEPS 本身的跳動（≈1/分割倍數）驗證，規則明顯不對時改用前後一個月。Yahoo 查不到的（已下市：CTRA、DAY、HOLX、IPG），
+  改用季報 split_fac 的跳動，在兩個季末之間找 FEPS 跳動的月份。面板建好之後改了代號的公司：FI→FISV、MMC→MRSH、BK→BNY。
+  分割調整有兩個診斷會印出來：分割月前後是否變平滑，以及 FEPS ÷ 季報 FY1 GAAP EPS 每家的中位數。
+- **限制**：FEPS 是 I/B/E/S「街頭」EPS（多半是非 GAAP），跟 GAAP 差距可能很大（例：NVDA FY2023）；
+  fpi=1 在年報公布後才換到下一個年度，所以 1～2 月的 FY1 常常還是剛結束的那一年；
+  股價 ≤ $5 的月份沒有 FEPS（2009 年初的少數銀行股）；OSAP 的迄日要看下載下來的資料（預期在 2024 年底附近）；
+  配對靠價格相關，對同公司多股別或換過 permno 的公司（合併、重新上市）可能只抓到其中一段，看 note 跟 coverage。

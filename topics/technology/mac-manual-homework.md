@@ -26,10 +26,9 @@ last_updated: 2026-07-06
 ### 🆕 2026-10-07 新增（本益比軌道模型 session）
 
 - [x] ~~雲端允許 `fc.yahoo.com`、`query2.finance.yahoo.com`、`finance.yahoo.com`~~（2026-10-08 Jake 已加；quoteSummary 實測 200，已接進 `orbit_price.py --cons auto`）
-- [ ] **（選配）OSAP 歷史共識 `FEPS`（I/B/E/S FY1 月度，1983 起）→ 用真正的歷史共識重估 pe-forecast 的 β**。二選一：
-  ①**雲端（推薦，不用碰 Mac）**：在這個雲端環境的網路設定再允許 `drive.google.com`、`drive.usercontent.google.com`（OSAP 的檔案放在 Google Drive；
-  2026-10-08 實測兩者皆不通），之後跟我說一聲，我在雲端 `pip install openassetpricing` 下載、配對代號、commit 進 repo。
-  ②Mac：步驟見 `projects/pe-forecast/research/06_consensus_data_sources.md` §4.1；產出的 CSV 放 `projects/pe-forecast/data/osap/` 後 git push。
+- [x] ~~雲端允許 `drive.google.com`、`drive.usercontent.google.com`~~（2026-10-08 Jake 已加；連線正常）。
+  OSAP 的訊號檔被 Google Drive 回「Quota exceeded」（檔案擁有者的下載配額，別的公開 Drive 檔可以下載），雲端 session 會自己重試
+  （`projects/pe-forecast/osap_fetch.py --wait-min 120`）。**不需要你做什麼**；若連續兩天都下載不了，再考慮改在 Mac 上下載（步驟見 research/06 §4.1）。
 
 ### 🆕 2026-09-24 新增（前瞻本益比模型 session 產生）
 
