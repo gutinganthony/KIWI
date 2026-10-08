@@ -127,8 +127,8 @@ def main():
         a = PAIR[h][0]
         z = p[p[f"y{h}"].notna() & p[f"p{h}_原始成長a"].notna() & (p[f"eps_f{a}"] > 0)].copy()
         z["e"] = z[f"y{h}"] - z[f"p{h}_原始成長a"]                   # 實際 − 預測
-        vmed = float(z["vol36"].median())
         cal = z[tgt(z["month"], h) <= pd.Timestamp("2021-12-31")]
+        vmed = float(cal["vol36"].median())                    # 缺波動時補的中位數也只用校準期
         u = cal["e"].to_numpy() / scale(cal["vol36"].to_numpy(float), vmed)
         q = np.quantile(u - np.median(u), Q)
         chk = z[z["month"] >= "2022-01-01"]

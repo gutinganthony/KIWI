@@ -110,7 +110,7 @@ def freeze_orbit():
     其他線索用 results/now_all.csv；快照的財報日晚於 now_all 最新一季的下一季季末時，EPS 改用 Yahoo 的 GAAP 最近四季。
     凍結：今天的輸入、orbit_model.json、各 h 的軌道股價；共識（0y、+1y）原樣保存，之後可以用來驗「共識當你的 EPS」。"""
     import glob
-    snaps = sorted(glob.glob(os.path.join(HERE, "data", "consensus_snapshots", "yahoo_*.csv.gz")))
+    snaps = sorted(glob.glob(os.path.join(HERE, "data", "consensus_snapshots", "yahoo_2*.csv.gz")))  # 只看選股器快照（不含 yahoo_detail_）
     if not snaps:
         sys.exit("沒有共識快照：先跑 python3 consensus_snapshot.py")
     sn = pd.read_csv(snaps[-1]).set_index("symbol")

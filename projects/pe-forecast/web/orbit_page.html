@@ -319,7 +319,7 @@ $("meta").innerHTML = [`股價與共識：Yahoo ${esc(DATA.snap || "")}`, `${DAT
   const nz = BT.noise.find((x) => x.指數 === SP);
   const tiles = [
     [`${pct(a.模型)} <small>／ ${pct(b.模型)}</small>`, `12 個月後本益比的典型誤差（S&P 500／Nasdaq-100，2022 以後，EPS 完全正確）。本益比不變是 ${pct(a.本益比不變)}／${pct(b.本益比不變)}。`],
-    [`${pct(a["＋你的EPS(a)_±20%"])} <small>／ ${pct(b["＋你的EPS(a)_±20%"])}</small>`, `落在實際 ±20% 內的比例。本益比不變只有 ${pct(a["本益比不變_±20%"])}／${pct(b["本益比不變_±20%"])}。`],
+    [`${pct(a["＋你的EPS(a)_±20%"])} <small>／ ${pct(b["＋你的EPS(a)_±20%"])}</small>`, `落在實際 ±20% 內的比例（同樣假設 EPS 完全正確）。本益比不變只有 ${pct(a["本益比不變_±20%"])}／${pct(b["本益比不變_±20%"])}。`],
     [`${pct(fa.勝不變)} <small>／ ${pct(fb.勝不變)}</small>`, `逐家公司裡，模型比本益比不變準的比例（S&P 500 ${fa.家數} 家／Nasdaq-100 ${fb.家數} 家，2015 以後）。`],
     [`≈ 20%`, `你的 EPS 典型誤差到這裡，優勢就消失（σ＝0.3 時 ${pct(nz["σ=0.3"], 1)} vs 本益比不變 ${pct(nz.本益比不變, 1)}）。準不準主要看 EPS。`],
   ];
@@ -350,7 +350,8 @@ function consFor(t, h) {
   const a = C.calendarize(fy, C.addMonths(asof, h), lastQ, t.e, true);
   const b = C.calendarize(fy, C.addMonths(asof, h + 12), lastQ, t.e, true);
   const kOk = t.c.k !== null && t.c.k >= 0.4 && t.c.k <= 1.15;
-  return { a, b, k: kOk ? (Math.abs(t.c.k - 1) > 0.03 ? t.c.k : 1) : 1, kRaw: t.c.k, kOk };
+  const kBad = t.c.k !== null && !kOk;                        // 算得出來但不合理（虧損、一次性損益、口徑差太多）
+  return { a, b, k: kOk ? (Math.abs(t.c.k - 1) > 0.03 ? t.c.k : 1) : 1, kRaw: t.c.k, kOk, kBad };
 }
 function fillFrom(base, baseB, ex) {
   [0.9, 1, 1.1].forEach((m, i) => { setv("a" + i, base === null ? null : base * m); setv("b" + i, baseB === null ? null : baseB * m); });
@@ -366,11 +367,16 @@ function loadTicker(sym) {
   }
   cur = t;
   const cs = consFor(t, H);
-  $("use-cons").checked = !!cs; $("use-cons").disabled = !t.c;
-  if (cs) { setv("ck", cs.k, 2); setv("ca", cs.a ? cs.a.eps * cs.k : null); setv("cb", cs.b ? cs.b.eps * cs.k : null);
-    fillFrom(cs.a ? cs.a.eps * cs.k : null, cs.b ? cs.b.eps * cs.k : null, true); }
-  else { setv("ck", null); setv("ca", null); setv("cb", null); fillFrom(t.e > 0 ? t.e : null, null, true); }
+  $("use-cons").disabled = !t.c;
+  $("use-cons").checked = !!(cs && !cs.kBad);                // 口徑係數不合理：預設不放共識（多半是調整後口徑）；算不出來：照用，附註
+  if (cs) { setv("ck", cs.k, 2); setv("ca", cs.a ? cs.a.eps * cs.k : null); setv("cb", cs.b ? cs.b.eps * cs.k : null); }
+  else { setv("ck", null); setv("ca", null); setv("cb", null); }
+  defaultScenarios(t, cs);
   render();
+}
+function defaultScenarios(t, cs) {
+  if (cs && !cs.kBad && cs.a) fillFrom(cs.a.eps * cs.k, cs.b ? cs.b.eps * cs.k : null, true);
+  else fillFrom(t.e > 0 ? t.e : null, null, true);
 }
 function render() {
   const t = cur; if (!t) return;
@@ -388,8 +394,8 @@ function render() {
     $("cons-note").innerHTML = `Yahoo 共識（${c.d}）：本財年（至 ${c.f0}）${f2(c.c0)}${c.n0 ? `，${c.n0} 位分析師` : ""}${c.r0 !== null ? `，90 天 ${sgn(c.r0)}` : ""}；
       下一財年 ${f2(c.c1)}${c.r1 !== null ? `，90 天 ${sgn(c.r1)}` : ""}。` +
       (cs && cs.kOk ? (cs.k !== 1 ? `已乘口徑係數 ${cs.k.toFixed(2)}（GAAP ÷ 調整後最近四季）換成 GAAP。` : "口徑：GAAP 和調整後差不到 3%，不換算。")
-        : (c.k === null ? "Yahoo 缺少調整後的實際 EPS，算不出口徑係數，沒有換算；若這家的調整後和 GAAP 差很多，請自己改口徑係數。"
-                         : `口徑係數 ${c.k.toFixed(2)} 不合理（虧損或一次性損益），沒有換算；你的 EPS 若是 GAAP，請自己調整共識。`)) +
+        : (c.k === null ? "Yahoo 缺少調整後的實際 EPS，算不出口徑係數，共識照原樣使用；若這家的調整後和 GAAP 差很多，請自己改口徑係數。"
+                         : `口徑係數 ${c.k.toFixed(2)} 不合理（虧損、一次性損益或調整後口徑差太多），預設不放共識、範例改用今天的 EPS；要用請勾選並自己調整口徑係數。`)) +
       (cs && cs.b && /外推/.test(cs.b.how) ? " 共識 EPS_b 有一部分是用成長率外推的。" : "");
   } else $("cons-note").textContent = "這一檔沒有自動共識（只有 S&P 500、科技股與 Nasdaq-100 約 460 檔有）。可以自己輸入共識，或不勾選。";
   const useC = $("use-cons").checked;
@@ -441,8 +447,10 @@ function drawRange(o, px0) {
 }
 document.querySelectorAll("#hseg button").forEach((b) => b.addEventListener("click", () => {
   H = +b.dataset.h; document.querySelectorAll("#hseg button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  if (!cur) return;
   const cs = consFor(cur, H);
-  if (cs && $("use-cons").checked) { setv("ca", cs.a ? cs.a.eps * (num("ck") || 1) : null); setv("cb", cs.b ? cs.b.eps * (num("ck") || 1) : null); }
+  if (cs) { setv("ca", cs.a ? cs.a.eps * (num("ck") || 1) : null); setv("cb", cs.b ? cs.b.eps * (num("ck") || 1) : null); }
+  if (!$("ex-chip").hidden) defaultScenarios(cur, cs);      // 還是範例數字時，跟著預測距離重填
   render();
 }));
 $("tk").addEventListener("change", () => loadTicker($("tk").value));
@@ -453,7 +461,7 @@ $("ck").addEventListener("input", () => { const cs = consFor(cur, H), k = num("c
 $("use-cons").addEventListener("change", render);
 $("fill-cons").addEventListener("click", () => { const ca = num("ca"), cb = num("cb"); if (ca !== null) { fillFrom(ca, cb, false); render(); } });
 $("fill-flat").addEventListener("click", () => { if (cur && cur.e > 0) { fillFrom(cur.e, null, false); render(); } });
-$("calc-sub").textContent = "預設是 MU，你的 EPS 先用「共識 ±10%」當範例，請改成你的看法。";
+$("calc-sub").textContent = "預設是 MU。範例 EPS 用「共識 ±10%」（共識的口徑係數不合理時改用「今天的 EPS ±10%」）；請改成你的看法。";
 loadTicker("MU");
 
 // ---- 圖表共用 ----
@@ -587,7 +595,7 @@ drawC1();
     `<b>準不準主要看你的 EPS</b>：回測假設 EPS 完全正確。你的 EPS 典型誤差約 13% 時，12 個月本益比誤差約 ${pct(BT.noise.find((x) => x.指數 === SP)["σ=0.2"])}；到 20% 左右就和本益比不變差不多。`,
     `<b>預測不了產業被重新定價</b>：最近一段科技股的誤差約 ${pct(rt.模型)}（全部 ${pct(ra.模型)}、Nasdaq-100 ${pct(rb.模型)}），主因是 AI 記憶體行情（半導體類比軌道多漲約 61%）和軟體股修正。NVDA、WDC、ENPH 這類公司最不準。`,
     "<b>你的 EPS 對股價影響很小</b>：β 小，EPS 從悲觀到樂觀差 50%，股價中位通常只差 10% 左右。想靠這個模型找「被低估的股價」不適合，它比較適合回答「如果 EPS 是 X，本益比會是多少」。",
-    "<b>倖存者與覆蓋</b>：面板是 2025 年的 S&P 500 名單（已另算「當時成分股」）；Nasdaq-100 只有同時在 S&P 500 面板裡的約 70–85 家，ASML、PDD 這類外國公司沒有。中小型股沒有驗證。",
+    "<b>倖存者與覆蓋</b>：面板是 2025 年的 S&P 500 名單（已另算「當時成分股」）；Nasdaq-100 只有同時在 S&P 500 面板裡的 51–85 家（早年較少），ASML、PDD 這類外國公司沒有。中小型股沒有驗證。",
     "<b>共識的係數還是代理</b>：「市場已預期」那一項的 β 是用模型自己的預期估的，不是真正的歷史分析師共識；歷史共識資料正在接，之後要重估。",
     "<b>大盤是固定的資金成本</b>：r＝10 年期＋5%。大盤整年往同一邊走時，所有預測一起偏。",
     "<b>2022 以後的資料在設計時看過</b>：真正沒碰過的驗收是 2026-10-06 凍結的前瞻紀錄（1,982 家，2027-04、2027-10 驗收）。",

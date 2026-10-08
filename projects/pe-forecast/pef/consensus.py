@@ -236,9 +236,9 @@ def quote_summary(ticker, cache_dir=None, max_age_h=24):
 
 
 def latest_snapshot(snap_dir, ticker, max_age_days=7):
-    """data/consensus_snapshots/ 裡最新、且 max_age_days 天內的快照中這一檔的那一列（dict），沒有就 None。"""
+    """data/consensus_snapshots/ 裡最新、且 max_age_days 天內的選股器快照（yahoo_YYYY-MM-DD；不含 yahoo_detail_）中這一檔的那一列，沒有就 None。"""
     sym = yahoo_symbol(ticker)
-    for f in sorted(glob.glob(os.path.join(snap_dir, "yahoo_*.csv.gz")), reverse=True):
+    for f in sorted(glob.glob(os.path.join(snap_dir, "yahoo_2*.csv.gz")), reverse=True):
         d = pd.read_csv(f)
         when = pd.Timestamp(d["asof_utc"].iloc[0]) if len(d) else None
         if when is None or (pd.Timestamp.now(tz="UTC") - when).days > max_age_days:
