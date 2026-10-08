@@ -10,7 +10,8 @@
     python3 orbit_price.py MU --eps 70 --eps2 90 --cons auto           # 自動抓 Yahoo 共識（本財年、下一財年；pef/consensus.py）
 共識 EPS 也可以放在 data/consensus.csv（欄位：ticker, fy_end, eps, source, asof；同一年度取 asof 最新的一筆），
 沒給 --cons／--fy-cons 時自動讀；你在命令列給的永遠優先。--cons auto：先用 7 天內的快照（data/consensus_snapshots/），
-沒有就即時抓並存成今天的快照。Yahoo 共識多半是調整後口徑，--cons-scale 可換算成 GAAP（例如 0.8）。
+沒有就即時抓並存成今天的快照；再抓 quoteSummary（分析師人數、90 天修正、精確的會計年度、調整後實際 EPS），
+並用「GAAP ÷ 調整後」的最近四季把共識自動換成 GAAP 口徑（--cons-scale 可以自己指定，1＝不換）。
 今天的股價：先試 Yahoo（今天收盤），失敗就用 results/now_all.csv。
 不是投資建議。
 """
@@ -81,7 +82,8 @@ def main():
     ap.add_argument("--cons2", type=float, help="市場共識：h＋12 個月後的最近四季 EPS")
     ap.add_argument("--fy", help="你的會計年度 EPS，例如 \"2027-08:72,2028-08:90\"")
     ap.add_argument("--fy-cons", help="市場共識的會計年度 EPS，格式同 --fy")
-    ap.add_argument("--cons-scale", type=float, default=1.0, help="共識乘上這個數（調整後口徑 → GAAP，例如 0.8）")
+    ap.add_argument("--cons-scale", type=float, default=None,
+                    help="共識乘上這個數（調整後口徑 → GAAP，例如 0.8）；--cons auto 時預設用 GAAP ÷ 調整後的最近四季自動換算")
     ap.add_argument("--erp", type=float, default=None, help="股權風險溢酬（預設 0.05）")
     a = ap.parse_args(sys.argv[1:])
     t = a.ticker.upper().replace(".", "-")
@@ -90,7 +92,9 @@ def main():
     notes = []
     use_auto = str(a.cons or "").lower() == "auto"
     snap, snap_src = consensus.get_row(t, os.path.join(HERE, "data", "consensus_snapshots"), live=use_auto)
-    rf = consensus.refresh_eps(row, snap)       # 快照比 now_all.csv 新、又公布了新的季 → 改用 Yahoo 的 GAAP 最近四季
+    cache = os.path.join(HERE, ".cache", "yahoo")
+    qs = consensus.quote_summary(t, cache) if use_auto else None   # 完整分析師資料（要 fc.yahoo.com、query2 網域）
+    rf = consensus.refresh_eps(row, snap, mrq=(qs or {}).get("mrq"))   # 快照比 now_all.csv 新、又公布了新的季 → 改用 Yahoo 的 GAAP 最近四季
     if rf["n_new"]:
         row["eps0"], row["period_end"] = rf["eps0"], rf["period_end"]
         notes.append(rf["note"])
@@ -133,7 +137,7 @@ def main():
             if use_auto:
                 notes.append("data/consensus.csv 有這一檔 → 用檔案裡的共識，--cons auto 略過（要用 Yahoo 就先刪掉檔案裡那幾列）")
     if not fyc and ca is None and use_auto:
-        au = consensus.auto(t, snap, snap_src, os.path.join(HERE, ".cache", "yahoo"))
+        au = consensus.auto(t, snap, snap_src, cache, qs=qs)
         if au is None:
             notes.append("--cons auto：Yahoo 沒有這一檔的共識（或抓不到會計年度），改用沒有共識的寫法")
         else:
@@ -141,14 +145,25 @@ def main():
             k = [f"{e.date()} {v:,.2f}" for e, v in sorted(au["fy"].items())]
             notes.append(f"Yahoo 共識：本財年／下一財年 {'、'.join(k)}（本財年＝還沒公布的最早那一年）")
             v0 = sorted(au["fy"].items())[0][1]
+            k_ok = au["basis_k"] is not None and 0.4 <= au["basis_k"] <= 1.15
             if eps0 > 0:
                 notes.append(f"口徑對照：本財年共識 ÷ 目前 GAAP 最近四季 ＝ {v0 / eps0:.2f}"
                              + ("（> 1.5：可能是高成長，也可能是共識用調整後口徑——軟體、股票報酬費用高的公司通常是後者，"
-                                "那就用 --cons-scale 換算）" if v0 / eps0 > 1.5 else ""))
+                                "那就用 --cons-scale 換算）" if v0 / eps0 > 1.5 and not k_ok else ""))
             elif v0 > 0:
                 notes.append("⚠ 今天 GAAP 虧損、共識卻是正的：共識幾乎一定是調整後口徑。你的 EPS 若是 GAAP，"
                              "「你和共識的差距」會被系統性低估 → 用 --cons-scale、或手動給 GAAP 口徑的共識")
+            notes += ["  " + i for i in au["info"]]
             notes += ["⚠ " + w for w in au["warn"]]
+            k = au["basis_k"]
+            if a.cons_scale is None and k is not None:
+                if 0.4 <= k <= 1.15:
+                    if abs(k - 1) > 0.03:
+                        a.cons_scale = k
+                        notes.append(f"口徑：GAAP 最近四季 ÷ 調整後最近四季 ＝ {k:.2f} → 共識自動 × {k:.2f} 換成 GAAP"
+                                     "（不要換算就加 --cons-scale 1）")
+                else:
+                    notes.append(f"⚠ 口徑係數 {k:.2f} 不合理（GAAP 虧損或一次性損益）→ 不自動換算；你的 EPS 若是 GAAP，請用 --cons-scale 自己換")
     if fyc:
         if ca is None:
             ca, how_ca = orbit.calendarize(fyc, ta, row["period_end"], eps0, extrapolate=True)
@@ -159,10 +174,10 @@ def main():
         else:
             how_cb = "命令列"
         notes.append(f"共識由會計年度換算：a＝{how_ca}；b＝{how_cb}")
-    if a.cons_scale != 1.0:
+    if a.cons_scale is not None and a.cons_scale != 1.0:
         ca = ca * a.cons_scale if ca is not None else None
         cb = cb * a.cons_scale if cb is not None else None
-        notes.append(f"共識已乘上 {a.cons_scale}（--cons-scale）")
+        notes.append(f"共識已乘上 {a.cons_scale:.2f}（--cons-scale）")
     if not mine:
         if ca is None:
             sys.exit("請給你的 EPS（--eps／--fy），或提供市場共識（--cons 數字或 auto／--fy-cons／data/consensus.csv）")

@@ -1227,6 +1227,18 @@ S&P 500 走動式回測，假設 EPS 完全正確；中位 |ln 誤差|（本益�
 落在實際 ±20% 內的比例（2022 以後，同一批列；`results/orbit_fit.txt`）：12 個月全部 63%→64%→65%（本益比不變 42%）、科技 57%→59%→59%（35%）；
 6 個月全部 77%→78%；24 個月全部 47%→51%。
 
+**實際用起來多準：取決於你的 EPS 多準**（`research/orbit_eps_noise.py` → `results/orbit_eps_noise.txt`，2022 以後）。
+本益比 ＝ 股價 ÷ 你的 EPS，而股價對 EPS 的反應很小，所以**你的 EPS 錯多少，本益比大約就錯多少**：
+
+| 12 個月，中位 \|ln 本益比誤差\| | 本益比不變（不用 EPS） | EPS 完全正確 | EPS 中位差約 7%（σ＝0.1） | 約 13%（σ＝0.2） | 約 20%（σ＝0.3） | 用模型的代理預測當 EPS |
+|---|---|---|---|---|---|---|
+| 全部 | 0.260 | 0.145 | 0.164 | 0.206 | 0.254 | 0.224 |
+| 科技 | 0.302 | 0.166 | 0.183 | 0.220 | 0.253 | 0.286 |
+
+EPS 中位差 20% 左右時，就和「本益比不變」差不多了；24 個月同樣的門檻約在 20–25%（全部 0.298 vs σ＝0.3 的 0.289）。
+所以這個模型的價值在於「**把一個好的 EPS 預估，轉成可靠的本益比與股價區間**」；EPS 本身要靠你的研究或分析師共識——
+共識快照（§16.5）累積之後，就能直接量「拿共識當 EPS」實際有多準。
+
 **最近一段**（`lab_orbit_recent.py`：起點 2024-10～2025-09，股價用 Yahoo、EPS 用最新申報值，目標日到 2026-09）：
 
 | 類型 | n | 本益比不變 | 軌道 | ＋你的 EPS（a） | 股價偏離軌道（中位，ln） |
@@ -1278,8 +1290,17 @@ S&P 500 走動式回測，假設 EPS 完全正確；中位 |ln 誤差|（本益�
 - **口徑**：模型的 EPS 是 GAAP 稀釋；Yahoo 的 TTM 是 GAAP，但共識多半是調整後（street）口徑——軟體、股票報酬費用高的公司可差 30% 以上。
   程式會印「本財年共識 ÷ 目前 GAAP 最近四季」，今天 GAAP 虧損但共識是正的也會警告；用 `--cons-scale 0.8` 之類的係數換算，或手動給 GAAP 口徑的共識。
   ADR／外幣財報的共識可能和股價不同幣別（例：BABA），程式會警告。
-- 更完整的共識（分析師人數、7／30／60／90 天前的修正）：允許 `fc.yahoo.com`、`query2.finance.yahoo.com`、`finance.yahoo.com` 後可以抓 quoteSummary；
-  有歷史時點的免費來源只有 OSAP 的 `FEPS`（I/B/E/S FY1 月度，要在 Mac 上下載）。見 `research/06_consensus_data_sources.md`。
+- **完整分析師資料（quoteSummary，2026-10-08 起可用：環境已允許 `fc.yahoo.com`、`query2.finance.yahoo.com`、`finance.yahoo.com`）**：
+  `--cons auto` 會先抓它（失敗才退回選股器）——
+  - 會計年度用 `lastFiscalYearEnd`（最近一個已公布的年度，實測 MU、AAPL、COST、MSFT、NVDA、CRM、SNOW 都對），0y＝它＋12 個月，精確到日；
+    earningsTrend 裡的 `endDate` 剛公布後會落後一期（MU 把 FY2027 的 176 標成 2026-08-31），不用。
+  - 口徑自動換算：調整後（street）最近四季＝earningsHistory 的四季實際值加總；**共識 × (GAAP 最近四季 ÷ 調整後最近四季)** 換成 GAAP。
+    例：CRM 10.93 ÷ 16.84＝0.65，共識 16.75 → 約 10.9。係數在 0.4–1.15 之外（虧損、一次性損益）不自動換，會警告；`--cons-scale` 可以自己指定（1＝不換）。
+  - 印出分析師人數、高低區間、90 天來共識變了多少、30 天上修／下修人數（例：MU 本財年共識 90 天 +17%、下一財年 +26%）。
+  - 最近一季季末用 `mostRecentQuarter`，今天 EPS 的更新更精確。
+  - `python3 consensus_snapshot.py --detail`：S&P 500＋科技＋Nasdaq-100 約 460 檔的完整資料存成 `yahoo_detail_YYYY-MM-DD.csv.gz`；
+    每份自帶 7／30／60／90 天前的共識，第一份就有 90 天的修正歷史。
+- 有歷史時點的免費來源只有 OSAP 的 `FEPS`（I/B/E/S FY1 月度）：資料在 Google Drive，這個環境還連不到（見 `research/06_consensus_data_sources.md`）。
 - 注意：β_e、β_s 是用「代理預期」估的；真正的分析師共識比代理準，β_s 可能被低估。累積快照後要重估。
 
 ### 16.6 用法
@@ -1292,6 +1313,7 @@ python3 orbit_price.py MU --fy "2027-08:170,2028-08:210" --fy-cons "2027-08:176,
 python3 orbit_price.py AAPL --eps 9 --eps2 10 --h 24                 # 6／12／24 個月
 python3 orbit_price.py SNOW --eps -0.5 --eps2 1.2                    # 虧損：只給股價＋forward 本益比
 python3 consensus_snapshot.py                                        # 存一份共識快照（建議每週）
+python3 consensus_snapshot.py --detail                               # 再存一份完整分析師資料（約 10 分鐘）
 ```
 
 會計年度換算：目標日那天大概已公布到哪一季（季末 + 45 天），那四季各落在哪個會計年度，按季數加權；

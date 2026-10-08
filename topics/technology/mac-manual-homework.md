@@ -25,11 +25,11 @@ last_updated: 2026-07-06
 
 ### 🆕 2026-10-07 新增（本益比軌道模型 session）
 
-- [ ] **（選配）讓 pe-forecast 的共識更完整**：雲端已能免 cookie 抓 Yahoo 選股器的本財年／下一財年共識（`orbit_price.py --cons auto`，README §16.5）。
-  還缺的兩樣，要你做：①在 claude.ai 這個雲端環境的網路設定允許 `fc.yahoo.com`、`query2.finance.yahoo.com`、`finance.yahoo.com`
-  → 可抓分析師人數與 7／30／60／90 天前的修正（quoteSummary 現在 401）②Mac 上 `pip install openassetpricing` 下載 OSAP 的
-  `FEPS`／`sfe`／`AnalystRevision`（I/B/E/S FY1 月度歷史，1983 起；步驟見 `projects/pe-forecast/research/06_consensus_data_sources.md` §4.1），
-  CSV 放 `projects/pe-forecast/data/`（不是 docs/）→ 下一輪用真正的共識重估 β。
+- [x] ~~雲端允許 `fc.yahoo.com`、`query2.finance.yahoo.com`、`finance.yahoo.com`~~（2026-10-08 Jake 已加；quoteSummary 實測 200，已接進 `orbit_price.py --cons auto`）
+- [ ] **（選配）OSAP 歷史共識 `FEPS`（I/B/E/S FY1 月度，1983 起）→ 用真正的歷史共識重估 pe-forecast 的 β**。二選一：
+  ①**雲端（推薦，不用碰 Mac）**：在這個雲端環境的網路設定再允許 `drive.google.com`、`drive.usercontent.google.com`（OSAP 的檔案放在 Google Drive；
+  2026-10-08 實測兩者皆不通），之後跟我說一聲，我在雲端 `pip install openassetpricing` 下載、配對代號、commit 進 repo。
+  ②Mac：步驟見 `projects/pe-forecast/research/06_consensus_data_sources.md` §4.1；產出的 CSV 放 `projects/pe-forecast/data/osap/` 後 git push。
 
 ### 🆕 2026-09-24 新增（前瞻本益比模型 session 產生）
 

@@ -7,9 +7,12 @@
 可用 --cons-scale 換算，或直接手動給共識（命令列與 data/consensus.csv 永遠優先）。
 """
 import glob
+import http.cookiejar
 import json
 import os
 import time
+import urllib.error
+import urllib.parse
 import urllib.request
 
 import pandas as pd
@@ -25,6 +28,9 @@ FIELDS = ["symbol", "shortName", "regularMarketTime", "regularMarketPrice", "cur
           "epsTrailingTwelveMonths", "epsCurrentYear", "epsForward", "forwardPE", "priceEpsCurrentYear",
           "earningsTimestamp", "marketCap", "averageAnalystRating"]
 UA = {"User-Agent": "Mozilla/5.0"}
+QS_URL = ("https://query2.finance.yahoo.com/v10/finance/quoteSummary/{}"
+          "?modules=earningsTrend,earningsHistory,defaultKeyStatistics&crumb={}")
+_QS = {}
 
 
 def _get(url):
@@ -126,9 +132,10 @@ def last_reported_quarter(period_end, row, now=None):
     return chain[-1], len(chain) - 1
 
 
-def refresh_eps(row, snap, now=None):
+def refresh_eps(row, snap, now=None, mrq=None):
     """repo 的最近四季 EPS（row["eps0"]、row["period_end"]）比快照舊時，改用快照的 GAAP 最近四季（epsTrailingTwelveMonths）。
-    只在美元報價、美元財報時更新。回傳 dict(eps0, period_end, n_new, ratio, note)；不更新時 n_new＝0。"""
+    只在美元報價、美元財報時更新。mrq（quoteSummary 的最近一季季末）有給就用它，否則用財報日推。
+    回傳 dict(eps0, period_end, n_new, ratio, note)；不更新時 n_new＝0。"""
     out = dict(eps0=float(row["eps0"]), period_end=pd.Timestamp(row["period_end"]), n_new=0, ratio=None, note=None)
     if snap is None:
         return out
@@ -136,7 +143,13 @@ def refresh_eps(row, snap, now=None):
     cur, fcur = str(snap.get("currency") or ""), str(snap.get("financialCurrency") or "")
     if ttm is None or pd.isna(ttm) or cur != "USD" or fcur not in ("USD", "nan", ""):
         return out
-    q, n = last_reported_quarter(out["period_end"], snap, now)
+    if mrq is not None:                                   # quoteSummary 的最近一季季末（精確）
+        mrq = pd.Timestamp(mrq)
+        if mrq <= out["period_end"] + pd.Timedelta(days=20):
+            return out
+        q, n = mrq, max(1, int(round((mrq - out["period_end"]).days / 91)))
+    else:
+        q, n = last_reported_quarter(out["period_end"], snap, now)
     if n < 1:
         return out
     old = out["eps0"]
@@ -146,6 +159,80 @@ def refresh_eps(row, snap, now=None):
     if ratio is not None and (ratio <= 0 or ratio > 3 or ratio < 1 / 3):
         note += f"　⚠ 新舊相差 {ratio:.2f} 倍（或正負號改變），請確認"
     return dict(eps0=float(ttm), period_end=q, n_new=n, ratio=ratio, note=note)
+
+
+def _qs_session():
+    """quoteSummary 要 cookie＋crumb：先連 fc.yahoo.com 拿 cookie（回 404 也會設），再到 query2 拿 crumb。
+    需要環境允許 fc.yahoo.com、query2.finance.yahoo.com（2026-10-08 起這個雲端環境已允許）。失敗回傳 None。"""
+    if "op" in _QS:
+        return _QS["op"], _QS["crumb"]
+    op = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
+    op.addheaders = list(UA.items())
+    try:
+        try:
+            op.open("https://fc.yahoo.com/", timeout=20)
+        except urllib.error.HTTPError:
+            pass
+        crumb = op.open("https://query2.finance.yahoo.com/v1/test/getcrumb", timeout=20).read().decode().strip()
+    except Exception:                                     # noqa: BLE001
+        return None, None
+    if not crumb or "<" in crumb:
+        return None, None
+    _QS.update(op=op, crumb=crumb)
+    return op, crumb
+
+
+def _raw(d, k):
+    v = (d or {}).get(k)
+    return v.get("raw") if isinstance(v, dict) else None
+
+
+def parse_quote_summary(raw):
+    """quoteSummary JSON → dict(last_fy, mrq, trend={0q,+1q,0y,+1y: dict(avg, low, high, n, d7, d30, d60, d90, up30, down30)},
+    street=[(季, 調整後實際 EPS)…], street_ttm)。
+    last_fy（defaultKeyStatistics.lastFiscalYearEnd）＝最近一個「已公布」的會計年度結束日——實測可靠；
+    earningsTrend 裡的 endDate 在剛公布後會落後一期（MU 2026-10：0y 標 2026-08-31，其實是 FY2027），不用。"""
+    try:
+        r = raw["quoteSummary"]["result"][0]
+    except (KeyError, IndexError, TypeError):
+        return None
+    k = r.get("defaultKeyStatistics") or {}
+    ts = lambda v: pd.Timestamp(int(v), unit="s").normalize() if v else None
+    out = dict(last_fy=ts(_raw(k, "lastFiscalYearEnd")), mrq=ts(_raw(k, "mostRecentQuarter")), trend={})
+    for t in (r.get("earningsTrend") or {}).get("trend", []):
+        e, tr, rv = t.get("earningsEstimate") or {}, t.get("epsTrend") or {}, t.get("epsRevisions") or {}
+        out["trend"][t.get("period")] = dict(avg=_raw(e, "avg"), low=_raw(e, "low"), high=_raw(e, "high"),
+                                             n=_raw(e, "numberOfAnalysts"), d7=_raw(tr, "7daysAgo"), d30=_raw(tr, "30daysAgo"),
+                                             d60=_raw(tr, "60daysAgo"), d90=_raw(tr, "90daysAgo"),
+                                             up30=_raw(rv, "upLast30days"), down30=_raw(rv, "downLast30days"))
+    hist = [(ts(_raw(h, "quarter")), _raw(h, "epsActual")) for h in (r.get("earningsHistory") or {}).get("history", [])]
+    hist = sorted([(q, v) for q, v in hist if q is not None and v is not None])
+    out["street"] = hist
+    last4 = hist[-4:]
+    ok = len(last4) == 4 and all((last4[i + 1][0] - last4[i][0]).days < 120 for i in range(3))
+    out["street_ttm"] = float(sum(v for _, v in last4)) if ok else None
+    return out
+
+
+def quote_summary(ticker, cache_dir=None, max_age_h=24):
+    """一檔的完整分析師資料（parse_quote_summary 的格式）；拿不到回傳 None。"""
+    sym = yahoo_symbol(ticker)
+    path = os.path.join(cache_dir, f"{sym}_quoteSummary.json") if cache_dir else None
+    raw = None
+    if path and os.path.exists(path) and time.time() - os.path.getmtime(path) < max_age_h * 3600:
+        raw = json.load(open(path))
+    if raw is None:
+        op, crumb = _qs_session()
+        if op is None:
+            return None
+        try:
+            raw = json.load(op.open(QS_URL.format(sym, urllib.parse.quote(crumb)), timeout=30))
+        except Exception:                                 # noqa: BLE001
+            return None
+        if path:
+            os.makedirs(cache_dir, exist_ok=True)
+            json.dump(raw, open(path, "w"))
+    return parse_quote_summary(raw)
 
 
 def latest_snapshot(snap_dir, ticker, max_age_days=7):
@@ -186,23 +273,49 @@ def get_row(ticker, snap_dir, live=False, log=print):
     return (hit.iloc[0].to_dict(), "Yahoo 選股器（剛抓）") if len(hit) else (None, None)
 
 
-def auto(ticker, row, src, cache_dir=None, now=None):
-    """回傳 dict(fy={0y 年度結束日: 0y, +1y 年度結束日: +1y}, source, warn=[...], fy0=0y 年度結束日)；拿不到回傳 None。"""
-    if row is None:
+def auto(ticker, row, src, cache_dir=None, now=None, qs=None):
+    """回傳 dict(fy={0y 年度結束日: 0y, +1y 年度結束日: +1y}, source, warn=[...], fy0, basis_k, info=[...])；拿不到回傳 None。
+    有 quoteSummary（qs）時：年度用 last_fy＋12／24 個月（精確），數字用 qs 的平均；另算口徑係數
+    basis_k＝GAAP 最近四季 ÷ 調整後（street）最近四季，用來把共識換成 GAAP 口徑。沒有 qs 時用選股器＋fy0_end 推估。"""
+    info, warn = [], []
+    vals = {}
+    if qs and qs.get("last_fy") is not None and qs["trend"].get("0y", {}).get("avg") is not None:
+        e0 = qs["last_fy"] + pd.DateOffset(months=12)
+        for k, p in ((0, "0y"), (1, "+1y")):
+            v = qs["trend"].get(p, {}).get("avg")
+            if v is not None:
+                vals[e0 + pd.DateOffset(months=12 * k)] = float(v)
+        src = "Yahoo quoteSummary（剛抓）"
+        if row is not None:
+            m = pd.Timestamp(qs["last_fy"]).month
+            guess = fy0_end(m, row, now)
+            if abs((guess - e0).days) > 40:
+                info.append(f"（選股器推估的本財年是 {guess.date()}，以 Yahoo 的「最近已公布年度」為準）")
+        for p in ("0y", "+1y"):
+            t = qs["trend"].get(p) or {}
+            if t.get("avg") and t.get("d90"):
+                info.append(f"{p}：分析師 {t.get('n') or '?'} 位、區間 {t.get('low') or float('nan'):,.2f}–{t.get('high') or float('nan'):,.2f}、"
+                            f"90 天來 {t['avg'] / t['d90'] - 1:+.1%}（30 天上修 {t.get('up30') or 0}、下修 {t.get('down30') or 0} 位）")
+        gaap = row.get("epsTrailingTwelveMonths") if row is not None else None
+        st = qs.get("street_ttm")
+        basis_k = float(gaap) / st if (gaap is not None and pd.notna(gaap) and st and st > 0) else None
+    else:
+        if row is None:
+            return None
+        m = fy_month(ticker, cache_dir)
+        if m is None:
+            return None
+        e0 = fy0_end(m, row, now)
+        for k, col in ((0, "epsCurrentYear"), (1, "epsForward")):
+            v = row.get(col)
+            if v is not None and pd.notna(v):
+                vals[e0 + pd.DateOffset(months=12 * k) + pd.offsets.MonthEnd(0)] = float(v)
+        basis_k = None
+        src = f"{src}，{str(row['asof_utc'])[:10]}"
+    if row is not None:
+        cur, fcur = str(row.get("currency") or ""), str(row.get("financialCurrency") or "")
+        if cur != "USD" or (fcur and fcur not in ("nan", cur)):
+            warn.append(f"幣別：報價 {cur}、財報 {fcur}——共識可能和股價不同幣別（ADR 常見），請手動確認或改用 --cons")
+    if not vals:
         return None
-    m = fy_month(ticker, cache_dir)
-    if m is None:
-        return None
-    e0 = fy0_end(m, row, now)
-    warn = []
-    cur, fcur = str(row.get("currency") or ""), str(row.get("financialCurrency") or "")
-    if cur != "USD" or (fcur and fcur not in ("nan", cur)):
-        warn.append(f"幣別：報價 {cur}、財報 {fcur}——共識可能和股價不同幣別（ADR 常見），請手動確認或改用 --cons")
-    fy = {}
-    for k, col in ((0, "epsCurrentYear"), (1, "epsForward")):
-        v = row.get(col)
-        if v is not None and pd.notna(v):
-            fy[e0 + pd.DateOffset(months=12 * k) + pd.offsets.MonthEnd(0)] = float(v)
-    if not fy:
-        return None
-    return dict(fy=fy, source=f"{src}，{str(row['asof_utc'])[:10]}", warn=warn, fy0=e0)
+    return dict(fy=vals, source=src, warn=warn, fy0=min(vals), basis_k=basis_k, info=info)

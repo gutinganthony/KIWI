@@ -191,7 +191,9 @@ pd.DataFrame(rows).to_csv(f"consensus_{today}.csv", index=False)
   `import openassetpricing as oap; d = oap.OpenAP(); df = d.dl_signal('pandas', ['FEPS','sfe','AnalystRevision'])`。套件 0.0.2 的 `urls.py` 列出 release `202510`（「Version 2.00: data release - 2025.10」）與 `202410`【實測：從 PyPI 下載 wheel 檢查】。
 - 欄位：`permno, yyyymm, FEPS`（＝I/B/E/S 未調整的 FY1 meanest，`time_avail_m` ＝ statpers 所在月份）。`sfe` ＝ FY1 median ÷ 價格（排除距財年結束 90 天內）；`AnalystRevision` ＝ FEPS_t ÷ FEPS_{t−1}。
 - **要自己處理的事**【推論】：
-  1. permno 對到 ticker：OSAP 可以順便下載 CRSP 的 `prc`。把大型科技股 CRSP 的月底未調整價格跟 Yahoo 的未調整收盤價比對，就能找出 permno（或直接用已知的 permno）。
+  1. permno 對到 ticker：**更正（2026-10-08，看過套件原始碼 `openap_download.py`）：OSAP 的 `Price`、`Size`、`STreversal` 三個訊號要用 WRDS 帳號從 CRSP 現抓（`wrds.Connection()`），沒有帳號拿不到**；其他訊號（含 `FEPS`、`Mom12m`、`Mom6m`）是公開 CSV、不用 WRDS。
+     做法：下載 `Mom12m`／`Mom6m`（CRSP 報酬算的動能），和我們自己的股價算出的同一個動能逐月比對，相關最高且吻合的那個 permno 就是這家公司；
+     或找公開的 permno–ticker 對照表交叉檢查。
   2. 分割：FEPS 沒做分割調整（`statsumu`），跟同月的未調整價格比沒問題，但**月對月的修正碰到分割月會跳**。分割日期可以從 Yahoo v8 chart 的 `events=split` 拿到（這裡抓得到）。
   3. 財年換年：`AnalystRevision` 在 FY1 從今年換到明年那個月會失真，要剔除（財年結束月份可以從 SEC 財報鏡像拿到，見 data/SOURCES.md）。
   4. 只有 FY1：財年後段 FY1 跟 NTM 差很多。要嘛只用前半年的觀測值，要嘛用 `fgr5yrLag`（長期成長率）粗估 FY2【推論，品質差】。
