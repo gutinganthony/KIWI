@@ -272,8 +272,9 @@ python3 consensus_snapshot.py --detail    # 存一份共識快照</div>
 
   <div class="panel stack" id="cons-panel">
     <h3>6. 拿真正的分析師共識當 EPS（I/B/E/S 歷史共識）</h3>
-    <p class="note prose">上面都假設你的 EPS 完全正確。這裡改用當時的分析師共識（本財年平均，2012–2024；來源 Open Source Asset Pricing）當 EPS，
-      看 12 個月後的本益比實際差多少。「校正」＝乘上這家公司過去「實際 GAAP ÷ 一年前共識」的中位數（只用當時已揭曉的年度）。</p>
+    <p class="note prose">上面都假設你的 EPS 完全正確。這裡改用當時的分析師共識（本財年平均，2015–2024；來源 Open Source Asset Pricing）當 EPS，
+      看 12 個月後的本益比實際差多少。「校正」＝乘上這家公司過去「實際 GAAP ÷ 一年前共識」的中位數（只用當時已揭曉的年度）。
+      目標日虧損（約 4%）與起點前後有分割的列不評分，所以對虧損公司偏樂觀。</p>
     <div class="tbl"><table id="t-cons"></table></div>
     <p class="note prose" id="cons-sum"></p>
   </div>

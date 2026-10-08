@@ -6,6 +6,7 @@
 共識：OSAP 的 FEPS＝I/B/E/S 每月 FY1（還沒公布的本財年）共識平均（osap_fetch.py），用面板季報的 split_fac 換到面板的股數口徑。
   口徑是調整後（street）：股票報酬費用高的公司、REIT（FFO）會比 GAAP 高很多——這就是「拿共識當 EPS」實際會遇到的誤差，照算。
 挑起點：本財年的年報在「起點後 10.5～12 個月」之間公布 → 12 個月後的最近四季 EPS 剛好就是本財年 EPS，FY1 共識不用換算。
+  β 從 2015 年才有（lab_orbit.py 走動式），所以評分期間是 2015 起；起點到目標日之間有分割、或目標日虧損的列不評分。
   年報公布日＝那一季財報的可用日（data/quarters_sp500.csv 的 avail）；會計年度結束月份＝Yahoo 年度資料（pef/consensus.fy_month，有快取）。
 比較（都用 lab_orbit.py 的走動式「原始成長a」β：起點那一年 1 月的版本）：
   共識（原樣）：EPS_a＝FEPS
@@ -124,8 +125,21 @@ def main():
 
     bt = beta[beta["方法"] == "原始成長a"].set_index(["h", "年", "組別"])["b0"]
     one["b"] = [bt.get((12, m.year, GNAME[g]), np.nan) for m, g in zip(one["month"], one["grp"])]
-    pos = (one["eps0"] > 0) & (one["eps_f12"] > 0) & (one["feps"] > 0) & one["b"].notna()
+    # 起點到目標日之間有分割的列不評分：面板的 split_fac 以季末對齊、不是實際分割日，分割前後幾個月的共識和 EPS 可能差一個分割倍數
+    sq = qs.sort_values(["ticker", "me"]).copy()
+    sq["chg"] = sq.groupby("ticker")["split_fac"].diff().fillna(0) != 0
+    splits = sq[sq["chg"]].groupby("ticker")["me"].apply(list).to_dict()
+    near = [any(m - pd.DateOffset(months=4) < e <= m + pd.DateOffset(months=16) for e in splits.get(t, []))
+            for t, m in zip(one["ticker"], one["month"])]
+    one["near_split"] = near
+    nb = one["b"].notna()
+    loss = nb & (one["eps0"] > 0) & (one["feps"] > 0) & ~(one["eps_f12"] > 0)
+    say(f"不評分：起點前後有分割 {int((nb & one['near_split']).sum()):,} 列；目標日虧損（實際 EPS ≤ 0，本益比沒有定義）{int(loss.sum()):,} 列"
+        f"（{loss.sum() / max(1, nb.sum()):.1%}）——以結果篩選，對虧損公司偏樂觀")
+    pos = (one["eps0"] > 0) & (one["eps_f12"] > 0) & (one["feps"] > 0) & nb & ~one["near_split"]
     d = one[pos].copy()
+    say(f"評分的列：{len(d):,}（{d['ticker'].nunique()} 家，起點 {d['month'].min():%Y-%m}～{d['month'].max():%Y-%m}）；"
+        f"共識 ÷ 實際 GAAP 的中位 {np.exp(np.median(np.log(d['feps'] / d['eps_f12']))):.3f}")
     act_lpe = np.log(d["px"]) + d["y12"] + d["orbit_lr"] - np.log(d["eps_f12"])            # 實際 ln 本益比（12 個月後）
     def pe_err(ea):
         lpx = np.log(d["px"]) + d["orbit_lr"] + d["b"] * np.log(ea / d["eps0"]).clip(-2, 2)
@@ -145,8 +159,8 @@ def main():
     d["sp_pit"] = d["sp_pit"].fillna(False).astype(bool)
 
     out = []
-    for per, (lo, hi) in {"2012–2021": ("2012-01-01", "2021-12-31"), "2022 以後": ("2022-01-01", "2026-12-31"),
-                          "全期": ("2012-01-01", "2026-12-31")}.items():
+    for per, (lo, hi) in {"2015–2021": ("2015-01-01", "2021-12-31"), "2022 以後": ("2022-01-01", "2026-12-31"),
+                          "全期": ("2015-01-01", "2026-12-31")}.items():
         dp = d[(d["month"] >= lo) & (d["month"] <= hi)]
         for gn, m in (("S&P 500（當時成分股）", dp["sp_pit"]), ("Nasdaq-100（當年成分股）", dp["ndx"]),
                       ("科技（S&P 500 面板）", dp["grp"] != "other"), ("全部", dp["ticker"].notna())):
