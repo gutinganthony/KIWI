@@ -1,6 +1,6 @@
 # _SOURCE_PROBE — 有価証券報告書來源探測（JEM 否證 #3）
 
-> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-10-08T08:31:20+00:00
+> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-10-09T00:44:30+00:00
 > **為什麼有這支**：2026-08-20 Jake 多次嘗試註冊 EDINET API key 失敗（登入問題）。
 > 與其讓他繼續跟註冊表單纏鬥，不如讓 runner 直接回報**哪一條路是通的**。
 
@@ -61,7 +61,7 @@
 `https://ufocatch.com/`
 
 ```html
-<!DOCTYPE html> <html lang="ja"> <head>     <!-- Google Tag Manager -->     <script>(function(w,d,s,l,i){w[l]=w[l]//[];w[l].push({'gtm.start':     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);     })(window,document,'script','dataLayer','GTM-KQ5J3GZM');</script>     <!-- End Google Tag Manager -->     <meta charset="utf-8" />     <meta name="viewport" content="width=device-width, initial-scale=1.0" />     <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />     <meta name="google-site-verification" content="Me5AYZ0nFZgkYjEfhSMHKiX-3RtBCC4Pu3oj79fryxo" />     <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />     <link rel="icon" type="image/png" sizes="192x192" href="/staticfiles/icons/icon-192.png" />     <link rel="apple-touch-icon" sizes="180x180" href="/staticfiles/icons/apple-touch-icon.png" />     <meta name="description" content="EDINET&#x3084;TDnet&#x3067;&#x516C;&#x8868;&#x3055;&#x308C;&#x305F;&#x4F01;&#x696D;&#x958B;&#x793A;&#x60C5;&#x5831;&#x3092;&#x3054;&#x63D0;&#x4F9B;&#x3059;&#x308B;&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x3067;&#x3059;&#x3002;XBRL&#x3092;&#x6D3B;&#x7528;&#x3057;&#x3001;&#x4F1A;&#x793E;&#x5C5E;&#x6027;&#x60C5;&#x5831;&#x306A;&#x3069;&#x3092;&#x30C7;&#x30FC;&#x30BF;&#x5316;&#x3057;&#x3066;&#x3044;&#x307E;&#x3059;&#x3
+<!DOCTYPE html> <html lang="ja"> <head>     <!-- Google Tag Manager -->     <script>(function(w,d,s,l,i){w[l]=w[l]//[];w[l].push({'gtm.start':     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);     })(window,document,'script','dataLayer','GTM-KQ5J3GZM');</script>     <!-- End Google Tag Manager -->     <meta charset="utf-8" />     <meta name="viewport" content="width=device-width, initial-scale=1.0" />     <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />     <meta name="google-site-verification" content="Me5AYZ0nFZgkYjEfhSMHKiX-3RtBCC4Pu3oj79fryxo" />     <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />     <link rel="icon" type="image/png" sizes="192x192" href="/staticfiles/icons/icon-192.png" />     <link rel="apple-touch-icon" sizes="180x180" href="/staticfiles/icons/apple-touch-icon.png" />     <meta name="description" content="EDINET&#x30FB;TDnet&#x306E;&#x6709;&#x4FA1;&#x8A3C;&#x5238;&#x5831;&#x544A;&#x66F8;&#x3001;&#x6C7A;&#x7B97;&#x77ED;&#x4FE1;&#x3001;&#x5927;&#x91CF;&#x4FDD;&#x6709;&#x5831;&#x544A;&#x66F8;&#x3092;&#x6A2A;&#x65AD;&#x691C;&#x7D22;&#x3002;XBRL&#x306E;&#x8CA1;&#x52D9;&#x30C7;&#x30FC;&#x30BF;&#x3001;&#x30A6;&#x30A9;&#x30C3;&#x30C1;&#x30EA;&#x30B9;&#x30C8;&#x3001;&#x958B;&#x793A;&#x30A2;&#x30E9;&#x30FC;&#x30C8;&#x3
 ```
 
 ### ufocatch 說明頁（已知存在）
@@ -81,9 +81,9 @@
 
 ## TDnet 解析診斷
 
-- 回溯嘗試：20261007(0列)
-- 測試頁：`https://www.release.tdnet.info/inbs/I_list_001_20261007.html`
-- HTML 長度：55,422 字元
+- 回溯嘗試：20261008(0列)
+- 測試頁：`https://www.release.tdnet.info/inbs/I_list_001_20261008.html`
+- HTML 長度：56,271 字元
 - `parse_list_page` 解析出的列數：**0**
 - 其中命中目標代碼：**0**
 
