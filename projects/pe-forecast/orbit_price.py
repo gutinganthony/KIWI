@@ -7,12 +7,15 @@
                                                                        # 用會計年度 EPS（年度結束月:EPS），自動換算成目標日的最近四季
     python3 orbit_price.py MU --eps 55,70,85 --eps2 70,85,100          # 悲觀／基準／樂觀（逗號分隔，一一對應）
     python3 orbit_price.py NVDA --eps 9 --h 24                         # 6、12、24 個月
-    python3 orbit_price.py MU --eps 70 --eps2 90 --cons auto           # 自動抓 Yahoo 共識（本財年、下一財年；pef/consensus.py）
+    python3 orbit_price.py MU --eps 70 --eps2 90 --cons auto           # 自動抓 Yahoo 共識（本財年、下一財年；pef/consensus.py），並用共識校正模型換成預期的 GAAP
+    python3 orbit_price.py NVDA --eps 9 --cons auto --rate-view -1     # 利率情境：你認為 10 年期到目標日會降 1 個百分點（README §19.3）
+    python3 orbit_price.py TSM --cons auto                             # 外國公司 ADR：讀 data/adr_now.csv（每 ADR 美元口徑，adr_fetch.py）
 共識 EPS 也可以放在 data/consensus.csv（欄位：ticker, fy_end, eps, source, asof；同一年度取 asof 最新的一筆），
 沒給 --cons／--fy-cons 時自動讀；你在命令列給的永遠優先。--cons auto：先用 7 天內的快照（data/consensus_snapshots/），
 沒有就即時抓並存成今天的快照；再抓 quoteSummary（分析師人數、90 天修正、精確的會計年度、調整後實際 EPS），
-並用「GAAP ÷ 調整後」的最近四季把共識自動換成 GAAP 口徑（--cons-scale 可以自己指定，1＝不換）。
-今天的股價：先試 Yahoo（今天收盤），失敗就用 results/now_all.csv。
+再用共識校正模型（pef/eps_correct.py，README §19.1）把共識換成「預期的實際 GAAP EPS」（--no-correct：改用舊的
+「GAAP ÷ 調整後最近四季」口徑係數；--cons-scale 自己指定，1＝不換）。係數先乘在會計年度共識上，再換算成目標日的最近四季。
+今天的股價：先試 Yahoo（今天收盤），失敗就用 results/now_all.csv；不在裡面的外國公司 ADR 用 data/adr_now.csv。
 不是投資建議。
 """
 import argparse
@@ -25,7 +28,7 @@ import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from pef import consensus, orbit, yahoo                 # noqa: E402
+from pef import consensus, eps_correct, orbit, yahoo    # noqa: E402
 
 RES = os.path.join(HERE, "results")
 
@@ -57,12 +60,28 @@ def consensus_from_file(ticker):
     return fy, f"{c['source'].iloc[-1]}，{c['asof'].max().date()}"
 
 
+def adr_row(t):
+    """外國公司 ADR（data/adr_now.csv，adr_fetch.py）：股價、最近四季 EPS、共識都已換成每 ADR 美元；口徑檢查沒過的不給用。"""
+    path = os.path.join(HERE, "data", "adr_now.csv")
+    if not os.path.exists(path):
+        return None
+    d = pd.read_csv(path, parse_dates=["period_end", "price_date", "last_fy"])
+    hit = d[d["ticker"] == t]
+    if hit.empty:
+        return None
+    row = hit.iloc[0].to_dict()
+    if not bool(row.get("conv_ok")):
+        sys.exit(f"{t}：ADR 的 EPS 口徑換算沒通過檢查（{row.get('conv_note')}）→ 不給算，以免股價和 EPS 單位對不上")
+    row["adr"] = True
+    return row
+
+
 def today_row(t):
     d = pd.read_csv(os.path.join(RES, "now_all.csv"), parse_dates=["period_end", "price_date"])
     hit = d[(d["ticker"] == t) | d["aliases"].fillna("").str.split().apply(lambda s: t in s)]
-    if hit.empty:
-        sys.exit(f"找不到 {t}（results/now_all.csv 只有有季報的美股）")
-    row = hit.iloc[0].to_dict()
+    row = hit.iloc[0].to_dict() if len(hit) else adr_row(t)
+    if row is None:
+        sys.exit(f"找不到 {t}（results/now_all.csv 只有有季報的美股；外國公司 ADR 見 data/adr_now.csv，約 100 檔）")
     y = yahoo.chart(t, "5d", "1d")
     if y is not None and len(y["close"]):
         new_px = float(y["close"].iloc[-1])
@@ -84,12 +103,21 @@ def main():
     ap.add_argument("--fy-cons", help="市場共識的會計年度 EPS，格式同 --fy")
     ap.add_argument("--cons-scale", type=float, default=None,
                     help="共識乘上這個數（調整後口徑 → GAAP，例如 0.8）；--cons auto 時預設用 GAAP ÷ 調整後的最近四季自動換算")
+    ap.add_argument("--no-correct", action="store_true", help="--cons auto 時不用共識校正模型，改用舊的口徑係數（GAAP ÷ 調整後最近四季）")
+    ap.add_argument("--rate-view", type=float, default=None,
+                    help="利率情境：你認為到目標日 10 年期殖利率會變多少個百分點（-1＝降 1 個百分點）；市場已預期的部分已在軌道裡")
+    ap.add_argument("--rate-regime", default="2022", choices=["2022", "2012"],
+                    help="利率情境用哪段期間的反應：2022＝2022 以後的通膨期（預設）、2012＝2012–2021 低通膨期")
     ap.add_argument("--erp", type=float, default=None, help="股權風險溢酬（預設 0.05）")
     a = ap.parse_args(sys.argv[1:])
     t = a.ticker.upper().replace(".", "-")
     model = json.load(open(os.path.join(RES, "orbit_model.json")))
     row = today_row(t)
     notes = []
+    y_new, y_m = orbit.latest_y10()
+    if y_new is not None and not row.get("adr") and abs(y_new - float(row["y10"])) > 1e-9:
+        notes.append(f"10 年期殖利率用 FRED 最新值 {y_new:.2%}（{y_m:%Y-%m}，data/rates_monthly.csv；results/now_all.csv 裡的是 {float(row['y10']):.2%}，較舊）")
+        row["y10"] = y_new
     use_auto = str(a.cons or "").lower() == "auto"
     snap, snap_src = consensus.get_row(t, os.path.join(HERE, "data", "consensus_snapshots"), live=use_auto)
     cache = os.path.join(HERE, ".cache", "yahoo")
@@ -136,6 +164,16 @@ def main():
             csrc = f"data/consensus.csv（{src}）"
             if use_auto:
                 notes.append("data/consensus.csv 有這一檔 → 用檔案裡的共識，--cons auto 略過（要用 Yahoo 就先刪掉檔案裡那幾列）")
+    scale, scale_src = None, None                       # 乘在共識上的係數（先乘會計年度共識，再換算）
+    is_adr = bool(row.get("adr"))
+    if not fyc and ca is None and use_auto and is_adr:
+        lf = pd.Timestamp(row["last_fy"])
+        fyc = {lf + pd.DateOffset(months=12 * k) + pd.offsets.MonthEnd(0): float(row[c])
+               for k, c in ((1, "cons_0y"), (2, "cons_1y")) if pd.notna(row.get(c))}
+        csrc = f"data/adr_now.csv（Yahoo，已換成每 ADR 美元，{pd.Timestamp(row['price_date']).date()}）"
+        notes.append("外國公司 ADR：共識校正模型只用 S&P 500 訓練、沒有在外國公司驗證過 → 不校正（要換算請用 --cons-scale）；"
+                     "ADR 回測見 README §19.4（扣掉大盤偏差後和 S&P 500 接近，但外國股 2024–25 年整體比軌道多漲）")
+        use_auto = False
     if not fyc and ca is None and use_auto:
         au = consensus.auto(t, snap, snap_src, cache, qs=qs)
         if au is None:
@@ -149,21 +187,44 @@ def main():
             if eps0 > 0:
                 notes.append(f"口徑對照：本財年共識 ÷ 目前 GAAP 最近四季 ＝ {v0 / eps0:.2f}"
                              + ("（> 1.5：可能是高成長，也可能是共識用調整後口徑——軟體、股票報酬費用高的公司通常是後者，"
-                                "那就用 --cons-scale 換算）" if v0 / eps0 > 1.5 and not k_ok else ""))
+                                "那就用 --cons-scale 換算）" if v0 / eps0 > 1.5 and not k_ok and a.no_correct else ""))
             elif v0 > 0:
                 notes.append("⚠ 今天 GAAP 虧損、共識卻是正的：共識幾乎一定是調整後口徑。你的 EPS 若是 GAAP，"
                              "「你和共識的差距」會被系統性低估 → 用 --cons-scale、或手動給 GAAP 口徑的共識")
             notes += ["  " + i for i in au["info"]]
             notes += ["⚠ " + w for w in au["warn"]]
             k = au["basis_k"]
-            if a.cons_scale is None and k is not None:
+            cr = None
+            big = str(row.get("in_sp500")).lower() == "true" or str(row.get("in_ndx")).lower() == "true"
+            if a.cons_scale is None and not a.no_correct and not big:
+                notes.append("共識校正模型只用 S&P 500 訓練、這家不在 S&P 500／Nasdaq-100 → 不校正，改用口徑係數")
+            if a.cons_scale is None and not a.no_correct and big:
+                t0 = ((qs or {}).get("trend") or {}).get("0y") or {}
+                cr = eps_correct.for_ticker(t, row, v0, au["fy0"], t0.get("d30"), t0.get("d90"), (qs or {}).get("last_fy"), today=asof)
+            if cr is not None:
+                scale, scale_src = cr["factor"], "共識校正模型"
+                dr = "、".join(f"{n_}（{v:,.3g}）{e:+.2f}" for n_, v, e in cr["drivers"])
+                notes.append(f"共識校正（README §19.1）：預期實際 GAAP ÷ 共識 ＝ {cr['factor']:.2f}（距離本財年年報約 {cr['feats']['lead']:.1f} 個月）；"
+                             f"影響最大的線索：{dr}" + ("" if cr["known"] else "；這家不在訓練名單，沒有「過去偏差」可用"))
+                notes.append("  樣本外（S&P 500，2015 以後）：EPS 誤差中位 0.144 → 0.113；12 個月本益比誤差（2022 以後）0.221 → 0.197；"
+                             "下一財年用同一個係數（沒驗證過）"
+                             + (f"；舊做法的口徑係數＝{k:.2f}（加 --no-correct 改用它）" if k is not None else ""))
+            elif a.cons_scale is None and k is not None:
                 if 0.4 <= k <= 1.15:
                     if abs(k - 1) > 0.03:
-                        a.cons_scale = k
+                        scale, scale_src = k, "口徑係數：GAAP ÷ 調整後最近四季"
                         notes.append(f"口徑：GAAP 最近四季 ÷ 調整後最近四季 ＝ {k:.2f} → 共識自動 × {k:.2f} 換成 GAAP"
                                      "（不要換算就加 --cons-scale 1）")
                 else:
                     notes.append(f"⚠ 口徑係數 {k:.2f} 不合理（GAAP 虧損或一次性損益）→ 不自動換算；你的 EPS 若是 GAAP，請用 --cons-scale 自己換")
+    if a.cons_scale is not None:
+        scale, scale_src = a.cons_scale, "--cons-scale"
+    ca_cmd, cb_cmd = ca is not None, cb is not None
+    if scale is not None and scale != 1.0:
+        fyc = {e: v * scale for e, v in fyc.items()}
+        ca = ca * scale if ca_cmd else None
+        cb = cb * scale if cb_cmd else None
+        notes.append(f"共識已乘上 {scale:.2f}（{scale_src}）" + ("；先乘在會計年度共識上，換算時已公布的季仍用 GAAP 實際值" if fyc else ""))
     if fyc:
         if ca is None:
             ca, how_ca = orbit.calendarize(fyc, ta, row["period_end"], eps0, extrapolate=True)
@@ -174,21 +235,32 @@ def main():
         else:
             how_cb = "命令列"
         notes.append(f"共識由會計年度換算：a＝{how_ca}；b＝{how_cb}")
-    if a.cons_scale is not None and a.cons_scale != 1.0:
-        ca = ca * a.cons_scale if ca is not None else None
-        cb = cb * a.cons_scale if cb is not None else None
-        notes.append(f"共識已乘上 {a.cons_scale:.2f}（--cons-scale）")
     if not mine:
         if ca is None:
             sys.exit("請給你的 EPS（--eps／--fy），或提供市場共識（--cons 數字或 auto／--fy-cons／data/consensus.csv）")
         mine = [(ca, cb)]
         notes.append("沒有給你自己的 EPS：用市場共識當你的看法（模型只算「市場預期」那一項）")
 
+    rate = None
+    if a.rate_view:
+        pr = orbit.pe_rank(float(row["px"]), eps0)
+        sl, how = orbit.rate_slope(a.h, a.rate_regime, pr)
+        rate = (a.rate_view, sl)
+        notes.append(f"利率情境（README §19.3）：10 年期到 {ta.date()} {a.rate_view:+.2f} 個百分點 × 每個百分點 {sl:+.3f} ＝ 股價 "
+                     f"{np.exp(a.rate_view * sl) - 1:+.1%}（{how}；本益比百分位 {('—' if pr is None else f'{pr:.0%}')}）")
+        notes.append("  這是情境不是預測：市場的升降息預期已在今天的 10 年期裡；同樣是降息，2012–2021 和 2022 以後的反應方向不同。區間不變")
+    flag = lambda v: str(v).strip().lower() in ("true", "1", "1.0")
+    kind = "adr" if row.get("adr") else (None if (flag(row.get("in_sp500")) or flag(row.get("in_ndx"))) else "small")
+    bm = orbit.band_widen(kind, a.h)
+    if bm != 1.0:
+        notes.append(f"區間放寬 ×{bm:.2f}：" + ("外國公司 ADR 用 S&P 500 校準的區間只涵蓋 68–74%（2023-10～2025-09 起點；README §19.4）"
+                                             if kind == "adr" else "不在 S&P 500／Nasdaq-100：中小型股用 S&P 500 校準的區間只涵蓋約 73%（2020–2026；README §19.4）"))
     qa = orbit.reported_quarter(row["period_end"], ta)
     print(f"{row['ticker']}　{row['name']}")
     pe0 = f"{row['px'] / eps0:,.1f}" if eps0 > 0 else "無定義（虧損）"
     print(f"  今天（{asof.date()}）：股價 {row['px']:,.2f}、最近四季 EPS {eps0:,.2f}、本益比 {pe0}；"
-          f"類型：{orbit.GNAME[orbit.group_of(row.get('sector'))]}")
+          f"類型：{orbit.GNAME[row['grp'] if row.get('grp') in orbit.GNAME else orbit.group_of(row.get('sector'))]}"
+          + ("（外國公司 ADR，每 ADR 美元）" if row.get("adr") else ""))
     print(f"  {a.h} 個月後（{ta.date()}）：那時大概已公布到 {qa.date()} 那一季 → EPS_a＝季末 "
           f"{(qa - pd.DateOffset(months=9)).strftime('%Y-%m')}～{qa.strftime('%Y-%m')} 的四季合計；EPS_b＝再往後 12 個月（若公司實際公布得比 45 天快，可能多含一季）")
     if ca is not None:
@@ -197,12 +269,13 @@ def main():
         print("  " + n_)
     res = []
     for ea, eb in mine:
-        o = orbit.predict(row, a.h, model, ea, eb, ca, cb, erp=a.erp)
+        o = orbit.predict(row, a.h, model, ea, eb, ca, cb, erp=a.erp, rate=rate, band_mult=bm)
         o["eps_a"], o["eps_b"] = ea, eb if (eb is not None and np.isfinite(eb)) else None
         res.append(o)
     o0 = res[0]
     print(f"\n  寫法：{o0['spec']}｜軌道（資金成本 − 股利，{a.h} 個月）{np.exp(o0['mk']) - 1:+.1%}｜區間寬度：波動 {o0['vol']:.0%}"
-          f"{'' if o0['vol_known'] else '（沒有資料，用中位數）'}，是中位波動股票的 {o0['width']:.2f} 倍")
+          f"{'' if o0['vol_known'] else '（沒有資料，用中位數）'}，是中位波動股票的 {o0['width']:.2f} 倍"
+          + (f"（含放寬 ×{o0['band_mult']:.2f}）" if o0["band_mult"] != 1 else ""))
     print("  EPS_a     EPS_b    本益比（中位）  本益比 80% 區間     股價（中位）  股價 50% 區間        股價 80% 區間       h 個月後 forward 本益比")
     for o in res:
         pe = f"{o['pe']:10.1f}     {o['pe_lo80']:6.1f}–{o['pe_hi80']:<7.1f}" if o["pe"] else "    無定義（EPS_a ≤ 0）     "

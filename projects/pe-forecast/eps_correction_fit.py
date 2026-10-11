@@ -40,7 +40,8 @@ def main():
                 months=[str(tr["month"].min().date()), str(tr["month"].max().date())], last_report=str(tr["report"].max().date()),
                 sklearn=sklearn.__version__, target="ln(實際 GAAP 本財年 EPS ÷ FY1 共識)",
                 in_sample_mae_raw=float(np.median(np.abs(tr["tgt"]))), in_sample_mae_corrected=float(np.median(np.abs(tr["tgt"] - pred))),
-                walk_forward_note="樣本外成績見 results/eps_correction.txt（樹（今天的線索））")
+                walk_forward_note="樣本外成績見 results/eps_correction.txt（樹（今天的線索））",
+                medians={c: float(np.nanmedian(X[:, i])) for i, c in enumerate(L.FEATS_NOW)})   # 解釋用：把一條線索換成中位數，預測變多少
     json.dump(meta, open(os.path.join(RES, "eps_correction_model.json"), "w"), ensure_ascii=False, indent=1)
 
     # 每家公司的歷史線索

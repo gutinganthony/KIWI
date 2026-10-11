@@ -9,7 +9,7 @@
   本益比不變：今天的本益比 × 實際 EPS_h。EPS 完全正確（上限）。只用今天與 h 個月後 EPS 都 > 0 的列（另報虧損占比）。
 區間：正式版「原始成長a」的分位數 × 波動^0.7。波動＝過去 12 季季報酬的標準差 × 2（季資料，和 S&P 500 的月資料算法不同但同樣是年化）。
 分組：起點當季是哪個指數的成分股（data/members_small.csv）。
-輸出：results/orbit_small.txt、orbit_small_scores.csv
+輸出：results/orbit_small.txt、orbit_small_scores.csv；results/band_widen.json 的 "small"（中小型股區間放寬倍數，給 orbit_price.py 與網頁）
 """
 import argparse
 import io
@@ -108,12 +108,21 @@ def main():
                 rows.append(r)
         # 區間要放寬多少才夠：讓 80% 區間在中小型股涵蓋 80% 的倍數
         w = np.quantile(np.abs(uu - np.median(uu)), 0.8) / max(abs(band["q"][0]), abs(band["q"][3]))
-        cov.append(dict(h=h, 需要的放寬倍數=float(w)))
+        # 不扣大盤（單一股票的使用者事先不知道大盤會怎麼偏）：把 80% 區間放寬幾倍，涵蓋率才到 80%（二分搜尋，期間分開看穩不穩）
+        def need(uv):
+            lo_, hi_ = 0.5, 3.0
+            for _ in range(40):
+                m_ = (lo_ + hi_) / 2
+                lo_, hi_ = (m_, hi_) if ((uv >= band["q"][0] * m_) & (uv <= band["q"][3] * m_)).mean() < 0.8 else (lo_, m_)
+            return hi_
+        early = (d["month"] < "2023-01-01").to_numpy()
+        cov.append(dict(h=h, 扣大盤後需要的倍數=float(w), 不扣大盤需要的倍數=float(need(u.to_numpy())),
+                        不扣大盤_2020_2022=float(need(u.to_numpy()[early])), 不扣大盤_2023以後=float(need(u.to_numpy()[~early]))))
     sc = pd.DataFrame(rows)
     say("\n== 中位 |ln 誤差|（EPS 完全正確；本益比與股價的 ln 誤差相同）、±20% 命中、區間涵蓋（目標 80%／50%）")
     say(sc[["h", "期間", "指數", "n", "家數", "本益比不變", "軌道", "模型", "本益比不變_±20%", "模型_±20%", "80%涵蓋", "50%涵蓋", "80%涵蓋_扣大盤",
             "偏離軌道中位"]].round(3).to_string(index=False))
-    say("\n== 區間放寬：讓 80% 區間在中小型股真的涵蓋 80%（扣掉當季大盤偏差後）需要的倍數")
+    say("\n== 區間放寬：讓 80% 區間在中小型股真的涵蓋 80% 需要的倍數（扣掉當季大盤偏差後＝只看個股；不扣＝單一股票使用者實際面對的）")
     say(pd.DataFrame(cov).round(3).to_string(index=False))
     # S&P 500 同期對照（月頻 → 取季末月份，起點 2020-12 以後）
     p = pd.read_csv(os.path.join(RES, "orbit_predictions.csv.gz"), parse_dates=["month"])
@@ -121,6 +130,12 @@ def main():
     say(f"\n對照 S&P 500 同期（季末起點 2020-12 以後、12 個月）：本益比不變 {np.median(np.abs(p['g12'] - (p['y12'] + p['orbit_lr']))):.3f}、"
         f"軌道 {np.median(np.abs(p['y12'])):.3f}、模型 {np.median(np.abs(p['p12_原始成長a'] - p['y12'])):.3f}（n={len(p):,}）")
     sc.to_csv(os.path.join(RES, "orbit_small_scores.csv"), index=False, float_format="%.6f")
+    bw_path = os.path.join(RES, "band_widen.json")
+    bw = json.load(open(bw_path)) if os.path.exists(bw_path) else {}
+    w = {str(r["h"]): round(r["不扣大盤需要的倍數"], 3) for r in cov}
+    w["24"] = w["12"]                                                       # 24 個月沒有測（季資料太短），沿用 12 個月
+    bw["small"] = dict(h=w, note="不在 S&P 500／Nasdaq-100 的股票：80% 區間放寬倍數（lab_orbit_small.py，2020–2026，不扣大盤）")
+    json.dump(bw, open(bw_path, "w"), ensure_ascii=False, indent=1)
     open(os.path.join(RES, "orbit_small.txt"), "w").write(buf.getvalue())
 
 

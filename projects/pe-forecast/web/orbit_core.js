@@ -60,8 +60,16 @@ const OrbitCore = (() => {
     "原始成長a": ["你的 EPS 成長（a）"],
   };
 
-  // row：{px, e（今天的最近四季 EPS）, y（10 年期殖利率）, dy, v（36 個月波動）, g（類型）}
-  function predict(row, h, model, ea, eb = null, ca = null, cb = null) {
+  // 利率情境：每升 1 個百分點的 ln 影響（和 pef/orbit.py 的 rate_slope 相同）。rs＝results/rate_sensitivity.json；pr＝本益比百分位（null＝0.5）
+  function rateSlope(rs, h, regime, pr) {
+    const c = rs.regimes[String(regime)].h[String(h)];
+    const p = pr === null || pr === undefined || !Number.isFinite(pr) ? 0.5 : clip(pr, 1 / 6, 5 / 6);
+    return c.mkt + (c.dur * (p - 0.5)) / (2 / 3);
+  }
+
+  // row：{px, e（今天的最近四季 EPS）, y（10 年期殖利率）, dy, v（36 個月波動）, g（類型）}；rate：[10 年期變化（百分點）, 斜率] 或 null
+  // bandMult：區間再乘的倍數（中小型股、外國 ADR；pef/orbit.py 的 band_widen）
+  function predict(row, h, model, ea, eb = null, ca = null, cb = null, rate = null, bandMult = 1) {
     const hm = model.h[String(h)];
     const g = row.g;
     const eps0 = row.e;
@@ -82,15 +90,16 @@ const OrbitCore = (() => {
     xs = xs.map((x) => clip(x, -2, 2));
     let adj = 0;
     const parts = xs.map((x, i) => { adj += b[i] * x; return { name: NAMES[spec][i], x, beta: b[i], effect: b[i] * x }; });
+    if (rate && rate[0]) { adj += rate[0] * rate[1]; parts.push({ name: "你的利率看法（10 年期變化，百分點）", x: rate[0], beta: rate[1], effect: rate[0] * rate[1] }); }
     const lpx = Math.log(row.px) + mk + adj;
     const band = hm.bands[spec] || hm.bands["軌道"];
     const volKnown = Number.isFinite(row.v);
     const vol = volKnown ? row.v : band.vol_median;
     const [vlo, vhi] = model.vol_clip;
     const widen = pos(ea) ? 1 : (model.loss_widen && model.loss_widen[String(h)]) || 1.6;
-    const sc = Math.pow(clip(vol, vlo, vhi), model.alpha) * widen;
+    const sc = Math.pow(clip(vol, vlo, vhi), model.alpha) * widen * bandMult;
     const out = {
-      spec, mk, adj, parts, vol, volKnown, widen, px: Math.exp(lpx),
+      spec, mk, adj, parts, vol, volKnown, widen, bandMult, px: Math.exp(lpx),
       width: sc / Math.pow(clip(band.vol_median, vlo, vhi), model.alpha),
     };
     ["lo80", "lo50", "hi50", "hi80"].forEach((k, i) => { out["px_" + k] = Math.exp(lpx + sc * band.q[i]); });
@@ -100,6 +109,6 @@ const OrbitCore = (() => {
     return out;
   }
 
-  return { utc, iso, addMonths, addDays, reportedQuarter, calendarize, predict };
+  return { utc, iso, addMonths, addDays, reportedQuarter, calendarize, predict, rateSlope };
 })();
 if (typeof module !== "undefined") module.exports = OrbitCore;

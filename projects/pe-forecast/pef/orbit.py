@@ -11,9 +11,17 @@ h 個月後股價 ＝ 今天股價 × exp[(r − 股利殖利率) × h/12 ＋ �
 區間：回測的樣本外誤差除以 波動^α、置中後的分位數（和 README §15.5 同一個做法），乘回這家的 波動^α。
 虧損：EPS_a ≤ 0 → 本益比沒有定義，只給股價（方案 A），區間依回測放寬（model["loss_widen"]，約 1.3 倍）；
       EPS_b > 0 時另給 h 個月後的 forward 本益比（方案 B）。今天虧損但有共識：只用「你和共識的差距」那一項（修正a）。
+利率情境（可選，README §19.3）：你認為到目標日 10 年期殖利率會變多少個百分點 → 調整＋＝變化 × 斜率（rate_slope）。
+  市場的升降息預期已經在今天的 10 年期裡（軌道用它當資金成本）；這一項只放「你和市場不同的利率看法」，而且斜率依環境變號。
 """
+import json
+import os
+
 import numpy as np
 import pandas as pd
+
+RES = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "results")
+_C = {}
 
 GROUPS = {"software": "growth", "internet": "growth", "semis": "cyclical", "semicap": "cyclical", "memory": "cyclical",
           "hardware": "tech_other", "itservices": "tech_other", "gics_it": "tech_other"}
@@ -24,6 +32,48 @@ VOL_CLIP = (0.1, 1.5)
 
 def group_of(sector):
     return GROUPS.get(str(sector), "other")
+
+
+def rate_slope(h, regime="2022", pe_rank=None):
+    """每升 1 個百分點（10 年期，到目標日）股價相對軌道的 ln 變化（results/rate_sensitivity.json）。
+    regime：「2022」＝2022 以後的通膨期（預設，2026 年 CPI 年增仍 > 3%）、「2012」＝2012–2021 低通膨期。
+    pe_rank：今天本益比在 S&P 500 的百分位（0～1；None／虧損＝0.5）：本益比越高（存續期間越長）越敏感。回傳 (斜率, 說明)。"""
+    if "rate" not in _C:
+        _C["rate"] = json.load(open(os.path.join(RES, "rate_sensitivity.json")))
+    r = _C["rate"]["regimes"][str(regime)]
+    c = r["h"][str(h)]
+    pr = 0.5 if pe_rank is None or not np.isfinite(pe_rank) else float(np.clip(pe_rank, 1 / 6, 5 / 6))
+    tilt = c["dur"] * (pr - 0.5) / (2 / 3)
+    return c["mkt"] + tilt, f"{r['label']}：中位股票 {c['mkt']:+.3f}、本益比位置傾斜 {tilt:+.3f}"
+
+
+def latest_y10():
+    """最新的 10 年期殖利率（data/rates_monthly.csv，FRED DGS10 每月最後一個交易日；rates_fetch.py 更新）。回傳 (小數, 月份) 或 (None, None)。
+    results/now_all.csv 的 y10 來自 data/us10y_monthly.csv（月平均，常落後 2–3 個月）：軌道的資金成本要用今天的殖利率。"""
+    if "y10" not in _C:
+        p = os.path.join(os.path.dirname(RES), "data", "rates_monthly.csv")
+        r = pd.read_csv(p, parse_dates=["month_end"]).dropna(subset=["DGS10"]) if os.path.exists(p) else None
+        _C["y10"] = (float(r["DGS10"].iloc[-1]) / 100, r["month_end"].iloc[-1]) if r is not None and len(r) else (None, None)
+    return _C["y10"]
+
+
+def band_widen(kind, h):
+    """區間放寬倍數（results/band_widen.json）：kind＝"small"（不在 S&P 500／Nasdaq-100）、"adr"（外國公司），其他回傳 1。"""
+    if "bw" not in _C:
+        p = os.path.join(RES, "band_widen.json")
+        _C["bw"] = json.load(open(p)) if os.path.exists(p) else {}
+    return float(_C["bw"].get(kind, {}).get("h", {}).get(str(h), 1.0)) if kind else 1.0
+
+
+def pe_rank(px, eps0):
+    """今天的本益比在今天 S&P 500 的百分位（results/now_all.csv）；虧損回傳 None。"""
+    if not (px > 0 and eps0 > 0):
+        return None
+    if "pe_ref" not in _C:
+        n = pd.read_csv(os.path.join(RES, "now_all.csv"), usecols=["ln_pe", "in_sp500"])
+        _C["pe_ref"] = np.sort(n.loc[n["in_sp500"].astype(bool), "ln_pe"].dropna().to_numpy(float))
+    ref = _C["pe_ref"]
+    return float(np.searchsorted(ref, np.log(px / eps0), side="right") / len(ref)) if len(ref) else None
 
 
 def reported_quarter(last_qend, target, lag_days=45):
@@ -75,12 +125,14 @@ def _band_scale(vol, alpha):
     return float(np.clip(vol, *VOL_CLIP) ** alpha)
 
 
-def predict(row, h, model, eps_a, eps_b=None, cons_a=None, cons_b=None, erp=None):
-    """row：今天的資料（px、eps0、y10、dy、vol36、sector）。h：6、12 或 24。
+def predict(row, h, model, eps_a, eps_b=None, cons_a=None, cons_b=None, erp=None, rate=None, band_mult=1.0):
+    """row：今天的資料（px、eps0、y10、dy、vol36、sector 或 grp）。h：6、12 或 24。
     eps_a、eps_b：你的 h、h＋12 個月後 EPS；cons_a、cons_b：市場共識（同口徑），沒有就 None。
+    rate：利率情境 (到目標日 10 年期變化的百分點, 每個百分點的斜率)，沒有就 None；區間不變（情境不是預測）。
+    band_mult：區間再乘的倍數（中小型股、外國 ADR 用 band_widen；S&P 500 校準的區間在它們身上偏窄）。
     回傳 dict：股價中位與 50%／80% 區間、本益比（EPS_a ≤ 0 時為 None）、forward 本益比（方案 B）、各項拆解、用了哪個寫法。"""
     hm = model["h"][str(h)]
-    g = group_of(row.get("sector"))
+    g = row.get("grp") if row.get("grp") in GNAME else group_of(row.get("sector"))
     px, eps0 = float(row["px"]), float(row.get("eps0", np.nan))
     y10, dy = float(row["y10"]), float(row.get("dy", 0) or 0)
     erp = model["erp"] if erp is None else erp
@@ -112,15 +164,18 @@ def predict(row, h, model, eps_a, eps_b=None, cons_a=None, cons_b=None, erp=None
     adj = float(np.dot(b, xs)) if xs else 0.0
     for n_, v, bb in zip(names, xs, b):
         parts.append(dict(項目=n_, 數值=v, β=bb, 影響=bb * v))
+    if rate is not None and rate[0]:
+        adj += float(rate[0]) * float(rate[1])
+        parts.append(dict(項目="你的利率看法（10 年期變化，百分點）", 數值=float(rate[0]), β=float(rate[1]), 影響=float(rate[0]) * float(rate[1])))
     lpx = np.log(px) + mk + adj
     band = hm["bands"].get(spec) or hm["bands"]["軌道"]
     vol = row.get("vol36")
     vol_known = vol is not None and np.isfinite(vol)
     vol = float(vol) if vol_known else band["vol_median"]
     widen = float(model.get("loss_widen", {}).get(str(h), LOSS_WIDEN)) if not pos(eps_a) else 1.0
-    sc = _band_scale(vol, model["alpha"]) * widen
+    sc = _band_scale(vol, model["alpha"]) * widen * band_mult
     q = band["q"]                                                     # 10/25/75/90% 分位數（ln、已除以波動^α、置中）
-    out = dict(spec=spec, group=GNAME[g], group_key=g, widen=widen, mk=mk, adj=adj, parts=parts, px=float(np.exp(lpx)), vol=vol, vol_known=vol_known,
+    out = dict(spec=spec, group=GNAME[g], group_key=g, widen=widen, band_mult=band_mult, mk=mk, adj=adj, parts=parts, px=float(np.exp(lpx)), vol=vol, vol_known=vol_known,
                width=sc / _band_scale(band["vol_median"], model["alpha"]))
     for k, qq in zip(("lo80", "lo50", "hi50", "hi80"), q):
         out[f"px_{k}"] = float(np.exp(lpx + sc * qq))

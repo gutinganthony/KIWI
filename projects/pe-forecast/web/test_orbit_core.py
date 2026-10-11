@@ -27,7 +27,11 @@ for i, r in enumerate(rows):
         for ea, eb, ca, cb in ((r["e"] * 1.2, r["e"] * 1.4, None, None), (r["e"] * 1.2, None, None, None),
                                (r["e"] * 1.1, r["e"] * 1.3, r["e"] * 1.15, r["e"] * 1.35), (r["e"] * 1.1, None, r["e"] * 1.05, None),
                                (2.0, 3.0, 2.5, 3.2), (-1.0, 2.0, None, None)):
-            cases.append(dict(i=i, h=h, ea=ea, eb=eb, ca=ca, cb=cb))
+            cases.append(dict(i=i, h=h, ea=ea, eb=eb, ca=ca, cb=cb, rt=None, bm=1.0))
+        cases.append(dict(i=i, h=h, ea=r["e"] * 1.1, eb=None, ca=r["e"] * 1.05, cb=None, rt=[-1.0, -0.06], bm=1.0))   # 利率情境
+        cases.append(dict(i=i, h=h, ea=r["e"] * 1.2, eb=r["e"] * 1.4, ca=None, cb=None, rt=None, bm=1.17))     # 區間放寬
+rsens = json.load(open(os.path.join(HERE, "results", "rate_sensitivity.json")))
+slopes = [dict(h=h, rg=rg, pr=pr) for h in (6, 12, 24) for rg in ("2022", "2012") for pr in (None, 0.02, 0.4, 0.97)]
 cal = [dict(fy=[["2027-09-03", 176.15], ["2028-09-03", 206.33]], t="2027-10-07", q="2026-09-03", e=74.33, x=True),
        dict(fy=[["2027-09-03", 176.15], ["2028-09-03", 206.33]], t="2028-10-07", q="2026-09-03", e=74.33, x=True),
        dict(fy=[["2027-01-31", 16.75], ["2028-01-31", 16.02]], t="2029-10-07", q="2026-07-31", e=11.09, x=True),
@@ -39,8 +43,9 @@ js = os.path.join(HERE, "web", "orbit_core.js")
 prog = f"""
 const C = require({json.dumps(js)}); const model = {json.dumps(model)};
 const rows = {json.dumps(rows).replace('NaN', 'null')}; rows.forEach(r => {{ if (r.v === null) r.v = NaN; }});
-const out = {{pred: [], cal: []}};
-for (const c of {json.dumps(cases)}) {{ const o = C.predict(rows[c.i], c.h, model, c.ea, c.eb, c.ca, c.cb);
+const out = {{pred: [], cal: [], sl: []}};
+for (const c of {json.dumps(slopes)}) out.sl.push(C.rateSlope({json.dumps(rsens)}, c.h, c.rg, c.pr));
+for (const c of {json.dumps(cases)}) {{ const o = C.predict(rows[c.i], c.h, model, c.ea, c.eb, c.ca, c.cb, c.rt, c.bm);
   out.pred.push([o.spec, o.px, o.px_lo80, o.px_hi80, o.pe, o.fwd]); }}
 for (const c of {json.dumps(cal)}) {{ const r = C.calendarize(c.fy.map(x => [C.utc(x[0]), x[1]]), C.utc(c.t), C.utc(c.q), c.e, c.x);
   out.cal.push(r ? [r.eps, r.how] : null); }}
@@ -52,18 +57,24 @@ for c, j in zip(cases, res["pred"]):
     o = orbit.predict(dict(px=rows[c["i"]]["px"], eps0=rows[c["i"]]["e"], y10=rows[c["i"]]["y"], dy=rows[c["i"]]["dy"],
                            vol36=rows[c["i"]]["v"], sector={"cyclical": "semis", "growth": "software", "tech_other": "hardware",
                                                             "other": "x"}[rows[c["i"]]["g"]]),
-                      c["h"], model, c["ea"], c["eb"], c["ca"], c["cb"])
+                      c["h"], model, c["ea"], c["eb"], c["ca"], c["cb"], rate=c["rt"], band_mult=c["bm"])
     py = [o["spec"], o["px"], o["px_lo80"], o["px_hi80"], o["pe"], o["fwd_pe"]]
     same = py[0] == j[0] and all((a is None and b is None) or (a is not None and b is not None and abs(a - b) <= 1e-9 * max(1, abs(a)))
                                   for a, b in zip(py[1:], j[1:]))
     bad += not same
     if not same:
         print("不一致", c, py, j)
+for c, j in zip(slopes, res["sl"]):
+    py = orbit.rate_slope(c["h"], c["rg"], c["pr"])[0]
+    same = abs(py - j) < 1e-12
+    bad += not same
+    if not same:
+        print("利率斜率不一致", c, py, j)
 for c, j in zip(cal, res["cal"]):
     p = orbit.calendarize({T(k): v for k, v in c["fy"]}, T(c["t"]), T(c["q"]), c["e"], extrapolate=c["x"])
     py = None if p[0] is None else [p[0], p[1]]
     same = (py is None and j is None) or (py is not None and j is not None and abs(py[0] - j[0]) < 1e-9 and py[1] == j[1])
     bad += not same
     print(("一致" if same else "不一致"), c["t"], py, j)
-print(f"predict {len(cases)} 組、calendarize {len(cal)} 組；不一致 {bad}")
+print(f"predict {len(cases)} 組（含利率情境）、利率斜率 {len(slopes)} 組、calendarize {len(cal)} 組；不一致 {bad}")
 sys.exit(1 if bad else 0)
