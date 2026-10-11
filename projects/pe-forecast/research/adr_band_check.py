@@ -7,6 +7,8 @@
 當作歷史波動的近似——ADR 月資料只有約 3 年，算不出起點當時的 36 個月波動）、data/rates_monthly.csv（10 年期）。
 評分：起點 2023-10～2025-09，h＝6、12；起點與目標日 EPS 都 > 0、ADR 比率沒變、|ln EPS 成長| < 2；用正式版「原始成長a」的 β 與區間。
 「需要的倍數」＝讓 80% 區間涵蓋 80% 要放寬幾倍（不扣大盤＝單一股票使用者實際面對的；扣掉每月共同偏離＝只看個股）。
+對照：S&P 500 同一段起點（2023-10～2025-09）用同一個做法的涵蓋率——results/orbit_predictions.csv.gz（走動式，目標日到 2025-09）
+不夠的月份用 results/orbit_recent_rows.csv.gz（lab_orbit_recent.py，目標日到 2026-09）補；波動用 orbit_predictions 的 vol36（當時的值）。
 """
 import json
 import os
@@ -58,6 +60,18 @@ for h in (6, 12):
     print(f"\n{h} 個月：{len(d):,} 列、{d['ticker'].nunique()} 家；中位 |誤差| 模型 {np.median(np.abs(dev - pred)):.3f}；偏離軌道中位 {np.median(dev):+.3f}")
     print(f"  80% 區間涵蓋：{cov:.1%}（扣掉每月共同偏離後 {covc:.1%}）；需要的倍數：不扣 {need(u, q):.2f}、扣掉後 {need(uc, q):.2f}")
     w[str(h)] = round(max(1.0, need(u, q)), 3)
+    # S&P 500 同期對照
+    pr = pd.read_csv(os.path.join(HERE, "results", "orbit_predictions.csv.gz"), parse_dates=["month"],
+                     usecols=["ticker", "month", "vol36", f"y{h}", f"p{h}_原始成長a"])
+    a1 = pr[(pr["month"] >= "2023-10-01") & (pr["month"] <= "2025-09-30") & pr[f"y{h}"].notna() & pr[f"p{h}_原始成長a"].notna()]
+    a1 = a1.assign(res=a1[f"y{h}"] - a1[f"p{h}_原始成長a"])
+    rr = pd.read_csv(os.path.join(HERE, "results", "orbit_recent_rows.csv.gz"), parse_dates=["month"])
+    rr = rr[(rr["h"] == h) & ~rr["month"].isin(a1["month"].unique()) & rr["e_raw"].notna()]
+    rr = rr.merge(pr[["ticker", "month", "vol36"]], on=["ticker", "month"], how="left").assign(res=lambda v: -v["e_raw"])
+    sp = pd.concat([a1[["month", "vol36", "res"]], rr[["month", "vol36", "res"]]])
+    us = (sp["res"] / np.clip(sp["vol36"].fillna(band["vol_median"]), *model["vol_clip"]) ** model["alpha"]).to_numpy()
+    print(f"  對照 S&P 500 同一段起點（{sp['month'].min():%Y-%m}～{sp['month'].max():%Y-%m}，{len(sp):,} 列）：80% 區間涵蓋 "
+          f"{((us >= q[0]) & (us <= q[3])).mean():.1%}；需要的倍數 {need(us, q):.2f}")
 w["24"] = w["12"]                                                           # 24 個月沒有測，沿用 12 個月
 p = os.path.join(HERE, "results", "band_widen.json")
 bw = json.load(open(p)) if os.path.exists(p) else {}

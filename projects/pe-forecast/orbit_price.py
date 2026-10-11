@@ -222,9 +222,11 @@ def main():
     ca_cmd, cb_cmd = ca is not None, cb is not None
     if scale is not None and scale != 1.0:
         fyc = {e: v * scale for e, v in fyc.items()}
-        ca = ca * scale if ca_cmd else None
-        cb = cb * scale if cb_cmd else None
-        notes.append(f"共識已乘上 {scale:.2f}（{scale_src}）" + ("；先乘在會計年度共識上，換算時已公布的季仍用 GAAP 實際值" if fyc else ""))
+        manual = scale_src == "--cons-scale"                 # 命令列直接給的共識數字只乘你自己指定的係數，不乘自動算的
+        ca = ca * scale if (ca_cmd and manual) else ca
+        cb = cb * scale if (cb_cmd and manual) else cb
+        notes.append(f"共識已乘上 {scale:.2f}（{scale_src}）" + ("；先乘在會計年度共識上，換算時已公布的季仍用 GAAP 實際值" if fyc else "")
+                     + ("；命令列給的 --cons／--cons2 數字照原樣用" if (ca_cmd or cb_cmd) and not manual else ""))
     if fyc:
         if ca is None:
             ca, how_ca = orbit.calendarize(fyc, ta, row["period_end"], eps0, extrapolate=True)
