@@ -40,7 +40,9 @@ FEATS = ["cons_g", "lead", "rev1", "rev3", "rev6", "past_bias", "n_past", "ltg",
          "ret6", "ret12", "sigma", "ln_mc", "ln_pe", "lev", "sector_id", "loss0"]
 LIN = ["cons_g", "lead", "rev3", "rev6", "past_bias", "ltg", "gap_model", "acc", "ret12"]
 # 正式使用時今天拿得到的線索（Yahoo 共識 d30／d90 → rev1、rev3；OSAP 到 2024 的過去偏差與 LTG；now_all 的公司特徵）
-FEATS_NOW = ["cons_g", "lead", "rev1", "rev3", "past_bias", "n_past", "ltg", "g_rev", "ret12", "vol36", "ln_mc", "ln_pe", "grp_id", "loss0"]
+# 市值用「當月在面板裡的百分位」（ln 市值會隨時間一路變大：2026 年的 AAPL 4.9 兆美元超出訓練範圍，樹模型會亂外推）；
+# 過去偏差的筆數上限 8（筆數會隨年份增加，不截斷會被當成時間指標）
+FEATS_NOW = ["cons_g", "lead", "rev1", "rev3", "past_bias", "n_past8", "ltg", "g_rev", "ret12", "vol36", "mc_rank", "ln_pe", "grp_id", "loss0"]
 GRP_ID = {"cyclical": 0, "growth": 1, "tech_other": 2, "other": 3}
 buf = io.StringIO()
 
@@ -128,6 +130,8 @@ def build(cache):
         pb.append(float(np.median(past)) if len(past) >= 2 else np.nan)
         npb.append(len(past))
     d["past_bias"], d["n_past"] = pb, npb
+    d["n_past8"] = np.minimum(d["n_past"], 8)
+    d["mc_rank"] = d.groupby("month")["ln_mc"].rank(pct=True)
     return d
 
 
@@ -258,6 +262,13 @@ def main():
     say("\n== 5. 逐年本益比誤差")
     say(pd.DataFrame(yr).round(4).to_string(index=False))
 
+    # 診斷：依「距離年報」與「市值百分位」看樣本外預測和實際偏差（大型股在快公布年報時會不會被過度上修）
+    ev["mc_dec"] = pd.cut(ev["mc_rank"], [0, 0.5, 0.9, 1.0], labels=["後 50%", "50–90%", "前 10%"])
+    dg = ev.groupby(["mc_dec", "lead_b"], observed=True).agg(n=("tgt", "size"), 預測中位=("p_now", "median"), 實際中位=("tgt", "median"),
+                                                             誤差原樣=("tgt", lambda v: np.median(np.abs(v))),
+                                                             誤差校正=("tgt", lambda v: np.median(np.abs(v - ev.loc[v.index, "p_now"])))).reset_index()
+    say("\n== 6. 診斷：依市值百分位 × 距離年報，樣本外預測 vs 實際的 ln(實際÷共識) 中位數，以及 |誤差| 中位")
+    say(dg.round(4).to_string(index=False))
     lg.to_csv(os.path.join(RES, "eps_correction_logic.csv"), index=False, float_format="%.6f")
     pd.concat([sc.assign(表="EPS"), pe.assign(表="PE")]).to_csv(os.path.join(RES, "eps_correction_scores.csv"), index=False, float_format="%.6f")
     one[["ticker", "month", "grp", "feps", "eps0", "eps_f12", "p_past", "p_lin", "p_gbm", "p_mix", "p_now"]].to_csv(
