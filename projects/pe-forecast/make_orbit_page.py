@@ -74,7 +74,7 @@ def tickers():
                      d=str(q["asof_utc"])[:10])
             r2 = dict(r, px=px, eps0=rf["eps0"])
             big = bool(r.get("in_sp500")) or bool(r.get("in_ndx"))        # 中小型股：距離年報 ≥ 9 個月不校正（README §20.3）
-            cr = eps_correct.for_ticker(r["ticker"], r2, c["c0"], fy0, num(q.get("0y_d30")), num(q.get("0y_d90")), q["last_fy"],
+            cr = eps_correct.for_ticker(r["ticker"], r2, num(q.get("0y_avg")), fy0, num(q.get("0y_d30")), num(q.get("0y_d90")), q["last_fy"],
                                         today=pd.Timestamp(q["asof_utc"]).tz_localize(None).normalize(), scope="big" if big else "small")
             if cr is not None and cr["small_note"]:
                 c["cg"] = cr["small_note"]

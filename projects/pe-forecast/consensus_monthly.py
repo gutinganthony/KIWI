@@ -63,8 +63,11 @@ def corrections(date):
     s = pd.read_csv(scr[-1]).drop_duplicates("symbol").set_index("symbol") if scr else pd.DataFrame()
     n = pd.read_csv(os.path.join(RES, "now_all.csv"))
     n["sym"] = n["ticker"].map(consensus.yahoo_symbol)
+    y_new, _ = orbit.latest_y10()                         # 和網頁一樣用最新的 10 年期（now_all 的是落後的月平均）
     rows = []
     for r in n[n["sym"].isin(q.index)].to_dict("records"):
+        if y_new is not None:
+            r["y10"] = y_new
         big = bool(r["in_sp500"]) or bool(r.get("in_ndx"))
         x = q.loc[r["sym"]]
         if pd.isna(x.get("last_fy")) or not (x.get("0y_avg") and x["0y_avg"] > 0):
