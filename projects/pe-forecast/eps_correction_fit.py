@@ -6,6 +6,7 @@
 另外存每家公司今天用得到的歷史線索（results/eps_correction_firm.csv）：過去偏差（lead≈11 個月時 ln(實際 GAAP ÷ 共識) 的中位數與筆數）、
 最新的長期成長預估 LTG（OSAP fgr5yrLag）、年報通常在會計年度結束後幾天公布（算「距離年報幾個月」用）、
 同時點護欄（README §20.2）：距離年報 0.5–3／3–6／6–9／9–12 個月各自的過去偏差 pbK、過去 |偏差| paK、年度數 pnK（K＝0～3）。
+中小型股（README §20.3，有 data/osap/feps_small.csv.gz 與 <cache>/small_cond.pkl 時）：同樣的欄位，scope＝small（模型不重訓，只補公司表）。
 使用：pef/eps_correct.py（orbit_price.py --cons auto、make_orbit_page.py）。
 """
 import argparse
@@ -58,6 +59,24 @@ def main():
     wide.columns = [f"{a}{int(b)}" for a, b in wide.columns]
     firm = pd.concat([pb, ltg, lag.rename("report_lag_days"), wide], axis=1)
     firm.index.name = "ticker"
+    firm["scope"] = "sp500"
+    if os.path.exists(os.path.join(HERE, "data", "osap", "feps_small.csv.gz")) and os.path.exists(os.path.join(a.cache, "small_cond.pkl")):
+        import lab_eps_correction_small as LS
+        s = LS.build_small(a.cache)
+        s = s[~s["ticker"].isin(firm.index)]
+        sb = s[(s["lead"] > 9) & s["tgt"].notna()].groupby("ticker")["tgt"].agg(past_bias="median", n_past="size")
+        sl = s.sort_values("month").groupby("ticker")["ltg"].last().rename("ltg")
+        slag = s.drop_duplicates(["ticker", "fy1"]).assign(lag=lambda v: (v["report"] - v["fy1"]).dt.days).groupby("ticker")["lag"].median()
+        sk = s[s["tgt"].notna()]
+        spf = sk.groupby(["ticker", "lead_b", "fy1"]).agg(tg=("tgt", "median"), ab=("tgt", lambda v: np.median(np.abs(v)))).reset_index()
+        sgb = spf.groupby(["ticker", "lead_b"]).agg(pb=("tg", "median"), pa=("ab", "median"), pn=("tg", "size")).reset_index()
+        sw = sgb.pivot(index="ticker", columns="lead_b")
+        sw.columns = [f"{x}{int(y)}" for x, y in sw.columns]
+        small = pd.concat([sb, sl, slag.rename("report_lag_days"), sw], axis=1)
+        small["scope"] = "small"
+        small.index.name = "ticker"
+        firm = pd.concat([firm, small])
+        print(f"中小型股公司表 {len(small)} 家")
     firm.round(5).to_csv(os.path.join(RES, "eps_correction_firm.csv"))
     print(f"訓練 {len(tr):,} 列、{tr['ticker'].nunique()} 家（{meta['months'][0]}～{meta['months'][1]}）；樣本內 |誤差| 中位 "
           f"{meta['in_sample_mae_raw']:.3f} → {meta['in_sample_mae_corrected']:.3f}；公司表 {len(firm)} 家")

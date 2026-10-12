@@ -196,20 +196,25 @@ def main():
             k = au["basis_k"]
             cr = None
             big = str(row.get("in_sp500")).lower() == "true" or str(row.get("in_ndx")).lower() == "true"
-            if a.cons_scale is None and not a.no_correct and not big:
-                notes.append("共識校正模型只用 S&P 500 訓練、這家不在 S&P 500／Nasdaq-100 → 不校正，改用口徑係數")
-            if a.cons_scale is None and not a.no_correct and big:
+            if a.cons_scale is None and not a.no_correct:
                 t0 = ((qs or {}).get("trend") or {}).get("0y") or {}
-                cr = eps_correct.for_ticker(t, row, v0, au["fy0"], t0.get("d30"), t0.get("d90"), (qs or {}).get("last_fy"), today=asof)
+                cr = eps_correct.for_ticker(t, row, v0, au["fy0"], t0.get("d30"), t0.get("d90"), (qs or {}).get("last_fy"), today=asof,
+                                            scope="big" if big else "small")
+            if cr is not None and cr["small_note"]:
+                notes.append(cr["small_note"])
+                cr = None
+                k = None                                           # 中小型股、距離年報 ≥ 9 個月：共識照原樣用
             if cr is not None:
                 scale, scale_src = cr["factor"], "共識校正模型"
                 dr = "、".join(f"{n_}（{v:,.3g}）{e:+.2f}" for n_, v, e in cr["drivers"])
-                notes.append(f"共識校正（README §19.1）：預期實際 GAAP ÷ 共識 ＝ {cr['factor']:.2f}（距離本財年年報約 {cr['feats']['lead']:.1f} 個月）；"
-                             f"影響最大的線索：{dr}" + ("" if cr["known"] else "；這家不在訓練名單，沒有「過去偏差」可用"))
+                notes.append(f"共識校正（README §19.1{'、§20.3 中小型股' if not big else ''}）：預期實際 GAAP ÷ 共識 ＝ {cr['factor']:.2f}"
+                             f"（距離本財年年報約 {cr['feats']['lead']:.1f} 個月）；"
+                             f"影響最大的線索：{dr}" + ("" if cr["known"] else "；這家沒有歷史共識紀錄，沒有「過去偏差」可用"))
                 if cr["guard"]:
                     notes.append("  " + cr["guard"] + "（README §20.2）")
-                notes.append("  樣本外（S&P 500，2015 以後）：EPS 誤差中位 0.144 → 0.110（含同時點護欄）；12 個月本益比誤差（2022 以後）0.221 → 0.194；"
-                             "下一財年用同一個係數（沒驗證過）"
+                notes.append(("  樣本外（S&P 500，2015 以後）：EPS 誤差中位 0.144 → 0.110（含同時點護欄）；12 個月本益比誤差（2022 以後）0.221 → 0.194；" if big else
+                              "  樣本外（中小型股，2020–2024、距離年報 < 9 個月）：EPS 誤差中位 0.214 → 0.185；")
+                             + "下一財年用同一個係數（沒驗證過）"
                              + (f"；舊做法的口徑係數＝{k:.2f}（加 --no-correct 改用它）" if k is not None else ""))
             elif a.cons_scale is None and k is not None:
                 if 0.4 <= k <= 1.15:

@@ -8,6 +8,8 @@
 同時點護欄（README §20.2）：這家公司在同一個距離年報區間有 ≥ 4 個年度的紀錄時，把樹的預測限制在
 「該區間的過去偏差 ± 過去 |偏差|」之內（AAPL 年報前一個月：樹說 +7.6%，Apple 過去在這個時點都在 ±2% 內 → 限制到約 +2%）。
 走動式回測：EPS 誤差 0.1125 → 0.1099，10 年裡 7 年較準（results/eps_correction2.txt）。
+中小型股（README §20.3，scope="small"）：同一個模型（S&P 500 訓練）搬過去，走動式 2020–2024 EPS 誤差 0.214 → 0.185，
+但只在距離年報 < 9 個月時有用（9–12 個月 0.283 → 0.287、12 個月本益比反而變差）→ 9 個月以上不校正（係數 1）。
 假設：同一個係數也用在下一財年（EPS_b）——訓練資料只有本財年，這一步沒有驗證過。
 用法：先把係數乘在會計年度共識上，再換算成「目標日的最近四季」（已公布的季用 GAAP 實際值，不乘係數）。
 """
@@ -128,11 +130,20 @@ def explain(feats, top=3):
     return sorted(eff, key=lambda e: -abs(e[2]))[:top]
 
 
-def for_ticker(ticker, row, cons0, fy0_end, d30=None, d90=None, last_fy=None, today=None):
-    """一檔的共識校正：dict(factor, ln, feats, drivers)；沒有模型或共識 ≤ 0 時回傳 None。"""
+SMALL_MAX_LEAD = 9.0
+
+
+def for_ticker(ticker, row, cons0, fy0_end, d30=None, d90=None, last_fy=None, today=None, scope="big"):
+    """一檔的共識校正：dict(factor, ln, feats, drivers, guard, small_note)；沒有模型或共識 ≤ 0 時回傳 None。
+    scope＝"small"（不在 S&P 500／Nasdaq-100 的美股）：距離年報 ≥ 9 個月時不校正（README §20.3）。"""
     if _load() is None or not (num(cons0) > 0):
         return None
     f = features(ticker, row, float(cons0), fy0_end, d30, d90, last_fy, today)
     k_raw, p_raw = correction(f)
     p, note = guard(ticker, f["lead"], p_raw)
-    return dict(factor=float(np.exp(p)), ln=p, factor_tree=k_raw, guard=note, feats=f, drivers=explain(f), known=ticker in _M["firm"].index)
+    small_note = None
+    if scope == "small" and f["lead"] >= SMALL_MAX_LEAD:
+        p, small_note = 0.0, (f"中小型股、距離年報 {f['lead']:.1f} 個月（≥ 9）：這個距離校正沒有幫助（README §20.3）→ 不校正"
+                              f"（樹的預測是 {k_raw:.2f}）")
+    return dict(factor=float(np.exp(p)), ln=p, factor_tree=k_raw, guard=note, small_note=small_note, feats=f, drivers=explain(f),
+                known=ticker in _M["firm"].index, scope=scope)

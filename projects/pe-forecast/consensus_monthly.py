@@ -59,24 +59,28 @@ def corrections(date):
     scr = sorted(glob.glob(os.path.join(SNAP, f"yahoo_{date}.csv.gz")))
     if not det:
         return None
-    q = pd.read_csv(det[-1], parse_dates=["last_fy"]).drop_duplicates("symbol").set_index("symbol")
+    q = pd.read_csv(det[-1], parse_dates=["last_fy", "mrq"]).drop_duplicates("symbol").set_index("symbol")
     s = pd.read_csv(scr[-1]).drop_duplicates("symbol").set_index("symbol") if scr else pd.DataFrame()
     n = pd.read_csv(os.path.join(RES, "now_all.csv"))
     n["sym"] = n["ticker"].map(consensus.yahoo_symbol)
     rows = []
-    for r in n[n["sym"].isin(q.index) & (n["in_sp500"].astype(bool) | n["in_ndx"].astype(bool))].to_dict("records"):
+    for r in n[n["sym"].isin(q.index)].to_dict("records"):
+        big = bool(r["in_sp500"]) or bool(r.get("in_ndx"))
         x = q.loc[r["sym"]]
         if pd.isna(x.get("last_fy")) or not (x.get("0y_avg") and x["0y_avg"] > 0):
             continue
-        r2 = dict(r)
-        if r["sym"] in s.index and pd.notna(s.loc[r["sym"], "regularMarketPrice"]):
-            r2["px"] = float(s.loc[r["sym"], "regularMarketPrice"])
-        if r["sym"] in s.index and pd.notna(s.loc[r["sym"], "epsTrailingTwelveMonths"]):
-            r2["eps0"] = float(s.loc[r["sym"], "epsTrailingTwelveMonths"])
+        r2 = dict(r)                                      # 和網頁（make_orbit_page.py）同一套：快照股價＋refresh_eps 的最近四季
+        sr = s.loc[r["sym"]].to_dict() if r["sym"] in s.index else None
+        if sr is not None and sr.get("currency") == "USD" and pd.notna(sr.get("regularMarketPrice")):
+            r2["px"] = float(sr["regularMarketPrice"])
+        snap_time = pd.Timestamp(sr["asof_utc"]).tz_localize(None) if sr is not None and pd.notna(sr.get("asof_utc")) else pd.Timestamp(date)
+        rf = consensus.refresh_eps(r, sr, snap_time, mrq=x["mrq"] if pd.notna(x.get("mrq")) else None)
+        r2["eps0"] = rf["eps0"]
         cr = eps_correct.for_ticker(r["ticker"], r2, x["0y_avg"], x["last_fy"] + pd.DateOffset(months=12), x.get("0y_d30"),
-                                    x.get("0y_d90"), x["last_fy"], today=pd.Timestamp(date))
+                                    x.get("0y_d90"), x["last_fy"], today=pd.Timestamp(date), scope="big" if big else "small")
         if cr is not None:
-            rows.append(dict(symbol=r["sym"], cf=round(cr["factor"], 5), cf_tree=round(cr["factor_tree"], 5), lead=round(cr["feats"]["lead"], 2)))
+            rows.append(dict(symbol=r["sym"], cf=round(cr["factor"], 5), cf_tree=round(cr["factor_tree"], 5), lead=round(cr["feats"]["lead"], 2),
+                             scope="big" if big else "small"))
     out = pd.DataFrame(rows)
     out.to_csv(os.path.join(SNAP, f"correction_{date}.csv"), index=False)
     return out

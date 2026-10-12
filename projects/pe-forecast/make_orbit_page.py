@@ -73,9 +73,12 @@ def tickers():
                      r0=num(rev(num(q.get("0y_avg")), num(q.get("0y_d90"))), 4), r1=num(rev(num(q.get("+1y_avg")), num(q.get("+1y_d90"))), 4),
                      d=str(q["asof_utc"])[:10])
             r2 = dict(r, px=px, eps0=rf["eps0"])
-            big = bool(r.get("in_sp500")) or bool(r.get("in_ndx"))        # 校正模型只用 S&P 500 訓練：中小型股不套
-            cr = None if not big else eps_correct.for_ticker(r["ticker"], r2, c["c0"], fy0, num(q.get("0y_d30")), num(q.get("0y_d90")), q["last_fy"],
-                                        today=pd.Timestamp(q["asof_utc"]).tz_localize(None).normalize())
+            big = bool(r.get("in_sp500")) or bool(r.get("in_ndx"))        # 中小型股：距離年報 ≥ 9 個月不校正（README §20.3）
+            cr = eps_correct.for_ticker(r["ticker"], r2, c["c0"], fy0, num(q.get("0y_d30")), num(q.get("0y_d90")), q["last_fy"],
+                                        today=pd.Timestamp(q["asof_utc"]).tz_localize(None).normalize(), scope="big" if big else "small")
+            if cr is not None and cr["small_note"]:
+                c["cg"] = cr["small_note"]
+                cr = None
             if cr is not None:                                    # 共識校正（README §19.1）：預設的共識係數
                 c["cf"] = num(cr["factor"], 4)
                 c["cl"] = num(cr["feats"]["lead"], 1)

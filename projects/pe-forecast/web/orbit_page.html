@@ -118,7 +118,7 @@ footer { padding-block: 30px; color: var(--muted); font-size: 13px; border-top: 
 </style>
 
 <nav class="toc" aria-label="目錄"><div class="in">
-  <a href="#model">模型長什麼樣子</a><a href="#calc">試算器</a><a href="#howto">怎麼用</a><a href="#report">回測報告</a><a href="#opt">第二輪優化</a><a href="#limits">優勢與限制</a>
+  <a href="#model">模型長什麼樣子</a><a href="#calc">試算器</a><a href="#howto">怎麼用</a><a href="#report">回測報告</a><a href="#opt">優化實驗</a><a href="#limits">優勢與限制</a>
 </div></nav>
 
 <div class="wrap">
@@ -301,8 +301,27 @@ python3 consensus_snapshot.py --detail    # 存一份共識快照</div>
 </section>
 
 <section id="opt">
-  <div class="sec-head"><div class="eyebrow">第二輪優化</div><h2>四個方向：哪些有用、哪些沒用、為什麼</h2>
+  <div class="sec-head"><div class="eyebrow">優化實驗</div><h2>第二、三輪：哪些有用、哪些沒用、為什麼</h2>
     <p class="prose note">每一項都照「先講邏輯 → 用走動式回測實證（每年 1 月只用當時已揭曉的資料）→ 再驗算」。通過樣本外檢驗的才放進模型；沒通過的照實寫出來。</p></div>
+
+  <div class="panel stack">
+    <h3>第三輪（2026-10-12）：六項，一覽 <span class="chip ok">4 項採用</span></h3>
+    <div class="tbl"><table>
+      <tr><th>項目</th><th>邏輯</th><th>實證（樣本外）</th><th>結論</th></tr>
+      <tr><td>共識校正的同時點護欄</td><td>同一家公司在「距離年報同一段」的歷史偏差，最能說明它現在離實際多遠（Apple 年報前一個月，過去都在 ±2% 內）</td>
+        <td>EPS 誤差 11.25% → 10.99%，10 年裡 7 年較準；Apple 年報前的樣本外預測從 +4.5～6.1% 降到 +2%（實際 0.2～1%）</td><td class="best">採用（Apple 今天 1.08 → 1.02）</td></tr>
+      <tr><td>共識校正搬到中小型股</td><td>中小型股一樣有「預估成長越高越高估」等規律（方向檢查比 S&P 500 還強）</td>
+        <td>1,157 家配上 I/B/E/S 共識；EPS 誤差 21.4% → 18.5%，2020–2024 每年都較準；但距離年報 9 個月以上沒幫助</td><td class="best">採用（距離年報 &lt; 9 個月才校正）</td></tr>
+      <tr><td>時變的風險溢酬</td><td>市場很貴時未來報酬通常較低</td>
+        <td>1871 年以來的 S&P 500：固定 5% 在 1950–2023、1990–2023、2010–2023 每一段都最準；依盈餘殖利率、CAPE、股利殖利率調整的全部較差</td><td>不採用（維持 5%）</td></tr>
+      <tr><td>虧損公司的專用版本</td><td>成長率算不出來時，改用「EPS 變化 ÷ 股價」（正負都能算）</td>
+        <td>S&P 500 虧損列 12 個月誤差 25.3% → 24.0%（轉盈的公司 24.0% → 21.8%）；係數 0.22／0.50／1.02（6／12／24 個月）；轉盈的區間放寬 ×1.10</td><td class="best">採用</td></tr>
+      <tr><td>用真共識重估 β</td><td>「市場已預期的成長」原本用代理估，改用 I/B/E/S 歷史共識</td>
+        <td>7,339 組、走動式：和正式版差不到 0.2 個百分點、方向不一致</td><td>不換（確認了 β 的大小）</td></tr>
+      <tr><td>每月共識快照＋前瞻凍結</td><td>Yahoo 只給今天的共識；真正沒看過答案的檢驗只能等時間</td>
+        <td>每月一個指令存快照與當時的校正係數（2028 年初可驗證下一財年的校正）；整套模型凍結 2,079 家、543 家只用共識的事前預測</td><td class="best">已上線（2027-04 第一次驗收）</td></tr>
+    </table></div>
+  </div>
 
   <div class="panel stack">
     <h3>1. 共識校正：已採用 <span class="chip ok">樣本外有效</span></h3>
@@ -486,7 +505,8 @@ function render() {
     const c = t.c;
     const kTxt = t.adr ? "外國公司 ADR：共識已換成每 ADR 美元。校正模型只用 S&P 500 訓練、沒在外國公司驗證過，預設不校正（係數 1）。"
       : cs && cs.cf !== null ? `共識係數預設 ${cs.cf.toFixed(2)}＝共識校正模型預估的「實際 GAAP ÷ 共識」（距離年報約 ${c.cl} 個月；影響最大：${esc(c.cx || "—")}）。` +
-          `${c.cg ? esc(c.cg) + "。" : ""}樣本外 EPS 誤差中位 14.4% → 11.0%。${c.k !== null ? `舊的口徑係數（GAAP ÷ 調整後最近四季）是 ${c.k.toFixed(2)}，想用它就改共識係數。` : ""}`
+          `${c.cg ? esc(c.cg) + "。" : ""}樣本外 EPS 誤差中位 ${t.sp || t.nd ? "14.4% → 11.0%" : "21.4% → 18.5%（中小型股、距離年報 < 9 個月）"}。${c.k !== null ? `舊的口徑係數（GAAP ÷ 調整後最近四季）是 ${c.k.toFixed(2)}，想用它就改共識係數。` : ""}`
+      : c.cg ? esc(c.cg) + "；共識照原樣使用。"
       : cs && cs.kOk ? (cs.k0 !== 1 ? `共識係數＝口徑係數 ${cs.k0.toFixed(2)}（GAAP ÷ 調整後最近四季）換成 GAAP。` : "口徑：GAAP 和調整後差不到 3%，不換算。")
       : (c.k === null ? "Yahoo 缺少調整後的實際 EPS，算不出口徑係數，共識照原樣使用；若這家的調整後和 GAAP 差很多，請自己改共識係數。"
                       : `口徑係數 ${c.k.toFixed(2)} 不合理（虧損、一次性損益或調整後口徑差太多），預設不放共識、範例改用今天的 EPS；要用請勾選並自己調整共識係數。`);
