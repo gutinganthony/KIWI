@@ -35,6 +35,7 @@
 - [x] 2026-09-03 | COHX 出場規則裁決 | ✅ **Jake 裁決：只用 WT cross**。已寫進 `exit-playbook.md` §0 規則 2（COHR 週線 WT1 下穿 WT2 → 全出；看 COHR 不看 COHX；不設水位；**無停損**）。🔴 **記錄在案**：舊規則 2(b)「−30% 硬停損」在改版當下**已觸發未執行**（9/1 收盤 −35.38%）；配套認定 COHX 為「可歸零部位」。D7 連四週最高優先項結案
 - [x] 2026-09-05 | 信用利差監控接入管線 | ✅ **Jake 核准並已完成**。`projects/avi-v5/scripts/fetch_credit_spreads.py` 掛進 `update-dashboard.yml`（runner 已有 FRED_API_KEY，不需新 workflow）。抓 HY/BB/CCC 三條 ICE BofA OAS → `data/ext/credit/{hy_oas.csv, STATUS.md}`，**只在 🟡(≥100bp)/🔴(≥150bp) 推 Telegram，🟢 靜音**。這是 AI 追蹤系統裡**唯一通過歷史驗證**的訊號（2007 領先 S&P 見頂 4.4 個月）。⚠️ **首次 runner 執行後要驗收**：確認 STATUS.md 有產出且數字合理（現值應約 265bp）
 - [ ] 2026-09-08 | 🔴 **信用利差監控合併進 main（驗收未完成的唯一原因）** 【needs Jake】| **2026-09-07 驗收結果：這一格從來沒跑過，也不會跑。** 原因是機制性的——**GitHub Actions 的 schedule 只從 default branch 執行**，而 `update-dashboard.yml` 的 push trigger 也只認 `branches: [main]`。程式碼與 workflow 改動都在 `claude/kiwi-memory-supercycle-hgtt34` 上，**main 沒有 `fetch_credit_spreads.py`、workflow 也沒有那個步驟、`data/ext/credit/STATUS.md` 不存在**。管線本身是健康的（run #251 於 2026-09-07 07:04 UTC schedule 觸發、成功）。⚠️ **feature 落後 main 1170 個 commit**，且 main 剛併入 PR #39（三指數因子健檢＋殖利率曲線改版＋ECY）⇒ **合併需先 rebase／merge main 並處理衝突，不是一行指令**。**需要你一句話授權才動 main。**
+- [ ] 2026-11-12 | 本益比模型：每月共識快照 【Claude 可做，每月一次】| 開一個雲端 session 說「跑每月共識快照」→ `cd projects/pe-forecast && python3 consensus_monthly.py`（約 12 分鐘：全部類股共識＋S&P 500／科技／Nasdaq-100 詳細資料＋當時的校正係數 → 累積面板 `data/consensus_panel.csv.gz`），跑完 commit。**完成後把日期改成下個月同一天，不要勾掉**——這是每月重複的任務。為什麼：Yahoo 只給今天的共識，漏掉的月份補不回來；累積到 2028 年初可以驗證「下一財年的校正」（README §20.6）
 
 ## 🎯 目標（里程碑，無硬到期日）
 

@@ -80,6 +80,8 @@ def tickers():
                 c["cf"] = num(cr["factor"], 4)
                 c["cl"] = num(cr["feats"]["lead"], 1)
                 c["cx"] = "、".join(f"{n_} {e:+.2f}" for n_, _, e in cr["drivers"])
+                if cr["guard"] and abs(cr["factor"] - cr["factor_tree"]) > 1e-6:
+                    c["cg"] = cr["guard"]
         out.append(dict(t=r["ticker"], n=short_name(r.get("name")), g=orbit.group_of(r.get("sector")), px=round(px, 4),
                         d=str(pdate.date()), e=num(rf["eps0"], 4), q=str(pd.Timestamp(rf["period_end"]).date()),
                         y=num(r["y10"], 5), dy=num(r.get("dy"), 5) or 0, v=num(r.get("vol36"), 4),
@@ -152,9 +154,9 @@ def opt():
 
 def main():
     out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "artifact", "orbit.html")
-    model = json.load(open(os.path.join(RES, "orbit_model.json")))
+    model = orbit.load_model(RES)
     slim = dict(version=model["version"], fit_cutoff=model["fit_cutoff"], erp=model["erp"], alpha=model["alpha"],
-                vol_clip=model["vol_clip"], loss_widen=model["loss_widen"],
+                vol_clip=model["vol_clip"], loss_widen=model["loss_widen"], loss_beta=model.get("loss_beta"), turn_widen=model.get("turn_widen"),
                 h={h: dict(pair=v["pair"], beta=v["beta"], bands={k: dict(q=b["q"], vol_median=b["vol_median"]) for k, b in v["bands"].items()})
                    for h, v in model["h"].items()})
     tk, snap_date = tickers()

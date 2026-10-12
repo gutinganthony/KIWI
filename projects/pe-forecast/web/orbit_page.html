@@ -486,7 +486,7 @@ function render() {
     const c = t.c;
     const kTxt = t.adr ? "外國公司 ADR：共識已換成每 ADR 美元。校正模型只用 S&P 500 訓練、沒在外國公司驗證過，預設不校正（係數 1）。"
       : cs && cs.cf !== null ? `共識係數預設 ${cs.cf.toFixed(2)}＝共識校正模型預估的「實際 GAAP ÷ 共識」（距離年報約 ${c.cl} 個月；影響最大：${esc(c.cx || "—")}）。` +
-          `樣本外 EPS 誤差中位 14.4% → 11.3%。${c.k !== null ? `舊的口徑係數（GAAP ÷ 調整後最近四季）是 ${c.k.toFixed(2)}，想用它就改共識係數。` : ""}`
+          `${c.cg ? esc(c.cg) + "。" : ""}樣本外 EPS 誤差中位 14.4% → 11.0%。${c.k !== null ? `舊的口徑係數（GAAP ÷ 調整後最近四季）是 ${c.k.toFixed(2)}，想用它就改共識係數。` : ""}`
       : cs && cs.kOk ? (cs.k0 !== 1 ? `共識係數＝口徑係數 ${cs.k0.toFixed(2)}（GAAP ÷ 調整後最近四季）換成 GAAP。` : "口徑：GAAP 和調整後差不到 3%，不換算。")
       : (c.k === null ? "Yahoo 缺少調整後的實際 EPS，算不出口徑係數，共識照原樣使用；若這家的調整後和 GAAP 差很多，請自己改共識係數。"
                       : `口徑係數 ${c.k.toFixed(2)} 不合理（虧損、一次性損益或調整後口徑差太多），預設不放共識、範例改用今天的 EPS；要用請勾選並自己調整共識係數。`);
@@ -528,6 +528,8 @@ function render() {
   if (t.g === "cyclical" && base && base.eb === null) notes.push(["warn", "半導體／設備／記憶體的股價主要看「再下一年」的 EPS，建議填 EPS_b。"]);
   if (base && base.o.pe === null) notes.push(["warn", "EPS_a ≤ 0：本益比沒有定義，只看股價（方案 A）；有 EPS_b 時看 forward 本益比（方案 B）。"]);
   if (t.e <= 0 && base && base.o.spec === "軌道" && base.o.pe !== null) notes.push(["", "今天虧損、沒有共識：算不了成長率，股價只用軌道；你的 EPS 只用在本益比的分母。"]);
+  if (base && base.o.spec === "虧損：EPS 變化") notes.push(["", `虧損版：成長率算不出來，改用「EPS 變化 ÷ 今天股價」× β ${f2(base.o.parts[0].beta)}（S&P 500 回測 12 個月誤差 25.3% → 24.0%，轉盈的公司 24.0% → 21.8%）` +
+    (base.o.pe !== null && base.o.widen > 1 ? `；今天虧損、EPS_a 轉正，區間放寬 ×${base.o.widen.toFixed(2)}。` : "。")]);
   if (bm > 1) notes.push(["warn", t.adr ? `外國公司 ADR：用 S&P 500 校準的 80% 區間在 ADR 只涵蓋 68–74%（起點 2023-10～2025-09），區間已放寬 ×${bm.toFixed(2)}。外國股這兩年整體比軌道多漲，只有約 2 年資料。`
     : `不在 S&P 500／Nasdaq-100：中小型股用 S&P 500 校準的 80% 區間實際只涵蓋約 73%（2020–2026），區間已放寬 ×${bm.toFixed(2)}；點預測本身在中小型股一樣有效（12 個月誤差 24% vs 本益比不變 37%）。`]);
   notes.push(["", `回測（12 個月、2022 以後、EPS 完全正確）：S&P 500 典型誤差 ${pct(sc(12, "2022 以後", SP).模型)}，Nasdaq-100 ${pct(sc(12, "2022 以後", ND).模型)}；你的 EPS 若有誤差，誤差會跟著放大。`]);

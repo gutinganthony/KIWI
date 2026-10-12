@@ -111,7 +111,7 @@ def main():
     ap.add_argument("--erp", type=float, default=None, help="股權風險溢酬（預設 0.05）")
     a = ap.parse_args(sys.argv[1:])
     t = a.ticker.upper().replace(".", "-")
-    model = json.load(open(os.path.join(RES, "orbit_model.json")))
+    model = orbit.load_model(RES)
     row = today_row(t)
     notes = []
     y_new, y_m = orbit.latest_y10()
@@ -206,7 +206,9 @@ def main():
                 dr = "、".join(f"{n_}（{v:,.3g}）{e:+.2f}" for n_, v, e in cr["drivers"])
                 notes.append(f"共識校正（README §19.1）：預期實際 GAAP ÷ 共識 ＝ {cr['factor']:.2f}（距離本財年年報約 {cr['feats']['lead']:.1f} 個月）；"
                              f"影響最大的線索：{dr}" + ("" if cr["known"] else "；這家不在訓練名單，沒有「過去偏差」可用"))
-                notes.append("  樣本外（S&P 500，2015 以後）：EPS 誤差中位 0.144 → 0.113；12 個月本益比誤差（2022 以後）0.221 → 0.197；"
+                if cr["guard"]:
+                    notes.append("  " + cr["guard"] + "（README §20.2）")
+                notes.append("  樣本外（S&P 500，2015 以後）：EPS 誤差中位 0.144 → 0.110（含同時點護欄）；12 個月本益比誤差（2022 以後）0.221 → 0.194；"
                              "下一財年用同一個係數（沒驗證過）"
                              + (f"；舊做法的口徑係數＝{k:.2f}（加 --no-correct 改用它）" if k is not None else ""))
             elif a.cons_scale is None and k is not None:
@@ -292,6 +294,10 @@ def main():
     if o0["widen"] > 1:
         print(f"  ⚠ EPS_a ≤ 0：本益比沒有定義（方案 A：只看股價），區間依回測放寬 ×{o0['widen']:.2f}；"
               "有給 EPS_b 時看最右欄的 forward 本益比（方案 B）")
+    if o0["spec"] == "虧損：EPS 變化":
+        print(f"  虧損版（README §20.5）：成長率算不出來，改用「EPS 變化 ÷ 今天股價」× β {o0['parts'][0]['β']:.2f}；"
+              "S&P 500 回測 12 個月誤差 0.253 → 0.240（虧損→轉盈 0.240 → 0.218）"
+              + (f"；今天虧損、EPS_a 轉正 → 區間放寬 ×{o0['widen']:.2f}" if o0["pe"] is not None and o0["widen"] > 1 else ""))
     if o0["spec"] == "軌道" and eps0 <= 0 and o0["pe"] is not None:
         print("  注意：今天虧損、又沒有共識 → 算不了 EPS 成長率，股價只用軌道（你的 EPS 只用在本益比的分母）；"
               "給共識（--cons）時可以用「你和共識的差距」")

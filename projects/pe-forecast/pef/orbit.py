@@ -11,6 +11,8 @@ h 個月後股價 ＝ 今天股價 × exp[(r − 股利殖利率) × h/12 ＋ �
 區間：回測的樣本外誤差除以 波動^α、置中後的分位數（和 README §15.5 同一個做法），乘回這家的 波動^α。
 虧損：EPS_a ≤ 0 → 本益比沒有定義，只給股價（方案 A），區間依回測放寬（model["loss_widen"]，約 1.3 倍）；
       EPS_b > 0 時另給 h 個月後的 forward 本益比（方案 B）。今天虧損但有共識：只用「你和共識的差距」那一項（修正a）。
+      成長率算不出來時（今天或目標日 EPS ≤ 0），改用「EPS 變化 ÷ 今天股價」× β_虧損（README §20.5；model["loss_beta"]，
+      12 個月約 0.50）；今天虧損、EPS_a > 0（轉盈）時區間放寬 model["turn_widen"]（約 1.1 倍）。
 利率情境（可選，README §19.3）：你認為到目標日 10 年期殖利率會變多少個百分點 → 調整＋＝變化 × 斜率（rate_slope）。
   市場的升降息預期已經在今天的 10 年期裡（軌道用它當資金成本）；這一項只放「你和市場不同的利率看法」，而且斜率依環境變號。
 """
@@ -45,6 +47,16 @@ def rate_slope(h, regime="2022", pe_rank=None):
     pr = 0.5 if pe_rank is None or not np.isfinite(pe_rank) else float(np.clip(pe_rank, 1 / 6, 5 / 6))
     tilt = c["dur"] * (pr - 0.5) / (2 / 3)
     return c["mkt"] + tilt, f"{r['label']}：中位股票 {c['mkt']:+.3f}、本益比位置傾斜 {tilt:+.3f}"
+
+
+def load_model(res=RES):
+    """正式版係數：orbit_model.json，併入虧損版的係數與轉盈的區間放寬（orbit_loss_beta.json，有的話）。"""
+    m = json.load(open(os.path.join(res, "orbit_model.json")))
+    p = os.path.join(res, "orbit_loss_beta.json")
+    if os.path.exists(p):
+        lb = json.load(open(p))
+        m["loss_beta"], m["turn_widen"] = lb["beta"], lb.get("turn_widen", {})
+    return m
 
 
 def latest_y10():
@@ -158,7 +170,12 @@ def predict(row, h, model, eps_a, eps_b=None, cons_a=None, cons_b=None, erp=None
         b = hm["beta"][spec][g]
         xs = [np.log(eps_a / eps0)] + ([np.log(eps_b / eps0)] if use_b else [])
         names = ["你的 EPS 成長（a）"] + (["你的 EPS 成長（b）"] if use_b else [])
-    else:                                                             # 今天或目標日虧損：只用軌道
+    elif np.isfinite(eps0) and eps_a is not None and np.isfinite(eps_a) and px > 0 and model.get("loss_beta", {}).get(str(h)) is not None:
+        spec = "虧損：EPS 變化"                                        # 成長率算不出來：EPS 變化 ÷ 今天股價（§20.5）
+        b = [float(model["loss_beta"][str(h)])]
+        xs = [float(np.clip((eps_a - eps0) / px, -1, 1))]
+        names = ["EPS 變化 ÷ 今天股價（虧損版）"]
+    else:                                                             # 今天或目標日虧損、沒有可用的看法：只用軌道
         spec, b, xs, names = "軌道", [], [], []
     xs = [float(np.clip(v, -2, 2)) for v in xs]
     adj = float(np.dot(b, xs)) if xs else 0.0
@@ -172,7 +189,12 @@ def predict(row, h, model, eps_a, eps_b=None, cons_a=None, cons_b=None, erp=None
     vol = row.get("vol36")
     vol_known = vol is not None and np.isfinite(vol)
     vol = float(vol) if vol_known else band["vol_median"]
-    widen = float(model.get("loss_widen", {}).get(str(h), LOSS_WIDEN)) if not pos(eps_a) else 1.0
+    if not pos(eps_a):
+        widen = float(model.get("loss_widen", {}).get(str(h), LOSS_WIDEN))
+    elif not ok0:                                                     # 今天虧損、EPS_a > 0（轉盈）：實測區間偏窄
+        widen = float(model.get("turn_widen", {}).get(str(h), 1.0))
+    else:
+        widen = 1.0
     sc = _band_scale(vol, model["alpha"]) * widen * band_mult
     q = band["q"]                                                     # 10/25/75/90% 分位數（ln、已除以波動^α、置中）
     out = dict(spec=spec, group=GNAME[g], group_key=g, widen=widen, band_mult=band_mult, mk=mk, adj=adj, parts=parts, px=float(np.exp(lpx)), vol=vol, vol_known=vol_known,

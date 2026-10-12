@@ -5,6 +5,8 @@
     python3 forward_log.py score --tag 2026-09-24 --actuals <實際值.csv>   # 答案揭曉後驗收
     python3 forward_log.py freeze-orbit                  # 凍結本益比軌道模型（§16）：最新共識快照的股價＋results/orbit_model.json
     python3 forward_log.py score-orbit --tag orbit-2026-10-06 --actuals results/now_all.csv
+    python3 forward_log.py freeze-orbit2                 # 第二輪（§20.1）：共識校正＋護欄、虧損版、區間放寬、最新 10 年期，連同「只用共識」的事前預測
+    python3 forward_log.py score-orbit2 --tag orbit2-2026-10-12 --actuals results/now_all.csv
 
 為什麼要做：給定 EPS 的模型（xs）的設計是看過 2022 以後的逐年結果才定的，所以 2022 以後已經不是完全沒碰過的樣本。
 真正的樣本外只能是「規格凍結以後才發生的事」。這裡凍結的是模型係數、區間表和今天的線索；
@@ -189,12 +191,166 @@ def score_orbit(tag, actuals, tol_days=20):
     s.to_csv(os.path.join(base, f"score_{pd.Timestamp.today():%Y-%m-%d}.csv"), index=False, float_format="%.6f")
 
 
+BUNDLE = ["orbit_model.json", "orbit_loss_beta.json", "band_widen.json", "rate_sensitivity.json", "eps_correction_model.json",
+          "eps_correction_firm.csv"]
+
+
+def _bw(base, kind, h):
+    p = os.path.join(base, "band_widen.json")
+    bw = json.load(open(p)) if os.path.exists(p) else {}
+    return float(bw.get(kind, {}).get("h", {}).get(str(h), 1.0)) if isinstance(kind, str) and kind else 1.0
+
+
+def freeze_orbit2():
+    """第二輪（README §20.1）：凍結整套模型——共識校正（含同時點護欄）、虧損版、轉盈／中小型股／ADR 區間放寬、最新 10 年期。
+    A. 給定 EPS（和回測同一個問法）：今天的輸入＋全部係數；驗收時代入目標日實際公布的最近四季 EPS。
+    B. 只用共識（真正的事前預測，不需要任何人給 EPS）：S&P 500／Nasdaq-100 用詳細共識（本財年、下一財年）×當時的校正係數，
+       算好 6／12／24 個月的股價中位、80% 區間、本益比；原樣共識也存，驗收時比校正前後誰準。外國 ADR 用每 ADR 美元的共識（不校正）。"""
+    import glob
+    import hashlib
+    import consensus_monthly as CM
+    scr = sorted(glob.glob(os.path.join(HERE, "data", "consensus_snapshots", "yahoo_2*.csv.gz")))
+    det = sorted(glob.glob(os.path.join(HERE, "data", "consensus_snapshots", "yahoo_detail_*.csv.gz")))
+    if not scr or not det:
+        sys.exit("要先有選股器快照與詳細快照：python3 consensus_monthly.py")
+    sn = pd.read_csv(scr[-1]).drop_duplicates("symbol").set_index("symbol")
+    dq = pd.read_csv(det[-1], parse_dates=["last_fy", "mrq"]).drop_duplicates("symbol").set_index("symbol")
+    det_date = os.path.basename(det[-1])[len("yahoo_detail_"):-len(".csv.gz")]
+    d = pd.read_csv(os.path.join(RES, "now_all.csv"), parse_dates=["period_end"])
+    d = d[~d["too_old"].fillna(False).astype(bool)].copy()
+    d["sym"] = d["ticker"].map(yahoo_symbol)
+    d = d[d["sym"].isin(sn.index)].copy()
+    q = sn.loc[d["sym"]]
+    d["px"] = q["regularMarketPrice"].to_numpy(float)
+    d["price_date"] = pd.to_datetime(q["regularMarketTime"].to_numpy(), unit="s").normalize()
+    snap_time = pd.Timestamp(sn["asof_utc"].iloc[0]).tz_localize(None)
+    rf = [consensus.refresh_eps(r, sn.loc[r["sym"]].to_dict(), snap_time,
+                                mrq=dq.loc[r["sym"], "mrq"] if r["sym"] in dq.index and pd.notna(dq.loc[r["sym"], "mrq"]) else None)
+          for r in d.to_dict("records")]
+    d["eps0"], d["period_end"] = [x["eps0"] for x in rf], [x["period_end"] for x in rf]
+    y_new, y_m = orbit.latest_y10()
+    d["y10"] = y_new if y_new is not None else d["y10"]
+    big = d["in_sp500"].astype(bool) | d["in_ndx"].fillna(False).astype(bool)
+    d["band_kind"] = np.where(big, "", "small")
+    d["grp"] = d["sector"].map(lambda v: orbit.group_of(v))
+    d["adr"] = False
+    a = pd.read_csv(os.path.join(HERE, "data", "adr_now.csv"), parse_dates=["period_end", "price_date", "last_fy"])
+    a = a[a["conv_ok"].astype(bool) & (a["px"] > 0) & ~a["ticker"].isin(d["ticker"])].copy()
+    a = a.assign(sym=a["ticker"], name=a["name"], tier="adr", in_sp500=False, in_ndx=False, sector=None, band_kind="adr", adr=True,
+                 y10=y_new if y_new is not None else a["y10"])
+    keep = ["ticker", "sym", "name", "tier", "in_sp500", "in_ndx", "sector", "grp", "adr", "band_kind", "price_date", "px", "eps0",
+            "period_end", "y10", "dy", "vol36"]
+    d = pd.concat([d[keep], a[keep]], ignore_index=True)
+    d = d[(d["px"] > 0) & d["price_date"].notna() & d["eps0"].notna()]
+    tag = "orbit2-" + str(pd.Timestamp(d["price_date"].mode().iloc[0]).date())
+    out = os.path.join(FWD, tag)
+    if os.path.exists(os.path.join(out, "inputs.csv")):
+        sys.exit(f"{out} 已經凍結過了；凍結的紀錄不能改（要重來請換一天）。")
+    # B. 只用共識的事前預測
+    cf = CM.corrections(det_date)
+    cf = cf.set_index("symbol")["cf"] if cf is not None and len(cf) else pd.Series(dtype=float)
+    model = orbit.load_model(RES)
+    cons_rows = []
+    for r in d.to_dict("records"):
+        if r["adr"]:
+            x = a[a["ticker"] == r["ticker"]].iloc[0]
+            fy0, c0, c1, k = pd.Timestamp(x["last_fy"]) + pd.DateOffset(months=12), x.get("cons_0y"), x.get("cons_1y"), np.nan
+        elif r["sym"] in dq.index and pd.notna(dq.loc[r["sym"], "last_fy"]):
+            x = dq.loc[r["sym"]]
+            fy0, c0, c1, k = pd.Timestamp(x["last_fy"]) + pd.DateOffset(months=12), x.get("0y_avg"), x.get("+1y_avg"), cf.get(r["sym"], np.nan)
+        else:
+            continue
+        if not (pd.notna(c0) and c0 > 0):
+            continue
+        fy1 = fy0 + pd.DateOffset(months=12)
+        rec = dict(ticker=r["ticker"], fy0_end=fy0.date(), cons0=c0, cons1=c1, cf=k)
+        row = dict(px=r["px"], eps0=r["eps0"], y10=r["y10"], dy=r["dy"], vol36=r["vol36"], sector=r["sector"], grp=r["grp"])
+        for h in ORBIT_H:
+            ta, tb = r["price_date"] + pd.DateOffset(months=h), r["price_date"] + pd.DateOffset(months=h + 12)
+            for tagc, mult in (("raw", 1.0), ("corr", k if np.isfinite(k) else 1.0)):
+                fy = {fy0: c0 * mult}
+                if pd.notna(c1) and c1 > 0:
+                    fy[fy1] = c1 * mult
+                ca, _ = orbit.calendarize(fy, ta, r["period_end"], r["eps0"], extrapolate=True)
+                cb, _ = orbit.calendarize(fy, tb, r["period_end"], r["eps0"], extrapolate=True)
+                rec[f"ca_{tagc}_{h}"], rec[f"cb_{tagc}_{h}"] = ca, cb
+                if tagc == "corr" and ca is not None:
+                    o = orbit.predict(row, h, model, ca, cb, ca, cb, band_mult=orbit.band_widen(r["band_kind"] or None, h))
+                    rec.update({f"px_{h}": o["px"], f"px_lo80_{h}": o["px_lo80"], f"px_hi80_{h}": o["px_hi80"], f"pe_{h}": o["pe"], f"spec_{h}": o["spec"]})
+        cons_rows.append(rec)
+    os.makedirs(out, exist_ok=True)
+    d.to_csv(os.path.join(out, "inputs.csv"), index=False, float_format="%.6g")
+    cp = pd.DataFrame(cons_rows)
+    cp.to_csv(os.path.join(out, "consensus_preds.csv"), index=False, float_format="%.6g")
+    for f in BUNDLE:
+        if os.path.exists(os.path.join(RES, f)):
+            shutil.copy(os.path.join(RES, f), os.path.join(out, f))
+    meta = dict(frozen_price_date=tag[7:], model_version=model["version"] + "＋第二輪（§19–20）", fit_cutoff=model["fit_cutoff"], n=len(d),
+                n_sp500=int(d["in_sp500"].astype(bool).sum()), n_small=int((d["band_kind"] == "small").sum()), n_adr=int(d["adr"].sum()),
+                n_consensus_preds=len(cp), n_corrected=int(cp["cf"].notna().sum()) if len(cp) else 0, y10=y_new, y10_month=str(y_m)[:7],
+                snapshot=os.path.relpath(scr[-1], HERE), detail_snapshot=os.path.relpath(det[-1], HERE),
+                eps_correction_model_md5=hashlib.md5(open(os.path.join(RES, "eps_correction_model.pkl"), "rb").read()).hexdigest(),
+                note="A＝inputs.csv＋係數（驗收時代入實際 EPS）；B＝consensus_preds.csv（只用共識的事前預測，raw＝原樣、corr＝乘校正係數）。"
+                     "驗收：forward_log.py score-orbit2")
+    json.dump(meta, open(os.path.join(out, "meta.json"), "w"), ensure_ascii=False, indent=1)
+    print(f"凍結 {len(d):,} 家（S&P 500 {meta['n_sp500']}、中小型股 {meta['n_small']}、外國 ADR {meta['n_adr']}）；"
+          f"只用共識的事前預測 {len(cp):,} 家（其中乘校正係數 {meta['n_corrected']}）→ {os.path.relpath(out, HERE)}")
+
+
+def score_orbit2(tag, actuals, tol_days=20):
+    base = os.path.join(FWD, tag)
+    inp = pd.read_csv(os.path.join(base, "inputs.csv"), parse_dates=["price_date", "period_end"])
+    cp = pd.read_csv(os.path.join(base, "consensus_preds.csv")).set_index("ticker")
+    model = orbit.load_model(base)
+    act = pd.read_csv(actuals)
+    if "eps_ttm" not in act and {"price_date", "px", "eps0"} <= set(act.columns):
+        if "too_old" in act:
+            act = act[~act["too_old"].fillna(False).astype(bool)]
+        act = act.rename(columns={"price_date": "date", "eps0": "eps_ttm"})
+    act["date"] = pd.to_datetime(act["date"])
+    act["ticker"] = act["ticker"].str.upper().str.replace(".", "-", regex=False)
+    by = {t: g for t, g in act.groupby("ticker")}
+    rows = []
+    for r in inp.to_dict("records"):
+        for x in by.get(r["ticker"], pd.DataFrame()).to_dict("records"):
+            hit = [h for h in ORBIT_H if abs((x["date"] - (r["price_date"] + pd.DateOffset(months=h))).days) <= tol_days]
+            if not hit:
+                continue
+            h, ea, la = hit[0], float(x["eps_ttm"]), np.log(x["px"])
+            bm = _bw(base, r["band_kind"] if isinstance(r["band_kind"], str) else "", h)
+            o = orbit.predict(r, h, model, ea, band_mult=bm)
+            orb = np.log(r["px"]) + (r["y10"] + model["erp"] - (r["dy"] if np.isfinite(r["dy"]) else 0)) * h / 12
+            z = dict(ticker=r["ticker"], h=h, grp=r["grp"], kind="ADR" if r["adr"] else ("中小型股" if r["band_kind"] == "small" else "S&P 500／Nasdaq-100"),
+                     loss=not ea > 0, orbit=orb - la, model=np.log(o["px"]) - la, in80=o["px_lo80"] <= x["px"] <= o["px_hi80"])
+            if r["ticker"] in cp.index and pd.notna(cp.loc[r["ticker"]].get(f"px_{h}")):
+                c = cp.loc[r["ticker"]]
+                z.update(cons_px=np.log(c[f"px_{h}"]) - la, cons_in80=bool(c[f"px_lo80_{h}"] <= x["px"] <= c[f"px_hi80_{h}"]),
+                         eps_raw=np.log(ea / c[f"ca_raw_{h}"]) if ea > 0 and c[f"ca_raw_{h}"] > 0 else np.nan,
+                         eps_corr=np.log(ea / c[f"ca_corr_{h}"]) if ea > 0 and c[f"ca_corr_{h}"] > 0 else np.nan,
+                         cons_pe=(np.log(c[f"px_{h}"] / c[f"ca_corr_{h}"]) - np.log(x["px"] / ea)) if ea > 0 and c[f"ca_corr_{h}"] > 0 else np.nan)
+            rows.append(z)
+    if not rows:
+        sys.exit("沒有對得上的列（還沒到目標日？）")
+    s = pd.DataFrame(rows)
+    print(f"凍結 {tag}；對上 {len(s):,} 列")
+    for (kind, h), g in s.groupby(["kind", "h"]):
+        msg = (f"  {kind}｜{h} 個月 n={len(g):,}：中位 |ln 股價誤差| 軌道 {np.nanmedian(np.abs(g['orbit'])):.3f}、軌道＋實際 EPS {np.nanmedian(np.abs(g['model'])):.3f}；"
+               f"80% 區間涵蓋 {g['in80'].mean():.0%}")
+        if "cons_px" in g and g["cons_px"].notna().any():
+            gc = g[g["cons_px"].notna()]
+            msg += (f"｜只用共識（n={len(gc):,}）：股價 {np.nanmedian(np.abs(gc['cons_px'])):.3f}、本益比 {np.nanmedian(np.abs(gc['cons_pe'])):.3f}、"
+                    f"EPS 誤差 原樣 {np.nanmedian(np.abs(gc['eps_raw'])):.3f} → 校正 {np.nanmedian(np.abs(gc['eps_corr'])):.3f}、區間涵蓋 {gc['cons_in80'].astype(float).mean():.0%}")
+        print(msg)
+    s.to_csv(os.path.join(base, f"score_{pd.Timestamp.today():%Y-%m-%d}.csv"), index=False, float_format="%.6f")
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("freeze")
     sub.add_parser("freeze-orbit")
-    for nm in ("score", "score-orbit"):
+    sub.add_parser("freeze-orbit2")
+    for nm in ("score", "score-orbit", "score-orbit2"):
         s = sub.add_parser(nm)
         s.add_argument("--tag", required=True, help="results/forward/ 底下的資料夾名（凍結那天的股價日）")
         s.add_argument("--actuals", required=True)
@@ -203,8 +359,12 @@ def main():
         freeze()
     elif a.cmd == "freeze-orbit":
         freeze_orbit()
+    elif a.cmd == "freeze-orbit2":
+        freeze_orbit2()
     elif a.cmd == "score":
         score(a.tag, a.actuals)
+    elif a.cmd == "score-orbit2":
+        score_orbit2(a.tag, a.actuals)
     else:
         score_orbit(a.tag, a.actuals)
 

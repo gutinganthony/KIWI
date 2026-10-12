@@ -15,7 +15,7 @@ HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, HERE)
 from pef import orbit                                    # noqa: E402
 
-model = json.load(open(os.path.join(HERE, "results", "orbit_model.json")))
+model = orbit.load_model(os.path.join(HERE, "results"))
 T = pd.Timestamp
 rows = [dict(px=1045.56, e=74.33, y=0.0413, dy=0.0004, v=0.67, g="cyclical"),
         dict(px=224.56, e=11.09, y=0.0413, dy=0.007, v=0.42, g="growth"),

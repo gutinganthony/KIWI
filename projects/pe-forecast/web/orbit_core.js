@@ -58,6 +58,7 @@ const OrbitCore = (() => {
     "修正a": ["你和共識的差距（a）"],
     "原始成長ab": ["你的 EPS 成長（a）", "你的 EPS 成長（b）"],
     "原始成長a": ["你的 EPS 成長（a）"],
+    "虧損：EPS 變化": ["EPS 變化 ÷ 今天股價（虧損版）"],
   };
 
   // 利率情境：每升 1 個百分點的 ln 影響（和 pef/orbit.py 的 rate_slope 相同）。rs＝results/rate_sensitivity.json；pr＝本益比百分位（null＝0.5）
@@ -85,8 +86,11 @@ const OrbitCore = (() => {
     } else if (ok0 && pos(ea)) {
       spec = useB ? "原始成長ab" : "原始成長a";
       xs = [Math.log(ea / eps0)].concat(useB ? [Math.log(eb / eps0)] : []);
+    } else if (Number.isFinite(eps0) && ea !== null && Number.isFinite(ea) && row.px > 0 && model.loss_beta && model.loss_beta[String(h)] !== undefined) {
+      spec = "虧損：EPS 變化";                                    // 成長率算不出來：EPS 變化 ÷ 今天股價（§20.5）
+      xs = [clip((ea - eps0) / row.px, -1, 1)];
     }
-    const b = spec === "軌道" ? [] : hm.beta[spec][g];
+    const b = spec === "軌道" ? [] : spec === "虧損：EPS 變化" ? [model.loss_beta[String(h)]] : hm.beta[spec][g];
     xs = xs.map((x) => clip(x, -2, 2));
     let adj = 0;
     const parts = xs.map((x, i) => { adj += b[i] * x; return { name: NAMES[spec][i], x, beta: b[i], effect: b[i] * x }; });
@@ -96,7 +100,8 @@ const OrbitCore = (() => {
     const volKnown = Number.isFinite(row.v);
     const vol = volKnown ? row.v : band.vol_median;
     const [vlo, vhi] = model.vol_clip;
-    const widen = pos(ea) ? 1 : (model.loss_widen && model.loss_widen[String(h)]) || 1.6;
+    const widen = !pos(ea) ? (model.loss_widen && model.loss_widen[String(h)]) || 1.6
+      : !ok0 ? (model.turn_widen && model.turn_widen[String(h)]) || 1 : 1;            // 今天虧損、EPS_a > 0（轉盈）
     const sc = Math.pow(clip(vol, vlo, vhi), model.alpha) * widen * bandMult;
     const out = {
       spec, mk, adj, parts, vol, volKnown, widen, bandMult, px: Math.exp(lpx),

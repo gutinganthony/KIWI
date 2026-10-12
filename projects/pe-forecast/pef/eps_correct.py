@@ -5,6 +5,9 @@
   這家公司過去的偏差與筆數（上限 8）、LTG（eps_correction_firm.csv）、營收成長、12 個月報酬、波動、市值在 S&P 500 的百分位、ln 本益比、
   公司類型、今天是否虧損。
 走動式回測：EPS 誤差中位 0.144 → 0.113，12 個月本益比誤差（2022 以後）0.221 → 0.197（results/eps_correction.txt）。
+同時點護欄（README §20.2）：這家公司在同一個距離年報區間有 ≥ 4 個年度的紀錄時，把樹的預測限制在
+「該區間的過去偏差 ± 過去 |偏差|」之內（AAPL 年報前一個月：樹說 +7.6%，Apple 過去在這個時點都在 ±2% 內 → 限制到約 +2%）。
+走動式回測：EPS 誤差 0.1125 → 0.1099，10 年裡 7 年較準（results/eps_correction2.txt）。
 假設：同一個係數也用在下一財年（EPS_b）——訓練資料只有本財年，這一步沒有驗證過。
 用法：先把係數乘在會計年度共識上，再換算成「目標日的最近四季」（已公布的季用 GAAP 實際值，不乘係數）。
 """
@@ -78,13 +81,35 @@ def features(ticker, row, cons0, fy0_end, d30=None, d90=None, last_fy=None, toda
                 loss0=float(not eps0 > 0))
 
 
-def correction(feats):
-    """回傳 (係數 exp(預測), 預測的 ln 值)；沒有模型時回傳 (None, None)。"""
+GUARD_MIN_YEARS = 4
+BUCKETS = (0.5, 3, 6, 9, 12)
+
+
+def guard(ticker, lead, p):
+    """同時點護欄：回傳 (限制後的 ln 值, 說明或 None)。"""
+    f = _M["firm"].loc[ticker] if _M.get("firm") is not None and ticker in _M["firm"].index else None
+    if f is None or not np.isfinite(lead):
+        return p, None
+    b = int(np.clip(np.searchsorted(BUCKETS, lead, side="left") - 1, 0, 3))
+    pb, pa, pn = num(f.get(f"pb{b}")), num(f.get(f"pa{b}")), num(f.get(f"pn{b}"))
+    if not (np.isfinite(pb) and np.isfinite(pa) and pn >= GUARD_MIN_YEARS):
+        return p, None
+    q = float(np.clip(p, pb - pa, pb + pa))
+    lab = f"{BUCKETS[b]}–{BUCKETS[b + 1]} 個月"
+    note = (f"同時點護欄：這家在距離年報 {lab} 時，過去 {int(pn)} 年的偏差中位 {np.exp(pb) - 1:+.1%}、通常差 {pa:.1%}"
+            + (f" → 樹的 {np.exp(p) - 1:+.1%} 限制成 {np.exp(q) - 1:+.1%}" if abs(q - p) > 1e-9 else "（樹的預測在範圍內，不改）"))
+    return q, note
+
+
+def correction(feats, ticker=None):
+    """回傳 (係數 exp(預測), 預測的 ln 值)；沒有模型時回傳 (None, None)。給 ticker 時套用同時點護欄。"""
     m = _load()
     if m is None:
         return None, None
     X = np.array([[feats.get(c, np.nan) for c in _M["meta"]["features"]]], float)
     p = float(np.clip(m.predict(X)[0], -1.0, 0.7))
+    if ticker is not None:
+        p, _ = guard(ticker, feats.get("lead", np.nan), p)
     return float(np.exp(p)), p
 
 
@@ -108,5 +133,6 @@ def for_ticker(ticker, row, cons0, fy0_end, d30=None, d90=None, last_fy=None, to
     if _load() is None or not (num(cons0) > 0):
         return None
     f = features(ticker, row, float(cons0), fy0_end, d30, d90, last_fy, today)
-    k, p = correction(f)
-    return dict(factor=k, ln=p, feats=f, drivers=explain(f), known=ticker in _M["firm"].index)
+    k_raw, p_raw = correction(f)
+    p, note = guard(ticker, f["lead"], p_raw)
+    return dict(factor=float(np.exp(p)), ln=p, factor_tree=k_raw, guard=note, feats=f, drivers=explain(f), known=ticker in _M["firm"].index)
