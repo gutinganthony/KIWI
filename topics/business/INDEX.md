@@ -98,3 +98,5 @@
 | 2026-09-07 | [全掃收尾：3013／3533／CEJN／GaN-SiC — 冷卻與 800VDC 兩線結案](./2026-09-07-scan-remaining-cooling-800vdc.md) | serenity, step5-9, cooling, 800VDC, UQD, CEJN, navitas, GaN, purity-filter, no-position |
 | 2026-09-07 | [SEMICON Taiwan 2026：從先進製程到 3D IC — 重點與對 KIWI 的意涵](./2026-09-07-semicon-taiwan-2026-3dic.md) | semicon-taiwan, 3DIC, advanced-packaging, hybrid-bonding, TCB, FOPLP, SoIC, system-integration, advantest |
 | 2026-10-08 | [科斯托蘭尼的「失衡」與 1987 年股災：前因後果、今天的對照，以及現在最像哪一段](./2026-10-08-kostolany-1987-crash-analog.md) | kostolany, 1987-crash, black-monday, fed-warsh, rate-hike, historical-analog, dotcom-2000, 1973, CRI, exit-rule, portfolio-insurance |
+| 2026-10-13 | [記憶體八因子季度重跑（2026 Q4 輪）＋ T1 v2 六條逐條判定](./2026-10-13-memory-eight-factor-q4-rerun.md) | memory, DRAM, HBM, T1, eight-factor, exit-playbook |
+| 2026-10-13 | [Serenity Step 1–9：Seikoh Giken 6834 投資價值重評（不建倉前提）](./2026-10-13-serenity-seikoh-6834-revaluation.md) | serenity, seikoh-giken, 6834, optical-connector, valuation, watchlist |

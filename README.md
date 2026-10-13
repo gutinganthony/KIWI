@@ -18,8 +18,8 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |-------|---------|
 | [Technology](./topics/technology/INDEX.md) | 6 |
 | [Science](./topics/science/INDEX.md) | 0 |
-| [Business](./topics/business/INDEX.md) | 96 |
-| [Business](./topics/business/INDEX.md) | 96 |
+| [Business](./topics/business/INDEX.md) | 98 |
+| [Business](./topics/business/INDEX.md) | 98 |
 | [Health](./topics/health/INDEX.md) | 1 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Other](./topics/other/INDEX.md) | 4 |
@@ -33,6 +33,8 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-10-13 | [記憶體八因子季度重跑（2026 Q4 輪）＋ T1 v2 六條逐條判定](./topics/business/2026-10-13-memory-eight-factor-q4-rerun.md) | Business |
+| 2026-10-13 | [Serenity Step 1–9：Seikoh Giken 6834 投資價值重評（不建倉前提）](./topics/business/2026-10-13-serenity-seikoh-6834-revaluation.md) | Business |
 | 2026-10-13 | [7 個 GitHub 開源專案評估（GitHub AI 週報 EP1）](./topics/technology/2026-10-13-github-ai-weekly-ep1-repo-evaluation.md) | Technology |
 | 2026-10-08 | [科斯托蘭尼的「失衡」與 1987 年股災：前因後果、今天的對照，以及現在最像哪一段](./topics/business/2026-10-08-kostolany-1987-crash-analog.md) | Business |
 | 2026-08-28 | [T1 條件⑤ 檢核 — NVDA Q2 FY27：供應商融資擴散觸發](./topics/business/2026-08-28-t1-condition5-nvda-q2-fy27-trigger.md) | Business |
