@@ -1,0 +1,18 @@
+{
+ "frozen_price_date": "2026-10-12",
+ "scope": "中小型美股",
+ "model_version": "orbit-1＋第二輪（§19–20）",
+ "fit_cutoff": "2025-09-30",
+ "n": 1518,
+ "n_sp500": 0,
+ "n_small": 1518,
+ "n_adr": 0,
+ "n_consensus_preds": 1273,
+ "n_corrected": 1273,
+ "y10": 0.052199999999999996,
+ "y10_month": "2026-10",
+ "snapshot": "data/consensus_snapshots/yahoo_2026-10-13.csv.gz",
+ "detail_snapshot": "data/consensus_snapshots/yahoo_detail_2026-10-13.csv.gz",
+ "eps_correction_model_md5": "c4e36f9e012ebbf5819a221617c9fdf7",
+ "note": "A＝inputs.csv＋係數（驗收時代入實際 EPS）；B＝consensus_preds.csv（只用共識的事前預測，raw＝原樣、corr＝乘校正係數）。驗收：forward_log.py score-orbit2"
+}

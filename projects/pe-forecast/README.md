@@ -1311,7 +1311,7 @@ EPS 中位差 20% 左右時，就和「本益比不變」差不多了；24 個�
     例：CRM 10.93 ÷ 16.84＝0.65，共識 16.75 → 約 10.9。係數在 0.4–1.15 之外（虧損、一次性損益）不自動換，會警告；`--cons-scale` 可以自己指定（1＝不換）。
   - 印出分析師人數、高低區間、90 天來共識變了多少、30 天上修／下修人數（例：MU 本財年共識 90 天 +17%、下一財年 +26%）。
   - 最近一季季末用 `mostRecentQuarter`，今天 EPS 的更新更精確。
-  - `python3 consensus_snapshot.py --detail`：S&P 500＋科技＋Nasdaq-100 約 460 檔的完整資料存成 `yahoo_detail_YYYY-MM-DD.csv.gz`；
+  - `python3 consensus_snapshot.py --detail`：約 3,000 檔美股（2026-10-13 起含中小型股；`--universe big` 只抓 S&P 500＋科技＋Nasdaq-100 約 460 檔）的完整資料存成 `yahoo_detail_YYYY-MM-DD.csv.gz`；
     每份自帶 7／30／60／90 天前的共識，第一份就有 90 天的修正歷史。
 - 有歷史時點的免費來源只有 OSAP 的 `FEPS`（I/B/E/S FY1 月度）：資料在 Google Drive，這個環境還連不到（見 `research/06_consensus_data_sources.md`）。
 - 注意：β_e、β_s 是用「代理預期」估的；真正的分析師共識比代理準，β_s 可能被低估。累積快照後要重估。
@@ -1379,7 +1379,7 @@ python3 forward_log.py freeze-orbit            # 凍結前瞻紀錄（同一個�
 網頁（試算器＋模型說明＋回測報告＋優勢與限制）：`python3 make_orbit_page.py <輸出.html>`（預設 `artifact/orbit.html`）。
 試算器的計算核心 `web/orbit_core.js` 和 `pef/orbit.py` 相同，`python3 web/test_orbit_core.py` 用 node 對照（72 組預測、6 組年度換算全部一致）。
 輸入資料可能不同：網頁用建置當時的快照股價與 EPS（例：MU 10-06 收盤 1,045.56），命令列抓當天的 Yahoo 收盤價，所以同樣的 EPS 算出的本益比會差一點。
-資料：約 3,000 檔美股今天的股價與最近四季 EPS（有新財報時用 Yahoo 更新），S&P 500＋科技＋Nasdaq-100 約 460 檔自動帶入分析師共識（GAAP 口徑換算）。
+資料：約 3,000 檔美股今天的股價與最近四季 EPS（有新財報時用 Yahoo 更新），約 2,800 檔自動帶入分析師共識（2026-10-13 起含中小型股，§21.1；共識校正見 §19.1、§20.3）。
 
 ### 17.1 回測設計（`lab_orbit_index.py`，幾秒；只讀既有的走動式結果）
 

@@ -215,7 +215,7 @@ footer { padding-block: 30px; color: var(--muted); font-size: 13px; border-top: 
       <ul class="list">
         <li>輸入代號（S&P 500、Nasdaq-100 與其他約 3,000 檔美股）。今天的股價、最近四季 EPS、波動會自動帶入；有新財報時 EPS 已用 Yahoo 更新。</li>
         <li>選預測距離。填你的 <b>EPS_a</b>（h 個月後那時已公布的最近四季 EPS），最好也填 <b>EPS_b</b>（再往後 12 個月）。三個情境可以只填基準。</li>
-        <li>S&P 500、科技股與 Nasdaq-100 約 460 檔有分析師共識，會自動帶入，並用<b>共識校正模型</b>換成「預期的實際 GAAP EPS」（係數可以改，也可以取消勾選）。外國公司 ADR 約 100 檔也有共識（已換成每 ADR 美元）。</li>
+        <li>約 2,800 檔有分析師共識（S&P 500、Nasdaq-100 與大部分中小型美股），會自動帶入，並用<b>共識校正模型</b>換成「預期的實際 GAAP EPS」（中小型股距離年報 9 個月以上照原樣用；係數可以改，也可以取消勾選）。外國公司 ADR 約 100 檔也有共識（已換成每 ADR 美元）。</li>
         <li>想加入自己的利率看法：在「利率情境」填 10 年期到目標日的變化（百分點）。不填＝和市場一樣。</li>
         <li>看結果：本益比中位與 80% 區間、股價 50%／80% 區間、h 個月後的 forward 本益比，以及每一項對股價的影響。</li>
       </ul>
@@ -513,7 +513,7 @@ function render() {
     $("cons-note").innerHTML = `Yahoo 共識（${c.d}）：本財年（至 ${c.f0}）${f2(c.c0)}${c.n0 ? `，${c.n0} 位分析師` : ""}${c.r0 !== null ? `，90 天 ${sgn(c.r0)}` : ""}；
       下一財年 ${f2(c.c1)}${c.r1 !== null ? `，90 天 ${sgn(c.r1)}` : ""}。` + kTxt + " 係數先乘在會計年度共識上，已公布的季仍用 GAAP 實際值。" +
       (cs && cs.b && /外推/.test(cs.b.how) ? " 共識 EPS_b 有一部分是用成長率外推的。" : "");
-  } else $("cons-note").textContent = "這一檔沒有自動共識（只有 S&P 500、科技股、Nasdaq-100 約 460 檔與外國 ADR 約 100 檔有）。可以自己輸入共識，或不勾選。";
+  } else $("cons-note").textContent = "這一檔沒有自動共識（Yahoo 沒有分析師預估，或共識是虧損）。可以自己輸入共識，或不勾選。";
   const useC = $("use-cons").checked;
   const ca = useC ? num("ca") : null, cb = useC ? num("cb") : null;
   const row = { px: t.px, e: t.e, y: t.y, dy: t.dy, v: t.v === null ? NaN : t.v, g: t.g };
