@@ -6,6 +6,7 @@
     python3 forward_log.py freeze-orbit                  # 凍結本益比軌道模型（§16）：最新共識快照的股價＋results/orbit_model.json
     python3 forward_log.py score-orbit --tag orbit-2026-10-06 --actuals results/now_all.csv
     python3 forward_log.py freeze-orbit2                 # 第二輪（§20.1）：共識校正＋護欄、虧損版、區間放寬、最新 10 年期，連同「只用共識」的事前預測
+    python3 forward_log.py freeze-orbit2 --only small    # §21.1：補凍中小型美股（有詳細共識之後）
     python3 forward_log.py score-orbit2 --tag orbit2-2026-10-12 --actuals results/now_all.csv
 
 為什麼要做：給定 EPS 的模型（xs）的設計是看過 2022 以後的逐年結果才定的，所以 2022 以後已經不是完全沒碰過的樣本。
@@ -201,11 +202,13 @@ def _bw(base, kind, h):
     return float(bw.get(kind, {}).get("h", {}).get(str(h), 1.0)) if isinstance(kind, str) and kind else 1.0
 
 
-def freeze_orbit2():
+def freeze_orbit2(only=None):
     """第二輪（README §20.1）：凍結整套模型——共識校正（含同時點護欄）、虧損版、轉盈／中小型股／ADR 區間放寬、最新 10 年期。
     A. 給定 EPS（和回測同一個問法）：今天的輸入＋全部係數；驗收時代入目標日實際公布的最近四季 EPS。
     B. 只用共識（真正的事前預測，不需要任何人給 EPS）：S&P 500／Nasdaq-100 用詳細共識（本財年、下一財年）×當時的校正係數，
-       算好 6／12／24 個月的股價中位、80% 區間、本益比；原樣共識也存，驗收時比校正前後誰準。外國 ADR 用每 ADR 美元的共識（不校正）。"""
+       算好 6／12／24 個月的股價中位、80% 區間、本益比；原樣共識也存，驗收時比校正前後誰準。外國 ADR 用每 ADR 美元的共識（不校正）。
+    only="small"（README §21.1）：只凍結中小型美股（不在 S&P 500／Nasdaq-100、有詳細共識的），資料夾 orbit2s-<股價日>；
+       用來補上 2026-10-09 那份沒有的中小型股「只用共識」預測（當時詳細快照只有約 460 檔大型股）。"""
     import glob
     import hashlib
     import consensus_monthly as CM
@@ -234,15 +237,17 @@ def freeze_orbit2():
     d["band_kind"] = np.where(big, "", "small")
     d["grp"] = d["sector"].map(lambda v: orbit.group_of(v))
     d["adr"] = False
+    if only == "small":
+        d = d[~big & d["sym"].isin(dq.index)].copy()
     a = pd.read_csv(os.path.join(HERE, "data", "adr_now.csv"), parse_dates=["period_end", "price_date", "last_fy"])
-    a = a[a["conv_ok"].astype(bool) & (a["px"] > 0) & ~a["ticker"].isin(d["ticker"])].copy()
+    a = a[a["conv_ok"].astype(bool) & (a["px"] > 0) & ~a["ticker"].isin(d["ticker"]) & (only is None)].copy()
     a = a.assign(sym=a["ticker"], name=a["name"], tier="adr", in_sp500=False, in_ndx=False, sector=None, band_kind="adr", adr=True,
                  y10=y_new if y_new is not None else a["y10"])
     keep = ["ticker", "sym", "name", "tier", "in_sp500", "in_ndx", "sector", "grp", "adr", "band_kind", "price_date", "px", "eps0",
             "period_end", "y10", "dy", "vol36"]
     d = pd.concat([d[keep], a[keep]], ignore_index=True)
     d = d[(d["px"] > 0) & d["price_date"].notna() & d["eps0"].notna()]
-    tag = "orbit2-" + str(pd.Timestamp(d["price_date"].mode().iloc[0]).date())
+    tag = ("orbit2s-" if only == "small" else "orbit2-") + str(pd.Timestamp(d["price_date"].mode().iloc[0]).date())
     out = os.path.join(FWD, tag)
     if os.path.exists(os.path.join(out, "inputs.csv")):
         sys.exit(f"{out} 已經凍結過了；凍結的紀錄不能改（要重來請換一天）。")
@@ -285,7 +290,8 @@ def freeze_orbit2():
     for f in BUNDLE:
         if os.path.exists(os.path.join(RES, f)):
             shutil.copy(os.path.join(RES, f), os.path.join(out, f))
-    meta = dict(frozen_price_date=tag[7:], model_version=model["version"] + "＋第二輪（§19–20）", fit_cutoff=model["fit_cutoff"], n=len(d),
+    meta = dict(frozen_price_date=tag.split("-", 1)[1], scope="中小型美股" if only == "small" else "全部",
+                model_version=model["version"] + "＋第二輪（§19–20）", fit_cutoff=model["fit_cutoff"], n=len(d),
                 n_sp500=int(d["in_sp500"].astype(bool).sum()), n_small=int((d["band_kind"] == "small").sum()), n_adr=int(d["adr"].sum()),
                 n_consensus_preds=len(cp), n_corrected=int(cp["cf"].notna().sum()) if len(cp) else 0, y10=y_new, y10_month=str(y_m)[:7],
                 snapshot=os.path.relpath(scr[-1], HERE), detail_snapshot=os.path.relpath(det[-1], HERE),
@@ -349,7 +355,8 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("freeze")
     sub.add_parser("freeze-orbit")
-    sub.add_parser("freeze-orbit2")
+    fo = sub.add_parser("freeze-orbit2")
+    fo.add_argument("--only", choices=["small"], default=None, help="small＝只凍結中小型美股（README §21.1）")
     for nm in ("score", "score-orbit", "score-orbit2"):
         s = sub.add_parser(nm)
         s.add_argument("--tag", required=True, help="results/forward/ 底下的資料夾名（凍結那天的股價日）")
@@ -360,7 +367,7 @@ def main():
     elif a.cmd == "freeze-orbit":
         freeze_orbit()
     elif a.cmd == "freeze-orbit2":
-        freeze_orbit2()
+        freeze_orbit2(a.only)
     elif a.cmd == "score":
         score(a.tag, a.actuals)
     elif a.cmd == "score-orbit2":

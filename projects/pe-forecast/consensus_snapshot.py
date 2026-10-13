@@ -2,7 +2,7 @@
 """存一份市場共識 EPS 快照（Yahoo 預設產業選股器，全部類股約 3,600 檔）→ data/consensus_snapshots/yahoo_YYYY-MM-DD.csv.gz
 
     python3 consensus_snapshot.py              # 全部類股的本財年／下一財年共識（約 30 秒）
-    python3 consensus_snapshot.py --detail     # 另存 S&P 500＋科技＋Nasdaq-100（約 460 檔）的完整分析師資料（約 10 分鐘）
+    python3 consensus_snapshot.py --detail     # 另存完整分析師資料：S&P 500＋科技＋Nasdaq-100＋中小型美股（約 1,900 檔，約 1 小時；--universe big 只抓約 460 檔）
                                                # → data/consensus_snapshots/yahoo_detail_YYYY-MM-DD.csv.gz
 
 每週跑一次，累積下來就是我們自己的「歷史時點」共識（research/06 §4.2）：以後可以用真正的共識重估
@@ -16,6 +16,7 @@ import argparse
 import os
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 import pandas as pd
 
@@ -26,15 +27,29 @@ from pef import consensus                                # noqa: E402
 SNAP = os.path.join(HERE, "data", "consensus_snapshots")
 
 
-def detail(pause=1.0):
+def detail(pause=1.0, universe="all", workers=4):
+    """universe：big＝S&P 500＋科技＋Nasdaq-100（約 460 檔）；all＝再加中小型美股（now_all.csv 裡其他有股價、資料不過期的，約 3,000 檔）。
+    workers 條連線同時抓，每條抓完停 pause 秒（4 條約每秒 1 檔，3,000 檔約 1 小時）。"""
     u = pd.read_csv(os.path.join(HERE, "results", "now_all.csv"))
-    u = u[(u["in_sp500"] == True) | (u["in_tech"] == True) | (u["in_ndx"] == True)]  # noqa: E712
+    big = (u["in_sp500"] == True) | (u["in_tech"] == True) | (u["in_ndx"] == True)  # noqa: E712
+    ok = ~u["too_old"].fillna(False).astype(bool) & (u["px"] > 0) & u["eps0"].notna()
+    u = u[big] if universe == "big" else u[big | ok]
+    tickers = sorted(u["ticker"].unique())
+    cache = os.path.join(HERE, ".cache", "yahoo")
+    consensus._qs_session()                               # 先建好 cookie／crumb，再開多條連線
+
+    def one(t):
+        q = consensus.quote_summary(t, cache, max_age_h=12)
+        time.sleep(pause)
+        return t, q
+
     rows, fail, asof = [], [], pd.Timestamp.now(tz="UTC").strftime("%Y-%m-%dT%H:%MZ")
-    for i, t in enumerate(sorted(u["ticker"].unique())):
-        q = consensus.quote_summary(t, os.path.join(HERE, ".cache", "yahoo"), max_age_h=12)
+    ex = ThreadPoolExecutor(max_workers=workers)
+    for i, (t, q) in enumerate(ex.map(one, tickers)):
         if q is None:
             fail.append(t)
             if len(fail) >= 20 and len(fail) > 0.5 * (i + 1):
+                ex.shutdown(wait=False, cancel_futures=True)
                 sys.exit(f"失敗太多（{len(fail)}／{i + 1}），可能被限流或 cookie 失效；已停止")
         else:
             r = dict(asof_utc=asof, symbol=consensus.yahoo_symbol(t), last_fy=q["last_fy"], mrq=q["mrq"], street_ttm=q["street_ttm"])
@@ -42,7 +57,9 @@ def detail(pause=1.0):
                 for k, v in (q["trend"].get(p) or {}).items():
                     r[f"{p}_{k}"] = v
             rows.append(r)
-        time.sleep(pause)
+        if (i + 1) % 250 == 0:
+            print(f"  {i + 1:,}／{len(tickers):,}（失敗 {len(fail)}）", flush=True)
+    ex.shutdown()
     d = pd.DataFrame(rows)
     path = os.path.join(SNAP, f"yahoo_detail_{asof[:10]}.csv.gz")
     os.makedirs(SNAP, exist_ok=True)
@@ -52,10 +69,11 @@ def detail(pause=1.0):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--detail", action="store_true", help="另存 quoteSummary 的完整分析師資料（S&P 500＋科技＋Nasdaq-100）")
+    ap.add_argument("--detail", action="store_true", help="另存 quoteSummary 的完整分析師資料")
+    ap.add_argument("--universe", choices=["all", "big"], default="all", help="--detail 的範圍：all（含中小型股，約 1 小時）或 big（約 460 檔）")
     a = ap.parse_args()
     if a.detail:
-        return detail()
+        return detail(universe=a.universe)
     d = consensus.snapshot()
     if not len(d):
         sys.exit("沒有抓到任何資料（Yahoo 可能改版或限流）")

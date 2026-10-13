@@ -456,7 +456,7 @@ function consFor(t, h, kUser = null) {
   const kOk = t.c.k !== null && t.c.k >= 0.4 && t.c.k <= 1.15;
   const cf = Number.isFinite(t.c.cf) ? t.c.cf : null;
   const kBad = cf === null && t.c.k !== null && !kOk;         // 算得出來但不合理（虧損、一次性損益、口徑差太多），又沒有校正係數
-  const k0 = cf !== null ? cf : (kOk ? (Math.abs(t.c.k - 1) > 0.03 ? t.c.k : 1) : 1);
+  const k0 = cf !== null ? cf : t.c.cg ? 1 : (kOk ? (Math.abs(t.c.k - 1) > 0.03 ? t.c.k : 1) : 1);   // 中小型股距離年報 ≥ 9 個月：共識照原樣（README §20.3）
   const same = kUser !== null && Math.abs(kUser - Math.round(k0 * 100) / 100) < 1e-9;   // 輸入框顯示的是四捨五入後的預設值
   const k = kUser !== null && Number.isFinite(kUser) && kUser > 0 && !same ? kUser : k0;
   const fy = [[C.utc(t.c.f0), t.c.c0 * k]].concat(t.c.c1 !== null ? [[C.utc(t.c.f1), t.c.c1 * k]] : []);
@@ -506,7 +506,7 @@ function render() {
     const kTxt = t.adr ? "外國公司 ADR：共識已換成每 ADR 美元。校正模型只用 S&P 500 訓練、沒在外國公司驗證過，預設不校正（係數 1）。"
       : cs && cs.cf !== null ? `共識係數預設 ${cs.cf.toFixed(2)}＝共識校正模型預估的「實際 GAAP ÷ 共識」（距離年報約 ${c.cl} 個月；影響最大：${esc(c.cx || "—")}）。` +
           `${c.cg ? esc(c.cg) + "。" : ""}樣本外 EPS 誤差中位 ${t.sp || t.nd ? "14.4% → 11.0%" : "21.4% → 18.5%（中小型股、距離年報 < 9 個月）"}。${c.k !== null ? `舊的口徑係數（GAAP ÷ 調整後最近四季）是 ${c.k.toFixed(2)}，想用它就改共識係數。` : ""}`
-      : c.cg ? esc(c.cg) + "；共識照原樣使用。"
+      : c.cg ? esc(c.cg) + "；共識照原樣使用（係數 1）。" + (cs && cs.kBad ? ` 但 GAAP ÷ 調整後最近四季＝${c.k.toFixed(2)}，口徑差很多，預設不放共識；要用請勾選並自己調整共識係數。` : "")
       : cs && cs.kOk ? (cs.k0 !== 1 ? `共識係數＝口徑係數 ${cs.k0.toFixed(2)}（GAAP ÷ 調整後最近四季）換成 GAAP。` : "口徑：GAAP 和調整後差不到 3%，不換算。")
       : (c.k === null ? "Yahoo 缺少調整後的實際 EPS，算不出口徑係數，共識照原樣使用；若這家的調整後和 GAAP 差很多，請自己改共識係數。"
                       : `口徑係數 ${c.k.toFixed(2)} 不合理（虧損、一次性損益或調整後口徑差太多），預設不放共識、範例改用今天的 EPS；要用請勾選並自己調整共識係數。`);
