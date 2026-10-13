@@ -16,7 +16,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 
 | Topic | Entries |
 |-------|---------|
-| [Technology](./topics/technology/INDEX.md) | 5 |
+| [Technology](./topics/technology/INDEX.md) | 6 |
 | [Science](./topics/science/INDEX.md) | 0 |
 | [Business](./topics/business/INDEX.md) | 96 |
 | [Business](./topics/business/INDEX.md) | 96 |
@@ -33,6 +33,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-10-13 | [7 個 GitHub 開源專案評估（GitHub AI 週報 EP1）](./topics/technology/2026-10-13-github-ai-weekly-ep1-repo-evaluation.md) | Technology |
 | 2026-10-08 | [科斯托蘭尼的「失衡」與 1987 年股災：前因後果、今天的對照，以及現在最像哪一段](./topics/business/2026-10-08-kostolany-1987-crash-analog.md) | Business |
 | 2026-08-28 | [T1 條件⑤ 檢核 — NVDA Q2 FY27：供應商融資擴散觸發](./topics/business/2026-08-28-t1-condition5-nvda-q2-fy27-trigger.md) | Business |
 | 2026-08-25 | [「中國曝險」紅旗的第一性原理重寫](./topics/business/2026-08-25-china-red-flag-first-principles-rewrite.md) | Business |
