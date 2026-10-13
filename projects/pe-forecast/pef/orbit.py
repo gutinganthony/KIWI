@@ -50,12 +50,22 @@ def rate_slope(h, regime="2022", pe_rank=None):
 
 
 def load_model(res=RES):
-    """正式版係數：orbit_model.json，併入虧損版的係數與轉盈的區間放寬（orbit_loss_beta.json，有的話）。"""
+    """正式版係數：orbit_model.json，併入虧損版的係數與轉盈的區間放寬（orbit_loss_beta.json）、
+    以及「EPS 變化越大區間越寬」的 δ 與重新校準的分位數（band_epschange.json，README §22.4）——有的話。
+    凍結的前瞻紀錄（results/forward/*）沒有 band_epschange.json，照凍結當時的區間驗收。"""
     m = json.load(open(os.path.join(res, "orbit_model.json")))
     p = os.path.join(res, "orbit_loss_beta.json")
     if os.path.exists(p):
         lb = json.load(open(p))
         m["loss_beta"], m["turn_widen"] = lb["beta"], lb.get("turn_widen", {})
+    p = os.path.join(res, "band_epschange.json")
+    if os.path.exists(p):
+        be = json.load(open(p))
+        m["band_delta"] = be["delta"]
+        for h, specs in be["q"].items():
+            for spec, q in specs.items():
+                if spec in m["h"][h]["bands"]:
+                    m["h"][h]["bands"][spec]["q"] = q
     return m
 
 
@@ -195,9 +205,12 @@ def predict(row, h, model, eps_a, eps_b=None, cons_a=None, cons_b=None, erp=None
         widen = float(model.get("turn_widen", {}).get(str(h), 1.0))
     else:
         widen = 1.0
-    sc = _band_scale(vol, model["alpha"]) * widen * band_mult
+    eps_widen = 1.0
+    if spec not in ("軌道", "虧損：EPS 變化") and ok0 and pos(eps_a) and model.get("band_delta"):   # EPS 變化越大區間越寬（§22.4）
+        eps_widen = float(np.exp(float(model["band_delta"].get(str(h), 0)) * min(abs(np.log(eps_a / eps0)), 2.0)))
+    sc = _band_scale(vol, model["alpha"]) * widen * band_mult * eps_widen
     q = band["q"]                                                     # 10/25/75/90% 分位數（ln、已除以波動^α、置中）
-    out = dict(spec=spec, group=GNAME[g], group_key=g, widen=widen, band_mult=band_mult, mk=mk, adj=adj, parts=parts, px=float(np.exp(lpx)), vol=vol, vol_known=vol_known,
+    out = dict(spec=spec, group=GNAME[g], group_key=g, widen=widen, band_mult=band_mult, eps_widen=eps_widen, mk=mk, adj=adj, parts=parts, px=float(np.exp(lpx)), vol=vol, vol_known=vol_known,
                width=sc / _band_scale(band["vol_median"], model["alpha"]))
     for k, qq in zip(("lo80", "lo50", "hi50", "hi80"), q):
         out[f"px_{k}"] = float(np.exp(lpx + sc * qq))

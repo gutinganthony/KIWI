@@ -301,7 +301,7 @@ python3 consensus_snapshot.py --detail    # 存一份共識快照</div>
 </section>
 
 <section id="opt">
-  <div class="sec-head"><div class="eyebrow">優化實驗</div><h2>第二到四輪：哪些有用、哪些沒用、為什麼</h2>
+  <div class="sec-head"><div class="eyebrow">優化實驗</div><h2>第二到五輪：哪些有用、哪些沒用、為什麼</h2>
     <p class="prose note">每一項都照「先講邏輯 → 用走動式回測實證（每年 1 月只用當時已揭曉的資料）→ 再驗算」。通過樣本外檢驗的才放進模型；沒通過的照實寫出來。</p></div>
 
   <div class="panel stack">
@@ -312,7 +312,30 @@ python3 consensus_snapshot.py --detail    # 存一份共識快照</div>
         <td>詳細快照擴到約 3,000 檔美股；網頁有共識的 556 → 2,810 檔（有校正係數 1,980）；1,273 家中小型股補凍「只用共識」的事前預測</td><td class="best">採用</td></tr>
       <tr><td>市場恐慌時放寬價格區間</td><td>80% 區間的涵蓋率隨時期變（2015–2021 多在 65–73%、2022 以後 82–87%）；起點時 VIX 高或大盤波動大，區間該先放寬？</td>
         <td>12 個月：事後挑的放寬幅度略好（區間分數 0.983 → 0.974），但事前挑的沒有更好（0.987–0.991）；漏最多的 2020 年起點時 VIX 反而很低</td><td>不採用</td></tr>
+      <tr><td>分析師意見分歧</td><td>分析師意見越分歧，獲利越難預測（可當校正線索、可放寬區間）</td>
+        <td>歷史資料（OSAP）被 Google Drive 下載配額擋住，2 小時內重試 12 次都失敗；程式已備妥</td><td>沒做成</td></tr>
     </table></div>
+  </div>
+
+  <div class="panel stack">
+    <h3>回頭驗證（2026-10-13）：如果 2024、2025 年就用這個模型，算得準今天的本益比嗎？</h3>
+    <p class="note">只用起點當時拿得到的資料：當時股價、已公布的 EPS、利率、分析師的 forward EPS（Yahoo 歷史 forward 本益比）、起點那年的走動式 β。目標日 2026-10-12。</p>
+    <div class="tbl"><table id="t-case">
+      <tr><th>本益比</th><th>實際</th><th>2024 起點（24 個月）<br>分析師×係數</th><th>同左，不外推</th><th>EPS 完全猜對</th><th>本益比不變</th><th>2025 起點（12 個月）<br>分析師×係數</th><th>EPS 完全猜對</th><th>本益比不變</th></tr>
+      <tr><td>TSM</td><td>32.3</td><td>23.0</td><td>28.9</td><td>19.4</td><td>33.4</td><td>28.4</td><td>23.2</td><td>30.7</td></tr>
+      <tr><td>GOOGL</td><td>17.8</td><td>17.3</td><td>21.0</td><td>11.0</td><td>23.3</td><td>22.8</td><td>13.7</td><td>25.0</td></tr>
+      <tr><td>NVDA</td><td>28.6</td><td>41.7</td><td>49.7</td><td>26.9</td><td>63.2</td><td>30.7</td><td>27.8</td><td>51.9</td></tr>
+      <tr><td>MU</td><td>12.8</td><td>21.7</td><td>28.1</td><td>2.5</td><td>153.6</td><td>16.3</td><td>3.2</td><td>23.9</td></tr>
+      <tr><td>META</td><td>28.0</td><td>22.6</td><td>27.0</td><td>27.3</td><td>29.9</td><td>25.6</td><td>29.0</td><td>25.3</td></tr>
+      <tr><td><b>中位誤差</b></td><td></td><td>34.0%</td><td class="best">16.7%</td><td>47.8%</td><td>26.9%</td><td class="best">12.9%</td><td>26.2%</td><td>34.0%</td></tr>
+      <tr><td><b>S&P 500 約 400 家</b></td><td></td><td>30.3%</td><td class="best">28.7%</td><td>23.8%</td><td>35.0%</td><td class="best">22.5%</td><td>17.1%</td><td>27.1%</td></tr>
+    </table></div>
+    <ul class="list">
+      <li><b>最大的誤差來源是 EPS</b>：分析師在 AI 行情裡大幅低估 MU、NVDA 的獲利；S&P 500 的分析師 EPS 誤差中位 36%（24 個月）／18%（12 個月）。共識係數把 12 個月的偏差從 +11% 修到 +2%。</li>
+      <li><b>MU 這種景氣谷底的爆發，模型的股價反應不夠</b>：給它完全正確的 EPS，本益比反而只算出 2.5–3.2。試過「往正常本益比拉回」與非線性兩種修正，樣本外都沒有更好，所以改成<b>EPS 變化越大、區間越寬</b>（已採用：24 個月 EPS 大變化的 80% 區間涵蓋 74% → 81%）。</li>
+      <li><b>24 個月不要把成長率再延一年</b>：I/B/E/S 2012–2022 的檢驗，這樣做 24 個月後的 EPS 中位高估 8%（科技 21%、半導體 24%）。網頁在 EPS_a 用到外推時會提醒。</li>
+      <li>用 12 個月、每月更新，比 24 個月準約 6 個百分點；產業被重新評價（AI 行情）仍然預測不了，只能看區間。</li>
+    </ul>
   </div>
 
   <div class="panel stack">
@@ -523,7 +546,8 @@ function render() {
                       : `口徑係數 ${c.k.toFixed(2)} 不合理（虧損、一次性損益或調整後口徑差太多），預設不放共識、範例改用今天的 EPS；要用請勾選並自己調整共識係數。`);
     $("cons-note").innerHTML = `Yahoo 共識（${c.d}）：本財年（至 ${c.f0}）${f2(c.c0)}${c.n0 ? `，${c.n0} 位分析師` : ""}${c.r0 !== null ? `，90 天 ${sgn(c.r0)}` : ""}；
       下一財年 ${f2(c.c1)}${c.r1 !== null ? `，90 天 ${sgn(c.r1)}` : ""}。` + kTxt + " 係數先乘在會計年度共識上，已公布的季仍用 GAAP 實際值。" +
-      (cs && cs.b && /外推/.test(cs.b.how) ? " 共識 EPS_b 有一部分是用成長率外推的。" : "");
+      (cs && cs.b && /外推/.test(cs.b.how) ? " 共識 EPS_b 有一部分是用成長率外推的。" : "") +
+      (cs && cs.a && /外推/.test(cs.a.how) ? " 注意：EPS_a 也用到外推——歷史上把成長率再延一年，約 24 個月後的 EPS 中位高估約 8%（科技約 21%、半導體約 24%；README §22.5），寧可保守或自己填。" : "");
   } else $("cons-note").textContent = "這一檔沒有自動共識（Yahoo 沒有分析師預估，或共識是虧損）。可以自己輸入共識，或不勾選。";
   const useC = $("use-cons").checked;
   const ca = useC ? num("ca") : null, cb = useC ? num("cb") : null;

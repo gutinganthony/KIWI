@@ -192,7 +192,7 @@ def score_orbit(tag, actuals, tol_days=20):
     s.to_csv(os.path.join(base, f"score_{pd.Timestamp.today():%Y-%m-%d}.csv"), index=False, float_format="%.6f")
 
 
-BUNDLE = ["orbit_model.json", "orbit_loss_beta.json", "band_widen.json", "rate_sensitivity.json", "eps_correction_model.json",
+BUNDLE = ["orbit_model.json", "orbit_loss_beta.json", "band_widen.json", "band_epschange.json", "rate_sensitivity.json", "eps_correction_model.json",
           "eps_correction_firm.csv"]
 
 

@@ -244,6 +244,8 @@ def main():
         else:
             how_cb = "命令列"
         notes.append(f"共識由會計年度換算：a＝{how_ca}；b＝{how_cb}")
+        if "外推" in str(how_ca):
+            notes.append("注意：EPS_a 用到外推——歷史上把成長率再延一年，約 24 個月後的 EPS 中位高估約 8%（科技約 21%、半導體約 24%；README §22.5），寧可保守或自己給 EPS")
     if not mine:
         if ca is None:
             sys.exit("請給你的 EPS（--eps／--fy），或提供市場共識（--cons 數字或 auto／--fy-cons／data/consensus.csv）")
@@ -284,7 +286,8 @@ def main():
     o0 = res[0]
     print(f"\n  寫法：{o0['spec']}｜軌道（資金成本 − 股利，{a.h} 個月）{np.exp(o0['mk']) - 1:+.1%}｜區間寬度：波動 {o0['vol']:.0%}"
           f"{'' if o0['vol_known'] else '（沒有資料，用中位數）'}，是中位波動股票的 {o0['width']:.2f} 倍"
-          + (f"（含放寬 ×{o0['band_mult']:.2f}）" if o0["band_mult"] != 1 else ""))
+          + (f"（含放寬 ×{o0['band_mult']:.2f}）" if o0["band_mult"] != 1 else "")
+          + (f"（EPS 變化大，再放寬 ×{o0['eps_widen']:.2f}，README §22.4）" if o0.get("eps_widen", 1) > 1.005 else ""))
     print("  EPS_a     EPS_b    本益比（中位）  本益比 80% 區間     股價（中位）  股價 50% 區間        股價 80% 區間       h 個月後 forward 本益比")
     for o in res:
         pe = f"{o['pe']:10.1f}     {o['pe_lo80']:6.1f}–{o['pe_hi80']:<7.1f}" if o["pe"] else "    無定義（EPS_a ≤ 0）     "

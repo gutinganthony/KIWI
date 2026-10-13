@@ -160,6 +160,7 @@ def main():
     model = orbit.load_model(RES)
     slim = dict(version=model["version"], fit_cutoff=model["fit_cutoff"], erp=model["erp"], alpha=model["alpha"],
                 vol_clip=model["vol_clip"], loss_widen=model["loss_widen"], loss_beta=model.get("loss_beta"), turn_widen=model.get("turn_widen"),
+                band_delta=model.get("band_delta"),
                 h={h: dict(pair=v["pair"], beta=v["beta"], bands={k: dict(q=b["q"], vol_median=b["vol_median"]) for k, b in v["bands"].items()})
                    for h, v in model["h"].items()})
     tk, snap_date = tickers()

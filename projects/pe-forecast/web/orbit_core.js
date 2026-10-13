@@ -102,9 +102,12 @@ const OrbitCore = (() => {
     const [vlo, vhi] = model.vol_clip;
     const widen = !pos(ea) ? (model.loss_widen && model.loss_widen[String(h)]) || 1.6
       : !ok0 ? (model.turn_widen && model.turn_widen[String(h)]) || 1 : 1;            // 今天虧損、EPS_a > 0（轉盈）
-    const sc = Math.pow(clip(vol, vlo, vhi), model.alpha) * widen * bandMult;
+    let epsWiden = 1;                                                                 // EPS 變化越大區間越寬（README §22.4）
+    if (spec !== "軌道" && spec !== "虧損：EPS 變化" && ok0 && pos(ea) && model.band_delta)
+      epsWiden = Math.exp((model.band_delta[String(h)] || 0) * Math.min(Math.abs(Math.log(ea / row.e)), 2));
+    const sc = Math.pow(clip(vol, vlo, vhi), model.alpha) * widen * bandMult * epsWiden;
     const out = {
-      spec, mk, adj, parts, vol, volKnown, widen, bandMult, px: Math.exp(lpx),
+      spec, mk, adj, parts, vol, volKnown, widen, bandMult, epsWiden, px: Math.exp(lpx),
       width: sc / Math.pow(clip(band.vol_median, vlo, vhi), model.alpha),
     };
     ["lo80", "lo50", "hi50", "hi80"].forEach((k, i) => { out["px_" + k] = Math.exp(lpx + sc * band.q[i]); });
