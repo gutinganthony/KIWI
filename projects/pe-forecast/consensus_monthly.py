@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """每月一次的共識快照與累積面板（README §20.6）。
 
-    python3 consensus_monthly.py                 # 每月跑一次（約 12 分鐘）：存兩份快照 → 記下當時的校正係數 → 更新累積面板 → 印出進度
+    python3 consensus_monthly.py                 # 每月跑一次（約 50 分鐘，含中小型股約 3,000 檔）：存兩份快照 → 記下當時的校正係數 → 更新累積面板 → 印出進度
     python3 consensus_monthly.py --skip-fetch    # 不抓新資料，只用已存的快照重建面板與進度
     python3 consensus_monthly.py --reestimate    # 用累積的面板對答案（不夠時說明還差什麼）→ results/consensus_monthly.txt
     python3 consensus_monthly.py --selftest --cache <lab_orbit 暫存目錄>

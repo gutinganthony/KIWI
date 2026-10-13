@@ -301,8 +301,19 @@ python3 consensus_snapshot.py --detail    # 存一份共識快照</div>
 </section>
 
 <section id="opt">
-  <div class="sec-head"><div class="eyebrow">優化實驗</div><h2>第二、三輪：哪些有用、哪些沒用、為什麼</h2>
+  <div class="sec-head"><div class="eyebrow">優化實驗</div><h2>第二到四輪：哪些有用、哪些沒用、為什麼</h2>
     <p class="prose note">每一項都照「先講邏輯 → 用走動式回測實證（每年 1 月只用當時已揭曉的資料）→ 再驗算」。通過樣本外檢驗的才放進模型；沒通過的照實寫出來。</p></div>
+
+  <div class="panel stack">
+    <h3>第四輪（2026-10-13）：一覽</h3>
+    <div class="tbl"><table id="t-round4">
+      <tr><th>項目</th><th>邏輯</th><th>實證（樣本外）</th><th>結論</th></tr>
+      <tr><td>中小型股的共識放上網頁</td><td>第三輪驗證了中小型股的共識校正，但網頁只有約 460 檔大型股的詳細共識</td>
+        <td>詳細快照擴到約 3,000 檔美股；網頁有共識的 556 → 2,810 檔（有校正係數 1,980）；1,273 家中小型股補凍「只用共識」的事前預測</td><td class="best">採用</td></tr>
+      <tr><td>市場恐慌時放寬價格區間</td><td>80% 區間的涵蓋率隨時期變（2015–2021 多在 65–73%、2022 以後 82–87%）；起點時 VIX 高或大盤波動大，區間該先放寬？</td>
+        <td>12 個月：事後挑的放寬幅度略好（區間分數 0.983 → 0.974），但事前挑的沒有更好（0.987–0.991）；漏最多的 2020 年起點時 VIX 反而很低</td><td>不採用</td></tr>
+    </table></div>
+  </div>
 
   <div class="panel stack">
     <h3>第三輪（2026-10-12）：六項，一覽 <span class="chip ok">4 項採用</span></h3>
