@@ -219,7 +219,7 @@ last_updated: 2026-07-06
 - [ ] **上線驗證「連續維持天數」標注**：同一張 LFI 卡片底部應出現「目前水位已連續維持 ≥80 X · ≥90 Y · ≥95 Z 交易日」那一行（bot 下次跑才會帶出 `days_ge_*`，在那之前該行隱藏是正常的）。07-10 讀數已到 84.8，若持續 ≥80，X 應該 ≥1 且逐日遞增。
 - [ ] **（可選）真標的驗證節流閥**：資料橋補齊 JEM/Towa/Kokusai 等真股歷史後（~1 週），重跑 `scripts/serenity_throttle_validation.py` 改用真標的，確認「節流閥別硬加」的結論在真標的上也成立。
 ### 2026-07-12 session 產生的（llm-council-skill 評估）
-- [ ] **安裝 gcpdev/llm-council-skill 到 Mac 本機 Claude Code**（雲端跑不了：容器 proxy 會擋 OpenAI/Gemini 的 API 呼叫）。
+- [x] ✅ **2026-10-13 Jake 確認已安裝** — **安裝 gcpdev/llm-council-skill 到 Mac 本機 Claude Code**（雲端跑不了：容器 proxy 會擋 OpenAI/Gemini 的 API 呼叫）。
   > ✅ **2026-07-27：擋住這項的「程式碼未逐行審查」已解除。判定＝有條件可安裝。**
   > 全部可執行程式碼只有 212 行的 `llm-council/scripts/query_llms.py`，已逐行讀完；
   > 發布的 `llm-council.skill` bundle 與 repo 原始碼 `diff` 結果 **IDENTICAL**（無夾帶）。
