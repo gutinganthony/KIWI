@@ -9,7 +9,7 @@
   線索：ga＝ln(EPS_a ÷ 今天 EPS)、GT＝ln(T 時的共識 ÷ EPS_a)、G0＝ln(今天的共識 ÷ 今天 EPS)、ret12c＝過去 12 個月 ln 報酬（截在 ±1）
 係數（Huber）：非科技自己估、科技三組共用全部一起估（科技樣本太小）。
   正式版：目標日 ≤ 2025-09-30 的全部配對；走動式（by_year）：每個年份 Y 只用目標日在 Y 年以前的配對（回測、回頭驗證用）。
-區間：走動式預測誤差 ÷ (波動^α × exp(δ × min(|ga|, 2)))（α 和軌道模型一樣，δ 用區間分數挑）、置中後的 10／25／75／90% 分位數；同時報告「只用前幾年校準」的樣本外涵蓋率。
+區間：走動式預測誤差 ÷ (波動^α × exp(δ × min(|ga|, 2)))（α 和軌道模型一樣，δ 用區間分數挑）、置中後的 10／25／75／90% 分位數；同時報告樣本外涵蓋率（每年只用目標日在那年以前的誤差校準）。δ、α 和波動中位數是全樣本挑的（輕微後見之明）。
 """
 import argparse
 import io
@@ -109,7 +109,7 @@ def main():
         # 樣本外涵蓋：每年只用前幾年的誤差校準 10／90%
         cov = []
         for Y in sorted(d.loc[e.index, "year"].unique()):
-            prev = u[d.loc[u.index, "year"] < Y]
+            prev = u[d.loc[u.index, "T"] < pd.Timestamp(f"{Y}-01-01")]              # 只用目標日在 Y 年以前（已揭曉）的誤差校準
             cur = e[d.loc[e.index, "year"] == Y]
             if len(prev) < 200 or cur.empty:
                 continue

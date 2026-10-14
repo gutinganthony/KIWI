@@ -71,12 +71,13 @@ def pairs(b, h):
     return d
 
 
-def walk(d, cols, target, by_group=True):
-    """每個起點年份 Y：只用目標日在 Y 年以前的配對估 Huber 迴歸（含截距）；回傳預測的 target。"""
+def walk(d, cols, target, by_group=True, known_lag=0):
+    """每個起點年份 Y：只用「目標日＋known_lag 個月」在 Y 年以前的配對估 Huber 迴歸（含截距）；回傳預測的 target。
+    known_lag：線索要到目標日之後才揭曉時（B 用 T＋12 的實現 EPS）設 12，訓練資料才不會用到 Y 年以後才知道的數字。"""
     pred = pd.Series(np.nan, index=d.index)
     coefs = []
     for Y in range(2015, 2025):
-        tr = d[(d["T"] < pd.Timestamp(f"{Y}-01-01"))].dropna(subset=cols + [target])
+        tr = d[(d["T"] + pd.DateOffset(months=known_lag) < pd.Timestamp(f"{Y}-01-01"))].dropna(subset=cols + [target])
         te = d[d["year"] == Y].dropna(subset=cols)
         if len(tr) < 300 or te.empty:
             continue
@@ -94,6 +95,30 @@ def walk(d, cols, target, by_group=True):
             pred.loc[teg.index] = Xt @ co
             coefs.append(dict(年=Y, 組別=GNAME.get(g, "全部"), n=len(trg), **{k: v for k, v in zip(["截距"] + cols, co)}))
     return pred, pd.DataFrame(coefs)
+
+
+def decompose(b):
+    """§24.2：forward 本益比的變化（倍數重新評價）拆成大盤、產業、個股，和成長預期的關係。共識用原值（不需要校正）。"""
+    for h in (12, 24):
+        d = pairs(b, h)
+        d["dfpe"] = d["lfpeT"] - d["lfpe0"]
+        d = d[d["dfpe"].abs() < 2].copy()
+        mk = d.groupby("month")["dfpe"].transform("median")
+        sec = d.groupby(["month", "sector"])["dfpe"].transform("median")
+        d["mkt"], d["sec"], d["idio"] = mk, sec - mk, d["dfpe"] - sec
+        v = d["dfpe"].var()
+        d["rev"] = np.log(d["feps_T"] / d["feps"])                  # 這段期間明年 EPS 預估的變化
+        sp = lambda a, c: float(d[[a, c]].dropna().corr(method="spearman").iloc[0, 1])  # noqa: E731
+        s = d.groupby(["month", "sector"]).agg(dfpe=("dfpe", "median"), rev=("rev", "median"), n=("dfpe", "size")).reset_index()
+        s = s[s["n"] >= 4]
+        for c in ("dfpe", "rev"):
+            s[c] = s[c] - s.groupby("month")[c].transform("median")
+        m = d.groupby("month").agg(dfpe=("dfpe", "median"), rev=("rev", "median"))
+        d["y"] = d["dfpe"] - mk
+        say(f"  {h} 個月（{len(d):,} 組）：forward 本益比變化的變異 ＝ 大盤 {d['mkt'].var() / v:.0%}、產業 {d['sec'].var() / v:.0%}、個股 {d['idio'].var() / v:.0%}"
+            f"（三者有共變，加總不必是 100%）；和「明年 EPS 預估變化」的 Spearman：個股 {sp('idio', 'rev'):+.2f}、"
+            f"產業（同月去平均）{s['dfpe'].corr(s['rev'], method='spearman'):+.2f}、大盤 {m['dfpe'].corr(m['rev']):+.2f}（Pearson，{len(m)} 個月）；"
+            f"事前線索 vs 個股＋產業部分：今天的相對 forward 本益比 {sp('prem0', 'y'):+.2f}、過去 12 個月報酬 {sp('ret12', 'y'):+.2f}")
 
 
 def score(d, preds, h):
@@ -142,6 +167,7 @@ def main():
         r2 = 1 - np.var(zz[y] - X @ co) / np.var(zz[y])
         say(f"  {lab}：斜率 {', '.join(f'{v:.2f}' for v in co[1:])}；R² {r2:.2f}")
     say("  讀法：本益比（用最近四季 EPS）對「明年成長預期 G」的斜率約 1 ＝ 市場大致對明年的 EPS 給倍數；forward 本益比和 G 幾乎無關。")
+    decompose(b)
 
     out, coefs_all = [], []
     for h in (12, 24):
@@ -177,9 +203,9 @@ def main():
         # B：猜中基本面（下一年 EPS 用實現值），同一個式子但用實現值估係數
         d["GTr_"] = d["GTr"]
         dB = d.rename(columns={"GT": "GT_mkt"}).rename(columns={"GTr_": "GT"})
-        rB, cB = walk(dB, gcols, "yo")
-        preds["O_ab 軌道（b＝實現值）"] = orbit_pe(d["EA"], d["EB"].where(d["EB"] > 0))
-        preds["G 成長定價（實現值）"] = base + rB
+        rB, cB = walk(dB, gcols, "yo", known_lag=12)          # 實現值要到 T＋12 才知道
+        bpreds = {"O_a 軌道": preds["O_a 軌道"], "O_ab 軌道（b＝實現值）": orbit_pe(d["EA"], d["EB"].where(d["EB"] > 0)),
+                  "G 成長定價（實現值）": base + rB}
         preds["平均：O_a 與 G（F_T）"] = (preds["O_a 軌道"] + preds["G 成長定價（F_T）"]) / 2
         # 上限：你連「產業（含大盤）的 forward 倍數變化」都猜中
         d["secmk"] = d.groupby(["month", "sector"])["dfpe"].transform("median").clip(-1, 1)
@@ -204,9 +230,14 @@ def main():
         ok = pd.concat(preds, axis=1).notna().all(axis=1)
         dd = d[ok]
         say(f"\n== {h} 個月：{len(dd):,} 組配對（{dd['ticker'].nunique()} 家；起點 {dd['month'].min():%Y-%m}～{dd['month'].max():%Y-%m}）")
-        say("-- A／B：你給了 EPS_a（實際）和目標日時的下一年 EPS（A＝當時市場共識，B＝實現值）：中位 |ln 本益比誤差|")
+        say("-- A：你給了 EPS_a（實際）和「目標日時市場對下一年的預期」（當時的共識 × 係數）：中位 |ln 本益比誤差|")
         sA = score(dd, {k: v[ok] for k, v in preds.items()}, h)
         say(sA.drop(columns="h").round(3).to_string(index=False))
+        okB = pd.concat(bpreds, axis=1).notna().all(axis=1)
+        dB_ = d[okB]
+        say(f"-- B：你給了 EPS_a 和下一年 EPS 的實現值（猜對基本面；係數只用 T＋12 在起點那年以前的配對估）：{len(dB_):,} 組（起點 {dB_['month'].min():%Y-%m}～{dB_['month'].max():%Y-%m}）")
+        sB = score(dB_, {k: v[okB] for k, v in bpreds.items()}, h)
+        say(sB.drop(columns="h").round(3).to_string(index=False))
         okc = pd.concat(cpred, axis=1).notna().all(axis=1)
         say("-- C：沒有額外看法（EPS 都用今天的共識推）：中位 |ln 本益比誤差|")
         sC = score(d[okc], {k: v[okc] for k, v in cpred.items()}, h)
@@ -217,7 +248,7 @@ def main():
         last = cA[cA["年"] == cA["年"].max()]
         say("  G（F_T）最後一年的係數（ga＝交出的成長、GT＝目標日的成長預期、G0＝今天的成長預期、ret12c＝過去 12 個月報酬）：")
         say(last.round(3).to_string(index=False))
-        out += [sA.assign(輸入="A／B"), sC.assign(輸入="C")]
+        out += [sA.assign(輸入="A"), sB.assign(輸入="B"), sC.assign(輸入="C")]
         coefs_all += [cA.assign(h=h, 版本="A 市場預期"), cB.assign(h=h, 版本="B 實現值")]
         # 存逐列結果給後續（網頁、README）
         keep = dd[["ticker", "month", "grp", "px", "eps0", "feps", "EA", "feps_T", "EB", "act", "lfpe0", "lfpeT", "G0", "GT", "ret12"]].copy()

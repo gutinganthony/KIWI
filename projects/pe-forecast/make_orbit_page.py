@@ -96,12 +96,6 @@ def tickers():
     ap = os.path.join(HERE, "data", "adr_now.csv")
     if os.path.exists(ap):                                         # 外國公司 ADR（口徑檢查通過的；每 ADR 美元）
         a = pd.read_csv(ap, parse_dates=["period_end", "price_date", "last_fy"])
-        hp = os.path.join(HERE, "data", "adr_hist.csv.gz")                  # 過去 12 個月報酬（成長定價用）：ADR 月底股價
-        hist = pd.read_csv(hp, parse_dates=["month_end"]) if os.path.exists(hp) else pd.DataFrame(columns=["ticker", "month_end", "px"])
-        def adr_ret12(t, px_now, d_now):
-            g = hist[(hist["ticker"] == t) & (hist["month_end"] <= pd.Timestamp(d_now) - pd.DateOffset(months=12))].sort_values("month_end")
-            ok = len(g) and g["month_end"].iloc[-1] >= pd.Timestamp(d_now) - pd.DateOffset(months=14) and g["px"].iloc[-1] > 0
-            return num(np.log(px_now / float(g["px"].iloc[-1])), 4) if ok else None
         for r in a[a["conv_ok"].astype(bool) & (a["px"] > 0) & a["eps0"].notna()].to_dict("records"):
             if r["ticker"] in have:
                 continue
@@ -113,7 +107,7 @@ def tickers():
             out.append(dict(t=r["ticker"], n=short_name(r.get("name")), g=r["grp"] if r["grp"] in orbit.GNAME else "other", px=round(float(r["px"]), 4),
                             d=str(r["price_date"].date()), e=num(r["eps0"], 4), q=str(r["period_end"].date()), y=num(r["y10"], 5),
                             dy=num(r.get("dy"), 5) or 0, v=num(r.get("vol36"), 4), sp=False, nd=False, u=0, c=c,
-                            r=adr_ret12(r["ticker"], float(r["px"]), r["price_date"]),
+                            r=num(growth_price.adr_ret12(r["ticker"], float(r["px"]), r["price_date"]), 4),   # 成長定價用
                             pr=num(orbit.pe_rank(float(r["px"]), float(r["eps0"])), 3), bw="adr", adr=True))
     out.sort(key=lambda x: (not x["sp"] and not x["nd"], x["t"]))
     return out, (str(snap_time.date()) if snap_time is not None else None)

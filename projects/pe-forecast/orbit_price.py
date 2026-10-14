@@ -345,6 +345,8 @@ def growth_section(a, row, model, mine, fyc, ca, cb, asof, eps0, rate, bm):
         return
     r12 = row.get("ret12")
     r12 = float(r12) if r12 is not None and np.isfinite(float(r12)) else None
+    if r12 is None and row.get("adr"):                   # 外國 ADR：用 data/adr_hist.csv.gz 的月底股價（和網頁一樣）
+        r12 = GP.adr_ret12(row["ticker"], float(row["px"]), row["price_date"])
     out = []
     for ea, eb in mine:
         eb_g = eb if (eb is not None and np.isfinite(eb)) else cb
@@ -372,8 +374,9 @@ def growth_section(a, row, model, mine, fyc, ca, cb, asof, eps0, rate, bm):
           + (f"，EPS 變化大再放寬 ×{og['eps_widen']:.2f}" if og["eps_widen"] > 1.005 else "")
           + (f"，放寬 ×{bm:.2f}" if bm != 1 else "") + f"；回測樣本外 80% 區間涵蓋約 {gh.get('wf_cover80') or 0:.0%}")
     print("  讀法（成長定價）：目標日時市場預期的下一年成長每多 10%，本益比約多 6–7%；這段期間交出的 EPS 成長每多 10%，本益比約少 5%"
-          "\n        （EPS 調高 → 本益比被稀釋，但只稀釋一半）。回測（I/B/E/S，你給對了 EPS_a 和目標日的成長預期）：12 個月本益比誤差"
-          "\n        16.3% → 14.8%、24 個月 22.0% → 16.9%；只用今天的共識、沒有自己的看法時，12 個月軌道較準（22.3% vs 23.8%）。")
+          "\n        （EPS 調高 → 本益比被稀釋，但只稀釋一半）。回測（I/B/E/S 起點 2018–2023）：EPS_a 和「目標日時市場對下一年的預期」"
+          "\n        都給對時，12 個月本益比誤差 16.6% → 15.3%、24 個月 22.1% → 17.0%；只猜對下一年的實際 EPS 時 12 個月打平。"
+          "\n        只用今天的共識、沒有自己的看法時，12 個月軌道較準（22.3% vs 23.8%）——那時以軌道為主。")
 
 
 if __name__ == "__main__":

@@ -17,6 +17,7 @@ import json
 import os
 
 import numpy as np
+import pandas as pd
 
 from pef import orbit
 
@@ -26,6 +27,21 @@ CLIP = {"ga": 2.0, "GT": 1.5, "G0": 1.5, "ret12c": 1.0}
 NAMES = {"ga": "交出的 EPS 成長（EPS_a ÷ 今天）", "GT": "目標日的成長預期（EPS_b ÷ EPS_a）",
          "G0": "今天已反映的成長預期（共識 ÷ 今天）", "ret12c": "過去 12 個月報酬（ln）"}
 _C = {}
+
+
+def adr_ret12(ticker, px_now, d_now):
+    """外國 ADR 的過去 12 個月 ln 報酬（data/adr_hist.csv.gz 的月底股價，12～14 個月前那個月底）；沒有資料回傳 None。網頁和命令列共用。"""
+    p = os.path.join(os.path.dirname(RES), "data", "adr_hist.csv.gz")
+    if "adr_hist" not in _C:
+        _C["adr_hist"] = pd.read_csv(p, parse_dates=["month_end"], usecols=["ticker", "month_end", "px"]) if os.path.exists(p) else None
+    h = _C["adr_hist"]
+    if h is None or not px_now or not px_now > 0:
+        return None
+    d_now = pd.Timestamp(d_now)
+    g = h[(h["ticker"] == ticker) & (h["month_end"] <= d_now - pd.DateOffset(months=12))].sort_values("month_end")
+    if g.empty or g["month_end"].iloc[-1] < d_now - pd.DateOffset(months=14) or not g["px"].iloc[-1] > 0:
+        return None
+    return float(np.log(px_now / float(g["px"].iloc[-1])))
 
 
 def load(res=RES):
