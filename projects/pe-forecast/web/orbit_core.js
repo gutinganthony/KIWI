@@ -1,4 +1,4 @@
-// 本益比軌道模型的計算核心：和 pef/orbit.py 的 reported_quarter、calendarize、predict 一模一樣（make_orbit_page.py 嵌進網頁；
+// 本益比軌道模型的計算核心：和 pef/orbit.py 的 reported_quarter、calendarize、predict（以及 pef/growth_price.py 的 predict）一模一樣（make_orbit_page.py 嵌進網頁；
 // web/test_orbit_core.py 用 node 跑，對照 Python 的結果）。日期一律用 UTC；加月份照 pandas DateOffset 的規則（日子超過月底就截到月底）。
 const OrbitCore = (() => {
   const DAY = 86400000;
@@ -117,6 +117,37 @@ const OrbitCore = (() => {
     return out;
   }
 
-  return { utc, iso, addMonths, addDays, reportedQuarter, calendarize, predict, rateSlope };
+  // 成長定價（和 pef/growth_price.py 的 predict 相同，README §24）：市場在目標日依「那時對下一年的成長預期」給新的本益比。
+  // gp：results/growth_price.json 的 h（coef、q、delta、vol_median）；f0＝今天市場預期的下一個 12 個月 EPS；r12＝過去 12 個月 ln 報酬（沒有＝0）
+  const GFEATS = ["ga", "GT", "G0", "ret12c"];
+  const GNAMES = { ga: "交出的 EPS 成長（EPS_a ÷ 今天）", GT: "目標日的成長預期（EPS_b ÷ EPS_a）",
+    G0: "今天已反映的成長預期（共識 ÷ 今天）", ret12c: "過去 12 個月報酬（ln）" };
+  function predictGrowth(row, h, model, gp, ea, eb, f0, r12, rate = null, bandMult = 1) {
+    const gh = gp && gp.h && gp.h[String(h)];
+    const eps0 = row.e;
+    if (!gh || !(pos(eps0) && pos(ea) && pos(eb) && pos(f0)) || !(row.px > 0)) return null;
+    const r = r12 === null || r12 === undefined || !Number.isFinite(r12) ? 0 : r12;
+    const x = { ga: clip(Math.log(ea / eps0), -2, 2), GT: clip(Math.log(eb / ea), -1.5, 1.5), G0: clip(Math.log(f0 / eps0), -1.5, 1.5), ret12c: clip(r, -1, 1) };
+    const c = row.g === "other" && gh.coef.other ? gh.coef.other : gh.coef.all;
+    const mk = ((row.y + model.erp - (row.dy || 0)) * h) / 12;
+    let adj = c[0];
+    const parts = [{ name: "常數（歷史上倍數的平均變化）", x: 1, beta: c[0], effect: c[0] }];
+    GFEATS.forEach((k, i) => { adj += c[i + 1] * x[k]; parts.push({ name: GNAMES[k], x: x[k], beta: c[i + 1], effect: c[i + 1] * x[k] }); });
+    if (rate && rate[0]) { adj += rate[0] * rate[1]; parts.push({ name: "你的利率看法（10 年期變化，百分點）", x: rate[0], beta: rate[1], effect: rate[0] * rate[1] }); }
+    const lpx = Math.log(row.px / eps0) + mk + adj + Math.log(ea);
+    const volKnown = Number.isFinite(row.v);
+    const vol = volKnown ? row.v : gh.vol_median;
+    const [vlo, vhi] = model.vol_clip;
+    const epsWiden = Math.exp((gh.delta || 0) * Math.min(Math.abs(x.ga), 2));
+    const sc = Math.pow(clip(vol, vlo, vhi), model.alpha) * bandMult * epsWiden;
+    const out = { spec: "成長定價", mk, adj, parts, x, vol, volKnown, widen: 1, bandMult, epsWiden, px: Math.exp(lpx),
+      width: sc / Math.pow(clip(gh.vol_median, vlo, vhi), model.alpha) };
+    ["lo80", "lo50", "hi50", "hi80"].forEach((k, i) => { out["px_" + k] = Math.exp(lpx + sc * gh.q[i]); out["pe_" + k] = out["px_" + k] / ea; });
+    out.pe = out.px / ea;
+    out.fwd = out.px / eb;
+    return out;
+  }
+
+  return { utc, iso, addMonths, addDays, reportedQuarter, calendarize, predict, predictGrowth, rateSlope };
 })();
 if (typeof module !== "undefined") module.exports = OrbitCore;

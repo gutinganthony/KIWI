@@ -16,11 +16,13 @@ import os
 import re
 import sys
 
+import numpy as np
 import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from pef import consensus, eps_correct, orbit            # noqa: E402
+from pef import growth_price                             # noqa: E402
 
 RES = os.path.join(HERE, "results")
 SNAP = os.path.join(HERE, "data", "consensus_snapshots")
@@ -88,12 +90,18 @@ def tickers():
         out.append(dict(t=r["ticker"], n=short_name(r.get("name")), g=orbit.group_of(r.get("sector")), px=round(px, 4),
                         d=str(pdate.date()), e=num(rf["eps0"], 4), q=str(pd.Timestamp(rf["period_end"]).date()),
                         y=num(r["y10"], 5), dy=num(r.get("dy"), 5) or 0, v=num(r.get("vol36"), 4),
-                        sp=bool(r.get("in_sp500")), nd=bool(r.get("in_ndx")), u=int(rf["n_new"]), c=c,
+                        sp=bool(r.get("in_sp500")), nd=bool(r.get("in_ndx")), u=int(rf["n_new"]), c=c, r=num(r.get("ret12"), 4),
                         pr=num(orbit.pe_rank(px, rf["eps0"]), 3), bw=None if (r.get("in_sp500") or r.get("in_ndx")) else "small"))
     have = {x["t"] for x in out}
     ap = os.path.join(HERE, "data", "adr_now.csv")
     if os.path.exists(ap):                                         # 外國公司 ADR（口徑檢查通過的；每 ADR 美元）
         a = pd.read_csv(ap, parse_dates=["period_end", "price_date", "last_fy"])
+        hp = os.path.join(HERE, "data", "adr_hist.csv.gz")                  # 過去 12 個月報酬（成長定價用）：ADR 月底股價
+        hist = pd.read_csv(hp, parse_dates=["month_end"]) if os.path.exists(hp) else pd.DataFrame(columns=["ticker", "month_end", "px"])
+        def adr_ret12(t, px_now, d_now):
+            g = hist[(hist["ticker"] == t) & (hist["month_end"] <= pd.Timestamp(d_now) - pd.DateOffset(months=12))].sort_values("month_end")
+            ok = len(g) and g["month_end"].iloc[-1] >= pd.Timestamp(d_now) - pd.DateOffset(months=14) and g["px"].iloc[-1] > 0
+            return num(np.log(px_now / float(g["px"].iloc[-1])), 4) if ok else None
         for r in a[a["conv_ok"].astype(bool) & (a["px"] > 0) & a["eps0"].notna()].to_dict("records"):
             if r["ticker"] in have:
                 continue
@@ -105,6 +113,7 @@ def tickers():
             out.append(dict(t=r["ticker"], n=short_name(r.get("name")), g=r["grp"] if r["grp"] in orbit.GNAME else "other", px=round(float(r["px"]), 4),
                             d=str(r["price_date"].date()), e=num(r["eps0"], 4), q=str(r["period_end"].date()), y=num(r["y10"], 5),
                             dy=num(r.get("dy"), 5) or 0, v=num(r.get("vol36"), 4), sp=False, nd=False, u=0, c=c,
+                            r=adr_ret12(r["ticker"], float(r["px"]), r["price_date"]),
                             pr=num(orbit.pe_rank(float(r["px"]), float(r["eps0"])), 3), bw="adr", adr=True))
     out.sort(key=lambda x: (not x["sp"] and not x["nd"], x["t"]))
     return out, (str(snap_time.date()) if snap_time is not None else None)
@@ -163,6 +172,9 @@ def main():
                 band_delta=model.get("band_delta"),
                 h={h: dict(pair=v["pair"], beta=v["beta"], bands={k: dict(q=b["q"], vol_median=b["vol_median"]) for k, b in v["bands"].items()})
                    for h, v in model["h"].items()})
+    gp = growth_price.load(RES)                                        # 成長定價（README §24）
+    slim["gp"] = dict(h={h: dict(coef=v["coef"], q=v["q"], delta=v["delta"], vol_median=v["vol_median"], wf_cover80=v.get("wf_cover80"))
+                         for h, v in gp["h"].items()}) if gp else None
     tk, snap_date = tickers()
     data = dict(model=slim, tickers=tk, snap=snap_date, bt=backtest(), opt=opt())
     core = open(os.path.join(HERE, "web", "orbit_core.js")).read()

@@ -27,6 +27,7 @@ HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, HERE)
 import make_orbit_page as MP                             # noqa: E402
 from pef import consensus, eps_correct, orbit            # noqa: E402
+from pef import growth_price as GP                       # noqa: E402
 
 RES = os.path.join(HERE, "results")
 NOW = pd.Timestamp("2026-10-12")
@@ -131,11 +132,21 @@ def main():
     print(f"{'S&P 500 面板裡、今天也有資料的' if a.universe == 'sp500' else '要評的'} {len(names)} 家；Yahoo 抓到 {okn} 家")
     adr = pd.read_csv(os.path.join(HERE, "data", "adr_hist.csv.gz"), parse_dates=["month_end"]).set_index(["ticker", "month_end"]).sort_index()
     secmap = pd.read_csv(os.path.join(RES, "now_all.csv"), usecols=["ticker", "sector"]).set_index("ticker")["sector"].to_dict()
+    gm = GP.load()
     rows = []
     for t in names:
         fpe, close = load(t, a.raw)
         n = now[t]
         p1, e1 = float(n["px"]), float(n["e"])
+        # 成長定價（README §24.4）的「目標日時市場對下一年的預期」：今天的共識換算成未來 12 個月（和網頁 consFor 一樣：係數乘在會計年度共識上、可外推）
+        eb_now = None
+        c = n.get("c") or {}
+        if c.get("c0") is not None and c.get("f0") and e1 > 0:
+            kc = c.get("cf") if c.get("cf") is not None else 1.0
+            fy = {pd.Timestamp(c["f0"]): c["c0"] * kc}
+            if c.get("c1") is not None and c.get("f1"):
+                fy[pd.Timestamp(c["f1"])] = c["c1"] * kc
+            eb_now, _ = orbit.calendarize(fy, NOW + pd.DateOffset(months=12), pd.Timestamp(n["q"]), e1, extrapolate=True)
         for nm, t0, mon, h in SCEN:
             if t not in members[nm] or t0 not in fpe or close[:t0].empty:
                 continue
@@ -171,7 +182,16 @@ def main():
             p_n = p0 * np.exp(orb + b_exp * np.log(F * k / e0))           # 24 個月不外推（§22.5）：EPS_a＝EPS_b＝forward × 係數
             p_c = p0 * np.exp(orb + b_exp * np.log(ea * g / e0))
             p_p = p0 * np.exp(orb + b_raw * float(np.clip(np.log(e1 / e0), -2, 2)))
-            rows.append(dict(股票=t, 情境=nm, 組別=gn, 來源=src, 產業=secmap.get(t) or ("adr" if n.get("adr") else ""), 起點本益比=p0 / e0, 實際本益比=pe1,
+            # 成長定價：F_0＝起點的 forward EPS × 係數；走動式係數（只用目標日在起點那年以前的配對）
+            grow = dict(px=p0, eps0=e0, y10=r10, dy=dy0, vol36=vol0, grp=grp0 if grp0 in orbit.GNAME else "other")
+            gpe = lambda ea, eb: (GP.predict(grow, h, ea, eb, F * k, ret0, model=model, gm=gm, year=t0.year) or {}).get("pe")  # noqa: E731
+            pe_go = gpe(e1, eb_now) if eb_now else None
+            ga_ = F * k if h == 12 else F * k * g
+            pe_gc = gpe(ga_, ga_ * g)
+            pe_gn = gpe(F * k, F * k * g) if h == 24 else pe_gc
+            lg = lambda v: np.log(v / pe1) if v else np.nan     # noqa: E731
+            rows.append(dict(股票=t, 情境=nm, 組別=gn, 來源=src, 成長定價_猜中市場預期=lg(pe_go), 成長定價_事前=lg(pe_gc), 成長定價_事前不外推=lg(pe_gn),
+                             今天共識未來12月=eb_now, 產業=secmap.get(t) or ("adr" if n.get("adr") else ""), 起點本益比=p0 / e0, 實際本益比=pe1,
                              波動=vol0, 報酬12=ret0, 營收成長=grev0, 股利殖利率=dy0, 市值=mc0, 隱含成長=np.log(F / e0), forward本益比=fpe[t0],
                              誤差_分析師=np.log(p_c / ea / pe1), 誤差_股價=np.log(p_c / p1), 誤差_EPS=np.log(ea / e1),
                              共識係數=k, 誤差_分析師校正=np.log(p_k / (ea * k) / pe1), 誤差_EPS校正=np.log(ea * k / e1),
@@ -179,6 +199,16 @@ def main():
                              誤差_EPS猜對=np.log(p_p / e1 / pe1), 誤差_本益比不變=np.log(p0 / e0 / pe1), EPS變化=np.log(e1 / e0)))
     d = pd.DataFrame(rows)
     d.to_csv(os.path.join(RES, f"{tag}.csv"), index=False, float_format="%.6g")
+
+    def gstats(gg):
+        """成長定價 vs 軌道，同一批有今天共識的公司（README §24.4）。"""
+        z = gg[gg["成長定價_猜中市場預期"].notna() & gg["成長定價_事前"].notna()]
+        m = lambda c: float(np.median(np.abs(z[c]))) if len(z) else np.nan                  # noqa: E731
+        w = lambda c: float(np.mean(np.abs(np.exp(z[c]) - 1) <= 0.2)) if len(z) else np.nan  # noqa: E731
+        return dict(G_n=len(z), G軌道_EPS猜對=m("誤差_EPS猜對"), G成長定價_猜中市場預期=m("成長定價_猜中市場預期"),
+                    G軌道_分析師乘係數=m("誤差_分析師校正"), G軌道_改善版=m("誤差_改善版"), G成長定價_事前=m("成長定價_事前"),
+                    G成長定價_事前不外推=m("成長定價_事前不外推"), G本益比不變=m("誤差_本益比不變"),
+                    G猜中_20內=w("成長定價_猜中市場預期"), G軌道猜對_20內=w("誤差_EPS猜對"), G事前_20內=w("成長定價_事前"), G軌道事前_20內=w("誤差_分析師校正"))
     out = []
     for nm, g in d.groupby("情境", sort=False):
         for lab, gg in [("全部", g), ("科技", g[g["組別"] != "非科技"]), ("半導體／設備／記憶體", g[g["組別"] == "半導體／設備／記憶體"]),
@@ -189,11 +219,15 @@ def main():
                             改善版=m("誤差_改善版"), EPS完全猜對=m("誤差_EPS猜對"), 本益比不變=m("誤差_本益比不變"),
                             分析師_股價部分=m("誤差_股價"), 分析師_EPS部分=m("誤差_EPS"),
                             EPS偏差中位_原樣=float(np.median(gg["誤差_EPS"])), EPS偏差中位_校正=float(np.median(gg["誤差_EPS校正"])),
-                            分析師_20內=w20("誤差_分析師"), 校正_20內=w20("誤差_分析師校正"), 改善_20內=w20("誤差_改善版"), 猜對_20內=w20("誤差_EPS猜對"), 不變_20內=w20("誤差_本益比不變")))
+                            分析師_20內=w20("誤差_分析師"), 校正_20內=w20("誤差_分析師校正"), 改善_20內=w20("誤差_改善版"), 猜對_20內=w20("誤差_EPS猜對"), 不變_20內=w20("誤差_本益比不變"),
+                            **gstats(gg)))
     t = pd.DataFrame(out)
     pd.set_option("display.width", 250)
+    pd.set_option("display.max_columns", 40)
     print("\n== 中位 |ln 本益比誤差|（0.20 ≈ 差 20%）與誤差在 ±20% 內的比例")
-    print(t.round(3).to_string(index=False))
+    print(t[[c for c in t.columns if not c.startswith("G")]].round(3).to_string(index=False))
+    print("\n== 成長定價（README §24）vs 軌道：同一批有今天共識的公司。猜中＝EPS_a 用實際、目標日的下一年預期用今天的共識；事前＝只用起點的 forward EPS")
+    print(t[["情境", "樣本"] + [c for c in t.columns if c.startswith("G")]].round(3).to_string(index=False))
     t.to_csv(os.path.join(RES, f"{tag}_scores.csv"), index=False, float_format="%.6f")
     if a.universe == "ndx":
         print("\n== 誤差最大的 10 家（2025 起點，分析師×係數）")

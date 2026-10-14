@@ -32,6 +32,7 @@ import pandas as pd
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, HERE)
 from pef import cond, orbit                              # noqa: E402
+from pef import growth_price as GP                       # noqa: E402
 
 RES = os.path.join(HERE, "results")
 DATA = os.path.join(HERE, "data")
@@ -102,11 +103,23 @@ def main():
     model = orbit.load_model()
     wb = pd.read_csv(os.path.join(RES, "orbit_beta.csv")).set_index(["h", "年", "方法", "組別"])
     rates = pd.read_csv(os.path.join(DATA, "rates_monthly.csv"), parse_dates=["month_end"]).set_index("month_end")["DGS10"] / 100
+    import make_orbit_page as MP                         # 今天的共識（成長定價用，README §24.4）
+    tk, _ = MP.tickers()
+    nowc = {x["t"]: x for x in tk}
+    gm = GP.load()
     rows = []
     for t, grp in TICKERS.items():
         close, adj = prices(t, a.raw)
         p1 = float(close[:NOW].iloc[-1])
         e1 = NOW_EPS[t]
+        # 目標日（今天）時市場對下一年的預期：今天的共識換算成未來 12 個月（和網頁 consFor 一樣）
+        n = nowc[t]
+        c = n.get("c") or {}
+        kc = c.get("cf") if c.get("cf") is not None else 1.0
+        fy = {pd.Timestamp(c["f0"]): c["c0"] * kc}
+        if c.get("c1") is not None:
+            fy[pd.Timestamp(c["f1"])] = c["c1"] * kc
+        eb_now, _ = orbit.calendarize(fy, pd.Timestamp(n["d"]) + pd.DateOffset(months=12), pd.Timestamp(n["q"]), float(n["e"]), extrapolate=True)
         for name, t0, h, fdate in SCEN:
             p0 = float(close[:t0].iloc[-1])
             e0, dv, eper = eps_then(t, t0)
@@ -141,6 +154,16 @@ def main():
                 rows.append(dict(base, 版本=ver, 預測EPS=ea, 軌道=orb, 調整=adj_, 預測股價=ppred, 預測本益比=ppred / ea,
                                  本益比80低=qs[0] / ea, 本益比80高=qs[3] / ea, 股價在80區間=bool(qs[0] <= p1 <= qs[3]),
                                  誤差_本益比=np.log(ppred / ea / (p1 / e1)), 誤差_股價=np.log(ppred / p1), 誤差_EPS=np.log(ea / e1)))
+            # 成長定價（README §24）：走動式係數（只用目標日在起點那年以前的配對）；F_0＝起點的 forward EPS × 係數
+            ret0 = float(np.log(m.iloc[-1] / m.iloc[-13])) if len(m) > 13 else np.nan
+            grow = dict(px=p0, eps0=e0, y10=r10, dy=dy, vol36=vol, grp=grp)
+            for ver, ea, eb in (("4 成長定價（EPS 猜對＋目標日成長預期用今天共識）", e1, eb_now), ("4b 成長定價（事前：分析師×係數）", ea_c * k, ea_c * k * g)):
+                o = GP.predict(grow, h, ea, eb, F * k, ret0, model=model, gm=gm, band_mult=bw, year=t0.year)
+                if o is None:
+                    continue
+                rows.append(dict(base, 版本=ver, 預測EPS=ea, 目標日下一年EPS=eb, 軌道=o["mk"], 調整=o["adj"], 預測股價=o["px"], 預測本益比=o["pe"],
+                                 本益比80低=o["pe_lo80"], 本益比80高=o["pe_hi80"], 股價在80區間=bool(o["px_lo80"] <= p1 <= o["px_hi80"]),
+                                 誤差_本益比=np.log(o["pe"] / (p1 / e1)), 誤差_股價=np.log(o["px"] / p1), 誤差_EPS=np.log(ea / e1)))
             rows.append(dict(base, 版本="3 本益比不變", 預測EPS=np.nan, 預測股價=np.nan, 預測本益比=p0 / e0,
                              誤差_本益比=np.log((p0 / e0) / (p1 / e1))))
     d = pd.DataFrame(rows)

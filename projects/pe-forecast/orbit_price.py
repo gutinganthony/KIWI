@@ -28,6 +28,7 @@ import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+from pef import growth_price as GP                       # noqa: E402
 from pef import consensus, eps_correct, orbit, yahoo    # noqa: E402
 
 RES = os.path.join(HERE, "results")
@@ -322,9 +323,57 @@ def main():
         print(f"  最近（起點 2024-10～2025-09，目標日到 2026-09）：" + "；".join(
             f"{g} 軌道 {v['軌道']:.3f}（市場偏離軌道 {v['市場偏離軌道中位']:+.2f}）" for g, v in rc.items()
             if g in ("全部", "科技", o0["group"])))
-    print("  讀法：股價主要跟著軌道走；EPS 多 10% 通常只讓股價多 0.5–2%（半導體類較大、再下一年的 EPS 較重要），"
+    growth_section(a, row, model, mine, fyc, ca, cb, asof, eps0, rate, bm)
+    print("\n  讀法（軌道）：股價主要跟著軌道走；EPS 多 10% 通常只讓股價多 0.5–2%（半導體類較大、再下一年的 EPS 較重要），"
           "\n        所以本益比 ≈ 股價 ÷ 你的 EPS，主要由你的 EPS 決定。誤差最大的來源是整個產業被重新定價"
           "\n        （2025–26 年的 AI 記憶體行情、軟體股修正），模型預測不了，區間已含這部分。不是投資建議。")
+
+
+def growth_section(a, row, model, mine, fyc, ca, cb, asof, eps0, rate, bm):
+    """成長定價（README §24）：市場在目標日依「那時對下一年的成長預期（EPS_b）」給新的本益比。只有 12、24 個月。"""
+    gm = GP.load()
+    if gm is None or str(a.h) not in gm["h"]:
+        print(f"\n  成長定價：只有 12、24 個月（{a.h} 個月沒有回測過），這裡只看軌道。")
+        return
+    f0, how_f0 = None, None
+    if fyc:
+        f0, how_f0 = orbit.calendarize(fyc, asof + pd.DateOffset(months=12), row["period_end"], eps0, extrapolate=True)
+    elif ca is not None and a.h == 12:
+        f0, how_f0 = ca, "命令列 --cons"
+    if f0 is None:
+        print("\n  成長定價：需要今天的市場共識（未來 12 個月的 EPS，用來扣掉「今天已反映的成長預期」）→ 加 --cons auto 或 --fy-cons")
+        return
+    r12 = row.get("ret12")
+    r12 = float(r12) if r12 is not None and np.isfinite(float(r12)) else None
+    out = []
+    for ea, eb in mine:
+        eb_g = eb if (eb is not None and np.isfinite(eb)) else cb
+        og = GP.predict(row, a.h, ea, eb_g, f0, r12, model=model, gm=gm, rate=rate, band_mult=bm)
+        out.append((ea, eb_g, og))
+    print(f"\n  ── 成長定價（README §24）：市場在 {(asof + pd.DateOffset(months=a.h)).date()} 會依「那時對下一年的成長預期」給新的本益比")
+    print(f"     今天市場預期的未來 12 個月 EPS（F_0）{f0:,.2f}（{how_f0}）；過去 12 個月報酬 "
+          + (f"{np.exp(r12) - 1:+.0%}" if r12 is not None else "沒有資料（當作 0）")
+          + "；EPS_b 沒給時用共識的 EPS_b 當「目標日時市場的預期」")
+    print("  EPS_a     EPS_b    本益比（中位）  本益比 80% 區間     股價（中位）  股價 50% 區間        股價 80% 區間       h 個月後 forward 本益比")
+    for ea, eb_g, og in out:
+        if og is None:
+            print(f"  {ea:>7,.2f}  {'—' if eb_g is None else f'{eb_g:,.2f}':>7}  成長定價不適用（EPS_a、EPS_b、今天 EPS 都要 > 0，且要有 EPS_b）")
+            continue
+        print(f"  {ea:>7,.2f}  {eb_g:>7,.2f}  {og['pe']:10.1f}     {og['pe_lo80']:6.1f}–{og['pe_hi80']:<7.1f}  {og['px']:>10,.0f}   "
+              f"{og['px_lo50']:>8,.0f}–{og['px_hi50']:<8,.0f}  {og['px_lo80']:>8,.0f}–{og['px_hi80']:<8,.0f}   {og['fwd_pe']:.1f}")
+    og = next((o for _, _, o in out if o is not None), None)
+    if og is None:
+        return
+    print(f"  拆解（第一個可用情境）：本益比 ＝ 今天 {og['pe_today']:,.1f} 倍 × exp(軌道 {og['mk']:+.3f} ＋ 下面各項 {og['adj']:+.3f})")
+    for p in og["parts"]:
+        print(f"    {p['項目']}：{p['數值']:+.3f} × {p['β']:+.3f} ＝ {p['影響']:+.3f}")
+    gh = gm["h"][str(a.h)]
+    print(f"  區間：波動 {og['vol']:.0%}" + ("" if og["vol_known"] else "（沒有資料，用中位數）")
+          + (f"，EPS 變化大再放寬 ×{og['eps_widen']:.2f}" if og["eps_widen"] > 1.005 else "")
+          + (f"，放寬 ×{bm:.2f}" if bm != 1 else "") + f"；回測樣本外 80% 區間涵蓋約 {gh.get('wf_cover80') or 0:.0%}")
+    print("  讀法（成長定價）：目標日時市場預期的下一年成長每多 10%，本益比約多 6–7%；這段期間交出的 EPS 成長每多 10%，本益比約少 5%"
+          "\n        （EPS 調高 → 本益比被稀釋，但只稀釋一半）。回測（I/B/E/S，你給對了 EPS_a 和目標日的成長預期）：12 個月本益比誤差"
+          "\n        16.3% → 14.8%、24 個月 22.0% → 16.9%；只用今天的共識、沒有自己的看法時，12 個月軌道較準（22.3% vs 23.8%）。")
 
 
 if __name__ == "__main__":

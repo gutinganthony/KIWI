@@ -14,6 +14,7 @@ import pandas as pd
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, HERE)
 from pef import orbit                                    # noqa: E402
+from pef import growth_price as GP                       # noqa: E402
 
 model = orbit.load_model(os.path.join(HERE, "results"))
 T = pd.Timestamp
@@ -30,6 +31,16 @@ for i, r in enumerate(rows):
             cases.append(dict(i=i, h=h, ea=ea, eb=eb, ca=ca, cb=cb, rt=None, bm=1.0))
         cases.append(dict(i=i, h=h, ea=r["e"] * 1.1, eb=None, ca=r["e"] * 1.05, cb=None, rt=[-1.0, -0.06], bm=1.0))   # 利率情境
         cases.append(dict(i=i, h=h, ea=r["e"] * 1.2, eb=r["e"] * 1.4, ca=None, cb=None, rt=None, bm=1.17))     # 區間放寬
+gpm = GP.load(os.path.join(HERE, "results"))
+gp_js = dict(h={h: dict(coef=v["coef"], q=v["q"], delta=v["delta"], vol_median=v["vol_median"]) for h, v in gpm["h"].items()})
+gcases = []                                              # 成長定價（README §24）
+for i, r in enumerate(rows):
+    for h in (6, 12, 24):
+        for ea, eb, f0, r12 in ((r["e"] * 1.2, r["e"] * 1.5, r["e"] * 1.15, 0.3), (r["e"] * 1.1, r["e"] * 1.1, r["e"] * 1.3, None),
+                                (r["e"] * 3.0, r["e"] * 4.5, r["e"] * 2.0, -1.4), (r["e"] * 0.8, r["e"] * 1.2, r["e"] * 0.9, 0.05),
+                                (2.0, 3.0, 2.5, 0.1), (-1.0, 2.0, 1.0, 0.0)):
+            gcases.append(dict(i=i, h=h, ea=ea, eb=eb, f0=f0, r12=r12, rt=None, bm=1.0))
+        gcases.append(dict(i=i, h=h, ea=r["e"] * 1.2, eb=r["e"] * 1.4, f0=r["e"] * 1.1, r12=0.2, rt=[-1.0, -0.06], bm=1.17))
 rsens = json.load(open(os.path.join(HERE, "results", "rate_sensitivity.json")))
 slopes = [dict(h=h, rg=rg, pr=pr) for h in (6, 12, 24) for rg in ("2022", "2012") for pr in (None, 0.02, 0.4, 0.97)]
 cal = [dict(fy=[["2027-09-03", 176.15], ["2028-09-03", 206.33]], t="2027-10-07", q="2026-09-03", e=74.33, x=True),
@@ -43,7 +54,9 @@ js = os.path.join(HERE, "web", "orbit_core.js")
 prog = f"""
 const C = require({json.dumps(js)}); const model = {json.dumps(model)};
 const rows = {json.dumps(rows).replace('NaN', 'null')}; rows.forEach(r => {{ if (r.v === null) r.v = NaN; }});
-const out = {{pred: [], cal: [], sl: []}};
+const out = {{pred: [], cal: [], sl: [], gp: []}};
+for (const c of {json.dumps(gcases)}) {{ const o = C.predictGrowth(rows[c.i], c.h, model, {json.dumps(gp_js)}, c.ea, c.eb, c.f0, c.r12, c.rt, c.bm);
+  out.gp.push(o ? [o.spec, o.px, o.px_lo80, o.px_hi80, o.pe, o.fwd] : null); }}
 for (const c of {json.dumps(slopes)}) out.sl.push(C.rateSlope({json.dumps(rsens)}, c.h, c.rg, c.pr));
 for (const c of {json.dumps(cases)}) {{ const o = C.predict(rows[c.i], c.h, model, c.ea, c.eb, c.ca, c.cb, c.rt, c.bm);
   out.pred.push([o.spec, o.px, o.px_lo80, o.px_hi80, o.pe, o.fwd]); }}
@@ -64,6 +77,16 @@ for c, j in zip(cases, res["pred"]):
     bad += not same
     if not same:
         print("不一致", c, py, j)
+for c, j in zip(gcases, res["gp"]):
+    r = rows[c["i"]]
+    o = GP.predict(dict(px=r["px"], eps0=r["e"], y10=r["y"], dy=r["dy"], vol36=r["v"], grp=r["g"]), c["h"], c["ea"], c["eb"], c["f0"], c["r12"],
+                   model=model, gm=gpm, rate=c["rt"], band_mult=c["bm"])
+    py = None if o is None else [o["spec"], o["px"], o["px_lo80"], o["px_hi80"], o["pe"], o["fwd_pe"]]
+    same = (py is None and j is None) or (py is not None and j is not None and py[0] == j[0]
+                                          and all(abs(a - b) <= 1e-9 * max(1, abs(a)) for a, b in zip(py[1:], j[1:])))
+    bad += not same
+    if not same:
+        print("成長定價不一致", c, py, j)
 for c, j in zip(slopes, res["sl"]):
     py = orbit.rate_slope(c["h"], c["rg"], c["pr"])[0]
     same = abs(py - j) < 1e-12
@@ -76,5 +99,5 @@ for c, j in zip(cal, res["cal"]):
     same = (py is None and j is None) or (py is not None and j is not None and abs(py[0] - j[0]) < 1e-9 and py[1] == j[1])
     bad += not same
     print(("一致" if same else "不一致"), c["t"], py, j)
-print(f"predict {len(cases)} 組（含利率情境）、利率斜率 {len(slopes)} 組、calendarize {len(cal)} 組；不一致 {bad}")
+print(f"predict {len(cases)} 組（含利率情境）、成長定價 {len(gcases)} 組、利率斜率 {len(slopes)} 組、calendarize {len(cal)} 組；不一致 {bad}")
 sys.exit(1 if bad else 0)
