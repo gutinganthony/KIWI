@@ -89,6 +89,9 @@ td.best { font-weight: 600; color: var(--good); }
 table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
 th, td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
 th:first-child, td:first-child { text-align: left; }
+table.text th, table.text td { white-space: normal; text-align: left; vertical-align: top; }
+table.text td:first-child { min-width: 7em; }
+@media (max-width: 640px) { table.text { min-width: 620px; } table.text th, table.text td { padding: 6px 7px; font-size: 12.5px; } }
 th { font-weight: 500; color: var(--muted); font-size: 12.5px; }
 tr.base td { font-weight: 700; }
 .today { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 14px; }
@@ -202,7 +205,7 @@ footer { padding-block: 30px; color: var(--muted); font-size: 13px; border-top: 
         <div id="decomp" class="note"></div>
         <div id="notes" class="stack" style="gap:6px"></div>
       </div>
-      <p class="note">80% 區間＝回測裡 10 次大約 8 次落在裡面（2022 以後實測 80–89%，略偏寬）。區間已含產業被重新定價的風險，所以很寬。不是投資建議。</p>
+      <p class="note">80% 區間＝回測裡 10 次大約 8 次落在裡面（2022 以後實測 80–89%，略偏寬）——前提是 EPS 猜對。<b>用共識當 EPS、只填一個情境時，實際只涵蓋約 60%</b>：請把悲觀／樂觀填成基準的 −20%／+20%，看三個情境合起來的範圍（回測約 80%）；景氣谷底的公司用 ±40%。區間已含產業被重新定價的風險，所以很寬。不是投資建議。</p>
     </div>
   </div>
 </section>
@@ -214,7 +217,7 @@ footer { padding-block: 30px; color: var(--muted); font-size: 13px; border-top: 
       <h3>在這個網頁</h3>
       <ul class="list">
         <li>輸入代號（S&P 500、Nasdaq-100 與其他約 3,000 檔美股）。今天的股價、最近四季 EPS、波動會自動帶入；有新財報時 EPS 已用 Yahoo 更新。</li>
-        <li>選預測距離。填你的 <b>EPS_a</b>（h 個月後那時已公布的最近四季 EPS），最好也填 <b>EPS_b</b>（再往後 12 個月）。三個情境可以只填基準。</li>
+        <li>選預測距離。填你的 <b>EPS_a</b>（h 個月後那時已公布的最近四季 EPS），最好也填 <b>EPS_b</b>（再往後 12 個月）。三個情境可以只填基準；<b>用共識時建議悲觀／樂觀各填基準的 −20%／+20%</b>，看三個情境合起來的範圍（第六輪回測：只填一個情境，80% 區間只涵蓋約 60%）。</li>
         <li>約 2,800 檔有分析師共識（S&P 500、Nasdaq-100 與大部分中小型美股），會自動帶入，並用<b>共識校正模型</b>換成「預期的實際 GAAP EPS」（中小型股距離年報 9 個月以上照原樣用；係數可以改，也可以取消勾選）。外國公司 ADR 約 100 檔也有共識（已換成每 ADR 美元）。</li>
         <li>想加入自己的利率看法：在「利率情境」填 10 年期到目標日的變化（百分點）。不填＝和市場一樣。</li>
         <li>看結果：本益比中位與 80% 區間、股價 50%／80% 區間、h 個月後的 forward 本益比，以及每一項對股價的影響。</li>
@@ -301,12 +304,35 @@ python3 consensus_snapshot.py --detail    # 存一份共識快照</div>
 </section>
 
 <section id="opt">
-  <div class="sec-head"><div class="eyebrow">優化實驗</div><h2>第二到五輪：哪些有用、哪些沒用、為什麼</h2>
+  <div class="sec-head"><div class="eyebrow">優化實驗</div><h2>第二到六輪：哪些有用、哪些沒用、為什麼</h2>
     <p class="prose note">每一項都照「先講邏輯 → 用走動式回測實證（每年 1 月只用當時已揭曉的資料）→ 再驗算」。通過樣本外檢驗的才放進模型；沒通過的照實寫出來。</p></div>
 
   <div class="panel stack">
+    <h3>第六輪（2026-10-14）：使用建議回測、哪種公司誤差大、Nasdaq-100</h3>
+    <div class="tbl"><table id="t-round6" class="text">
+      <tr><th>項目</th><th>問題</th><th>實證（樣本外）</th><th>結論</th></tr>
+      <tr><td>12 個月、每月更新</td><td>同一個目標日，越晚預估越準嗎？共識多久要更新一次？</td>
+        <td>1,803 個目標日（2016–2025）：12 → 6 → 2 個月前預估的本益比誤差 21.8% → 17.8% → 13.6%；24 個月 29.0%（不外推 25.6%）。共識舊 1 個月沒差，舊 2 個月以上開始變差</td>
+        <td class="best">成立；目標日只剩 2–3 個月時，看現在的本益比就好（13.6% vs 12.8%）</td></tr>
+      <tr><td>三個 EPS 情境</td><td>用共識當 EPS 時，80% 區間真的有 80%？</td>
+        <td>只填一個情境：12 個月只涵蓋 61%、6 個月 59%。悲觀／樂觀 ±20% 合起來：79%／83%，區間分數最好；±40% 太寬。景氣谷底的公司 ±40% 也只涵蓋 61–73%</td>
+        <td class="best">用共識時一律看 ±20% 三情境；谷底用 ±40%</td></tr>
+      <tr><td>台積電月營收</td><td>每月 10 日前公布的月營收，能提早更新 EPS 嗎？</td>
+        <td>當季 EPS：季初用上一季 12.3% → 第 1 個月營收 9.0% → 前 2 個月 7.0% → 法說前一週（3 個月營收）3.2%。12 個月後的 EPS 19.9% → 12.9%；但 12 個月後的本益比沒有變準（估值變動主導）</td>
+        <td>拿來更新 EPS 情境。2026Q3 即時預估 EPS 32.05 元（29.3～35.5）</td></tr>
+      <tr><td>哪種公司誤差大</td><td>S&P 500 回顧與 2015–2024 長歷史，誤差和什麼特徵有關？</td>
+        <td>波動大、EPS 年年忽高忽低、分析師預期 EPS 大變化、過去一年大跌、過去 5 年虧損過 → 誤差大（例：公用事業 16%、必需消費 17%；軟體 44%、半導體 38%）。大誤差有 2/3 以上是 EPS 估錯</td>
+        <td>先看公司屬於哪一類；誤差大的那類以區間為主</td></tr>
+      <tr><td>Nasdaq-100</td><td>同樣 2024、2025 兩個起點準不準？</td>
+        <td>12 個月 30.8%（本益比不變 31.5%；S&P 500 22.7%）；24 個月 32.6%（本益比不變 46.7%）</td>
+        <td>這兩年比 S&P 500 難（科技、高波動多）；2015–2024 長期兩者差不多</td></tr>
+    </table></div>
+    <p class="note">細節：README §23；重現：<code>research/usage_backtest.py</code>、<code>research/tsmc_monthly_revenue.py</code>、<code>research/error_traits.py</code>、<code>research/case_broad.py --universe ndx</code>。</p>
+  </div>
+
+  <div class="panel stack">
     <h3>第四輪（2026-10-13）：一覽</h3>
-    <div class="tbl"><table id="t-round4">
+    <div class="tbl"><table id="t-round4" class="text">
       <tr><th>項目</th><th>邏輯</th><th>實證（樣本外）</th><th>結論</th></tr>
       <tr><td>中小型股的共識放上網頁</td><td>第三輪驗證了中小型股的共識校正，但網頁只有約 460 檔大型股的詳細共識</td>
         <td>詳細快照擴到約 3,000 檔美股；網頁有共識的 556 → 2,810 檔（有校正係數 1,980）；1,273 家中小型股補凍「只用共識」的事前預測</td><td class="best">採用</td></tr>
@@ -328,7 +354,7 @@ python3 consensus_snapshot.py --detail    # 存一份共識快照</div>
       <tr><td>MU</td><td>12.8</td><td>21.7</td><td>28.1</td><td>2.5</td><td>153.6</td><td>16.3</td><td>3.2</td><td>23.9</td></tr>
       <tr><td>META</td><td>28.0</td><td>22.6</td><td>27.0</td><td>27.3</td><td>29.9</td><td>25.6</td><td>29.0</td><td>25.3</td></tr>
       <tr><td><b>中位誤差</b></td><td></td><td>34.0%</td><td class="best">16.7%</td><td>47.8%</td><td>26.9%</td><td class="best">12.9%</td><td>26.2%</td><td>34.0%</td></tr>
-      <tr><td><b>S&P 500 約 400 家</b></td><td></td><td>30.0%</td><td class="best">28.8%</td><td>24.0%</td><td>34.6%</td><td class="best">22.5%</td><td>17.1%</td><td>27.1%</td></tr>
+      <tr><td><b>S&P 500 約 400 家</b></td><td></td><td>30.0%</td><td class="best">28.8%</td><td>24.0%</td><td>34.6%</td><td class="best">22.7%</td><td>17.2%</td><td>27.4%</td></tr>
     </table></div>
     <ul class="list">
       <li><b>最大的誤差來源是 EPS</b>：分析師在 AI 行情裡大幅低估 MU、NVDA 的獲利；S&P 500 的分析師 EPS 誤差中位 36%（24 個月）／18%（12 個月）。共識係數把 12 個月的偏差從 +11% 修到 +2%。</li>
@@ -340,7 +366,7 @@ python3 consensus_snapshot.py --detail    # 存一份共識快照</div>
 
   <div class="panel stack">
     <h3>第三輪（2026-10-12）：六項，一覽 <span class="chip ok">4 項採用</span></h3>
-    <div class="tbl"><table>
+    <div class="tbl"><table class="text">
       <tr><th>項目</th><th>邏輯</th><th>實證（樣本外）</th><th>結論</th></tr>
       <tr><td>共識校正的同時點護欄</td><td>同一家公司在「距離年報同一段」的歷史偏差，最能說明它現在離實際多遠（Apple 年報前一個月，過去都在 ±2% 內）</td>
         <td>EPS 誤差 11.25% → 10.99%，10 年裡 7 年較準；Apple 年報前的樣本外預測從 +4.5～6.1% 降到 +2%（實際 0.2～1%）</td><td class="best">採用（Apple 今天 1.08 → 1.02）</td></tr>

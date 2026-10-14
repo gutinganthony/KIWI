@@ -66,11 +66,50 @@ def load(t, raw):
         return {}, pd.Series(dtype=float)
 
 
+def fallback_start(t, t0, raw, close5, adr):
+    """不在 S&P 500 面板的公司（Nasdaq-100 用）：起點當時的最近四季 EPS、股利殖利率、波動、12 個月報酬。
+    外國 ADR 用 data/adr_hist.csv.gz（每 ADR 美元、起點前一個月底）；其他用 Yahoo trailingDilutedEPS（季末＋45 天 ≤ 起點、美元）。"""
+    m = close5[:t0].resample("ME").last().dropna()
+    vol = float(np.log(m).diff().dropna().tail(36).std() * np.sqrt(12)) if len(m) > 13 else np.nan
+    ret12 = float(np.log(m.iloc[-1] / m.iloc[-13])) if len(m) > 13 else np.nan
+    if t in adr.index.get_level_values(0):
+        g = adr.loc[t]
+        g = g[g.index < t0]
+        if len(g):
+            return float(g["eps_usd"].iloc[-1]), float(g["dy"].iloc[-1]), vol, ret12
+        return np.nan, np.nan, vol, ret12
+    s = consensus.yahoo_symbol(t)
+    path = os.path.join(raw, f"ts_{s}.json")
+    fetch(f"https://query1.finance.yahoo.com/ws/fundamentals-timeseries/v1/finance/timeseries/{s}"
+          "?type=trailingDilutedEPS&period1=1577836800&period2=1800000000", path)
+    try:
+        f = json.load(open(path))
+        pts = [(pd.Timestamp(x["asOfDate"]), x["reportedValue"]["raw"], x.get("currencyCode", "USD")) for r in f["timeseries"]["result"]
+               for x in r.get("trailingDilutedEPS", []) if x]
+    except Exception:                                    # noqa: BLE001
+        pts = []
+    pts = [p for p in pts if p[0] + pd.Timedelta(days=45) <= t0 and p[2] == "USD"]
+    return (float(max(pts)[1]) if pts else np.nan), 0.0, vol, ret12
+
+
+def close_5y(t, raw):
+    s = consensus.yahoo_symbol(t)
+    path = os.path.join(raw, f"px5_{s}.json")
+    fetch(f"https://query1.finance.yahoo.com/v8/finance/chart/{s}?range=5y&interval=1d", path)
+    try:
+        c = json.load(open(path))["chart"]["result"][0]
+        return pd.Series(c["indicators"]["adjclose"][0]["adjclose"], index=pd.to_datetime(c["timestamp"], unit="s").normalize()).dropna()
+    except Exception:                                    # noqa: BLE001
+        return pd.Series(dtype=float)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--cache", required=True)
     ap.add_argument("--raw", required=True)
+    ap.add_argument("--universe", choices=["sp500", "ndx"], default="sp500", help="ndx＝起點那年 1 月 1 日的 Nasdaq-100 成分股")
     a = ap.parse_args()
+    tag = "case_broad" if a.universe == "sp500" else "case_ndx"
     os.makedirs(a.raw, exist_ok=True)
     x = pd.read_pickle(os.path.join(a.cache, "orbit_x2.pkl"))
     tk, _ = MP.tickers()
@@ -78,47 +117,66 @@ def main():
     model = orbit.load_model()
     wb = pd.read_csv(os.path.join(RES, "orbit_beta.csv")).set_index(["h", "年", "方法", "組別"])
     rates = pd.read_csv(os.path.join(HERE, "data", "rates_monthly.csv"), parse_dates=["month_end"]).set_index("month_end")["DGS10"] / 100
-    names = sorted(set(x.loc[x["month"].isin(pd.to_datetime([m for _, _, m, _ in SCEN])), "ticker"]) & set(now))
+    if a.universe == "sp500":
+        names = sorted(set(x.loc[x["month"].isin(pd.to_datetime([m for _, _, m, _ in SCEN])), "ticker"]) & set(now))
+        members = {nm: set(names) for nm, *_ in SCEN}
+    else:
+        nd = pd.read_csv(os.path.join(HERE, "data", "ndx_members_jan1.csv"))
+        members = {nm: set(nd.loc[nd["year"] == t0.year, "ticker"]) - {"GOOG"} for nm, t0, _, _ in SCEN}
+        allm = set().union(*members.values())
+        names = sorted(allm & set(now))
+        print(f"Nasdaq-100（起點那年 1 月 1 日）共 {len(allm)} 家，今天還有資料的 {len(names)} 家；沒有的：{' '.join(sorted(allm - set(now)))}")
     with ThreadPoolExecutor(4) as ex:
         okn = sum(ok for _, ok in ex.map(lambda t: get(t, a.raw), names))
-    print(f"S&P 500 面板裡、今天也有資料的 {len(names)} 家；Yahoo 抓到 {okn} 家")
+    print(f"{'S&P 500 面板裡、今天也有資料的' if a.universe == 'sp500' else '要評的'} {len(names)} 家；Yahoo 抓到 {okn} 家")
+    adr = pd.read_csv(os.path.join(HERE, "data", "adr_hist.csv.gz"), parse_dates=["month_end"]).set_index(["ticker", "month_end"]).sort_index()
+    secmap = pd.read_csv(os.path.join(RES, "now_all.csv"), usecols=["ticker", "sector"]).set_index("ticker")["sector"].to_dict()
     rows = []
     for t in names:
         fpe, close = load(t, a.raw)
         n = now[t]
         p1, e1 = float(n["px"]), float(n["e"])
         for nm, t0, mon, h in SCEN:
-            r = x[(x["ticker"] == t) & (x["month"] == mon)]
-            if r.empty or t0 not in fpe or close[:t0].empty:
+            if t not in members[nm] or t0 not in fpe or close[:t0].empty:
                 continue
-            r = r.iloc[0]
-            p0, e0 = float(close[:t0].iloc[-1]), float(r["eps0"])
-            if not (e0 > 0 and e1 > 0 and fpe[t0] > 0):
+            r = x[(x["ticker"] == t) & (x["month"] == mon)]
+            p0 = float(close[:t0].iloc[-1])
+            if len(r):
+                r = r.iloc[0]
+                src, e0, dy0 = "面板", float(r["eps0"]), (float(r["dy"]) if np.isfinite(r["dy"]) else 0.0)
+                vol0, ret0, grp0, grev0, mc0 = float(r["vol36"]), float(r["ret12"]), r["grp"], float(r["g_rev"]), p0 * float(r["mc"]) / float(r["px"])
+            else:
+                c5 = close_5y(t, a.raw)
+                e0, dy0, vol0, ret0 = fallback_start(t, t0, a.raw, c5, adr)
+                src, grp0, grev0, mc0 = ("ADR" if n.get("adr") else "Yahoo"), n["g"], np.nan, np.nan
+                dy0 = 0.0 if not np.isfinite(dy0) else dy0
+            if not (np.isfinite(e0) and e0 > 0 and e1 > 0 and fpe[t0] > 0):
                 continue
             months = (NOW - t0).days / 30.4375
             r10 = float(rates[rates.index < t0].iloc[-1])
-            orb = (r10 + model["erp"] - (r["dy"] if np.isfinite(r["dy"]) else 0)) * months / 12
+            orb = (r10 + model["erp"] - dy0) * months / 12
             F = p0 / fpe[t0]
             g = float(np.clip(F / e0, 0.7, 1.5))
             ea = F if h == 12 else F * g
-            gn = orbit.GNAME[r["grp"]]
+            gn = orbit.GNAME[grp0 if grp0 in orbit.GNAME else "other"]
             b_exp = float(wb.loc[(h, t0.year, "預期b＋修正ab", gn), "b0"])
             b_raw = float(wb.loc[(h, t0.year, "原始成長a", gn), "b0"])
             pe1 = p1 / e1
-            row = dict(px=p0, eps0=e0, g_rev=r["g_rev"], ret12=r["ret12"], vol36=r["vol36"], mc=p0 * r["mc"] / r["px"], grp=r["grp"])
-            k, _ = eps_correct.correction(eps_correct.features(t, row, F, t0 + pd.DateOffset(months=12), today=t0), ticker=t)
-            k = k if k is not None else 1.0
+            row = dict(px=p0, eps0=e0, g_rev=grev0, ret12=ret0, vol36=vol0, mc=mc0, grp=grp0)
+            k, _ = (None, None) if (src == "ADR") else eps_correct.correction(eps_correct.features(t, row, F, t0 + pd.DateOffset(months=12), today=t0), ticker=t)
+            k = k if k is not None else 1.0                  # 不在面板的外國 ADR 不校正（正式版規則）；面板裡的外國註冊公司（CB、ETN…）照算
             p_k = p0 * np.exp(orb + b_exp * np.log(ea * k * g / e0))
             p_n = p0 * np.exp(orb + b_exp * np.log(F * k / e0))           # 24 個月不外推（§22.5）：EPS_a＝EPS_b＝forward × 係數
             p_c = p0 * np.exp(orb + b_exp * np.log(ea * g / e0))
             p_p = p0 * np.exp(orb + b_raw * float(np.clip(np.log(e1 / e0), -2, 2)))
-            rows.append(dict(股票=t, 情境=nm, 組別=gn, 起點本益比=p0 / e0, 實際本益比=pe1,
+            rows.append(dict(股票=t, 情境=nm, 組別=gn, 來源=src, 產業=secmap.get(t) or ("adr" if n.get("adr") else ""), 起點本益比=p0 / e0, 實際本益比=pe1,
+                             波動=vol0, 報酬12=ret0, 營收成長=grev0, 股利殖利率=dy0, 市值=mc0, 隱含成長=np.log(F / e0), forward本益比=fpe[t0],
                              誤差_分析師=np.log(p_c / ea / pe1), 誤差_股價=np.log(p_c / p1), 誤差_EPS=np.log(ea / e1),
                              共識係數=k, 誤差_分析師校正=np.log(p_k / (ea * k) / pe1), 誤差_EPS校正=np.log(ea * k / e1),
                              誤差_改善版=np.log(p_n / (F * k) / pe1) if h == 24 else np.log(p_k / (ea * k) / pe1),
                              誤差_EPS猜對=np.log(p_p / e1 / pe1), 誤差_本益比不變=np.log(p0 / e0 / pe1), EPS變化=np.log(e1 / e0)))
     d = pd.DataFrame(rows)
-    d.to_csv(os.path.join(RES, "case_broad.csv"), index=False, float_format="%.6g")
+    d.to_csv(os.path.join(RES, f"{tag}.csv"), index=False, float_format="%.6g")
     out = []
     for nm, g in d.groupby("情境", sort=False):
         for lab, gg in [("全部", g), ("科技", g[g["組別"] != "非科技"]), ("半導體／設備／記憶體", g[g["組別"] == "半導體／設備／記憶體"]),
@@ -134,7 +192,12 @@ def main():
     pd.set_option("display.width", 250)
     print("\n== 中位 |ln 本益比誤差|（0.20 ≈ 差 20%）與誤差在 ±20% 內的比例")
     print(t.round(3).to_string(index=False))
-    t.to_csv(os.path.join(RES, "case_broad_scores.csv"), index=False, float_format="%.6f")
+    t.to_csv(os.path.join(RES, f"{tag}_scores.csv"), index=False, float_format="%.6f")
+    if a.universe == "ndx":
+        print("\n== 誤差最大的 10 家（2025 起點，分析師×係數）")
+        b_ = d[d["情境"].str.startswith("B")].assign(絕對誤差=lambda v: v["誤差_分析師校正"].abs()).nlargest(10, "絕對誤差")
+        print(b_[["股票", "來源", "組別", "起點本益比", "實際本益比", "誤差_分析師校正", "誤差_EPS校正", "誤差_股價"]].round(3).to_string(index=False))
+        return
     five = d[d["股票"].isin(["GOOGL", "NVDA", "MU", "META"])]
     print("\n== 對照：個案的 4 檔在這個表裡（TSM 不是 S&P 500）")
     print(five[["股票", "情境", "起點本益比", "實際本益比", "誤差_分析師", "誤差_EPS猜對", "誤差_本益比不變"]].round(3).to_string(index=False))
