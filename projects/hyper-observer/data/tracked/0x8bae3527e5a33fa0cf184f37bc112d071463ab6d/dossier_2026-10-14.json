@@ -1,0 +1,449 @@
+{
+  "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+  "label": "scan-best-candidate-9M-lowdd",
+  "snapshot_date": "2026-10-14",
+  "classification": "choppy",
+  "classification_reasons": [
+    "目前槓桿 40.0 <= 20x"
+  ],
+  "followable": {
+    "ok": false,
+    "reasons": [
+      "槓桿過高：目前 40x > 10x"
+    ]
+  },
+  "metrics": {
+    "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+    "snapshot_date": "2026-10-14",
+    "pnl_source": "portfolio_curve",
+    "portfolio_window": "perpAllTime",
+    "low_confidence": false,
+    "total_pnl": 11968022.79,
+    "peak_pnl": 12029020.5,
+    "monthly_pnl": {
+      "2025-07": -73180.55,
+      "2025-08": -34288.37,
+      "2025-09": -8212.34,
+      "2025-10": 1435708.48,
+      "2025-11": 2045437.87,
+      "2025-12": 930544.52,
+      "2026-01": 638177.85,
+      "2026-02": 519822.91,
+      "2026-03": 1413004.59,
+      "2026-04": 1924051.99,
+      "2026-05": 106203.52,
+      "2026-06": -253202.61,
+      "2026-07": 1066691.25,
+      "2026-08": 1556583.85,
+      "2026-09": 253168.89,
+      "2026-10": 447510.94
+    },
+    "active_months": 16,
+    "positive_month_ratio": 0.75,
+    "best_month_pnl": 2045437.87,
+    "max_drawdown_pct": 0.0554,
+    "current_drawdown_pct": 0.0051,
+    "max_single_day_crash_pct": 0.0331,
+    "span_days": 454.1,
+    "days_idle": 0.9,
+    "n_fills": 2000,
+    "profit_factor": 1418.847,
+    "avg_win": 1803.59,
+    "avg_loss": 20.08,
+    "realized_win_rate": 0.94,
+    "avg_hold_hours": 510.927,
+    "net_direction_ratio": 0.0474,
+    "n_fills_truncated": true,
+    "n_fills_last_30d": 552,
+    "n_events": 45,
+    "n_events_last_30d": 11,
+    "n_events_last_30d_est": 11,
+    "events_30d_coverage_days": 30.0,
+    "median_fills_per_event": 20,
+    "median_event_notional": 458777.34,
+    "median_gap_between_events_hours": 1.88,
+    "p90_gap_between_events_hours": 113.94,
+    "had_liquidation": false,
+    "n_liquidations": 0,
+    "top_coin": "xyz:NVDA",
+    "vlm": 361138020.79,
+    "vlm_to_pnl_ratio": 30.18,
+    "funding_total": -114641.21,
+    "n_open_positions": 8,
+    "n_open_positions_native": 5,
+    "dexs_with_positions": [
+      "xyz"
+    ],
+    "account_value_native": 200581.0,
+    "account_value_by_dex": {
+      "": 200581.0,
+      "abcd": 0.0,
+      "cash": 0.0,
+      "flx": 0.0,
+      "hyna": 0.0,
+      "io": 0.0,
+      "km": 0.0,
+      "mkts": 0.0,
+      "para": 0.0,
+      "vntl": 0.0,
+      "xyz": 497274.34
+    },
+    "spot_value_usd": 4181499.32,
+    "spot_tokens": [
+      {
+        "coin": "USDC",
+        "qty": 4133284.05926533,
+        "usd": 4133284.06,
+        "estimated": false
+      },
+      {
+        "coin": "USDT0",
+        "qty": 48215.25091058,
+        "usd": 48215.25,
+        "estimated": true
+      },
+      {
+        "coin": "USDH",
+        "qty": 0.01250805,
+        "usd": 0.01,
+        "estimated": false
+      }
+    ],
+    "total_value_all_venues": 4879354.66,
+    "non_native_share": 0.9589,
+    "current_max_leverage": 40.0,
+    "has_extreme_leverage": true,
+    "margin_types": [
+      "cross"
+    ],
+    "account_value": 697855.34,
+    "fetch_errors": []
+  },
+  "position_value": 6696546.21,
+  "unrealized_pnl": -91033.6,
+  "n_open_positions": 8,
+  "open_positions": [
+    {
+      "coin": "BTC",
+      "szi": -10.74691,
+      "side": "short",
+      "entry_px": 83783.0,
+      "position_value": 895668.97322,
+      "unrealized_pnl": 4740.32927,
+      "leverage_value": 40.0,
+      "leverage_type": "cross",
+      "liquidation_px": 434952.7205550477,
+      "margin_used": 22391.72433,
+      "max_leverage": 40.0,
+      "cum_funding_all_time": -27956.650983,
+      "dex": ""
+    },
+    {
+      "coin": "DOGE",
+      "szi": 9756943.0,
+      "side": "long",
+      "entry_px": 0.092131,
+      "position_value": 825847.169406,
+      "unrealized_pnl": -73079.297402,
+      "leverage_value": 10.0,
+      "leverage_type": "cross",
+      "liquidation_px": null,
+      "margin_used": 82584.71694,
+      "max_leverage": 10.0,
+      "cum_funding_all_time": 8064.970258,
+      "dex": ""
+    },
+    {
+      "coin": "BSV",
+      "szi": 552.51,
+      "side": "long",
+      "entry_px": 16.5199,
+      "position_value": 10329.17445,
+      "unrealized_pnl": 1201.709251,
+      "leverage_value": 3.0,
+      "leverage_type": "cross",
+      "liquidation_px": null,
+      "margin_used": 3443.05815,
+      "max_leverage": 3.0,
+      "cum_funding_all_time": 1448.28123,
+      "dex": ""
+    },
+    {
+      "coin": "TNSR",
+      "szi": 862794.4,
+      "side": "long",
+      "entry_px": 0.03649,
+      "position_value": 30068.38484,
+      "unrealized_pnl": -1414.982816,
+      "leverage_value": 3.0,
+      "leverage_type": "cross",
+      "liquidation_px": null,
+      "margin_used": 10022.794946,
+      "max_leverage": 3.0,
+      "cum_funding_all_time": -892.762216,
+      "dex": ""
+    },
+    {
+      "coin": "kNEIRO",
+      "szi": 365308.9,
+      "side": "long",
+      "entry_px": 0.07529,
+      "position_value": 30024.738491,
+      "unrealized_pnl": 2520.63141,
+      "leverage_value": 3.0,
+      "leverage_type": "cross",
+      "liquidation_px": null,
+      "margin_used": 10008.246163,
+      "max_leverage": 3.0,
+      "cum_funding_all_time": 61.758147,
+      "dex": ""
+    },
+    {
+      "coin": "xyz:GOOGL",
+      "szi": 219.928,
+      "side": "long",
+      "entry_px": 343.187,
+      "position_value": 78017.25872,
+      "unrealized_pnl": 2540.637708,
+      "leverage_value": 10.0,
+      "leverage_type": "cross",
+      "liquidation_px": null,
+      "margin_used": 7801.725872,
+      "max_leverage": 20.0,
+      "cum_funding_all_time": 3104.400632,
+      "dex": "xyz"
+    },
+    {
+      "coin": "xyz:SKHX",
+      "szi": 2107.974,
+      "side": "long",
+      "entry_px": 1431.724,
+      "position_value": 2301907.608,
+      "unrealized_pnl": -716130.6376,
+      "leverage_value": 10.0,
+      "leverage_type": "cross",
+      "liquidation_px": null,
+      "margin_used": 230190.7608,
+      "max_leverage": 10.0,
+      "cum_funding_all_time": 32184.215937,
+      "dex": "xyz"
+    },
+    {
+      "coin": "xyz:SKHY",
+      "szi": -16202.56,
+      "side": "short",
+      "entry_px": 198.3187,
+      "position_value": 2524682.8992,
+      "unrealized_pnl": 688588.0089,
+      "leverage_value": 10.0,
+      "leverage_type": "cross",
+      "liquidation_px": 380.6929597232,
+      "margin_used": 252468.28992,
+      "max_leverage": 10.0,
+      "cum_funding_all_time": 19545.816277,
+      "dex": "xyz"
+    }
+  ],
+  "recent_fills": [
+    {
+      "time": "2026-10-13T01:23:37.135000+00:00",
+      "coin": "BSV",
+      "dir": "Close Long",
+      "px": 19.7,
+      "sz": 1.01,
+      "closed_pnl": 3.21,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-10-13T01:23:37.135000+00:00",
+      "coin": "BSV",
+      "dir": "Close Long",
+      "px": 19.7,
+      "sz": 1.01,
+      "closed_pnl": 3.21,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-10-13T01:23:37.135000+00:00",
+      "coin": "BSV",
+      "dir": "Close Long",
+      "px": 19.7,
+      "sz": 1.01,
+      "closed_pnl": 3.21,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-10-13T01:23:37.135000+00:00",
+      "coin": "BSV",
+      "dir": "Close Long",
+      "px": 19.7,
+      "sz": 1.01,
+      "closed_pnl": 3.21,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-10-13T01:23:37.135000+00:00",
+      "coin": "BSV",
+      "dir": "Close Long",
+      "px": 19.7,
+      "sz": 1.01,
+      "closed_pnl": 3.21,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-10-13T01:23:37.135000+00:00",
+      "coin": "BSV",
+      "dir": "Close Long",
+      "px": 19.7,
+      "sz": 1.01,
+      "closed_pnl": 3.21,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-10-13T01:23:37.135000+00:00",
+      "coin": "BSV",
+      "dir": "Close Long",
+      "px": 19.7,
+      "sz": 4.82,
+      "closed_pnl": 15.33,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-10-13T01:23:37.135000+00:00",
+      "coin": "BSV",
+      "dir": "Close Long",
+      "px": 19.7,
+      "sz": 1.01,
+      "closed_pnl": 3.21,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-10-13T01:23:37.135000+00:00",
+      "coin": "BSV",
+      "dir": "Close Long",
+      "px": 19.7,
+      "sz": 1.01,
+      "closed_pnl": 3.21,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-10-13T01:23:37.135000+00:00",
+      "coin": "BSV",
+      "dir": "Close Long",
+      "px": 19.7,
+      "sz": 1.01,
+      "closed_pnl": 3.21,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-10-13T01:23:37.135000+00:00",
+      "coin": "BSV",
+      "dir": "Close Long",
+      "px": 19.7,
+      "sz": 1.01,
+      "closed_pnl": 3.21,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-10-13T01:23:37.135000+00:00",
+      "coin": "BSV",
+      "dir": "Close Long",
+      "px": 19.7,
+      "sz": 1.01,
+      "closed_pnl": 3.21,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-10-13T01:23:37.135000+00:00",
+      "coin": "BSV",
+      "dir": "Close Long",
+      "px": 19.7,
+      "sz": 43.6,
+      "closed_pnl": 138.65,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-10-13T01:23:37.135000+00:00",
+      "coin": "BSV",
+      "dir": "Close Long",
+      "px": 19.7,
+      "sz": 1.43,
+      "closed_pnl": 4.55,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-10-13T01:23:37.135000+00:00",
+      "coin": "BSV",
+      "dir": "Close Long",
+      "px": 19.7,
+      "sz": 49.79,
+      "closed_pnl": 158.34,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-10-13T01:23:37.235000+00:00",
+      "coin": "BSV",
+      "dir": "Close Long",
+      "px": 19.7,
+      "sz": 126.67,
+      "closed_pnl": 402.82,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-10-13T01:23:37.235000+00:00",
+      "coin": "BSV",
+      "dir": "Close Long",
+      "px": 19.7,
+      "sz": 3.0,
+      "closed_pnl": 9.54,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-10-13T01:23:37.235000+00:00",
+      "coin": "BSV",
+      "dir": "Close Long",
+      "px": 19.7,
+      "sz": 1.01,
+      "closed_pnl": 3.21,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-10-13T01:23:37.235000+00:00",
+      "coin": "BSV",
+      "dir": "Close Long",
+      "px": 19.7,
+      "sz": 1.01,
+      "closed_pnl": 3.21,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-10-13T01:23:37.235000+00:00",
+      "coin": "BSV",
+      "dir": "Close Long",
+      "px": 19.7,
+      "sz": 1.01,
+      "closed_pnl": 3.21,
+      "is_liquidation": false
+    }
+  ],
+  "new_positions": [],
+  "disappeared_positions": [],
+  "initialized": false,
+  "raw_source": "snapshot",
+  "funds_trend": {
+    "status": "收手中（現金化＋資本外移）",
+    "n_points": 7,
+    "days": 7,
+    "threshold": 0.05,
+    "first_date": "2026-10-08",
+    "last_date": "2026-10-14",
+    "spot_share_first": 0.7915,
+    "spot_share_last": 0.857,
+    "spot_share_change": 0.0655,
+    "total_first": 6483120.37,
+    "total_last": 4879354.66,
+    "total_change_pct": -0.2474,
+    "perp_change_pct": -0.4838,
+    "position_value_change_pct": -0.2732
+  }
+}
