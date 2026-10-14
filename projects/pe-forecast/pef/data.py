@@ -263,6 +263,9 @@ def stooq_monthly(path):
     return m
 
 
+STOOQ_DIV_END = pd.Timestamp("2022-12-19")
+
+
 def unadjust_dividends(adj_m, q):
     """把 Stooq 的股利還原拿掉：F(t) = Π_{除息日 d > t} (1 − y_d)，真實價 = 還原價 ÷ F(t)。
 
@@ -271,7 +274,8 @@ def unadjust_dividends(adj_m, q):
     """
     F = pd.Series(1.0, index=adj_m.index)
     divs = q[["period_end", "dps_now"]].dropna()
-    divs = divs[divs["dps_now"] > 0].sort_values("period_end", ascending=False)
+    # 鏡像的 Stooq 只還原到 2022-12-16 的除息，之後是原始價（README §25.0；build_broad.STOOQ_DIV_END）→ 之後的股利不反推
+    divs = divs[(divs["dps_now"] > 0) & (divs["period_end"] + pd.offsets.MonthEnd(0) < STOOQ_DIV_END)].sort_values("period_end", ascending=False)
     f_after = 1.0
     for r in divs.itertuples():
         ex = r.period_end + pd.offsets.MonthEnd(0)

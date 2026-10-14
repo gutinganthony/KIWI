@@ -5,7 +5,7 @@
 
 來源（都在同一個公開鏡像）：
   company_facts/CIK*.json              SEC companyfacts（財報，取第一次申報值，同 pef/data.py）
-  sp500_stooq_ohcl/<t>.us.txt          Stooq 日股價（有做股利與分割還原）
+  sp500_stooq_ohcl/<t>.us.txt          Stooq 日股價（分割還原；股利只還原到 2022-12-16 的除息——鏡像在那之後接上的是原始價，見 STOOQ_DIV_END）
   sp500_corporate_actions_yfinance.csv 每一次除息（日期、金額）與分割（含「分拆」記成的非整數比例）
   S_and_P_500_component_stocks.csv     名單、CIK、GICS 產業
 
@@ -38,6 +38,12 @@ def is_split(r):
         if abs(r - k) / k < 0.01 or abs(1 / r - k) / k < 0.01:
             return True
     return False
+
+
+# 鏡像裡的 Stooq 股價只把 2022-12-16（含）以前的除息還原過，之後接上的是原始收盤價（2026-10-14 用 Bloomberg 月底收盤價、
+# Yahoo 原始收盤價核對：2022-12-19 以後的除息沒有被還原，456 家的 Stooq ÷ 原始價在 2022-11 以後都是 1.000）。
+# 修正前把 2022-12 以後的除息也「反還原」，配息股 2025-06 以前的股價被高估（MO 約 17–21%、VZ 15–18%、KO 5–7%、JPM 4–6%）。
+STOOQ_DIV_END = pd.Timestamp("2022-12-19")
 
 
 def stooq_daily(path):
@@ -114,7 +120,7 @@ def main():
             continue
         adj = stooq_daily(sp)
         divs = a_t[a_t["event_type"] == "dividend"].set_index("ex_date")["cash_amount"].dropna()
-        raw = unadjust_daily(adj, divs[divs.index > adj.index.min()])
+        raw = unadjust_daily(adj, divs[(divs.index > adj.index.min()) & (divs.index < STOOQ_DIV_END)])
         px_m = raw.resample("ME").last().dropna()
         q = q.copy()
         q["sh_now"], n_fix = fix_share_scale(q, px_m)          # 股數單位錯（千股／百萬股）→ 乘回來
