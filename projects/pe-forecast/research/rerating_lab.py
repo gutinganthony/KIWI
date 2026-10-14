@@ -122,7 +122,7 @@ def decompose(b):
 
 
 def score(d, preds, h):
-    subsets = [("全部", d["act"].notna()), ("2022 以後起點", d["month"] >= "2022-01-01"), ("科技", d["grp"] != "other"),
+    subsets = [("全部", d["act"].notna()), ("2022 以後起點", d["month"] >= "2022-01-01"), ("科技", d["grp"] != "other"), ("非科技", d["grp"] == "other"),
                ("半導體類", d["grp"] == "cyclical"), ("成長加速 ΔG > 0.15", (d["GT"] - d["G0"]) > 0.15),
                ("成長放緩 ΔG < −0.15", (d["GT"] - d["G0"]) < -0.15),
                ("forward 本益比大升（> +0.3）", (d["lfpeT"] - d["lfpe0"]) > 0.3), ("forward 本益比大降（< −0.3）", (d["lfpeT"] - d["lfpe0"]) < -0.3),
@@ -224,7 +224,24 @@ def main():
             m = (d["year"] == Y) & (d["grp"].map(GNAME) == gname)
             Rc.loc[m] = row["截距"] + sum(row[c] * xc.loc[m, c] for c in gcols)
         cpred["G 成長定價"] = base + Rc
+        # 沒有看法時，目標日的成長預期改用「回歸」：GT ＝ a ＋ λ × G0（走動式：只用目標日在起點那年以前的配對估）
+        gth = pd.Series(np.nan, index=d.index)
+        for Y in range(2015, 2025):
+            tr = d[d["T"] < pd.Timestamp(f"{Y}-01-01")].dropna(subset=["GT", "G0"])
+            m = d["year"] == Y
+            if len(tr) < 300 or not m.any():
+                continue
+            ab = huber_ols(np.column_stack([np.ones(len(tr)), tr["G0"].to_numpy(float)]), tr["GT"].to_numpy(float))
+            gth.loc[m] = ab[0] + ab[1] * d.loc[m, "G0"]
+        xr = xc.assign(GT=gth.clip(-1.5, 1.5))
+        Rr = pd.Series(np.nan, index=d.index)
+        for (Y, gname), row in cc.iterrows():
+            m = (d["year"] == Y) & (d["grp"].map(GNAME) == gname)
+            Rr.loc[m] = row["截距"] + sum(row[c] * xr.loc[m, c] for c in gcols)
+        cpred["G 成長定價（成長預期回歸）"] = base + Rr
         cpred["平均：O_a 與 G"] = (cpred["O_a 軌道"] + cpred["G 成長定價"]) / 2
+        cpred["分組：科技用 G、非科技用軌道"] = cpred["G 成長定價"].where(d["grp"] != "other", cpred["O_a 軌道"])
+        cpred["分組：科技用 G（回歸）、非科技用軌道"] = cpred["G 成長定價（成長預期回歸）"].where(d["grp"] != "other", cpred["O_a 軌道"])
         if h == 24:
             cpred["O_a 軌道（不外推）"] = orbit_pe(d["F0k"])
         ok = pd.concat(preds, axis=1).notna().all(axis=1)

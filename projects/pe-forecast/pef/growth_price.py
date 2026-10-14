@@ -58,6 +58,16 @@ def coefs(gm, h, grp, year=None):
     return src["other"] if grp == "other" and "other" in src else src["all"]
 
 
+def eps_b_hat(gm, h, eps_a, eps0, fwd0, year=None):
+    """沒有自己看法時的 EPS_b（目標日時市場預期的下一年）：EPS_a × exp(a ＋ λ × ln(F_0 ÷ 今天 EPS))。
+    市場的成長預期會強烈回歸（λ 約 0.15–0.3，README §24.7）；直接把今天的成長率延伸一年會高估。"""
+    src = gm["by_year"][str(h)][str(year)] if year is not None else gm["h"][str(h)]
+    a, lam = src["gt_hat"]
+    if not (eps_a and eps_a > 0 and eps0 and eps0 > 0 and fwd0 and fwd0 > 0):
+        return None
+    return float(eps_a * np.exp(a + lam * float(np.clip(np.log(fwd0 / eps0), -CLIP["G0"], CLIP["G0"]))))
+
+
 def features(eps0, eps_a, eps_b, fwd0, ret12):
     pos = lambda v: v is not None and np.isfinite(v) and v > 0
     if not (pos(eps0) and pos(eps_a) and pos(eps_b) and pos(fwd0)):

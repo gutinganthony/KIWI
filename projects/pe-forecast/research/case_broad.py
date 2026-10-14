@@ -67,6 +67,60 @@ def load(t, raw):
         return {}, pd.Series(dtype=float)
 
 
+CLEAN = (1.5, 2, 3, 4, 5, 6, 7, 8, 10, 12, 15, 20, 25, 30, 40, 50, 100)
+
+
+def clean_factor(ratio):
+    """股數口徑差幾倍：比值離 1 不到 ±20% 當作沒有差（只是日期或股利調整的雜訊）；否則取最接近的常見分割倍數（含反分割）。"""
+    if not (ratio > 0) or abs(np.log(ratio)) <= 0.2:
+        return 1.0
+    cands = [c for c in CLEAN] + [1 / c for c in CLEAN]
+    best = min(cands, key=lambda c: abs(np.log(ratio / c)))
+    return float(best) if abs(np.log(ratio / best)) < 0.15 else float(ratio)
+
+
+def basis_factor(px_ref, close, date, exact=True):
+    """參考價（面板或 ADR 歷史的股價，當時的股數口徑）÷ 同一天的 Yahoo 股價（已回溯調整到今天的口徑）。
+    回傳 EPS 要除以的倍數：起點到今天之間有分割或分拆時 ≠ 1（例：NFLX 2025-11 一拆十 → 10；分拆子公司 → Yahoo 的調整比例）。
+    exact：面板和 Yahoo 是同一天的收盤，用實際比值（±15% 以內當作沒有差：面板股價有時含特別股利的還原誤差，例 TDG）；ADR 歷史對的是含息調整的股價，改取最接近的常見分割倍數。"""
+    c = close[:pd.Timestamp(date)]
+    if c.empty or not px_ref > 0:
+        return 1.0
+    r = float(px_ref / c.iloc[-1])
+    if exact:
+        return 1.0 if abs(np.log(r)) <= 0.15 else r
+    return clean_factor(r)
+
+
+def panel_price_date(x, mon, closes):
+    """面板某個月那一列的股價是哪一天的收盤（月底，或建表那天）：在那個月裡找讓各公司「面板股價 ÷ Yahoo 收盤」最接近 1 的日子。"""
+    rows = x[x["month"] == pd.Timestamp(mon)].set_index("ticker")["px"]
+    days = pd.bdate_range(pd.Timestamp(mon), pd.Timestamp(mon) + pd.offsets.MonthEnd(0))
+    best = None
+    for dd in days:
+        lr = [abs(np.log(rows[t] / float(c[:dd].iloc[-1]))) for t, c in closes.items() if t in rows.index and len(c[:dd]) and c[:dd].index[-1] >= dd - pd.Timedelta(days=4)]
+        if len(lr) >= 30:
+            v = float(np.median(lr))
+            best = (v, dd) if best is None or v < best[0] else best
+    return best[1] if best else pd.Timestamp(mon) + pd.offsets.MonthEnd(0)
+
+
+def split_factor_since(t, raw, since):
+    """Yahoo 的分割事件（chart events=split）：since 之後到今天累計的分割倍數（Yahoo trailing EPS 沒有回溯調整）。"""
+    s = consensus.yahoo_symbol(t)
+    path = os.path.join(raw, f"spl_{s}.json")
+    fetch(f"https://query1.finance.yahoo.com/v8/finance/chart/{s}?range=10y&interval=1mo&events=split", path)
+    try:
+        ev = json.load(open(path))["chart"]["result"][0].get("events", {}).get("splits", {})
+    except Exception:                                    # noqa: BLE001
+        return 1.0
+    f = 1.0
+    for v in ev.values():
+        if pd.Timestamp(int(v["date"]), unit="s") > pd.Timestamp(since) and v.get("denominator"):
+            f *= float(v["numerator"]) / float(v["denominator"])
+    return f
+
+
 def fallback_start(t, t0, raw, close5, adr):
     """不在 S&P 500 面板的公司（Nasdaq-100 用）：起點當時的最近四季 EPS、股利殖利率、波動、12 個月報酬。
     外國 ADR 用 data/adr_hist.csv.gz（每 ADR 美元、起點前一個月底）；其他用 Yahoo trailingDilutedEPS（季末＋45 天 ≤ 起點、美元）。"""
@@ -77,8 +131,10 @@ def fallback_start(t, t0, raw, close5, adr):
         g = adr.loc[t]
         g = g[g.index < t0]
         if len(g):
-            return float(g["eps_usd"].iloc[-1]), float(g["dy"].iloc[-1]), vol, ret12
-        return np.nan, np.nan, vol, ret12
+            me = g.index[-1]
+            bf = basis_factor(float(g["px"].iloc[-1]), close5, me, exact=False)    # ADR 歷史是當時的口徑
+            return float(g["eps_usd"].iloc[-1]) / bf, float(g["dy"].iloc[-1]), vol, ret12, bf
+        return np.nan, np.nan, vol, ret12, 1.0
     s = consensus.yahoo_symbol(t)
     path = os.path.join(raw, f"ts_{s}.json")
     fetch(f"https://query1.finance.yahoo.com/ws/fundamentals-timeseries/v1/finance/timeseries/{s}"
@@ -90,7 +146,11 @@ def fallback_start(t, t0, raw, close5, adr):
     except Exception:                                    # noqa: BLE001
         pts = []
     pts = [p for p in pts if p[0] + pd.Timedelta(days=45) <= t0 and p[2] == "USD"]
-    return (float(max(pts)[1]) if pts else np.nan), 0.0, vol, ret12
+    if not pts:
+        return np.nan, 0.0, vol, ret12, 1.0
+    asof, v, _ = max(pts)
+    sf = split_factor_since(t, raw, asof)                 # trailing EPS 是公布當時的口徑
+    return float(v) / sf, 0.0, vol, ret12, sf
 
 
 def close_5y(t, raw):
@@ -133,6 +193,10 @@ def main():
     adr = pd.read_csv(os.path.join(HERE, "data", "adr_hist.csv.gz"), parse_dates=["month_end"]).set_index(["ticker", "month_end"]).sort_index()
     secmap = pd.read_csv(os.path.join(RES, "now_all.csv"), usecols=["ticker", "sector"]).set_index("ticker")["sector"].to_dict()
     gm = GP.load()
+    sample = names[::max(1, len(names) // 80)]
+    closes = {t: load(t, a.raw)[1] for t in sample}
+    pdates = {mon: panel_price_date(x, mon, closes) for _, _, mon, _ in SCEN}
+    print("面板股價的日期：" + "、".join(f"{m[:7]} 那一列＝{d.date()}" for m, d in pdates.items()))
     rows = []
     for t in names:
         fpe, close = load(t, a.raw)
@@ -154,13 +218,15 @@ def main():
             p0 = float(close[:t0].iloc[-1])
             if len(r):
                 r = r.iloc[0]
-                src, e0, dy0 = "面板", float(r["eps0"]), (float(r["dy"]) if np.isfinite(r["dy"]) else 0.0)
-                vol0, ret0, grp0, grev0, mc0 = float(r["vol36"]), float(r["ret12"]), r["grp"], float(r["g_rev"]), p0 * float(r["mc"]) / float(r["px"])
+                # 面板的股價／EPS 是面板自己的股數口徑；Yahoo 股價已回溯調整到今天 → 起點到今天之間有分割時，EPS 要換成今天的口徑（§24.7）
+                bf = basis_factor(float(r["px"]), close, pdates[mon])
+                src, e0, dy0 = "面板", float(r["eps0"]) / bf, (float(r["dy"]) if np.isfinite(r["dy"]) else 0.0)
+                vol0, ret0, grp0, grev0, mc0 = float(r["vol36"]), float(r["ret12"]), r["grp"], float(r["g_rev"]), p0 * bf * float(r["mc"]) / float(r["px"])   # 市值不受口徑影響
             elif a.universe == "sp500":
                 continue                                 # S&P 500 回顧只用面板（§22.2 的定義）；起點前一個月沒有面板列的不評
             else:
                 c5 = close_5y(t, a.raw)
-                e0, dy0, vol0, ret0 = fallback_start(t, t0, a.raw, c5, adr)
+                e0, dy0, vol0, ret0, bf = fallback_start(t, t0, a.raw, c5, adr)
                 src, grp0, grev0, mc0 = ("ADR" if n.get("adr") else "Yahoo"), n["g"], np.nan, np.nan
                 dy0 = 0.0 if not np.isfinite(dy0) else dy0
             if not (np.isfinite(e0) and e0 > 0 and e1 > 0 and fpe[t0] > 0):
@@ -184,13 +250,31 @@ def main():
             p_p = p0 * np.exp(orb + b_raw * float(np.clip(np.log(e1 / e0), -2, 2)))
             # 成長定價：F_0＝起點的 forward EPS × 係數；走動式係數（只用目標日在起點那年以前的配對）
             grow = dict(px=p0, eps0=e0, y10=r10, dy=dy0, vol36=vol0, grp=grp0 if grp0 in orbit.GNAME else "other")
-            gpe = lambda ea, eb: (GP.predict(grow, h, ea, eb, F * k, ret0, model=model, gm=gm, year=t0.year) or {}).get("pe")  # noqa: E731
-            pe_go = gpe(e1, eb_now) if eb_now else None
+            bwm = orbit.band_widen("adr", h) if src == "ADR" else 1.0
+            gp_ = lambda ea, eb: GP.predict(grow, h, ea, eb, F * k, ret0, model=model, gm=gm, year=t0.year, band_mult=bwm) if eb else None  # noqa: E731
+            go = gp_(e1, eb_now)
             ga_ = F * k if h == 12 else F * k * g
-            pe_gc = gpe(ga_, ga_ * g)
-            pe_gn = gpe(F * k, F * k * g) if h == 24 else pe_gc
+            gc = gp_(ga_, ga_ * g)
+            gn_ = gp_(F * k, F * k * g) if h == 24 else gc
+            # 事前（成長預期回歸，README §24.7）：目標日的成長預期 ＝ a ＋ λ × 今天的成長預期；24 個月的 EPS_a 也用回歸的成長延一年
+            G0_ = float(np.clip(np.log(F * k / e0), -1.5, 1.5))
+            gt12 = gm["by_year"]["12"][str(t0.year)]["gt_hat"]
+            ea_r = F * k if h == 12 else F * k * np.exp(gt12[0] + gt12[1] * G0_)
+            gr = gp_(ea_r, GP.eps_b_hat(gm, h, ea_r, e0, F * k, year=t0.year))
+            pe_go, pe_gc, pe_gn, pe_gr = [(o or {}).get("pe") for o in (go, gc, gn_, gr)]
+            inb = lambda o: (bool(o["pe_lo80"] <= pe1 <= o["pe_hi80"]) if o else np.nan)  # noqa: E731
+            vq = lambda spec: vol0 if np.isfinite(vol0) else model["h"][str(h)]["bands"][spec]["vol_median"]  # noqa: E731
+
+            def inb_orbit(pc, e_, spec):                     # 軌道的 80% 本益比區間（正式版分位數 × 波動^α × EPS 變化放寬）
+                q = model["h"][str(h)]["bands"][spec]["q"]
+                sc_ = float(np.clip(vq(spec), *orbit.VOL_CLIP) ** model["alpha"]) * bwm * float(
+                    np.exp(model["band_delta"][str(h)] * min(abs(np.log(e_ / e0)), 2.0)))
+                return bool(pc * np.exp(q[0] * sc_) / e_ <= pe1 <= pc * np.exp(q[3] * sc_) / e_)
             lg = lambda v: np.log(v / pe1) if v else np.nan     # noqa: E731
-            rows.append(dict(股票=t, 情境=nm, 組別=gn, 來源=src, 成長定價_猜中市場預期=lg(pe_go), 成長定價_事前=lg(pe_gc), 成長定價_事前不外推=lg(pe_gn),
+            rows.append(dict(股票=t, 情境=nm, 組別=gn, 來源=src, 分割調整=bf, 成長定價_猜中市場預期=lg(pe_go), 成長定價_事前=lg(pe_gc), 成長定價_事前不外推=lg(pe_gn),
+                             成長定價_事前回歸=lg(pe_gr), 區間_軌道猜對=inb_orbit(p_p, e1, "原始成長a"), 區間_軌道事前=inb_orbit(p_k, ea * k, "預期b＋修正ab"),
+                             區間_軌道改善版=inb_orbit(p_n, F * k, "預期b＋修正ab") if h == 24 else inb_orbit(p_k, ea * k, "預期b＋修正ab"),
+                             區間_成長猜對=inb(go), 區間_成長事前=inb(gc), 區間_成長事前回歸=inb(gr),
                              今天共識未來12月=eb_now, 產業=secmap.get(t) or ("adr" if n.get("adr") else ""), 起點本益比=p0 / e0, 實際本益比=pe1,
                              波動=vol0, 報酬12=ret0, 營收成長=grev0, 股利殖利率=dy0, 市值=mc0, 隱含成長=np.log(F / e0), forward本益比=fpe[t0],
                              誤差_分析師=np.log(p_c / ea / pe1), 誤差_股價=np.log(p_c / p1), 誤差_EPS=np.log(ea / e1),
