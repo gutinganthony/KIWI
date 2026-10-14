@@ -190,8 +190,10 @@ def main():
                 r_[nm] = float(np.median(np.abs(e_))) if len(e_) >= 20 else np.nan
             rr.append(r_)
         return pd.DataFrame(rr)
+    summ = []
     for h in (12, 24):
         g = o[o["h"] == h]
+        summ += [tab(g, ["組"]).assign(h=h, 年="全部"), tab(g, ["year", "組"]).assign(h=h).rename(columns={"year": "年"}), tab(g, ["year"]).assign(h=h, 組="全部").rename(columns={"year": "年"})]
         say(f"\n==================== {h} 個月：{len(g):,} 組（{g['ticker'].nunique()} 家；起點 {g['month'].min():%Y-%m}～{g['month'].max():%Y-%m}，每個月一個起點）")
         say(f"  分析師 EPS 誤差（中位 |ln(預估 ÷ 實際)|）：未來 12 個月 × 係數（{'延一年' if h == 24 else '原樣'}）{np.median(np.abs(g['eps_err1'].dropna())):.3f}"
             + (f"；第 13–24 個月 × 係數 {np.median(np.abs(g['eps_err2'].dropna())):.3f}" if h == 24 else ""))
@@ -207,6 +209,7 @@ def main():
                 f"成長定價（回歸）勝軌道 {int((t['成長定價（回歸）'] < t['軌道（延一年）']).sum())}；軌道（第二年）勝軌道（延一年）{int((t['軌道（第二年＝分析師）'] < t['軌道（延一年）']).sum())}；"
                 f"猜對時成長定價勝軌道 {int((t['猜對：成長定價'] < t['猜對：軌道']).sum())}")
         say("  ±20%：" + "、".join(f"{nm} {np.mean(np.abs(np.exp(g[c].dropna()) - 1) <= 0.2):.0%}" for c, nm in cols if g[c].notna().any()))
+    pd.concat(summ, ignore_index=True).to_csv(os.path.join(RES, "bbg_consensus_scores.csv"), index=False, float_format="%.4f")   # 只有中位誤差（彙總）
     open(os.path.join(RES, "bbg_consensus.txt"), "w").write(buf.getvalue())
 
 
