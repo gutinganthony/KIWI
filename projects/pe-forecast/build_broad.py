@@ -42,7 +42,7 @@ def is_split(r):
 
 # 鏡像裡的 Stooq 股價多半只把 2022-12-19（含）以前的除息還原過，之後接上的是原始收盤價（2026-10-14 用 Bloomberg 月底收盤價、
 # Yahoo 原始收盤價逐筆核對：12-19 以前 98.5% 有還原，之後 4%）。修正前把之後的除息也「反還原」，配息股 2025-06 以前的股價被高估
-# （MO 約 17–21%、VZ 15–18%、KO 5–7%、JPM 4–6%）。少數公司之後仍有部分除息被還原（AAPL、MSFT、MRK、F…）：
+# （MO 約 17–21%、VZ 15–18%、KO 5–8%、JPM 4–6%）。少數公司之後仍有部分除息被還原（AAPL、MSFT、MRK、F…）：
 # research/stooq_div_check.py 用 Yahoo 原始收盤價逐筆判斷 → data/stooq_div_adjusted.csv，這些除息也照樣反推。
 STOOQ_DIV_END = pd.Timestamp("2022-12-20")             # 不含：12-19（含）以前的除息反推
 _p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "stooq_div_adjusted.csv")
