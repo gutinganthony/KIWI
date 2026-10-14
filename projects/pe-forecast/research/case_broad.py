@@ -145,6 +145,8 @@ def main():
                 r = r.iloc[0]
                 src, e0, dy0 = "面板", float(r["eps0"]), (float(r["dy"]) if np.isfinite(r["dy"]) else 0.0)
                 vol0, ret0, grp0, grev0, mc0 = float(r["vol36"]), float(r["ret12"]), r["grp"], float(r["g_rev"]), p0 * float(r["mc"]) / float(r["px"])
+            elif a.universe == "sp500":
+                continue                                 # S&P 500 回顧只用面板（§22.2 的定義）；起點前一個月沒有面板列的不評
             else:
                 c5 = close_5y(t, a.raw)
                 e0, dy0, vol0, ret0 = fallback_start(t, t0, a.raw, c5, adr)

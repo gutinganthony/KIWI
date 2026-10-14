@@ -321,10 +321,10 @@ python3 consensus_snapshot.py --detail    # 存一份共識快照</div>
         <td>當季 EPS：季初用上一季 12.3% → 第 1 個月營收 9.0% → 前 2 個月 7.0% → 法說前一週（3 個月營收）3.2%。12 個月後的 EPS 19.9% → 12.9%；但 12 個月後的本益比沒有變準（估值變動主導）</td>
         <td>拿來更新 EPS 情境。2026Q3 即時預估 EPS 32.05 元（29.3～35.5）</td></tr>
       <tr><td>哪種公司誤差大</td><td>S&P 500 回顧與 2015–2024 長歷史，誤差和什麼特徵有關？</td>
-        <td>波動大、EPS 年年忽高忽低、分析師預期 EPS 大變化、過去一年大跌、過去 5 年虧損過 → 誤差大（例：公用事業 16%、必需消費 17%；軟體 44%、半導體 38%）。大誤差有 2/3 以上是 EPS 估錯</td>
+        <td>波動大、EPS 年年忽高忽低、分析師預期 EPS 大變化、過去一年大跌、過去 5 年虧損過 → 誤差大（例：公用事業 16%、必需消費 17%；軟體 44%、半導體 38%）。大誤差有 66–74% 主要是 EPS 估錯</td>
         <td>先看公司屬於哪一類；誤差大的那類以區間為主</td></tr>
       <tr><td>Nasdaq-100</td><td>同樣 2024、2025 兩個起點準不準？</td>
-        <td>12 個月 30.8%（本益比不變 31.5%；S&P 500 22.7%）；24 個月 32.6%（本益比不變 46.7%）</td>
+        <td>12 個月 30.8%（本益比不變 31.5%；S&P 500 22.5%）；24 個月 32.6%（本益比不變 46.7%）</td>
         <td>這兩年比 S&P 500 難（科技、高波動多）；2015–2024 長期兩者差不多</td></tr>
     </table></div>
     <p class="note">細節：README §23；重現：<code>research/usage_backtest.py</code>、<code>research/tsmc_monthly_revenue.py</code>、<code>research/error_traits.py</code>、<code>research/case_broad.py --universe ndx</code>。</p>
@@ -354,7 +354,7 @@ python3 consensus_snapshot.py --detail    # 存一份共識快照</div>
       <tr><td>MU</td><td>12.8</td><td>21.7</td><td>28.1</td><td>2.5</td><td>153.6</td><td>16.3</td><td>3.2</td><td>23.9</td></tr>
       <tr><td>META</td><td>28.0</td><td>22.6</td><td>27.0</td><td>27.3</td><td>29.9</td><td>25.6</td><td>29.0</td><td>25.3</td></tr>
       <tr><td><b>中位誤差</b></td><td></td><td>34.0%</td><td class="best">16.7%</td><td>47.8%</td><td>26.9%</td><td class="best">12.9%</td><td>26.2%</td><td>34.0%</td></tr>
-      <tr><td><b>S&P 500 約 400 家</b></td><td></td><td>30.0%</td><td class="best">28.8%</td><td>24.0%</td><td>34.6%</td><td class="best">22.7%</td><td>17.2%</td><td>27.4%</td></tr>
+      <tr><td><b>S&P 500 約 400 家</b></td><td></td><td>30.0%</td><td class="best">28.8%</td><td>24.0%</td><td>34.6%</td><td class="best">22.5%</td><td>17.1%</td><td>27.1%</td></tr>
     </table></div>
     <ul class="list">
       <li><b>最大的誤差來源是 EPS</b>：分析師在 AI 行情裡大幅低估 MU、NVDA 的獲利；S&P 500 的分析師 EPS 誤差中位 36%（24 個月）／18%（12 個月）。共識係數把 12 個月的偏差從 +11% 修到 +2%。</li>
