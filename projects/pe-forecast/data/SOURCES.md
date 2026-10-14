@@ -161,7 +161,9 @@
   未來 12 個月（1BF）／第 13–24 個月（2BF）／第 25–36 個月（3BF）共識 EPS（BEst，調整後口徑、分割還原到 2026-09）、季 ROIC 與營益率、月底市值。
   匯出檔每一列靠左排（每檔從自己第一筆資料開始），`research/bbg_load.py` 靠右對齊到 2026-09，用面板股價驗證
   （438 家月報酬相關中位 0.998）。只把結果彙總（中位誤差）寫進 results/，不存逐月原始數字。
-- **股利還原的修正（2026-10-14）**：hanumantjain 鏡像的 Stooq 日股價只還原到 2022-12-16 的除息，之後接上的是原始收盤價
-  （用 Bloomberg 月底收盤價與 Yahoo 原始收盤價核對）。`build_broad.py` 原本把之後的除息也反推，配息股 2025-06 以前的股價被高估
-  （MO 約 17–21%、VZ 15–18%、XOM 7–9%、KO 5–7%、JPM 4–6%；修正前與 Bloomberg 的中位差 4.7%，修正後 0.0%）。
-  `build_broad.STOOQ_DIV_END`、`pef/data.STOOQ_DIV_END`。68 家科技股面板（`build_data.py`）的程式也改了，但資料檔還沒重建（原始鏡像不在這個 session）。
+- **股利還原的修正（2026-10-14）**：hanumantjain 鏡像的 Stooq 日股價，2022-12-19（含）以前的除息有還原，之後接上的多半是原始收盤價
+  （`research/stooq_div_check.py` 用 Yahoo 5 年日線的原始收盤價逐筆核對 384 家、4,158 筆：之前 98.5% 有還原、之後 4%——27 家、156 筆，
+  例：AAPL、MRK、UNH、V 幾乎全部，MSFT、AVGO、F 部分 → `data/stooq_div_adjusted.csv`）。`build_broad.py` 原本把之後的除息也反推，
+  配息股 2025-06 以前的股價被高估（MO 約 17–21%、VZ 15–18%、XOM 7–9%、KO 5–7%、JPM 4–6%）。修正後只反推 12-19（含）以前的與清單上的除息：
+  465 家和 Yahoo 原始收盤價（2021-11～2025-08）只有 9 家某個月差超過 1%（3 家是 Yahoo 自己的分拆調整），和 Bloomberg 月底收盤價的逐檔中位差 4.5% → 0.0%。
+  `build_broad.STOOQ_DIV_END`、`pef/data.STOOQ_DIV_END`（68 家科技股面板用 `data/stooq_div_full.csv`：之後的除息 ≥ 80% 都有還原的公司整家照舊反推；資料檔還沒重建，原始鏡像不在這個 session）。

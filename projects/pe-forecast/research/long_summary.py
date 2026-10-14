@@ -67,7 +67,7 @@ def firm(o):
                 out.append(row(str(k), len(g), {nm: med(g[c]) for c, nm in cols}, ex))
         cov = {k: float(W[c].dropna().astype(float).mean()) for c, k in (("bO", "軌道"), ("bGr", "成長定價（回歸）"), ("bO_or", "猜對：軌道"), ("bGA", "猜對：成長定價"))}
         w20 = {nm: float(np.mean(np.abs(np.exp(W[c].dropna()) - 1) <= 0.2)) for c, nm in cols}
-        out.append(f"\n嚴格事前的 80% 區間實際涵蓋：" + "、".join(f"{k} {v:.0%}" for k, v in cov.items())
+        out.append(f"\n走動式係數的 80% 區間實際涵蓋（區間分位數用全樣本校準）：" + "、".join(f"{k} {v:.0%}" for k, v in cov.items())
                    + "；誤差在 ±20% 內：" + "、".join(f"{k} {v:.0%}" for k, v in w20.items()) + "。")
     return out
 
