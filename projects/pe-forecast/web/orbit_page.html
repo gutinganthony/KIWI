@@ -332,7 +332,7 @@ python3 consensus_snapshot.py --detail    # 存一份共識快照</div>
           2025-10 起點回頭驗證：S&P 500 16.9% → 15.2%、Nasdaq-100 23.6% → 20.9%、五檔 26.2% → 12.9%（MU 本益比 3.2 → 8.6 倍，實際 12.8）；但 2024 起點 24 個月打平或較差（MU 預測 40 倍，實際 12.8）</td>
         <td class="best">採用為第二種方法；你填了自己的 EPS 時自動採用</td></tr>
       <tr><td>沒有自己的看法時</td><td>只用今天的共識往下推呢？</td>
-        <td>12 個月軌道略準（22.3% vs 23.8%；2025 回頭驗證 22.5% vs 25.8%）；24 個月成長定價較準（29.3% → 25.0%）</td>
+        <td>12 個月軌道略準（22.3% vs 23.8%；2025 回頭驗證 22.5% vs 25.5%）；24 個月成長定價較準（29.3% → 25.0%）</td>
         <td>只有範例共識時：科技用成長定價、非科技用軌道（下一列）</td></tr>
       <tr><td>回測 S&P 500、Nasdaq-100</td><td>12、24 個月前（2025-10、2024-09）只用當時的資料，預估今天的本益比？</td>
         <td>事前：S&P 500 軌道 22.5%／29.1%、成長定價 24.2–25.5%／30.7–31.9%；Nasdaq-100 12 個月成長定價 28.2%（軌道 30.8%）、24 個月軌道 31.2%。
@@ -393,7 +393,7 @@ python3 consensus_snapshot.py --detail    # 存一份共識快照</div>
       <tr><td><b>S&P 500 約 400 家</b></td><td></td><td>29.6%</td><td class="best">29.1%</td><td>24.2%</td><td>34.6%</td><td class="best">22.5%</td><td>16.9%</td><td>27.1%</td></tr>
     </table></div>
     <ul class="list">
-      <li><b>最大的誤差來源是 EPS</b>：分析師在 AI 行情裡大幅低估 MU、NVDA 的獲利；S&P 500 的分析師 EPS 誤差中位 36%（24 個月）／18%（12 個月）。共識係數把 12 個月的偏差從 +11% 修到 +2%。</li>
+      <li><b>最大的誤差來源是 EPS</b>：分析師在 AI 行情裡大幅低估 MU、NVDA 的獲利；S&P 500 的分析師 EPS 誤差中位 35%（24 個月）／18%（12 個月）。共識係數把 12 個月的偏差從 +11% 修到 +1%。</li>
       <li><b>MU 這種景氣谷底的爆發，模型的股價反應不夠</b>：給它完全正確的 EPS，本益比反而只算出 2.5–3.2。試過「往正常本益比拉回」與非線性兩種修正，樣本外都沒有更好，所以改成<b>EPS 變化越大、區間越寬</b>（已採用：24 個月 EPS 大變化的 80% 區間涵蓋 74% → 81%）。</li>
       <li><b>24 個月不要把成長率再延一年</b>：I/B/E/S 2012–2022 的檢驗，這樣做 24 個月後的 EPS 中位高估 8%（科技 21%、半導體 24%）。網頁在 EPS_a 用到外推時會提醒。</li>
       <li>用 12 個月、每月更新，比 24 個月準約 6 個百分點；產業被重新評價（AI 行情）仍然預測不了，只能看區間。</li>
@@ -540,7 +540,7 @@ $("meta").innerHTML = [`股價與共識：Yahoo ${esc(DATA.snap || "")}`, `${DAT
 // ---- 試算器 ----
 const byT = new Map(DATA.tickers.map((t) => [t.t, t]));
 $("tk-list").innerHTML = DATA.tickers.map((t) => `<option value="${esc(t.t)}">${esc(t.n)}</option>`).join("");
-let H = 12, cur = null, METHOD = "auto";   // METHOD：auto＝範例數字用軌道、你填了自己的 EPS 改用成長定價（README §24.5）；g、o＝手動選
+let H = 12, cur = null, METHOD = "auto";   // METHOD：auto＝你填了自己的 EPS 用成長定價；只有範例數字時科技三組用成長定價、非科技用軌道（README §24.7）；g、o＝手動選
 const num = (id) => { const v = parseFloat($(id).value); return Number.isFinite(v) ? v : null; };
 const setv = (id, v, d = 2) => { $(id).value = (v === null || v === undefined || !Number.isFinite(v)) ? "" : String(+v.toFixed(d)); };
 
