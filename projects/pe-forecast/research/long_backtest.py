@@ -226,7 +226,7 @@ def main():
         both = P.merge(W, on=["ticker", "month"], suffixes=("_p", "_w"))
         W = W.assign(組=np.where(W["grp"] == "非科技", "非科技", "科技"))
         say(table(W, ["組"], EX + OR).round(3).to_string(index=False))
-        say("  後見之明（2015 年起同一批列；全期 → 走動式）：" + "、".join(f"{nm} {med(both[c + '_p']):.3f} → {med(both[c + '_w']):.3f}" for c, nm in EX + OR))
+        say("  後見之明（走動式有的列：12 個月 2017 年起、24 個月 2019 年起，同一批；全期 → 走動式）：" + "、".join(f"{nm} {med(both[c + '_p']):.3f} → {med(both[c + '_w']):.3f}" for c, nm in EX + OR))
         say("-- 2. 依期間與組別（全期係數）")
         P = P.assign(期間=pd.cut(P["year"], [2010, 2014, 2019, 2021, 2024], labels=["2011–2014", "2015–2019", "2020–2021", "2022–2024"]),
                      組=np.where(P["grp"] == "非科技", "非科技", "科技"))

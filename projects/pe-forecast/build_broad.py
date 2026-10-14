@@ -5,7 +5,7 @@
 
 來源（都在同一個公開鏡像）：
   company_facts/CIK*.json              SEC companyfacts（財報，取第一次申報值，同 pef/data.py）
-  sp500_stooq_ohcl/<t>.us.txt          Stooq 日股價（分割還原；股利只還原到 2022-12-16 的除息——鏡像在那之後接上的是原始價，見 STOOQ_DIV_END）
+  sp500_stooq_ohcl/<t>.us.txt          Stooq 日股價（分割還原；股利多半只還原到 2022-12-19 的除息——鏡像在那之後接上的是原始價，見 STOOQ_DIV_END）
   sp500_corporate_actions_yfinance.csv 每一次除息（日期、金額）與分割（含「分拆」記成的非整數比例）
   S_and_P_500_component_stocks.csv     名單、CIK、GICS 產業
 
@@ -40,10 +40,13 @@ def is_split(r):
     return False
 
 
-# 鏡像裡的 Stooq 股價只把 2022-12-16（含）以前的除息還原過，之後接上的是原始收盤價（2026-10-14 用 Bloomberg 月底收盤價、
-# Yahoo 原始收盤價核對：2022-12-19 以後的除息沒有被還原，456 家的 Stooq ÷ 原始價在 2022-11 以後都是 1.000）。
-# 修正前把 2022-12 以後的除息也「反還原」，配息股 2025-06 以前的股價被高估（MO 約 17–21%、VZ 15–18%、KO 5–7%、JPM 4–6%）。
-STOOQ_DIV_END = pd.Timestamp("2022-12-19")
+# 鏡像裡的 Stooq 股價多半只把 2022-12-19（含）以前的除息還原過，之後接上的是原始收盤價（2026-10-14 用 Bloomberg 月底收盤價、
+# Yahoo 原始收盤價逐筆核對：12-19 以前 98.5% 有還原，之後 4%）。修正前把之後的除息也「反還原」，配息股 2025-06 以前的股價被高估
+# （MO 約 17–21%、VZ 15–18%、KO 5–7%、JPM 4–6%）。少數公司之後仍有部分除息被還原（AAPL、MSFT、MRK、F…）：
+# research/stooq_div_check.py 用 Yahoo 原始收盤價逐筆判斷 → data/stooq_div_adjusted.csv，這些除息也照樣反推。
+STOOQ_DIV_END = pd.Timestamp("2022-12-20")             # 不含：12-19（含）以前的除息反推
+_p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "stooq_div_adjusted.csv")
+STOOQ_DIV_LATE = (pd.read_csv(_p, parse_dates=["ex_date"]).groupby("ticker")["ex_date"].apply(set).to_dict() if os.path.exists(_p) else {})
 
 
 def stooq_daily(path):
@@ -120,7 +123,9 @@ def main():
             continue
         adj = stooq_daily(sp)
         divs = a_t[a_t["event_type"] == "dividend"].set_index("ex_date")["cash_amount"].dropna()
-        raw = unadjust_daily(adj, divs[(divs.index > adj.index.min()) & (divs.index < STOOQ_DIV_END)])
+        late = STOOQ_DIV_LATE.get(t, set())
+        keep = (divs.index > adj.index.min()) & ((divs.index < STOOQ_DIV_END) | divs.index.isin(list(late)))
+        raw = unadjust_daily(adj, divs[keep])
         px_m = raw.resample("ME").last().dropna()
         q = q.copy()
         q["sh_now"], n_fix = fix_share_scale(q, px_m)          # 股數單位錯（千股／百萬股）→ 乘回來

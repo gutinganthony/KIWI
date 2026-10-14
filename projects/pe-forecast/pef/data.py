@@ -263,10 +263,16 @@ def stooq_monthly(path):
     return m
 
 
-STOOQ_DIV_END = pd.Timestamp("2022-12-19")
+STOOQ_DIV_END = pd.Timestamp("2022-12-20")                # 不含（build_broad.STOOQ_DIV_END）；data/stooq_div_full.csv 的公司照舊全部反推
 
 
-def unadjust_dividends(adj_m, q):
+def _div_full():
+    """Stooq 一直持續做股利還原的公司（research/stooq_div_check.py → data/stooq_div_full.csv）。"""
+    p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "stooq_div_full.csv")
+    return set(pd.read_csv(p)["ticker"]) if os.path.exists(p) else set()
+
+
+def unadjust_dividends(adj_m, q, ticker=None):
     """把 Stooq 的股利還原拿掉：F(t) = Π_{除息日 d > t} (1 − y_d)，真實價 = 還原價 ÷ F(t)。
 
     y_d 由財報的每股股利（今日口徑）與還原價反推：c = DPS × F(d) / A(d−)，y = c / (1 + c)。
@@ -274,8 +280,9 @@ def unadjust_dividends(adj_m, q):
     """
     F = pd.Series(1.0, index=adj_m.index)
     divs = q[["period_end", "dps_now"]].dropna()
-    # 鏡像的 Stooq 只還原到 2022-12-16 的除息，之後是原始價（README §25.0；build_broad.STOOQ_DIV_END）→ 之後的股利不反推
-    divs = divs[(divs["dps_now"] > 0) & (divs["period_end"] + pd.offsets.MonthEnd(0) < STOOQ_DIV_END)].sort_values("period_end", ascending=False)
+    # 鏡像的 Stooq 多半只還原到 2022-12-19 的除息，之後是原始價（README §25.0；build_broad.STOOQ_DIV_END）→ 之後的股利不反推
+    cut = STOOQ_DIV_END if ticker not in _div_full() else pd.Timestamp.max
+    divs = divs[(divs["dps_now"] > 0) & (divs["period_end"] + pd.offsets.MonthEnd(0) < cut)].sort_values("period_end", ascending=False)
     f_after = 1.0
     for r in divs.itertuples():
         ex = r.period_end + pd.offsets.MonthEnd(0)
@@ -303,7 +310,7 @@ def assemble_price(stooq_path, splitonly_path, q):
     adj = stooq_monthly(stooq_path) if stooq_path and os.path.exists(stooq_path) else None
     src = "stooq-unadj"
     if adj is not None:
-        raw, _ = unadjust_dividends(adj, q)
+        raw, _ = unadjust_dividends(adj, q, ticker=q["ticker"].iloc[0] if "ticker" in q and len(q) else None)
     if splitonly_path and os.path.exists(splitonly_path):
         so = splitonly_monthly(splitonly_path)
         if adj is None:
