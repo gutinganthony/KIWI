@@ -1,4 +1,4 @@
-// 本益比軌道模型的計算核心：和 pef/orbit.py 的 reported_quarter、calendarize、predict（以及 pef/growth_price.py 的 predict）一模一樣（make_orbit_page.py 嵌進網頁；
+// 本益比軌道模型的計算核心：和 pef/orbit.py 的 reported_quarter、calendarize、predict（以及 pef/growth_price.py 的 predict、pef/unified.py 的 predict）一模一樣（make_orbit_page.py 嵌進網頁；
 // web/test_orbit_core.py 用 node 跑，對照 Python 的結果）。日期一律用 UTC；加月份照 pandas DateOffset 的規則（日子超過月底就截到月底）。
 const OrbitCore = (() => {
   const DAY = 86400000;
@@ -148,6 +148,83 @@ const OrbitCore = (() => {
     return out;
   }
 
-  return { utc, iso, addMonths, addDays, reportedQuarter, calendarize, predict, predictGrowth, rateSlope };
+  // 統一模型（和 pef/unified.py 的 predict 相同，README §26）：軌道是本體；你的 EPS_b 依「意思」分流——基本面預估走軌道的 β_s，
+  // 市場在目標日會預期的數字走成長定價的係數 (1 ＋ c_a) × Δa ＋ c_T × ΔT；只有共識（沒有自己的看法）時區間改用 conformal（cq＝results/conformal.json）。
+  // ea、eb：你的 EPS（null＝用共識）；ebKind："fund"（預設）或 "market"；ca、cb：共識（已乘係數、目標日口徑）；f0：今天共識的未來 12 個月 EPS（null＝ca）
+  function conformalQ(cq, h, g) {
+    if (!cq || !cq.h || !cq.h[String(h)]) return [null, null];
+    const c = cq.h[String(h)];
+    const key = g !== "other" ? "tech" : "other";
+    if (c[key] && (c[key].n || 0) >= (cq.min_n || 300)) return [c[key].q, key === "tech" ? "科技" : "非科技"];
+    return [c.pooled.q, "全部"];
+  }
+  const given = (v) => v !== null && v !== undefined && Number.isFinite(v);
+  function predictUnified(row, h, model, gp, cq, ea, eb, ebKind = "fund", ca = null, cb = null, f0 = null, rate = null, bandMult = 1) {
+    const eps0 = row.e, g = row.g;
+    const haveCons = pos(ca);
+    let eaU = given(ea) ? ea : haveCons ? ca : null;
+    let ebU = given(eb) ? eb : (haveCons && pos(cb)) ? cb : null;
+    const haveView = given(ea) || given(eb);
+    const K = ["lo80", "lo50", "hi50", "hi80"];
+    const [vlo, vhi] = model.vol_clip;
+    if (!(haveCons && pos(eps0) && row.px > 0 && pos(eaU) && (ebU === null || pos(ebU)))) {
+      const o = predict(row, h, model, eaU, ebU, haveCons ? ca : null, haveCons ? cb : null, rate, bandMult);
+      Object.assign(o, { mode: haveCons ? (haveView ? "看法" : "共識") : "軌道", kind: haveView && haveCons ? "fund" : null, bandKind: "模型", bandGroup: null,
+        epsA: eaU, epsB: ebU, gtCons: null, view: null, note: null });
+      return o;
+    }
+    const gh = gp && gp.h && gp.h[String(h)];
+    const growthOk = !!gh;
+    const f0U = pos(f0) ? f0 : ca;
+    let gtCons = null, cbU = null;
+    if (pos(cb)) { gtCons = clip(Math.log(cb / ca), -1.5, 1.5); cbU = cb; }
+    else if (growthOk) {                                                                  // 沒有下一財年共識：回歸的目標日成長預期（pef/growth_price.py eps_b_hat）
+      const [a0, lam] = gh.gt_hat;
+      cbU = ca * Math.exp(a0 + lam * clip(Math.log(f0U / eps0), -1.5, 1.5));
+      gtCons = Math.log(cbU / ca);
+    }
+    if (!given(eb)) ebU = cbU;
+    let note = null;
+    let market = ebKind === "market" && pos(eb);
+    if (market && !(growthOk && gtCons !== null)) { market = false; note = "6 個月沒有成長定價係數（或算不出共識隱含的成長）：EPS_b 當作基本面預估處理"; }
+    let o;
+    if (market) {
+      const base = predict(row, h, model, ca, cbU, ca, cbU, rate, bandMult);
+      const c = g === "other" && gh.coef.other ? gh.coef.other : gh.coef.all;
+      const da = clip(Math.log(eaU / ca), -2, 2);
+      const dT = clip(Math.log(ebU / eaU) - gtCons, -1.5, 1.5);
+      const adjV = (1 + c[1]) * da + c[2] * dT;
+      const lpx = Math.log(base.px) + adjV;
+      const epsWiden = Math.exp((gh.delta || 0) * Math.min(Math.abs(Math.log(eaU / eps0)), 2));
+      const sc = Math.pow(clip(base.vol, vlo, vhi), model.alpha) * bandMult * epsWiden;
+      o = Object.assign({}, base, { spec: "統一模型：EPS_b＝市場預期", adj: base.adj + adjV, px: Math.exp(lpx), epsWiden, widen: 1,
+        width: sc / Math.pow(clip(gh.vol_median, vlo, vhi), model.alpha),
+        parts: base.parts.concat([{ name: "你的 EPS_a 和共識的差距（Δa）", x: da, beta: 1 + c[1], effect: (1 + c[1]) * da },
+          { name: "你的 EPS_b（市場預期）隱含的成長和共識的差距（ΔT）", x: dT, beta: c[2], effect: c[2] * dT }]),
+        view: { da, dT, cA: c[1], cT: c[2] }, kind: "market" });
+      K.forEach((k, i) => { o["px_" + k] = Math.exp(lpx + sc * gh.q[i]); });
+    } else {
+      o = predict(row, h, model, eaU, ebU, ca, cbU, rate, bandMult);
+      Object.assign(o, { spec: "統一模型：" + o.spec, view: null, kind: haveView ? "fund" : null });
+    }
+    Object.assign(o, { mode: haveView ? "看法" : "共識", epsA: eaU, epsB: ebU, gtCons, bandGroup: null, bandKind: "模型", note });
+    if (!haveView) {                                                                       // 共識模式：conformal 區間
+      const [q, grpLab] = conformalQ(cq, h, g);
+      if (q) {
+        const lpx = Math.log(o.px);
+        const delta = (model.band_delta && model.band_delta[String(h)]) || 0;
+        const epsWiden = Math.exp(delta * Math.min(Math.abs(Math.log(eaU / eps0)), 2));
+        const sc = Math.pow(clip(o.vol, vlo, vhi), model.alpha) * bandMult * epsWiden;
+        Object.assign(o, { bandKind: "conformal", bandGroup: grpLab, epsWiden, width: sc / Math.pow(clip(cq.h[String(h)].vol_median, vlo, vhi), model.alpha) });
+        K.forEach((k, i) => { o["px_" + k] = Math.exp(lpx + sc * q[i]); });
+      }
+    }
+    o.pe = pos(eaU) ? o.px / eaU : null;
+    K.forEach((k) => { o["pe_" + k] = o.pe === null ? null : o["px_" + k] / eaU; });
+    o.fwd = pos(ebU) ? o.px / ebU : null;
+    return o;
+  }
+
+  return { utc, iso, addMonths, addDays, reportedQuarter, calendarize, predict, predictGrowth, predictUnified, conformalQ, rateSlope };
 })();
 if (typeof module !== "undefined") module.exports = OrbitCore;

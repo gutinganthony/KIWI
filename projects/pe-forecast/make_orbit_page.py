@@ -22,7 +22,7 @@ import pandas as pd
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from pef import consensus, eps_correct, orbit            # noqa: E402
-from pef import growth_price                             # noqa: E402
+from pef import growth_price, unified                    # noqa: E402
 
 RES = os.path.join(HERE, "results")
 SNAP = os.path.join(HERE, "data", "consensus_snapshots")
@@ -113,6 +113,28 @@ def tickers():
     return out, (str(snap_time.date()) if snap_time is not None else None)
 
 
+def cons_for(t, h, k_user=None):
+    """網頁 consFor 的 Python 版（web/test_orbit_core.py 對照）：預設共識係數 k0（校正模型 cf ＞ 中小型股不校正 cg ＞ 口徑係數 k）；
+    係數先乘在會計年度共識上，再換算成目標日的最近四季（可外推）。回傳 dict(a=(eps, how)|None, b=…, k, k0, cf, k_bad) 或 None。"""
+    c = t.get("c")
+    if not c or c.get("c0") is None:
+        return None
+    asof, last_q = pd.Timestamp(t["d"]), pd.Timestamp(t["q"])
+    kraw = c.get("k")
+    k_ok = kraw is not None and 0.4 <= kraw <= 1.15
+    cf = c.get("cf") if (c.get("cf") is not None and math.isfinite(c.get("cf"))) else None
+    k_bad = cf is None and kraw is not None and not k_ok
+    k0 = cf if cf is not None else 1 if c.get("cg") else (kraw if (k_ok and abs(kraw - 1) > 0.03) else 1)
+    same = k_user is not None and abs(k_user - round(k0 * 100) / 100) < 1e-9
+    k = k_user if (k_user is not None and math.isfinite(k_user) and k_user > 0 and not same) else k0
+    fy = {pd.Timestamp(c["f0"]): c["c0"] * k}
+    if c.get("c1") is not None:
+        fy[pd.Timestamp(c["f1"])] = c["c1"] * k
+    a = orbit.calendarize(fy, asof + pd.DateOffset(months=h), last_q, t["e"], extrapolate=True)
+    b = orbit.calendarize(fy, asof + pd.DateOffset(months=h + 12), last_q, t["e"], extrapolate=True)
+    return dict(a=a if a[0] is not None else None, b=b if b[0] is not None else None, k=k, k0=k0, cf=cf, k_bad=k_bad)
+
+
 def backtest():
     sc = pd.read_csv(os.path.join(RES, "orbit_index_scores.csv"))
     sc["模型"] = sc["＋你的EPS(a)"].fillna(sc.get("模型"))
@@ -158,6 +180,14 @@ def opt():
                 cmeta=json.load(open(os.path.join(RES, "eps_correction_model.json")))["n_train"])
 
 
+def slim_cq(cq):
+    if not cq:
+        return None
+    return dict(min_n=cq["min_n"], cutoff=cq["cutoff"],
+                h={h: dict(vol_median=v["vol_median"], n=v["n"], wf_cover80=v["wf_cover80"].get("全部校準"),
+                           **{k: dict(n=v[k]["n"], q=v[k]["q"]) for k in ("pooled", "tech", "other")}) for h, v in cq["h"].items()})
+
+
 def main():
     out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "artifact", "orbit.html")
     model = orbit.load_model(RES)
@@ -167,8 +197,9 @@ def main():
                 h={h: dict(pair=v["pair"], beta=v["beta"], bands={k: dict(q=b["q"], vol_median=b["vol_median"]) for k, b in v["bands"].items()})
                    for h, v in model["h"].items()})
     gp = growth_price.load(RES)                                        # 成長定價（README §24）
-    slim["gp"] = dict(h={h: dict(coef=v["coef"], q=v["q"], delta=v["delta"], vol_median=v["vol_median"], wf_cover80=v.get("wf_cover80"))
+    slim["gp"] = dict(h={h: dict(coef=v["coef"], q=v["q"], delta=v["delta"], vol_median=v["vol_median"], wf_cover80=v.get("wf_cover80"), gt_hat=v["gt_hat"])
                          for h, v in gp["h"].items()}) if gp else None
+    slim["cq"] = slim_cq(unified.load_conformal(RES))                 # 共識模式的 conformal 區間（README §26.2）
     tk, snap_date = tickers()
     data = dict(model=slim, tickers=tk, snap=snap_date, bt=backtest(), opt=opt())
     core = open(os.path.join(HERE, "web", "orbit_core.js")).read()

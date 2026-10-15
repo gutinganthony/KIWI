@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""對照 web/orbit_core.js（網頁試算器）和 pef/orbit.py（命令列）算出來的結果是否一致。
+"""對照 web/orbit_core.js（網頁試算器）和 pef/orbit.py、pef/growth_price.py、pef/unified.py（命令列）算出來的結果是否一致；
+也對照網頁的 consFor（共識 → 目標日 EPS）和 make_orbit_page.cons_for（算相對輸出的分布用）。
 
     python3 web/test_orbit_core.py        # 要 node；全部一致才回傳 0
 """
@@ -15,6 +16,8 @@ HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, HERE)
 from pef import orbit                                    # noqa: E402
 from pef import growth_price as GP                       # noqa: E402
+from pef import unified                                  # noqa: E402
+import make_orbit_page as MP                             # noqa: E402
 
 model = orbit.load_model(os.path.join(HERE, "results"))
 T = pd.Timestamp
@@ -41,6 +44,33 @@ for i, r in enumerate(rows):
                                 (2.0, 3.0, 2.5, 0.1), (-1.0, 2.0, 1.0, 0.0)):
             gcases.append(dict(i=i, h=h, ea=ea, eb=eb, f0=f0, r12=r12, rt=None, bm=1.0))
         gcases.append(dict(i=i, h=h, ea=r["e"] * 1.2, eb=r["e"] * 1.4, f0=r["e"] * 1.1, r12=0.2, rt=[-1.0, -0.06], bm=1.17))
+gp_js = dict(h={h: dict(gp_js["h"][h], gt_hat=v["gt_hat"]) for h, v in gpm["h"].items()})
+cq = unified.load_conformal(os.path.join(HERE, "results"))
+cq_js = MP.slim_cq(cq)
+ucases = []                                              # 統一模型（README §26）
+for i, r in enumerate(rows):
+    e = r["e"]
+    for h in (6, 12, 24):
+        for ea, eb, kind, ca, cb, f0 in ((None, None, "fund", e * 1.15, e * 1.35, e * 1.1), (None, None, "fund", e * 1.15, None, e * 1.1),
+                                         (None, None, "fund", e * 1.15, e * 1.35, None), (e * 1.1, None, "fund", e * 1.15, e * 1.35, None),
+                                         (e * 1.1, e * 1.4, "fund", e * 1.15, e * 1.35, e * 1.1), (e * 1.1, e * 1.4, "market", e * 1.15, e * 1.35, e * 1.1),
+                                         (e * 1.1, e * 1.4, "market", e * 1.15, None, e * 1.1), (None, e * 1.5, "market", e * 1.15, e * 1.35, e * 1.1),
+                                         (e * 1.2, e * 1.4, "fund", None, None, None), (e * 1.2, None, "market", None, None, None),
+                                         (-1.0, 2.0, "fund", 2.5, 3.2, None), (2.0, 3.0, "market", 2.5, 3.2, 2.4)):
+            ucases.append(dict(i=i, h=h, ea=ea, eb=eb, kind=kind, ca=ca, cb=cb, f0=f0, rt=None, bm=1.0))
+        ucases.append(dict(i=i, h=h, ea=e * 1.1, eb=e * 1.4, kind="market", ca=e * 1.15, cb=e * 1.35, f0=e * 1.1, rt=[-1.0, -0.06], bm=1.17))
+        ucases.append(dict(i=i, h=h, ea=None, eb=None, kind="fund", ca=e * 1.15, cb=e * 1.35, f0=e * 1.1, rt=[0.5, -0.05], bm=1.17))
+cf_t = [dict(d="2026-10-10", q="2026-08-31", e=74.33, c=dict(f0="2027-08-31", f1="2028-08-31", c0=176.15, c1=206.33, k=0.95, cf=0.91)),
+        dict(d="2026-10-10", q="2026-08-31", e=74.33, c=dict(f0="2027-08-31", f1="2028-08-31", c0=176.15, c1=206.33, k=0.9)),
+        dict(d="2026-10-10", q="2026-06-30", e=11.09, c=dict(f0="2027-01-31", f1="2028-01-31", c0=16.75, c1=16.02, k=1.02)),
+        dict(d="2026-10-10", q="2026-06-30", e=6.0, c=dict(f0="2026-12-31", f1="2027-12-31", c0=5.0, c1=6.0, k=0.3)),
+        dict(d="2026-10-10", q="2026-06-30", e=6.0, c=dict(f0="2026-12-31", f1="2027-12-31", c0=5.0, c1=6.0, k=0.3, cg="中小型股：距離年報 10 個月，不校正")),
+        dict(d="2026-10-10", q="2026-06-27", e=8.72, c=dict(f0="2026-09-27", f1="2027-09-27", c0=8.82, c1=None, k=None)),
+        dict(d="2026-10-10", q="2026-06-27", e=-2.0, c=dict(f0="2026-09-27", f1="2027-09-27", c0=1.0, c1=2.5, k=None, cf=1.1)),
+        dict(d="2026-10-10", q="2026-06-27", e=8.72, c=None)]
+cfcases = [dict(j=j, h=h, ku=ku) for j in range(len(cf_t)) for h in (6, 12, 24) for ku in (None, 0.91, 0.8, 1.0)]
+page = open(os.path.join(HERE, "web", "orbit_page.html")).read()
+cons_for_js = page[page.index("function consFor("):page.index("function fillFrom(")]
 rsens = json.load(open(os.path.join(HERE, "results", "rate_sensitivity.json")))
 slopes = [dict(h=h, rg=rg, pr=pr) for h in (6, 12, 24) for rg in ("2022", "2012") for pr in (None, 0.02, 0.4, 0.97)]
 cal = [dict(fy=[["2027-09-03", 176.15], ["2028-09-03", 206.33]], t="2027-10-07", q="2026-09-03", e=74.33, x=True),
@@ -54,7 +84,15 @@ js = os.path.join(HERE, "web", "orbit_core.js")
 prog = f"""
 const C = require({json.dumps(js)}); const model = {json.dumps(model)};
 const rows = {json.dumps(rows).replace('NaN', 'null')}; rows.forEach(r => {{ if (r.v === null) r.v = NaN; }});
-const out = {{pred: [], cal: [], sl: [], gp: []}};
+const out = {{pred: [], cal: [], sl: [], gp: [], un: [], cf: []}};
+const CQ = {json.dumps(cq_js)}; const GPJ = {json.dumps(gp_js)};
+const UK = ["spec", "mode", "kind", "bandKind", "bandGroup", "px", "px_lo80", "px_lo50", "px_hi80", "pe", "pe_hi80", "fwd", "epsA", "epsB", "gtCons", "note", "adj", "width", "epsWiden"];
+for (const c of {json.dumps(ucases)}) {{ const o = C.predictUnified(rows[c.i], c.h, model, GPJ, CQ, c.ea, c.eb, c.kind, c.ca, c.cb, c.f0, c.rt, c.bm);
+  out.un.push(UK.map(k => o[k] === undefined ? null : o[k])); }}
+{cons_for_js}
+const CFT = {json.dumps(cf_t)};
+for (const c of {json.dumps(cfcases)}) {{ const t = CFT[c.j]; const r = consFor(t, c.h, c.ku);
+  out.cf.push(r ? [r.a ? r.a.eps : null, r.a ? r.a.how : null, r.b ? r.b.eps : null, r.b ? r.b.how : null, r.k, r.k0, r.kBad] : null); }}
 for (const c of {json.dumps(gcases)}) {{ const o = C.predictGrowth(rows[c.i], c.h, model, {json.dumps(gp_js)}, c.ea, c.eb, c.f0, c.r12, c.rt, c.bm);
   out.gp.push(o ? [o.spec, o.px, o.px_lo80, o.px_hi80, o.pe, o.fwd] : null); }}
 for (const c of {json.dumps(slopes)}) out.sl.push(C.rateSlope({json.dumps(rsens)}, c.h, c.rg, c.pr));
@@ -87,6 +125,31 @@ for c, j in zip(gcases, res["gp"]):
     bad += not same
     if not same:
         print("成長定價不一致", c, py, j)
+UKP = ["spec", "mode", "kind", "band_kind", "band_group", "px", "px_lo80", "px_lo50", "px_hi80", "pe", "pe_hi80", "fwd_pe", "eps_a", "eps_b", "gt_cons", "note", "adj", "width", "eps_widen"]
+def same_val(a, b):
+    if a is None or b is None:
+        return a is None and b is None
+    if isinstance(a, str) or isinstance(b, str):
+        return a == b
+    return abs(a - b) <= 1e-9 * max(1, abs(a))
+for c, j in zip(ucases, res["un"]):
+    r = rows[c["i"]]
+    o = unified.predict(dict(px=r["px"], eps0=r["e"], y10=r["y"], dy=r["dy"], vol36=r["v"], grp=r["g"]), c["h"], model=model, gm=gpm, cq=cq,
+                        eps_a=c["ea"], eps_b=c["eb"], eb_kind=c["kind"], cons_a=c["ca"], cons_b=c["cb"], fwd0=c["f0"], rate=c["rt"], band_mult=c["bm"])
+    py = [o.get(k) for k in UKP]
+    py = [None if (isinstance(v, float) and not np.isfinite(v)) else v for v in py]
+    same = all(same_val(a, b) for a, b in zip(py, j))
+    bad += not same
+    if not same:
+        print("統一模型不一致", c, [(k, a, b) for k, a, b in zip(UKP, py, j) if not same_val(a, b)])
+for c, j in zip(cfcases, res["cf"]):
+    r = MP.cons_for(cf_t[c["j"]], c["h"], c["ku"])
+    py = None if r is None else [r["a"][0] if r["a"] else None, r["a"][1] if r["a"] else None, r["b"][0] if r["b"] else None, r["b"][1] if r["b"] else None,
+                                 r["k"], r["k0"], r["k_bad"]]
+    same = (py is None and j is None) or (py is not None and j is not None and all(same_val(a, b) for a, b in zip(py, j)))
+    bad += not same
+    if not same:
+        print("consFor 不一致", c, py, j)
 for c, j in zip(slopes, res["sl"]):
     py = orbit.rate_slope(c["h"], c["rg"], c["pr"])[0]
     same = abs(py - j) < 1e-12
@@ -99,5 +162,5 @@ for c, j in zip(cal, res["cal"]):
     same = (py is None and j is None) or (py is not None and j is not None and abs(py[0] - j[0]) < 1e-9 and py[1] == j[1])
     bad += not same
     print(("一致" if same else "不一致"), c["t"], py, j)
-print(f"predict {len(cases)} 組（含利率情境）、成長定價 {len(gcases)} 組、利率斜率 {len(slopes)} 組、calendarize {len(cal)} 組；不一致 {bad}")
+print(f"predict {len(cases)} 組（含利率情境）、成長定價 {len(gcases)} 組、統一模型 {len(ucases)} 組、consFor {len(cfcases)} 組、利率斜率 {len(slopes)} 組、calendarize {len(cal)} 組；不一致 {bad}")
 sys.exit(1 if bad else 0)

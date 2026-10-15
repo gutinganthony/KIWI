@@ -64,10 +64,16 @@ def predict(row, h, model=None, gm=None, cq=None, eps_a=None, eps_b=None, eb_kin
     cq = load_conformal() if cq is None else cq
     px, eps0 = float(row["px"]), float(row.get("eps0", np.nan))
     g = row.get("grp") if row.get("grp") in orbit.GNAME else orbit.group_of(row.get("sector"))
-    if not (pos(cons_a) and pos(eps0) and px > 0):     # 沒有共識（或今天虧損）：和以前一樣，只有軌道那一套
-        o = orbit.predict(row, h, model, eps_a, eps_b, None, None, erp=erp, rate=rate, band_mult=band_mult)
-        o.update(mode="軌道", kind=None, band_kind="模型", band_group=None, eps_a=eps_a if pos(eps_a) else None, eps_b=eps_b if pos(eps_b) else None,
-                 gt_cons=None, view=None, note=None)
+    given = lambda v: v is not None and np.isfinite(v)
+    have_cons = pos(cons_a)
+    ea = float(eps_a) if given(eps_a) else (float(cons_a) if have_cons else None)
+    eb = float(eps_b) if given(eps_b) else (float(cons_b) if (have_cons and pos(cons_b)) else None)
+    have_view = given(eps_a) or given(eps_b)
+    if not (have_cons and pos(eps0) and px > 0 and pos(ea) and (eb is None or pos(eb))):
+        # 沒有共識、今天虧損、或你的 EPS ≤ 0：和以前一樣交給軌道那一套（含虧損版、轉盈放寬）；沒有 conformal
+        o = orbit.predict(row, h, model, ea, eb, cons_a if have_cons else None, cons_b if have_cons else None, erp=erp, rate=rate, band_mult=band_mult)
+        o.update(mode=("看法" if have_view else "共識") if have_cons else "軌道", kind="fund" if (have_view and have_cons) else None,
+                 band_kind="模型", band_group=None, eps_a=ea, eps_b=eb, gt_cons=None, view=None, note=None)
         return o
     growth_ok = gm is not None and str(h) in gm["h"] and (year is None or str(year) in gm["by_year"][str(h)])
     f0 = float(fwd0) if pos(fwd0) else float(cons_a)
@@ -79,9 +85,8 @@ def predict(row, h, model=None, gm=None, cq=None, eps_a=None, eps_b=None, eb_kin
         cb = float(ebh) if ebh else None
     else:
         gt_cons, cb = None, None
-    ea = float(eps_a) if pos(eps_a) else float(cons_a)
-    eb = float(eps_b) if pos(eps_b) else cb
-    have_view = pos(eps_a) or pos(eps_b)
+    if not given(eps_b):
+        eb = cb                                          # 沒給 EPS_b：用共識的（沒有下一財年共識時用回歸的 EPS_b）
     note = None
     market = eb_kind == "market" and pos(eps_b)
     if market and not (growth_ok and gt_cons is not None):
