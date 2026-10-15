@@ -184,7 +184,9 @@ def opt():
 def slim_cq(cq):
     if not cq:
         return None
+    fwd = cq.get("fwd")                                  # §28：forward 本益比區間（results/fwd_pe_band.json）
     return dict(min_n=cq["min_n"], cutoff=cq["cutoff"], levels=cq.get("levels"),
+                fwd=None if not fwd else dict(alpha=fwd["alpha"], h={h: dict(q=v["q"], mdape=v["mdape"], wf_cover=v["wf_cover"], n=v["n"]) for h, v in fwd["h"].items()}),
                 h={h: dict(vol_median=v["vol_median"], n=v["n"], wf_cover80=v["wf_cover80"].get("全部校準"), wf_min=min(v["wf_by_year"].values()),
                            wf_cover={t: {L: [w["avg"], w["min"]] for L, w in d.items()} for t, d in (v.get("wf_cover") or {}).items()},   # §27：各水準走動式涵蓋（平均、最低）
                            **{k: dict(n=v[k]["n"], q=v[k]["q"], **{t: v[k][t] for t in ("pe", "px", "eps") if t in v[k]}) for k in ("pooled", "tech", "other")})

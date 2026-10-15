@@ -696,9 +696,11 @@ function render() {
     const cmp = alt && altTxt ? `<br><span class="note">${altTxt}：本益比 ${alt.pe === null ? "無定義" : f2(alt.pe, 1)}、股價 ${f0(alt.px)}（${LV}% ${f0(bnd(alt, "px_lo"))}–${f0(bnd(alt, "px_hi"))}）</span>` : "";
     const d = o.decomp;                                                                    // §27：股價變化 ＝ EPS 成長 × 本益比重估
     const dTxt = d ? `<br><b>股價變化拆成兩塊</b>：${f0(t.px)} → ${f0(o.px)}（${sgn(Math.exp(d.total) - 1)}）＝ EPS 成長 ${sgn(Math.exp(d.eps_g) - 1)}（${f2(t.e)} → ${f2(o.epsA)}）× 本益比重估 ${sgn(Math.exp(d.pe_ch) - 1)}（${f2(d.pe0, 1)} → ${f2(o.pe, 1)} 倍）` : "";
+    const fw = o.fwdBand && o.fwdBand.wfCover && o.fwdBand.wfCover[String(LV)];                 // §28：forward 本益比區間（Bloomberg 512 檔 2019–2026 校準）
+    const fTxt = o["fwd_lo" + LV] !== undefined && o.fwdBand ? `<br>forward 本益比 ${f2(o.fwd, 1)} 倍（股價 ÷ EPS_b）的 ${LV}% 區間：${f2(bnd(o, "fwd_lo"), 1)}–${f2(bnd(o, "fwd_hi"), 1)} 倍——分母是共識、不含 EPS 風險，所以比本益比區間窄；軌道在 Bloomberg 512 檔 2021–2026 的 forward 本益比 MdAPE ${pct(o.fwdBand.mdape, 1)}${fw ? `，${LV}% 區間走動式涵蓋 ${pct(fw.avg)}（最差的一年 ${pct(fw.min)}）` : ""}（README §28）。` : "";
     const eTxt = o.bandKind === "conformal" && o["eps_lo" + LV] !== undefined ? `<br>共識 EPS_a ${f2(o.epsA)} 本身的 ${LV}% 區間（歷史共識誤差）：${f2(o["eps_lo" + LV])}–${f2(o["eps_hi" + LV])}。本益比區間比股價區間寬，主要就是這一塊（本益比誤差 ＝ 股價誤差 − EPS 誤差）；填自己的 EPS 就把它拿掉了。` : "";
     $("decomp").innerHTML = `<b>拆解（${lab[base.i]}）</b>　模式：${modeTxt}　寫法：${o.spec}<br>軌道：${sgn(Math.exp(o.mk) - 1)}（資金成本 − 股利，${H} 個月）${terms ? "<br>" + terms : ""}${dTxt}<br>
-      ${bandTxt}；寬度：波動 ${pct(o.vol)}${o.volKnown ? "" : "（沒有資料，用中位數）"}，是中位波動股票的 ${o.width.toFixed(2)} 倍${o.epsWiden > 1.005 ? `（EPS 變化大，放寬 ×${o.epsWiden.toFixed(2)}）` : ""}${o.bandMult > 1 ? `（含${t.adr ? "外國 ADR" : "中小型股"}放寬 ×${o.bandMult.toFixed(2)}）` : ""}${o.widen > 1 ? `；目標日虧損，再放寬 ×${o.widen.toFixed(2)}` : ""}${eTxt}${o.note ? "<br>" + esc(o.note) : ""}` + cmp;
+      ${bandTxt}；寬度：波動 ${pct(o.vol)}${o.volKnown ? "" : "（沒有資料，用中位數）"}，是中位波動股票的 ${o.width.toFixed(2)} 倍${o.epsWiden > 1.005 ? `（EPS 變化大，放寬 ×${o.epsWiden.toFixed(2)}）` : ""}${o.bandMult > 1 ? `（含${t.adr ? "外國 ADR" : "中小型股"}放寬 ×${o.bandMult.toFixed(2)}）` : ""}${o.widen > 1 ? `；目標日虧損，再放寬 ×${o.widen.toFixed(2)}` : ""}${eTxt}${fTxt}${o.note ? "<br>" + esc(o.note) : ""}` + cmp;
   } else $("decomp").textContent = "請至少填基準情境的 EPS_a。";
   // 相對大盤（README §26.3）：扣掉同一天 S&P 500 只用共識的預測中位
   const R = M.rel && M.rel.h && M.rel.h[String(H)], LB = M.lab && M.lab[String(H)];

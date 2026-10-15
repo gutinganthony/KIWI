@@ -36,10 +36,29 @@ def pos(v):
 
 
 def load_conformal(res=RES):
+    """results/conformal.json；有 results/fwd_pe_band.json（§28：forward 本益比區間）就掛在 cq["fwd"]。"""
     p = os.path.join(res, "conformal.json")
     if p not in _C:
-        _C[p] = json.load(open(p)) if os.path.exists(p) else None
+        cq = json.load(open(p)) if os.path.exists(p) else None
+        pf = os.path.join(res, "fwd_pe_band.json")
+        if cq is not None and os.path.exists(pf):
+            cq["fwd"] = json.load(open(pf))
+        _C[p] = cq
     return _C[p]
+
+
+def _fwd_band(o, h, cq, band_mult):
+    """§28：forward 本益比（預測股價 ÷ EPS_b）的區間——軌道在 Bloomberg 512 檔 2019–2026 的 forward 本益比誤差分位數 × 波動^α × 放寬倍數。
+    分母是共識，所以不含 EPS 風險；只在有 EPS_b（fwd_pe）時給 fwd_lo{L}／fwd_hi{L}。"""
+    fb = (cq or {}).get("fwd")
+    if not fb or str(h) not in fb.get("h", {}) or not pos(o.get("fwd_pe")):
+        return
+    b = fb["h"][str(h)]
+    sc = float(np.clip(o["vol"], *orbit.VOL_CLIP) ** fb["alpha"]) * band_mult
+    lf = np.log(o["fwd_pe"])
+    for L, (lo, hi) in b["q"].items():
+        o[f"fwd_lo{L}"], o[f"fwd_hi{L}"] = float(np.exp(lf + sc * lo)), float(np.exp(lf + sc * hi))
+    o["fwd_band"] = dict(mdape=b.get("mdape"), wf_cover=b.get("wf_cover"))
 
 
 def conformal_q(cq, h, grp):
@@ -76,6 +95,7 @@ def predict(row, h, model=None, gm=None, cq=None, eps_a=None, eps_b=None, eb_kin
         o.update(mode=("看法" if have_view else "共識") if have_cons else "軌道", kind="fund" if (have_view and have_cons) else None,
                  band_kind="模型", band_group=None, eps_a=ea, eps_b=eb, gt_cons=None, view=None, note=None)
         o["decomp"] = _decomp(o, row, ea)
+        _fwd_band(o, h, cq, band_mult)
         return o
     growth_ok = gm is not None and str(h) in gm["h"] and (year is None or str(year) in gm["by_year"][str(h)])
     f0 = float(fwd0) if pos(fwd0) else float(cons_a)
@@ -118,6 +138,7 @@ def predict(row, h, model=None, gm=None, cq=None, eps_a=None, eps_b=None, eb_kin
     pe_own = _conformal_band(o, h, g, model, cq, band_mult, ea, eps0) if not have_view else False
     _pe(o, ea, eb, skip_band=pe_own)
     o["decomp"] = _decomp(o, row, ea)
+    _fwd_band(o, h, cq, band_mult)
     return o
 
 

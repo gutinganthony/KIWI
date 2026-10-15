@@ -76,6 +76,16 @@ const OrbitCore = (() => {
     });
     return out;
   }
+  // §28：forward 本益比（預測股價 ÷ EPS_b）的區間（和 pef/unified.py 的 _fwd_band 相同）：cq.fwd＝results/fwd_pe_band.json；分母是共識，不含 EPS 風險
+  function fwdBand(o, h, cq, bandMult) {
+    const fb = cq && cq.fwd;
+    if (!fb || !fb.h || !fb.h[String(h)] || !pos(o.fwd)) return;
+    const b = fb.h[String(h)];
+    const sc = Math.pow(clip(o.vol, 0.1, 1.5), fb.alpha) * bandMult;
+    const lf = Math.log(o.fwd);
+    Object.keys(b.q).forEach((L) => { o["fwd_lo" + L] = Math.exp(lf + sc * b.q[L][0]); o["fwd_hi" + L] = Math.exp(lf + sc * b.q[L][1]); });
+    o.fwdBand = { mdape: b.mdape, wfCover: b.wf_cover };
+  }
   // §27：股價變化 ＝ EPS 成長 ＋ 本益比重估（ln）：ln(預測股價 ÷ 今天) ＝ ln(EPS_a ÷ 今天 EPS) ＋ ln(預測本益比 ÷ 今天本益比)；本益比沒有定義時 null
   function decomp(row, o, ea) {
     if (!(pos(ea) && pos(row.e) && row.px > 0 && o.pe !== null && o.pe !== undefined)) return null;
@@ -193,6 +203,7 @@ const OrbitCore = (() => {
       Object.assign(o, { mode: haveCons ? (haveView ? "看法" : "共識") : "軌道", kind: haveView && haveCons ? "fund" : null, bandKind: "模型", bandGroup: null,
         epsA: eaU, epsB: ebU, gtCons: null, view: null, note: null });
       o.decomp = decomp(row, o, eaU);
+      fwdBand(o, h, cq, bandMult);
       return o;
     }
     const gh = gp && gp.h && gp.h[String(h)];
@@ -253,6 +264,7 @@ const OrbitCore = (() => {
     if (!peOwn) (o.bandLevels || [50, 80]).forEach((L) => { o["pe_lo" + L] = o.pe === null ? null : o["px_lo" + L] / eaU; o["pe_hi" + L] = o.pe === null ? null : o["px_hi" + L] / eaU; });
     o.fwd = pos(ebU) ? o.px / ebU : null;
     o.decomp = decomp(row, o, eaU);
+    fwdBand(o, h, cq, bandMult);
     return o;
   }
 

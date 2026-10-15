@@ -325,6 +325,12 @@ def main():
     if o0["band_kind"] == "conformal" and o0.get(f"eps_lo{L}") is not None:   # §27：共識 EPS 本身會錯多少
         print(f"  共識 EPS_a {o0['eps_a']:,.2f} 本身的 {L}% 區間（歷史共識誤差）：{o0[f'eps_lo{L}']:,.2f}–{o0[f'eps_hi{L}']:,.2f}；"
               "本益比區間比股價區間寬，主要就是這一塊（本益比誤差 ＝ 股價誤差 − EPS 誤差）；填自己的 EPS（--eps）就把它拿掉了")
+    if o0.get(f"fwd_lo{L}") is not None:                  # §28：forward 本益比區間（分母是共識，不含 EPS 風險）
+        fb = o0.get("fwd_band") or {}
+        wc = (fb.get("wf_cover") or {}).get(str(L))
+        print(f"  forward 本益比 {o0['fwd_pe']:.1f} 倍（股價 ÷ EPS_b）的 {L}% 區間：{o0[f'fwd_lo{L}']:.1f}–{o0[f'fwd_hi{L}']:.1f}；分母是共識、不含 EPS 風險，所以比本益比區間窄"
+              f"（軌道在 Bloomberg 512 檔 2021–2026 的 forward 本益比 MdAPE {fb.get('mdape', float('nan')):.1%}"
+              + (f"、{L}% 區間走動式涵蓋 {wc['avg']:.0%}（最差的一年 {wc['min']:.0%}）" if wc else "") + "；README §28）")
     print("\n  拆解（第一個情境）：")
     print(f"    軌道：股價 × exp({o0['mk']:+.3f})  ← 市場看法不變時的預期")
     for p in o0["parts"]:

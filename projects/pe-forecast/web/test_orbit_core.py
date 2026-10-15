@@ -87,7 +87,7 @@ const rows = {json.dumps(rows).replace('NaN', 'null')}; rows.forEach(r => {{ if 
 const out = {{pred: [], cal: [], sl: [], gp: [], un: [], cf: []}};
 const CQ = {json.dumps(cq_js)}; const GPJ = {json.dumps(gp_js)};
 const UK = ["spec", "mode", "kind", "bandKind", "bandGroup", "px", "px_lo80", "px_lo50", "px_hi80", "pe", "pe_hi80", "fwd", "epsA", "epsB", "gtCons", "note", "adj", "width", "epsWiden",
-  "px_lo70", "px_hi60", "px_lo90", "pe_lo70", "pe_hi90", "pe_lo60", "eps_lo80", "eps_hi80", "eps_lo50"];
+  "px_lo70", "px_hi60", "px_lo90", "pe_lo70", "pe_hi90", "pe_lo60", "eps_lo80", "eps_hi80", "eps_lo50", "fwd_lo80", "fwd_hi80", "fwd_lo60"];
 for (const c of {json.dumps(ucases)}) {{ const o = C.predictUnified(rows[c.i], c.h, model, GPJ, CQ, c.ea, c.eb, c.kind, c.ca, c.cb, c.f0, c.rt, c.bm);
   out.un.push(UK.map(k => o[k] === undefined ? null : o[k]).concat(["eps_g", "pe_ch", "total"].map(k => o.decomp ? o.decomp[k] : null), [(o.bandLevels || []).join(",")])); }}
 {cons_for_js}
@@ -127,7 +127,7 @@ for c, j in zip(gcases, res["gp"]):
     if not same:
         print("成長定價不一致", c, py, j)
 UKP = ["spec", "mode", "kind", "band_kind", "band_group", "px", "px_lo80", "px_lo50", "px_hi80", "pe", "pe_hi80", "fwd_pe", "eps_a", "eps_b", "gt_cons", "note", "adj", "width", "eps_widen",
-       "px_lo70", "px_hi60", "px_lo90", "pe_lo70", "pe_hi90", "pe_lo60", "eps_lo80", "eps_hi80", "eps_lo50"]
+       "px_lo70", "px_hi60", "px_lo90", "pe_lo70", "pe_hi90", "pe_lo60", "eps_lo80", "eps_hi80", "eps_lo50", "fwd_lo80", "fwd_hi80", "fwd_lo60"]
 def same_val(a, b):
     if a is None or b is None:
         return a is None and b is None
