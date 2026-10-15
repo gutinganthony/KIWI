@@ -276,9 +276,13 @@ def main():
     def ylast(s):
         return (r(s.iloc[-1], 2), s.index[-1].date().isoformat()) if s is not None and len(s) else (None, None)
 
-    tks = ["^MOVE", "^SKEW", "^VIX3M", "BIZD", "ARCC", "OWL", "BX", "APO", "KKR", "BKLN", "SMH", "NVDA"]
+    tks = ["^MOVE", "^SKEW", "^VIX3M", "BIZD", "ARCC", "OWL", "BX", "APO", "KKR", "BKLN", "SMH", "NVDA", "CL=F", "BZ=F"]
     with ThreadPoolExecutor(max_workers=6) as ex:
         yq = dict(zip(tks, ex.map(lambda t: safe(yahoo, t, C), tks)))
+    # FRED 的 EIA 油價常落後一週以上；落後超過 3 天就改用 Yahoo 的 WTI 期貨近月價
+    wti_now = last(F["DCOILWTICO"])
+    if (not wti_now[1] or (today - pd.Timestamp(wti_now[1])).days > 3) and ylast(yq.get("CL=F"))[0]:
+        wti_now = ylast(yq.get("CL=F"))
     vix_now = last(F["VIXCLS"])[0]
     sofr, iorb = last(F["SOFR"])[0], last(F["IORB"])[0]
     pcs = [x for x in (dd_from_high(yq[t]) for t in ("OWL", "BX", "APO", "KKR")) if x is not None]
@@ -303,8 +307,9 @@ def main():
         "spx_ma_dist": now_row["ma_dist"],
         "usdjpy": last(F["DEXJPUS"]), "usdjpy_3m_chg": r(chg(F["DEXJPUS"], today, 3, pct=True), 1),
         "jgb10": last(F["IRLTLT01JPM156N"]),
-        "brent_dated": last(F["DCOILBRENTEU"]), "wti": last(F["DCOILWTICO"]),
-        "wti_12m_chg": r(chg(F["DCOILWTICO"], today, 12, pct=True), 0),
+        "brent_dated": last(F["DCOILBRENTEU"]), "wti": wti_now, "brent_fut": ylast(yq.get("BZ=F")),
+        "wti_12m_chg": r((wti_now[0] / at(F["DCOILWTICO"], today - pd.DateOffset(months=12))[0] - 1) * 100, 0)
+        if wti_now[0] and len(F["DCOILWTICO"]) else None,
         "cpi_yoy": now_row["cpi"], "unemp": last(F["UNRATE"]), "m2_yoy": now_row["m2"],
         "nfci": last(F["NFCI"]), "stlfsi": last(F["STLFSI4"]),
         "fed": fed_cycle(F["FEDFUNDS"], F["CPIAUCSL"], F["NFCI"], today),
