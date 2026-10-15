@@ -35,7 +35,7 @@ for i, r in enumerate(rows):
         cases.append(dict(i=i, h=h, ea=r["e"] * 1.1, eb=None, ca=r["e"] * 1.05, cb=None, rt=[-1.0, -0.06], bm=1.0))   # 利率情境
         cases.append(dict(i=i, h=h, ea=r["e"] * 1.2, eb=r["e"] * 1.4, ca=None, cb=None, rt=None, bm=1.17))     # 區間放寬
 gpm = GP.load(os.path.join(HERE, "results"))
-gp_js = dict(h={h: dict(coef=v["coef"], q=v["q"], delta=v["delta"], vol_median=v["vol_median"]) for h, v in gpm["h"].items()})
+gp_js = dict(h={h: dict(coef=v["coef"], q=v["q"], levels=v.get("levels"), delta=v["delta"], vol_median=v["vol_median"]) for h, v in gpm["h"].items()})
 gcases = []                                              # 成長定價（README §24）
 for i, r in enumerate(rows):
     for h in (6, 12, 24):
@@ -86,18 +86,19 @@ const C = require({json.dumps(js)}); const model = {json.dumps(model)};
 const rows = {json.dumps(rows).replace('NaN', 'null')}; rows.forEach(r => {{ if (r.v === null) r.v = NaN; }});
 const out = {{pred: [], cal: [], sl: [], gp: [], un: [], cf: []}};
 const CQ = {json.dumps(cq_js)}; const GPJ = {json.dumps(gp_js)};
-const UK = ["spec", "mode", "kind", "bandKind", "bandGroup", "px", "px_lo80", "px_lo50", "px_hi80", "pe", "pe_hi80", "fwd", "epsA", "epsB", "gtCons", "note", "adj", "width", "epsWiden"];
+const UK = ["spec", "mode", "kind", "bandKind", "bandGroup", "px", "px_lo80", "px_lo50", "px_hi80", "pe", "pe_hi80", "fwd", "epsA", "epsB", "gtCons", "note", "adj", "width", "epsWiden",
+  "px_lo70", "px_hi60", "px_lo90", "pe_lo70", "pe_hi90", "pe_lo60", "eps_lo80", "eps_hi80", "eps_lo50"];
 for (const c of {json.dumps(ucases)}) {{ const o = C.predictUnified(rows[c.i], c.h, model, GPJ, CQ, c.ea, c.eb, c.kind, c.ca, c.cb, c.f0, c.rt, c.bm);
-  out.un.push(UK.map(k => o[k] === undefined ? null : o[k])); }}
+  out.un.push(UK.map(k => o[k] === undefined ? null : o[k]).concat(["eps_g", "pe_ch", "total"].map(k => o.decomp ? o.decomp[k] : null), [(o.bandLevels || []).join(",")])); }}
 {cons_for_js}
 const CFT = {json.dumps(cf_t)};
 for (const c of {json.dumps(cfcases)}) {{ const t = CFT[c.j]; const r = consFor(t, c.h, c.ku);
   out.cf.push(r ? [r.a ? r.a.eps : null, r.a ? r.a.how : null, r.b ? r.b.eps : null, r.b ? r.b.how : null, r.k, r.k0, r.kBad] : null); }}
 for (const c of {json.dumps(gcases)}) {{ const o = C.predictGrowth(rows[c.i], c.h, model, {json.dumps(gp_js)}, c.ea, c.eb, c.f0, c.r12, c.rt, c.bm);
-  out.gp.push(o ? [o.spec, o.px, o.px_lo80, o.px_hi80, o.pe, o.fwd] : null); }}
+  out.gp.push(o ? [o.spec, o.px, o.px_lo80, o.px_hi80, o.pe, o.fwd, o.px_lo70, o.pe_hi90] : null); }}
 for (const c of {json.dumps(slopes)}) out.sl.push(C.rateSlope({json.dumps(rsens)}, c.h, c.rg, c.pr));
 for (const c of {json.dumps(cases)}) {{ const o = C.predict(rows[c.i], c.h, model, c.ea, c.eb, c.ca, c.cb, c.rt, c.bm);
-  out.pred.push([o.spec, o.px, o.px_lo80, o.px_hi80, o.pe, o.fwd]); }}
+  out.pred.push([o.spec, o.px, o.px_lo80, o.px_hi80, o.pe, o.fwd, o.px_lo70, o.px_hi60, o.pe_lo90 === undefined ? null : o.pe_lo90]); }}
 for (const c of {json.dumps(cal)}) {{ const r = C.calendarize(c.fy.map(x => [C.utc(x[0]), x[1]]), C.utc(c.t), C.utc(c.q), c.e, c.x);
   out.cal.push(r ? [r.eps, r.how] : null); }}
 console.log(JSON.stringify(out));
@@ -109,7 +110,7 @@ for c, j in zip(cases, res["pred"]):
                            vol36=rows[c["i"]]["v"], sector={"cyclical": "semis", "growth": "software", "tech_other": "hardware",
                                                             "other": "x"}[rows[c["i"]]["g"]]),
                       c["h"], model, c["ea"], c["eb"], c["ca"], c["cb"], rate=c["rt"], band_mult=c["bm"])
-    py = [o["spec"], o["px"], o["px_lo80"], o["px_hi80"], o["pe"], o["fwd_pe"]]
+    py = [o["spec"], o["px"], o["px_lo80"], o["px_hi80"], o["pe"], o["fwd_pe"], o["px_lo70"], o["px_hi60"], o.get("pe_lo90")]
     same = py[0] == j[0] and all((a is None and b is None) or (a is not None and b is not None and abs(a - b) <= 1e-9 * max(1, abs(a)))
                                   for a, b in zip(py[1:], j[1:]))
     bad += not same
@@ -119,13 +120,14 @@ for c, j in zip(gcases, res["gp"]):
     r = rows[c["i"]]
     o = GP.predict(dict(px=r["px"], eps0=r["e"], y10=r["y"], dy=r["dy"], vol36=r["v"], grp=r["g"]), c["h"], c["ea"], c["eb"], c["f0"], c["r12"],
                    model=model, gm=gpm, rate=c["rt"], band_mult=c["bm"])
-    py = None if o is None else [o["spec"], o["px"], o["px_lo80"], o["px_hi80"], o["pe"], o["fwd_pe"]]
+    py = None if o is None else [o["spec"], o["px"], o["px_lo80"], o["px_hi80"], o["pe"], o["fwd_pe"], o["px_lo70"], o["pe_hi90"]]
     same = (py is None and j is None) or (py is not None and j is not None and py[0] == j[0]
                                           and all(abs(a - b) <= 1e-9 * max(1, abs(a)) for a, b in zip(py[1:], j[1:])))
     bad += not same
     if not same:
         print("成長定價不一致", c, py, j)
-UKP = ["spec", "mode", "kind", "band_kind", "band_group", "px", "px_lo80", "px_lo50", "px_hi80", "pe", "pe_hi80", "fwd_pe", "eps_a", "eps_b", "gt_cons", "note", "adj", "width", "eps_widen"]
+UKP = ["spec", "mode", "kind", "band_kind", "band_group", "px", "px_lo80", "px_lo50", "px_hi80", "pe", "pe_hi80", "fwd_pe", "eps_a", "eps_b", "gt_cons", "note", "adj", "width", "eps_widen",
+       "px_lo70", "px_hi60", "px_lo90", "pe_lo70", "pe_hi90", "pe_lo60", "eps_lo80", "eps_hi80", "eps_lo50"]
 def same_val(a, b):
     if a is None or b is None:
         return a is None and b is None
@@ -136,7 +138,7 @@ for c, j in zip(ucases, res["un"]):
     r = rows[c["i"]]
     o = unified.predict(dict(px=r["px"], eps0=r["e"], y10=r["y"], dy=r["dy"], vol36=r["v"], grp=r["g"]), c["h"], model=model, gm=gpm, cq=cq,
                         eps_a=c["ea"], eps_b=c["eb"], eb_kind=c["kind"], cons_a=c["ca"], cons_b=c["cb"], fwd0=c["f0"], rate=c["rt"], band_mult=c["bm"])
-    py = [o.get(k) for k in UKP]
+    py = [o.get(k) for k in UKP] + [None if o.get("decomp") is None else o["decomp"][k] for k in ("eps_g", "pe_ch", "total")] + [",".join(str(L) for L in o.get("band_levels", []))]
     py = [None if (isinstance(v, float) and not np.isfinite(v)) else v for v in py]
     same = all(same_val(a, b) for a, b in zip(py, j))
     bad += not same

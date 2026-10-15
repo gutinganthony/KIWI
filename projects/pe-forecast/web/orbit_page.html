@@ -179,6 +179,10 @@ EPS_b＝市場在目標日會預期的數字：
         <div class="seg" role="group" aria-label="EPS_b 的意思" id="kseg">
           <button type="button" data-k="fund" aria-pressed="true">我的基本面預估</button><button type="button" data-k="market" aria-pressed="false">市場在目標日會預期的數字</button>
         </div><p class="note" id="k-note"></p></div>
+      <div class="stack" style="gap:6px"><span class="note">外圍區間的涵蓋水準（核心區間固定 50%；水準越高區間越寬，實測命中率見結果下方）</span>
+        <div class="seg" role="group" aria-label="外圍區間的涵蓋水準" id="lseg">
+          <button type="button" data-l="60" aria-pressed="false">60%</button><button type="button" data-l="70" aria-pressed="false">70%</button><button type="button" data-l="80" aria-pressed="true">80%</button><button type="button" data-l="90" aria-pressed="false">90%</button>
+        </div></div>
       <div class="stack" style="gap:6px">
         <div class="row" style="justify-content:space-between"><span class="note">你的 EPS（GAAP 稀釋、最近四季口徑）</span><span class="chip ex" id="ex-chip" hidden>範例數字</span></div>
         <div class="scen">
@@ -217,7 +221,8 @@ EPS_b＝市場在目標日會預期的數字：
         <div id="rel" class="note"></div>
         <div id="notes" class="stack" style="gap:6px"></div>
       </div>
-      <p class="note"><b>區間怎麼讀</b>：沒改範例數字的基準列＝「只有共識」，區間用 conformal 校準（第十輪）——只有共識時的實際誤差，80% 區間走動式實測平均涵蓋 85–88%（2019–2024；最差的一年 73%；舊區間只有 57–63%）。
+      <p class="note"><b>區間怎麼讀</b>：沒改範例數字的基準列＝「只有共識」，區間用 conformal 校準（第十輪）——只有共識時的實際誤差；第十一輪起<b>股價和本益比分開校準</b>（本益比誤差 ＝ 股價誤差 − 共識 EPS 誤差，所以本益比區間一定比股價區間寬），
+        外圍區間的涵蓋水準可選 60／70／80／90%——命中率和寬度一起變，拆解裡印的是走動式實測的命中率（12 個月 80%：股價 79%、本益比 86%；最差的一年 54%／73%）。
         填了自己的 EPS（含悲觀／樂觀 ±10% 那兩列）＝「看法」，區間假設你的 EPS 對、只含模型誤差（2022 以後實測 80–89%）；你的 EPS 若不確定，請把悲觀／樂觀填成基準的 −20%／+20%，看三個情境合起來的範圍。區間已含產業被重新定價的風險，所以很寬。不是投資建議。</p>
     </div>
   </div>
@@ -234,7 +239,8 @@ EPS_b＝市場在目標日會預期的數字：
         <li>選預測距離。填你的 <b>EPS_a</b>（h 個月後那時已公布的最近四季 EPS），最好也填 <b>EPS_b</b>（再往後 12 個月）。三個情境可以只填基準；<b>用共識時建議悲觀／樂觀各填基準的 −20%／+20%</b>，看三個情境合起來的範圍（第六輪回測：只填一個情境，80% 區間只涵蓋約 60%）。</li>
         <li>約 2,800 檔有分析師共識（S&P 500、Nasdaq-100 與大部分中小型美股），會自動帶入，並用<b>共識校正模型</b>換成「預期的實際 GAAP EPS」（中小型股距離年報 9 個月以上照原樣用；係數可以改，也可以取消勾選）。外國公司 ADR 約 100 檔也有共識（已換成每 ADR 美元）。</li>
         <li>想加入自己的利率看法：在「利率情境」填 10 年期到目標日的變化（百分點）。不填＝和市場一樣。</li>
-        <li>看結果：本益比中位與 80% 區間、股價 50%／80% 區間、h 個月後的 forward 本益比，以及每一項對股價的影響。下面的「相對大盤」把同一天 S&P 500 只用共識的預測中位扣掉——大盤整體重新定價預測不了，相對的那一半比較可靠（回測相對誤差 0.21 vs 絕對 0.23）。</li>
+        <li>選外圍區間的涵蓋水準（預設 80%；想要窄一點選 60–70%，命中率跟著降，實測數字印在拆解裡）。</li>
+        <li>看結果：本益比與股價各自的中位、50% 核心區間與外圍區間、h 個月後的 forward 本益比、「股價變化 ＝ EPS 成長 × 本益比重估」的拆解，以及每一項對股價的影響。下面的「相對大盤」把同一天 S&P 500 只用共識的預測中位扣掉——大盤整體重新定價預測不了，相對的那一半比較可靠（回測相對誤差 0.21 vs 絕對 0.23）。</li>
       </ul>
       <h3>在雲端 session（命令列）</h3>
       <div class="cmd">cd projects/pe-forecast
@@ -336,6 +342,11 @@ python3 consensus_snapshot.py --detail    # 存一份共識快照</div>
       <tr><td>相對輸出</td><td>最大的誤差是大盤整體重新定價、事前預測不了；能不能把它拿掉？</td>
         <td>把同一個起點月全部公司的預測中位和實際中位各自扣掉：12 個月誤差 0.227 → 0.207、24 個月 0.253 → 0.228、6 個月 0.179 → 0.160；每個起點月預測 vs 實際的 Spearman 中位 12 個月 0.77（本益比不變 0.65）、24 個月 0.73（0.57）</td>
         <td class="best">試算器加「相對大盤」：扣掉同一天 S&P 500 只用共識的預測中位，並給百分位</td></tr>
+      <tr><td>第十一輪：區間太寬（README §27）</td><td>80% 本益比區間高 ÷ 低約 3.4 倍，沒有參考價值；同樣的命中率下能不能更窄？</td>
+        <td>走動式比了 10 種做法（最短區間、只用近 3 年校準、10 條線索的尺度模型、線性分位數迴歸＝線性規劃、梯度提升分位數迴歸）：同樣涵蓋下寬度只省 0–8%，梯度提升看似窄 20% 其實是命中率掉到 77%。
+          真正大的是結構：本益比誤差 ＝ 股價誤差 − 共識 EPS 誤差，12 個月 80% 區間的 ln 寬度 股價 0.67、EPS 0.88、本益比 1.05——本益比區間寬是因為 EPS 會錯；原本把本益比區間 × 共識 EPS 當股價區間，把 EPS 誤差也算進股價了。
+          對照：本益比不變＋歷史分位要 4.6 倍才涵蓋 84%，自己過去 5 年的本益比 10–90% 只涵蓋 60%</td>
+        <td class="best">股價、本益比分開校準（12 個月 80% 股價區間 3.4 → 2.0 倍）；涵蓋水準 60／70／80／90% 可選、逐一印實測命中率；拆解加「股價變化 ＝ EPS 成長 × 本益比重估」與共識 EPS 本身的區間</td></tr>
     </table></div>
     <p class="note">細節：README §26、審閱 REVIEW_2026-10-14.md；重現：<code>research/unified_lab.py</code>（→ results/unified_lab.txt）、<code>research/conformal_fit.py</code>（→ results/conformal.json）、<code>web/test_orbit_core.py</code>（網頁和命令列一致）。</p>
   </div>
@@ -567,7 +578,8 @@ $("meta").innerHTML = [`股價與共識：Yahoo ${esc(DATA.snap || "")}`, `${DAT
 // ---- 試算器 ----
 const byT = new Map(DATA.tickers.map((t) => [t.t, t]));
 $("tk-list").innerHTML = DATA.tickers.map((t) => `<option value="${esc(t.t)}">${esc(t.n)}</option>`).join("");
-let H = 12, cur = null, KIND = "fund";   // KIND：EPS_b 的意思——fund＝我的基本面預估（軌道的 β_s）、market＝市場在目標日會預期的數字（成長定價的係數；README §26）
+let H = 12, cur = null, KIND = "fund", LV = 80;   // KIND：EPS_b 的意思——fund＝我的基本面預估（軌道的 β_s）、market＝市場在目標日會預期的數字（成長定價的係數；README §26）；LV：外圍區間的涵蓋水準（§27）
+const bnd = (o, k, L = LV) => (o[k + L] !== undefined ? o[k + L] : o[k + "80"]);   // px_lo／px_hi／pe_lo／pe_hi ＋ 水準；舊資料只有 50、80
 const num = (id) => { const v = parseFloat($(id).value); return Number.isFinite(v) ? v : null; };
 const setv = (id, v, d = 2) => { $(id).value = (v === null || v === undefined || !Number.isFinite(v)) ? "" : String(+v.toFixed(d)); };
 
@@ -656,6 +668,8 @@ function render() {
   const U = (s, kind) => C.predictUnified(row, H, M, M.gp, M.cq, s.eaIn, s.ebIn, kind, ca, cb, fwd0, rate, bm);
   const res = sc_.map((s) => ({ ...s, o: U(s, KIND) }));
   const wf = M.cq && M.cq.h[String(H)] ? M.cq.h[String(H)] : null;
+  const cov = wf && wf.wf_cover ? wf.wf_cover : null;                                     // §27：各水準走動式實測涵蓋 [平均, 最差的一年]
+  const covTxt = (k) => cov && cov[k] && cov[k][String(LV)] ? `${pct(cov[k][String(LV)][0])}（最差的一年 ${pct(cov[k][String(LV)][1])}）` : "—";
   $("k-note").textContent = KIND === "market"
     ? "市場在目標日會預期的數字：你判斷「到時候市場對下一年 EPS 的看法」。它直接進本益比（成長定價的係數）：比共識隱含的成長每多 10%，本益比約多 6%。" + (H === 6 ? "6 個月沒有這組係數，這裡當作基本面預估。" : "只有填了 EPS_b 才有差別。")
     : "我的基本面預估（預設）：你研究出來的那一年 EPS。市場在目標日還不知道這個數字，所以用軌道的小係數（EPS_b 每多 10%，股價約多 0.3–1.7%）；回測猜對時這樣最準。";
@@ -665,23 +679,26 @@ function render() {
       "這家今天虧損，沒有可以當範例的 EPS。請在左邊填你預估的 EPS_a（可以是負的），有轉盈的話也填 EPS_b。"}</td></tr>`;
     drawRange(null); $("decomp").textContent = ""; $("rel").innerHTML = ""; $("notes").innerHTML = ""; return;
   }
-  $("res").innerHTML = `<tr><th>情境</th><th>EPS_a</th><th>EPS_b</th><th>本益比中位</th><th>本益比 80% 區間</th><th>股價中位</th><th>股價 50% 區間</th><th>股價 80% 區間</th><th>forward 本益比</th></tr>` +
+  $("res").innerHTML = `<tr><th>情境</th><th>EPS_a</th><th>EPS_b</th><th>本益比中位</th><th>本益比 50%</th><th>本益比 ${LV}%</th><th>股價中位</th><th>股價 50%</th><th>股價 ${LV}%</th><th>forward 本益比</th></tr>` +
     res.map(({ i, o }) => `<tr class="${i === 1 ? "base" : ""}"><td>${lab[i]}${o.mode === "共識" ? "（＝共識）" : ""}</td><td>${f2(o.epsA)}</td><td>${o.epsB === null || o.epsB === undefined ? "—" : f2(o.epsB)}</td>
-      <td>${o.pe === null ? "無定義" : f2(o.pe, 1)}</td><td>${o.pe === null ? "—" : f2(o.pe_lo80, 1) + "–" + f2(o.pe_hi80, 1)}</td>
-      <td>${f0(o.px)}</td><td>${f0(o.px_lo50)}–${f0(o.px_hi50)}</td><td>${f0(o.px_lo80)}–${f0(o.px_hi80)}</td><td>${o.fwd === null ? "—" : f2(o.fwd, 1)}</td></tr>`).join("");
+      <td>${o.pe === null ? "無定義" : f2(o.pe, 1)}</td><td>${o.pe === null ? "—" : f2(o.pe_lo50, 1) + "–" + f2(o.pe_hi50, 1)}</td><td>${o.pe === null ? "—" : f2(bnd(o, "pe_lo"), 1) + "–" + f2(bnd(o, "pe_hi"), 1)}</td>
+      <td>${f0(o.px)}</td><td>${f0(o.px_lo50)}–${f0(o.px_hi50)}</td><td>${f0(bnd(o, "px_lo"))}–${f0(bnd(o, "px_hi"))}</td><td>${o.fwd === null ? "—" : f2(o.fwd, 1)}</td></tr>`).join("");
   const base = res.find((r) => r.i === 1) || res[0];
   drawRange(base ? base.o : null, t.px);
   if (base) {
     const o = base.o;
     const terms = o.parts.map((p) => `${p.name}：${p.x >= 0 ? "+" : ""}${p.x.toFixed(3)} × β ${p.beta.toFixed(3)} ＝ ${sgn(p.effect)}`).join("<br>");
     const modeTxt = o.mode === "共識" ? "共識（沒有自己的看法）" : o.mode === "軌道" ? "軌道（沒有共識）" : `看法（EPS_b＝${o.kind === "market" ? "市場在目標日會預期的數字" : "我的基本面預估"}）`;
-    const bandTxt = o.bandKind === "conformal" ? `區間：conformal（${o.bandGroup}；只有共識時的實際誤差校準，80% 區間走動式實測涵蓋 ${pct(wf.wf_cover80)}）` : o.kind === "market" ? "區間：成長定價的殘差校準（假設你的 EPS_a 和市場預期對）" : "區間：模型（假設你的 EPS 對，只含模型誤差）";
+    const bandTxt = o.bandKind === "conformal" ? `區間：conformal（${o.bandGroup}；只有共識時的實際誤差，股價與本益比分開校準）。${LV}% 區間走動式實測涵蓋：股價 ${covTxt("px")}、本益比 ${covTxt("pe")}` : o.kind === "market" ? "區間：成長定價的殘差校準（假設你的 EPS_a 和市場預期對）" : "區間：模型（假設你的 EPS 對，只含模型誤差）";
     let alt = null, altTxt = "";                                                           // 對照：EPS_b 的另一種意思
     if (o.kind === "market") { alt = U(base, "fund"); altTxt = "對照（把 EPS_b 當我的基本面預估＝軌道 β_sb）"; }
     else if (o.kind === "fund" && base.ebIn !== null && H !== 6) { alt = U(base, "market"); altTxt = alt.kind === "market" ? "對照（把 EPS_b 當市場在目標日會預期的數字＝成長定價係數）" : ""; }
-    const cmp = alt && altTxt ? `<br><span class="note">${altTxt}：本益比 ${alt.pe === null ? "無定義" : f2(alt.pe, 1)}、股價 ${f0(alt.px)}（80% ${f0(alt.px_lo80)}–${f0(alt.px_hi80)}）</span>` : "";
-    $("decomp").innerHTML = `<b>拆解（${lab[base.i]}）</b>　模式：${modeTxt}　寫法：${o.spec}<br>軌道：${sgn(Math.exp(o.mk) - 1)}（資金成本 − 股利，${H} 個月）${terms ? "<br>" + terms : ""}<br>
-      ${bandTxt}；寬度：波動 ${pct(o.vol)}${o.volKnown ? "" : "（沒有資料，用中位數）"}，是中位波動股票的 ${o.width.toFixed(2)} 倍${o.epsWiden > 1.005 ? `（EPS 變化大，放寬 ×${o.epsWiden.toFixed(2)}）` : ""}${o.bandMult > 1 ? `（含${t.adr ? "外國 ADR" : "中小型股"}放寬 ×${o.bandMult.toFixed(2)}）` : ""}${o.widen > 1 ? `；目標日虧損，再放寬 ×${o.widen.toFixed(2)}` : ""}${o.note ? "<br>" + esc(o.note) : ""}` + cmp;
+    const cmp = alt && altTxt ? `<br><span class="note">${altTxt}：本益比 ${alt.pe === null ? "無定義" : f2(alt.pe, 1)}、股價 ${f0(alt.px)}（${LV}% ${f0(bnd(alt, "px_lo"))}–${f0(bnd(alt, "px_hi"))}）</span>` : "";
+    const d = o.decomp;                                                                    // §27：股價變化 ＝ EPS 成長 × 本益比重估
+    const dTxt = d ? `<br><b>股價變化拆成兩塊</b>：${f0(t.px)} → ${f0(o.px)}（${sgn(Math.exp(d.total) - 1)}）＝ EPS 成長 ${sgn(Math.exp(d.eps_g) - 1)}（${f2(t.e)} → ${f2(o.epsA)}）× 本益比重估 ${sgn(Math.exp(d.pe_ch) - 1)}（${f2(d.pe0, 1)} → ${f2(o.pe, 1)} 倍）` : "";
+    const eTxt = o.bandKind === "conformal" && o["eps_lo" + LV] !== undefined ? `<br>共識 EPS_a ${f2(o.epsA)} 本身的 ${LV}% 區間（歷史共識誤差）：${f2(o["eps_lo" + LV])}–${f2(o["eps_hi" + LV])}。本益比區間比股價區間寬，主要就是這一塊（本益比誤差 ＝ 股價誤差 − EPS 誤差）；填自己的 EPS 就把它拿掉了。` : "";
+    $("decomp").innerHTML = `<b>拆解（${lab[base.i]}）</b>　模式：${modeTxt}　寫法：${o.spec}<br>軌道：${sgn(Math.exp(o.mk) - 1)}（資金成本 − 股利，${H} 個月）${terms ? "<br>" + terms : ""}${dTxt}<br>
+      ${bandTxt}；寬度：波動 ${pct(o.vol)}${o.volKnown ? "" : "（沒有資料，用中位數）"}，是中位波動股票的 ${o.width.toFixed(2)} 倍${o.epsWiden > 1.005 ? `（EPS 變化大，放寬 ×${o.epsWiden.toFixed(2)}）` : ""}${o.bandMult > 1 ? `（含${t.adr ? "外國 ADR" : "中小型股"}放寬 ×${o.bandMult.toFixed(2)}）` : ""}${o.widen > 1 ? `；目標日虧損，再放寬 ×${o.widen.toFixed(2)}` : ""}${eTxt}${o.note ? "<br>" + esc(o.note) : ""}` + cmp;
   } else $("decomp").textContent = "請至少填基準情境的 EPS_a。";
   // 相對大盤（README §26.3）：扣掉同一天 S&P 500 只用共識的預測中位
   const R = M.rel && M.rel.h && M.rel.h[String(H)], LB = M.lab && M.lab[String(H)];
@@ -703,7 +720,7 @@ function render() {
     "如果是因為 EPS_a 含一次性收益（投資利得、處分收益、稅務利益），市場不會用它算倍數——請把 EPS_a 改成經常性獲利。"]);
   if (base && LB) {
     const o = base.o;
-    if (o.mode === "共識" && LB.C && wf) notes.push(["", `只有共識、沒有自己的看法（統一模型＝軌道）：回測 ${H} 個月本益比誤差 ${pct(LB.C[1], 1)}，本益比不變 ${pct(LB.C[0], 1)}（S&P 500，起點 2017–2024）；區間用 conformal 校準，80% 區間走動式實測涵蓋 ${pct(wf.wf_cover80)}（最差的一年 ${pct(wf.wf_min)}）。`]);
+    if (o.mode === "共識" && LB.C && wf) notes.push(["", `只有共識、沒有自己的看法（統一模型＝軌道）：回測 ${H} 個月本益比誤差 ${pct(LB.C[1], 1)}，本益比不變 ${pct(LB.C[0], 1)}（S&P 500，起點 2017–2024）；區間用 conformal 校準，${LV}% 區間走動式實測涵蓋：股價 ${covTxt("px")}、本益比 ${covTxt("pe")}。想要窄一點就選低一點的水準——命中率跟著降，表裡的數字是實測的。`]);
     else if (o.kind === "market" && LB.A) notes.push(["", `EPS_b 當「市場在目標日會預期的數字」：回測 EPS_a 和它都猜對時，${H} 個月本益比誤差 ${pct(LB.A[0], 1)}（當基本面預估處理 ${pct(LB.A[2], 1)}、第七輪成長定價原式 ${pct(LB.A[1], 1)}）；區間用成長定價的殘差校準，80% 區間樣本外約涵蓋 ${pct((M.gp.h[String(H)] || {}).wf_cover80)}。`]);
     else if (o.kind === "fund" && base.ebIn === null && LB.A1) notes.push(["", `只有自己的 EPS_a（EPS_b 用共識）：回測猜對 EPS_a 時 ${H} 個月本益比誤差 ${pct(LB.A1[0], 1)}（成長定價係數 ${pct(LB.A1[1], 1)}）；區間假設你的 EPS 對。`]);
     else if (o.kind === "fund" && LB.B) notes.push(["", `EPS_b 當基本面預估（軌道 β_s）：回測 EPS_a、EPS_b 的實現值都猜對時，${H} 個月本益比誤差 ${pct(LB.B[0], 1)}（成長定價係數 ${pct(LB.B[1], 1)}、誤標成市場預期 ${pct(LB.B[2], 1)}）；區間假設你的 EPS 對。`]);
@@ -716,19 +733,24 @@ function drawRange(o, px0) {
   const el = $("range");
   if (!o) { el.innerHTML = ""; return; }
   const W = 640, Hh = 74, L = 14, R = 14;
-  const lo = Math.min(o.px_lo80, px0) * 0.97, hi = Math.max(o.px_hi80, px0) * 1.03;
+  const oLo = bnd(o, "px_lo"), oHi = bnd(o, "px_hi");
+  const lo = Math.min(oLo, px0) * 0.97, hi = Math.max(oHi, px0) * 1.03;
   const x = (v) => L + ((Math.log(v) - Math.log(lo)) / (Math.log(hi) - Math.log(lo))) * (W - L - R);
   el.innerHTML = `<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="基準情境的股價區間">
-    <rect x="${x(o.px_lo80)}" y="22" width="${x(o.px_hi80) - x(o.px_lo80)}" height="18" rx="4" fill="var(--s-model)" opacity="0.22"></rect>
+    <rect x="${x(oLo)}" y="22" width="${x(oHi) - x(oLo)}" height="18" rx="4" fill="var(--s-model)" opacity="0.22"></rect>
     <rect x="${x(o.px_lo50)}" y="22" width="${x(o.px_hi50) - x(o.px_lo50)}" height="18" rx="4" fill="var(--s-model)" opacity="0.5"></rect>
     <line x1="${x(o.px)}" x2="${x(o.px)}" y1="17" y2="45" stroke="var(--s-model)" stroke-width="2.5"></line>
     <line x1="${x(px0)}" x2="${x(px0)}" y1="14" y2="48" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="3 3"></line>
     <text x="${x(px0)}" y="10" text-anchor="middle" class="val">今天 ${f0(px0)}</text>
     <text x="${x(o.px)}" y="62" text-anchor="middle" class="val">中位 ${f0(o.px)}</text>
-    <text x="${x(o.px_lo80)}" y="62" text-anchor="start" class="val">${f0(o.px_lo80)}</text>
-    <text x="${x(o.px_hi80)}" y="62" text-anchor="end" class="val">${f0(o.px_hi80)}</text>
-  </svg><p class="note">基準情境的股價：深色＝50% 區間、淺色＝80% 區間、藍線＝中位、虛線＝今天（對數刻度）。</p>`;
+    <text x="${x(oLo)}" y="62" text-anchor="start" class="val">${f0(oLo)}</text>
+    <text x="${x(oHi)}" y="62" text-anchor="end" class="val">${f0(oHi)}</text>
+  </svg><p class="note">基準情境的股價：深色＝50% 區間、淺色＝${LV}% 區間、藍線＝中位、虛線＝今天（對數刻度）。</p>`;
 }
+document.querySelectorAll("#lseg button").forEach((b) => b.addEventListener("click", () => {
+  LV = +b.dataset.l; document.querySelectorAll("#lseg button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  render();
+}));
 document.querySelectorAll("#hseg button").forEach((b) => b.addEventListener("click", () => {
   H = +b.dataset.h; document.querySelectorAll("#hseg button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
   if (!cur) return;

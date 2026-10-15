@@ -43,14 +43,15 @@ def load_conformal(res=RES):
 
 
 def conformal_q(cq, h, grp):
-    """共識模式的區間分位數 [10, 25, 75, 90]%（已除以 波動^α × EPS 放寬）：組別（科技／非科技）樣本夠就用組別的，否則用全部。沒有 → (None, None)。"""
+    """共識模式的區間分位數那一組（dict：q＝本益比 [10, 25, 75, 90]%，pe／px／eps＝各水準的 [低, 高]；都已除以 波動^α × EPS 放寬，eps 除外）：
+    組別（科技／非科技）樣本夠就用組別的，否則用全部。沒有 → (None, None)。"""
     if not cq or "h" not in cq or str(h) not in cq["h"]:
         return None, None
     c = cq["h"][str(h)]
     key = "tech" if grp != "other" else "other"
     if c.get(key) and c[key].get("n", 0) >= cq.get("min_n", 300):
-        return c[key]["q"], ("科技" if key == "tech" else "非科技")
-    return c["pooled"]["q"], "全部"
+        return c[key], ("科技" if key == "tech" else "非科技")
+    return c["pooled"], "全部"
 
 
 def predict(row, h, model=None, gm=None, cq=None, eps_a=None, eps_b=None, eb_kind="fund", cons_a=None, cons_b=None, fwd0=None,
@@ -74,6 +75,7 @@ def predict(row, h, model=None, gm=None, cq=None, eps_a=None, eps_b=None, eb_kin
         o = orbit.predict(row, h, model, ea, eb, cons_a if have_cons else None, cons_b if have_cons else None, erp=erp, rate=rate, band_mult=band_mult)
         o.update(mode=("看法" if have_view else "共識") if have_cons else "軌道", kind="fund" if (have_view and have_cons) else None,
                  band_kind="模型", band_group=None, eps_a=ea, eps_b=eb, gt_cons=None, view=None, note=None)
+        o["decomp"] = _decomp(o, row, ea)
         return o
     growth_ok = gm is not None and str(h) in gm["h"] and (year is None or str(year) in gm["by_year"][str(h)])
     f0 = float(fwd0) if pos(fwd0) else float(cons_a)
@@ -108,35 +110,59 @@ def predict(row, h, model=None, gm=None, cq=None, eps_a=None, eps_b=None, eb_kin
                  + [dict(項目="你的 EPS_a 和共識的差距（Δa）", 數值=da, β=1 + c[1], 影響=(1 + c[1]) * da),
                                               dict(項目="你的 EPS_b（市場預期）隱含的成長和共識的差距（ΔT）", 數值=dT, β=c[2], 影響=c[2] * dT)],
                  view=dict(da=da, dT=dT, c_a=c[1], c_T=c[2]), kind="market")
-        for k, qq in zip(BANDK, b["q"]):
-            o[f"px_{k}"] = float(np.exp(lpx + sc * qq))
+        orbit.apply_band(o, lpx, sc, b["q"], b.get("levels"))                       # px_lo50…px_hi90（本益比在 _pe 算）
     else:                                                # 基本面預估（或只有共識）：軌道的看法項
         o = orbit.predict(row, h, model, ea, eb, cons_a, cb, erp=erp, rate=rate, band_mult=band_mult)
         o.update(spec="統一模型：" + o["spec"], view=None, kind="fund" if have_view else None)
     o.update(mode="看法" if have_view else "共識", eps_a=ea, eps_b=eb, gt_cons=gt_cons, band_group=None, band_kind="模型", note=note)
-    if not have_view:
-        _conformal_band(o, h, g, model, cq, band_mult, ea, eps0)
-    _pe(o, ea, eb)
+    pe_own = _conformal_band(o, h, g, model, cq, band_mult, ea, eps0) if not have_view else False
+    _pe(o, ea, eb, skip_band=pe_own)
+    o["decomp"] = _decomp(o, row, ea)
     return o
 
 
-def _pe(o, ea, eb):
+def _pe(o, ea, eb, skip_band=False):
     o["pe"] = o["px"] / ea if pos(ea) else None
-    for k in BANDK:
-        o[f"pe_{k}"] = o[f"px_{k}"] / ea if pos(ea) else None
+    if not skip_band:
+        for L in o.get("band_levels") or (50, 80):
+            o[f"pe_lo{L}"] = o[f"px_lo{L}"] / ea if pos(ea) else None
+            o[f"pe_hi{L}"] = o[f"px_hi{L}"] / ea if pos(ea) else None
     o["fwd_pe"] = o["px"] / eb if pos(eb) else None
 
 
+def _decomp(o, row, ea):
+    """§27：股價變化 ＝ EPS 成長 ＋ 本益比重估（ln）：ln(預測股價 ÷ 今天) ＝ ln(EPS_a ÷ 今天 EPS) ＋ ln(預測本益比 ÷ 今天本益比)。本益比沒有定義時 None。"""
+    px0, eps0 = float(row["px"]), float(row.get("eps0", np.nan))
+    if not (pos(ea) and pos(eps0) and px0 > 0 and o.get("pe")):
+        return None
+    pe0 = px0 / eps0
+    return dict(eps_g=float(np.log(ea / eps0)), pe_ch=float(np.log(o["pe"] / pe0)), total=float(np.log(o["px"] / px0)), pe0=pe0)
+
+
 def _conformal_band(o, h, g, model, cq, band_mult, ea, eps0):
-    """共識模式的區間：conformal 分位數 × 波動^α × exp(δ × |ln(共識 EPS_a ÷ 今天 EPS)|) × 放寬倍數。沒有 conformal.json 時保留原本的區間。"""
-    q, grp_lab = conformal_q(cq, h, g)
-    if q is None:
-        return
+    """共識模式的區間：conformal 分位數 × 波動^α × exp(δ × |ln(共識 EPS_a ÷ 今天 EPS)|) × 放寬倍數。沒有 conformal.json 時保留原本的區間。
+    §27：股價（px）與本益比（pe）各自校準、每個水準都給；另給共識 EPS 本身的區間 eps_lo{L}／eps_hi{L}（＝共識 × exp(歷史共識誤差的分位數)）。
+    舊的 conformal.json 只有本益比的 q：照舊套在股價上、本益比 ＝ 股價 ÷ EPS_a。回傳 True ＝ 本益比區間已自己寫好（_pe 不要再用股價除）。"""
+    gq, grp_lab = conformal_q(cq, h, g)
+    if gq is None:
+        return False
     lpx = np.log(o["px"])
     delta = float((model.get("band_delta") or {}).get(str(h), 0.0))
     eps_widen = float(np.exp(delta * min(abs(np.log(ea / eps0)), 2.0)))
     sc = float(np.clip(o["vol"], *orbit.VOL_CLIP) ** model["alpha"]) * band_mult * eps_widen
     vmed = cq["h"][str(h)]["vol_median"]
     o.update(band_kind="conformal", band_group=grp_lab, eps_widen=eps_widen, width=sc / float(np.clip(vmed, *orbit.VOL_CLIP) ** model["alpha"]))
-    for k, qq in zip(BANDK, q):
+    if gq.get("px") and gq.get("pe"):
+        lpe = lpx - np.log(ea)
+        o["band_levels"] = sorted(int(k) for k in gq["px"])
+        for L, (lo, hi) in gq["px"].items():
+            o[f"px_lo{L}"], o[f"px_hi{L}"] = float(np.exp(lpx + sc * lo)), float(np.exp(lpx + sc * hi))
+        for L, (lo, hi) in gq["pe"].items():
+            o[f"pe_lo{L}"], o[f"pe_hi{L}"] = float(np.exp(lpe + sc * lo)), float(np.exp(lpe + sc * hi))
+        for L, (lo, hi) in (gq.get("eps") or {}).items():
+            o[f"eps_lo{L}"], o[f"eps_hi{L}"] = float(ea * np.exp(lo)), float(ea * np.exp(hi))
+        return True
+    o["band_levels"] = [50, 80]
+    for k, qq in zip(BANDK, gq["q"]):
         o[f"px_{k}"] = float(np.exp(lpx + sc * qq))
+    return False

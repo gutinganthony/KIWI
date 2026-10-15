@@ -61,6 +61,28 @@ const OrbitCore = (() => {
     "虧損：EPS 變化": ["EPS 變化 ÷ 今天股價（虧損版）"],
   };
 
+  // §27：各涵蓋水準的 [低, 高] 分位數（和 pef/orbit.py 的 band_levels／apply_band 相同）：有 levels（50～90%）就用它，沒有只有 q 給的 50、80
+  function bandLevels(q, levels) {
+    const out = { "50": [q[1], q[2]], "80": [q[0], q[3]] };
+    if (levels) Object.keys(levels).forEach((k) => { out[String(k)] = [levels[k][0], levels[k][1]]; });
+    return out;
+  }
+  function applyBand(out, lpx, sc, q, levels, ea) {
+    const lv = bandLevels(q, levels);
+    out.bandLevels = Object.keys(lv).map(Number).sort((a, b) => a - b);
+    Object.keys(lv).forEach((L) => {
+      out["px_lo" + L] = Math.exp(lpx + sc * lv[L][0]); out["px_hi" + L] = Math.exp(lpx + sc * lv[L][1]);
+      if (pos(ea)) { out["pe_lo" + L] = out["px_lo" + L] / ea; out["pe_hi" + L] = out["px_hi" + L] / ea; }
+    });
+    return out;
+  }
+  // §27：股價變化 ＝ EPS 成長 ＋ 本益比重估（ln）：ln(預測股價 ÷ 今天) ＝ ln(EPS_a ÷ 今天 EPS) ＋ ln(預測本益比 ÷ 今天本益比)；本益比沒有定義時 null
+  function decomp(row, o, ea) {
+    if (!(pos(ea) && pos(row.e) && row.px > 0 && o.pe !== null && o.pe !== undefined)) return null;
+    const pe0 = row.px / row.e;
+    return { eps_g: Math.log(ea / row.e), pe_ch: Math.log(o.pe / pe0), total: Math.log(o.px / row.px), pe0 };
+  }
+
   // 利率情境：每升 1 個百分點的 ln 影響（和 pef/orbit.py 的 rate_slope 相同）。rs＝results/rate_sensitivity.json；pr＝本益比百分位（null＝0.5）
   function rateSlope(rs, h, regime, pr) {
     const c = rs.regimes[String(regime)].h[String(h)];
@@ -110,9 +132,8 @@ const OrbitCore = (() => {
       spec, mk, adj, parts, vol, volKnown, widen, bandMult, epsWiden, px: Math.exp(lpx),
       width: sc / Math.pow(clip(band.vol_median, vlo, vhi), model.alpha),
     };
-    ["lo80", "lo50", "hi50", "hi80"].forEach((k, i) => { out["px_" + k] = Math.exp(lpx + sc * band.q[i]); });
+    applyBand(out, lpx, sc, band.q, band.levels, ea);                                   // px_lo50…px_hi90（與 pe_*）
     out.pe = pos(ea) ? out.px / ea : null;
-    if (out.pe !== null) ["lo80", "lo50", "hi50", "hi80"].forEach((k) => { out["pe_" + k] = out["px_" + k] / ea; });
     out.fwd = useB ? out.px / eb : null;
     return out;
   }
@@ -142,7 +163,7 @@ const OrbitCore = (() => {
     const sc = Math.pow(clip(vol, vlo, vhi), model.alpha) * bandMult * epsWiden;
     const out = { spec: "成長定價", mk, adj, parts, x, vol, volKnown, widen: 1, bandMult, epsWiden, px: Math.exp(lpx),
       width: sc / Math.pow(clip(gh.vol_median, vlo, vhi), model.alpha) };
-    ["lo80", "lo50", "hi50", "hi80"].forEach((k, i) => { out["px_" + k] = Math.exp(lpx + sc * gh.q[i]); out["pe_" + k] = out["px_" + k] / ea; });
+    applyBand(out, lpx, sc, gh.q, gh.levels, ea);
     out.pe = out.px / ea;
     out.fwd = out.px / eb;
     return out;
@@ -155,8 +176,8 @@ const OrbitCore = (() => {
     if (!cq || !cq.h || !cq.h[String(h)]) return [null, null];
     const c = cq.h[String(h)];
     const key = g !== "other" ? "tech" : "other";
-    if (c[key] && (c[key].n || 0) >= (cq.min_n || 300)) return [c[key].q, key === "tech" ? "科技" : "非科技"];
-    return [c.pooled.q, "全部"];
+    if (c[key] && (c[key].n || 0) >= (cq.min_n || 300)) return [c[key], key === "tech" ? "科技" : "非科技"];
+    return [c.pooled, "全部"];                                                              // 回傳那一組的分位數物件：q（本益比 [10,25,75,90]）、pe／px／eps（各水準）
   }
   const given = (v) => v !== null && v !== undefined && Number.isFinite(v);
   function predictUnified(row, h, model, gp, cq, ea, eb, ebKind = "fund", ca = null, cb = null, f0 = null, rate = null, bandMult = 1) {
@@ -171,6 +192,7 @@ const OrbitCore = (() => {
       const o = predict(row, h, model, eaU, ebU, haveCons ? ca : null, haveCons ? cb : null, rate, bandMult);
       Object.assign(o, { mode: haveCons ? (haveView ? "看法" : "共識") : "軌道", kind: haveView && haveCons ? "fund" : null, bandKind: "模型", bandGroup: null,
         epsA: eaU, epsB: ebU, gtCons: null, view: null, note: null });
+      o.decomp = decomp(row, o, eaU);
       return o;
     }
     const gh = gp && gp.h && gp.h[String(h)];
@@ -202,26 +224,35 @@ const OrbitCore = (() => {
         parts: base.parts.filter((p) => !p.name.startsWith("你和共識的差距")).concat([{ name: "你的 EPS_a 和共識的差距（Δa）", x: da, beta: 1 + c[1], effect: (1 + c[1]) * da },
           { name: "你的 EPS_b（市場預期）隱含的成長和共識的差距（ΔT）", x: dT, beta: c[2], effect: c[2] * dT }]),
         view: { da, dT, cA: c[1], cT: c[2] }, kind: "market" });
-      K.forEach((k, i) => { o["px_" + k] = Math.exp(lpx + sc * gh.q[i]); });
+      applyBand(o, lpx, sc, gh.q, gh.levels, null);
     } else {
       o = predict(row, h, model, eaU, ebU, ca, cbU, rate, bandMult);
       Object.assign(o, { spec: "統一模型：" + o.spec, view: null, kind: haveView ? "fund" : null });
     }
     Object.assign(o, { mode: haveView ? "看法" : "共識", epsA: eaU, epsB: ebU, gtCons, bandGroup: null, bandKind: "模型", note });
+    let peOwn = false;
     if (!haveView) {                                                                       // 共識模式：conformal 區間
-      const [q, grpLab] = conformalQ(cq, h, g);
-      if (q) {
+      const [gq, grpLab] = conformalQ(cq, h, g);
+      if (gq) {
         const lpx = Math.log(o.px);
         const delta = (model.band_delta && model.band_delta[String(h)]) || 0;
         const epsWiden = Math.exp(delta * Math.min(Math.abs(Math.log(eaU / eps0)), 2));
         const sc = Math.pow(clip(o.vol, vlo, vhi), model.alpha) * bandMult * epsWiden;
         Object.assign(o, { bandKind: "conformal", bandGroup: grpLab, epsWiden, width: sc / Math.pow(clip(cq.h[String(h)].vol_median, vlo, vhi), model.alpha) });
-        K.forEach((k, i) => { o["px_" + k] = Math.exp(lpx + sc * q[i]); });
+        if (gq.px && gq.pe) {                                                              // §27：股價、本益比各自校準；共識 EPS 本身的區間（eps_lo／eps_hi）
+          const lpe = lpx - Math.log(eaU);
+          o.bandLevels = Object.keys(gq.px).map(Number).sort((a, b) => a - b);
+          Object.keys(gq.px).forEach((L) => { o["px_lo" + L] = Math.exp(lpx + sc * gq.px[L][0]); o["px_hi" + L] = Math.exp(lpx + sc * gq.px[L][1]); });
+          Object.keys(gq.pe).forEach((L) => { o["pe_lo" + L] = Math.exp(lpe + sc * gq.pe[L][0]); o["pe_hi" + L] = Math.exp(lpe + sc * gq.pe[L][1]); });
+          if (gq.eps) Object.keys(gq.eps).forEach((L) => { o["eps_lo" + L] = eaU * Math.exp(gq.eps[L][0]); o["eps_hi" + L] = eaU * Math.exp(gq.eps[L][1]); });
+          peOwn = true;
+        } else { o.bandLevels = [50, 80]; K.forEach((k, i) => { o["px_" + k] = Math.exp(lpx + sc * gq.q[i]); }); }   // 舊的 conformal.json：只有本益比的 q
       }
     }
     o.pe = pos(eaU) ? o.px / eaU : null;
-    K.forEach((k) => { o["pe_" + k] = o.pe === null ? null : o["px_" + k] / eaU; });
+    if (!peOwn) (o.bandLevels || [50, 80]).forEach((L) => { o["pe_lo" + L] = o.pe === null ? null : o["px_lo" + L] / eaU; o["pe_hi" + L] = o.pe === null ? null : o["px_hi" + L] / eaU; });
     o.fwd = pos(ebU) ? o.px / ebU : null;
+    o.decomp = decomp(row, o, eaU);
     return o;
   }
 

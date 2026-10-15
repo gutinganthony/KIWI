@@ -30,6 +30,7 @@ GROUPS = {"software": "growth", "internet": "growth", "semis": "cyclical", "semi
 GNAME = {"cyclical": "半導體／設備／記憶體", "growth": "軟體／網路", "tech_other": "其他科技", "other": "非科技"}
 LOSS_WIDEN = 1.6          # model.json 沒有 loss_widen 時的預設（舊版 README §15.4 的估計）；正式版用 orbit_fit.py 的實測值
 VOL_CLIP = (0.1, 1.5)
+LEVELS = (50, 60, 70, 80, 90)   # §27：可選的區間涵蓋水準（50 ＝ 核心區間；舊模型檔只有 50、80）
 
 
 def group_of(sector):
@@ -66,6 +67,10 @@ def load_model(res=RES):
             for spec, q in specs.items():
                 if spec in m["h"][h]["bands"]:
                     m["h"][h]["bands"][spec]["q"] = q
+        for h, specs in be.get("levels", {}).items():       # §27：50～90% 各水準的分位數（軌道也有）
+            for spec, lv in specs.items():
+                if spec in m["h"][h]["bands"]:
+                    m["h"][h]["bands"][spec]["levels"] = lv
     return m
 
 
@@ -147,6 +152,26 @@ def _band_scale(vol, alpha):
     return float(np.clip(vol, *VOL_CLIP) ** alpha)
 
 
+def band_levels(q, levels=None):
+    """各涵蓋水準的 [低, 高] 分位數（ln、已除以波動^α）：有 levels（§27，50～90%）就用它；沒有（舊模型檔、凍結的前瞻紀錄）只有 q 給的 50、80。"""
+    out = {"50": [q[1], q[2]], "80": [q[0], q[3]]}
+    for k, v in (levels or {}).items():
+        out[str(k)] = [float(v[0]), float(v[1])]
+    return out
+
+
+def apply_band(out, lpx, sc, q, levels=None, eps_a=None):
+    """把區間寫進 out：px_lo{L}／px_hi{L} ＝ exp(lpx ＋ 尺度 × 分位數)，有 EPS_a 時再給 pe_lo{L}／pe_hi{L}（÷ EPS_a）；band_levels＝有哪些水準。"""
+    lv = band_levels(q, levels)
+    out["band_levels"] = sorted(int(k) for k in lv)
+    ok = eps_a is not None and np.isfinite(eps_a) and eps_a > 0
+    for L, (lo, hi) in lv.items():
+        out[f"px_lo{L}"], out[f"px_hi{L}"] = float(np.exp(lpx + sc * lo)), float(np.exp(lpx + sc * hi))
+        if ok:
+            out[f"pe_lo{L}"], out[f"pe_hi{L}"] = out[f"px_lo{L}"] / eps_a, out[f"px_hi{L}"] / eps_a
+    return out
+
+
 def predict(row, h, model, eps_a, eps_b=None, cons_a=None, cons_b=None, erp=None, rate=None, band_mult=1.0):
     """row：今天的資料（px、eps0、y10、dy、vol36、sector 或 grp）。h：6、12 或 24。
     eps_a、eps_b：你的 h、h＋12 個月後 EPS；cons_a、cons_b：市場共識（同口徑），沒有就 None。
@@ -212,13 +237,7 @@ def predict(row, h, model, eps_a, eps_b=None, cons_a=None, cons_b=None, erp=None
     q = band["q"]                                                     # 10/25/75/90% 分位數（ln、已除以波動^α、置中）
     out = dict(spec=spec, group=GNAME[g], group_key=g, widen=widen, band_mult=band_mult, eps_widen=eps_widen, mk=mk, adj=adj, parts=parts, px=float(np.exp(lpx)), vol=vol, vol_known=vol_known,
                width=sc / _band_scale(band["vol_median"], model["alpha"]))
-    for k, qq in zip(("lo80", "lo50", "hi50", "hi80"), q):
-        out[f"px_{k}"] = float(np.exp(lpx + sc * qq))
-    if pos(eps_a):
-        out["pe"] = out["px"] / eps_a
-        for k in ("lo80", "lo50", "hi50", "hi80"):
-            out[f"pe_{k}"] = out[f"px_{k}"] / eps_a
-    else:
-        out["pe"] = None
+    apply_band(out, lpx, sc, q, band.get("levels"), eps_a if pos(eps_a) else None)      # px_lo50…px_hi90（與 pe_*）
+    out["pe"] = out["px"] / eps_a if pos(eps_a) else None
     out["fwd_pe"] = out["px"] / eps_b if use_b else None              # 方案 B：h 個月後的 forward 本益比（用 EPS_b）
     return out

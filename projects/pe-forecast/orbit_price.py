@@ -117,6 +117,7 @@ def main():
     ap.add_argument("--eb-kind", default="fund", choices=["fund", "market"],
                     help="--eps2 的意思：fund＝你的基本面預估（預設；軌道的小係數）、market＝你判斷市場在目標日會預期的下一年 EPS（成長定價的係數；只有 12、24 個月）")
     ap.add_argument("--erp", type=float, default=None, help="股權風險溢酬（預設 0.05）")
+    ap.add_argument("--level", type=int, default=80, choices=[60, 70, 80, 90], help="外圍區間的涵蓋水準（預設 80；核心區間固定 50。越低越窄、命中率越低；README §27）")
     a = ap.parse_args(sys.argv[1:])
     t = a.ticker.upper().replace(".", "-")
     model = orbit.load_model(RES)
@@ -300,7 +301,10 @@ def main():
     mode_txt = {"共識": "共識（沒有自己的看法）", "軌道": "軌道（沒有共識）",
                 "看法": "看法（EPS_b＝" + ("市場在目標日會預期的數字" if o0.get("kind") == "market" else "我的基本面預估") + "）"}[o0["mode"]]
     cqh = (cq or {}).get("h", {}).get(str(a.h))
-    band_txt = (f"conformal（{o0['band_group']}；只有共識時的實際誤差校準，80% 區間走動式實測涵蓋 {cqh['wf_cover80']['全部校準']:.0%}）"
+    L = a.level if a.level in (o0.get("band_levels") or [50, 80]) else 80
+    wfc = (cqh or {}).get("wf_cover") or {}
+    cov = lambda k: (f"{wfc[k][str(L)]['avg']:.0%}（最差的一年 {wfc[k][str(L)]['min']:.0%}）" if wfc.get(k, {}).get(str(L)) else "—")   # noqa: E731
+    band_txt = (f"conformal（{o0['band_group']}；只有共識時的實際誤差，股價與本益比分開校準）。{L}% 區間走動式實測涵蓋：股價 {cov('px')}、本益比 {cov('pe')}"
                 if o0["band_kind"] == "conformal" else "成長定價的殘差校準（假設你的 EPS_a 和市場預期對）" if o0.get("kind") == "market"
                 else "模型（假設你的 EPS 對，只含模型誤差）")
     print(f"\n  統一模型（README §26）｜模式：{mode_txt}｜寫法：{o0['spec']}｜軌道（資金成本 − 股利，{a.h} 個月）{np.exp(o0['mk']) - 1:+.1%}")
@@ -309,18 +313,26 @@ def main():
           + (f"（EPS 變化大，再放寬 ×{o0['eps_widen']:.2f}，README §22.4）" if o0.get("eps_widen", 1) > 1.005 else ""))
     if o0.get("note"):
         print("  " + o0["note"])
-    print("  EPS_a     EPS_b    本益比（中位）  本益比 80% 區間     股價（中位）  股價 50% 區間        股價 80% 區間       h 個月後 forward 本益比")
+    print(f"  EPS_a     EPS_b    本益比（中位）  本益比 50%       本益比 {L}%       股價（中位）  股價 50% 區間        股價 {L}% 區間       h 個月後 forward 本益比")
     for o in res:
-        pe = f"{o['pe']:10.1f}     {o['pe_lo80']:6.1f}–{o['pe_hi80']:<7.1f}" if o["pe"] else "    無定義（EPS_a ≤ 0）     "
+        pe = (f"{o['pe']:10.1f}     {o['pe_lo50']:5.1f}–{o['pe_hi50']:<6.1f}   {o[f'pe_lo{L}']:5.1f}–{o[f'pe_hi{L}']:<6.1f}" if o["pe"]
+              else "    無定義（EPS_a ≤ 0）                      ")
         fwd = f"{o['fwd_pe']:.1f}" if o["fwd_pe"] else "—"
         eb_s = f"{o['eps_b']:,.2f}" if o["eps_b"] is not None else "—"
         ea_s = f"{o['eps_a']:,.2f}" if o["eps_a"] is not None else "—"
         print(f"  {ea_s:>7}  {eb_s:>7}  {pe}  {o['px']:>10,.0f}   "
-              f"{o['px_lo50']:>8,.0f}–{o['px_hi50']:<8,.0f}  {o['px_lo80']:>8,.0f}–{o['px_hi80']:<8,.0f}   {fwd}")
+              f"{o['px_lo50']:>8,.0f}–{o['px_hi50']:<8,.0f}  {o[f'px_lo{L}']:>8,.0f}–{o[f'px_hi{L}']:<8,.0f}   {fwd}")
+    if o0["band_kind"] == "conformal" and o0.get(f"eps_lo{L}") is not None:   # §27：共識 EPS 本身會錯多少
+        print(f"  共識 EPS_a {o0['eps_a']:,.2f} 本身的 {L}% 區間（歷史共識誤差）：{o0[f'eps_lo{L}']:,.2f}–{o0[f'eps_hi{L}']:,.2f}；"
+              "本益比區間比股價區間寬，主要就是這一塊（本益比誤差 ＝ 股價誤差 − EPS 誤差）；填自己的 EPS（--eps）就把它拿掉了")
     print("\n  拆解（第一個情境）：")
     print(f"    軌道：股價 × exp({o0['mk']:+.3f})  ← 市場看法不變時的預期")
     for p in o0["parts"]:
         print(f"    {p['項目']}：{p['數值']:+.3f} × β {p['β']:+.3f} ＝ {p['影響']:+.3f}")
+    d = o0.get("decomp")
+    if d:                                                # §27：股價變化 ＝ EPS 成長 × 本益比重估
+        print(f"    股價變化拆成兩塊：{float(row['px']):,.2f} → {o0['px']:,.2f}（{np.exp(d['total']) - 1:+.1%}）＝ EPS 成長 {np.exp(d['eps_g']) - 1:+.1%}（{eps0:,.2f} → {o0['eps_a']:,.2f}）"
+              f"× 本益比重估 {np.exp(d['pe_ch']) - 1:+.1%}（{d['pe0']:.1f} → {o0['pe']:.1f} 倍）")
     ea0, eb0 = mine[0]
     alt, alt_txt = None, None                            # 對照：EPS_b 的另一種意思
     if o0.get("kind") == "market":
@@ -331,7 +343,7 @@ def main():
                               rate=rate, band_mult=bm, erp=a.erp)
         alt_txt = "把 EPS_b 當「市場在目標日會預期的數字」（成長定價係數）" if alt.get("kind") == "market" else None
     if alt is not None and alt_txt:
-        print(f"  對照（{alt_txt}）：本益比 {alt['pe']:.1f}（80% {alt['pe_lo80']:.1f}–{alt['pe_hi80']:.1f}）、股價 {alt['px']:,.0f}（80% {alt['px_lo80']:,.0f}–{alt['px_hi80']:,.0f}）"
+        print(f"  對照（{alt_txt}）：本益比 {alt['pe']:.1f}（{L}% {alt[f'pe_lo{L}']:.1f}–{alt[f'pe_hi{L}']:.1f}）、股價 {alt['px']:,.0f}（{L}% {alt[f'px_lo{L}']:,.0f}–{alt[f'px_hi{L}']:,.0f}）"
               if alt.get("pe") else f"  對照（{alt_txt}）：股價 {alt['px']:,.0f}")
     rp = os.path.join(RES, "relative_dist.json")
     if os.path.exists(rp) and o0.get("pe") and eps0 > 0:    # 相對大盤（README §26.3）

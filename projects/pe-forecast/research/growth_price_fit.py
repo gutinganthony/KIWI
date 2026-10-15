@@ -115,6 +115,7 @@ def main():
         u = (e / base.loc[e.index])
         u = u - u.median()
         q = [float(v) for v in np.quantile(u, Q)]
+        levels = {str(L): [float(v) for v in np.quantile(u, [(1 - L / 100) / 2, 1 - (1 - L / 100) / 2])] for L in (50, 60, 70, 80, 90)}   # §27 可選的涵蓋水準
         # 樣本外涵蓋：每年只用前幾年的誤差校準 10／90%
         cov = []
         for Y in sorted(d.loc[e.index, "year"].unique()):
@@ -128,7 +129,7 @@ def main():
         cov = pd.DataFrame(cov)
         ga_bin = pd.cut(d.loc[e.index, "ga"].abs(), [0, 0.25, 0.5, 1, 5], labels=["|ga|<0.25", "0.25–0.5", "0.5–1", ">1"], include_lowest=True)
         inside = (e >= q[0] * base.loc[e.index]) & (e <= q[3] * base.loc[e.index])
-        out["h"][str(h)] = dict(coef=co, gt_hat=co_gt, q=q, delta=delta, vol_median=vmed, n=int(len(prod)), firms=int(prod["ticker"].nunique()),
+        out["h"][str(h)] = dict(coef=co, gt_hat=co_gt, q=q, levels=levels, delta=delta, vol_median=vmed, n=int(len(prod)), firms=int(prod["ticker"].nunique()),
                                 months=[str(prod["month"].min().date()), str(prod["month"].max().date())],
                                 wf_median_abs=float(np.median(np.abs(e))), wf_cover80=float(cov["涵蓋"].mean()) if len(cov) else None)
         out["by_year"][str(h)] = by

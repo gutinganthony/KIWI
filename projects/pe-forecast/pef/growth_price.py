@@ -109,9 +109,7 @@ def predict(row, h, eps_a, eps_b, fwd0, ret12, model=None, gm=None, rate=None, b
     out = dict(spec="成長定價", group=orbit.GNAME[g], group_key=g, widen=1.0, band_mult=band_mult, eps_widen=eps_widen, mk=mk, adj=adj, parts=parts,
                px=float(np.exp(lpx)), vol=vol, vol_known=vol_known,
                width=sc / float(np.clip(b["vol_median"], *orbit.VOL_CLIP) ** model["alpha"]), x=x)
-    for k, qq in zip(("lo80", "lo50", "hi50", "hi80"), b["q"]):
-        out[f"px_{k}"] = float(np.exp(lpx + sc * qq))
-        out[f"pe_{k}"] = out[f"px_{k}"] / eps_a
+    orbit.apply_band(out, lpx, sc, b["q"], b.get("levels"), eps_a)                                # px_lo50…px_hi90 與 pe_*
     out["pe"] = out["px"] / eps_a
     out["fwd_pe"] = out["px"] / eps_b
     out["pe_today"] = px / eps0

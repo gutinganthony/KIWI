@@ -184,9 +184,11 @@ def opt():
 def slim_cq(cq):
     if not cq:
         return None
-    return dict(min_n=cq["min_n"], cutoff=cq["cutoff"],
+    return dict(min_n=cq["min_n"], cutoff=cq["cutoff"], levels=cq.get("levels"),
                 h={h: dict(vol_median=v["vol_median"], n=v["n"], wf_cover80=v["wf_cover80"].get("全部校準"), wf_min=min(v["wf_by_year"].values()),
-                           **{k: dict(n=v[k]["n"], q=v[k]["q"]) for k in ("pooled", "tech", "other")}) for h, v in cq["h"].items()})
+                           wf_cover={t: {L: [w["avg"], w["min"]] for L, w in d.items()} for t, d in (v.get("wf_cover") or {}).items()},   # §27：各水準走動式涵蓋（平均、最低）
+                           **{k: dict(n=v[k]["n"], q=v[k]["q"], **{t: v[k][t] for t in ("pe", "px", "eps") if t in v[k]}) for k in ("pooled", "tech", "other")})
+                   for h, v in cq["h"].items()})
 
 
 def lab_numbers():
@@ -243,10 +245,10 @@ def main():
     slim = dict(version=model["version"], fit_cutoff=model["fit_cutoff"], erp=model["erp"], alpha=model["alpha"],
                 vol_clip=model["vol_clip"], loss_widen=model["loss_widen"], loss_beta=model.get("loss_beta"), turn_widen=model.get("turn_widen"),
                 band_delta=model.get("band_delta"),
-                h={h: dict(pair=v["pair"], beta=v["beta"], bands={k: dict(q=b["q"], vol_median=b["vol_median"]) for k, b in v["bands"].items()})
+                h={h: dict(pair=v["pair"], beta=v["beta"], bands={k: dict(q=b["q"], vol_median=b["vol_median"], levels=b.get("levels")) for k, b in v["bands"].items()})
                    for h, v in model["h"].items()})
     gp = growth_price.load(RES)                                        # 成長定價（README §24）
-    slim["gp"] = dict(h={h: dict(coef=v["coef"], q=v["q"], delta=v["delta"], vol_median=v["vol_median"], wf_cover80=v.get("wf_cover80"), gt_hat=v["gt_hat"])
+    slim["gp"] = dict(h={h: dict(coef=v["coef"], q=v["q"], levels=v.get("levels"), delta=v["delta"], vol_median=v["vol_median"], wf_cover80=v.get("wf_cover80"), gt_hat=v["gt_hat"])
                          for h, v in gp["h"].items()}) if gp else None
     slim["cq"] = slim_cq(unified.load_conformal(RES))                 # 共識模式的 conformal 區間（README §26.2）
     tk, snap_date = tickers()

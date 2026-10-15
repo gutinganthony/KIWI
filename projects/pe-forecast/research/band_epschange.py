@@ -34,6 +34,7 @@ def iscore(y, lo, hi):
 
 
 Q = (0.1, 0.25, 0.75, 0.9)
+LEVELS = (50, 60, 70, 80, 90)       # §27：可選的涵蓋水準
 CUTOFF = pd.Timestamp("2025-09-30")
 
 
@@ -63,15 +64,25 @@ def fit():
         dl = best[1]
         out["delta"][str(h)] = dl
         out["q"][str(h)] = {}
+        out.setdefault("levels", {})[str(h)] = {}
         for spec in m["h"][str(h)]["bands"]:
-            if spec == "軌道" or f"p{h}_{spec}" not in z:
+            if spec == "軌道":                             # 軌道（沒有 EPS，不放寬）：只補各水準的分位數，q 保留 orbit_fit.py 的
+                ee = z[f"y{h}"].where(z[f"eps_f{a_}"] > 0)
+                k = ee.notna()
+                u = ee[k] / base[k]
+                u = u - u.median()
+                out["levels"][str(h)][spec] = {str(L): [float(v) for v in np.quantile(u, [(1 - L / 100) / 2, 1 - (1 - L / 100) / 2])] for L in LEVELS}
+                continue
+            if f"p{h}_{spec}" not in z:
                 continue
             ee = z[f"y{h}"] - z[f"p{h}_{spec}"]
             k = ee.notna() & g.notna()
             u = ee[k] / (base[k] * np.exp(dl * g[k]))
             u = u - u.median()
             out["q"][str(h)][spec] = [float(v) for v in np.quantile(u, Q)]
-        print(f"{h} 個月：δ＝{dl:g}（區間分數 {best[0]:.4f}）；重新校準 {len(out['q'][str(h)])} 個寫法")
+            # §27：50／60／70／80／90% 的等尾區間（同一批 u；80 ＝ q 的 [10, 90]、50 ＝ [25, 75]）
+            out["levels"][str(h)][spec] = {str(L): [float(v) for v in np.quantile(u, [(1 - L / 100) / 2, 1 - (1 - L / 100) / 2])] for L in LEVELS}
+        print(f"{h} 個月：δ＝{dl:g}（區間分數 {best[0]:.4f}）；重新校準 {len(out['q'][str(h)])} 個寫法（各水準 {len(out['levels'][str(h)])} 個）")
     json.dump(out, open(os.path.join(RES, "band_epschange.json"), "w"), ensure_ascii=False, indent=1)
 
 
