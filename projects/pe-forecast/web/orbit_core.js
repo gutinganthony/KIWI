@@ -199,7 +199,7 @@ const OrbitCore = (() => {
       const sc = Math.pow(clip(base.vol, vlo, vhi), model.alpha) * bandMult * epsWiden;
       o = Object.assign({}, base, { spec: "統一模型：EPS_b＝市場預期", adj: base.adj + adjV, px: Math.exp(lpx), epsWiden, widen: 1,
         width: sc / Math.pow(clip(gh.vol_median, vlo, vhi), model.alpha),
-        parts: base.parts.concat([{ name: "你的 EPS_a 和共識的差距（Δa）", x: da, beta: 1 + c[1], effect: (1 + c[1]) * da },
+        parts: base.parts.filter((p) => !p.name.startsWith("你和共識的差距")).concat([{ name: "你的 EPS_a 和共識的差距（Δa）", x: da, beta: 1 + c[1], effect: (1 + c[1]) * da },
           { name: "你的 EPS_b（市場預期）隱含的成長和共識的差距（ΔT）", x: dT, beta: c[2], effect: c[2] * dT }]),
         view: { da, dT, cA: c[1], cT: c[2] }, kind: "market" });
       K.forEach((k, i) => { o["px_" + k] = Math.exp(lpx + sc * gh.q[i]); });

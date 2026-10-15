@@ -104,7 +104,8 @@ def predict(row, h, model=None, gm=None, cq=None, eps_a=None, eps_b=None, eb_kin
         o = dict(base)
         o.update(spec="統一模型：EPS_b＝市場預期", adj=base["adj"] + adj_v, px=float(np.exp(lpx)), eps_widen=eps_widen, widen=1.0,
                  width=sc / float(np.clip(b["vol_median"], *orbit.VOL_CLIP) ** model["alpha"]),
-                 parts=list(base["parts"]) + [dict(項目="你的 EPS_a 和共識的差距（Δa）", 數值=da, β=1 + c[1], 影響=(1 + c[1]) * da),
+                 parts=[p for p in base["parts"] if not p["項目"].startswith("你和共識的差距")]      # 基準是共識本身，差距項恆為 0
+                 + [dict(項目="你的 EPS_a 和共識的差距（Δa）", 數值=da, β=1 + c[1], 影響=(1 + c[1]) * da),
                                               dict(項目="你的 EPS_b（市場預期）隱含的成長和共識的差距（ΔT）", 數值=dT, β=c[2], 影響=c[2] * dT)],
                  view=dict(da=da, dT=dT, c_a=c[1], c_T=c[2]), kind="market")
         for k, qq in zip(BANDK, b["q"]):

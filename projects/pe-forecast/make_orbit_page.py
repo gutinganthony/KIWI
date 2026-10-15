@@ -7,7 +7,8 @@
 與 detail 快照（S&P 500＋科技＋Nasdaq-100 的分析師共識）、results/orbit_model.json（係數與區間）、results/orbit_index_*（回測）；
 第二輪優化（README §19）：共識校正模型（pef/eps_correct.py）、外國 ADR（data/adr_now.csv）、利率情境（results/rate_sensitivity.json）、
 區間放寬（results/band_widen.json）、實驗結果（results/eps_correction_scores.csv、orbit_factors_*、orbit_small_scores.csv）。
-計算核心 web/orbit_core.js 和 pef/orbit.py 相同（web/test_orbit_core.py 對照）。
+第十輪（README §26）：統一模型（pef/unified.py）、共識模式的 conformal 區間（results/conformal.json）、相對大盤（results/relative_dist.json，這裡算）。
+計算核心 web/orbit_core.js 和 pef/orbit.py、pef/unified.py 相同（web/test_orbit_core.py 對照）。
 """
 import glob
 import json
@@ -184,8 +185,56 @@ def slim_cq(cq):
     if not cq:
         return None
     return dict(min_n=cq["min_n"], cutoff=cq["cutoff"],
-                h={h: dict(vol_median=v["vol_median"], n=v["n"], wf_cover80=v["wf_cover80"].get("全部校準"),
+                h={h: dict(vol_median=v["vol_median"], n=v["n"], wf_cover80=v["wf_cover80"].get("全部校準"), wf_min=min(v["wf_by_year"].values()),
                            **{k: dict(n=v[k]["n"], q=v[k]["q"]) for k in ("pooled", "tech", "other")}) for h, v in cq["h"].items()})
+
+
+def lab_numbers():
+    """results/unified_lab.txt（research/unified_lab.py）的幾個數字，給網頁與命令列的註解用：每個 h 的 C／A／B／A1 表「全部」列、相對誤差、Spearman。"""
+    p = os.path.join(RES, "unified_lab.txt")
+    if not os.path.exists(p):
+        return None
+    parts = re.split(r"=+ (\d+) 個月：", open(p).read())
+    out = {}
+    for h, blk in zip(parts[1::2], parts[2::2]):
+        d = {}
+        for key in ("C", "A", "B", "A1"):
+            m = re.search(r"-- " + key + r" [^\n]*\n[^\n]*\n\s*全部\s+n=\s*\d+((?:\s+[\d.]+)+)", blk)
+            d[key] = [float(v) for v in m.group(1).split()] if m else None
+        m = re.search(r"相對誤差（扣同月中位）：統一 ([\d.]+)（絕對 ([\d.]+)）；本益比不變 ([\d.]+)（絕對 ([\d.]+)）", blk)
+        d["rel"] = [float(v) for v in m.groups()] if m else None
+        m = re.search(r"Spearman 中位：統一 ([\d.]+)、本益比不變 ([\d.]+)", blk)
+        d["sp"] = [float(v) for v in m.groups()] if m else None
+        out[h] = d
+    return out
+
+
+def relative_dist(tk, date, lab):
+    """相對輸出（README §26.3）：同一天 S&P 500 成分股「只用共識」的統一模型預測 ln(預測本益比 ÷ 今天本益比)，每個 h 一組排序後的數列；
+    網頁和命令列（orbit_price.py）用它算「相對大盤」與百分位 → results/relative_dist.json。只用 S&P 500（β、conformal 都是用它校準的）。"""
+    model, gm, cq = orbit.load_model(RES), growth_price.load(RES), unified.load_conformal(RES)
+    out = dict(date=date, note="S&P 500 成分股、只用共識（校正後）的統一模型預測：ln(預測本益比 ÷ 今天本益比)，依 h 排序；lab＝results/unified_lab.txt 的相對誤差與 Spearman",
+               lab={h: dict(rel=v["rel"], sp=v["sp"]) for h, v in (lab or {}).items()}, h={})
+    for h in (6, 12, 24):
+        vals, grp = [], []
+        for t in tk:
+            if not t["sp"] or t["e"] is None or t["e"] <= 0:
+                continue
+            cs = cons_for(t, h)
+            if not cs or cs["k_bad"] or not cs["a"]:
+                continue
+            cs12 = cons_for(t, 12)
+            row = dict(px=t["px"], eps0=t["e"], y10=t["y"], dy=t["dy"], vol36=t["v"] if t["v"] is not None else np.nan, grp=t["g"])
+            o = unified.predict(row, h, model=model, gm=gm, cq=cq, cons_a=cs["a"][0], cons_b=cs["b"][0] if cs["b"] else None,
+                                fwd0=cs12["a"][0] if (cs12 and cs12["a"]) else None)
+            if o.get("pe"):
+                vals.append(float(np.log(o["pe"] / (t["px"] / t["e"]))))
+                grp.append(t["g"])
+        v, g = np.array(vals), np.array(grp)
+        out["h"][str(h)] = dict(n=int(len(v)), med=float(np.median(v)), med_tech=float(np.median(v[g != "other"])) if (g != "other").any() else None,
+                                med_other=float(np.median(v[g == "other"])) if (g == "other").any() else None, v=[round(float(x), 4) for x in np.sort(v)])
+    json.dump(out, open(os.path.join(RES, "relative_dist.json"), "w"), ensure_ascii=False)
+    return out
 
 
 def main():
@@ -201,6 +250,8 @@ def main():
                          for h, v in gp["h"].items()}) if gp else None
     slim["cq"] = slim_cq(unified.load_conformal(RES))                 # 共識模式的 conformal 區間（README §26.2）
     tk, snap_date = tickers()
+    slim["lab"] = lab_numbers()                                        # 統一模型回測的幾個數字（註解用）
+    slim["rel"] = relative_dist(tk, snap_date or max(x["d"] for x in tk), slim["lab"])   # 相對大盤（README §26.3）
     data = dict(model=slim, tickers=tk, snap=snap_date, bt=backtest(), opt=opt())
     core = open(os.path.join(HERE, "web", "orbit_core.js")).read()
     tpl = open(os.path.join(HERE, "web", "orbit_page.html")).read()
@@ -210,7 +261,7 @@ def main():
     open(out, "w").write(html)
     print(f"{len(tk):,} 檔（有共識 {sum(1 for x in tk if x['c']):,}，其中有校正係數 {sum(1 for x in tk if x['c'] and x['c'].get('cf')):,}；"
           f"外國 ADR {sum(1 for x in tk if x.get('adr')):,}；EPS 用 Yahoo 更新 {sum(1 for x in tk if x['u']):,}）→ {out}"
-          f"（{len(html) / 1e6:.2f} MB）")
+          f"（{len(html) / 1e6:.2f} MB）；相對大盤分布：" + "、".join(f"{h} 個月 {v['n']} 家、中位 {np.exp(v['med']) - 1:+.1%}" for h, v in slim["rel"]["h"].items()))
 
 
 if __name__ == "__main__":

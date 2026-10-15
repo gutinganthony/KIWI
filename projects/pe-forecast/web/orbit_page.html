@@ -140,23 +140,26 @@ footer { padding-block: 30px; color: var(--muted); font-size: 13px; border-top: 
   <div class="flow" aria-label="模型流程">
     <div class="node"><b>今天</b><span class="f">股價 P₀、最近四季 EPS₀</span><span class="d">10 年期公債殖利率、股利殖利率、過去 36 個月波動</span></div>
     <div class="node k-orbit"><b>① 軌道</b><span class="f">× e^((r − 股利) × h/12)</span><span class="d">r＝10 年期＋5%。市場看法不變時股價的預期路徑。</span></div>
-    <div class="node k-view"><b>② 看法調整</b><span class="f">× e^(β × ln 成長)</span><span class="d">你的 EPS_a、EPS_b；有共識時拆成「市場已預期」＋「你和共識的差距」。β 依公司類型與 h 估。</span></div>
-    <div class="node"><b>③ 區間</b><span class="f">× e^(波動^0.7 × 分位數)</span><span class="d">回測的樣本外誤差校準；目標日虧損再放寬約 1.3 倍。</span></div>
+    <div class="node k-view"><b>② 看法調整</b><span class="f">× e^(β × ln 成長)</span><span class="d">你的 EPS_a、EPS_b；有共識時拆成「市場已預期」＋「你和共識的差距」。EPS_b 是基本面預估時用軌道的小 β；是「市場在目標日會預期的數字」時用成長定價的係數。</span></div>
+    <div class="node"><b>③ 區間</b><span class="f">× e^(波動^0.7 × 分位數)</span><span class="d">只有共識時用 conformal（只有共識時的實際誤差）校準；有自己的 EPS 時用「EPS 對」的殘差校準；目標日虧損再放寬約 1.3 倍。</span></div>
     <div class="node k-out"><b>h 個月後</b><span class="f">股價 Pₕ；本益比＝Pₕ ÷ EPS_a</span><span class="d">另給 forward 本益比＝Pₕ ÷ EPS_b。</span></div>
   </div>
   <div class="formula">h 個月後股價 ＝ P₀ × exp[ (r − 股利殖利率) × h/12  ＋  調整 ]
 沒有共識：調整 ＝ β_a × ln(EPS_a ÷ EPS₀) ＋ β_b × ln(EPS_b ÷ EPS₀)
-有共識：  調整 ＝ β_e × ln(共識_b ÷ EPS₀) ＋ β_sa × ln(EPS_a ÷ 共識_a) ＋ β_sb × ln(EPS_b ÷ 共識_b)
+有共識：  調整 ＝ β_e × ln(共識_b ÷ EPS₀) ＋ β_sa × ln(EPS_a ÷ 共識_a) ＋ β_sb × ln(EPS_b ÷ 共識_b)      ← EPS_b＝我的基本面預估（預設）
+EPS_b＝市場在目標日會預期的數字：
+          調整 ＝ β_e × ln(共識_b ÷ EPS₀) ＋ (1 ＋ c_a) × ln(EPS_a ÷ 共識_a) ＋ c_T × [ln(EPS_b ÷ EPS_a) − ln(共識_b ÷ 共識_a)]
 本益比   ＝ h 個月後股價 ÷ EPS_a</div>
   <div class="prose stack">
     <p><b>EPS_a</b>＝h 個月後「那時已經公布」的最近四季 GAAP 稀釋 EPS，也就是本益比的分母。<b>EPS_b</b>＝再往後 12 個月的同一個口徑。
       h 個月後的股價看的是那時的「下一年」，所以 EPS_b 往往比 EPS_a 重要：半導體類 12 個月的 β_a 約 0、β_b 約 0.17。</p>
     <p>β 都很小。12 個月的「你和共識的差距」每差 10%，股價大約只差 0.3–2%。所以<b>本益比主要由你給的 EPS 決定</b>，
       股價主要跟著軌道走。這和學術文獻（盈餘反應係數低、股價領先盈餘）一致。</p>
-    <p><b>第二種方法：成長定價（第七輪，README §24）。</b>市場其實是對「下一年」的 EPS 給倍數：同一個月比較，本益比和「明年預期成長」幾乎一比一（斜率 1.05）。
-      所以成長定價把<b>目標日時市場對下一年的成長預期（EPS_b ÷ EPS_a）</b>放進本益比：每多 10%，本益比約多 6–7%；這段期間交出的成長每多 10%，本益比約少 5%（只稀釋一半）；
-      今天已經反映在本益比裡的成長預期，之後會被消化掉。如果你對「目標日時市場怎麼看下一年的成長」判斷正確，回測比軌道準（12 個月 16.6% → 15.3%、24 個月 22.1% → 17.0%）；
-      只是猜對下一年的實際 EPS 時，12 個月打平、24 個月 21.2% → 18.5%。只有共識、沒有自己的看法時，12 個月軌道略準。</p>
+    <p><b>一個模型，EPS_b 分兩種意思（第十輪，README §26）。</b>第七輪的「成長定價」把目標日時市場對下一年的成長預期放進本益比，和軌道各有準的時候，網頁曾依公司類型與預測距離自動切換。
+      審閱後發現：只有共識、沒有自己的看法時，成長定價在代數上就等於軌道；差別只在你的 EPS_b 是什麼——
+      是<b>你研究出來的基本面預估</b>（市場在目標日還不知道這個數字），軌道的小係數最準（猜對時 12 個月本益比誤差 15.7%，成長定價係數 16.4%）；
+      是<b>你判斷市場在目標日會預期的數字</b>，成長定價的係數最準（14.3%，當基本面處理 16.2%）。所以現在只有一個模型：軌道是本體，EPS_b 的意思由你選。
+      只有共識時，區間改用 conformal 校準（80% 區間走動式實測涵蓋 86%，舊區間只有 57–63%）；另外給「相對大盤」的輸出，因為大盤整體重新定價是最大的誤差來源、也最難預測（相對誤差 0.21 vs 絕對 0.23）。</p>
   </div>
   <div class="panel tbl"><table id="beta-tbl" aria-label="12 個月的 β"></table></div>
 </section>
@@ -172,10 +175,10 @@ footer { padding-block: 30px; color: var(--muted); font-size: 13px; border-top: 
         <div class="seg" role="group" aria-label="預測距離" id="hseg">
           <button type="button" data-h="6" aria-pressed="false">6 個月</button><button type="button" data-h="12" aria-pressed="true">12 個月</button><button type="button" data-h="24" aria-pressed="false">24 個月</button>
         </div></div>
-      <div class="stack" style="gap:6px"><span class="note">估值方法</span>
-        <div class="seg" role="group" aria-label="估值方法" id="mseg">
-          <button type="button" data-m="g" aria-pressed="false">成長定價（成長預期放進本益比）</button><button type="button" data-m="o" aria-pressed="true">軌道</button>
-        </div><p class="note" id="m-note"></p></div>
+      <div class="stack" style="gap:6px"><span class="note">EPS_b 的意思（決定它怎麼進模型）</span>
+        <div class="seg" role="group" aria-label="EPS_b 的意思" id="kseg">
+          <button type="button" data-k="fund" aria-pressed="true">我的基本面預估</button><button type="button" data-k="market" aria-pressed="false">市場在目標日會預期的數字</button>
+        </div><p class="note" id="k-note"></p></div>
       <div class="stack" style="gap:6px">
         <div class="row" style="justify-content:space-between"><span class="note">你的 EPS（GAAP 稀釋、最近四季口徑）</span><span class="chip ex" id="ex-chip" hidden>範例數字</span></div>
         <div class="scen">
@@ -211,9 +214,11 @@ footer { padding-block: 30px; color: var(--muted); font-size: 13px; border-top: 
         <div class="tbl"><table id="res"></table></div>
         <div class="range chart" id="range" aria-label="股價區間"></div>
         <div id="decomp" class="note"></div>
+        <div id="rel" class="note"></div>
         <div id="notes" class="stack" style="gap:6px"></div>
       </div>
-      <p class="note">80% 區間＝回測裡 10 次大約 8 次落在裡面（2022 以後實測 80–89%，略偏寬）——前提是 EPS 猜對。<b>用共識當 EPS、只填一個情境時，實際只涵蓋約 60%</b>：請把悲觀／樂觀填成基準的 −20%／+20%，看三個情境合起來的範圍（回測約 80%）；景氣谷底的公司用 ±40%。區間已含產業被重新定價的風險，所以很寬。不是投資建議。</p>
+      <p class="note"><b>區間怎麼讀</b>：沒改範例數字的基準列＝「只有共識」，區間用 conformal 校準（第十輪）——只有共識時的實際誤差，80% 區間走動式實測平均涵蓋 85–88%（2019–2024；最差的一年 73%；舊區間只有 57–63%）。
+        填了自己的 EPS（含悲觀／樂觀 ±10% 那兩列）＝「看法」，區間假設你的 EPS 對、只含模型誤差（2022 以後實測 80–89%）；你的 EPS 若不確定，請把悲觀／樂觀填成基準的 −20%／+20%，看三個情境合起來的範圍。區間已含產業被重新定價的風險，所以很寬。不是投資建議。</p>
     </div>
   </div>
 </section>
@@ -225,11 +230,11 @@ footer { padding-block: 30px; color: var(--muted); font-size: 13px; border-top: 
       <h3>在這個網頁</h3>
       <ul class="list">
         <li>輸入代號（S&P 500、Nasdaq-100 與其他約 3,000 檔美股）。今天的股價、最近四季 EPS、波動會自動帶入；有新財報時 EPS 已用 Yahoo 更新。</li>
-        <li>選估值方法：<b>成長定價</b>（把目標日時市場的成長預期放進本益比，要有共識與 EPS_b，只有 12、24 個月）或<b>軌道</b>。沒有手動選時：你填了自己的 EPS 就用成長定價；只有範例數字（共識）時，12 個月科技股用成長定價、非科技股用軌道，24 個月都用成長定價。結果表是所選的方法，拆解下面附另一種方法的對照。</li>
+        <li>選 <b>EPS_b 的意思</b>：<b>我的基本面預估</b>（預設；你研究出來的那一年 EPS，市場在目標日還不知道 → 用軌道的小係數）或<b>市場在目標日會預期的數字</b>（你判斷到時候市場對下一年的看法 → 用成長定價的係數：比共識隱含的成長每多 10%，本益比約多 6%；只有 12、24 個月）。沒改範例數字＝只有共識，區間用 conformal 校準。</li>
         <li>選預測距離。填你的 <b>EPS_a</b>（h 個月後那時已公布的最近四季 EPS），最好也填 <b>EPS_b</b>（再往後 12 個月）。三個情境可以只填基準；<b>用共識時建議悲觀／樂觀各填基準的 −20%／+20%</b>，看三個情境合起來的範圍（第六輪回測：只填一個情境，80% 區間只涵蓋約 60%）。</li>
         <li>約 2,800 檔有分析師共識（S&P 500、Nasdaq-100 與大部分中小型美股），會自動帶入，並用<b>共識校正模型</b>換成「預期的實際 GAAP EPS」（中小型股距離年報 9 個月以上照原樣用；係數可以改，也可以取消勾選）。外國公司 ADR 約 100 檔也有共識（已換成每 ADR 美元）。</li>
         <li>想加入自己的利率看法：在「利率情境」填 10 年期到目標日的變化（百分點）。不填＝和市場一樣。</li>
-        <li>看結果：本益比中位與 80% 區間、股價 50%／80% 區間、h 個月後的 forward 本益比，以及每一項對股價的影響。</li>
+        <li>看結果：本益比中位與 80% 區間、股價 50%／80% 區間、h 個月後的 forward 本益比，以及每一項對股價的影響。下面的「相對大盤」把同一天 S&P 500 只用共識的預測中位扣掉——大盤整體重新定價預測不了，相對的那一半比較可靠（回測相對誤差 0.21 vs 絕對 0.23）。</li>
       </ul>
       <h3>在雲端 session（命令列）</h3>
       <div class="cmd">cd projects/pe-forecast
@@ -238,9 +243,11 @@ python3 orbit_price.py MU --eps 120,150,180 --eps2 150,200,250
 python3 orbit_price.py MU --fy "2027-08:170,2028-08:210"
 python3 orbit_price.py AAPL --eps 9 --eps2 10 --h 24
 python3 orbit_price.py NVDA --eps 9 --cons auto --rate-view -1
+python3 orbit_price.py MU --cons auto     # 沒有自己的看法：共識模式，conformal 區間
+python3 orbit_price.py MU --eps 150 --eps2 200 --cons auto --eb-kind market   # EPS_b＝市場在目標日會預期的數字
 python3 orbit_price.py TSM --cons auto    # 外國公司 ADR
 python3 consensus_snapshot.py --detail    # 存一份共識快照</div>
-      <p class="note">命令列多了：會計年度 EPS 自動換算（<code>--fy</code>）、即時抓共識與分析師修正（<code>--cons auto</code>）、改回舊的口徑係數（<code>--no-correct</code>）或自己指定（<code>--cons-scale</code>）、利率情境（<code>--rate-view</code>、<code>--rate-regime 2012</code>）。</p>
+      <p class="note">命令列多了：會計年度 EPS 自動換算（<code>--fy</code>）、即時抓共識與分析師修正（<code>--cons auto</code>）、改回舊的口徑係數（<code>--no-correct</code>）或自己指定（<code>--cons-scale</code>）、利率情境（<code>--rate-view</code>、<code>--rate-regime 2012</code>）、EPS_b 的意思（<code>--eb-kind market</code>）。</p>
     </div>
     <div class="stack prose">
       <h3>輸入要注意</h3>
@@ -313,8 +320,25 @@ python3 consensus_snapshot.py --detail    # 存一份共識快照</div>
 </section>
 
 <section id="opt">
-  <div class="sec-head"><div class="eyebrow">優化實驗</div><h2>第二到七輪：哪些有用、哪些沒用、為什麼</h2>
+  <div class="sec-head"><div class="eyebrow">優化實驗</div><h2>第二到十輪：哪些有用、哪些沒用、為什麼</h2>
     <p class="prose note">每一項都照「先講邏輯 → 用走動式回測實證（每年 1 月只用當時已揭曉的資料）→ 再驗算」。通過樣本外檢驗的才放進模型；沒通過的照實寫出來。</p></div>
+
+  <div class="panel stack">
+    <h3>第十輪（2026-10-15）：審閱後的三項——conformal 區間、統一模型、相對輸出</h3>
+    <div class="tbl"><table id="t-round10" class="text">
+      <tr><th>項目</th><th>問題</th><th>實證（S&P 500，I/B/E/S 共識，起點 2017–2024，走動式）</th><th>結論</th></tr>
+      <tr><td>統一模型</td><td>軌道和成長定價到底差在哪？要不要一直切換？</td>
+        <td>只有共識時，成長定價的三個成長項在代數上互相抵銷，剩下軌道（12 個月 22.7% vs 23.2%）。差別只在 EPS_b 的意思：猜對 EPS_a、EPS_b 的<b>實現值</b>時，軌道 15.7%、成長定價 16.4%、把基本面預估誤標成市場預期 17.2%；猜對 EPS_a 與<b>目標日時市場對下一年的預期</b>時，成長定價係數 14.3%、當基本面處理 16.2%、第七輪成長定價原式 14.7%（24 個月：19.0%／21.2%／18.3%）</td>
+        <td class="best">一個模型：軌道是本體；EPS_b 標成「基本面預估」走軌道 β_s，標成「市場預期」走成長定價係數。不再依公司類型、距離自動切換</td></tr>
+      <tr><td>conformal 區間</td><td>正式版區間是用「EPS 猜對」的殘差校準的，拿來包共識輸入太窄（涵蓋 57–63%），怎麼辦？</td>
+        <td>改用「只有共識」時的實際誤差校準（除以 波動^0.7 × EPS 放寬後取 10／90 分位；不置中）。走動式（每年只用目標日已到期的配對）80% 區間涵蓋：6 個月平均 88%（最低 83%）、12 個月 86%（最低 73%，2020）、24 個月 85%（最低 77%）；寬度是舊區間的 1.5–1.8 倍；科技／非科技分開校準和全部一起幾乎一樣</td>
+        <td class="best">只有共識（沒改範例數字）時用 conformal；填了自己的 EPS 時仍用「EPS 對」的區間</td></tr>
+      <tr><td>相對輸出</td><td>最大的誤差是大盤整體重新定價、事前預測不了；能不能把它拿掉？</td>
+        <td>把同一個起點月全部公司的預測中位和實際中位各自扣掉：12 個月誤差 0.227 → 0.207、24 個月 0.253 → 0.228、6 個月 0.179 → 0.160；每個起點月預測 vs 實際的 Spearman 中位 12 個月 0.77（本益比不變 0.65）、24 個月 0.73（0.57）</td>
+        <td class="best">試算器加「相對大盤」：扣掉同一天 S&P 500 只用共識的預測中位，並給百分位</td></tr>
+    </table></div>
+    <p class="note">細節：README §26、審閱 REVIEW_2026-10-14.md；重現：<code>research/unified_lab.py</code>（→ results/unified_lab.txt）、<code>research/conformal_fit.py</code>（→ results/conformal.json）、<code>web/test_orbit_core.py</code>（網頁和命令列一致）。</p>
+  </div>
 
   <div class="panel stack">
     <h3>第七輪（2026-10-14）：把成長預期放進本益比——成長定價</h3>
@@ -330,17 +354,17 @@ python3 consensus_snapshot.py --detail    # 存一份共識快照</div>
         <td>I/B/E/S 走動式（起點 2018–2023；EPS_a 與「目標日時市場的成長預期」都給對）：12 個月 16.7% → 15.0%（6 年都較準）、24 個月 21.9% → 16.6%（4 年都較準）；半導體 22.5% → 15.5%。
           只猜對下一年的實際 EPS：12 個月差不多（16.8% → 16.2%）、24 個月 21.1% → 18.7%。
           2025-10 起點回頭驗證：S&P 500 16.9% → 15.3%、Nasdaq-100 23.6% → 21.8%、五檔 26.2% → 13.8%（MU 本益比 3.2 → 8.8 倍，實際 12.8）；但 2024 起點 24 個月打平或較差（MU 預測 40 倍，實際 12.8）</td>
-        <td class="best">採用為第二種方法；你填了自己的 EPS 時自動採用</td></tr>
+        <td class="best">採用為第二種方法（第十輪起併入統一模型：EPS_b 標成「市場預期」時用它的係數）</td></tr>
       <tr><td>沒有自己的看法時</td><td>只用今天的共識往下推呢？</td>
         <td>12 個月軌道略準（22.7% vs 23.4%；2025 回頭驗證 23.1% vs 25.5%）；24 個月成長定價較準（28.7% → 25.5%；2011–2024 長回測、Bloomberg 每月起點：非科技略好、科技互有勝負）</td>
-        <td>只有範例共識時：12 個月科技用成長定價、非科技用軌道；24 個月都用成長定價（下兩列）</td></tr>
+        <td>當時的做法：只有範例共識時 12 個月科技用成長定價、非科技用軌道，24 個月都用成長定價（第十輪起不再切換：只有共識時兩者在代數上等價）</td></tr>
       <tr><td>回測 S&P 500、Nasdaq-100</td><td>12、24 個月前（2025-10、2024-09）只用當時的資料，預估今天的本益比？</td>
         <td>事前：S&P 500 軌道 23.1%／29.0%、成長定價 23.9–25.5%／30.5–31.8%；Nasdaq-100 12 個月成長定價 28.0–31.1%（軌道 32.3%）、24 個月軌道 32.6%。
           分公司類型：科技與半導體類成長定價 8 個比較 6 個較準（例：S&P 500 12 個月科技 36.4% → 34.5%）；非科技 4 個裡 3 個是軌道較準（只有兩個起點，資料小修就會讓計數變動，見下一列）</td>
-        <td class="best">網頁「自動」（12 個月）：只有範例共識時科技用成長定價、非科技用軌道</td></tr>
+        <td>當時網頁「自動」的依據（第十輪已取消切換）</td></tr>
       <tr><td>拉長回測（第九輪）</td><td>2011–2024 每一年當起點（S&P 500）、Bloomberg 共識 2019–2025 每個月當起點、S&P 500 指數 1960–2022，結論還站得住嗎？</td>
         <td>12 個月：非科技軌道略好（嚴格事前 20.9% vs 22.1%，8 年裡 5 年）、科技成長定價略好（28.2% vs 29.5%；Bloomberg 每月起點 27.2% vs 29.0%）。24 個月：非科技成長定價略好（24.0% vs 不外推軌道 25.1%；Bloomberg 24.6% vs 25.7%），科技互有勝負。猜對 EPS 時成長定價在大多數年份較準。指數層級（大盤本益比）成長定價沒有比軌道好：成長預期決定的是「哪家拿高本益比」，不是大盤的本益比。</td>
-        <td class="best">24 個月「自動」改成都用成長定價（證據是略好，不是大勝）</td></tr>
+        <td>當時 24 個月「自動」改成都用成長定價（證據是略好，不是大勝；第十輪已取消切換）</td></tr>
       <tr><td>上限</td><td>如果連產業倍數怎麼變都猜對？</td><td>12 個月誤差 9.7%、24 個月 11.6%</td><td>剩下最大的誤差是產業／大盤重新評價，事前預測不了</td></tr>
     </table></div>
     <p class="note">細節：README §24；重現：<code>research/rerating_lab.py</code>、<code>research/growth_price_fit.py</code>（係數與區間 → results/growth_price.json）、<code>research/case_broad.py</code>、<code>research/case_2024_2025.py</code>。</p>
@@ -543,7 +567,7 @@ $("meta").innerHTML = [`股價與共識：Yahoo ${esc(DATA.snap || "")}`, `${DAT
 // ---- 試算器 ----
 const byT = new Map(DATA.tickers.map((t) => [t.t, t]));
 $("tk-list").innerHTML = DATA.tickers.map((t) => `<option value="${esc(t.t)}">${esc(t.n)}</option>`).join("");
-let H = 12, cur = null, METHOD = "auto";   // METHOD：auto＝你填了自己的 EPS 用成長定價；只有範例數字時 12 個月科技三組用成長定價、非科技用軌道，24 個月都用成長定價（README §24.7、§25）；g、o＝手動選
+let H = 12, cur = null, KIND = "fund";   // KIND：EPS_b 的意思——fund＝我的基本面預估（軌道的 β_s）、market＝市場在目標日會預期的數字（成長定價的係數；README §26）
 const num = (id) => { const v = parseFloat($(id).value); return Number.isFinite(v) ? v : null; };
 const setv = (id, v, d = 2) => { $(id).value = (v === null || v === undefined || !Number.isFinite(v)) ? "" : String(+v.toFixed(d)); };
 
@@ -572,7 +596,7 @@ function loadTicker(sym) {
   if (!t) {
     cur = null;
     $("today").innerHTML = `<span>找不到「${esc(sym)}」。這裡有有季報資料的美股與約 100 檔外國公司 ADR（共 ${DATA.tickers.length.toLocaleString()} 檔）；口徑換算沒通過檢查的 ADR 不收。</span>`;
-    ["window", "res", "range", "decomp", "notes", "cons-note", "rate-note", "m-note"].forEach((id) => { $(id).innerHTML = ""; });
+    ["window", "res", "range", "decomp", "rel", "notes", "cons-note", "rate-note", "k-note"].forEach((id) => { $(id).innerHTML = ""; });
     ["ck", "ca", "cb", "a0", "a1", "a2", "b0", "b1", "b2"].forEach((id) => setv(id, null));     // 不留上一檔的數字
     return;
   }
@@ -598,7 +622,7 @@ function render() {
     <span>最近四季 EPS <b>${f2(t.e)}</b>${t.u ? "（已用新財報更新）" : ""}</span><span>本益比 <b>${pe0}</b></span><span>${GN[t.g]}</span>
     <span>波動 <b>${Number.isFinite(t.v) && t.v !== null ? pct(t.v) : "—"}</b></span>`;
   $("window").textContent = `${H} 個月後（${C.iso(ta)}）大概已公布到季末 ${C.iso(qa)} 那一季 → EPS_a＝季末 ${C.iso(C.addMonths(qa, -9)).slice(0, 7)}～${C.iso(qa).slice(0, 7)} 的四季合計；EPS_b＝再往後 12 個月。`;
-  $("hd-a").textContent = `EPS_a（${C.iso(ta).slice(0, 7)} 時）`; $("hd-b").textContent = `EPS_b（${C.iso(C.addMonths(ta, 12)).slice(0, 7)} 時；成長定價＝目標日時市場預期的下一年）`;
+  $("hd-a").textContent = `EPS_a（${C.iso(ta).slice(0, 7)} 時）`; $("hd-b").textContent = `EPS_b（${C.iso(C.addMonths(ta, 12)).slice(0, 7)} 時；${KIND === "market" ? "市場在目標日會預期的數字" : "我的基本面預估"}）`;
   const cs = consFor(t, H, num("ck"));
   if (t.c) {
     const c = t.c;
@@ -624,65 +648,67 @@ function render() {
     `${rg === "2022" ? "2022 以後" : "2012–2021"}：每升 1 個百分點，中位股票 ${sgn(Math.exp(RS.mkt) - 1)}，這家（本益比百分位 ${t.pr === null ? "—" : pct(t.pr)}）${sgn(Math.exp(C.rateSlope(RSJ, H, rg, t.pr)) - 1)}。` +
     (rate ? `　你的看法 ${rv > 0 ? "+" : ""}${rv} 個百分點 → 股價 ${sgn(Math.exp(rate[0] * rate[1]) - 1)}。` : "") + "兩段期間的方向不同，所以這是情境，不是預測；區間不變。";
   const bm = t.bw ? (DATA.opt.widen[t.bw] || {})[String(H)] || 1 : 1;
-  const sc_ = [0, 1, 2].map((i) => ({ i, ea: num("a" + i), eb: num("b" + i) })).filter((s) => s.ea !== null);
-  const res = sc_.map((s) => ({ ...s, o: C.predict(row, H, M, s.ea, s.eb, ca, cb, rate, bm) }));
-  // 成長定價：F_0＝今天市場預期的未來 12 個月 EPS（共識 × 係數）；EPS_b 沒填時用共識的 EPS_b 當「目標日時市場的預期」
   const cs12 = useC && t.c ? consFor(t, 12, num("ck")) : null;
-  const fwd0 = useC ? (H === 12 ? ca : (cs12 && cs12.a ? cs12.a.eps : null)) : null;
-  res.forEach((r) => { r.ebG = r.eb !== null ? r.eb : cb; r.g = C.predictGrowth(row, H, M, M.gp, r.ea, r.ebG, fwd0, t.r, rate, bm); });
-  const base0 = res.find((r) => r.i === 1) || res[0];
-  const auto = METHOD === "auto";
-  const eff = auto ? ($("ex-chip").hidden || t.g !== "other" || H === 24 ? "g" : "o") : METHOD;   // 你自己的 EPS → 成長定價；範例數字（只是共識）→ 12 個月科技用成長定價、非科技用軌道，24 個月都用成長定價（README §24.7、§25）
-  document.querySelectorAll("#mseg button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.m === eff)));
-  const useG = eff === "g" && !!(base0 && base0.g);
-  res.forEach((r) => { r.show = useG && r.g ? r.g : r.o; r.showEb = useG && r.g ? r.ebG : r.eb; });
-  $("m-note").textContent = eff !== "g" ? (auto ? "目前用軌道（自動）：範例數字只是共識，這是非科技股——沒有你自己的成長看法時，12 個月非科技股軌道較準（長歷史 20.9% vs 22.8%；2011–2024 嚴格事前 20.9% vs 22.1%）。" +
-        "填入你自己的 EPS（尤其 EPS_b：目標日時市場預期的下一年）後會自動改用成長定價，也可以直接切換。"
-      : "軌道：股價照資金成本走，EPS 主要只影響本益比的分母；成長預期幾乎不會讓本益比變高。")
-    : useG ? `${auto ? ($("ex-chip").hidden ? "目前用成長定價（自動，因為你填了自己的 EPS）：" : (H === 24 ? "目前用成長定價（自動：24 個月只有共識時，成長定價和軌道接近、非科技略好）：" : "目前用成長定價（自動：科技股即使只有共識，成長定價也略好）：")) : "成長定價："}市場在目標日依「那時對下一年的成長預期（EPS_b ÷ EPS_a）」給新的本益比；EPS_b 沒填時用共識的 EPS_b。`
-    : H === 6 ? "成長定價只有 12、24 個月（6 個月沒有回測過），這裡改用軌道。"
-    : !fwd0 ? "成長定價需要今天的市場共識（勾選「放入市場共識」），用來扣掉今天已經反映的成長預期；這裡改用軌道。"
-    : base0 && base0.ebG === null ? "成長定價需要 EPS_b（目標日時市場預期的下一年 EPS）：請填 EPS_b 或放入共識；這裡改用軌道。"
-    : "今天或目標日虧損：成長定價不適用，這裡改用軌道。";
+  const fwd0 = useC ? (H === 12 ? ca : (cs12 && cs12.a ? cs12.a.eps : null)) : null;   // 今天共識的未來 12 個月 EPS：沒有下一財年共識時，回歸的目標日成長預期用
+  // 和共識一樣的數字＝沒有自己的看法（共識模式，區間用 conformal）；不一樣＝你的看法（README §26.1）
+  const sc_ = [0, 1, 2].map((i) => ({ i, ea: num("a" + i), eb: num("b" + i) })).filter((s) => s.ea !== null)
+    .map((s) => ({ ...s, eaIn: useC && ca !== null && s.ea === ca ? null : s.ea, ebIn: useC && cb !== null && s.eb !== null && s.eb === cb ? null : s.eb }));
+  const U = (s, kind) => C.predictUnified(row, H, M, M.gp, M.cq, s.eaIn, s.ebIn, kind, ca, cb, fwd0, rate, bm);
+  const res = sc_.map((s) => ({ ...s, o: U(s, KIND) }));
+  const wf = M.cq && M.cq.h[String(H)] ? M.cq.h[String(H)] : null;
+  $("k-note").textContent = KIND === "market"
+    ? "市場在目標日會預期的數字：你判斷「到時候市場對下一年 EPS 的看法」。它直接進本益比（成長定價的係數）：比共識隱含的成長每多 10%，本益比約多 6%。" + (H === 6 ? "6 個月沒有這組係數，這裡當作基本面預估。" : "只有填了 EPS_b 才有差別。")
+    : "我的基本面預估（預設）：你研究出來的那一年 EPS。市場在目標日還不知道這個數字，所以用軌道的小係數（EPS_b 每多 10%，股價約多 0.3–1.7%）；回測猜對時這樣最準。";
   const lab = ["悲觀", "基準", "樂觀"];
   if (!res.length) {
     $("res").innerHTML = `<tr><td class="note" style="white-space:normal;text-align:left">${t.e > 0 ? "請填至少一個情境的 EPS_a。" :
       "這家今天虧損，沒有可以當範例的 EPS。請在左邊填你預估的 EPS_a（可以是負的），有轉盈的話也填 EPS_b。"}</td></tr>`;
-    drawRange(null); $("decomp").textContent = ""; $("notes").innerHTML = ""; return;
+    drawRange(null); $("decomp").textContent = ""; $("rel").innerHTML = ""; $("notes").innerHTML = ""; return;
   }
   $("res").innerHTML = `<tr><th>情境</th><th>EPS_a</th><th>EPS_b</th><th>本益比中位</th><th>本益比 80% 區間</th><th>股價中位</th><th>股價 50% 區間</th><th>股價 80% 區間</th><th>forward 本益比</th></tr>` +
-    res.map(({ i, ea, showEb: eb, show: o }) => `<tr class="${i === 1 ? "base" : ""}"><td>${lab[i]}</td><td>${f2(ea)}</td><td>${eb === null || eb === undefined ? "—" : f2(eb)}</td>
+    res.map(({ i, o }) => `<tr class="${i === 1 ? "base" : ""}"><td>${lab[i]}${o.mode === "共識" ? "（＝共識）" : ""}</td><td>${f2(o.epsA)}</td><td>${o.epsB === null || o.epsB === undefined ? "—" : f2(o.epsB)}</td>
       <td>${o.pe === null ? "無定義" : f2(o.pe, 1)}</td><td>${o.pe === null ? "—" : f2(o.pe_lo80, 1) + "–" + f2(o.pe_hi80, 1)}</td>
       <td>${f0(o.px)}</td><td>${f0(o.px_lo50)}–${f0(o.px_hi50)}</td><td>${f0(o.px_lo80)}–${f0(o.px_hi80)}</td><td>${o.fwd === null ? "—" : f2(o.fwd, 1)}</td></tr>`).join("");
-  const base = (res.find((r) => r.i === 1) || res[0]);
-  drawRange(base ? base.show : null, t.px);
-  const other = base ? (base.show === base.o ? base.g : base.o) : null;
-  const cmp = other ? `<br><span class="note">對照（${other.spec === "成長定價" ? "成長定價" : "軌道"}）：本益比 ${other.pe === null ? "無定義" : f2(other.pe, 1)}、股價 ${f0(other.px)}（80% ${f0(other.px_lo80)}–${f0(other.px_hi80)}）</span>` : "";
-  if (base && base.show.spec === "成長定價") {
-    const o = base.show;
-    const terms = o.parts.map((p) => p.name.startsWith("常數") ? `${p.name}：${sgn(p.effect)}` : `${p.name}：${p.x >= 0 ? "+" : ""}${p.x.toFixed(3)} × ${p.beta.toFixed(3)} ＝ ${sgn(p.effect)}`).join("<br>");
-    $("decomp").innerHTML = `<b>拆解（${lab[base.i]}）</b>　方法：成長定價<br>本益比 ＝ 今天 ${f2(t.px / t.e, 1)} 倍 × exp(軌道 ${o.mk.toFixed(3)} ＋ 下面各項 ${o.adj >= 0 ? "+" : ""}${o.adj.toFixed(3)})；股價 ＝ 本益比 × EPS_a<br>${terms}<br>
-      區間寬度：波動 ${pct(o.vol)}${o.volKnown ? "" : "（沒有資料，用中位數）"}，是中位波動股票的 ${o.width.toFixed(2)} 倍${o.epsWiden > 1.005 ? `（EPS 變化大，放寬 ×${o.epsWiden.toFixed(2)}）` : ""}${o.bandMult > 1 ? `（含${t.adr ? "外國 ADR" : "中小型股"}放寬 ×${o.bandMult.toFixed(2)}）` : ""}` + cmp;
-  } else if (base) {
-    const o = base.show;
+  const base = res.find((r) => r.i === 1) || res[0];
+  drawRange(base ? base.o : null, t.px);
+  if (base) {
+    const o = base.o;
     const terms = o.parts.map((p) => `${p.name}：${p.x >= 0 ? "+" : ""}${p.x.toFixed(3)} × β ${p.beta.toFixed(3)} ＝ ${sgn(p.effect)}`).join("<br>");
-    $("decomp").innerHTML = `<b>拆解（${lab[base.i]}）</b>　寫法：${o.spec}<br>軌道：${sgn(Math.exp(o.mk) - 1)}（資金成本 − 股利，${H} 個月）${terms ? "<br>" + terms : ""}<br>
-      區間寬度：波動 ${pct(o.vol)}${o.volKnown ? "" : "（沒有資料，用中位數）"}，是中位波動股票的 ${o.width.toFixed(2)} 倍${o.bandMult > 1 ? `（含${t.adr ? "外國 ADR" : "中小型股"}放寬 ×${o.bandMult.toFixed(2)}）` : ""}${o.widen > 1 ? `；目標日虧損，再放寬 ×${o.widen.toFixed(2)}` : ""}` + cmp;
+    const modeTxt = o.mode === "共識" ? "共識（沒有自己的看法）" : o.mode === "軌道" ? "軌道（沒有共識）" : `看法（EPS_b＝${o.kind === "market" ? "市場在目標日會預期的數字" : "我的基本面預估"}）`;
+    const bandTxt = o.bandKind === "conformal" ? `區間：conformal（${o.bandGroup}；只有共識時的實際誤差校準，80% 區間走動式實測涵蓋 ${pct(wf.wf_cover80)}）` : o.kind === "market" ? "區間：成長定價的殘差校準（假設你的 EPS_a 和市場預期對）" : "區間：模型（假設你的 EPS 對，只含模型誤差）";
+    let alt = null, altTxt = "";                                                           // 對照：EPS_b 的另一種意思
+    if (o.kind === "market") { alt = U(base, "fund"); altTxt = "對照（把 EPS_b 當我的基本面預估＝軌道 β_sb）"; }
+    else if (o.kind === "fund" && base.ebIn !== null && H !== 6) { alt = U(base, "market"); altTxt = alt.kind === "market" ? "對照（把 EPS_b 當市場在目標日會預期的數字＝成長定價係數）" : ""; }
+    const cmp = alt && altTxt ? `<br><span class="note">${altTxt}：本益比 ${alt.pe === null ? "無定義" : f2(alt.pe, 1)}、股價 ${f0(alt.px)}（80% ${f0(alt.px_lo80)}–${f0(alt.px_hi80)}）</span>` : "";
+    $("decomp").innerHTML = `<b>拆解（${lab[base.i]}）</b>　模式：${modeTxt}　寫法：${o.spec}<br>軌道：${sgn(Math.exp(o.mk) - 1)}（資金成本 − 股利，${H} 個月）${terms ? "<br>" + terms : ""}<br>
+      ${bandTxt}；寬度：波動 ${pct(o.vol)}${o.volKnown ? "" : "（沒有資料，用中位數）"}，是中位波動股票的 ${o.width.toFixed(2)} 倍${o.epsWiden > 1.005 ? `（EPS 變化大，放寬 ×${o.epsWiden.toFixed(2)}）` : ""}${o.bandMult > 1 ? `（含${t.adr ? "外國 ADR" : "中小型股"}放寬 ×${o.bandMult.toFixed(2)}）` : ""}${o.widen > 1 ? `；目標日虧損，再放寬 ×${o.widen.toFixed(2)}` : ""}${o.note ? "<br>" + esc(o.note) : ""}` + cmp;
   } else $("decomp").textContent = "請至少填基準情境的 EPS_a。";
+  // 相對大盤（README §26.3）：扣掉同一天 S&P 500 只用共識的預測中位
+  const R = M.rel && M.rel.h && M.rel.h[String(H)], LB = M.lab && M.lab[String(H)];
+  if (R && R.n && base && base.o.pe !== null && t.e > 0) {
+    const v = Math.log(base.o.pe / (t.px / t.e));
+    let lo = 0, hi = R.v.length; while (lo < hi) { const m = (lo + hi) >> 1; if (R.v[m] <= v) lo = m + 1; else hi = m; }
+    $("rel").innerHTML = `<b>相對大盤（${lab[base.i]}）</b>：預測本益比 ${f2(t.px / t.e, 1)} → ${f2(base.o.pe, 1)} 倍（${sgn(Math.exp(v) - 1)}）；同一天 S&P 500 ${R.n} 家只用共識的預測中位 ${sgn(Math.exp(R.med) - 1)}（科技 ${sgn(Math.exp(R.med_tech) - 1)}、非科技 ${sgn(Math.exp(R.med_other) - 1)}）→ <b>相對大盤 ${sgn(Math.exp(v - R.med) - 1)}</b>，排在第 ${Math.round(100 * lo / R.v.length)} 百分位。` +
+      (LB && LB.rel && LB.sp ? `<br><span class="note">大盤整體重新定價是最大的誤差來源、事前預測不了，所以相對的那一半比絕對水準可靠：回測（S&P 500，起點 2017–2024）${H} 個月相對誤差 ${LB.rel[0].toFixed(3)} vs 絕對 ${LB.rel[1].toFixed(3)}；每個起點月預測 vs 實際的 Spearman 中位 ${LB.sp[0].toFixed(2)}（本益比不變 ${LB.sp[1].toFixed(2)}）。</span>` : "");
+  } else $("rel").innerHTML = "";
   const notes = [];
-  if (t.g === "cyclical" && base && base.eb === null) notes.push(["warn", "半導體／設備／記憶體的股價主要看「再下一年」的 EPS，建議填 EPS_b。"]);
+  if (t.g === "cyclical" && base && (base.o.epsB === null || base.o.epsB === undefined)) notes.push(["warn", "半導體／設備／記憶體的股價主要看「再下一年」的 EPS，建議填 EPS_b。"]);
   if (base && base.o.pe === null) notes.push(["warn", "EPS_a ≤ 0：本益比沒有定義，只看股價（方案 A）；有 EPS_b 時看 forward 本益比（方案 B）。"]);
   if (t.e <= 0 && base && base.o.spec === "軌道" && base.o.pe !== null) notes.push(["", "今天虧損、沒有共識：算不了成長率，股價只用軌道；你的 EPS 只用在本益比的分母。"]);
   if (base && base.o.spec === "虧損：EPS 變化") notes.push(["", `虧損版：成長率算不出來，改用「EPS 變化 ÷ 今天股價」× β ${f2(base.o.parts[0].beta)}（S&P 500 回測 12 個月誤差 25.3% → 24.0%，轉盈的公司 24.0% → 21.8%）` +
     (base.o.pe !== null && base.o.widen > 1 ? `；今天虧損、EPS_a 轉正，區間放寬 ×${base.o.widen.toFixed(2)}。` : "。")]);
   if (bm > 1) notes.push(["warn", t.adr ? `外國公司 ADR：用 S&P 500 校準的 80% 區間在 ADR 只涵蓋 68–74%（起點 2023-10～2025-09），區間已放寬 ×${bm.toFixed(2)}。外國股這兩年整體比軌道多漲，只有約 2 年資料。`
     : `不在 S&P 500／Nasdaq-100：中小型股用 S&P 500 校準的 80% 區間實際只涵蓋約 73%（2020–2026），區間已放寬 ×${bm.toFixed(2)}；點預測本身在中小型股一樣有效（12 個月誤差 24% vs 本益比不變 37%）。`]);
-  if (useG && base && base.show.x && base.show.x.GT < -0.15) notes.push(["warn", `目標日的成長預期是負的（EPS_b 比 EPS_a 低 ${pct(1 - Math.exp(base.show.x.GT))}），成長定價會把本益比壓低。` +
-    "如果是因為 EPS_a 含一次性收益（投資利得、處分收益、稅務利益），市場不會用它算倍數——請把 EPS_a 改成經常性獲利，或改看軌道。"]);
-  if (useG) notes.push(["", `成長定價的回測（S&P 500，I/B/E/S 起點 2018–2023）：EPS_a 和「目標日時市場對下一年的預期」都給對時，12 個月本益比誤差 16.7%（軌道）→ 15.0%、24 個月 21.9% → 16.6%；` +
-    `只猜對下一年的實際 EPS 時，12 個月差不多（16.8% → 16.2%）、24 個月 21.1% → 18.7%。2025-10 起點回頭驗證 S&P 500 16.9% → 15.3%、Nasdaq-100 23.6% → 21.8%。只用今天的共識、沒有自己的看法時：12 個月科技股成長定價略好、非科技股軌道略好；24 個月成長定價和軌道接近、非科技略好（README §24.7、§25）。` +
-    `80% 區間樣本外約涵蓋 ${pct((M.gp.h[String(H)] || {}).wf_cover80)}。` +
-    (t.r === null || t.r === undefined ? "這家沒有過去 12 個月報酬的資料，當作 0。" : "")]);
+  if (base && base.o.view && base.o.view.dT < -0.15) notes.push(["warn", `你的 EPS_b 隱含的目標日成長比共識低 ${pct(1 - Math.exp(base.o.view.dT))}，會把本益比壓低。` +
+    "如果是因為 EPS_a 含一次性收益（投資利得、處分收益、稅務利益），市場不會用它算倍數——請把 EPS_a 改成經常性獲利。"]);
+  if (base && LB) {
+    const o = base.o;
+    if (o.mode === "共識" && LB.C && wf) notes.push(["", `只有共識、沒有自己的看法（統一模型＝軌道）：回測 ${H} 個月本益比誤差 ${pct(LB.C[1], 1)}，本益比不變 ${pct(LB.C[0], 1)}（S&P 500，起點 2017–2024）；區間用 conformal 校準，80% 區間走動式實測涵蓋 ${pct(wf.wf_cover80)}（最差的一年 ${pct(wf.wf_min)}）。`]);
+    else if (o.kind === "market" && LB.A) notes.push(["", `EPS_b 當「市場在目標日會預期的數字」：回測 EPS_a 和它都猜對時，${H} 個月本益比誤差 ${pct(LB.A[0], 1)}（當基本面預估處理 ${pct(LB.A[2], 1)}、第七輪成長定價原式 ${pct(LB.A[1], 1)}）；區間用成長定價的殘差校準，80% 區間樣本外約涵蓋 ${pct((M.gp.h[String(H)] || {}).wf_cover80)}。`]);
+    else if (o.kind === "fund" && base.ebIn === null && LB.A1) notes.push(["", `只有自己的 EPS_a（EPS_b 用共識）：回測猜對 EPS_a 時 ${H} 個月本益比誤差 ${pct(LB.A1[0], 1)}（成長定價係數 ${pct(LB.A1[1], 1)}）；區間假設你的 EPS 對。`]);
+    else if (o.kind === "fund" && LB.B) notes.push(["", `EPS_b 當基本面預估（軌道 β_s）：回測 EPS_a、EPS_b 的實現值都猜對時，${H} 個月本益比誤差 ${pct(LB.B[0], 1)}（成長定價係數 ${pct(LB.B[1], 1)}、誤標成市場預期 ${pct(LB.B[2], 1)}）；區間假設你的 EPS 對。`]);
+    else if (o.kind === "fund" && LB.C && LB.C.length > 2) notes.push(["", `6 個月：回測猜對 EPS_a 時本益比誤差 ${pct(LB.C[2], 1)}（只有共識 ${pct(LB.C[1], 1)}、本益比不變 ${pct(LB.C[0], 1)}）；區間假設你的 EPS 對。`]);
+  }
   notes.push(["", `回測（12 個月、2022 以後、EPS 完全正確）：S&P 500 典型誤差 ${pct(sc(12, "2022 以後", SP).模型)}，Nasdaq-100 ${pct(sc(12, "2022 以後", ND).模型)}；你的 EPS 若有誤差，誤差會跟著放大。`]);
   $("notes").innerHTML = notes.map(([k, s]) => `<p class="note ${k}">${s}</p>`).join("");
 }
@@ -711,21 +737,21 @@ document.querySelectorAll("#hseg button").forEach((b) => b.addEventListener("cli
   if (!$("ex-chip").hidden) defaultScenarios(cur, cs);      // 還是範例數字時，跟著預測距離重填
   render();
 }));
-document.querySelectorAll("#mseg button").forEach((b) => b.addEventListener("click", () => {
-  METHOD = b.dataset.m; document.querySelectorAll("#mseg button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+document.querySelectorAll("#kseg button").forEach((b) => b.addEventListener("click", () => {
+  KIND = b.dataset.k; document.querySelectorAll("#kseg button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
   render();
 }));
 $("tk").addEventListener("change", () => loadTicker($("tk").value));
 $("tk").addEventListener("keydown", (e) => { if (e.key === "Enter") loadTicker($("tk").value); });
 ["a0", "a1", "a2", "b0", "b1", "b2", "ca", "cb"].forEach((id) => $(id).addEventListener("input", () => { $("ex-chip").hidden = true; render(); }));
 $("ck").addEventListener("input", () => { const cs = consFor(cur, H, num("ck"));
-  if (cs) { setv("ca", cs.a ? cs.a.eps : null); setv("cb", cs.b ? cs.b.eps : null); } render(); });
+  if (cs) { setv("ca", cs.a ? cs.a.eps : null); setv("cb", cs.b ? cs.b.eps : null); if (!$("ex-chip").hidden) defaultScenarios(cur, cs); } render(); });
 $("rv").addEventListener("input", render);
 $("rg").addEventListener("change", render);
 $("use-cons").addEventListener("change", render);
 $("fill-cons").addEventListener("click", () => { const ca = num("ca"), cb = num("cb"); if (ca !== null) { fillFrom(ca, cb, false); render(); } });
 $("fill-flat").addEventListener("click", () => { if (cur && cur.e > 0) { fillFrom(cur.e, null, false); render(); } });
-$("calc-sub").textContent = "預設是 MU。範例 EPS 用「校正後的共識 ±10%」（沒有可靠的共識時改用「今天的 EPS ±10%」）；請改成你的看法。";
+$("calc-sub").textContent = "預設是 MU。範例 EPS 用「校正後的共識 ±10%」（沒有可靠的共識時改用「今天的 EPS ±10%」）：基準列＝共識本身（區間用 conformal），悲觀／樂觀＝當作你的看法；請改成你的看法。";
 loadTicker("MU");
 
 // ---- 圖表共用 ----
@@ -906,9 +932,10 @@ drawC1();
   const pros = [
     `<b>骨架穩</b>：軌道在每一段都大勝「本益比不變」：2015–2021、2022 以後、到 2026-09 的最近一段都成立（12 個月 S&P 500 ${pct(a.本益比不變)} → ${pct(a.模型)}，Nasdaq-100 ${pct(b.本益比不變)} → ${pct(b.模型)}）。`,
     "<b>每個數字都說得出意思</b>：只有軌道和 1–3 個 β，看得出你的 EPS、共識、時間各貢獻多少，不是黑盒子。",
-    "<b>能放入你的看法</b>：你的 EPS（三個情境）、再下一年的 EPS、市場共識、利率情境，都可以自己改；共識自動用校正模型換成預期的 GAAP（樣本外 EPS 誤差 14.4% → 11.3%）。",
+    "<b>能放入你的看法</b>：你的 EPS（三個情境）、再下一年的 EPS（基本面預估或市場預期兩種意思）、市場共識、利率情境，都可以自己改；共識自動用校正模型換成預期的 GAAP（樣本外 EPS 誤差 14.4% → 11.3%）。",
     "<b>涵蓋面更廣</b>：中小型股（2020–2026 樣本外驗證）與約 100 檔外國公司 ADR 也能算，區間依實測放寬。",
-    "<b>區間誠實</b>：用 2021 以前校準、2022 以後檢查，80% 區間實際涵蓋 80–89%，不會假裝很準。",
+    "<b>區間誠實</b>：有自己的 EPS 時用 2021 以前校準、2022 以後檢查（80% 區間實際涵蓋 80–89%）；只有共識時改用 conformal（只有共識時的實際誤差）校準，走動式實測平均 85–88%，不會假裝很準。",
+    "<b>相對大盤另外給</b>：大盤整體重新定價預測不了，所以試算器把同一天 S&P 500 只用共識的預測中位扣掉、給百分位；回測相對誤差 0.21 vs 絕對 0.23（12 個月），預測排序的 Spearman 0.77。",
     "<b>週期股與虧損股有處理</b>：週期股另一組 β 並強調再下一年的 EPS；虧損時改給股價與 forward 本益比。",
     "<b>關係穩定</b>：只用最近 3／5／8 年估 β 並沒有比較準，代表 EPS 和股價的關係在 2022 前後沒變。",
   ];
@@ -921,7 +948,7 @@ drawC1();
     (() => { const c = (BT.cons || []).find((r) => r.期間 === "2022 以後" && r.群組 === SP), t = (BT.cons || []).find((r) => r.期間 === "2022 以後" && r.群組 === "科技（S&P 500 面板）");
       return c ? `<b>實際用共識當 EPS，誤差大約 ${pct(c.共識校正)}（科技 ${pct(t.共識校正)}）</b>：比本益比不變好，但離「EPS 完全正確」的 ${pct(c.EPS完全正確)} 還遠。共識本身比實際 GAAP 高約 ${sgn(Math.exp(c.共識偏高中位) - 1, 0)}。「市場已預期」的 β 用真共識重估，量級和目前的代理差不多，暫不更換。`
         : "<b>共識的係數還是代理</b>：「市場已預期」那一項的 β 是用模型自己的預期估的，不是真正的歷史分析師共識。"; })(),
-    "<b>大盤是固定的資金成本</b>：r＝10 年期＋5%。大盤整年往同一邊走時，所有預測一起偏。",
+    "<b>大盤是固定的資金成本</b>：r＝10 年期＋5%。大盤整年往同一邊走時，所有預測一起偏；「相對大盤」的輸出就是為了避開這一塊。",
     "<b>2022 以後的資料在設計時看過</b>：真正沒碰過的驗收是 2026-10-06 凍結的前瞻紀錄（1,982 家，2027-04、2027-10 驗收）。",
   ];
   $("pros").innerHTML = pros.map((s) => `<li>${s}</li>`).join("");

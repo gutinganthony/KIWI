@@ -10,6 +10,11 @@
     python3 orbit_price.py MU --eps 70 --eps2 90 --cons auto           # 自動抓 Yahoo 共識（本財年、下一財年；pef/consensus.py），並用共識校正模型換成預期的 GAAP
     python3 orbit_price.py NVDA --eps 9 --cons auto --rate-view -1     # 利率情境：你認為 10 年期到目標日會降 1 個百分點（README §19.3）
     python3 orbit_price.py TSM --cons auto                             # 外國公司 ADR：讀 data/adr_now.csv（每 ADR 美元口徑，adr_fetch.py）
+    python3 orbit_price.py MU --cons auto                              # 沒有自己的看法：共識模式，區間用 conformal 校準（README §26.2）
+    python3 orbit_price.py MU --eps 70 --eps2 90 --cons auto --eb-kind market
+                                                                       # EPS_b 是「市場在目標日會預期的下一年 EPS」（不是你的基本面預估）→ 成長定價的係數（README §26.1）
+第十輪（README §26）起只有一個模型（pef/unified.py）：軌道是本體；EPS_b 標成基本面預估（預設）走軌道的小 β，標成市場預期走成長定價的係數；
+只有共識時區間用 conformal；另給「相對大盤」（扣掉同一天 S&P 500 只用共識的預測中位，results/relative_dist.json）。
 共識 EPS 也可以放在 data/consensus.csv（欄位：ticker, fy_end, eps, source, asof；同一年度取 asof 最新的一筆），
 沒給 --cons／--fy-cons 時自動讀；你在命令列給的永遠優先。--cons auto：先用 7 天內的快照（data/consensus_snapshots/），
 沒有就即時抓並存成今天的快照；再抓 quoteSummary（分析師人數、90 天修正、精確的會計年度、調整後實際 EPS），
@@ -29,7 +34,7 @@ import pandas as pd
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from pef import growth_price as GP                       # noqa: E402
-from pef import consensus, eps_correct, orbit, yahoo    # noqa: E402
+from pef import consensus, eps_correct, orbit, unified, yahoo    # noqa: E402
 
 RES = os.path.join(HERE, "results")
 
@@ -109,6 +114,8 @@ def main():
                     help="利率情境：你認為到目標日 10 年期殖利率會變多少個百分點（-1＝降 1 個百分點）；市場已預期的部分已在軌道裡")
     ap.add_argument("--rate-regime", default="2022", choices=["2022", "2012"],
                     help="利率情境用哪段期間的反應：2022＝2022 以後的通膨期（預設）、2012＝2012–2021 低通膨期")
+    ap.add_argument("--eb-kind", default="fund", choices=["fund", "market"],
+                    help="--eps2 的意思：fund＝你的基本面預估（預設；軌道的小係數）、market＝你判斷市場在目標日會預期的下一年 EPS（成長定價的係數；只有 12、24 個月）")
     ap.add_argument("--erp", type=float, default=None, help="股權風險溢酬（預設 0.05）")
     a = ap.parse_args(sys.argv[1:])
     t = a.ticker.upper().replace(".", "-")
@@ -250,8 +257,15 @@ def main():
     if not mine:
         if ca is None:
             sys.exit("請給你的 EPS（--eps／--fy），或提供市場共識（--cons 數字或 auto／--fy-cons／data/consensus.csv）")
-        mine = [(ca, cb)]
-        notes.append("沒有給你自己的 EPS：用市場共識當你的看法（模型只算「市場預期」那一項）")
+        mine = [(None, None)]
+        notes.append("沒有給你自己的 EPS：共識模式——EPS 用共識，區間用「只有共識」時的實際誤差校準（conformal，README §26.2）")
+    if a.eb_kind == "market" and all(eb is None for _, eb in mine):
+        notes.append("--eb-kind market 需要 --eps2（你判斷市場在目標日會預期的下一年 EPS）；沒有 → 當作只有 EPS_a")
+    f0 = None                                            # 今天共識的未來 12 個月 EPS：沒有下一財年共識時，回歸的目標日成長預期用（pef/growth_price.py eps_b_hat）
+    if fyc:
+        f0 = orbit.calendarize(fyc, asof + pd.DateOffset(months=12), row["period_end"], eps0, extrapolate=True)[0]
+    elif ca is not None and a.h == 12:
+        f0 = ca
 
     rate = None
     if a.rate_view:
@@ -279,27 +293,60 @@ def main():
         print(f"  市場共識（{csrc}）：EPS_a {ca:,.2f}" + (f"、EPS_b {cb:,.2f}" if cb is not None else ""))
     for n_ in notes:
         print("  " + n_)
-    res = []
-    for ea, eb in mine:
-        o = orbit.predict(row, a.h, model, ea, eb, ca, cb, erp=a.erp, rate=rate, band_mult=bm)
-        o["eps_a"], o["eps_b"] = ea, eb if (eb is not None and np.isfinite(eb)) else None
-        res.append(o)
+    gm, cq = GP.load(), unified.load_conformal()
+    res = [unified.predict(row, a.h, model=model, gm=gm, cq=cq, eps_a=ea, eps_b=eb, eb_kind=a.eb_kind, cons_a=ca, cons_b=cb, fwd0=f0,
+                           rate=rate, band_mult=bm, erp=a.erp) for ea, eb in mine]
     o0 = res[0]
-    print(f"\n  寫法：{o0['spec']}｜軌道（資金成本 − 股利，{a.h} 個月）{np.exp(o0['mk']) - 1:+.1%}｜區間寬度：波動 {o0['vol']:.0%}"
-          f"{'' if o0['vol_known'] else '（沒有資料，用中位數）'}，是中位波動股票的 {o0['width']:.2f} 倍"
+    mode_txt = {"共識": "共識（沒有自己的看法）", "軌道": "軌道（沒有共識）",
+                "看法": "看法（EPS_b＝" + ("市場在目標日會預期的數字" if o0.get("kind") == "market" else "我的基本面預估") + "）"}[o0["mode"]]
+    cqh = (cq or {}).get("h", {}).get(str(a.h))
+    band_txt = (f"conformal（{o0['band_group']}；只有共識時的實際誤差校準，80% 區間走動式實測涵蓋 {cqh['wf_cover80']['全部校準']:.0%}）"
+                if o0["band_kind"] == "conformal" else "成長定價的殘差校準（假設你的 EPS_a 和市場預期對）" if o0.get("kind") == "market"
+                else "模型（假設你的 EPS 對，只含模型誤差）")
+    print(f"\n  統一模型（README §26）｜模式：{mode_txt}｜寫法：{o0['spec']}｜軌道（資金成本 − 股利，{a.h} 個月）{np.exp(o0['mk']) - 1:+.1%}")
+    print(f"  區間：{band_txt}；寬度：波動 {o0['vol']:.0%}{'' if o0['vol_known'] else '（沒有資料，用中位數）'}，是中位波動股票的 {o0['width']:.2f} 倍"
           + (f"（含放寬 ×{o0['band_mult']:.2f}）" if o0["band_mult"] != 1 else "")
           + (f"（EPS 變化大，再放寬 ×{o0['eps_widen']:.2f}，README §22.4）" if o0.get("eps_widen", 1) > 1.005 else ""))
+    if o0.get("note"):
+        print("  " + o0["note"])
     print("  EPS_a     EPS_b    本益比（中位）  本益比 80% 區間     股價（中位）  股價 50% 區間        股價 80% 區間       h 個月後 forward 本益比")
     for o in res:
         pe = f"{o['pe']:10.1f}     {o['pe_lo80']:6.1f}–{o['pe_hi80']:<7.1f}" if o["pe"] else "    無定義（EPS_a ≤ 0）     "
         fwd = f"{o['fwd_pe']:.1f}" if o["fwd_pe"] else "—"
         eb_s = f"{o['eps_b']:,.2f}" if o["eps_b"] is not None else "—"
-        print(f"  {o['eps_a']:>7,.2f}  {eb_s:>7}  {pe}  {o['px']:>10,.0f}   "
+        ea_s = f"{o['eps_a']:,.2f}" if o["eps_a"] is not None else "—"
+        print(f"  {ea_s:>7}  {eb_s:>7}  {pe}  {o['px']:>10,.0f}   "
               f"{o['px_lo50']:>8,.0f}–{o['px_hi50']:<8,.0f}  {o['px_lo80']:>8,.0f}–{o['px_hi80']:<8,.0f}   {fwd}")
     print("\n  拆解（第一個情境）：")
     print(f"    軌道：股價 × exp({o0['mk']:+.3f})  ← 市場看法不變時的預期")
     for p in o0["parts"]:
         print(f"    {p['項目']}：{p['數值']:+.3f} × β {p['β']:+.3f} ＝ {p['影響']:+.3f}")
+    ea0, eb0 = mine[0]
+    alt, alt_txt = None, None                            # 對照：EPS_b 的另一種意思
+    if o0.get("kind") == "market":
+        alt, alt_txt = unified.predict(row, a.h, model=model, gm=gm, cq=cq, eps_a=ea0, eps_b=eb0, eb_kind="fund", cons_a=ca, cons_b=cb, fwd0=f0,
+                                       rate=rate, band_mult=bm, erp=a.erp), "把 EPS_b 當我的基本面預估（軌道 β_sb）"
+    elif o0.get("kind") == "fund" and eb0 is not None and gm is not None and str(a.h) in gm["h"]:
+        alt = unified.predict(row, a.h, model=model, gm=gm, cq=cq, eps_a=ea0, eps_b=eb0, eb_kind="market", cons_a=ca, cons_b=cb, fwd0=f0,
+                              rate=rate, band_mult=bm, erp=a.erp)
+        alt_txt = "把 EPS_b 當「市場在目標日會預期的數字」（成長定價係數）" if alt.get("kind") == "market" else None
+    if alt is not None and alt_txt:
+        print(f"  對照（{alt_txt}）：本益比 {alt['pe']:.1f}（80% {alt['pe_lo80']:.1f}–{alt['pe_hi80']:.1f}）、股價 {alt['px']:,.0f}（80% {alt['px_lo80']:,.0f}–{alt['px_hi80']:,.0f}）"
+              if alt.get("pe") else f"  對照（{alt_txt}）：股價 {alt['px']:,.0f}")
+    rp = os.path.join(RES, "relative_dist.json")
+    if os.path.exists(rp) and o0.get("pe") and eps0 > 0:    # 相對大盤（README §26.3）
+        rd = json.load(open(rp))
+        R = rd["h"].get(str(a.h))
+        if R and R["n"]:
+            v = float(np.log(o0["pe"] / (float(row["px"]) / eps0)))
+            pc = float(np.searchsorted(np.array(R["v"]), v, side="right")) / R["n"]
+            print(f"\n  相對大盤（README §26.3）：預測本益比 {float(row['px']) / eps0:.1f} → {o0['pe']:.1f} 倍（{np.exp(v) - 1:+.1%}）；"
+                  f"S&P 500 {R['n']} 家只用共識的預測中位 {np.exp(R['med']) - 1:+.1%}（{rd['date']}；科技 {np.exp(R['med_tech']) - 1:+.1%}、非科技 {np.exp(R['med_other']) - 1:+.1%}）"
+                  f"→ 相對大盤 {np.exp(v - R['med']) - 1:+.1%}，第 {pc:.0%} 百分位")
+            lb = (rd.get("lab") or {}).get(str(a.h)) or {}
+            if lb.get("rel") and lb.get("sp"):
+                print(f"    大盤整體重新定價是最大的誤差來源、事前預測不了，相對的那一半比絕對水準可靠：回測（S&P 500，起點 2017–2024）{a.h} 個月相對誤差 "
+                      f"{lb['rel'][0]:.3f} vs 絕對 {lb['rel'][1]:.3f}；每個起點月預測 vs 實際的 Spearman 中位 {lb['sp'][0]:.2f}（本益比不變 {lb['sp'][1]:.2f}）")
     if o0["widen"] > 1:
         print(f"  ⚠ EPS_a ≤ 0：本益比沒有定義（方案 A：只看股價），區間依回測放寬 ×{o0['widen']:.2f}；"
               "有給 EPS_b 時看最右欄的 forward 本益比（方案 B）")
@@ -312,7 +359,7 @@ def main():
               "給共識（--cons）時可以用「你和共識的差距」")
     if ca is None and not use_auto:
         print("  提示：加 --cons auto 可以自動抓 Yahoo 共識，模型會分開算「市場已預期的成長」和「你和市場的差距」")
-    if o0["group_key"] == "cyclical" and o0["eps_b"] is None and o0["spec"] != "軌道":
+    if o0.get("group_key") == "cyclical" and o0["eps_b"] is None and o0["spec"] != "軌道":
         print("  提示：半導體／設備／記憶體的股價主要看「再下一年」的 EPS（回測 β_b ≈ 0.17、β_a ≈ 0）→ 建議加 --eps2")
     bt = model["backtest"].get(str(a.h), {})
     if bt:
@@ -323,60 +370,9 @@ def main():
         print(f"  最近（起點 2024-10～2025-09，目標日到 2026-09）：" + "；".join(
             f"{g} 軌道 {v['軌道']:.3f}（市場偏離軌道 {v['市場偏離軌道中位']:+.2f}）" for g, v in rc.items()
             if g in ("全部", "科技", o0["group"])))
-    growth_section(a, row, model, mine, fyc, ca, cb, asof, eps0, rate, bm)
-    print("\n  讀法（軌道）：股價主要跟著軌道走；EPS 多 10% 通常只讓股價多 0.5–2%（半導體類較大、再下一年的 EPS 較重要），"
-          "\n        所以本益比 ≈ 股價 ÷ 你的 EPS，主要由你的 EPS 決定。誤差最大的來源是整個產業被重新定價"
-          "\n        （2025–26 年的 AI 記憶體行情、軟體股修正），模型預測不了，區間已含這部分。不是投資建議。")
-
-
-def growth_section(a, row, model, mine, fyc, ca, cb, asof, eps0, rate, bm):
-    """成長定價（README §24）：市場在目標日依「那時對下一年的成長預期（EPS_b）」給新的本益比。只有 12、24 個月。"""
-    gm = GP.load()
-    if gm is None or str(a.h) not in gm["h"]:
-        print(f"\n  成長定價：只有 12、24 個月（{a.h} 個月沒有回測過），這裡只看軌道。")
-        return
-    f0, how_f0 = None, None
-    if fyc:
-        f0, how_f0 = orbit.calendarize(fyc, asof + pd.DateOffset(months=12), row["period_end"], eps0, extrapolate=True)
-    elif ca is not None and a.h == 12:
-        f0, how_f0 = ca, "命令列 --cons"
-    if f0 is None:
-        print("\n  成長定價：需要今天的市場共識（未來 12 個月的 EPS，用來扣掉「今天已反映的成長預期」）→ 加 --cons auto 或 --fy-cons")
-        return
-    r12 = row.get("ret12")
-    r12 = float(r12) if r12 is not None and np.isfinite(float(r12)) else None
-    if r12 is None and row.get("adr"):                   # 外國 ADR：用 data/adr_hist.csv.gz 的月底股價（和網頁一樣）
-        r12 = GP.adr_ret12(row["ticker"], float(row["px"]), row["price_date"])
-    out = []
-    for ea, eb in mine:
-        eb_g = eb if (eb is not None and np.isfinite(eb)) else cb
-        og = GP.predict(row, a.h, ea, eb_g, f0, r12, model=model, gm=gm, rate=rate, band_mult=bm)
-        out.append((ea, eb_g, og))
-    print(f"\n  ── 成長定價（README §24）：市場在 {(asof + pd.DateOffset(months=a.h)).date()} 會依「那時對下一年的成長預期」給新的本益比")
-    print(f"     今天市場預期的未來 12 個月 EPS（F_0）{f0:,.2f}（{how_f0}）；過去 12 個月報酬 "
-          + (f"{np.exp(r12) - 1:+.0%}" if r12 is not None else "沒有資料（當作 0）")
-          + "；EPS_b 沒給時用共識的 EPS_b 當「目標日時市場的預期」")
-    print("  EPS_a     EPS_b    本益比（中位）  本益比 80% 區間     股價（中位）  股價 50% 區間        股價 80% 區間       h 個月後 forward 本益比")
-    for ea, eb_g, og in out:
-        if og is None:
-            print(f"  {ea:>7,.2f}  {'—' if eb_g is None else f'{eb_g:,.2f}':>7}  成長定價不適用（EPS_a、EPS_b、今天 EPS 都要 > 0，且要有 EPS_b）")
-            continue
-        print(f"  {ea:>7,.2f}  {eb_g:>7,.2f}  {og['pe']:10.1f}     {og['pe_lo80']:6.1f}–{og['pe_hi80']:<7.1f}  {og['px']:>10,.0f}   "
-              f"{og['px_lo50']:>8,.0f}–{og['px_hi50']:<8,.0f}  {og['px_lo80']:>8,.0f}–{og['px_hi80']:<8,.0f}   {og['fwd_pe']:.1f}")
-    og = next((o for _, _, o in out if o is not None), None)
-    if og is None:
-        return
-    print(f"  拆解（第一個可用情境）：本益比 ＝ 今天 {og['pe_today']:,.1f} 倍 × exp(軌道 {og['mk']:+.3f} ＋ 下面各項 {og['adj']:+.3f})")
-    for p in og["parts"]:
-        print(f"    {p['項目']}：{p['數值']:+.3f} × {p['β']:+.3f} ＝ {p['影響']:+.3f}")
-    gh = gm["h"][str(a.h)]
-    print(f"  區間：波動 {og['vol']:.0%}" + ("" if og["vol_known"] else "（沒有資料，用中位數）")
-          + (f"，EPS 變化大再放寬 ×{og['eps_widen']:.2f}" if og["eps_widen"] > 1.005 else "")
-          + (f"，放寬 ×{bm:.2f}" if bm != 1 else "") + f"；回測樣本外 80% 區間涵蓋約 {gh.get('wf_cover80') or 0:.0%}")
-    print("  讀法（成長定價）：目標日時市場預期的下一年成長每多 10%，本益比約多 6–7%；這段期間交出的 EPS 成長每多 10%，本益比約少 5%"
-          "\n        （EPS 調高 → 本益比被稀釋，但只稀釋一半）。回測（I/B/E/S 起點 2018–2023）：EPS_a 和「目標日時市場對下一年的預期」"
-          "\n        都給對時，12 個月本益比誤差 16.7% → 15.0%、24 個月 21.9% → 16.6%；只猜對下一年的實際 EPS 時 12 個月差不多（16.8% → 16.2%）。"
-          "\n        只用今天的共識、沒有自己的看法時：12 個月科技股成長定價略好、非科技股軌道略好；24 個月兩者接近、非科技成長定價略好（README §24.7、§25）。")
+    print("\n  讀法：股價主要跟著軌道走；你的基本面 EPS 多 10% 通常只讓股價多 0.5–2%（半導體類較大、再下一年的 EPS 較重要），"
+          "\n        所以本益比 ≈ 股價 ÷ 你的 EPS，主要由你的 EPS 決定。要讓本益比本身變高，得是「市場在目標日對下一年的預期」比共識高（--eb-kind market）。"
+          "\n        誤差最大的來源是整個產業／大盤被重新定價，模型預測不了，區間已含這部分——看「相對大盤」那一行會比絕對水準可靠。不是投資建議。")
 
 
 if __name__ == "__main__":
