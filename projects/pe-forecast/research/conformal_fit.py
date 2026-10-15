@@ -5,7 +5,8 @@
 
 正式版區間（orbit_fit.py、§22.4）是用「EPS 猜對」的走動式殘差校準的；實際使用時 EPS 是共識，誤差多了 EPS 那一塊，
 80% 區間只涵蓋 57–63%（§25.1）。這裡改用「只有共識」時的實際誤差：
-  u ＝ ln(預測本益比 ÷ 實際) ÷ (波動^α × exp(δ_h × min(|ln(共識 EPS_a ÷ 今天 EPS)|, 2)))      α、δ 和軌道區間相同
+  u ＝ ln(實際本益比 ÷ 預測) ÷ (波動^α × exp(δ_h × min(|ln(共識 EPS_a ÷ 今天 EPS)|, 2)))      α、δ 和軌道區間相同
+  （符號和軌道區間一致：區間 ＝ 預測 × exp(尺度 × 分位數)。2026-10-15 前誤用 ln(預測 ÷ 實際)，網頁區間上下顛倒；涵蓋率的檢查是對稱的，所以當時沒抓到）
   分位數（10／25／75／90%）取自已到期的配對；正式版＝目標日 ≤ 資料截止（2025-09）的全部配對；依組別（科技／非科技）各一組，樣本 < 300 用全部。
 走動式驗證：每個起點年份只用「目標日在該年第一個起點月以前」的配對校準，看那一年的涵蓋率（＝實際使用時能做到的）。
 不置中（conformal 保留偏差）：共識模式的誤差有整體偏差（軌道低估本益比），置中會把它藏起來。
@@ -31,7 +32,7 @@ def main():
     model = orbit.load_model()
     alpha = model["alpha"]
     delta = model.get("band_delta") or {}
-    out = dict(version="2026-10-15", note="README §26.2：共識模式（只有共識、沒有自己的看法）的區間分位數 [10,25,75,90]%，已除以 波動^α × exp(δ|ga|)；不置中",
+    out = dict(version="2026-10-15", note="README §26.2：共識模式（只有共識、沒有自己的看法）的區間分位數 [10,25,75,90]%，u＝ln(實際本益比÷預測)，已除以 波動^α × exp(δ|ga|)；不置中；區間＝預測×exp(尺度×分位數)",
                alpha=alpha, delta={h: float(delta.get(h, 0.0)) for h in ("6", "12", "24")}, min_n=MIN_N, cutoff="2025-09-30", h={})
     pd.set_option("display.width", 220)
     for h in (6, 12, 24):
@@ -39,7 +40,7 @@ def main():
         vmed = float(P["vol36"].median())
         vol = P["vol36"].where(np.isfinite(P["vol36"]), vmed).clip(*orbit.VOL_CLIP) ** alpha
         P["sc"] = vol * np.exp(float(delta.get(str(h), 0.0)) * P["ga_c"].abs().clip(upper=2))
-        P["u"] = P["C"] / P["sc"]
+        P["u"] = -P["C"] / P["sc"]                      # C ＝ ln(預測 ÷ 實際)；區間要的是 ln(實際 ÷ 預測)
         P["tech"] = P["grp"] != "非科技"
         print(f"\n== {h} 個月：{len(P):,} 組（目標日 {P['T'].min():%Y-%m}～{P['T'].max():%Y-%m}）；共識模式中位 |ln 本益比誤差| {np.median(np.abs(P['C'])):.3f}")
         rows = []

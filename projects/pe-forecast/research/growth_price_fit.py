@@ -97,7 +97,7 @@ def main():
             te = d["year"] == Y
             if te.any():
                 pred.loc[te] = apply(d[te], by[str(Y)])
-        e = (pred - d["y"]).dropna()
+        e = (d["y"] - pred).dropna()                 # ln(實際 ÷ 預測)：和區間的用法（預測 × exp(尺度 × 分位數)）同號；2026-10-15 前寫反
         vmed = float(d["vol36"].median())
         base = np.clip(d["vol36"].where(np.isfinite(d["vol36"]), vmed), *cond.VOL_CLIP) ** model["alpha"]
         # EPS 變化越大區間越寬（同 §22.4）：sc ×＝ exp(δ × min(|ga|, 2))，δ 用區間分數挑
