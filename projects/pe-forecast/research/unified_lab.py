@@ -207,7 +207,7 @@ def main():
         s_u, s_0 = rk("C"), rk("U")
         say(f"  每個起點月，預測 ln 本益比 vs 實際的 Spearman 中位：統一 {np.nanmedian(s_u):.2f}、本益比不變 {np.nanmedian(s_0):.2f}（{len(s_u)} 個月）")
     o = pd.concat(allo, ignore_index=True)
-    o.to_csv(os.path.join(RES, "unified_rows.csv.gz"), index=False, float_format="%.5g")
+    o.to_csv(os.path.join(RES, "unified_rows.csv.gz"), index=False, float_format="%.5g", compression=dict(method="gzip", mtime=0))   # 位元組可重現
     open(os.path.join(RES, "unified_lab.txt"), "w").write(buf.getvalue())
 
 
