@@ -1,10 +1,10 @@
 # 持倉快照（自 Google Sheet 同步，**非權威**）
 
 > ## ⚠️ 權威來源是 Google Sheet，不是這個檔
-> **KIWI 持倉即時表**：https://docs.google.com/spreadsheets/d/1tYg3PneDLrxXbtuoo1lsylFV8ehSpEblv9thEuAllns/edit
+> **KIWI 持倉表**：https://docs.google.com/spreadsheets/d/1FPmLpXYVgm8Xrsv6Gs01bC-SlKytcEdmXF7NC2vUqJ4/edit
 >
 > Jake 隨時在 Sheet 上更新，**不需要通知 Claude**。
-> **每個 session 開場必須用 `mcp__Google_Drive__read_file_content`（fileId `1tYg3PneDLrxXbtuoo1lsylFV8ehSpEblv9thEuAllns`）讀一次，
+> **每個 session 開場必須用 `mcp__Google_Drive__read_file_content`（fileId `1FPmLpXYVgm8Xrsv6Gs01bC-SlKytcEdmXF7NC2vUqJ4`）讀一次，
 > 並把本檔同步成最新內容。** 本檔存在的唯一理由是：GitHub Actions runner 沒有 Google 憑證、讀不到 Sheet，
 > 所以自動管線只能讀這份快照。
 >
@@ -12,7 +12,7 @@
 
 > 🔴 **2026-10-19 更正：權威 Sheet 換檔了。** 上面的舊 fileId（`1tYg3…`）回「找不到」，現行的是
 > **「KIWI 持倉表」fileId `1FPmLpXYVgm8Xrsv6Gs01bC-SlKytcEdmXF7NC2vUqJ4`**（2026-09-08 建立，Sheet 內「最後更新」欄也是 2026-09-08）。
-> `CLAUDE.md` §0 仍寫舊 fileId——依 `agents/MAINTENANCE.md`，§0 要 Jake 同意才能改，**已在對話中提出**。
+> `CLAUDE.md` §0 已於 2026-10-19 經 Jake 同意改成新 fileId。
 
 **最後同步：2026-10-19（自新 Sheet 讀取；Sheet 最後更新 2026-09-08）**
 

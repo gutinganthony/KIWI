@@ -99,6 +99,35 @@ def fetch_yfinance_data():
     return result
 
 
+def align_to_last_close(yf_data):
+    """把所有 Yahoo 序列截到 ^GSPC 最後一個「有效收盤」日。
+
+    2026-10-19 事故：週一美股開盤前重跑時，^VIX 已經有當天盤前（GTH）的 K 棒，
+    但 ^GSPC 最後收盤仍是上週五。CRI 用了「週一盤前 VIX＋週五 S&P」，再以週五日期
+    upsert 進 history.json，把週五的 58.7 蓋成 49.8，剛好跨過規則 3 的 50 門檻。
+    截齊之後，同一個 data_date 不論何時重跑都得到同一個分數。
+    """
+    gspc = yf_data.get("^GSPC")
+    if gspc is None or gspc.empty:
+        return yf_data
+    col = "Close" if "Close" in gspc.columns else gspc.columns[0]
+    valid = gspc[col].dropna()
+    if valid.empty:
+        return yf_data
+    last = pd.Timestamp(valid.index[-1]).date()
+    out = {}
+    for k, df in yf_data.items():
+        keep = [pd.Timestamp(d).date() <= last for d in df.index]
+        df = df[keep]
+        if k == "^GSPC":
+            df = df[df[col].notna()]
+        dropped = len(yf_data[k]) - len(df)
+        if dropped:
+            log.info(f"align: {k} 去掉 {dropped} 筆晚於 {last} 的資料")
+        out[k] = df
+    return out
+
+
 def fetch_fred_data():
     """Fetch FRED series. Returns empty dict if key missing or fetch fails."""
     if not FRED_KEY:
@@ -965,7 +994,7 @@ def main():
     log.info(f"HTML path  : {DOCS_HTML}")
 
     # 1. Fetch data
-    yf_data   = fetch_yfinance_data()
+    yf_data   = align_to_last_close(fetch_yfinance_data())
     fred_data = fetch_fred_data()
     cape_val  = scrape_cape()
 
