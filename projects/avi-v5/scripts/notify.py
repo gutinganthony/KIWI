@@ -141,37 +141,79 @@ def load_cri_history():
         return []
 
 
-def rule3_status(cri_val, cri_hist, ma_fetcher=fetch_sp500_ma200):
-    """出場規則 3（skills/serenity/exit-playbook.md §0）。回傳 (html_line, plain_line) 或 None。
-    A 段：CRI≥50 → 槓桿全賣。B 段：CRI≥50 且 S&P<200 日線 → 股票全賣。
-    解除：CRI 連續 10 日 <35 且 S&P>200 日線（只在近 60 日曾 ≥50 時才顯示）。"""
-    recently_hot = any(c >= 50 for c in cri_hist[-60:])
-    if cri_val < 50 and not recently_hot:
+RISK_DATA = PROJECT_ROOT.parent.parent / "docs" / "risk" / "data.json"
+RULE3B_START = "2026-10-19"   # B 段改用對照台總分的生效日
+
+
+def load_board():
+    """docs/risk/data.json 的對照台總分區塊（risk_dashboards_data.py 每日寫入）；讀不到回 None。"""
+    try:
+        return json.loads(RISK_DATA.read_text(encoding="utf-8")).get("board")
+    except Exception as e:
+        logger.warning(f"risk data unreadable: {e}")
         return None
-    spx, ma = ma_fetcher()
-    ma_known = spx is not None
-    below = ma_known and spx < ma
-    ma_txt = f"S&P {spx:,.0f} vs 200日線 {ma:,.0f}" if ma_known else "200日線無法自動取得，請手動確認"
+
+
+def rule3_status(cri_val, cri_hist, board=None, ma_fetcher=fetch_sp500_ma200):
+    """出場規則 3（skills/serenity/exit-playbook.md §0）。回傳 (html_line, plain_line) 或 None。
+    A 段：CRI≥50 → 槓桿全賣；解除＝CRI 連續 10 日 <35。
+    B 段（2026-10-19 起）：對照台總分≥35 且 S&P<200 日線 → 股票全賣；解除＝總分連續 10 日 <30 且 S&P>200 日線。"""
+    hist = [h for h in (board or {}).get("history", []) if h[0] >= RULE3B_START and h[1] is not None]
+    score = (board or {}).get("score")
+    if board and board.get("ma_dist") is not None:
+        below = board["ma_dist"] < 0
+        ma_txt = f"S&P 距 200 日線 {board['ma_dist']:+.1f}%｜對照台總分 {score}"
+    else:
+        spx, ma = ma_fetcher()
+        below = spx is not None and spx < ma
+        ma_txt = (f"S&P {spx:,.0f} vs 200日線 {ma:,.0f}" if spx is not None else "200日線無法自動取得，請手動確認") + \
+                 ("｜對照台總分讀不到" if score is None else f"｜對照台總分 {score}")
     ma_html = html.escape(ma_txt)
 
-    if cri_val >= 50 and below:
-        return (f"🔴🔴 <b>規則 3 B 段觸發：所有股票全賣</b>（台股今天、美股今晚，3 個交易日內賣完）\n<i>{ma_html}</i>",
-                f"🔴🔴 規則 3 B 段觸發：所有股票全賣（台股今天、美股今晚，3 個交易日內賣完）\n{ma_txt}")
-    if cri_val >= 50:
-        extra = "" if ma_known else "；B 段待確認"
-        return (f"🔴 <b>規則 3 A 段觸發：槓桿部位全賣</b>（COHX 等，美股今晚）{extra}\n<i>{ma_html}</i>",
-                f"🔴 規則 3 A 段觸發：槓桿部位全賣（COHX 等，美股今晚）{extra}\n{ma_txt}")
-    calm = len(cri_hist) >= 10 and all(c < 35 for c in cri_hist[-10:])
-    if calm and ma_known and not below:
-        return (f"✅ <b>規則 3 解除條件成立</b>：CRI 連續 10 日 &lt;35 且 S&amp;P 在 200 日線上，回到正常流程\n<i>{ma_html}</i>",
-                f"✅ 規則 3 解除條件成立：CRI 連續 10 日 <35 且 S&P 在 200 日線上，回到正常流程\n{ma_txt}")
-    n_calm = 0
-    for c in reversed(cri_hist):
-        if c >= 35:
-            break
-        n_calm += 1
-    return (f"⏳ 規則 3 仍在防守中：CRI 已連續 {n_calm}/10 日 &lt;35；{ma_html}",
-            f"⏳ 規則 3 仍在防守中：CRI 已連續 {n_calm}/10 日 <35；{ma_txt}")
+    b_now = score is not None and score >= 35 and below
+    b_recent = any(h[1] >= 35 and h[2] is not None and h[2] < 0 for h in hist)
+    a_now = cri_val >= 50
+    a_recent = any(c >= 50 for c in cri_hist[-60:])
+    b_half = score is not None and score >= 35 and not below
+    if not (a_now or b_now or a_recent or b_recent or b_half):
+        return None
+
+    lines_h, lines_p = [], []
+    if b_now:
+        lines_h.append("🔴🔴 <b>規則 3 B 段觸發：所有股票全賣</b>（對照台總分≥35 且跌破 200 日線；台股今天、美股今晚，3 個交易日內賣完）")
+        lines_p.append("🔴🔴 規則 3 B 段觸發：所有股票全賣（對照台總分≥35 且跌破 200 日線；台股今天、美股今晚，3 個交易日內賣完）")
+    elif b_recent:
+        calm = [h[1] < 30 for h in hist[-10:]]
+        n = 0
+        for h in reversed(hist):
+            if h[1] >= 30:
+                break
+            n += 1
+        if len(calm) == 10 and all(calm) and not below:
+            lines_h.append("✅ <b>規則 3 B 段解除</b>：總分連續 10 日 &lt;30 且站回 200 日線，回到正常流程")
+            lines_p.append("✅ 規則 3 B 段解除：總分連續 10 日 <30 且站回 200 日線，回到正常流程")
+        else:
+            lines_h.append(f"⏳ 規則 3 B 段防守中：總分已連續 {n}/10 日 &lt;30" + ("" if not below else "，且仍在 200 日線下"))
+            lines_p.append(f"⏳ 規則 3 B 段防守中：總分已連續 {n}/10 日 <30" + ("" if not below else "，且仍在 200 日線下"))
+    if a_now:
+        lines_h.append("🔴 <b>規則 3 A 段觸發：槓桿部位全賣</b>（CRI≥50，美股今晚）")
+        lines_p.append("🔴 規則 3 A 段觸發：槓桿部位全賣（CRI≥50，美股今晚）")
+    elif a_recent:
+        n = 0
+        for c in reversed(cri_hist):
+            if c >= 35:
+                break
+            n += 1
+        if n >= 10:
+            lines_h.append("✅ 規則 3 A 段解除：CRI 連續 10 日 &lt;35，可重新持有槓桿")
+            lines_p.append("✅ 規則 3 A 段解除：CRI 連續 10 日 <35，可重新持有槓桿")
+        else:
+            lines_h.append(f"⏳ 規則 3 A 段防守中（不持有槓桿）：CRI 已連續 {n}/10 日 &lt;35")
+            lines_p.append(f"⏳ 規則 3 A 段防守中（不持有槓桿）：CRI 已連續 {n}/10 日 <35")
+    if score is not None and not b_now and score >= 35:
+        lines_h.append("🟠 B 段半成立：對照台總分≥35，但 S&amp;P 仍在 200 日線上")
+        lines_p.append("🟠 B 段半成立：對照台總分≥35，但 S&P 仍在 200 日線上")
+    return ("\n".join(lines_h) + f"\n<i>{ma_html}</i>", "\n".join(lines_p) + f"\n{ma_txt}")
 
 
 def level_emoji(score, system):
@@ -244,7 +286,7 @@ def build_message(data, weekend=False):
         signal_html  = "🟢 <b>正常</b>：照常操作"
         signal_plain = "🟢 正常：照常操作"
 
-    rule3 = rule3_status(cri_val, load_cri_history()) if cri_score is not None else None
+    rule3 = rule3_status(cri_val, load_cri_history(), load_board()) if cri_score is not None else None
     if rule3:
         signal_html, signal_plain = rule3[0] + "\n" + signal_html, rule3[1] + "\n" + signal_plain
 
@@ -275,7 +317,7 @@ def build_message(data, weekend=False):
     if snap_line:
         html_lines += ["", snap_line.replace("S&P", "S&amp;P")]
     html_lines += ["", signal_html, "",
-                   "<i>觸發條件：TSI&gt;55 減倉 · CRI&gt;35 避險 · 雙高立即行動 · CRI≥50 規則 3（槓桿全賣；跌破 200 日線則全出清）</i>",
+                   "<i>觸發條件：TSI&gt;55 減倉 · CRI&gt;35 避險 · 雙高立即行動 · 規則 3：CRI≥50 槓桿全賣；對照台總分≥35 且跌破 200 日線則全出清</i>",
                    "",
                    '🌐 <a href="https://gutinganthony.github.io/KIWI/">查看完整 Dashboard</a>',
                    '🧭 <a href="https://gutinganthony.github.io/KIWI/risk/">崩盤風險對照台</a>']
@@ -295,7 +337,7 @@ def build_message(data, weekend=False):
     if snap_line:
         plain_lines += ["", snap_line]
     plain_lines += ["", signal_plain, "",
-                    "觸發條件：TSI>55 減倉 · CRI>35 避險 · 雙高立即行動 · CRI≥50 規則 3（槓桿全賣；跌破 200 日線則全出清）",
+                    "觸發條件：TSI>55 減倉 · CRI>35 避險 · 雙高立即行動 · 規則 3：CRI≥50 槓桿全賣；對照台總分≥35 且跌破 200 日線則全出清",
                     "",
                     "🌐 查看完整 Dashboard：https://gutinganthony.github.io/KIWI/",
                     "🧭 崩盤風險對照台：https://gutinganthony.github.io/KIWI/risk/"]
