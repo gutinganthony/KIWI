@@ -208,6 +208,46 @@
 **所以這題的真正內容是：「你認為自己讀基本面訊號的可靠度，高於一條年線嗎？」**
 2026-07-22 週報 9 檔價格誤植、以及 T1 五條壞三條，都是這題的實測資料。
 
+## 11. 【2026-10-19 季度重跑】八因子＋T1 v2 六條
+
+> AGENDA 2026-10-15 到期項（T1「不降級」裁決的配套），逾期 4 天執行。數字皆為二手來源交叉，標 `[二手]`；股價為 Yahoo 10/16 收盤。
+> **本輪最大的新事實不在基本面，在股價**：10/12–16 記憶體股暴跌（SK hynix 5 天 −26%、三星 −22%、美光 −11%，KOSPI 單日 −6%），**同一週合約價預估反而上修**。
+
+### 11.1 八因子複判
+
+| 因子 | 8/19 | **10/19** | 關鍵新讀數 |
+|---|---|---|---|
+| 1 長約／客戶承諾 | 未現，反證更強 | **未現（維持強反證）** | 美光 FQ4：26 份策略客戶協議約占 2030 年前產量 35%；**FY27 出貨 75% 已承諾**；2027 HBM 大致售罄。三星與美光都說供給緊到 **2028** `[二手]` |
+| 2 合約價／現貨價 | 「已現」的一半消失 | **收斂暫停，仍為正** | TrendForce 9/30：4Q26 一般型 DRAM **+10–15% QoQ**（8 月預估 +8–13%，**上修**）；含 HBM **+15–20%**；伺服器 DRAM 仍供不應求；手機端成本壓力。序列：1Q +81% → 2Q +58–63% → 3Q +13–18% → 4Q +10–15%。現貨：本輪查無 |
+| 3 庫存／售罄 | 未現（層次歧義） | **未現** | 原廠售罄覆蓋 ≥4 季（2027 大致售罄）。通路／消費端庫存壓力仍在（手機） |
+| 4 供給 capex | 已現且加深 | **已現且加深** | 美光 FQ4 營收 $542 億（+379% YoY）、毛利率 87%；FQ1 指引 $615 億，但**毛利率指引 86.25% 低於預期**＝首個「漲幅放緩」的財報訊號 |
+| 5 中國供給 | 已現，有量化時點 | **已現，且市場開始定價** | CXMT 上海科創板 IPO 募 ¥579 億、首日 +466%、市值一度超越騰訊；DDR5 良率說法 80–90%（未經驗證）、每 bit 成本仍高於三大廠 30%；HBM3 良率約 25%（SemiAnalysis 估）、**IPO 募資沒有 HBM 專案**。**10/12 宣布新架構伺服器記憶體＝本輪暴跌的引爆點** `[二手]` |
+| 6 需求 | AI 端全數上修 | **未見下修（Q3 實際數字尚未公布）** | 四大 2026 capex 約 $7,250 億、2027 市場估 >$1 兆；MSFT 指引含 $250 億「零組件漲價」＝成本推動。**Q3 財報 10/27–30 才出來** |
+| 7 賣方觀點 | 語意翻轉：看多＝擁擠 | **⚠️ 開始鬆動** | Counterpoint：DRAM 價格 **2028 年比 2027 年跌約 23%**；「2029 供給過剩」成為新敘事；**三星 Q3 營業利益創紀錄（KRW 107 兆，+783%），股價反而下跌**＝科斯托蘭尼的「好消息不漲」 |
+| 8 歷史對照 | 2.5–3 步 | **第 3 步：股價見頂、實體未見頂** | 7/26 的發現「股價歷史領先實體見頂 5–7 個月」正在發生：**SK hynix 距一年高點 −56%、已跌破年線（−2.6%）**；美光 −28% 但仍高於年線 38%；合約價仍在漲 |
+
+### 11.2 T1 v2 六條
+
+| # | 條件 | 10/19 狀態 |
+|---|---|---|
+| ① | 4Q26／1Q27 合約價 QoQ 轉負 | ❌ 未觸發（4Q26 +10–15%；1Q27 正式預估尚未發布） |
+| ② | HBM／伺服器 DRAM 合約價 QoQ 轉負 | ❌ 未觸發（伺服器仍供不應求；含 HBM 的 DRAM +15–20%） |
+| ③ | 三大廠售罄覆蓋期 <2 季 | ❌ 未觸發（≥4 季） |
+| ④ | hyperscaler 實際 capex 連兩季低於指引（排除會計重述） | ⏳ 無法判定（Q3 財報 10/27–30） |
+| ⑤ | 供應商融資擴散 | ✅ **已觸發（8/28）且持續**：NVDA DSO 約 60 天、擔保最大曝險 $1,085 億（見 `2026-08-28-t1-condition5-nvda-q2-fy27-trigger.md` §6） |
+| ⑥ | CXMT DDR5 良率達標／HBM 通過客戶驗證 | 🟡 **接近**：DDR5 良率「80–90%」說法未經驗證；HBM 仍在樣品／小量階段 |
+
+### 11.3 結論
+
+1. **實體面（合約價、售罄、長約）仍未見頂，甚至略為轉強；股價面已經提前崩了。** 這正是 7/26 推估的形狀：股價領先實體 5–7 個月。若照這個時差，**合約價見頂落在 2027 年 Q1–Q2**，和原本的「2026Q4–2027H1」估計一致。
+2. **T1 現在管的部位是零**（SKHY 8/28 已出場），所以本輪不產生減碼指令。8271 宇瞻是**模組廠**，依 8/28 的定義不掛 T1，只適用 §0 規則 1：10/16 收 181.5、年線 170.1，**還在線上 6.7%**；10/30 月收盤是下一個檢查點。
+3. **對 8271 要特別注意的是因子 2 的「漲幅放緩」**：模組廠的獲利來自漲價期的庫存增值，漲幅從 +81% 一路收斂到 +10–15%，**庫存增值的順風正在變小**，漲價真的停下來時會反過來變成減值。
+4. **下次重跑：2027-01-15**（1Q27 合約價正式預估＋Q3 hyperscaler 實際 capex＋三星／海力士 Q4 財報）。④ 在 10/27–30 財報後可先單獨檢核。
+
+Sources：[TrendForce 4Q26（2026-09-30）](https://www.trendforce.com/presscenter/news/20260930-13258.html)・[TechNews 中文版](https://technews.tw/?p=1622115)・[Samsung Q3 preliminary（NewKerala）](https://www.newkerala.com/news/a/samsung-electronics-q3-operating-profit-jumps-783-record-894.htm)・[Micron FQ4（AI Weekly）](https://aiweekly.co/alerts/micron-q4-revenue-jumps-379-to-542b-on-ai-memory-demand-guides-fiscal-2027-q1)・[Gotrade：Micron blowout quarter](https://www.heygotrade.com/en/news/micron-blowout-quarter-ai-memory-supercycle-mu-sk-hynix-hbm/)・[CNBC：memory stocks hammered（10/15）](https://www.cnbc.com/2026/10/15/memory-stocks-micron-sk-hynix-samsung-china.html)・[24/7 Wall St：CXMT denser chip design](https://247wallst.com/investing/2026/10/12/memory-stocks-slide-as-chinas-cxmt-flags-denser-chip-design-micron-and-sk-hynix-fall-4-western-digital-drops-2/)・[Benzinga：sold-out chips, falling stocks](https://www.benzinga.com/markets/tech/26/10/62407253/sold-out-chips-falling-stocks-why-wall-street-is-suddenly-nervous-about-ais-memory-boom)・[Tom's Hardware：CXMT IPO](https://www.tomshardware.com/tech-industry/cxmt-closes-up-466-percent-in-shanghai-debut-with-no-hbm-project-in-its-ipo-prospectus)・[Silicon UK：CXMT](https://www.silicon.co.uk/mobility/smartphones/cxmt-lpddr5x-ai-memory-627320)・[AI Weekly：$725B capex](https://aiweekly.co/alerts/amazon-microsoft-alphabet-meta-plan-725b-ai-capex-in-2026)
+
+
 ## Update Log
 - 2026-07-26 v1.0：八因子判定＋對抗性複審。結論：估值修正、實體未見頂、二階導數轉向；NVDA-SKH 為 LOI 非合約；MU 與 DRAM ETF 因合約結構不同需分開時鐘（先減 ETF）；2027 日曆式減倉改事件驅動；7/28–30 為最近裁判日。
 - 2026-08-19 v1.1：**執行 §6 第 3 點要求的重跑**（逾期 20 天）。新增 §9：八因子複判（因子 5 由「證據不足」升為「已現且有量化時點」、因子 7 語意翻轉為「看多＝擁擠」、因子 2 的「已現」那一半因 DDR4 反轉而消失）；T1 五條逐條現況（**①④未觸發、②前提被推翻、③失去鑑別力、⑤未查**）；提出 T1 v2 六條草案待 Jake 裁決。**結論方向不變（實體面未見頂），但減倉時鐘往後、觸發條件需改版。**
+- 2026-10-19：§11 季度重跑（AGENDA 10/15 到期項，逾期 4 天）。八因子：實體未見頂、股價已先崩（SK hynix 跌破年線）；T1 v2 ⑤ 持續觸發、⑥ 接近；T1 目前無管轄部位。
