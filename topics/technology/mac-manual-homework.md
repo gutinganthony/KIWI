@@ -25,7 +25,7 @@ last_updated: 2026-07-06
 
 ### 🆕 2026-10-08 新增（主對話 session 產生）
 
-- [ ] 🟡 **2026-10-19 部分解決：找到新的權威 Sheet「KIWI 持倉表」**（fileId `1FPmLpXYVgm8Xrsv6Gs01bC-SlKytcEdmXF7NC2vUqJ4`），已同步進 `holdings.md`。**剩下兩件**：①同意把 `CLAUDE.md` §0 的 fileId 改成新的（§0 依 MAINTENANCE.md 要你同意）；②Sheet 的「現金餘額」仍寫「請填」、「最後更新」停在 09-08、COHX 出場價待補。原紀錄：**Google Sheet「KIWI 持倉即時表」雲端讀不到**：`mcp__Google_Drive__read_file_content`
+- [ ] 🟡 **2026-10-19 部分解決（CLAUDE.md fileId 已換，Jake 同意）：找到新的權威 Sheet「KIWI 持倉表」**（fileId `1FPmLpXYVgm8Xrsv6Gs01bC-SlKytcEdmXF7NC2vUqJ4`），已同步進 `holdings.md`。**剩下一件**：~~①CLAUDE.md fileId~~ ✅；②Sheet 的「現金餘額」仍寫「請填」、「最後更新」停在 09-08、COHX 出場價待補。原紀錄：**Google Sheet「KIWI 持倉即時表」雲端讀不到**：`mcp__Google_Drive__read_file_content`
   對 fileId `1tYg3PneDLrxXbtuoo1lsylFV8ehSpEblv9thEuAllns` 回 `Requested entity was not found`。
   可能是檔案被移動或刪除、共用權限變了，或 fileId 換了。**請在 Drive 確認檔案還在、連結的 Google 帳號有權限**；
   如果 fileId 換了，要更新 `CLAUDE.md` §0。在修好之前，每個 session 只能用 `skills/serenity/holdings.md`（最後同步 2026-08-28）。
