@@ -336,6 +336,332 @@
           "n": 0
         }
       }
+    },
+    {
+      "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+      "session_stamp": "20261019T170348Z",
+      "date": "2026-10-19",
+      "started_utc": "2026-10-19T17:03:48+00:00",
+      "duration_min": 30.0,
+      "poll_sec": 5.0,
+      "targets": [
+        {
+          "coin": "BTC",
+          "sources": [
+            "position"
+          ],
+          "n_fills_30d": 20
+        },
+        {
+          "coin": "DOGE",
+          "sources": [
+            "position",
+            "active"
+          ],
+          "n_fills_30d": 105
+        },
+        {
+          "coin": "BSV",
+          "sources": [
+            "position",
+            "active"
+          ],
+          "n_fills_30d": 78
+        },
+        {
+          "coin": "TNSR",
+          "sources": [
+            "position",
+            "active"
+          ],
+          "n_fills_30d": 33
+        },
+        {
+          "coin": "kNEIRO",
+          "sources": [
+            "position",
+            "active"
+          ],
+          "n_fills_30d": 48
+        },
+        {
+          "coin": "xyz:NVDA",
+          "sources": [
+            "active"
+          ],
+          "n_fills_30d": 268
+        }
+      ],
+      "main_market": "xyz:NVDA",
+      "polls": 323,
+      "fills_poll_failures": 0,
+      "book_failures": 0,
+      "allmids_failures": 0,
+      "rate_limited_backoffs": 0,
+      "discovery_errors": [],
+      "baseline_seeded": 2000,
+      "jsonl_file": "session_20261019T170348Z.jsonl",
+      "depth": {
+        "BTC": {
+          "open": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 82031.5,
+            "spread_pct": 0.0012,
+            "mid_allmids": 82031.5,
+            "top_bid_notional_usd": 65320.65,
+            "top_ask_notional_usd": 3127871.91,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.0006,
+              "5000": 0.0006,
+              "20000": 0.0006
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.0078,
+              "5000": 0.0089,
+              "20000": 0.0091
+            }
+          },
+          "close": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 81907.5,
+            "spread_pct": 0.0012,
+            "mid_allmids": 81907.5,
+            "top_bid_notional_usd": 2554734.67,
+            "top_ask_notional_usd": 4906390.26,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.0006,
+              "5000": 0.0006,
+              "20000": 0.0006
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.0006,
+              "5000": 0.0006,
+              "20000": 0.0006
+            }
+          }
+        },
+        "DOGE": {
+          "open": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 0.0793945,
+            "spread_pct": 0.0063,
+            "mid_allmids": 0.079403,
+            "top_bid_notional_usd": 8471.54,
+            "top_ask_notional_usd": 31124.61,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.0031,
+              "5000": 0.0037,
+              "20000": 0.0054
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.0031,
+              "5000": 0.0046,
+              "20000": 0.0121
+            }
+          },
+          "close": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 0.07907449999999999,
+            "spread_pct": 0.0089,
+            "mid_allmids": 0.079091,
+            "top_bid_notional_usd": 9242.66,
+            "top_ask_notional_usd": 14335.38,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.0044,
+              "5000": 0.0044,
+              "20000": 0.0076
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.005,
+              "5000": 0.0078,
+              "20000": 0.0131
+            }
+          }
+        },
+        "BSV": {
+          "open": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 17.593,
+            "spread_pct": 0.0568,
+            "mid_allmids": 17.593,
+            "top_bid_notional_usd": 487.84,
+            "top_ask_notional_usd": 2631.74,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.072,
+              "5000": 0.101,
+              "20000": 0.1625
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.1061,
+              "5000": 0.1831,
+              "20000": 0.2373
+            }
+          },
+          "close": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 17.502499999999998,
+            "spread_pct": 0.04,
+            "mid_allmids": 17.5055,
+            "top_bid_notional_usd": 3131.23,
+            "top_ask_notional_usd": 111.36,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.0874,
+              "5000": 0.1032,
+              "20000": 0.1255
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.0634,
+              "5000": 0.1188,
+              "20000": 0.1834
+            }
+          }
+        },
+        "TNSR": {
+          "open": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 0.031225000000000003,
+            "spread_pct": 0.0961,
+            "mid_allmids": 0.03123,
+            "top_bid_notional_usd": 4948.53,
+            "top_ask_notional_usd": 139.51,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.2594,
+              "5000": 0.4376,
+              "20000": 0.8649
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.1096,
+              "5000": 0.1403,
+              "20000": 0.4839
+            }
+          },
+          "close": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 0.031085,
+            "spread_pct": 0.0965,
+            "mid_allmids": 0.03108,
+            "top_bid_notional_usd": 139.96,
+            "top_ask_notional_usd": 5365.75,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.1611,
+              "5000": 0.2922,
+              "20000": 0.7142
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.3164,
+              "5000": 0.4612,
+              "20000": 0.8428
+            }
+          }
+        },
+        "kNEIRO": {
+          "open": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 0.070105,
+            "spread_pct": 0.0143,
+            "mid_allmids": 0.07008,
+            "top_bid_notional_usd": 1836.72,
+            "top_ask_notional_usd": 1900.54,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.052,
+              "5000": 0.093,
+              "20000": 0.2074
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.0644,
+              "5000": 0.1014,
+              "20000": 0.2225
+            }
+          },
+          "close": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 0.069645,
+            "spread_pct": 0.0144,
+            "mid_allmids": 0.06965,
+            "top_bid_notional_usd": 444.55,
+            "top_ask_notional_usd": 3278.83,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.039,
+              "5000": 0.084,
+              "20000": 0.2027
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.0649,
+              "5000": 0.1297,
+              "20000": 0.2308
+            }
+          }
+        },
+        "xyz:NVDA": {
+          "open": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 218.135,
+            "spread_pct": 0.0046,
+            "mid_allmids": null,
+            "top_bid_notional_usd": 235853.52,
+            "top_ask_notional_usd": 205664.0,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.0067,
+              "5000": 0.0068,
+              "20000": 0.0069
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.0023,
+              "5000": 0.0023,
+              "20000": 0.0047
+            }
+          },
+          "close": {
+            "book_unavailable": false,
+            "book_error": null,
+            "mid": 217.82999999999998,
+            "spread_pct": 0.0092,
+            "mid_allmids": null,
+            "top_bid_notional_usd": 308458.82,
+            "top_ask_notional_usd": 207501.29,
+            "buy_dev_vs_mid_pct": {
+              "1000": 0.0075,
+              "5000": 0.0088,
+              "20000": 0.0091
+            },
+            "sell_dev_vs_mid_pct": {
+              "1000": 0.007,
+              "5000": 0.0087,
+              "20000": 0.0091
+            }
+          }
+        }
+      },
+      "roundtrip_1k_pct": {
+        "coin": "xyz:NVDA",
+        "value": 0.0145,
+        "pass": "close"
+      },
+      "new_fills": {
+        "n_detected": 0,
+        "n_book_ok": 0,
+        "detect_lag_sec": {
+          "median": null,
+          "p90": null,
+          "n": 0
+        },
+        "copy_1k_degradation_pct": {
+          "median": null,
+          "p90": null,
+          "n": 0
+        }
+      }
     }
   ]
 }
