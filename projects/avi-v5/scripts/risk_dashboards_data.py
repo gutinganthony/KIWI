@@ -318,7 +318,29 @@ def main():
     kiwi = {k: (kd.get(k) or {}).get("score") for k in ("cri", "avi", "tsi")}
     kiwi["updated"] = kd.get("updated")
 
-    out = {"generated": date.today().isoformat(), "asof": today.date().isoformat(), "kiwi": kiwi,
+    # 對照台總分（與 risk_board_backtest.py 同一份定義）——出場規則 3 B 段用
+    board = None
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from risk_board_backtest import build_board
+        BD, BS, _, _ = build_board(C, live_cri=True)
+        BD = BD.dropna(subset=["board"])
+        hist97 = BD.board[BD.index >= "1997-01-01"]
+        last = BD.iloc[-1]
+        board = {
+            "date": BD.index[-1].date().isoformat(), "score": r(last["board"], 1),
+            "macro": r(last["board_macro"], 1), "market": r(last["board_market"], 1),
+            "pct_rank": r((hist97 <= last["board"]).mean() * 100, 1),
+            "ma_dist": r(last["ma"], 2),
+            "lights": {k: (None if pd.isna(v) else int(v)) for k, v in BS.iloc[-1].items()},
+            "values": {k: (None if pd.isna(last[k]) else r(last[k], 2)) for k in BS.columns if k in BD.columns},
+            "history": [[d.date().isoformat(), r(b, 1), r(m, 2)] for d, b, m in
+                        zip(BD.index[-60:], BD.board.iloc[-60:], BD.ma.iloc[-60:])],
+        }
+    except Exception as e:
+        print(f"  ⚠️ 對照台總分計算失敗：{e}", file=sys.stderr)
+
+    out = {"generated": date.today().isoformat(), "asof": today.date().isoformat(), "kiwi": kiwi, "board": board,
            "hist": hist, "now": now_row, "similarity": similarity, "closest": closest,
            "monitor": v, "manual": MANUAL}
     os.makedirs(os.path.dirname(a.out), exist_ok=True)

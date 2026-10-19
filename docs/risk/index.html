@@ -275,6 +275,7 @@ $("#asof").textContent = D.asof + (K.updated?`（KIWI 指數 ${K.updated}）`:""
 /* 頂部 */
 const lvl=(v,a,b)=>v>=b?"hot":v>=a?"warn":"ok";
 const strip=[
+ ...(D.board?[{k:"對照台總分", v:fmt(D.board.score,1), s:`<span class="pill ${D.board.score>=35?(D.board.ma_dist<0?'hot':'warn'):'ok'}">${D.board.score>=35?(D.board.ma_dist<0?'≥35 且跌破 200 日線':'≥35，仍在 200 日線上'):'<35'}</span> 30 年第 ${fmt(D.board.pct_rank,0)} 百分位`}]:[]),
  {k:"CRI 崩盤風險", v:fmt(K.cri,0), s:`<span class="pill ${lvl(K.cri||0,35,50)}">${(K.cri||0)>=50?"HIGH":(K.cri||0)>=35?"ELEVATED":"LOW"}</span> 50＝高`},
  {k:"S&P 距 200 日線", v:sgn(M.spx_ma_dist,1,"%"), s:`<span class="pill ${M.spx_ma_dist<0?'hot':'ok'}">${M.spx_ma_dist<0?'在線下':'在線上'}</span> ${fmt(M.spx,0)} / ${fmt(M.spx_ma200,0)}`},
  {k:"AVI 估值壓力", v:fmt(K.avi,2), s:`<span class="pill ${lvl(K.avi||0,6,7)}">${(K.avi||0)>=7?'很貴':(K.avi||0)>=6?'偏貴':'正常'}</span> 0–10`},

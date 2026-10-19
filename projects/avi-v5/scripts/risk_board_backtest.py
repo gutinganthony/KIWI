@@ -112,9 +112,10 @@ def hysteresis(enter_out, enter_in, n=len):
     return np.array(w)
 
 
-def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("--cache"); a = ap.parse_args()
-    C = a.cache
+def build_board(C=None, live_cri=True, start="1994-01-01"):
+    """組出每日的對照台分數。回傳 (D 指標＋分數, st 各燈 0/1/2, spy, ser)。
+    回測與每日管線（risk_dashboards_data.py）共用這一份定義，避免兩邊門檻不一致。
+    live_cri=True 時，docs/history.json 的即時 CRI（含信用/利率指標）會覆蓋同日期的回測版 CRI。"""
     if C:
         os.makedirs(C, exist_ok=True)
 
@@ -142,9 +143,16 @@ def main():
     cape.index = cape.index + pd.DateOffset(months=1)                          # 月資料延後 1 個月
     cri = pd.concat([pd.read_csv(os.path.join(BT, f), parse_dates=["date"]).set_index("date")["score"]
                      for f in ("cri_history_30yr.csv", "cri_history_ext.csv")])
+    if live_cri:
+        try:
+            h = json.load(open(os.path.join(REPO, "docs", "history.json"), encoding="utf-8"))
+            live = pd.Series(h["c"], index=pd.to_datetime(h["d"]), dtype=float).dropna()
+            cri = pd.concat([cri, live])
+        except Exception as e:
+            print(f"  ⚠️ 即時 CRI 讀不到，只用回測版：{e}", file=sys.stderr)
     cri = cri[~cri.index.duplicated(keep="last")].sort_index()
 
-    idx = spx.index[spx.index >= "1994-01-01"]
+    idx = spx.index[spx.index >= start]
     f = lambda s: s.reindex(idx.union(s.index)).ffill().reindex(idx)
     D = pd.DataFrame(index=idx)
     D["spx"] = spx.reindex(idx)
@@ -174,6 +182,17 @@ def main():
     D["board"] = board(list(TH) + ["ma"])
     D["board_macro"] = board(MACRO)
     D["board_market"] = board(MARKET)
+    return D, st, spy, ser
+
+
+def main():
+    ap = argparse.ArgumentParser(); ap.add_argument("--cache"); a = ap.parse_args()
+    C = a.cache
+    if C:
+        os.makedirs(C, exist_ok=True)
+    D, st, spy, ser = build_board(C, live_cri=False)
+    idx = D.index
+    f = lambda s: s.reindex(idx.union(s.index)).ffill().reindex(idx)
     D = D[D.index >= START]
     st = st[st.index >= START]
 
