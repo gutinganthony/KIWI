@@ -110,6 +110,7 @@ ul.tight{margin:6px 0 0;padding-left:20px} ul.tight li{margin:3px 0}
   <button role="tab" id="t-fed" aria-selected="false" aria-controls="p-fed">Fed 循環位置</button>
   <button role="tab" id="t-monitor" aria-selected="false" aria-controls="p-monitor">系統風險監控</button>
   <button role="tab" id="t-87" aria-selected="false" aria-controls="p-87">1987 與 200 日線</button>
+  <button role="tab" id="t-bt" aria-selected="false" aria-controls="p-bt">30 年驗證</button>
 </nav>
 
 <!-- ① 四次對照 -->
@@ -210,10 +211,48 @@ ul.tight{margin:6px 0 0;padding-left:20px} ul.tight li{margin:3px 0}
     </div>
   </div>
 </section>
+
+<!-- ⑤ 30 年驗證 -->
+<section class="panel" id="p-bt" role="tabpanel" aria-labelledby="t-bt" hidden>
+  <div class="card">
+    <h2>對照台在過去 30 年有沒有用？</h2>
+    <p class="lead small">用和本頁相同的燈號門檻，把對照台分數倒推回 <span class="mono" id="btPeriod"></span>，不另外調參。訊號以收盤判定、隔天換倉；現金用 3 個月國庫券利率計息，每次進出扣 0.1%。以「絕對水位」設定的燈（例如 10 年期 5%）改用變化量版本；NFCI、CCC 利差、私募信貸等歷史不夠長的指標不納入。</p>
+    <div class="strip" id="btTiles" style="margin:10px 0 0"></div>
+  </div>
+  <div class="card">
+    <h2>對照台分數與 S&amp;P 500</h2>
+    <p class="muted small">上：S&amp;P 500（對數刻度，週資料）；灰色區塊＝跌幅 ≥15% 的波段。下：對照台分數（0–100），虛線是 35。</p>
+    <svg id="btChart" viewBox="0 0 900 360" width="100%" role="img" aria-label="1997 年以來 S&P 500 與對照台分數"></svg>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h2>預警能力</h2>
+      <p class="muted small">AUC：0.5＝跟猜銅板一樣，1＝完美預測。基準是「某天之後一段期間內會不會出現該跌幅」。</p>
+      <div class="scroll"><table id="btAuc"></table></div>
+      <div class="scroll" style="margin-top:10px"><table id="btPrec"></table></div>
+    </div>
+    <div class="card">
+      <h2>讀法</h2>
+      <ul class="tight small" id="btReading"></ul>
+    </div>
+  </div>
+  <div class="card">
+    <h2>15 次大跌：事前與事中的分數</h2>
+    <p class="muted small">「高點前 60 天」和「跌到 −10% 時」用的是對照台分數在 30 年歷史中的百分位數（100＝史上最高）。≥75 標成橘色。</p>
+    <div class="scroll"><table id="btEvents"></table></div>
+  </div>
+  <div class="card">
+    <h2>照對照台進出場的回測</h2>
+    <p class="muted small">每格：年化報酬／最大回撤。粗體＝該期間年化報酬高於買進持有。Sharpe 用全期計算。</p>
+    <div class="scroll"><table id="btTable"></table></div>
+    <div class="scroll" style="margin-top:12px"><table id="btLev"></table></div>
+  </div>
+</section>
 </div>
 
 <script>
 const EMBED = /*EMBED*/null;
+const EMBED_BT = /*EMBED_BT*/null;
 const $ = s => document.querySelector(s);
 const ERA = {"1973":"var(--e1973)","1987":"var(--e1987)","2000":"var(--e2000)","2008":"var(--e2008)","now":"var(--enow)"};
 const ENAME = {"1973":"1973 年 1 月","1987":"1987 年 8 月","2000":"2000 年 3 月","now":"現在","2008":"2007 年 10 月"};
@@ -226,7 +265,7 @@ const tabs=[...document.querySelectorAll('[role=tab]')];
 function show(id){tabs.forEach(b=>{const on=b.id===id;b.setAttribute('aria-selected',on);document.getElementById(b.getAttribute('aria-controls')).hidden=!on});try{localStorage.setItem('crash-tab',id)}catch(e){}}
 tabs.forEach(b=>b.addEventListener('click',()=>show(b.id)));
 try{const t=localStorage.getItem('crash-tab'); if(t&&document.getElementById(t)) show(t)}catch(e){}
-({"#fed":"t-fed","#monitor":"t-monitor","#y1987":"t-87"})[location.hash] && show(({"#fed":"t-fed","#monitor":"t-monitor","#y1987":"t-87"})[location.hash]);
+({"#fed":"t-fed","#monitor":"t-monitor","#y1987":"t-87","#backtest":"t-bt"})[location.hash] && show(({"#fed":"t-fed","#monitor":"t-monitor","#y1987":"t-87","#backtest":"t-bt"})[location.hash]);
 
 function render(D){
 const H=D.hist, N=D.now, M=D.monitor, K=D.kiwi||{}, FED=M.fed;
@@ -383,7 +422,60 @@ $("#risks").innerHTML=RISKS.map((r,ix)=>`<article class="card risk ${r.status}">
  $("#tailTable").innerHTML=`<thead><tr><th>空頭</th><th>跌破 200 日線</th><th>當時跌幅</th><th>最大跌幅</th><th>買回時</th><th>少賠</th></tr></thead><tbody>`+TAIL.map(t=>`<tr><td><span class="era"><span class="dot" style="background:${ERA[t[0]]}"></span>${t[0]}</span></td><td class="num">${t[1]}</td><td class="num">${t[2]}%</td><td class="num">${t[3]}%</td><td class="num">${t[4]}%</td><td class="num"><b>${t[0]==="1987"?"約 0（看成交價）":"+"+(t[2]-t[4]).toFixed(0)+"pp"}</b></td></tr>`).join("")+`</tbody><caption style="caption-side:bottom;text-align:left" class="note">少賠＝出場時跌幅減掉買回時跌幅。這裡簡化成只出場、買回各一次；1994–2020 的完整回測（含來回洗刷）見 <span class="mono">cri_exit_rule_backtest.py</span>。</caption>`;})();
 }
 
+
+function renderBT(B){
+ const P=B.prediction, BT=B.backtest, L=B.latest, base=B.base_rate_fwd63_dd10;
+ $("#btPeriod").textContent=B.period[0]+" 到 "+B.period[1];
+ const p40=P["總分≥40"];
+ $("#btTiles").innerHTML=[
+  {k:"對照台總分（最新）",v:L.board.toFixed(1),s:`<span class="pill ${L.board_pct_rank>=90?'hot':L.board_pct_rank>=75?'warn':'ok'}">30 年第 ${L.board_pct_rank.toFixed(0)} 百分位</span> ${L.date}`},
+  {k:"總分 ≥40 之後 3 個月內跌 10%",v:p40.precision+"%",s:`平常是 ${base}%（${p40.lift} 倍）`},
+  {k:"預測力 AUC：市場分項",v:P["市場分項（快）"]["3 個月內跌 10%"].toFixed(2),s:`總分 ${P["對照台總分"]["3 個月內跌 10%"].toFixed(2)}`},
+  {k:"預測力 AUC：總體分項",v:P["總體分項（慢）"]["3 個月內跌 10%"].toFixed(2),s:`<span class="pill na">≈ 猜銅板</span>`},
+ ].map(t=>`<div class="tile"><div class="k">${t.k}</div><div class="v">${t.v}</div><div class="s">${t.s}</div></div>`).join("");
+ /* 圖 */
+ (function(){const S=B.spx_weekly, Bd=B.board_weekly, svg=$("#btChart"), W=900, L0=50, R=12, T1=10, H1=210, T2=250, H2=80;
+  const t0=new Date(S[0][0]).getTime(), t1=new Date(S[S.length-1][0]).getTime(), x=d=>L0+(W-L0-R)*(new Date(d).getTime()-t0)/(t1-t0);
+  const lv=S.map(r=>Math.log(r[1])), lo=Math.min(...lv), hi=Math.max(...lv), y=v=>T1+H1*(hi-Math.log(v))/(hi-lo), y2=v=>T2+H2*(1-v/70);
+  let s="";
+  B.events.forEach(e=>{s+=`<rect x="${x(e.peak)}" y="${T1}" width="${Math.max(1.5,x(e.trough)-x(e.peak))}" height="${H1}" fill="var(--soft)"/>`});
+  [500,1000,2000,4000,8000].forEach(v=>{if(Math.log(v)>=lo&&Math.log(v)<=hi)s+=`<line x1="${L0}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L0-6}" y="${y(v)+4}" text-anchor="end">${v}</text>`});
+  [0,35,70].forEach(v=>s+=`<line x1="${L0}" x2="${W-R}" y1="${y2(v)}" y2="${y2(v)}" stroke="var(--line)" ${v===35?'stroke-dasharray="4 3"':''}/><text x="${L0-6}" y="${y2(v)+4}" text-anchor="end">${v}</text>`);
+  for(let yr=2000;yr<=2025;yr+=5)s+=`<text x="${x(yr+'-01-01')}" y="${T2+H2+16}" text-anchor="middle">${yr}</text>`;
+  s+=`<polyline fill="none" stroke="var(--enow)" stroke-width="1.4" points="${S.map(r=>`${x(r[0]).toFixed(1)},${y(r[1]).toFixed(1)}`).join(" ")}"/>`;
+  s+=`<polyline fill="none" stroke="var(--accent)" stroke-width="1.1" points="${Bd.map(r=>`${x(r[0]).toFixed(1)},${y2(Math.min(70,r[1])).toFixed(1)}`).join(" ")}"/>`;
+  const lb=Bd[Bd.length-1]; s+=`<circle cx="${x(lb[0])}" cy="${y2(Math.min(70,lb[1]))}" r="4" fill="var(--hot)"/><text class="lbl" x="${x(lb[0])-6}" y="${y2(Math.min(70,lb[1]))-8}" text-anchor="end">現在 ${lb[1]}</text>`;
+  s+=`<text class="lbl" x="${L0+4}" y="${T2-6}">對照台分數</text>`;
+  svg.innerHTML=s;})();
+ /* 預警表 */
+ const hs=Object.keys(P._base_rates);
+ $("#btAuc").innerHTML=`<thead><tr><th>指標</th>${hs.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>`+
+  ["對照台總分","市場分項（快）","總體分項（慢）","CRI 單獨","跌破 200 日線（負距離）"].map(k=>`<tr><td>${k}</td>${hs.map(h=>{const v=P[k][h];return `<td class="num"><span class="pill ${v>=0.7?'ok':v>=0.6?'warn':'na'}">${v.toFixed(2)}</span></td>`}).join("")}</tr>`).join("")+
+  `<tr><td class="muted">基準發生率</td>${hs.map(h=>`<td class="num muted">${P._base_rates[h]}%</td>`).join("")}</tr></tbody>`;
+ $("#btPrec").innerHTML=`<thead><tr><th>門檻</th><th>出現天數</th><th>之後 3 個月跌 10% 的機率</th><th>倍數</th><th>抓到的比例</th></tr></thead><tbody>`+
+  [30,35,40,45,50].map(T=>{const r=P["總分≥"+T];return `<tr><td>總分 ≥ ${T}</td><td class="num">${r.days_pct}%</td><td class="num">${r.precision}%</td><td class="num">${r.lift}×</td><td class="num">${r.recall}%</td></tr>`}).join("")+`</tbody>`;
+ const E=B.events, firstTops=["1998-07-17","2000-03-24","2007-10-09","2010-04-23","2011-04-29","2018-09-20","2020-02-19","2022-01-03","2025-02-19"];
+ const pre=E.filter(e=>firstTops.includes(e.peak)), preHit=pre.filter(e=>e.board_pctile_avg_60d_before_peak>=75).length, midHit=E.filter(e=>e.board_pctile_at_cross10>=75).length;
+ const bh=BT["買進持有"]["全期 1997–2026"], best=BT["總分≥35 且跌破 200 日線"]["全期 1997–2026"], r3=BT["規則 3（CRI≥50 且跌破 200 日線）"]["全期 1997–2026"];
+ $("#btReading").innerHTML=[
+  `<b>事中確認很可靠</b>：${E.length} 次大跌裡，有 ${midHit} 次在跌到 −10% 時分數已在歷史前 25%。它能分辨「這次不是普通拉回」。`,
+  `<b>事前預警不可靠</b>：${pre.length} 次「新一輪大跌的第一個高點」裡，只有 ${preHit} 次在高點前 60 天分數就偏高（2000 年最明顯）。2020、2022、2011 年事前都是安靜的。`,
+  `<b>總體分項（利率、股債比價、油價、日圓）沒有預測力</b>：3、6、12 個月的 AUC 都在 0.5 左右。這些是「條件」不是「時機」：1997–2000 年股債比價連續三年偏貴，股市照漲；2008 年的崩盤反而發生在利率下降時。`,
+  `<b>真正有用的是市場分項</b>（信用、波動率結構、SKEW、半導體、CRI、200 日線），但它的 AUC（${P["市場分項（快）"]["3 個月內跌 10%"].toFixed(2)}）和單看 200 日線（${P["跌破 200 日線（負距離）"]["3 個月內跌 10%"].toFixed(2)}）差不多。`,
+  `<b>報酬</b>：沒有一個進出場版本在 30 年年化報酬上贏過買進持有（${bh.cagr}%）。最好的「總分 ≥35 且跌破 200 日線」是 ${best.cagr}%，少約 ${(bh.cagr-best.cagr).toFixed(1)} 個百分點，但最大回撤從 ${bh.mdd}% 降到 ${best.mdd}%，Sharpe 從 ${bh.sharpe} 升到 ${best.sharpe}。`,
+  `<b>2 倍槓桿時結論翻轉</b>：買進持有 ${B.lev2x["買進持有"].cagr}%／${B.lev2x["買進持有"].mdd}%；用同一條規則進出場是 ${B.lev2x["總分≥35 且跌破 200 日線"].cagr}%／${B.lev2x["總分≥35 且跌破 200 日線"].mdd}%，報酬和風險都贏。`,
+ ].map(x=>`<li>${x}</li>`).join("");
+ $("#btEvents").innerHTML=`<thead><tr><th>高點</th><th>低點</th><th>跌幅</th><th>高點前 60 天</th><th>跌到 −10% 時</th><th>從高點到 −10%</th></tr></thead><tbody>`+
+  E.map(e=>{const c=v=>`<span class="pill ${v>=90?'hot':v>=75?'warn':'ok'}">${v}</span>`;return `<tr><td class="num">${firstTops.includes(e.peak)?'<b>'+e.peak+'</b>':e.peak}</td><td class="num">${e.trough}</td><td class="num">${e.max_dd}%</td><td class="num">${c(e.board_pctile_avg_60d_before_peak)}</td><td class="num">${c(e.board_pctile_at_cross10)}</td><td class="num">${e.days_peak_to_cross10} 天</td></tr>`}).join("")+
+  `</tbody><caption style="caption-side:bottom;text-align:left" class="note">粗體＝新一輪大跌的第一個高點（其餘是同一個空頭裡的後續下跌，分數本來就已偏高）。</caption>`;
+ const PN=Object.keys(BT["買進持有"]), show_=["買進持有","只看 200 日線","規則 3（CRI≥50 且跌破 200 日線）","對照台總分≥35 出場","對照台總分≥45 出場","總分≥30 且跌破 200 日線","總分≥35 且跌破 200 日線","分數漸進減碼（20→0%、60→全出）"];
+ $("#btTable").innerHTML=`<thead><tr><th>策略</th>${PN.map(p=>`<th>${p}</th>`).join("")}<th>Sharpe</th><th>空手時間</th><th>進出次數</th></tr></thead><tbody>`+
+  show_.map(k=>`<tr><td>${k}</td>${PN.map(p=>{const r=BT[k][p],b=BT["買進持有"][p];return `<td class="num">${r.cagr>b.cagr&&k!=="買進持有"?'<b>'+r.cagr.toFixed(1)+'%</b>':r.cagr.toFixed(1)+'%'} <span class="muted">/ ${r.mdd}%</span></td>`}).join("")}<td class="num">${BT[k][PN[0]].sharpe}</td><td class="num">${BT[k][PN[0]].out_pct}%</td><td class="num">${BT[k][PN[0]].switches}</td></tr>`).join("")+`</tbody>`;
+ $("#btLev").innerHTML=`<thead><tr><th>2 倍槓桿（全期）</th><th>年化報酬</th><th>最大回撤</th></tr></thead><tbody>`+Object.entries(B.lev2x).map(([k,v])=>`<tr><td>${k}</td><td class="num">${v.cagr}%</td><td class="num">${v.mdd}%</td></tr>`).join("")+`</tbody><caption style="caption-side:bottom;text-align:left" class="note">每日 2 倍 SPY，借款成本＝國庫券利率，未扣槓桿 ETF 管理費。單一個股的槓桿 ETF 波動遠大於此。</caption>`;
+}
+
 if(EMBED){render(EMBED)}else{fetch("data.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(render).catch(e=>{$("#loadErr").hidden=false;console.error(e)})}
+if(EMBED_BT){renderBT(EMBED_BT)}else{fetch("backtest.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(b=>b&&renderBT(b)).catch(e=>console.error(e))}
 </script>
 
 </body>
