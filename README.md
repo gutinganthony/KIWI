@@ -35,6 +35,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |------|-------|-------|
 | 2026-08-28 | [T1 條件⑤ 檢核 — NVDA Q2 FY27：供應商融資擴散觸發](./topics/business/2026-08-28-t1-condition5-nvda-q2-fy27-trigger.md) | Business |
 | 2026-08-25 | [「中國曝險」紅旗的第一性原理重寫](./topics/business/2026-08-25-china-red-flag-first-principles-rewrite.md) | Business |
+| 2026-10-20 | [Serenity 完整 Step 1–9：IonQ（IONQ）與 Quantinuum（QNT）](./topics/business/2026-10-20-serenity-step1-9-ionq-qnt.md) | Business |
 | 2026-10-20 | [量子計算產業現況與前景、個別公司優勢，以及 WaveTrend 超賣訊號的勝率（含 QNT）](./topics/business/2026-10-20-quantum-computing-landscape-and-wt-oversold-winrate.md) | Business |
 | 2026-10-08 | [白話版：〈從 Hot Chips 2026 的 7 顆 AI 晶片看各家策略〉在說什麼](./topics/business/2026-10-08-hot-chips-2026-seven-ai-chips-plain-explainer.md) | Business |
 | 2026-09-30 | [WaveTrend 全市場掃描：美股與台股各自最適用的前 10 檔與共同特徵](./topics/business/2026-09-30-wavetrend-universe-scan-us-tw.md) | Business |
@@ -157,6 +158,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-09-30 | [WaveTrend 全市場掃描：美股與台股各自最適用的前 10 檔與共同特徵](./topics/business/2026-09-30-wavetrend-universe-scan-us-tw.md) | Business |
 | 2026-10-08 | [白話版：〈從 Hot Chips 2026 的 7 顆 AI 晶片看各家策略〉在說什麼](./topics/business/2026-10-08-hot-chips-2026-seven-ai-chips-plain-explainer.md) | Business |
 | 2026-10-20 | [量子計算產業現況與前景、個別公司優勢，以及 WaveTrend 超賣訊號的勝率（含 QNT）](./topics/business/2026-10-20-quantum-computing-landscape-and-wt-oversold-winrate.md) | Business |
+| 2026-10-20 | [Serenity 完整 Step 1–9：IonQ（IONQ）與 Quantinuum（QNT）](./topics/business/2026-10-20-serenity-step1-9-ionq-qnt.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
