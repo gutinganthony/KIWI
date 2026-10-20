@@ -11,14 +11,14 @@ US=[("站回20日線",6.4,12/29*100),("跟進日",6.6,10/28*100),("離低點反�
 fig=plt.figure(figsize=(15.6,9.0),facecolor=BG)
 fig.text(0.05,0.94,"■",color=GOLD,fontsize=17); fig.text(0.077,0.932,"等確認訊號，要錯過多少漲幅？",color=INK,fontsize=27,fontproperties=sb)
 fig.lines.append(plt.Line2D([0.05,0.96],[0.905,0.905],transform=fig.transFigure,color=INK,lw=1.0))
-fig.text(0.077,0.878,"跌離一年高點 8% 以上之後，第一次出現各個訊號就買進。橫軸：訊號出現時已經從谷底反彈多少；縱軸：買進後三個月內又跌破谷底的比例",color=GREY,fontsize=12.5)
+fig.text(0.077,0.888,"跌離一年高點 8% 以上之後，第一次出現各個訊號就買進。「真正的谷底」＝這段跌勢回到前高之前的最低收盤，常常出現在訊號之後，\n所以「反彈 5%」的上車點，事後量起來會離真正谷底 6% 以上。縱軸：買進後三個月內，指數跌破買進前那個低點的機率",color=GREY,fontsize=12.5,linespacing=1.5,va='top')
 for k,(data,ttl,col) in enumerate(((TW,"台股加權指數（1999 起）",RED),(US,"那斯達克 100 ETF（QQQ，2000 起）",SLATE))):
     ax=fig.add_axes([0.07+k*0.47,0.14,0.40,0.62]); ax.set_facecolor(BG)
     fig.text(0.07+k*0.47,0.80,ttl,color=INK,fontsize=16,fontproperties=sb)
     for s in ('top','right'): ax.spines[s].set_visible(False)
     for s in ('left','bottom'): ax.spines[s].set_color(LGRID)
     ax.tick_params(colors=GREY,labelsize=11,length=0); ax.grid(color=LGRID,lw=0.6,zorder=0)
-    ax.set_xlim(4,14); ax.set_ylim(0,70); ax.set_xlabel("訊號出現時，已從谷底反彈（中位數，%）",color=GREY,fontsize=12); ax.set_ylabel("三個月內又跌破谷底（%）",color=GREY,fontsize=12)
+    ax.set_xlim(4,14); ax.set_ylim(0,70); ax.set_xlabel("上車點離這段跌勢真正的谷底有多遠（中位數，%）",color=GREY,fontsize=12); ax.set_ylabel("三個月內跌破前底機率（%）",color=GREY,fontsize=12)
     for n,x,y in data:
         ax.scatter([x],[y],s=170,color=col,zorder=3)
         off={('跟進日',1):(10,-22),('離低點反彈5%',1):(-30,-30)}.get((n,k),(8,8))
