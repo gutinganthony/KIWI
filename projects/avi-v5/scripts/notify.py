@@ -22,6 +22,7 @@ Usage:
 """
 
 import argparse
+import html
 import json
 import logging
 import os
@@ -96,6 +97,125 @@ def load_dashboard_data():
     return json.loads(match.group(1))
 
 
+HISTORY_JSON = PROJECT_ROOT.parent.parent / "docs" / "history.json"
+
+
+def fetch_sp500_ma200():
+    """S&P 500 最新收盤與 200 日均線。只用標準函式庫（daily-alert 不裝 pip 套件）。
+    先試 FRED（免金鑰 CSV），失敗再試 Yahoo。都失敗回 (None, None)，由呼叫端標示「需手動確認」。"""
+    closes = []
+    try:
+        url = "https://fred.stlouisfed.org/graph/fredgraph.csv?id=SP500"
+        with urllib.request.urlopen(url, timeout=20) as r:
+            for line in r.read().decode().splitlines()[1:]:
+                parts = line.split(",")
+                if len(parts) == 2 and parts[1] not in ("", "."):
+                    closes.append(float(parts[1]))
+    except Exception as e:
+        logger.warning(f"FRED SP500 fetch failed: {e}")
+    if len(closes) < 200:
+        try:
+            url = "https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?range=2y&interval=1d"
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=20) as r:
+                raw = json.loads(r.read().decode())
+            closes = [c for c in raw["chart"]["result"][0]["indicators"]["quote"][0]["close"] if c is not None]
+        except Exception as e:
+            logger.warning(f"Yahoo ^GSPC fetch failed: {e}")
+            return None, None
+    if len(closes) < 200:
+        return None, None
+    return closes[-1], sum(closes[-200:]) / 200
+
+
+RULE3_START = "2026-10-08"   # 規則 3 生效日；之前的 CRI 不算觸發
+
+
+def load_cri_history():
+    """docs/history.json 的 CRI 日序列（舊→新），只取規則 3 生效日之後；讀不到回空 list。"""
+    try:
+        h = json.loads(HISTORY_JSON.read_text(encoding="utf-8"))
+        return [c for d, c in zip(h.get("d", []), h.get("c", [])) if c is not None and d >= RULE3_START]
+    except Exception as e:
+        logger.warning(f"history.json unreadable: {e}")
+        return []
+
+
+RISK_DATA = PROJECT_ROOT.parent.parent / "docs" / "risk" / "data.json"
+RULE3B_START = "2026-10-19"   # B 段改用對照台總分的生效日
+
+
+def load_board():
+    """docs/risk/data.json 的對照台總分區塊（risk_dashboards_data.py 每日寫入）；讀不到回 None。"""
+    try:
+        return json.loads(RISK_DATA.read_text(encoding="utf-8")).get("board")
+    except Exception as e:
+        logger.warning(f"risk data unreadable: {e}")
+        return None
+
+
+def rule3_status(cri_val, cri_hist, board=None, ma_fetcher=fetch_sp500_ma200):
+    """出場規則 3（skills/serenity/exit-playbook.md §0）。回傳 (html_line, plain_line) 或 None。
+    A 段：CRI≥50 → 槓桿全賣；解除＝CRI 連續 10 日 <35。
+    B 段（2026-10-19 起）：對照台總分≥35 且 S&P<200 日線 → 股票全賣；解除＝總分連續 10 日 <30 且 S&P>200 日線。"""
+    hist = [h for h in (board or {}).get("history", []) if h[0] >= RULE3B_START and h[1] is not None]
+    score = (board or {}).get("score")
+    if board and board.get("ma_dist") is not None:
+        below = board["ma_dist"] < 0
+        ma_txt = f"S&P 距 200 日線 {board['ma_dist']:+.1f}%｜對照台總分 {score}"
+    else:
+        spx, ma = ma_fetcher()
+        below = spx is not None and spx < ma
+        ma_txt = (f"S&P {spx:,.0f} vs 200日線 {ma:,.0f}" if spx is not None else "200日線無法自動取得，請手動確認") + \
+                 ("｜對照台總分讀不到" if score is None else f"｜對照台總分 {score}")
+    ma_html = html.escape(ma_txt)
+
+    b_now = score is not None and score >= 35 and below
+    b_recent = any(h[1] >= 35 and h[2] is not None and h[2] < 0 for h in hist)
+    a_now = cri_val >= 50
+    a_recent = any(c >= 50 for c in cri_hist[-60:])
+    b_half = score is not None and score >= 35 and not below
+    if not (a_now or b_now or a_recent or b_recent or b_half):
+        return None
+
+    lines_h, lines_p = [], []
+    if b_now:
+        lines_h.append("🔴🔴 <b>規則 3 B 段觸發：所有股票全賣</b>（對照台總分≥35 且跌破 200 日線；台股今天、美股今晚，3 個交易日內賣完）")
+        lines_p.append("🔴🔴 規則 3 B 段觸發：所有股票全賣（對照台總分≥35 且跌破 200 日線；台股今天、美股今晚，3 個交易日內賣完）")
+    elif b_recent:
+        calm = [h[1] < 30 for h in hist[-10:]]
+        n = 0
+        for h in reversed(hist):
+            if h[1] >= 30:
+                break
+            n += 1
+        if len(calm) == 10 and all(calm) and not below:
+            lines_h.append("✅ <b>規則 3 B 段解除</b>：總分連續 10 日 &lt;30 且站回 200 日線，回到正常流程")
+            lines_p.append("✅ 規則 3 B 段解除：總分連續 10 日 <30 且站回 200 日線，回到正常流程")
+        else:
+            lines_h.append(f"⏳ 規則 3 B 段防守中：總分已連續 {n}/10 日 &lt;30" + ("" if not below else "，且仍在 200 日線下"))
+            lines_p.append(f"⏳ 規則 3 B 段防守中：總分已連續 {n}/10 日 <30" + ("" if not below else "，且仍在 200 日線下"))
+    if a_now:
+        lines_h.append("🔴 <b>規則 3 A 段觸發：槓桿部位全賣</b>（CRI≥50，美股今晚）")
+        lines_p.append("🔴 規則 3 A 段觸發：槓桿部位全賣（CRI≥50，美股今晚）")
+    elif a_recent:
+        n = 0
+        for c in reversed(cri_hist):
+            if c >= 35:
+                break
+            n += 1
+        if n >= 10:
+            lines_h.append("✅ 規則 3 A 段解除：CRI 連續 10 日 &lt;35，可重新持有槓桿")
+            lines_p.append("✅ 規則 3 A 段解除：CRI 連續 10 日 <35，可重新持有槓桿")
+        else:
+            lines_h.append(f"⏳ 規則 3 A 段防守中（不持有槓桿）：CRI 已連續 {n}/10 日 &lt;35")
+            lines_p.append(f"⏳ 規則 3 A 段防守中（不持有槓桿）：CRI 已連續 {n}/10 日 <35")
+    if score is not None and not b_now and score >= 35:
+        lines_h.append("🟠 B 段半成立：對照台總分≥35，但 S&amp;P 仍在 200 日線上")
+        lines_p.append("🟠 B 段半成立：對照台總分≥35，但 S&P 仍在 200 日線上")
+    return ("\n".join(lines_h) + f"\n<i>{ma_html}</i>", "\n".join(lines_p) + f"\n{ma_txt}")
+
+
 def level_emoji(score, system):
     if score is None:
         return "⚪"
@@ -166,6 +286,10 @@ def build_message(data, weekend=False):
         signal_html  = "🟢 <b>正常</b>：照常操作"
         signal_plain = "🟢 正常：照常操作"
 
+    rule3 = rule3_status(cri_val, load_cri_history(), load_board()) if cri_score is not None else None
+    if rule3:
+        signal_html, signal_plain = rule3[0] + "\n" + signal_html, rule3[1] + "\n" + signal_plain
+
     cri_d = f"{cri_val:.0f}" if cri_score is not None else "──"
     tsi_d = f"{tsi_val:.0f}" if tsi_score is not None else "──"
     avi_d = f"{avi_val:.1f}" if avi_score is not None else "──"
@@ -193,9 +317,10 @@ def build_message(data, weekend=False):
     if snap_line:
         html_lines += ["", snap_line.replace("S&P", "S&amp;P")]
     html_lines += ["", signal_html, "",
-                   "<i>觸發條件：TSI&gt;55 減倉 · CRI&gt;35 避險 · 雙高立即行動</i>",
+                   "<i>觸發條件：TSI&gt;55 減倉 · CRI&gt;35 避險 · 雙高立即行動 · 規則 3：CRI≥50 槓桿全賣；對照台總分≥35 且跌破 200 日線則全出清</i>",
                    "",
-                   '🌐 <a href="https://gutinganthony.github.io/KIWI/">查看完整 Dashboard</a>']
+                   '🌐 <a href="https://gutinganthony.github.io/KIWI/">查看完整 Dashboard</a>',
+                   '🧭 <a href="https://gutinganthony.github.io/KIWI/risk/">崩盤風險對照台</a>']
 
     # ── LINE (plain text) ──
     plain_lines = [
@@ -212,9 +337,10 @@ def build_message(data, weekend=False):
     if snap_line:
         plain_lines += ["", snap_line]
     plain_lines += ["", signal_plain, "",
-                    "觸發條件：TSI>55 減倉 · CRI>35 避險 · 雙高立即行動",
+                    "觸發條件：TSI>55 減倉 · CRI>35 避險 · 雙高立即行動 · 規則 3：CRI≥50 槓桿全賣；對照台總分≥35 且跌破 200 日線則全出清",
                     "",
-                    "🌐 查看完整 Dashboard：https://gutinganthony.github.io/KIWI/"]
+                    "🌐 查看完整 Dashboard：https://gutinganthony.github.io/KIWI/",
+                    "🧭 崩盤風險對照台：https://gutinganthony.github.io/KIWI/risk/"]
 
     return "\n".join(html_lines), "\n".join(plain_lines)
 

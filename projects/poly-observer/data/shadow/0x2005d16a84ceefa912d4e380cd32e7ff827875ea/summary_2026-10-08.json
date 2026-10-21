@@ -1,0 +1,161 @@
+{
+  "date": "2026-10-08",
+  "address": "0x2005d16a84ceefa912d4e380cd32e7ff827875ea",
+  "caveats": [
+    "⚠️ 誠實聲明：本工具只測「進場價劣化與延遲」，**不測完整損益**（出場價與市場結局未知），",
+    "不能由本資料推論跟單能否獲利。本工具不執行任何交易：不下單、不簽章、無私鑰，",
+    "只對公開 read-only 端點發 HTTP GET。detect_lag 受輪詢間隔下限影響——真 bot 可用",
+    "websocket 更快，故本測值是實際可達延遲的**上界**。不構成投資建議。",
+    "⚠️ 時鐘註記：activity 的 timestamp 是鏈上/伺服器時間，本機（runner）時鐘可能有偏移，",
+    "detect_lag 可能含 ±數秒的系統時鐘差，數值請當量級參考、不要當精確值。"
+  ],
+  "sessions": [
+    {
+      "address": "0x2005d16a84ceefa912d4e380cd32e7ff827875ea",
+      "session_stamp": "20261008T024624Z",
+      "date": "2026-10-08",
+      "started_utc": "2026-10-08T02:46:24+00:00",
+      "duration_min": 40.0,
+      "poll_sec": 4.0,
+      "polls": 584,
+      "activity_failures": 0,
+      "book_failures": 0,
+      "baseline_seeded": 16,
+      "jsonl_file": "session_20261008T024624Z.jsonl",
+      "stats": {
+        "n_detected": 38,
+        "n_book_ok": 38,
+        "n_book_unavailable": 0,
+        "detect_lag_sec": {
+          "median": 20.545,
+          "p90": 31.71,
+          "n": 38
+        },
+        "adverse_drift": {
+          "BUY": {
+            "median": 0.029642500000000002,
+            "p90": 0.157895,
+            "n": 38
+          },
+          "SELL": {
+            "median": null,
+            "p90": null,
+            "n": 0
+          }
+        },
+        "spread": {
+          "median": 0.01,
+          "n": 38
+        },
+        "depth_at_best_usd": {
+          "median": 779.72,
+          "n": 38
+        },
+        "fixed_copy_usd": 50.0,
+        "fillable_at_best_ratio": 0.8157894736842105,
+        "fillable_at_best_counts": {
+          "fillable": 31,
+          "with_depth": 38
+        }
+      }
+    },
+    {
+      "address": "0x2005d16a84ceefa912d4e380cd32e7ff827875ea",
+      "session_stamp": "20261008T045333Z",
+      "date": "2026-10-08",
+      "started_utc": "2026-10-08T04:53:33+00:00",
+      "duration_min": 40.0,
+      "poll_sec": 4.0,
+      "polls": 579,
+      "activity_failures": 0,
+      "book_failures": 0,
+      "baseline_seeded": 11,
+      "jsonl_file": "session_20261008T045333Z.jsonl",
+      "stats": {
+        "n_detected": 96,
+        "n_book_ok": 96,
+        "n_book_unavailable": 0,
+        "detect_lag_sec": {
+          "median": 18.060000000000002,
+          "p90": 29.51,
+          "n": 96
+        },
+        "adverse_drift": {
+          "BUY": {
+            "median": 0.016393,
+            "p90": 0.285714,
+            "n": 96
+          },
+          "SELL": {
+            "median": null,
+            "p90": null,
+            "n": 0
+          }
+        },
+        "spread": {
+          "median": 0.015,
+          "n": 96
+        },
+        "depth_at_best_usd": {
+          "median": 1575.9,
+          "n": 96
+        },
+        "fixed_copy_usd": 50.0,
+        "fillable_at_best_ratio": 0.8958333333333334,
+        "fillable_at_best_counts": {
+          "fillable": 86,
+          "with_depth": 96
+        }
+      }
+    },
+    {
+      "address": "0x2005d16a84ceefa912d4e380cd32e7ff827875ea",
+      "session_stamp": "20261008T201558Z",
+      "date": "2026-10-08",
+      "started_utc": "2026-10-08T20:15:58+00:00",
+      "duration_min": 40.0,
+      "poll_sec": 4.0,
+      "polls": 584,
+      "activity_failures": 0,
+      "book_failures": 0,
+      "baseline_seeded": 39,
+      "jsonl_file": "session_20261008T201558Z.jsonl",
+      "stats": {
+        "n_detected": 43,
+        "n_book_ok": 43,
+        "n_book_unavailable": 0,
+        "detect_lag_sec": {
+          "median": 18.84,
+          "p90": 33.1,
+          "n": 43
+        },
+        "adverse_drift": {
+          "BUY": {
+            "median": 0.054850499999999996,
+            "p90": 0.083333,
+            "n": 42
+          },
+          "SELL": {
+            "median": null,
+            "p90": null,
+            "n": 0
+          }
+        },
+        "spread": {
+          "median": 0.01,
+          "n": 42
+        },
+        "depth_at_best_usd": {
+          "median": 703.72,
+          "n": 42
+        },
+        "fixed_copy_usd": 50.0,
+        "fillable_at_best_ratio": 0.7142857142857143,
+        "fillable_at_best_counts": {
+          "fillable": 30,
+          "with_depth": 42
+        }
+      }
+    }
+  ]
+}

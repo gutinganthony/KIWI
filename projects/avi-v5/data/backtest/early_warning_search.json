@@ -1,0 +1,1864 @@
+{
+ "generated": "2026-10-19",
+ "first_tops": [
+  "1998-07-17",
+  "2000-03-24",
+  "2007-10-09",
+  "2010-04-23",
+  "2011-04-29",
+  "2018-09-20",
+  "2020-02-19",
+  "2022-01-03",
+  "2025-02-19"
+ ],
+ "train_tops": [
+  "1998-07-17",
+  "2000-03-24",
+  "2007-10-09",
+  "2010-04-23",
+  "2011-04-29"
+ ],
+ "test_tops": [
+  "2018-09-20",
+  "2020-02-19",
+  "2022-01-03",
+  "2025-02-19"
+ ],
+ "n_candidates": 7308,
+ "top_rules": [
+  {
+   "rule": "SKEW ≥ 124.34（90 分位）  且  S&P 距 200 日線（過熱） ≥ 7.43（70 分位）",
+   "train": {
+    "hits": 5,
+    "of": 5,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     45,
+     89,
+     119,
+     89,
+     92
+    ],
+    "on_pct": 3.9,
+    "alerts": 11,
+    "alert_precision": 27.0
+   },
+   "train_p": 0.0,
+   "test": {
+    "hits": 3,
+    "of": 4,
+    "hit_list": [
+     false,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     null,
+     56,
+     126,
+     126
+    ],
+    "on_pct": 29.2,
+    "alerts": 17,
+    "alert_precision": 41.0
+   },
+   "test_chance": 2.92,
+   "test_p": 0.75,
+   "test_on_pct": 29.2,
+   "all": {
+    "hits": 8,
+    "of": 9,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true,
+     false,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     45,
+     89,
+     119,
+     89,
+     92,
+     null,
+     56,
+     126,
+     126
+    ],
+    "on_pct": 16.5,
+    "alerts": 28,
+    "alert_precision": 15.0
+   },
+   "chance_mean_hits": 5.13,
+   "p_value": 0.007
+  },
+  {
+   "rule": "SKEW ≥ 121.98（80 分位）  且  S&P 12 個月漲幅（過熱） ≥ 21.69（80 分位）",
+   "train": {
+    "hits": 5,
+    "of": 5,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     119,
+     101,
+     81,
+     103,
+     59
+    ],
+    "on_pct": 5.2,
+    "alerts": 11,
+    "alert_precision": 18.0
+   },
+   "train_p": 0.0,
+   "test": {
+    "hits": 3,
+    "of": 4,
+    "hit_list": [
+     false,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     null,
+     43,
+     126,
+     126
+    ],
+    "on_pct": 19.1,
+    "alerts": 16,
+    "alert_precision": 50.0
+   },
+   "test_chance": 2.54,
+   "test_p": 0.585,
+   "test_on_pct": 19.1,
+   "all": {
+    "hits": 8,
+    "of": 9,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true,
+     false,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     119,
+     101,
+     81,
+     103,
+     59,
+     null,
+     43,
+     126,
+     126
+    ],
+    "on_pct": 12.1,
+    "alerts": 27,
+    "alert_precision": 12.0
+   },
+   "chance_mean_hits": 4.49,
+   "p_value": 0.007
+  },
+  {
+   "rule": "SKEW ≥ 124.34（90 分位）  且  S&P 12 個月漲幅（過熱） ≥ 16.98（70 分位）",
+   "train": {
+    "hits": 5,
+    "of": 5,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     45,
+     96,
+     99,
+     89,
+     68
+    ],
+    "on_pct": 3.7,
+    "alerts": 14,
+    "alert_precision": 36.0
+   },
+   "train_p": 0.0,
+   "test": {
+    "hits": 4,
+    "of": 4,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     23,
+     59,
+     126,
+     126
+    ],
+    "on_pct": 31.0,
+    "alerts": 20,
+    "alert_precision": 35.0
+   },
+   "test_chance": 3.1,
+   "test_p": 0.335,
+   "test_on_pct": 31.0,
+   "all": {
+    "hits": 9,
+    "of": 9,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     45,
+     96,
+     99,
+     89,
+     68,
+     23,
+     59,
+     126,
+     126
+    ],
+    "on_pct": 17.2,
+    "alerts": 34,
+    "alert_precision": 24.0
+   },
+   "chance_mean_hits": 5.3,
+   "p_value": 0.0
+  },
+  {
+   "rule": "SKEW ≥ 121.98（80 分位）  且  S&P 12 個月漲幅（過熱） ≥ 16.98（70 分位）",
+   "train": {
+    "hits": 5,
+    "of": 5,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     119,
+     101,
+     100,
+     103,
+     68
+    ],
+    "on_pct": 7.5,
+    "alerts": 12,
+    "alert_precision": 25.0
+   },
+   "train_p": 0.0,
+   "test": {
+    "hits": 4,
+    "of": 4,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     23,
+     59,
+     126,
+     126
+    ],
+    "on_pct": 32.1,
+    "alerts": 21,
+    "alert_precision": 38.0
+   },
+   "test_chance": 3.12,
+   "test_p": 0.37,
+   "test_on_pct": 32.1,
+   "all": {
+    "hits": 9,
+    "of": 9,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     119,
+     101,
+     100,
+     103,
+     68,
+     23,
+     59,
+     126,
+     126
+    ],
+    "on_pct": 19.7,
+    "alerts": 33,
+    "alert_precision": 18.0
+   },
+   "chance_mean_hits": 5.41,
+   "p_value": 0.0
+  },
+  {
+   "rule": "S&P 12 個月漲幅（過熱） ≥ 16.98（70 分位）  且  SKEW 3 年百分位 ≥ 86.38（80 分位）",
+   "train": {
+    "hits": 5,
+    "of": 5,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     126,
+     101,
+     99,
+     103,
+     68
+    ],
+    "on_pct": 9.6,
+    "alerts": 12,
+    "alert_precision": 17.0
+   },
+   "train_p": 0.0,
+   "test": {
+    "hits": 4,
+    "of": 4,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     23,
+     44,
+     126,
+     123
+    ],
+    "on_pct": 13.5,
+    "alerts": 23,
+    "alert_precision": 39.0
+   },
+   "test_chance": 2.69,
+   "test_p": 0.16,
+   "test_on_pct": 13.5,
+   "all": {
+    "hits": 9,
+    "of": 9,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     126,
+     101,
+     99,
+     103,
+     68,
+     23,
+     44,
+     126,
+     123
+    ],
+    "on_pct": 11.5,
+    "alerts": 35,
+    "alert_precision": 14.0
+   },
+   "chance_mean_hits": 4.81,
+   "p_value": 0.0
+  },
+  {
+   "rule": "S&P 12 個月漲幅（過熱） ≥ 16.98（70 分位）  且  SKEW 3 年百分位 ≥ 77.38（70 分位）",
+   "train": {
+    "hits": 5,
+    "of": 5,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     126,
+     116,
+     99,
+     103,
+     68
+    ],
+    "on_pct": 13.0,
+    "alerts": 13,
+    "alert_precision": 15.0
+   },
+   "train_p": 0.0,
+   "test": {
+    "hits": 4,
+    "of": 4,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     23,
+     44,
+     126,
+     124
+    ],
+    "on_pct": 17.9,
+    "alerts": 25,
+    "alert_precision": 40.0
+   },
+   "test_chance": 3.14,
+   "test_p": 0.33,
+   "test_on_pct": 17.9,
+   "all": {
+    "hits": 9,
+    "of": 9,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     126,
+     116,
+     99,
+     103,
+     68,
+     23,
+     44,
+     126,
+     124
+    ],
+    "on_pct": 15.4,
+    "alerts": 38,
+    "alert_precision": 14.0
+   },
+   "chance_mean_hits": 5.44,
+   "p_value": 0.0
+  },
+  {
+   "rule": "SKEW ≥ 120.23（70 分位）  且  S&P 12 個月漲幅（過熱） ≥ 21.69（80 分位）",
+   "train": {
+    "hits": 5,
+    "of": 5,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     125,
+     117,
+     82,
+     104,
+     59
+    ],
+    "on_pct": 7.6,
+    "alerts": 10,
+    "alert_precision": 10.0
+   },
+   "train_p": 0.0,
+   "test": {
+    "hits": 3,
+    "of": 4,
+    "hit_list": [
+     false,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     null,
+     43,
+     126,
+     126
+    ],
+    "on_pct": 19.2,
+    "alerts": 16,
+    "alert_precision": 50.0
+   },
+   "test_chance": 2.47,
+   "test_p": 0.525,
+   "test_on_pct": 19.2,
+   "all": {
+    "hits": 8,
+    "of": 9,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true,
+     false,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     125,
+     117,
+     82,
+     104,
+     59,
+     null,
+     43,
+     126,
+     126
+    ],
+    "on_pct": 13.4,
+    "alerts": 26,
+    "alert_precision": 8.0
+   },
+   "chance_mean_hits": 4.52,
+   "p_value": 0.01
+  },
+  {
+   "rule": "SKEW ≥ 121.98（80 分位）  且  S&P 距 200 日線（過熱） ≥ 7.43（70 分位）",
+   "train": {
+    "hits": 5,
+    "of": 5,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     117,
+     89,
+     119,
+     119,
+     117
+    ],
+    "on_pct": 7.7,
+    "alerts": 12,
+    "alert_precision": 17.0
+   },
+   "train_p": 0.0,
+   "test": {
+    "hits": 3,
+    "of": 4,
+    "hit_list": [
+     false,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     null,
+     56,
+     126,
+     126
+    ],
+    "on_pct": 30.1,
+    "alerts": 18,
+    "alert_precision": 44.0
+   },
+   "test_chance": 2.94,
+   "test_p": 0.79,
+   "test_on_pct": 30.1,
+   "all": {
+    "hits": 8,
+    "of": 9,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true,
+     false,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     117,
+     89,
+     119,
+     119,
+     117,
+     null,
+     56,
+     126,
+     126
+    ],
+    "on_pct": 18.9,
+    "alerts": 30,
+    "alert_precision": 10.0
+   },
+   "chance_mean_hits": 5.32,
+   "p_value": 0.0
+  },
+  {
+   "rule": "S&P 距 200 日線（過熱） ≥ 7.43（70 分位）  且  SKEW 3 年百分位 ≥ 86.38（80 分位）",
+   "train": {
+    "hits": 5,
+    "of": 5,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     124,
+     89,
+     119,
+     119,
+     116
+    ],
+    "on_pct": 8.3,
+    "alerts": 10,
+    "alert_precision": 0.0
+   },
+   "train_p": 0.0,
+   "test": {
+    "hits": 3,
+    "of": 4,
+    "hit_list": [
+     false,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     null,
+     44,
+     126,
+     123
+    ],
+    "on_pct": 11.9,
+    "alerts": 24,
+    "alert_precision": 25.0
+   },
+   "test_chance": 2.79,
+   "test_p": 0.65,
+   "test_on_pct": 11.9,
+   "all": {
+    "hits": 8,
+    "of": 9,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true,
+     false,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     124,
+     89,
+     119,
+     119,
+     116,
+     null,
+     44,
+     126,
+     123
+    ],
+    "on_pct": 10.1,
+    "alerts": 34,
+    "alert_precision": 9.0
+   },
+   "chance_mean_hits": 4.87,
+   "p_value": 0.007
+  },
+  {
+   "rule": "SKEW ≥ 120.23（70 分位）  且  S&P 12 個月漲幅（過熱） ≥ 16.98（70 分位）",
+   "train": {
+    "hits": 5,
+    "of": 5,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     125,
+     117,
+     100,
+     109,
+     68
+    ],
+    "on_pct": 11.0,
+    "alerts": 12,
+    "alert_precision": 8.0
+   },
+   "train_p": 0.0,
+   "test": {
+    "hits": 4,
+    "of": 4,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     23,
+     59,
+     126,
+     126
+    ],
+    "on_pct": 32.8,
+    "alerts": 20,
+    "alert_precision": 40.0
+   },
+   "test_chance": 3.13,
+   "test_p": 0.36,
+   "test_on_pct": 32.8,
+   "all": {
+    "hits": 9,
+    "of": 9,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     125,
+     117,
+     100,
+     109,
+     68,
+     23,
+     59,
+     126,
+     126
+    ],
+    "on_pct": 21.8,
+    "alerts": 32,
+    "alert_precision": 12.0
+   },
+   "chance_mean_hits": 5.56,
+   "p_value": 0.0
+  },
+  {
+   "rule": "CRI ≥ 52.98（90 分位）  且  S&P 12 個月漲幅（過熱） ≥ 16.98（70 分位）",
+   "train": {
+    "hits": 5,
+    "of": 5,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     57,
+     126,
+     86,
+     63,
+     47
+    ],
+    "on_pct": 2.2,
+    "alerts": 17,
+    "alert_precision": 35.0
+   },
+   "train_p": 0.0,
+   "test": {
+    "hits": 3,
+    "of": 4,
+    "hit_list": [
+     false,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     null,
+     16,
+     117,
+     115
+    ],
+    "on_pct": 0.8,
+    "alerts": 15,
+    "alert_precision": 13.0
+   },
+   "test_chance": 1.22,
+   "test_p": 0.1,
+   "test_on_pct": 0.8,
+   "all": {
+    "hits": 8,
+    "of": 9,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true,
+     false,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     57,
+     126,
+     86,
+     63,
+     47,
+     null,
+     16,
+     117,
+     115
+    ],
+    "on_pct": 1.5,
+    "alerts": 32,
+    "alert_precision": 35.0
+   },
+   "chance_mean_hits": 3.35,
+   "p_value": 0.0
+  },
+  {
+   "rule": "CRI ≥ 36.74（70 分位）  且  S&P 距 200 日線（過熱） ≥ 7.43（70 分位）",
+   "train": {
+    "hits": 5,
+    "of": 5,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     79,
+     59,
+     87,
+     123,
+     63
+    ],
+    "on_pct": 5.5,
+    "alerts": 19,
+    "alert_precision": 26.0
+   },
+   "train_p": 0.0,
+   "test": {
+    "hits": 3,
+    "of": 4,
+    "hit_list": [
+     false,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     null,
+     17,
+     124,
+     122
+    ],
+    "on_pct": 3.1,
+    "alerts": 17,
+    "alert_precision": 24.0
+   },
+   "test_chance": 1.72,
+   "test_p": 0.135,
+   "test_on_pct": 3.1,
+   "all": {
+    "hits": 8,
+    "of": 9,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true,
+     false,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     79,
+     59,
+     87,
+     123,
+     63,
+     null,
+     17,
+     124,
+     122
+    ],
+    "on_pct": 4.3,
+    "alerts": 36,
+    "alert_precision": 20.0
+   },
+   "chance_mean_hits": 3.94,
+   "p_value": 0.0
+  },
+  {
+   "rule": "S&P 12 個月漲幅（過熱） ≥ 16.98（70 分位）  且  CRI 3 年百分位 ≥ 72.75（70 分位）",
+   "train": {
+    "hits": 5,
+    "of": 5,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     79,
+     126,
+     87,
+     123,
+     63
+    ],
+    "on_pct": 8.8,
+    "alerts": 16,
+    "alert_precision": 25.0
+   },
+   "train_p": 0.0,
+   "test": {
+    "hits": 3,
+    "of": 4,
+    "hit_list": [
+     false,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     null,
+     17,
+     124,
+     122
+    ],
+    "on_pct": 5.7,
+    "alerts": 24,
+    "alert_precision": 29.0
+   },
+   "test_chance": 2.24,
+   "test_p": 0.44,
+   "test_on_pct": 5.7,
+   "all": {
+    "hits": 8,
+    "of": 9,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true,
+     false,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     79,
+     126,
+     87,
+     123,
+     63,
+     null,
+     17,
+     124,
+     122
+    ],
+    "on_pct": 7.3,
+    "alerts": 40,
+    "alert_precision": 18.0
+   },
+   "chance_mean_hits": 4.79,
+   "p_value": 0.013
+  },
+  {
+   "rule": "CRI ≥ 36.74（70 分位）  且  S&P 12 個月漲幅（過熱） ≥ 16.98（70 分位）",
+   "train": {
+    "hits": 5,
+    "of": 5,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     79,
+     126,
+     87,
+     123,
+     63
+    ],
+    "on_pct": 8.3,
+    "alerts": 20,
+    "alert_precision": 25.0
+   },
+   "train_p": 0.0,
+   "test": {
+    "hits": 3,
+    "of": 4,
+    "hit_list": [
+     false,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     null,
+     17,
+     124,
+     122
+    ],
+    "on_pct": 4.6,
+    "alerts": 23,
+    "alert_precision": 22.0
+   },
+   "test_chance": 2.29,
+   "test_p": 0.455,
+   "test_on_pct": 4.6,
+   "all": {
+    "hits": 8,
+    "of": 9,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true,
+     false,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     79,
+     126,
+     87,
+     123,
+     63,
+     null,
+     17,
+     124,
+     122
+    ],
+    "on_pct": 6.5,
+    "alerts": 43,
+    "alert_precision": 19.0
+   },
+   "chance_mean_hits": 4.68,
+   "p_value": 0.003
+  },
+  {
+   "rule": "CRI ≥ 43.10（80 分位）  且  S&P 12 個月漲幅（過熱） ≥ 16.98（70 分位）",
+   "train": {
+    "hits": 5,
+    "of": 5,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     79,
+     126,
+     86,
+     123,
+     47
+    ],
+    "on_pct": 5.3,
+    "alerts": 20,
+    "alert_precision": 25.0
+   },
+   "train_p": 0.0,
+   "test": {
+    "hits": 3,
+    "of": 4,
+    "hit_list": [
+     false,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     null,
+     16,
+     117,
+     115
+    ],
+    "on_pct": 2.7,
+    "alerts": 18,
+    "alert_precision": 22.0
+   },
+   "test_chance": 1.78,
+   "test_p": 0.24,
+   "test_on_pct": 2.7,
+   "all": {
+    "hits": 8,
+    "of": 9,
+    "hit_list": [
+     true,
+     true,
+     true,
+     true,
+     true,
+     false,
+     true,
+     true,
+     true
+    ],
+    "lead_days": [
+     79,
+     126,
+     86,
+     123,
+     47,
+     null,
+     16,
+     117,
+     115
+    ],
+    "on_pct": 4.0,
+    "alerts": 38,
+    "alert_precision": 22.0
+   },
+   "chance_mean_hits": 4.24,
+   "p_value": 0.0
+  }
+ ],
+ "references": {
+  "對照台總分 ≥35": {
+   "hits": 4,
+   "of": 9,
+   "hit_list": [
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true
+   ],
+   "lead_days": [
+    76,
+    126,
+    46,
+    null,
+    null,
+    null,
+    null,
+    null,
+    115
+   ],
+   "on_pct": 13.0,
+   "alerts": 34,
+   "alert_precision": 42.0,
+   "chance_mean_hits": 4.99,
+   "p_value": 0.853
+  },
+  "CRI ≥ 50": {
+   "hits": 9,
+   "of": 9,
+   "hit_list": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "lead_days": [
+    76,
+    126,
+    86,
+    121,
+    113,
+    126,
+    122,
+    117,
+    115
+   ],
+   "on_pct": 10.5,
+   "alerts": 91,
+   "alert_precision": 33.0,
+   "chance_mean_hits": 8.68,
+   "p_value": 0.71
+  },
+  "S&P 跌破 200 日線": {
+   "hits": 3,
+   "of": 9,
+   "hit_list": [
+    false,
+    true,
+    true,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false
+   ],
+   "lead_days": [
+    null,
+    126,
+    46,
+    null,
+    null,
+    120,
+    null,
+    null,
+    null
+   ],
+   "on_pct": 25.8,
+   "alerts": 29,
+   "alert_precision": 31.0,
+   "chance_mean_hits": 6.11,
+   "p_value": 0.997
+  },
+  "殖利率曲線倒掛（10Y<3M）": {
+   "hits": 3,
+   "of": 9,
+   "hit_list": [
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    true,
+    false,
+    true
+   ],
+   "lead_days": [
+    null,
+    null,
+    126,
+    null,
+    null,
+    null,
+    126,
+    null,
+    126
+   ],
+   "on_pct": 12.3,
+   "alerts": 9,
+   "alert_precision": 44.0,
+   "chance_mean_hits": 2.01,
+   "p_value": 0.207
+  }
+ },
+ "best_single_all_period": [
+  {
+   "rule": "CRI ≥ 52.98（90 分位）",
+   "hits": 9,
+   "of": 9,
+   "hit_list": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "lead_days": [
+    57,
+    126,
+    86,
+    121,
+    47,
+    126,
+    122,
+    117,
+    115
+   ],
+   "on_pct": 8.4,
+   "alerts": 87,
+   "alert_precision": 34.0
+  },
+  {
+   "rule": "CRI 3 年百分位 ≥ 92.92（90 分位）",
+   "hits": 9,
+   "of": 9,
+   "hit_list": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "lead_days": [
+    77,
+    126,
+    86,
+    121,
+    31,
+    126,
+    122,
+    117,
+    115
+   ],
+   "on_pct": 8.5,
+   "alerts": 80,
+   "alert_precision": 32.0
+  },
+  {
+   "rule": "SKEW 3 年百分位 ≥ 94.44（90 分位）",
+   "hits": 9,
+   "of": 9,
+   "hit_list": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "lead_days": [
+    125,
+    96,
+    124,
+    89,
+    91,
+    108,
+    40,
+    126,
+    122
+   ],
+   "on_pct": 10.6,
+   "alerts": 58,
+   "alert_precision": 16.0
+  },
+  {
+   "rule": "CRI ≥ 43.10（80 分位）",
+   "hits": 9,
+   "of": 9,
+   "hit_list": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "lead_days": [
+    79,
+    126,
+    86,
+    123,
+    113,
+    126,
+    122,
+    117,
+    115
+   ],
+   "on_pct": 16.9,
+   "alerts": 86,
+   "alert_precision": 28.0
+  },
+  {
+   "rule": "CRI 3 年百分位 ≥ 83.47（80 分位）",
+   "hits": 9,
+   "of": 9,
+   "hit_list": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "lead_days": [
+    79,
+    126,
+    87,
+    121,
+    113,
+    126,
+    122,
+    117,
+    115
+   ],
+   "on_pct": 18.3,
+   "alerts": 91,
+   "alert_precision": 28.0
+  },
+  {
+   "rule": "SKEW 3 年百分位 ≥ 86.38（80 分位）",
+   "hits": 9,
+   "of": 9,
+   "hit_list": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "lead_days": [
+    126,
+    101,
+    126,
+    119,
+    116,
+    108,
+    44,
+    126,
+    123
+   ],
+   "on_pct": 21.2,
+   "alerts": 54,
+   "alert_precision": 8.0
+  },
+  {
+   "rule": "CRI ≥ 36.74（70 分位）",
+   "hits": 9,
+   "of": 9,
+   "hit_list": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "lead_days": [
+    79,
+    126,
+    87,
+    123,
+    113,
+    126,
+    122,
+    124,
+    122
+   ],
+   "on_pct": 25.8,
+   "alerts": 91,
+   "alert_precision": 25.0
+  },
+  {
+   "rule": "CRI 3 年百分位 ≥ 72.75（70 分位）",
+   "hits": 9,
+   "of": 9,
+   "hit_list": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "lead_days": [
+    79,
+    126,
+    113,
+    123,
+    113,
+    126,
+    125,
+    124,
+    122
+   ],
+   "on_pct": 28.1,
+   "alerts": 81,
+   "alert_precision": 25.0
+  },
+  {
+   "rule": "SKEW 3 年百分位 ≥ 77.38（70 分位）",
+   "hits": 9,
+   "of": 9,
+   "hit_list": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "lead_days": [
+    126,
+    116,
+    126,
+    120,
+    117,
+    108,
+    44,
+    126,
+    124
+   ],
+   "on_pct": 31.2,
+   "alerts": 50,
+   "alert_precision": 17.0
+  },
+  {
+   "rule": "S&P 12 個月漲幅（過熱） ≥ 16.98（70 分位）",
+   "hits": 9,
+   "of": 9,
+   "hit_list": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "lead_days": [
+    126,
+    126,
+    100,
+    125,
+    68,
+    23,
+    59,
+    126,
+    126
+   ],
+   "on_pct": 32.8,
+   "alerts": 27,
+   "alert_precision": 15.0
+  }
+ ],
+ "trade_backtest": {
+  "買進持有": {
+   "全期": {
+    "cagr": 10.02,
+    "mdd": -55.2,
+    "vol": 19.3,
+    "sharpe": 0.48,
+    "out_pct": 0.0,
+    "switches": 0
+   },
+   "訓練 1997–2011": {
+    "cagr": 5.37,
+    "mdd": -55.2,
+    "vol": 21.8,
+    "sharpe": 0.22,
+    "out_pct": 0.0,
+    "switches": 0
+   },
+   "驗證 2012–2026": {
+    "cagr": 14.95,
+    "mdd": -33.7,
+    "vol": 16.5,
+    "sharpe": 0.83,
+    "out_pct": 0.0,
+    "switches": 0
+   }
+  },
+  "只看 200 日線": {
+   "全期": {
+    "cagr": 7.28,
+    "mdd": -23.6,
+    "vol": 12.1,
+    "sharpe": 0.46,
+    "out_pct": 26.0,
+    "switches": 204
+   },
+   "訓練 1997–2011": {
+    "cagr": 4.74,
+    "mdd": -23.6,
+    "vol": 12.6,
+    "sharpe": 0.21,
+    "out_pct": 36.0,
+    "switches": 120
+   },
+   "驗證 2012–2026": {
+    "cagr": 10.06,
+    "mdd": -19.7,
+    "vol": 11.5,
+    "sharpe": 0.75,
+    "out_pct": 15.0,
+    "switches": 82
+   }
+  },
+  "總分≥35 且跌破 200 日線（現行規則 3 B）": {
+   "全期": {
+    "cagr": 9.53,
+    "mdd": -25.4,
+    "vol": 12.4,
+    "sharpe": 0.62,
+    "out_pct": 26.0,
+    "switches": 36
+   },
+   "訓練 1997–2011": {
+    "cagr": 6.31,
+    "mdd": -25.4,
+    "vol": 12.6,
+    "sharpe": 0.33,
+    "out_pct": 37.0,
+    "switches": 22
+   },
+   "驗證 2012–2026": {
+    "cagr": 12.9,
+    "mdd": -19.9,
+    "vol": 12.3,
+    "sharpe": 0.92,
+    "out_pct": 14.0,
+    "switches": 14
+   }
+  },
+  "預警亮過＋跌破 200 日線：SKEW ≥ 124.34（90 分位）  且  S&P 距 200 日線（過熱） ≥ 7.43（70 分位）": {
+   "全期": {
+    "cagr": 7.03,
+    "mdd": -58.0,
+    "vol": 17.0,
+    "sharpe": 0.35,
+    "out_pct": 8.0,
+    "switches": 86
+   },
+   "訓練 1997–2011": {
+    "cagr": 2.0,
+    "mdd": -58.0,
+    "vol": 20.4,
+    "sharpe": 0.06,
+    "out_pct": 7.0,
+    "switches": 46
+   },
+   "驗證 2012–2026": {
+    "cagr": 12.38,
+    "mdd": -20.0,
+    "vol": 12.7,
+    "sharpe": 0.85,
+    "out_pct": 9.0,
+    "switches": 40
+   }
+  },
+  "預警亮過＋跌破 200 日線：SKEW ≥ 121.98（80 分位）  且  S&P 12 個月漲幅（過熱） ≥ 21.69（80 分位）": {
+   "全期": {
+    "cagr": 6.44,
+    "mdd": -60.6,
+    "vol": 17.0,
+    "sharpe": 0.32,
+    "out_pct": 8.0,
+    "switches": 100
+   },
+   "訓練 1997–2011": {
+    "cagr": 0.8,
+    "mdd": -60.6,
+    "vol": 20.3,
+    "sharpe": 0.0,
+    "out_pct": 8.0,
+    "switches": 60
+   },
+   "驗證 2012–2026": {
+    "cagr": 12.62,
+    "mdd": -20.0,
+    "vol": 12.7,
+    "sharpe": 0.87,
+    "out_pct": 9.0,
+    "switches": 38
+   }
+  },
+  "預警亮過＋跌破 200 日線：SKEW ≥ 124.34（90 分位）  且  S&P 12 個月漲幅（過熱） ≥ 16.98（70 分位）": {
+   "全期": {
+    "cagr": 6.04,
+    "mdd": -59.9,
+    "vol": 16.8,
+    "sharpe": 0.3,
+    "out_pct": 10.0,
+    "switches": 112
+   },
+   "訓練 1997–2011": {
+    "cagr": 0.93,
+    "mdd": -59.9,
+    "vol": 20.3,
+    "sharpe": 0.01,
+    "out_pct": 8.0,
+    "switches": 58
+   },
+   "驗證 2012–2026": {
+    "cagr": 11.63,
+    "mdd": -20.0,
+    "vol": 12.3,
+    "sharpe": 0.82,
+    "out_pct": 11.0,
+    "switches": 52
+   }
+  },
+  "預警亮過＋跌破 200 日線：SKEW ≥ 121.98（80 分位）  且  S&P 12 個月漲幅（過熱） ≥ 16.98（70 分位）": {
+   "全期": {
+    "cagr": 5.93,
+    "mdd": -61.2,
+    "vol": 16.8,
+    "sharpe": 0.3,
+    "out_pct": 10.0,
+    "switches": 116
+   },
+   "訓練 1997–2011": {
+    "cagr": 0.72,
+    "mdd": -61.2,
+    "vol": 20.3,
+    "sharpe": 0.0,
+    "out_pct": 9.0,
+    "switches": 62
+   },
+   "驗證 2012–2026": {
+    "cagr": 11.63,
+    "mdd": -20.0,
+    "vol": 12.3,
+    "sharpe": 0.82,
+    "out_pct": 11.0,
+    "switches": 52
+   }
+  },
+  "預警亮過＋跌破 200 日線：S&P 12 個月漲幅（過熱） ≥ 16.98（70 分位）  且  SKEW 3 年百分位 ≥ 86.38（80 分位）": {
+   "全期": {
+    "cagr": 6.1,
+    "mdd": -59.9,
+    "vol": 16.8,
+    "sharpe": 0.3,
+    "out_pct": 10.0,
+    "switches": 110
+   },
+   "訓練 1997–2011": {
+    "cagr": 0.93,
+    "mdd": -59.9,
+    "vol": 20.3,
+    "sharpe": 0.01,
+    "out_pct": 8.0,
+    "switches": 58
+   },
+   "驗證 2012–2026": {
+    "cagr": 11.75,
+    "mdd": -20.0,
+    "vol": 12.3,
+    "sharpe": 0.83,
+    "out_pct": 11.0,
+    "switches": 50
+   }
+  },
+  "預警亮過＋跌破 200 日線：對照台總分 ≥35": {
+   "全期": {
+    "cagr": 8.03,
+    "mdd": -24.3,
+    "vol": 12.8,
+    "sharpe": 0.49,
+    "out_pct": 22.0,
+    "switches": 156
+   },
+   "訓練 1997–2011": {
+    "cagr": 5.04,
+    "mdd": -24.2,
+    "vol": 13.2,
+    "sharpe": 0.23,
+    "out_pct": 33.0,
+    "switches": 104
+   },
+   "驗證 2012–2026": {
+    "cagr": 11.28,
+    "mdd": -20.9,
+    "vol": 12.5,
+    "sharpe": 0.79,
+    "out_pct": 12.0,
+    "switches": 50
+   }
+  }
+ }
+}

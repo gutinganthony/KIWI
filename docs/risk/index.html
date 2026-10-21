@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>崩盤風險對照台</title>
+<!-- 本頁公開部署（GitHub Pages）。只放市場數據與通用分析；個人持倉、出場規則一律不得寫進來。 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* 版面：頂部是 KIWI 儀表，下面四個分頁；歷史期用淡色，「現在」一律用墨色強調 */
+:root{
+  --bg:#F4F6F8; --panel:#FFFFFF; --fg:#17212B; --muted:#5A6673; --line:#DCE2E8; --soft:#EEF2F5;
+  --accent:#1F5F8B; --ok:#2E7D4F; --warn:#B26B00; --hot:#C0392B;
+  --e1973:#9A6B2F; --e1987:#7A4FA3; --e2000:#2A7F8E; --e2008:#7C8A97; --enow:#17212B;
+  --okbg:#E6F3EB; --warnbg:#FBF0DC; --hotbg:#FBE5E2;
+  --display:"Noto Serif TC","Songti TC",serif; --body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0F151B; --panel:#161E27; --fg:#E5EAF0; --muted:#97A3B0; --line:#273342; --soft:#1C2631;
+  --accent:#73B3E2; --ok:#5DC08B; --warn:#E3A73E; --hot:#F07062;
+  --e1973:#D3A465; --e1987:#B591DB; --e2000:#5EC0CF; --e2008:#A3B0BC; --enow:#F3F6F9;
+  --okbg:#17332A; --warnbg:#3A2E15; --hotbg:#3D1E1C; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F151B; --panel:#161E27; --fg:#E5EAF0; --muted:#97A3B0; --line:#273342; --soft:#1C2631;
+  --accent:#73B3E2; --ok:#5DC08B; --warn:#E3A73E; --hot:#F07062;
+  --e1973:#D3A465; --e1987:#B591DB; --e2000:#5EC0CF; --e2008:#A3B0BC; --enow:#F3F6F9;
+  --okbg:#17332A; --warnbg:#3A2E15; --hotbg:#3D1E1C; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.6;margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:20px 48px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+h1{font-size:26px;letter-spacing:.02em}
+h2{font-size:20px;margin-bottom:6px}
+h3{font-size:16px}
+.mono,.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
+.asof{font-size:13px;color:var(--muted)}
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-width:0}
+.tile .k{font-size:12px;color:var(--muted);letter-spacing:.04em}
+.tile .v{font-family:var(--mono);font-size:22px;font-weight:600}
+.tile .s{font-size:12px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:18px;overflow-x:auto}
+.tabs button{font:inherit;font-size:15px;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:8px 14px;cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent);font-weight:700}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+section.panel{display:grid;gap:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.lead{max-width:72ch}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
+th:first-child,td:first-child{text-align:left}
+thead th{font-size:12px;color:var(--muted);font-weight:500;letter-spacing:.04em;white-space:nowrap}
+tr.group td{background:var(--soft);font-weight:700;font-size:12px;color:var(--muted);letter-spacing:.06em;text-align:left}
+td.num{white-space:nowrap}
+td.close{outline:2px solid var(--accent);outline-offset:-2px;border-radius:4px;font-weight:600}
+td.nowcol,th.nowcol{background:var(--soft)}
+.era{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.bars{display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:64px 1fr 48px;gap:10px;align-items:center}
+.bar .track{height:14px;background:var(--soft);border-radius:7px;overflow:hidden}
+.bar .fill{height:100%;border-radius:7px}
+.pill{display:inline-block;font-size:12px;padding:1px 8px;border-radius:999px;white-space:nowrap;font-weight:500}
+.pill.ok{background:var(--okbg);color:var(--ok)} .pill.warn{background:var(--warnbg);color:var(--warn)} .pill.hot{background:var(--hotbg);color:var(--hot)} .pill.na{background:var(--soft);color:var(--muted)}
+.pill.role{background:var(--soft);color:var(--fg)}
+.risk{display:grid;grid-template-columns:44px 1fr;gap:12px;border-left:4px solid var(--line)}
+.risk.ok{border-left-color:var(--ok)} .risk.warn{border-left-color:var(--warn)} .risk.hot{border-left-color:var(--hot)}
+.rank{font-family:var(--mono);font-size:26px;font-weight:600;color:var(--muted);line-height:1}
+.risk-head{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-bottom:6px}
+.scores{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--muted);margin:6px 0 10px}
+.pips{display:inline-flex;gap:2px;vertical-align:middle;margin-left:4px}
+.pips i{width:9px;height:9px;border-radius:2px;background:var(--line);display:inline-block}
+.pips i.on{background:var(--accent)}
+.risk table td,.risk table th{font-size:13px;padding:5px 6px}
+.act{font-size:13px;background:var(--soft);border-radius:6px;padding:8px 10px;margin-top:8px}
+svg text{fill:var(--muted);font-family:var(--mono);font-size:11px}
+svg .lbl{fill:var(--fg);font-family:var(--body);font-size:12px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;margin-top:6px}
+ul.tight{margin:6px 0 0;padding-left:20px} ul.tight li{margin:3px 0}
+.note{font-size:13px;color:var(--muted);max-width:80ch}
+.matrix{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.matrix .cell{background:var(--soft);border-radius:8px;padding:8px;min-height:64px;font-size:13px}
+.matrix .cell b{display:block;font-size:12px;color:var(--muted);font-weight:500;margin-bottom:4px}
+@media (max-width:560px){h1{font-size:22px}.risk{grid-template-columns:1fr}.rank{font-size:20px}.matrix{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <h1>崩盤風險對照台</h1>
+    <div class="asof">市場資料日 <span class="mono" id="asof">—</span>　·　每個交易日台北清晨自動更新　·　FRED、Yahoo、Shiller CAPE　·　非投資建議</div>
+  </div>
+</header>
+<div id="loadErr" class="card" hidden>資料載入失敗。請重新整理；如果持續失敗，代表當天的自動更新沒有跑完。</div>
+
+<div class="strip" id="strip"></div>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" id="t-analog" aria-selected="true" aria-controls="p-analog">四次對照</button>
+  <button role="tab" id="t-fed" aria-selected="false" aria-controls="p-fed">Fed 循環位置</button>
+  <button role="tab" id="t-monitor" aria-selected="false" aria-controls="p-monitor">系統風險監控</button>
+  <button role="tab" id="t-87" aria-selected="false" aria-controls="p-87">1987 與 200 日線</button>
+  <button role="tab" id="t-bt" aria-selected="false" aria-controls="p-bt">30 年驗證</button>
+</nav>
+
+<!-- ① 四次對照 -->
+<section class="panel" id="p-analog" role="tabpanel" aria-labelledby="t-analog">
+  <div class="grid2">
+    <div class="card">
+      <h2>今天最像哪一次？</h2>
+      <p class="muted small lead">用 <span id="nkeys">18</span> 項量化指標，比較三次大頂當天和今天。每項指標用四期的全距正規化後算距離，分數越高越像。質性條件另列在下面。</p>
+      <div class="bars" id="simbars"></div>
+    </div>
+    <div class="card">
+      <h2>讀法</h2>
+      <ul class="tight" id="reading"></ul>
+    </div>
+  </div>
+  <div class="card">
+    <h2>量化指標並排</h2>
+    <p class="muted small">藍框＝這項指標上離今天最近的那一次。歷史期取見頂當天（1973/1/11、1987/8/25、2000/3/24），月資料取該月。</p>
+    <div class="scroll"><table id="analogTable"></table></div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h2>質性條件</h2>
+      <div class="scroll"><table id="qualTable"></table></div>
+    </div>
+    <div class="card">
+      <h2>見頂之後發生了什麼</h2>
+      <p class="muted small">S&amp;P 500 從見頂日起 36 個月的路徑（週資料）。空心點＝第一次收在 200 日線下。</p>
+      <svg id="paths" viewBox="0 0 560 300" width="100%" role="img" aria-label="三次見頂後 S&P 500 的跌幅路徑"></svg>
+      <div class="legend" id="pathsLegend"></div>
+      <div class="scroll"><table id="outcomeTable" style="margin-top:8px"></table></div>
+    </div>
+  </div>
+</section>
+
+<!-- ② Fed 循環 -->
+<section class="panel" id="p-fed" role="tabpanel" aria-labelledby="t-fed" hidden>
+  <div class="grid2">
+    <div class="card">
+      <h2>現在在升息循環的哪裡？</h2>
+      <div class="bars" id="fedgauge"></div>
+      <p class="note" style="margin-top:10px">「大頂前區間」＝1973、1987、2000 三次見頂當下的範圍。現值越接近區間，越像大頂前的樣子。</p>
+    </div>
+    <div class="card">
+      <h2>讀法</h2>
+      <ul class="tight small" id="fedreading"></ul>
+    </div>
+  </div>
+  <div class="card">
+    <h2>歷次大頂當下的 Fed 位置</h2>
+    <p class="muted small">「利率低點」取見頂前 36 個月內聯邦基金利率（月均）的最低點。實質政策利率＝聯邦基金利率減 CPI 年增率。NFCI 是芝加哥 Fed 金融條件指數，負值＝寬鬆，0＝歷史平均。</p>
+    <div class="scroll"><table id="topsFed"></table></div>
+  </div>
+</section>
+
+<!-- ③ 系統風險監控 -->
+<section class="panel" id="p-monitor" role="tabpanel" aria-labelledby="t-monitor" hidden>
+  <div class="card">
+    <h2>1987 的盲點，今天換成什麼形式？</h2>
+    <p class="lead small">1987 年的崩盤有三個結構性盲點：<b>賣壓是機械式、對價格不敏感的</b>（投資組合保險）；<b>沒人知道它有多大</b>；<b>流動性提供者在最需要的時候撤退</b>。熔斷機制和 Fed 的救市劇本處理了後兩點的一部分，但第一點換了形式還在。今天還多了兩個不透明的地方：私募信貸，以及 AI 資本支出的表外融資。</p>
+    <p class="note">排序依「影響力」：市場衝擊 40%、傳染速度 30%、對 AI／半導體集中型組合的相關性 30%，各 1–5 分，為主觀評分。燈號依「現值」對照每列的警戒線。<b>影響力高不代表現在危險，燈號紅也不代表影響最大</b>，兩者要一起看。</p>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:8px">燈號 × 影響力</h3>
+    <div class="matrix" id="matrix"></div>
+  </div>
+  <div id="risks" style="display:grid;gap:12px"></div>
+  <p class="note">標「手動」的指標沒有免費即時資料源，每月對一次。資料腳本：<span class="mono">projects/avi-v5/scripts/risk_dashboards_data.py</span>。</p>
+</section>
+
+<!-- ④ 1987 -->
+<section class="panel" id="p-87" role="tabpanel" aria-labelledby="t-87" hidden>
+  <div class="card">
+    <h2>1987：真正的暴跌只有 4 個交易日</h2>
+    <p class="lead small">S&amp;P 500 在 8/25 見頂後兩個月內只是盤跌，到 10/13 才比高點低 6.6%，<b>一直站在 200 日線上</b>。最早的警報在債市：10 年期殖利率從 3 月的 7.5% 一路升到 10/16 的 10.2%。股市的崩跌集中在 10/14 到 10/19：四天跌掉 28.5%。</p>
+    <svg id="c87" viewBox="0 0 760 380" width="100%" role="img" aria-label="1986 年 10 月到 1988 年 7 月 S&P 500、200 日線與 10 年期殖利率"></svg>
+    <div class="legend">
+      <span class="era"><span class="dot" style="background:var(--enow)"></span>S&amp;P 500</span>
+      <span class="era"><span class="dot" style="background:var(--muted)"></span>200 日線</span>
+      <span class="era"><span class="dot" style="background:var(--hot)"></span>10 年期殖利率（下圖）</span>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h2>關鍵日</h2>
+      <div class="scroll"><table id="t87"></table></div>
+      <p class="note">VXO 是當年的 VIX 前身。10/16 收盤才 36，10/19 衝到 150。</p>
+    </div>
+    <div class="card">
+      <h2>「砍尾巴」是什麼意思</h2>
+      <p class="small">規則：見頂後第一次收在 200 日線下就出清，跌深後重新站回 200 日線才買回。套到四次大空頭：</p>
+      <div class="scroll"><table id="tailTable"></table></div>
+      <ul class="tight small">
+        <li><b>1973、2000、2008 是慢熊</b>：跌破 200 日線時才跌 6–12%，後面還有 35–57%。規則在這種情況下保住的是最大的那一段。</li>
+        <li><b>1987 是快崩</b>：10/15 才跌破 200 日線，最早只能在 10/16 或 10/19 執行，賣在 10/19 收盤反而比抱著更差。</li>
+        <li><b>任何看價格的規則都躲不掉 1987 那種一天的崩盤</b>，能躲的方法只有事先就不帶槓桿。</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ⑤ 30 年驗證 -->
+<section class="panel" id="p-bt" role="tabpanel" aria-labelledby="t-bt" hidden>
+  <div class="card">
+    <h2>對照台在過去 30 年有沒有用？</h2>
+    <p class="lead small">用和本頁相同的燈號門檻，把對照台分數倒推回 <span class="mono" id="btPeriod"></span>，不另外調參。訊號以收盤判定、隔天換倉；現金用 3 個月國庫券利率計息，每次進出扣 0.1%。以「絕對水位」設定的燈（例如 10 年期 5%）改用變化量版本；NFCI、CCC 利差、私募信貸等歷史不夠長的指標不納入。</p>
+    <div class="strip" id="btTiles" style="margin:10px 0 0"></div>
+  </div>
+  <div class="card">
+    <h2>對照台分數與 S&amp;P 500</h2>
+    <p class="muted small">上：S&amp;P 500（對數刻度，週資料）；灰色區塊＝跌幅 ≥15% 的波段。下：對照台分數（0–100），虛線是 35。</p>
+    <svg id="btChart" viewBox="0 0 900 360" width="100%" role="img" aria-label="1997 年以來 S&P 500 與對照台分數"></svg>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h2>預警能力</h2>
+      <p class="muted small">AUC：0.5＝跟猜銅板一樣，1＝完美預測。基準是「某天之後一段期間內會不會出現該跌幅」。</p>
+      <div class="scroll"><table id="btAuc"></table></div>
+      <div class="scroll" style="margin-top:10px"><table id="btPrec"></table></div>
+    </div>
+    <div class="card">
+      <h2>讀法</h2>
+      <ul class="tight small" id="btReading"></ul>
+    </div>
+  </div>
+  <div class="card">
+    <h2>15 次大跌：事前與事中的分數</h2>
+    <p class="muted small">「高點前 60 天」和「跌到 −10% 時」用的是對照台分數在 30 年歷史中的百分位數（100＝史上最高）。≥75 標成橘色。</p>
+    <div class="scroll"><table id="btEvents"></table></div>
+  </div>
+  <div class="card">
+    <h2>照對照台進出場的回測</h2>
+    <p class="muted small">每格：年化報酬／最大回撤。粗體＝該期間年化報酬高於買進持有。Sharpe 用全期計算。</p>
+    <div class="scroll"><table id="btTable"></table></div>
+    <div class="scroll" style="margin-top:12px"><table id="btLev"></table></div>
+  </div>
+</section>
+</div>
+
+<script>
+const EMBED = /*EMBED*/null;
+const EMBED_BT = /*EMBED_BT*/null;
+const $ = s => document.querySelector(s);
+const ERA = {"1973":"var(--e1973)","1987":"var(--e1987)","2000":"var(--e2000)","2008":"var(--e2008)","now":"var(--enow)"};
+const ENAME = {"1973":"1973 年 1 月","1987":"1987 年 8 月","2000":"2000 年 3 月","now":"現在","2008":"2007 年 10 月"};
+const fmt = (v,d=1,u="") => v===null||v===undefined ? "—" : (typeof v==="number" ? v.toFixed(d) : v)+u;
+const sgn = (v,d=1,u="") => v===null||v===undefined ? "—" : (v>0?"+":"")+v.toFixed(d)+u;
+const v0 = x => Array.isArray(x) ? x[0] : x;
+
+/* 分頁 */
+const tabs=[...document.querySelectorAll('[role=tab]')];
+function show(id){tabs.forEach(b=>{const on=b.id===id;b.setAttribute('aria-selected',on);document.getElementById(b.getAttribute('aria-controls')).hidden=!on});try{localStorage.setItem('crash-tab',id)}catch(e){}}
+tabs.forEach(b=>b.addEventListener('click',()=>show(b.id)));
+try{const t=localStorage.getItem('crash-tab'); if(t&&document.getElementById(t)) show(t)}catch(e){}
+({"#fed":"t-fed","#monitor":"t-monitor","#y1987":"t-87","#backtest":"t-bt"})[location.hash] && show(({"#fed":"t-fed","#monitor":"t-monitor","#y1987":"t-87","#backtest":"t-bt"})[location.hash]);
+
+function render(D){
+const H=D.hist, N=D.now, M=D.monitor, K=D.kiwi||{}, FED=M.fed;
+const ROWSD={...H.rows, now:N};
+$("#asof").textContent = D.asof + (K.updated?`（KIWI 指數 ${K.updated}）`:"");
+
+/* 頂部 */
+const lvl=(v,a,b)=>v>=b?"hot":v>=a?"warn":"ok";
+const strip=[
+ ...(D.board?[{k:"對照台總分", v:fmt(D.board.score,1), s:`<span class="pill ${D.board.score>=35?(D.board.ma_dist<0?'hot':'warn'):'ok'}">${D.board.score>=35?(D.board.ma_dist<0?'≥35 且跌破 200 日線':'≥35，仍在 200 日線上'):'<35'}</span> 30 年第 ${fmt(D.board.pct_rank,0)} 百分位`}]:[]),
+ {k:"CRI 崩盤風險", v:fmt(K.cri,0), s:`<span class="pill ${lvl(K.cri||0,35,50)}">${(K.cri||0)>=50?"HIGH":(K.cri||0)>=35?"ELEVATED":"LOW"}</span> 50＝高`},
+ {k:"S&P 距 200 日線", v:sgn(M.spx_ma_dist,1,"%"), s:`<span class="pill ${M.spx_ma_dist<0?'hot':'ok'}">${M.spx_ma_dist<0?'在線下':'在線上'}</span> ${fmt(M.spx,0)} / ${fmt(M.spx_ma200,0)}`},
+ {k:"AVI 估值壓力", v:fmt(K.avi,2), s:`<span class="pill ${lvl(K.avi||0,6,7)}">${(K.avi||0)>=7?'很貴':(K.avi||0)>=6?'偏貴':'正常'}</span> 0–10`},
+ {k:"TSI 科技壓力", v:fmt(K.tsi,1), s:`<span class="pill ${lvl(K.tsi||0,40,55)}">${(K.tsi||0)>=55?'高':(K.tsi||0)>=40?'軟警戒':'正常'}</span> 55＝高`},
+ {k:"10Y − CAPE 盈餘殖利率", v:sgn(M.gap,2,"pp"), s:`<span class="pill ${lvl(M.gap,2,3.5)}">${M.gap>=0?'債比股划算':'股比債划算'}</span> 1987：+3.27`},
+ {k:"實質政策利率", v:sgn(FED.real_ff,2,"%"), s:`<span class="pill ${FED.real_ff>=2?'hot':FED.real_ff>=1.2?'warn':'ok'}">${FED.real_ff>=2?'大頂前水準':'仍寬鬆'}</span> 大頂前 +2.1～+2.4`},
+];
+$("#strip").innerHTML=strip.map(t=>`<div class="tile"><div class="k">${t.k}</div><div class="v">${t.v}</div><div class="s">${t.s}</div></div>`).join("");
+
+/* ① 相似度 */
+const simE=Object.entries(D.similarity).sort((a,b)=>b[1]-a[1]);
+$("#nkeys").textContent=Object.keys(D.closest).length;
+$("#simbars").innerHTML=simE.map(([k,v])=>`<div class="bar"><span class="era"><span class="dot" style="background:${ERA[k]}"></span>${k}</span><div class="track"><div class="fill" style="width:${v}%;background:${ERA[k]}"></div></div><span class="num">${v}</span></div>`).join("")
+ +`<p class="small" style="margin:6px 0 0">量化上最像 <b>${simE[0][0]}</b>，其次 <b>${simE[1][0]}</b>。1987 的相似處主要在觸發條件（新任主席、長債突破、中東衝突、財政），不在數字上：1987 年 8 月市場年漲 ${H.rows["1987"].spx_12m}%、高於 200 日線 ${H.rows["1987"].ma_dist}%，今天是 ${sgn(N.spx_12m,0,"%")}、${sgn(N.ma_dist,1,"%")}。</p>`;
+const closeCount=e=>Object.values(D.closest).filter(x=>x===e).length;
+$("#reading").innerHTML=[
+ `<b>估值</b>：CAPE ${fmt(N.cape,1)}，2000 年是 ${H.rows["2000"].cape}，1973 和 1987 都只有 18 左右。10 年期殖利率減 CAPE 盈餘殖利率是 ${sgn(N.gap,2,"pp")}（1973 ${sgn(H.rows["1973"].gap,2)}、1987 ${sgn(H.rows["1987"].gap,2)}、2000 ${sgn(H.rows["2000"].gap,2)}）。`,
+ `<b>短端還鬆、長端已緊</b>：實質政策利率 ${sgn(N.real_ff,2,"%")}，三次大頂前都在 +2.1% 到 +2.4%；實質 10 年期殖利率 ${sgn(N.real_10y,2,"%")}，已經接近 2000 年的 ${sgn(H.rows["2000"].real_10y,2,"%")}。詳見「Fed 循環位置」分頁。`,
+ `<b>金融條件</b>：NFCI ${fmt(N.nfci,2)}（負值＝寬鬆）。三次大頂當下都在 0 附近（−0.13 到 0.00），代表錢已經不便宜了；現在還明顯偏鬆。`,
+ `<b>財政</b>：赤字占 GDP ${Math.abs(N.deficit).toFixed(1)}%。1987 年是 3.1%，2000 年是盈餘 2.3%。`,
+ `<b>三次的結局</b>：1973 和 2000 都跌了約一半，花 7 年以上才收復；1987 跌三成多，兩年收復。骨架越像 2000，萬一出事越可能是長熊，不是一天崩完的 V 型。`,
+].map(x=>`<li>${x}</li>`).join("");
+
+const ROWS=[["估值",null],["cape","CAPE（Shiller 本益比）","",1],["gap","10 年期 − CAPE 盈餘殖利率","pp",2,1],
+ ["利率與貨幣",null],["y10_chg","10 年期殖利率 12 個月變化","pp",2,1],["ff_chg","聯邦基金利率 12 個月變化","pp",2,1],["real_ff","實質政策利率","%",2,1],["real_10y","實質 10 年期殖利率","%",2,1],["curve","殖利率曲線 10Y−3M","pp",2,1],["m2","M2 年增率","%",1],["credit","信用利差 BAA−10Y","pp",2],["nfci","NFCI 金融條件（負＝寬鬆）","",2,1],
+ ["通膨與油價",null],["cpi","CPI 年增率","%",1],["cpi_accel","CPI 年增率比一年前變化","pp",1,1],["oil_chg","油價（WTI）12 個月漲幅","%",0,1],
+ ["經濟",null],["unemp_chg","失業率 12 個月變化","pp",1,1],
+ ["市場熱度",null],["spx_12m","S&P 500 過去 12 個月漲幅","%",0,1],["ma_dist","S&P 500 距 200 日線","%",1,1],["vol","波動率（VIX／1987 用 VXO）","",1],
+ ["財政與匯率",null],["deficit","聯邦財政餘額占 GDP","%",1,1],["dollar_chg","美元指數 12 個月變化","%",1,1]];
+const eps=["1973","1987","2000","now"];
+let h=`<thead><tr><th>指標</th>${eps.map(e=>`<th class="${e==='now'?'nowcol':''}"><span class="era"><span class="dot" style="background:${ERA[e]}"></span>${ENAME[e]}</span></th>`).join("")}</tr></thead><tbody>`;
+for(const r of ROWS){
+ if(r[1]===null){h+=`<tr class="group"><td colspan="5">${r[0]}</td></tr>`;continue}
+ const [key,label,u,d,signed]=r;
+ h+=`<tr><td>${label}</td>`+eps.map(e=>{const v=ROWSD[e][key];const s=signed?sgn(v,d,u):fmt(v,d,u);
+   const cl=(D.closest[key]===e?"close ":"")+(e==="now"?"nowcol":"");return `<td class="num ${cl}">${s}</td>`}).join("")+`</tr>`;
+}
+$("#analogTable").innerHTML=h+"</tbody>";
+const QUAL=[["新任 Fed 主席上任後升息","○","●","○","●"],["中東戰爭／油價供給衝擊","●（10 月，見頂後）","◐ 兩伊油輪戰","○","● 美伊戰爭、荷姆茲"],["單一技術敘事的資本支出熱潮","○","○","● 網路／電信","● AI 資料中心"],["供應商借錢給客戶","○","○","● Lucent、Nortel","● NVDA 延長付款、擔保、入股客戶"],["少數大型股主導","● Nifty Fifty","○","● 科技股","● AI 巨頭"],["機械式、對價格不敏感的賣壓","○","● 投資組合保險","◐","● 波動率目標、槓桿 ETF、0DTE"],["不透明的信用擴張","◐","● LBO、垃圾債","◐","● 私募信貸、表外 SPV"],["先降息、再重新升息","● 1970–71 降 → 1972 升","● 1984–86 降 → 1987 升","● 1998 降 → 1999 升","● 2024–25 降 → 2026/9 升"],["當時有沒有熔斷","○","○","●","●"]];
+$("#qualTable").innerHTML=`<thead><tr><th>條件</th>${eps.map(e=>`<th class="${e==='now'?'nowcol':''}">${e==='now'?'現在':e}</th>`).join("")}</tr></thead><tbody>`+QUAL.map(q=>`<tr><td>${q[0]}</td>${q.slice(1).map((v,i)=>`<td class="small ${i===3?'nowcol':''}" style="text-align:left">${v}</td>`).join("")}</tr>`).join("")+`</tbody><caption style="caption-side:bottom;text-align:left" class="note">● 有　◐ 部分　○ 沒有</caption>`;
+
+(function(){const svg=$("#paths"),W=560,H2=300,L=44,R=10,T=12,B=30,keys=["1973","1987","2000"];
+ const x=d=>L+(W-L-R)*d/1100,y=v=>T+(H2-T-B)*(0-v)/60;let s="";
+ for(let v=0;v>=-60;v-=10)s+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${v}%</text>`;
+ for(let m=0;m<=36;m+=6)s+=`<text x="${x(m*30.44)}" y="${H2-10}" text-anchor="middle">${m}月</text>`;
+ for(const k of keys){const p=H.paths[k];s+=`<polyline fill="none" stroke="${ERA[k]}" stroke-width="2" points="${p.map(q=>`${x(q[0]).toFixed(1)},${y(q[1]).toFixed(1)}`).join(" ")}"/>`;
+  const fb=p.find(q=>q[2]&&q[0]>7);if(fb)s+=`<circle cx="${x(fb[0])}" cy="${y(fb[1])}" r="4.5" fill="var(--panel)" stroke="${ERA[k]}" stroke-width="2"/>`;}
+ svg.innerHTML=s;$("#pathsLegend").innerHTML=keys.map(k=>`<span class="era"><span class="dot" style="background:${ERA[k]}"></span>${ENAME[k]} 見頂</span>`).join("");
+ const O=H.outcome;$("#outcomeTable").innerHTML=`<thead><tr><th></th><th>最大跌幅</th><th>到谷底</th><th>收復高點</th></tr></thead><tbody>`+keys.map(k=>`<tr><td><span class="era"><span class="dot" style="background:${ERA[k]}"></span>${k}</span></td><td class="num">${O[k].max_dd}%</td><td class="num">${O[k].months_to_trough} 個月</td><td class="num">${O[k].months_to_recover} 個月</td></tr>`).join("")+`</tbody>`;})();
+
+/* ② Fed 循環 */
+const KT=H.tops_fed.filter(t=>["1973-01-11","1987-08-25","2000-03-24"].includes(t.top));
+const rng=k=>[Math.min(...KT.map(t=>t[k])),Math.max(...KT.map(t=>t[k]))];
+const G=[["months_from_trough","距利率低點（月）",FED.months_from_trough,0,24,0],["rise_from_trough","從低點已升息（pp）",FED.rise_from_trough,0,3,2],["real_ff","實質政策利率（%）",FED.real_ff,-1,3.5,2],["nfci","NFCI 金融條件（越右越緊）",FED.nfci,-0.8,0.4,2],["real_10y","實質 10 年期殖利率（%）",N.real_10y,0,5,2]];
+$("#fedgauge").innerHTML=G.map(([k,label,v,lo,hi,d])=>{const R2=k==="real_10y"?[Math.min(...["1973","1987","2000"].map(e=>H.rows[e].real_10y)),Math.max(...["1973","1987","2000"].map(e=>H.rows[e].real_10y))]:rng(k);
+ const p=x=>Math.max(0,Math.min(100,(x-lo)/(hi-lo)*100));
+ return `<div style="display:grid;gap:4px"><div class="small" style="display:flex;justify-content:space-between;gap:8px"><span>${label}</span><span class="num"><b>${v===null?'—':v.toFixed(d)}</b> <span class="muted">大頂前 ${R2[0].toFixed(d)}～${R2[1].toFixed(d)}</span></span></div>
+ <div style="position:relative;height:16px;background:var(--soft);border-radius:8px"><div style="position:absolute;left:${p(R2[0])}%;width:${Math.max(1.5,p(R2[1])-p(R2[0]))}%;top:0;bottom:0;background:var(--hotbg);border:1px solid var(--hot);border-radius:6px"></div><div style="position:absolute;left:calc(${p(v)}% - 6px);top:-2px;width:12px;height:20px;border-radius:4px;background:var(--enow)"></div></div></div>`}).join("");
+$("#fedreading").innerHTML=[
+ `<b>順序已經對上了</b>：1973、1987、2000 三次大頂都是「先降息 → 利率見底 → 重新升息 → 見頂」。現在的利率低點在 ${FED.trough_date}（${FED.trough}%），9/16 重新升息，順序一致。`,
+ `<b>但程度還差很遠</b>：三次大頂當下，距利率低點 11–15 個月、已升 0.9–2.6 個百分點、實質政策利率 +2.1% 到 +2.4%。現在是第 ${FED.months_from_trough} 個月、升了 ${fmt(FED.rise_from_trough,2)} 個百分點、實質 ${sgn(FED.real_ff,2,"%")}。`,
+ `<b>過去 12 個月淨降息（${sgn(FED.ff_12m,2)}pp）的影響</b>：短端的錢還便宜，金融條件（NFCI ${fmt(FED.nfci,2)}）明顯比三次大頂時寬鬆。這是股市能無視長債殖利率、繼續創高的燃料，也就是科斯托蘭尼說的「貨幣還站在多頭這邊」。`,
+ `<b>長端已經替 Fed 收緊了</b>：實質 10 年期 ${sgn(N.real_10y,2,"%")}，接近 2000 年的 ${sgn(H.rows["2000"].real_10y,2,"%")}。股票估值是用長端折現，所以估值壓力已經到位，只是錢的數量還沒收緊。`,
+ `<b>如果歷史模式成立</b>：大頂落在利率低點後 11–15 個月，也就是 ${(()=>{const [y,m]=FED.trough_date.split("-").map(Number);const f=n=>{const t=new Date(y,m-1+n,1);return t.getFullYear()+"/"+(t.getMonth()+1)};return f(11)+"～"+f(15)})()}。樣本只有 3 次，這是參考區間，不是預測。`,
+ `<b>什麼會讓它更快到</b>：Fed 在油價推升通膨下連續升息（實質利率快速往 +2% 走）、NFCI 從負值翻向 0。<b>什麼會延後</b>：就業轉弱逼 Fed 停在這裡，那就更像 1998 年，前面還有一段融漲。`,
+].map(x=>`<li>${x}</li>`).join("");
+$("#topsFed").innerHTML=`<thead><tr><th>股市大頂</th><th>類型</th><th>聯邦基金利率</th><th>12 個月變化</th><th>利率低點</th><th>距低點</th><th>已升</th><th>實質政策利率</th><th>NFCI</th></tr></thead><tbody>`+
+ [...H.tops_fed,{top:"現在 "+D.asof,...FED,now:1}].map(t=>{const typ=t.now?"剛重新升息":(Math.abs(t.ff_12m)<0.1?"零利率持平":(t.ff_12m>0?"升息中見頂":"降息中見頂"));const k=["1973-01-11","1987-08-25","2000-03-24"].includes(t.top);
+ return `<tr class="${t.now?'':''}"><td class="num ${t.now?'nowcol':''}">${k?'<b>'+t.top+'</b>':t.top}</td><td class="small ${t.now?'nowcol':''}" style="text-align:left">${typ}</td><td class="num ${t.now?'nowcol':''}">${fmt(t.ff,2)}%</td><td class="num ${t.now?'nowcol':''}">${sgn(t.ff_12m,2)}</td><td class="num ${t.now?'nowcol':''}">${fmt(t.trough,2)}%（${t.trough_date}）</td><td class="num ${t.now?'nowcol':''}">${t.months_from_trough} 月</td><td class="num ${t.now?'nowcol':''}">${sgn(t.rise_from_trough,2)}</td><td class="num ${t.now?'nowcol':''}">${sgn(t.real_ff,2,"%")}</td><td class="num ${t.now?'nowcol':''}">${fmt(t.nfci,2)}</td></tr>`}).join("")+
+ `</tbody><caption style="caption-side:bottom;text-align:left" class="note">粗體是科斯托蘭尼「緊縮失衡型」的三次大頂。1990、2007、2020 是「衰退型」：Fed 因為經濟轉弱已經在降息，股市才見頂。2022 是零利率下、市場預期升息而先跌（原文第一段的狀態）。</caption>`;
+
+/* ③ 監控 */
+const st=(v,y,r,dir=1)=>{if(v===null||v===undefined)return"na";return dir>0?(v>=r?"hot":v>=y?"warn":"ok"):(v<=r?"hot":v<=y?"warn":"ok")};
+const LBL={ok:"正常",warn:"注意",hot:"警戒",na:"手動"};
+const MAN=D.manual||{};
+const RISKS=[
+ {name:"長端利率、財政與期限溢價",role:"起因",m:5,s:3,u:5,a1987:"長債從 7.6% 升到 10%（科斯托蘭尼的「失衡」）",why:"所有資產都用它折現，AI 這類長存續期間的成長股對它最敏感。",
+  ind:[["10 年期殖利率",v0(M.y10),"%",2,5.0,5.75],["30 年期殖利率",v0(M.y30),"%",2,5.5,6.0],["10Y − CAPE 盈餘殖利率",M.gap,"pp",2,2.0,3.5],["實質 10 年期殖利率",M.real_10y,"%",2,2.0,3.0],["MOVE 債市波動率",v0(M.move),"",0,110,140]],
+  act:"30 年期突破 6%，或股債差超過 +3.5pp（超過 1987 年）：不加碼成長股，槓桿歸零。"},
+ {name:"機械式、順勢賣壓",role:"放大器",m:4,s:5,u:4,a1987:"投資組合保險（跌越多賣越多）",why:"波動率目標基金、CTA 趨勢策略、槓桿 ETF 每日再平衡、0DTE 造市商避險。VIX 越低它們的部位越大，等於燃料越滿。",
+  ind:[["VIX（越低燃料越滿）",v0(M.vix),"",1,null,null,"inv"],["VIX ÷ VIX3M（>1＝恐慌倒掛）",M.vix_term,"",2,0.95,1.05],["SKEW 尾部避險需求",v0(M.skew),"",0,140,150],["S&P 距 200 日線",M.spx_ma_dist,"%",1,null,null,"ma"]],
+  act:"VIX 期限結構倒掛（>1.05）加上跌破 200 日線，就是 1987 型連鎖賣壓的條件。"},
+ {name:"AI 資本支出融資鏈",role:"起因",m:5,s:2,u:5,a1987:"併購熱潮（10/14 的併購稅案直接打掉溢價）",why:"利潤在賣鏟子的人，債務和風險在下游。NVDA 延長付款條件、入股客戶、替 OpenAI 的資料中心租約擔保；私募信貸也大量流向資料中心。",
+  ind:[["SMH 距 200 日線",M.smh_ma_dist,"%",1,20,35],["SMH 距一年高點",M.smh_dd,"%",1,-10,-20,"neg"],["NVDA 應收帳款天數（DSO）",(MAN.nvda_dso||{}).value||"手動","",null,null,null,"text-"+((MAN.nvda_dso||{}).status||"na")]],
+  act:"SMH 跌破 200 日線，或 NVDA 下一季 DSO 再拉長（>65 天）：AI 鏈部位減碼。"},
+ {name:"美債市場管線（準備金、回購、基差交易）",role:"傳染管道",m:4,s:5,u:3,a1987:"造市商資本不足、期現貨脫鉤",why:"準備金接近底線時回購利率會跳；避險基金的美債基差交易被迫平倉時，連美債都會失去流動性（2020 年 3 月、2025 年 4 月）。",
+  ind:[["SOFR − IORB",M.sofr_iorb_bp,"bp",0,0,10],["銀行準備金（兆美元）",M.reserves_tn,"",2,3.0,2.8,"lowbad"],["隔夜逆回購餘額（十億美元）",M.rrp_bn,"",1,100,10,"lowbad"]],
+  act:"SOFR 持續高於 IORB 10bp 以上：金融管線在擠壓，系統已經沒有緩衝。"},
+ {name:"散戶槓桿",role:"放大器",m:3,s:4,u:5,a1987:"融資買股、猶豫的投資者",why:"科斯托蘭尼說崩盤時最慘的是猶豫的投資者，而槓桿會讓每個人都變成猶豫的人。單一個股 2 倍 ETF 在 1987 年那種日子可能一天跌 40% 以上。",
+  ind:[["FINRA 融資餘額",(MAN.margin_debt||{}).value||"手動","",null,null,null,"text-"+((MAN.margin_debt||{}).status||"na")]],
+  act:"融資餘額再創新高之後反轉，就是猶豫的投資者被追繳的前兆。"},
+ {name:"日圓套利交易",role:"傳染管道",m:3,s:5,u:3,a1987:"Baker 與西德的匯率衝突",why:"日本公債殖利率是數十年高點，日銀若再升息，借日圓買美股和台股的部位會被迫平倉（2024 年 8 月日圓三週升值約 12%，日經一天跌 12%）。",
+  ind:[["USD/JPY",v0(M.usdjpy),"",2,null,null,"info"],["USD/JPY 3 個月變化（負＝日圓升值）",M.usdjpy_3m_chg,"%",1,-4,-7,"neg"],["日本 10 年期公債",v0(M.jgb10),"%",2,2.5,3.2]],
+  act:"日圓 3 個月升值超過 7%：台股外資提款風險升高。"},
+ {name:"油價與荷姆茲海峽",role:"起因",m:4,s:3,u:3,a1987:"兩伊油輪戰（10/16 美籍油輪被擊中）",why:"油價是通膨的開關。通膨下不來，Fed 就沒辦法像 1987 年那樣馬上救市。實體 Brent 比期貨貴很多，代表現貨缺口比期貨顯示的更緊。",
+  ind:[["WTI 原油（美元）",v0(M.wti),"",1,90,110],["WTI 12 個月漲幅",M.wti_12m_chg,"%",0,30,60],["Brent 期貨近月（美元）",v0(M.brent_fut),"",1,100,130],["實體 Brent（Dated，FRED 每週更新，美元）",v0(M.brent_dated),"",1,100,130]],
+  act:"油價推升 CPI 再加速、Fed 繼續升息：進入 1973 劇本（慢熊）。"},
+ {name:"私募信貸",role:"傳染管道",m:4,s:2,u:4,a1987:"LBO 與垃圾債（不透明的槓桿）",why:"規模約 2 兆美元，用模型估值、贖回受限，問題會延遲出現；和壽險公司、銀行的 NAV 貸款、AI 資料中心融資都綁在一起。<b>它的公開市場代理指標已經在亮燈。</b>",
+  ind:[["私募信貸管理公司（OWL、BX、APO、KKR）距一年高點",M.pc_mgr_dd,"%",1,-20,-35,"neg"],["BDC ETF（BIZD）距一年高點",M.bizd_dd,"%",1,-10,-20,"neg"],["CCC 級信用利差",M.ccc_oas_bp,"bp",0,1000,1400],["高收益債利差",M.hy_oas_bp,"bp",0,350,450],["高收益債利差 3 個月變化",M.hy_oas_3m_chg_bp,"bp",0,50,100]],
+  act:"高收益債利差 3 個月擴大 100bp 以上，或突破 450bp：私募的問題已經傳到公開市場（2007 年信用利差領先 S&P 見頂約 4.4 個月）。"},
+ {name:"指數集中與被動化",role:"放大器",m:4,s:1,u:4,a1987:"（1987 年沒有，指數成分很分散）",why:"前十大股票占 S&P 的比重是歷史高點。被動資金只看市值買賣，同一個敘事翻轉時，指數和 AI 持股會同時被賣。",
+  ind:[["前十大占 S&P 500 權重",(MAN.top10_weight||{}).value||"手動","",null,null,null,"text-na"],["SMH 距 200 日線",M.smh_ma_dist,"%",1,20,35]],
+  act:"不直接觸發動作，用來判斷出事時跌幅可能有多深。"},
+];
+RISKS.forEach(r=>{r.score=+(0.4*r.m+0.3*r.s+0.3*r.u).toFixed(1);
+ r.ind=r.ind.map(([n,v,u,d,y,rd,mode])=>{let s="na",vs;
+  if(mode&&mode.startsWith("text")){s=mode.split("-")[1];vs=v}
+  else if(v===null||v===undefined){s="na";vs="—"}
+  else if(mode==="info"){s="ok";vs=fmt(v,d)}
+  else if(mode==="inv"){s=v<14?"warn":v>25?"hot":"ok";vs=fmt(v,d)}
+  else if(mode==="ma"){s=v<0?"hot":v>10?"warn":"ok";vs=sgn(v,d,u)}
+  else if(mode==="neg"){s=st(v,y,rd,-1);vs=sgn(v,d,u)}
+  else if(mode==="lowbad"){s=v<=rd?"hot":v<=y?"warn":"ok";vs=fmt(v,d)}
+  else{s=st(v,y,rd);vs=fmt(v,d)+(u==="bp"?" bp":u)}
+  return {n,vs,y,rd,s,mode}});
+ const o={hot:3,warn:2,ok:1,na:0};r.status=r.ind.reduce((a,i)=>o[i.s]>o[a]?i.s:a,"ok");});
+RISKS.sort((a,b)=>b.score-a.score);
+const pips=n=>`<span class="pips">${[1,2,3,4,5].map(i=>`<i class="${i<=n?'on':''}"></i>`).join("")}</span>`;
+const th=(i,w)=>{const v=w==="y"?i.y:i.rd;if(v===null||v===undefined)return"—";return((i.mode==="neg"||i.mode==="lowbad")?"≤ ":"≥ ")+v};
+$("#risks").innerHTML=RISKS.map((r,ix)=>`<article class="card risk ${r.status}"><div class="rank">${ix+1}</div><div style="min-width:0">
+ <div class="risk-head"><h3>${r.name}</h3><span class="pill role">${r.role}</span><span class="pill ${r.status}">${LBL[r.status]}</span></div>
+ <div class="scores"><span>影響力 <b class="mono" style="color:var(--fg)">${r.score}</b></span><span>市場衝擊${pips(r.m)}</span><span>傳染速度${pips(r.s)}</span><span>對 AI 集中組合${pips(r.u)}</span></div>
+ <p class="small" style="margin:0 0 4px"><span class="muted">1987 對應物：</span>${r.a1987}</p><p class="small" style="margin:0 0 8px">${r.why}</p>
+ <div class="scroll"><table><thead><tr><th>指標</th><th>現值</th><th>注意</th><th>警戒</th><th>燈號</th></tr></thead><tbody>${r.ind.map(i=>`<tr><td>${i.n}</td><td class="num">${i.vs}</td><td class="num muted">${th(i,"y")}</td><td class="num muted">${th(i,"r")}</td><td><span class="pill ${i.s}">${LBL[i.s]}</span></td></tr>`).join("")}</tbody></table></div>
+ <div class="act"><b>亮燈時怎麼看：</b>${r.act}</div></div></article>`).join("");
+(function(){const cols=[["hot","警戒"],["warn","注意"],["ok","正常"]];const hi=RISKS.filter(r=>r.score>=4.0),lo=RISKS.filter(r=>r.score<4.0);let h="";
+ for(const [band,list] of [["影響力高（≥4.0）",hi],["影響力中（<4.0）",lo]])for(const [k,l] of cols){const names=list.filter(r=>r.status===k).map(r=>r.name).join("<br>")||"<span class='muted'>—</span>";h+=`<div class="cell"><b>${band} × <span class="pill ${k}">${l}</span></b>${names}</div>`}
+ $("#matrix").innerHTML=h;})();
+
+/* ④ 1987 */
+(function(){const S=H.chart87,svg=$("#c87"),W=760,L=46,R=46,T1=12,H1=230,T2=262,HH=90;const n=S.length,x=i=>L+(W-L-R)*i/(n-1);
+ const lo=200,hi=345,y=v=>T1+H1*(hi-v)/(hi-lo),ylo=7,yhi=10.6,y2=v=>T2+HH*(yhi-v)/(yhi-ylo),idx=d=>S.findIndex(r=>r[0]>=d);let s="";
+ for(let v=200;v<=340;v+=20)s+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${v}</text>`;
+ for(let v=7;v<=10.5;v+=1)s+=`<line x1="${L}" x2="${W-R}" y1="${y2(v)}" y2="${y2(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y2(v)+4}" text-anchor="end">${v}%</text>`;
+ const a=idx("1987-10-14"),b=idx("1987-10-19");s+=`<rect x="${x(a)}" y="${T1}" width="${x(b)-x(a)+2}" height="${H1}" fill="var(--hotbg)"/>`;
+ ["1987-01-02","1987-04-01","1987-07-01","1987-10-01","1988-01-04","1988-04-04","1988-07-01"].forEach(d=>{const i=idx(d);if(i>=0)s+=`<text x="${x(i)}" y="${T2+HH+16}" text-anchor="middle">${d.slice(0,7)}</text>`});
+ s+=`<polyline fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3" points="${S.map((r,i)=>`${x(i).toFixed(1)},${y(r[2]).toFixed(1)}`).join(" ")}"/>`;
+ s+=`<polyline fill="none" stroke="var(--enow)" stroke-width="1.8" points="${S.map((r,i)=>`${x(i).toFixed(1)},${y(r[1]).toFixed(1)}`).join(" ")}"/>`;
+ s+=`<polyline fill="none" stroke="var(--hot)" stroke-width="1.6" points="${S.map((r,i)=>`${x(i).toFixed(1)},${y2(r[3]).toFixed(1)}`).join(" ")}"/>`;
+ const mk=(d,t,dy,an="middle")=>{const i=idx(d),r=S[i];s+=`<circle cx="${x(i)}" cy="${y(r[1])}" r="4" fill="var(--panel)" stroke="var(--enow)" stroke-width="2"/><text class="lbl" x="${x(i)}" y="${y(r[1])+dy}" text-anchor="${an}">${t}</text>`};
+ mk("1987-08-25","8/25 見頂 336.8",-10);mk("1987-10-15","10/15 跌破 200 日線",-12,"end");mk("1987-10-19","10/19 −20.5%",18,"start");mk("1988-06-06","1988/6/6 站回 200 日線",-12,"end");
+ s+=`<text class="lbl" x="${L+4}" y="${T2-6}">10 年期殖利率</text>`;svg.innerHTML=s;
+ $("#t87").innerHTML=`<thead><tr><th>日期</th><th>S&amp;P</th><th>距高點</th><th>200 日線</th><th>10Y</th><th>VXO</th></tr></thead><tbody>`+H.timeline87.rows.map(r=>`<tr${r.spx<r.ma200?' style="color:var(--hot)"':''}><td class="num">${r.date}</td><td class="num">${r.spx.toFixed(1)}</td><td class="num">${sgn(r.dd,1,"%")}</td><td class="num">${r.ma200.toFixed(1)}</td><td class="num">${r.y10.toFixed(2)}</td><td class="num">${fmt(r.vxo,1)}</td></tr>`).join("")+`</tbody>`;
+ const TAIL=[["1973","1973/2/27",-7.8,-48.2,-35.7],["1987","1987/10/15",-11.5,-33.5,-20.7],["2000","2000/4/14",-11.2,-49.1,-41.4],["2008","2007/11/7",-5.7,-56.8,-39.8]];
+ $("#tailTable").innerHTML=`<thead><tr><th>空頭</th><th>跌破 200 日線</th><th>當時跌幅</th><th>最大跌幅</th><th>買回時</th><th>少賠</th></tr></thead><tbody>`+TAIL.map(t=>`<tr><td><span class="era"><span class="dot" style="background:${ERA[t[0]]}"></span>${t[0]}</span></td><td class="num">${t[1]}</td><td class="num">${t[2]}%</td><td class="num">${t[3]}%</td><td class="num">${t[4]}%</td><td class="num"><b>${t[0]==="1987"?"約 0（看成交價）":"+"+(t[2]-t[4]).toFixed(0)+"pp"}</b></td></tr>`).join("")+`</tbody><caption style="caption-side:bottom;text-align:left" class="note">少賠＝出場時跌幅減掉買回時跌幅。這裡簡化成只出場、買回各一次；1994–2020 的完整回測（含來回洗刷）見 <span class="mono">cri_exit_rule_backtest.py</span>。</caption>`;})();
+}
+
+
+function renderBT(B){
+ const P=B.prediction, BT=B.backtest, L=B.latest, base=B.base_rate_fwd63_dd10;
+ $("#btPeriod").textContent=B.period[0]+" 到 "+B.period[1];
+ const p40=P["總分≥40"];
+ $("#btTiles").innerHTML=[
+  {k:"對照台總分（最新）",v:L.board.toFixed(1),s:`<span class="pill ${L.board_pct_rank>=90?'hot':L.board_pct_rank>=75?'warn':'ok'}">30 年第 ${L.board_pct_rank.toFixed(0)} 百分位</span> ${L.date}`},
+  {k:"總分 ≥40 之後 3 個月內跌 10%",v:p40.precision+"%",s:`平常是 ${base}%（${p40.lift} 倍）`},
+  {k:"預測力 AUC：市場分項",v:P["市場分項（快）"]["3 個月內跌 10%"].toFixed(2),s:`總分 ${P["對照台總分"]["3 個月內跌 10%"].toFixed(2)}`},
+  {k:"預測力 AUC：總體分項",v:P["總體分項（慢）"]["3 個月內跌 10%"].toFixed(2),s:`<span class="pill na">≈ 猜銅板</span>`},
+ ].map(t=>`<div class="tile"><div class="k">${t.k}</div><div class="v">${t.v}</div><div class="s">${t.s}</div></div>`).join("");
+ /* 圖 */
+ (function(){const S=B.spx_weekly, Bd=B.board_weekly, svg=$("#btChart"), W=900, L0=50, R=12, T1=10, H1=210, T2=250, H2=80;
+  const t0=new Date(S[0][0]).getTime(), t1=new Date(S[S.length-1][0]).getTime(), x=d=>L0+(W-L0-R)*(new Date(d).getTime()-t0)/(t1-t0);
+  const lv=S.map(r=>Math.log(r[1])), lo=Math.min(...lv), hi=Math.max(...lv), y=v=>T1+H1*(hi-Math.log(v))/(hi-lo), y2=v=>T2+H2*(1-v/70);
+  let s="";
+  B.events.forEach(e=>{s+=`<rect x="${x(e.peak)}" y="${T1}" width="${Math.max(1.5,x(e.trough)-x(e.peak))}" height="${H1}" fill="var(--soft)"/>`});
+  [500,1000,2000,4000,8000].forEach(v=>{if(Math.log(v)>=lo&&Math.log(v)<=hi)s+=`<line x1="${L0}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L0-6}" y="${y(v)+4}" text-anchor="end">${v}</text>`});
+  [0,35,70].forEach(v=>s+=`<line x1="${L0}" x2="${W-R}" y1="${y2(v)}" y2="${y2(v)}" stroke="var(--line)" ${v===35?'stroke-dasharray="4 3"':''}/><text x="${L0-6}" y="${y2(v)+4}" text-anchor="end">${v}</text>`);
+  for(let yr=2000;yr<=2025;yr+=5)s+=`<text x="${x(yr+'-01-01')}" y="${T2+H2+16}" text-anchor="middle">${yr}</text>`;
+  s+=`<polyline fill="none" stroke="var(--enow)" stroke-width="1.4" points="${S.map(r=>`${x(r[0]).toFixed(1)},${y(r[1]).toFixed(1)}`).join(" ")}"/>`;
+  s+=`<polyline fill="none" stroke="var(--accent)" stroke-width="1.1" points="${Bd.map(r=>`${x(r[0]).toFixed(1)},${y2(Math.min(70,r[1])).toFixed(1)}`).join(" ")}"/>`;
+  const lb=Bd[Bd.length-1]; s+=`<circle cx="${x(lb[0])}" cy="${y2(Math.min(70,lb[1]))}" r="4" fill="var(--hot)"/><text class="lbl" x="${x(lb[0])-6}" y="${y2(Math.min(70,lb[1]))-8}" text-anchor="end">現在 ${lb[1]}</text>`;
+  s+=`<text class="lbl" x="${L0+4}" y="${T2-6}">對照台分數</text>`;
+  svg.innerHTML=s;})();
+ /* 預警表 */
+ const hs=Object.keys(P._base_rates);
+ $("#btAuc").innerHTML=`<thead><tr><th>指標</th>${hs.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>`+
+  ["對照台總分","市場分項（快）","總體分項（慢）","CRI 單獨","跌破 200 日線（負距離）"].map(k=>`<tr><td>${k}</td>${hs.map(h=>{const v=P[k][h];return `<td class="num"><span class="pill ${v>=0.7?'ok':v>=0.6?'warn':'na'}">${v.toFixed(2)}</span></td>`}).join("")}</tr>`).join("")+
+  `<tr><td class="muted">基準發生率</td>${hs.map(h=>`<td class="num muted">${P._base_rates[h]}%</td>`).join("")}</tr></tbody>`;
+ $("#btPrec").innerHTML=`<thead><tr><th>門檻</th><th>出現天數</th><th>之後 3 個月跌 10% 的機率</th><th>倍數</th><th>抓到的比例</th></tr></thead><tbody>`+
+  [30,35,40,45,50].map(T=>{const r=P["總分≥"+T];return `<tr><td>總分 ≥ ${T}</td><td class="num">${r.days_pct}%</td><td class="num">${r.precision}%</td><td class="num">${r.lift}×</td><td class="num">${r.recall}%</td></tr>`}).join("")+`</tbody>`;
+ const E=B.events, firstTops=["1998-07-17","2000-03-24","2007-10-09","2010-04-23","2011-04-29","2018-09-20","2020-02-19","2022-01-03","2025-02-19"];
+ const pre=E.filter(e=>firstTops.includes(e.peak)), preHit=pre.filter(e=>e.board_pctile_avg_60d_before_peak>=75).length, midHit=E.filter(e=>e.board_pctile_at_cross10>=75).length;
+ const bh=BT["買進持有"]["全期 1997–2026"], best=BT["總分≥35 且跌破 200 日線"]["全期 1997–2026"], r3=BT["規則 3（CRI≥50 且跌破 200 日線）"]["全期 1997–2026"];
+ $("#btReading").innerHTML=[
+  `<b>事中確認很可靠</b>：${E.length} 次大跌裡，有 ${midHit} 次在跌到 −10% 時分數已在歷史前 25%。它能分辨「這次不是普通拉回」。`,
+  `<b>事前預警不可靠</b>：${pre.length} 次「新一輪大跌的第一個高點」裡，只有 ${preHit} 次在高點前 60 天分數就偏高（2000 年最明顯）。2020、2022、2011 年事前都是安靜的。`,
+  `<b>總體分項（利率、股債比價、油價、日圓）沒有預測力</b>：3、6、12 個月的 AUC 都在 0.5 左右。這些是「條件」不是「時機」：1997–2000 年股債比價連續三年偏貴，股市照漲；2008 年的崩盤反而發生在利率下降時。`,
+  `<b>真正有用的是市場分項</b>（信用、波動率結構、SKEW、半導體、CRI、200 日線），但它的 AUC（${P["市場分項（快）"]["3 個月內跌 10%"].toFixed(2)}）和單看 200 日線（${P["跌破 200 日線（負距離）"]["3 個月內跌 10%"].toFixed(2)}）差不多。`,
+  `<b>報酬</b>：沒有一個進出場版本在 30 年年化報酬上贏過買進持有（${bh.cagr}%）。最好的「總分 ≥35 且跌破 200 日線」是 ${best.cagr}%，少約 ${(bh.cagr-best.cagr).toFixed(1)} 個百分點，但最大回撤從 ${bh.mdd}% 降到 ${best.mdd}%，Sharpe 從 ${bh.sharpe} 升到 ${best.sharpe}。`,
+  `<b>2 倍槓桿時結論翻轉</b>：買進持有 ${B.lev2x["買進持有"].cagr}%／${B.lev2x["買進持有"].mdd}%；用同一條規則進出場是 ${B.lev2x["總分≥35 且跌破 200 日線"].cagr}%／${B.lev2x["總分≥35 且跌破 200 日線"].mdd}%，報酬和風險都贏。`,
+ ].map(x=>`<li>${x}</li>`).join("");
+ $("#btEvents").innerHTML=`<thead><tr><th>高點</th><th>低點</th><th>跌幅</th><th>高點前 60 天</th><th>跌到 −10% 時</th><th>從高點到 −10%</th></tr></thead><tbody>`+
+  E.map(e=>{const c=v=>`<span class="pill ${v>=90?'hot':v>=75?'warn':'ok'}">${v}</span>`;return `<tr><td class="num">${firstTops.includes(e.peak)?'<b>'+e.peak+'</b>':e.peak}</td><td class="num">${e.trough}</td><td class="num">${e.max_dd}%</td><td class="num">${c(e.board_pctile_avg_60d_before_peak)}</td><td class="num">${c(e.board_pctile_at_cross10)}</td><td class="num">${e.days_peak_to_cross10} 天</td></tr>`}).join("")+
+  `</tbody><caption style="caption-side:bottom;text-align:left" class="note">粗體＝新一輪大跌的第一個高點（其餘是同一個空頭裡的後續下跌，分數本來就已偏高）。</caption>`;
+ const PN=Object.keys(BT["買進持有"]), show_=["買進持有","只看 200 日線","規則 3（CRI≥50 且跌破 200 日線）","對照台總分≥35 出場","對照台總分≥45 出場","總分≥30 且跌破 200 日線","總分≥35 且跌破 200 日線","分數漸進減碼（20→0%、60→全出）"];
+ $("#btTable").innerHTML=`<thead><tr><th>策略</th>${PN.map(p=>`<th>${p}</th>`).join("")}<th>Sharpe</th><th>空手時間</th><th>進出次數</th></tr></thead><tbody>`+
+  show_.map(k=>`<tr><td>${k}</td>${PN.map(p=>{const r=BT[k][p],b=BT["買進持有"][p];return `<td class="num">${r.cagr>b.cagr&&k!=="買進持有"?'<b>'+r.cagr.toFixed(1)+'%</b>':r.cagr.toFixed(1)+'%'} <span class="muted">/ ${r.mdd}%</span></td>`}).join("")}<td class="num">${BT[k][PN[0]].sharpe}</td><td class="num">${BT[k][PN[0]].out_pct}%</td><td class="num">${BT[k][PN[0]].switches}</td></tr>`).join("")+`</tbody>`;
+ $("#btLev").innerHTML=`<thead><tr><th>2 倍槓桿（全期）</th><th>年化報酬</th><th>最大回撤</th></tr></thead><tbody>`+Object.entries(B.lev2x).map(([k,v])=>`<tr><td>${k}</td><td class="num">${v.cagr}%</td><td class="num">${v.mdd}%</td></tr>`).join("")+`</tbody><caption style="caption-side:bottom;text-align:left" class="note">每日 2 倍 SPY，借款成本＝國庫券利率，未扣槓桿 ETF 管理費。單一個股的槓桿 ETF 波動遠大於此。</caption>`;
+}
+
+if(EMBED){render(EMBED)}else{fetch("data.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(render).catch(e=>{$("#loadErr").hidden=false;console.error(e)})}
+if(EMBED_BT){renderBT(EMBED_BT)}else{fetch("backtest.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(b=>b&&renderBT(b)).catch(e=>console.error(e))}
+</script>
+
+</body>
+</html>

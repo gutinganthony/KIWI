@@ -1,0 +1,2193 @@
+{
+  "address": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+  "label": "hft-highvolume-candidate",
+  "date": "2026-10-10",
+  "probed_at": "2026-10-10T01:59:41.025188+00:00",
+  "ledger_window_days": 45,
+  "queries_ok": {
+    "perpDexs": true,
+    "clearinghouseState_native": true,
+    "clearinghouseState_dex": true,
+    "spotClearinghouseState": true,
+    "userNonFundingLedgerUpdates": true,
+    "portfolio": true,
+    "userFills": true
+  },
+  "dexs_detected": [
+    "xyz",
+    "flx",
+    "vntl",
+    "hyna",
+    "km",
+    "abcd",
+    "cash",
+    "para",
+    "mkts",
+    "io"
+  ],
+  "aborted": false,
+  "dexs_queried": [
+    "abcd",
+    "cash",
+    "flx",
+    "hyna",
+    "io",
+    "km",
+    "mkts",
+    "para",
+    "vntl",
+    "xyz"
+  ],
+  "portfolio_windows": {
+    "day": {
+      "account_value_last": 244782472.84,
+      "account_value_ts_iso": "2026-10-10T01:59:50.838000+00:00",
+      "pnl_last": -7784414.49,
+      "vlm": 2601477.8,
+      "n_points": 13
+    },
+    "week": {
+      "account_value_last": 244782472.84,
+      "account_value_ts_iso": "2026-10-10T01:59:50.838000+00:00",
+      "pnl_last": 35617030.81,
+      "vlm": 37958878.18,
+      "n_points": 65
+    },
+    "month": {
+      "account_value_last": 244782472.84,
+      "account_value_ts_iso": "2026-10-10T01:59:50.838000+00:00",
+      "pnl_last": 1792235.91,
+      "vlm": 398034940.25,
+      "n_points": 47
+    },
+    "allTime": {
+      "account_value_last": 244782472.84,
+      "account_value_ts_iso": "2026-10-10T01:59:50.838000+00:00",
+      "pnl_last": 144247834.82,
+      "vlm": 5714316182.35,
+      "n_points": 89
+    },
+    "perpDay": {
+      "account_value_last": 167219316.77,
+      "account_value_ts_iso": "2026-10-10T01:59:50.838000+00:00",
+      "pnl_last": -8004633.21,
+      "vlm": 2361379.05,
+      "n_points": 13
+    },
+    "perpWeek": {
+      "account_value_last": 167219316.77,
+      "account_value_ts_iso": "2026-10-10T01:59:50.838000+00:00",
+      "pnl_last": 37140354.45,
+      "vlm": 37128225.44,
+      "n_points": 65
+    },
+    "perpMonth": {
+      "account_value_last": 167219316.77,
+      "account_value_ts_iso": "2026-10-10T01:59:50.838000+00:00",
+      "pnl_last": 814350.42,
+      "vlm": 369976430.38,
+      "n_points": 47
+    },
+    "perpAllTime": {
+      "account_value_last": 167219316.77,
+      "account_value_ts_iso": "2026-10-10T01:59:50.838000+00:00",
+      "pnl_last": 140601311.37,
+      "vlm": 5337795717.93,
+      "n_points": 89
+    }
+  },
+  "trading": {
+    "n_fills": 2000,
+    "truncated": true,
+    "last_fill_ts": 1791578533.607,
+    "last_fill_iso": "2026-10-09T20:42:13.607000+00:00",
+    "days_since_last_fill": 0.22,
+    "n_fills_7d": 2000,
+    "n_fills_30d": 2000,
+    "first_fill_iso": "2026-10-08T20:49:48.809000+00:00",
+    "top_coins": [
+      [
+        "BTC",
+        1515
+      ],
+      [
+        "ETH",
+        220
+      ],
+      [
+        "@107",
+        168
+      ],
+      [
+        "HYPE",
+        49
+      ],
+      [
+        "XPL",
+        21
+      ],
+      [
+        "LINK",
+        18
+      ],
+      [
+        "SUI",
+        5
+      ],
+      [
+        "SOL",
+        4
+      ]
+    ],
+    "by_venue": {
+      "native": 1832,
+      "spot": 168
+    },
+    "recent_fills": [
+      {
+        "time_iso": "2026-10-09T13:42:42.042000+00:00",
+        "coin": "@107",
+        "dir": "Sell",
+        "px": 85.107,
+        "sz": 19.98,
+        "closed_pnl": 241.92
+      },
+      {
+        "time_iso": "2026-10-09T13:42:42.375000+00:00",
+        "coin": "@107",
+        "dir": "Sell",
+        "px": 85.108,
+        "sz": 36.8,
+        "closed_pnl": 445.61
+      },
+      {
+        "time_iso": "2026-10-09T13:42:59.940000+00:00",
+        "coin": "HYPE",
+        "dir": "Close Short",
+        "px": 84.966,
+        "sz": 115.51,
+        "closed_pnl": -1707.67
+      },
+      {
+        "time_iso": "2026-10-09T13:43:00.805000+00:00",
+        "coin": "@107",
+        "dir": "Sell",
+        "px": 85.0,
+        "sz": 115.38,
+        "closed_pnl": 1384.68
+      },
+      {
+        "time_iso": "2026-10-09T13:43:00.805000+00:00",
+        "coin": "@107",
+        "dir": "Sell",
+        "px": 85.011,
+        "sz": 0.13,
+        "closed_pnl": 1.56
+      },
+      {
+        "time_iso": "2026-10-09T13:44:42.359000+00:00",
+        "coin": "HYPE",
+        "dir": "Close Short",
+        "px": 84.991,
+        "sz": 8.55,
+        "closed_pnl": -126.61
+      },
+      {
+        "time_iso": "2026-10-09T13:44:43.836000+00:00",
+        "coin": "@107",
+        "dir": "Sell",
+        "px": 85.021,
+        "sz": 8.55,
+        "closed_pnl": 102.79
+      },
+      {
+        "time_iso": "2026-10-09T13:58:18.945000+00:00",
+        "coin": "HYPE",
+        "dir": "Close Short",
+        "px": 85.172,
+        "sz": 51.61,
+        "closed_pnl": -773.62
+      },
+      {
+        "time_iso": "2026-10-09T13:58:19.744000+00:00",
+        "coin": "@107",
+        "dir": "Sell",
+        "px": 85.209,
+        "sz": 51.61,
+        "closed_pnl": 630.16
+      },
+      {
+        "time_iso": "2026-10-09T13:59:41.675000+00:00",
+        "coin": "HYPE",
+        "dir": "Close Short",
+        "px": 85.022,
+        "sz": 175.28,
+        "closed_pnl": -2601.1
+      },
+      {
+        "time_iso": "2026-10-09T13:59:42.378000+00:00",
+        "coin": "@107",
+        "dir": "Sell",
+        "px": 85.035,
+        "sz": 0.12,
+        "closed_pnl": 1.44
+      },
+      {
+        "time_iso": "2026-10-09T13:59:42.378000+00:00",
+        "coin": "@107",
+        "dir": "Sell",
+        "px": 85.042,
+        "sz": 5.0,
+        "closed_pnl": 60.22
+      },
+      {
+        "time_iso": "2026-10-09T13:59:42.378000+00:00",
+        "coin": "@107",
+        "dir": "Sell",
+        "px": 85.042,
+        "sz": 10.0,
+        "closed_pnl": 120.43
+      },
+      {
+        "time_iso": "2026-10-09T13:59:42.378000+00:00",
+        "coin": "@107",
+        "dir": "Sell",
+        "px": 85.043,
+        "sz": 0.24,
+        "closed_pnl": 2.89
+      },
+      {
+        "time_iso": "2026-10-09T13:59:42.378000+00:00",
+        "coin": "@107",
+        "dir": "Sell",
+        "px": 85.06,
+        "sz": 6.6,
+        "closed_pnl": 79.6
+      },
+      {
+        "time_iso": "2026-10-09T13:59:42.378000+00:00",
+        "coin": "@107",
+        "dir": "Sell",
+        "px": 85.07,
+        "sz": 15.36,
+        "closed_pnl": 185.41
+      },
+      {
+        "time_iso": "2026-10-09T14:07:19.725000+00:00",
+        "coin": "@107",
+        "dir": "Sell",
+        "px": 85.031,
+        "sz": 116.53,
+        "closed_pnl": 1402.09
+      },
+      {
+        "time_iso": "2026-10-09T14:07:19.725000+00:00",
+        "coin": "@107",
+        "dir": "Sell",
+        "px": 85.031,
+        "sz": 21.43,
+        "closed_pnl": 257.85
+      },
+      {
+        "time_iso": "2026-10-09T19:48:58.233000+00:00",
+        "coin": "LINK",
+        "dir": "Close Short",
+        "px": 12.721,
+        "sz": 1565.5,
+        "closed_pnl": 1389.27
+      },
+      {
+        "time_iso": "2026-10-09T20:42:13.607000+00:00",
+        "coin": "ETH",
+        "dir": "Close Short",
+        "px": 2477.9,
+        "sz": 8.083,
+        "closed_pnl": -1255.05
+      }
+    ]
+  },
+  "funds": {
+    "native": {
+      "n_positions": 17,
+      "account_value": 157420286.827403,
+      "position_value": 790573837.57
+    },
+    "builder_dex": {
+      "xyz": {
+        "n_positions": 3,
+        "account_value": 9800514.255616,
+        "position_value": 41381268.17
+      },
+      "flx": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "vntl": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "hyna": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "km": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "abcd": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "cash": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "para": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "mkts": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "io": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      }
+    },
+    "spot": {
+      "n_nonzero": 11,
+      "balances": [
+        {
+          "coin": "USDC",
+          "total": 186706079.26037458,
+          "hold": 167235267.448131,
+          "entry_ntl": 0.0,
+          "usd": 186706079.26037458
+        },
+        {
+          "coin": "HYPE",
+          "total": 520592.24921254,
+          "hold": 0.0,
+          "entry_ntl": 38002698.3467747,
+          "usd": 38002698.3467747,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "UFART",
+          "total": 29411764.413389,
+          "hold": 0.0,
+          "entry_ntl": 5835924.25018508,
+          "usd": 5835924.25018508,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "UXPL",
+          "total": 6632011.511632,
+          "hold": 0.0,
+          "entry_ntl": 607049.8129923,
+          "usd": 607049.8129923,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "UBONK",
+          "total": 2331863.80511,
+          "hold": 0.0,
+          "entry_ntl": 21.06872538,
+          "usd": 21.06872538,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "FUND",
+          "total": 18.69,
+          "hold": 0.0,
+          "entry_ntl": 14.0446005,
+          "usd": 14.0446005,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "UPUMP",
+          "total": 4014.188103,
+          "hold": 0.0,
+          "entry_ntl": 11.81897403,
+          "usd": 11.81897403,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "USDT0",
+          "total": 7.99944001,
+          "hold": 0.0,
+          "entry_ntl": 7.99944001,
+          "usd": 7.99944001,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "LICKO",
+          "total": 35585.49249208,
+          "hold": 0.0,
+          "entry_ntl": 0.21351295,
+          "usd": 0.21351295,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "USDH",
+          "total": 0.01001646,
+          "hold": 0.0,
+          "entry_ntl": 0.01001646,
+          "usd": 0.01001646
+        },
+        {
+          "coin": "LATINA",
+          "total": 45658.0657,
+          "hold": 0.0,
+          "entry_ntl": 0.0,
+          "usd": 0.0,
+          "usd_is_estimate": true
+        }
+      ],
+      "usd_stable": 186706079.27,
+      "usd_est_other": 44445727.56,
+      "usd_total_est": 231151806.83,
+      "estimated": true
+    },
+    "native_usd": 157420286.83,
+    "builder_usd": 9800514.26,
+    "spot_usd": 231151806.83,
+    "total_usd": 398372607.91,
+    "non_native_usd": 240952321.09,
+    "non_native_share": 0.6048,
+    "positions": [
+      {
+        "coin": "BTC",
+        "szi": -2853.37736,
+        "side": "short",
+        "entry_px": 76152.4,
+        "position_value": 235847047.041744,
+        "unrealized_pnl": -18555316.651605,
+        "leverage_value": 5.0,
+        "leverage_type": "cross",
+        "liquidation_px": 137041.2218502357,
+        "margin_used": 47169409.408348,
+        "max_leverage": 20.0,
+        "cum_funding_all_time": -18394660.855361,
+        "dex": ""
+      },
+      {
+        "coin": "ETH",
+        "szi": -111801.5668,
+        "side": "short",
+        "entry_px": 2322.63,
+        "position_value": 278947145.197336,
+        "unrealized_pnl": -19273213.571008,
+        "leverage_value": 5.0,
+        "leverage_type": "cross",
+        "liquidation_px": 3871.8503895203,
+        "margin_used": 55789429.039467,
+        "max_leverage": 15.0,
+        "cum_funding_all_time": -17698154.979356,
+        "dex": ""
+      },
+      {
+        "coin": "SOL",
+        "szi": -741932.55,
+        "side": "short",
+        "entry_px": 94.3122,
+        "position_value": 81560645.2215,
+        "unrealized_pnl": -11587337.919808,
+        "leverage_value": 10.0,
+        "leverage_type": "cross",
+        "liquidation_px": 314.110869197,
+        "margin_used": 8156064.52215,
+        "max_leverage": 10.0,
+        "cum_funding_all_time": -3605460.767554,
+        "dex": ""
+      },
+      {
+        "coin": "BNB",
+        "szi": -1182.326,
+        "side": "short",
+        "entry_px": 780.108,
+        "position_value": 881335.35855,
+        "unrealized_pnl": 41007.6575,
+        "leverage_value": 3.0,
+        "leverage_type": "cross",
+        "liquidation_px": 123130.3662274387,
+        "margin_used": 293778.45285,
+        "max_leverage": 10.0,
+        "cum_funding_all_time": -2223.59384,
+        "dex": ""
+      },
+      {
+        "coin": "DOGE",
+        "szi": -70709347.0,
+        "side": "short",
+        "entry_px": 0.09463,
+        "position_value": 6093307.268378,
+        "unrealized_pnl": 597986.835834,
+        "leverage_value": 10.0,
+        "leverage_type": "cross",
+        "liquidation_px": 2.1401417375,
+        "margin_used": 609330.726837,
+        "max_leverage": 10.0,
+        "cum_funding_all_time": -46952.207123,
+        "dex": ""
+      },
+      {
+        "coin": "INJ",
+        "szi": -124849.6,
+        "side": "short",
+        "entry_px": 5.6137,
+        "position_value": 873435.31664,
+        "unrealized_pnl": -172566.300561,
+        "leverage_value": 3.0,
+        "leverage_type": "cross",
+        "liquidation_px": 1165.2102241422,
+        "margin_used": 291145.105546,
+        "max_leverage": 5.0,
+        "cum_funding_all_time": -17427.204581,
+        "dex": ""
+      },
+      {
+        "coin": "SUI",
+        "szi": -6061159.7,
+        "side": "short",
+        "entry_px": 1.14253,
+        "position_value": 6609088.53688,
+        "unrealized_pnl": 316005.528362,
+        "leverage_value": 10.0,
+        "leverage_type": "cross",
+        "liquidation_px": 25.0480714795,
+        "margin_used": 660908.853688,
+        "max_leverage": 10.0,
+        "cum_funding_all_time": -150297.623844,
+        "dex": ""
+      },
+      {
+        "coin": "LINK",
+        "szi": -500987.1,
+        "side": "short",
+        "entry_px": 13.60843,
+        "position_value": 6441191.1447,
+        "unrealized_pnl": 376457.891688,
+        "leverage_value": 3.0,
+        "leverage_type": "cross",
+        "liquidation_px": 302.7225565719,
+        "margin_used": 2147063.7149,
+        "max_leverage": 10.0,
+        "cum_funding_all_time": -25091.924752,
+        "dex": ""
+      },
+      {
+        "coin": "XRP",
+        "szi": -20913417.0,
+        "side": "short",
+        "entry_px": 1.489222,
+        "position_value": 29446258.443336,
+        "unrealized_pnl": 1698467.291722,
+        "leverage_value": 5.0,
+        "leverage_type": "cross",
+        "liquidation_px": 8.6636234982,
+        "margin_used": 5889251.688667,
+        "max_leverage": 20.0,
+        "cum_funding_all_time": -348895.002398,
+        "dex": ""
+      },
+      {
+        "coin": "WLD",
+        "szi": -3076431.8,
+        "side": "short",
+        "entry_px": 0.53487,
+        "position_value": 1609343.003216,
+        "unrealized_pnl": 36152.792542,
+        "leverage_value": 2.0,
+        "leverage_type": "cross",
+        "liquidation_px": 47.7981917366,
+        "margin_used": 804671.501608,
+        "max_leverage": 10.0,
+        "cum_funding_all_time": -3767.707004,
+        "dex": ""
+      },
+      {
+        "coin": "ENA",
+        "szi": -46663640.0,
+        "side": "short",
+        "entry_px": 0.238249,
+        "position_value": 10260401.1632,
+        "unrealized_pnl": 857180.84119,
+        "leverage_value": 10.0,
+        "leverage_type": "cross",
+        "liquidation_px": 3.3281952562,
+        "margin_used": 1026040.11632,
+        "max_leverage": 10.0,
+        "cum_funding_all_time": -65136.415439,
+        "dex": ""
+      },
+      {
+        "coin": "HYPE",
+        "szi": -620478.99,
+        "side": "short",
+        "entry_px": 70.1823,
+        "position_value": 52411239.80631,
+        "unrealized_pnl": -8864597.042236,
+        "leverage_value": 5.0,
+        "leverage_type": "cross",
+        "liquidation_px": 317.5189459513,
+        "margin_used": 10482247.961262,
+        "max_leverage": 5.0,
+        "cum_funding_all_time": -7789378.68419,
+        "dex": ""
+      },
+      {
+        "coin": "FARTCOIN",
+        "szi": -21720951.9,
+        "side": "short",
+        "entry_px": 0.20186,
+        "position_value": 3545510.978637,
+        "unrealized_pnl": 839106.310481,
+        "leverage_value": 3.0,
+        "leverage_type": "cross",
+        "liquidation_px": 6.854949915,
+        "margin_used": 1181836.992879,
+        "max_leverage": 10.0,
+        "cum_funding_all_time": -432543.863443,
+        "dex": ""
+      },
+      {
+        "coin": "PUMP",
+        "szi": -3302511003.0,
+        "side": "short",
+        "entry_px": 0.004607,
+        "position_value": 18124180.384464,
+        "unrealized_pnl": -2906727.155852,
+        "leverage_value": 5.0,
+        "leverage_type": "cross",
+        "liquidation_px": 0.0492994694,
+        "margin_used": 3624836.076892,
+        "max_leverage": 10.0,
+        "cum_funding_all_time": -585611.564867,
+        "dex": ""
+      },
+      {
+        "coin": "XPL",
+        "szi": -78539316.0,
+        "side": "short",
+        "entry_px": 0.106548,
+        "position_value": 6782733.869076,
+        "unrealized_pnl": 1585538.900175,
+        "leverage_value": 3.0,
+        "leverage_type": "cross",
+        "liquidation_px": 1.9275101524,
+        "margin_used": 2260911.289692,
+        "max_leverage": 5.0,
+        "cum_funding_all_time": -1259975.563656,
+        "dex": ""
+      },
+      {
+        "coin": "ZEC",
+        "szi": -40441.53,
+        "side": "short",
+        "entry_px": 1495.6613,
+        "position_value": 49455947.037,
+        "unrealized_pnl": 11030888.048548,
+        "leverage_value": 3.0,
+        "leverage_type": "cross",
+        "liquidation_px": 4798.4965484843,
+        "margin_used": 16485315.679,
+        "max_leverage": 5.0,
+        "cum_funding_all_time": -336627.20245,
+        "dex": ""
+      },
+      {
+        "coin": "LIT",
+        "szi": -464089.0,
+        "side": "short",
+        "entry_px": 4.421135,
+        "position_value": 1685027.799781,
+        "unrealized_pnl": 366772.666892,
+        "leverage_value": 3.0,
+        "leverage_type": "cross",
+        "liquidation_px": 315.2145878985,
+        "margin_used": 561675.93326,
+        "max_leverage": 5.0,
+        "cum_funding_all_time": -7589.910355,
+        "dex": ""
+      },
+      {
+        "coin": "xyz:GOLD",
+        "szi": -6936.2962,
+        "side": "short",
+        "entry_px": 4191.43,
+        "position_value": 29036723.15244,
+        "unrealized_pnl": 36337.827574,
+        "leverage_value": 4.0,
+        "leverage_type": "cross",
+        "liquidation_px": 26669.4255177726,
+        "margin_used": 7259180.78811,
+        "max_leverage": 25.0,
+        "cum_funding_all_time": -558702.146708,
+        "dex": "xyz"
+      },
+      {
+        "coin": "xyz:SILVER",
+        "szi": -198857.02,
+        "side": "short",
+        "entry_px": 64.6162,
+        "position_value": 12092694.24322,
+        "unrealized_pnl": 756706.832384,
+        "leverage_value": 5.0,
+        "leverage_type": "cross",
+        "liquidation_px": 845.044373922,
+        "margin_used": 2418538.848644,
+        "max_leverage": 25.0,
+        "cum_funding_all_time": -74743.338196,
+        "dex": "xyz"
+      },
+      {
+        "coin": "xyz:STRC",
+        "szi": 2528.8,
+        "side": "long",
+        "entry_px": 95.48622,
+        "position_value": 251850.7784,
+        "unrealized_pnl": 10385.206353,
+        "leverage_value": 3.0,
+        "leverage_type": "isolated",
+        "liquidation_px": 53.7205745758,
+        "margin_used": 122794.618862,
+        "max_leverage": 10.0,
+        "cum_funding_all_time": -6047.438583,
+        "dex": "xyz"
+      }
+    ],
+    "n_positions_total": 20,
+    "n_positions_native": 17,
+    "n_positions_builder": 3,
+    "known": true
+  },
+  "ledger": {
+    "n_total": 92,
+    "n_in_window": 92,
+    "n_kept": 92,
+    "by_type": {
+      "send": {
+        "n": 92,
+        "usd": 596501053.48,
+        "direction": "mixed"
+      }
+    },
+    "external_out_usd": 0.0,
+    "external_in_usd": 324001053.48,
+    "internal_usd": 0.0,
+    "vault_out_usd": 0.0,
+    "bridge_out_usd": 272500000.0,
+    "unknown_usd": 0.0,
+    "external_out_rows": [],
+    "bridge_out_rows": [
+      {
+        "time": 1791473366.723,
+        "time_iso": "2026-10-08T15:29:26.723000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xa9bda7d324e0fd2cab3704461e861d020a0500b8bfe41bfe4d865325e3e4d717"
+      },
+      {
+        "time": 1791473253.687,
+        "time_iso": "2026-10-08T15:27:33.687000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x671950479e154497689304461e7fff022326002d391863690ae1fb9a5d191e82"
+      },
+      {
+        "time": 1791473156.916,
+        "time_iso": "2026-10-08T15:25:56.916000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x58a6af529ac7a57f5a2004461e7aae02067e003835cac451fc6f5aa559cb7f69"
+      },
+      {
+        "time": 1791473080.82,
+        "time_iso": "2026-10-08T15:24:40.820000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xf582469b4fbb843ef6fc04461e766b020e340080eabea311994af1ee0ebf5e29"
+      },
+      {
+        "time": 1791368235.148,
+        "time_iso": "2026-10-07T10:17:15.148000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x3cb247189c2e4b363e2c044608118802014200fe37216a08e07af26b5b222520"
+      },
+      {
+        "time": 1791368132.051,
+        "time_iso": "2026-10-07T10:15:32.051000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xd303c94ec477e4d9d47d0446080be70202f400345f7b03ab76cc74a1837bbec4"
+      },
+      {
+        "time": 1790746022.378,
+        "time_iso": "2026-09-30T05:27:02.378000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x9bbac5e93b6bca349d34044583668d02017d00ced66ee9063f83713bfa6fa41f"
+      },
+      {
+        "time": 1790745816.784,
+        "time_iso": "2026-09-30T05:23:36.784000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xb65ab3fab69a302db7d40445835b260201eb00e0519d4eff5a235f4d759e0a18"
+      },
+      {
+        "time": 1790745759.866,
+        "time_iso": "2026-09-30T05:22:39.866000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xe5b1a456dfcd0f32e72b044583580b0201bd003c7ac02e04897a4fa99ec0e91d"
+      },
+      {
+        "time": 1790298081.955,
+        "time_iso": "2026-09-25T01:01:21.955000+00:00",
+        "type": "send",
+        "usd": 3000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xc2cc2bfa0bba5c75c4450445243d09020a5e00dfa6bd7b476694d74ccabe3660"
+      },
+      {
+        "time": 1790297986.843,
+        "time_iso": "2026-09-25T00:59:46.843000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xa1f9576a6497d77ba37304452437d202036f004fff9af64d45c202bd239bb166"
+      },
+      {
+        "time": 1790297819.725,
+        "time_iso": "2026-09-25T00:56:59.725000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xc00a02c4f777ca01c1830445242efc02017b00aa927ae8d363d2ae17b67ba3ec"
+      },
+      {
+        "time": 1789559784.114,
+        "time_iso": "2026-09-16T11:56:24.114000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x05c9a273cf2c889d0743044486b0900202ca00596a2fa76fa9924dc68e206287"
+      },
+      {
+        "time": 1789340787.097,
+        "time_iso": "2026-09-13T23:06:27.097000+00:00",
+        "type": "send",
+        "usd": 4000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xe862f3d735dc25efe9dc044458016f0202d200bcd0df44c18c2b9f29f4dfffda"
+      },
+      {
+        "time": 1789340660.336,
+        "time_iso": "2026-09-13T23:04:20.336000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xb9b93701153bd41fbb32044457fa7802014b00e6b03ef2f15d81e253d43fae0a"
+      },
+      {
+        "time": 1789259704.318,
+        "time_iso": "2026-09-13T00:35:04.318000+00:00",
+        "type": "send",
+        "usd": 7000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xd0d66cbbb46d740cd250044446e02702020b00a14f6092de749f180e73614df7"
+      },
+      {
+        "time": 1789171195.06,
+        "time_iso": "2026-09-11T23:59:55.060000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x1e8720e3b9ae90c620000444343fb102024d00c954a1af98c24fcc3678a26ab0"
+      },
+      {
+        "time": 1789091760.691,
+        "time_iso": "2026-09-11T01:56:00.691000+00:00",
+        "type": "send",
+        "usd": 7000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xc5213a90e4b11b48c69a0444236fc702043800767fb43a1a68e9e5e3a3b4f533"
+      },
+      {
+        "time": 1789089978.859,
+        "time_iso": "2026-09-11T01:26:18.859000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xcb4e10a1dc025494ccc70444230df10202230087770573666f16bbf49b062e7f"
+      },
+      {
+        "time": 1789069705.208,
+        "time_iso": "2026-09-10T19:48:25.208000+00:00",
+        "type": "send",
+        "usd": 5000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x536431e4fd10ce9854dd04441eba120202f700ca9813ed6af72cdd37bc14a882"
+      },
+      {
+        "time": 1788999048.194,
+        "time_iso": "2026-09-10T00:10:48.194000+00:00",
+        "type": "send",
+        "usd": 4000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x2b3bd573a6df011a2cb504440faa44020379005941d21feccf0480c665d2db04"
+      },
+      {
+        "time": 1788998952.2,
+        "time_iso": "2026-09-10T00:09:12.200000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xbe6a9e65cb20a905bfe404440fa4ea020548004b6623c7d7623349b88a2482f0"
+      },
+      {
+        "time": 1788853667.941,
+        "time_iso": "2026-09-08T07:47:47.941000+00:00",
+        "type": "send",
+        "usd": 4000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x91d03f33d28de0e593490443f0a9360204b200196d80ffb73598ea869181bad0"
+      },
+      {
+        "time": 1788844010.989,
+        "time_iso": "2026-09-08T05:06:50.989000+00:00",
+        "type": "send",
+        "usd": 8000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x64d4c9a3034e0600664e0443ee9c9d02025b00889e4124d2089d74f5c241dfeb"
+      },
+      {
+        "time": 1788565504.553,
+        "time_iso": "2026-09-04T23:45:04.553000+00:00",
+        "type": "send",
+        "usd": 5000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xd2950db60a332536d40e0443b32e8102012e009ba5364408765db908c936ff21"
+      },
+      {
+        "time": 1788533693.005,
+        "time_iso": "2026-09-04T14:54:53.005000+00:00",
+        "type": "send",
+        "usd": 7500000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x61f569e82f6eb5e8636f0443ac69c802035600cdca61d4ba05be153aee628fd3"
+      },
+      {
+        "time": 1788531616.19,
+        "time_iso": "2026-09-04T14:20:16.190000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x189fd0e2b742fcd51a190443abf924020cb800c852461ba7bc687c357646d6bf"
+      },
+      {
+        "time": 1788318290.288,
+        "time_iso": "2026-09-02T03:04:50.288000+00:00",
+        "type": "send",
+        "usd": 8000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xbbd0207c13d348f1bd4904437e6b260202df0061aed667c35f98cbced2d722dc"
+      },
+      {
+        "time": 1788289607.466,
+        "time_iso": "2026-09-01T19:06:47.466000+00:00",
+        "type": "send",
+        "usd": 7000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xbf722bde828599f2c0eb044378491902030300c41d88b8c4633ad731418973dd"
+      },
+      {
+        "time": 1788153058.885,
+        "time_iso": "2026-08-31T05:10:58.885000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x9679b2874c567f1a97f304435b0c4f02021a006ce7599dec3a425dda0b5a5905"
+      },
+      {
+        "time": 1787965986.431,
+        "time_iso": "2026-08-29T01:13:06.431000+00:00",
+        "type": "send",
+        "usd": 6000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xe462d23e85c1558ae5dc04433326c6020236002420c4745c882b7d9144c52f75"
+      },
+      {
+        "time": 1787965537.232,
+        "time_iso": "2026-08-29T01:05:37.232000+00:00",
+        "type": "send",
+        "usd": 9000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xc3ed6e7a237acafdc5670443330e27020324005fbe7de9cf67b619cce27ea4e8"
+      },
+      {
+        "time": 1787964989.141,
+        "time_iso": "2026-08-29T00:56:29.141000+00:00",
+        "type": "send",
+        "usd": 8000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x4175e1803718ec5642ef044332f02001d100f965d21c0b28e53e8cd2f61cc640"
+      }
+    ],
+    "unknown_rows": [],
+    "internal_rows": [],
+    "rows": [
+      {
+        "time": 1791473366.723,
+        "time_iso": "2026-10-08T15:29:26.723000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xa9bda7d324e0fd2cab3704461e861d020a0500b8bfe41bfe4d865325e3e4d717"
+      },
+      {
+        "time": 1791473253.687,
+        "time_iso": "2026-10-08T15:27:33.687000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x671950479e154497689304461e7fff022326002d391863690ae1fb9a5d191e82"
+      },
+      {
+        "time": 1791473156.916,
+        "time_iso": "2026-10-08T15:25:56.916000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x58a6af529ac7a57f5a2004461e7aae02067e003835cac451fc6f5aa559cb7f69"
+      },
+      {
+        "time": 1791473080.82,
+        "time_iso": "2026-10-08T15:24:40.820000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xf582469b4fbb843ef6fc04461e766b020e340080eabea311994af1ee0ebf5e29"
+      },
+      {
+        "time": 1791368235.148,
+        "time_iso": "2026-10-07T10:17:15.148000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x3cb247189c2e4b363e2c044608118802014200fe37216a08e07af26b5b222520"
+      },
+      {
+        "time": 1791368132.051,
+        "time_iso": "2026-10-07T10:15:32.051000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xd303c94ec477e4d9d47d0446080be70202f400345f7b03ab76cc74a1837bbec4"
+      },
+      {
+        "time": 1791294629.43,
+        "time_iso": "2026-10-06T13:50:29.430000+00:00",
+        "type": "send",
+        "usd": 4999999.2,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x1f731558a6a5560520ec0445f85b900102002d3e41a874d7c33bc0ab65a92fef"
+      },
+      {
+        "time": 1791294592.42,
+        "time_iso": "2026-10-06T13:49:52.420000+00:00",
+        "type": "send",
+        "usd": 4999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x7d2772aad388461a7ea10445f859900000628a906e8b64ec20f01dfd928c2005"
+      },
+      {
+        "time": 1790788468.416,
+        "time_iso": "2026-09-30T17:14:28.416000+00:00",
+        "type": "send",
+        "usd": 4999999.2,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x69269328ed4692b36aa004458c6d5c000061ab0e8849b1850cef3e7bac4a6c9e"
+      },
+      {
+        "time": 1790746022.378,
+        "time_iso": "2026-09-30T05:27:02.378000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x9bbac5e93b6bca349d34044583668d02017d00ced66ee9063f83713bfa6fa41f"
+      },
+      {
+        "time": 1790745816.784,
+        "time_iso": "2026-09-30T05:23:36.784000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xb65ab3fab69a302db7d40445835b260201eb00e0519d4eff5a235f4d759e0a18"
+      },
+      {
+        "time": 1790745759.866,
+        "time_iso": "2026-09-30T05:22:39.866000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xe5b1a456dfcd0f32e72b044583580b0201bd003c7ac02e04897a4fa99ec0e91d"
+      },
+      {
+        "time": 1790336987.446,
+        "time_iso": "2026-09-25T11:49:47.446000+00:00",
+        "type": "send",
+        "usd": 6999999.6,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xf4344a3c4356137bf5ae04452c85d100006f6221de59324e97fcf58f0259ed66"
+      },
+      {
+        "time": 1790336870.359,
+        "time_iso": "2026-09-25T11:47:50.359000+00:00",
+        "type": "send",
+        "usd": 7999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xc1d8d74ce9d1c805c35204452c7f4c010100ef3284d4e6d765a1829fa8d5a1f0"
+      },
+      {
+        "time": 1790329374.43,
+        "time_iso": "2026-09-25T09:42:54.430000+00:00",
+        "type": "send",
+        "usd": 8999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x9400f7240625e5a0957a04452ae70200003c0f09a129047237c9a276c529bf8b"
+      },
+      {
+        "time": 1790327307.459,
+        "time_iso": "2026-09-25T09:08:27.459000+00:00",
+        "type": "send",
+        "usd": 4999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xa5a06d2006477857a71a04452a762c0000db8505a14a972949691872c54b5242"
+      },
+      {
+        "time": 1790298081.955,
+        "time_iso": "2026-09-25T01:01:21.955000+00:00",
+        "type": "send",
+        "usd": 3000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xc2cc2bfa0bba5c75c4450445243d09020a5e00dfa6bd7b476694d74ccabe3660"
+      },
+      {
+        "time": 1790297986.843,
+        "time_iso": "2026-09-25T00:59:46.843000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xa1f9576a6497d77ba37304452437d202036f004fff9af64d45c202bd239bb166"
+      },
+      {
+        "time": 1790297819.725,
+        "time_iso": "2026-09-25T00:56:59.725000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xc00a02c4f777ca01c1830445242efc02017b00aa927ae8d363d2ae17b67ba3ec"
+      },
+      {
+        "time": 1790126400.41,
+        "time_iso": "2026-09-23T01:20:00.410000+00:00",
+        "type": "send",
+        "usd": 999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xf5af644421787bdbf7290444ffb85b0000ea7c29bc7b9aae99780f96e07c55c6"
+      },
+      {
+        "time": 1790126247.384,
+        "time_iso": "2026-09-23T01:17:27.384000+00:00",
+        "type": "send",
+        "usd": 8999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xdb58c02b575a69f9dcd20444ffb011000093d810f25d88cb7f216b7e165e43e4"
+      },
+      {
+        "time": 1790068142.469,
+        "time_iso": "2026-09-22T09:09:02.469000+00:00",
+        "type": "send",
+        "usd": 1999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x8c4a7d3501d7ebd98dc40444f34bd9000085951a9cdb0aab30132887c0dbc5c4"
+      },
+      {
+        "time": 1790067838.404,
+        "time_iso": "2026-09-22T09:03:58.404000+00:00",
+        "type": "send",
+        "usd": 7999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x9eeaf86160673a61a0640444f33b760000261046fb6a593342b3a3b41f6b144c"
+      },
+      {
+        "time": 1789999198.382,
+        "time_iso": "2026-09-21T13:59:58.382000+00:00",
+        "type": "send",
+        "usd": 999999.6,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xb23b1a7b81a38db1b3b40444e49d1a00007632611ca6ac835603c5ce40a7679c"
+      },
+      {
+        "time": 1789999148.36,
+        "time_iso": "2026-09-21T13:59:08.360000+00:00",
+        "type": "send",
+        "usd": 8999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xd1fda9e6d230aed2d3770444e49a57000038c1cc6d33cda475c65539913488bd"
+      },
+      {
+        "time": 1789991361.401,
+        "time_iso": "2026-09-21T11:49:21.401000+00:00",
+        "type": "send",
+        "usd": 4999999.6,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x59c69a61a85c321b5b400444e2f261000001b247435f50edfd8f45b467500c05"
+      },
+      {
+        "time": 1789991229.385,
+        "time_iso": "2026-09-21T11:47:09.385000+00:00",
+        "type": "send",
+        "usd": 4999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xbcbe9f86548733c5be380444e2eae00000f9b76bef8a529760874ad9138b0db0"
+      },
+      {
+        "time": 1789985697.351,
+        "time_iso": "2026-09-21T10:14:57.351000+00:00",
+        "type": "send",
+        "usd": 4999999.6,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x73a51d2161b9410d751e0444e1baaf0000e03506fcbc5fdf176dc87420bd1af8"
+      },
+      {
+        "time": 1789985636.392,
+        "time_iso": "2026-09-21T10:13:56.392000+00:00",
+        "type": "send",
+        "usd": 4999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x49e34ea6b5fbf7514b5d0444e1b74300001e668c50ff1623edabf9f974ffd13b"
+      },
+      {
+        "time": 1789985561.406,
+        "time_iso": "2026-09-21T10:12:41.406000+00:00",
+        "type": "send",
+        "usd": 4999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x8348e1caeb3e0dd184c20444e1b327000083f9b086312ca327118d1daa31e7bc"
+      },
+      {
+        "time": 1789984609.407,
+        "time_iso": "2026-09-21T09:56:49.407000+00:00",
+        "type": "send",
+        "usd": 3999999.4,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xbf2f919e3d3ff70fc0a90444e17ec700006aa983d83315e162f83cf0fc33d0fa"
+      },
+      {
+        "time": 1789984554.426,
+        "time_iso": "2026-09-21T09:55:54.426000+00:00",
+        "type": "send",
+        "usd": 4999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x8420e5a52224dc47859a0444e17bc200005bfd8abd27fb1927e990f7e128b632"
+      },
+      {
+        "time": 1789984509.411,
+        "time_iso": "2026-09-21T09:55:09.411000+00:00",
+        "type": "send",
+        "usd": 4999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x58c90dabf17822605a420444e1795b00000425918c7b4132fc91b8feb07bfc4a"
+      },
+      {
+        "time": 1789984465.388,
+        "time_iso": "2026-09-21T09:54:25.388000+00:00",
+        "type": "send",
+        "usd": 4999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xa70f880d7c90ddbea8890444e176f500004a9ff31793fc904ad833603b94b7a9"
+      },
+      {
+        "time": 1789984373.42,
+        "time_iso": "2026-09-21T09:52:53.420000+00:00",
+        "type": "send",
+        "usd": 4999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xb500f614ad3b6fe2b67a0444e171c700003c0dfa483e8eb458c9a1676c3f49cd"
+      },
+      {
+        "time": 1789981395.341,
+        "time_iso": "2026-09-21T09:03:15.341000+00:00",
+        "type": "send",
+        "usd": 6999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x242b5e6bdd9aa62b25a50444e0ce450000667651789dc4fdc7f409be9c9e8015"
+      },
+      {
+        "time": 1789981302.404,
+        "time_iso": "2026-09-21T09:01:42.404000+00:00",
+        "type": "send",
+        "usd": 7999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x78adb1a3a88657c07a270444e0c9200000e8c989438976921c765cf6678a31ab"
+      },
+      {
+        "time": 1789980900.466,
+        "time_iso": "2026-09-21T08:55:00.466000+00:00",
+        "type": "send",
+        "usd": 999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x5df8549674cf88ba5f720444e0b3340000336c7c0fc2a78c01c0ffe933c362a5"
+      },
+      {
+        "time": 1789980668.363,
+        "time_iso": "2026-09-21T08:51:08.363000+00:00",
+        "type": "send",
+        "usd": 8999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x225a80c51895678423d40444e0a6a801010098aab3988656c6232c17d799416e"
+      },
+      {
+        "time": 1789953308.413,
+        "time_iso": "2026-09-21T01:15:08.413000+00:00",
+        "type": "send",
+        "usd": 4999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xb47391c5f89cdddbb5ed0444dacca8010100a9ab939ffcad583c3d18b790b7c6"
+      },
+      {
+        "time": 1789747982.393,
+        "time_iso": "2026-09-18T16:13:02.393000+00:00",
+        "type": "send",
+        "usd": 4999999.6,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xbf4a60072db0fda5c0c40444aef66f00008577ecc8b41c7763130b59ecb4d790"
+      },
+      {
+        "time": 1789747922.403,
+        "time_iso": "2026-09-18T16:12:02.403000+00:00",
+        "type": "send",
+        "usd": 4999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x8982146f5218f14f8afb0444aef32d0000bd2c54ed1c10212d4abfc2111ccb3a"
+      },
+      {
+        "time": 1789747874.394,
+        "time_iso": "2026-09-18T16:11:14.394000+00:00",
+        "type": "send",
+        "usd": 4999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x16dc79182e90c51c18560444aef09500001790fdc993e3eebaa5246aed949f06"
+      },
+      {
+        "time": 1789559784.114,
+        "time_iso": "2026-09-16T11:56:24.114000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x05c9a273cf2c889d0743044486b0900202ca00596a2fa76fa9924dc68e206287"
+      },
+      {
+        "time": 1789408445.369,
+        "time_iso": "2026-09-14T17:54:05.369000+00:00",
+        "type": "send",
+        "usd": 8999998.2,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xaa7435a0e9054a49abed04446669c80000af4d868408691b4e3ce0f3a8092434"
+      },
+      {
+        "time": 1789372129.354,
+        "time_iso": "2026-09-14T07:48:49.354000+00:00",
+        "type": "send",
+        "usd": 8999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x0e833c629d951eab0ffc04445eaa450000be544838983d7db24be7b55c98f895"
+      },
+      {
+        "time": 1789368097.393,
+        "time_iso": "2026-09-14T06:41:37.393000+00:00",
+        "type": "send",
+        "usd": 8999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x071df0c15294a6b5089704445dcfd500005908a6ed97c587aae69c141198809f"
+      },
+      {
+        "time": 1789340787.097,
+        "time_iso": "2026-09-13T23:06:27.097000+00:00",
+        "type": "send",
+        "usd": 4000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xe862f3d735dc25efe9dc044458016f0202d200bcd0df44c18c2b9f29f4dfffda"
+      },
+      {
+        "time": 1789340660.336,
+        "time_iso": "2026-09-13T23:04:20.336000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xb9b93701153bd41fbb32044457fa7802014b00e6b03ef2f15d81e253d43fae0a"
+      },
+      {
+        "time": 1789259704.318,
+        "time_iso": "2026-09-13T00:35:04.318000+00:00",
+        "type": "send",
+        "usd": 7000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xd0d66cbbb46d740cd250044446e02702020b00a14f6092de749f180e73614df7"
+      },
+      {
+        "time": 1789171195.06,
+        "time_iso": "2026-09-11T23:59:55.060000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x1e8720e3b9ae90c620000444343fb102024d00c954a1af98c24fcc3678a26ab0"
+      },
+      {
+        "time": 1789132923.397,
+        "time_iso": "2026-09-11T13:22:03.397000+00:00",
+        "type": "send",
+        "usd": 999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x61df3bf04fe2c60a635804442c19ce00001a53d5eae5e4dc05a7e7430ee69ff5"
+      },
+      {
+        "time": 1789132805.414,
+        "time_iso": "2026-09-11T13:20:05.414000+00:00",
+        "type": "send",
+        "usd": 8999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x15d899e4415a3995175204442c1331000013b1c9dc5d5867b9a14537005e137f"
+      },
+      {
+        "time": 1789131946.447,
+        "time_iso": "2026-09-11T13:05:46.447000+00:00",
+        "type": "send",
+        "usd": 999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xe82374facaa43775e99d04442be4ea00005e8ce065a756478bec204d89a81160"
+      },
+      {
+        "time": 1789131858.431,
+        "time_iso": "2026-09-11T13:04:18.431000+00:00",
+        "type": "send",
+        "usd": 8999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x5e6657de47c66dd35fe004442be0240000a16fc3e2c98ca5022f033106ca47be"
+      },
+      {
+        "time": 1789091760.691,
+        "time_iso": "2026-09-11T01:56:00.691000+00:00",
+        "type": "send",
+        "usd": 7000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xc5213a90e4b11b48c69a0444236fc702043800767fb43a1a68e9e5e3a3b4f533"
+      },
+      {
+        "time": 1789089978.859,
+        "time_iso": "2026-09-11T01:26:18.859000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xcb4e10a1dc025494ccc70444230df10202230087770573666f16bbf49b062e7f"
+      },
+      {
+        "time": 1789069705.208,
+        "time_iso": "2026-09-10T19:48:25.208000+00:00",
+        "type": "send",
+        "usd": 5000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x536431e4fd10ce9854dd04441eba120202f700ca9813ed6af72cdd37bc14a882"
+      },
+      {
+        "time": 1788999048.194,
+        "time_iso": "2026-09-10T00:10:48.194000+00:00",
+        "type": "send",
+        "usd": 4000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x2b3bd573a6df011a2cb504440faa44020379005941d21feccf0480c665d2db04"
+      },
+      {
+        "time": 1788998952.2,
+        "time_iso": "2026-09-10T00:09:12.200000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xbe6a9e65cb20a905bfe404440fa4ea020548004b6623c7d7623349b88a2482f0"
+      },
+      {
+        "time": 1788860628.344,
+        "time_iso": "2026-09-08T09:43:48.344000+00:00",
+        "type": "send",
+        "usd": 4999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x0388ad1631a8bf8c05020443f2241a0000c3c4fbccabde5ea7515868f0ac9976"
+      },
+      {
+        "time": 1788853667.941,
+        "time_iso": "2026-09-08T07:47:47.941000+00:00",
+        "type": "send",
+        "usd": 4000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x91d03f33d28de0e593490443f0a9360204b200196d80ffb73598ea869181bad0"
+      },
+      {
+        "time": 1788844010.989,
+        "time_iso": "2026-09-08T05:06:50.989000+00:00",
+        "type": "send",
+        "usd": 8000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x64d4c9a3034e0600664e0443ee9c9d02025b00889e4124d2089d74f5c241dfeb"
+      },
+      {
+        "time": 1788779299.357,
+        "time_iso": "2026-09-07T11:08:19.357000+00:00",
+        "type": "send",
+        "usd": 4999999.6,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xdcd6b94e82730700de500443e0cfab000011d1341d7625d2809f64a14176e0eb"
+      },
+      {
+        "time": 1788779206.365,
+        "time_iso": "2026-09-07T11:06:46.365000+00:00",
+        "type": "send",
+        "usd": 4999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x3e1c67d0d5c3ce0b3f960443e0ca840000577fb670c6ecdde1e5132394c7a7f5"
+      },
+      {
+        "time": 1788764935.353,
+        "time_iso": "2026-09-07T07:08:55.353000+00:00",
+        "type": "send",
+        "usd": 1000650.9,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xd62a58dd4e95f194d7a40443ddbd8801010070c2e999106679f304300d99cb7f"
+      },
+      {
+        "time": 1788764890.364,
+        "time_iso": "2026-09-07T07:08:10.364000+00:00",
+        "type": "send",
+        "usd": 8999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x7da3d9c0f0082d117f1d0443ddbaf80000def1a68b0b4be3216c8513af0c06fc"
+      },
+      {
+        "time": 1788565504.553,
+        "time_iso": "2026-09-04T23:45:04.553000+00:00",
+        "type": "send",
+        "usd": 5000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xd2950db60a332536d40e0443b32e8102012e009ba5364408765db908c936ff21"
+      },
+      {
+        "time": 1788533693.005,
+        "time_iso": "2026-09-04T14:54:53.005000+00:00",
+        "type": "send",
+        "usd": 7500000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x61f569e82f6eb5e8636f0443ac69c802035600cdca61d4ba05be153aee628fd3"
+      },
+      {
+        "time": 1788531616.19,
+        "time_iso": "2026-09-04T14:20:16.190000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x189fd0e2b742fcd51a190443abf924020cb800c852461ba7bc687c357646d6bf"
+      },
+      {
+        "time": 1788513266.386,
+        "time_iso": "2026-09-04T09:14:26.386000+00:00",
+        "type": "send",
+        "usd": 1999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x1db0f72604302a431f2a0443a80eea0101000f0b9f334915c179a278c334042d"
+      },
+      {
+        "time": 1788513200.41,
+        "time_iso": "2026-09-04T09:13:20.410000+00:00",
+        "type": "send",
+        "usd": 7999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x79b870aae87d2e7b7b320443a80b71010200889083704d4d1d811bfda7710866"
+      },
+      {
+        "time": 1788451008.523,
+        "time_iso": "2026-09-03T15:56:48.523000+00:00",
+        "type": "send",
+        "usd": 1999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x33ea158e050b2023356304439abe880000252d73a00e3ef5d7b2c0e0c40efa0d"
+      },
+      {
+        "time": 1788450893.416,
+        "time_iso": "2026-09-03T15:54:53.416000+00:00",
+        "type": "send",
+        "usd": 7999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xdd56b2bf779c76c9ded004439ab865000091caa5129f959b811f5e12369050b4"
+      },
+      {
+        "time": 1788446445.367,
+        "time_iso": "2026-09-03T14:40:45.367000+00:00",
+        "type": "send",
+        "usd": 1000418.98,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x946db44baf11317d95e7044399c53d0000a8cc314a14504f38365f9e6e150b68"
+      },
+      {
+        "time": 1788446397.488,
+        "time_iso": "2026-09-03T14:39:57.488000+00:00",
+        "type": "send",
+        "usd": 8999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xf4bdea59020210c2f637044399c2980000f9023e9d052f95988695abc105eaad"
+      },
+      {
+        "time": 1788439325.399,
+        "time_iso": "2026-09-03T12:42:05.399000+00:00",
+        "type": "send",
+        "usd": 9999999.6,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xcf99d6f55aa4251cd11304439841ea0000d4eedaf5a743ee7362824819a7ff07"
+      },
+      {
+        "time": 1788418290.396,
+        "time_iso": "2026-09-03T06:51:30.396000+00:00",
+        "type": "send",
+        "usd": 999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xa8679acfe4a485e3a9e1044393c70a0000a2b2b57fa7a4b54c304622a3a85fce"
+      },
+      {
+        "time": 1788418012.483,
+        "time_iso": "2026-09-03T06:46:52.483000+00:00",
+        "type": "send",
+        "usd": 8999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xb9720c7dbe446440baeb044393b7ac0000ad2463594783125d3ab7d07d483e2b"
+      },
+      {
+        "time": 1788318290.288,
+        "time_iso": "2026-09-02T03:04:50.288000+00:00",
+        "type": "send",
+        "usd": 8000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xbbd0207c13d348f1bd4904437e6b260202df0061aed667c35f98cbced2d722dc"
+      },
+      {
+        "time": 1788289607.466,
+        "time_iso": "2026-09-01T19:06:47.466000+00:00",
+        "type": "send",
+        "usd": 7000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xbf722bde828599f2c0eb044378491902030300c41d88b8c4633ad731418973dd"
+      },
+      {
+        "time": 1788242204.402,
+        "time_iso": "2026-09-01T05:56:44.402000+00:00",
+        "type": "send",
+        "usd": 4999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x9165a52dec898ff592df04436e22600000a0bd13878caec7352e5080ab8d69e0"
+      },
+      {
+        "time": 1788227447.483,
+        "time_iso": "2026-09-01T01:50:47.483000+00:00",
+        "type": "send",
+        "usd": 4999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x1f460d1a7809170a20bf04436afd780000812500130c35dcc30eb86d370cf0f4"
+      },
+      {
+        "time": 1788221578.401,
+        "time_iso": "2026-09-01T00:12:58.401000+00:00",
+        "type": "send",
+        "usd": 2999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0xfd29a939890c59c6fea3044369bbc8000064c11f240f7899a0f2548c480033b1"
+      },
+      {
+        "time": 1788153058.885,
+        "time_iso": "2026-08-31T05:10:58.885000+00:00",
+        "type": "send",
+        "usd": 10000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x9679b2874c567f1a97f304435b0c4f02021a006ce7599dec3a425dda0b5a5905"
+      },
+      {
+        "time": 1788016798.448,
+        "time_iso": "2026-08-29T15:19:58.448000+00:00",
+        "type": "send",
+        "usd": 8999999.6,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x38650323e3b8c24839de04433df54f0000a01b097ebbe11adc2dae76a2bc9c32"
+      },
+      {
+        "time": 1787965986.431,
+        "time_iso": "2026-08-29T01:13:06.431000+00:00",
+        "type": "send",
+        "usd": 6000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xe462d23e85c1558ae5dc04433326c6020236002420c4745c882b7d9144c52f75"
+      },
+      {
+        "time": 1787965537.232,
+        "time_iso": "2026-08-29T01:05:37.232000+00:00",
+        "type": "send",
+        "usd": 9000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xc3ed6e7a237acafdc5670443330e27020324005fbe7de9cf67b619cce27ea4e8"
+      },
+      {
+        "time": 1787964989.141,
+        "time_iso": "2026-08-29T00:56:29.141000+00:00",
+        "type": "send",
+        "usd": 8000000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x4175e1803718ec5642ef044332f02001d100f965d21c0b28e53e8cd2f61cc640"
+      },
+      {
+        "time": 1787874461.353,
+        "time_iso": "2026-08-27T23:47:41.353000+00:00",
+        "type": "send",
+        "usd": 2999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x130077a1a1c97664147a04431f89370101008f873ccc9536b6c922f460cd504e"
+      },
+      {
+        "time": 1787844758.368,
+        "time_iso": "2026-08-27T15:32:38.368000+00:00",
+        "type": "send",
+        "usd": 3999999.8,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x172fd206be814a3d18a9044319260000006ae9ec5984690fbaf87d597d852427"
+      },
+      {
+        "time": 1787838188.363,
+        "time_iso": "2026-08-27T13:43:08.363000+00:00",
+        "type": "send",
+        "usd": 4999999.6,
+        "direction": "in",
+        "destination": "0x5b5d51203a0f9079f8aeb098a6523a13f298c060",
+        "token": "USDC",
+        "hash": "0x194bdcb32b69ae281ac5044317bde6000086f498c66cccfabd148805ea6d8812"
+      }
+    ],
+    "n_bridge_out": 33,
+    "n_unknown": 0,
+    "counterparties": {},
+    "parse_failed": false
+  },
+  "verdict": "同地址換戰場（builder dex/現貨）｜⚠️ 資本外移中",
+  "verdict_reasons": [
+    "非原生資金 $240,952,321.09 占總資產 $398,372,607.91 的60%（builder dex $9,800,514.26／現貨 $231,151,806.83）",
+    "近 45 天帳變動離場訊號：跨層轉移（HyperCore→HyperEVM，同一擁有者） $272,500,000.00",
+    "跨層轉移（HyperCore→HyperEVM，同一地址擁有者，非第三方）$272,500,000.00，占「現餘＋跨層轉移」41%（≥ 20% 門檻）→ 資本正離開交易場（跨層/減倉）"
+  ],
+  "endpoint_health": [
+    {
+      "name": "perpDexs",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "clearinghouseState[native]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "clearinghouseState[xyz]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "clearinghouseState[flx]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "clearinghouseState[vntl]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.51
+    },
+    {
+      "name": "clearinghouseState[hyna]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "clearinghouseState[km]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "clearinghouseState[abcd]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "clearinghouseState[cash]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "clearinghouseState[para]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "clearinghouseState[mkts]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "clearinghouseState[io]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "spotClearinghouseState",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "userNonFundingLedgerUpdates",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "portfolio",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "userFills",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.56
+    }
+  ],
+  "notes": [],
+  "requests_ok": 16,
+  "requests_failed": 0
+}

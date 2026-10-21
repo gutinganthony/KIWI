@@ -1,0 +1,692 @@
+{
+  "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+  "label": "scan-best-candidate-9M-lowdd",
+  "date": "2026-10-09",
+  "probed_at": "2026-10-09T02:39:25.638588+00:00",
+  "ledger_window_days": 45,
+  "queries_ok": {
+    "perpDexs": true,
+    "clearinghouseState_native": true,
+    "clearinghouseState_dex": true,
+    "spotClearinghouseState": true,
+    "userNonFundingLedgerUpdates": true,
+    "portfolio": true,
+    "userFills": true
+  },
+  "dexs_detected": [
+    "xyz",
+    "flx",
+    "vntl",
+    "hyna",
+    "km",
+    "abcd",
+    "cash",
+    "para",
+    "mkts",
+    "io"
+  ],
+  "aborted": false,
+  "dexs_queried": [
+    "abcd",
+    "cash",
+    "flx",
+    "hyna",
+    "io",
+    "km",
+    "mkts",
+    "para",
+    "vntl",
+    "xyz"
+  ],
+  "portfolio_windows": {
+    "day": {
+      "account_value_last": 5045529.09,
+      "account_value_ts_iso": "2026-10-09T02:39:35.614000+00:00",
+      "pnl_last": -76309.52,
+      "vlm": 0.0,
+      "n_points": 13
+    },
+    "week": {
+      "account_value_last": 5045529.09,
+      "account_value_ts_iso": "2026-10-09T02:39:35.614000+00:00",
+      "pnl_last": 436225.28,
+      "vlm": 5799822.58,
+      "n_points": 63
+    },
+    "month": {
+      "account_value_last": 5045529.09,
+      "account_value_ts_iso": "2026-10-09T02:39:35.614000+00:00",
+      "pnl_last": 592133.51,
+      "vlm": 16814578.8,
+      "n_points": 45
+    },
+    "allTime": {
+      "account_value_last": 5045529.09,
+      "account_value_ts_iso": "2026-10-09T02:39:35.614000+00:00",
+      "pnl_last": 11926530.09,
+      "vlm": 367552378.24,
+      "n_points": 69
+    },
+    "perpDay": {
+      "account_value_last": 1266746.89,
+      "account_value_ts_iso": "2026-10-09T02:39:35.614000+00:00",
+      "pnl_last": -76289.27,
+      "vlm": 0.0,
+      "n_points": 13
+    },
+    "perpWeek": {
+      "account_value_last": 1266746.89,
+      "account_value_ts_iso": "2026-10-09T02:39:35.614000+00:00",
+      "pnl_last": 436245.45,
+      "vlm": 5799822.58,
+      "n_points": 63
+    },
+    "perpMonth": {
+      "account_value_last": 1266746.89,
+      "account_value_ts_iso": "2026-10-09T02:39:35.614000+00:00",
+      "pnl_last": 592163.96,
+      "vlm": 16814578.8,
+      "n_points": 46
+    },
+    "perpAllTime": {
+      "account_value_last": 1266746.89,
+      "account_value_ts_iso": "2026-10-09T02:39:35.614000+00:00",
+      "pnl_last": 11931918.59,
+      "vlm": 359498021.18,
+      "n_points": 72
+    }
+  },
+  "trading": {
+    "n_fills": 2000,
+    "truncated": true,
+    "last_fill_ts": 1791358937.35,
+    "last_fill_iso": "2026-10-07T07:42:17.350000+00:00",
+    "days_since_last_fill": 1.79,
+    "n_fills_7d": 317,
+    "n_fills_30d": 530,
+    "first_fill_iso": "2026-08-01T20:25:50.595000+00:00",
+    "top_coins": [
+      [
+        "xyz:NVDA",
+        490
+      ],
+      [
+        "xyz:DRAM",
+        318
+      ],
+      [
+        "xyz:SKHY",
+        234
+      ],
+      [
+        "xyz:INTC",
+        224
+      ],
+      [
+        "xyz:SKHX",
+        180
+      ],
+      [
+        "DOGE",
+        105
+      ],
+      [
+        "xyz:GOOGL",
+        90
+      ],
+      [
+        "kLUNC",
+        73
+      ]
+    ],
+    "by_venue": {
+      "builder:xyz": 1584,
+      "native": 387,
+      "builder:para": 29
+    },
+    "recent_fills": [
+      {
+        "time_iso": "2026-10-07T07:42:12.855000+00:00",
+        "coin": "kNEIRO",
+        "dir": "Close Long",
+        "px": 0.086,
+        "sz": 11595.7,
+        "closed_pnl": 124.19
+      },
+      {
+        "time_iso": "2026-10-07T07:42:12.855000+00:00",
+        "coin": "kNEIRO",
+        "dir": "Close Long",
+        "px": 0.086,
+        "sz": 372.4,
+        "closed_pnl": 3.99
+      },
+      {
+        "time_iso": "2026-10-07T07:42:12.989000+00:00",
+        "coin": "kNEIRO",
+        "dir": "Close Long",
+        "px": 0.086,
+        "sz": 1163.0,
+        "closed_pnl": 12.46
+      },
+      {
+        "time_iso": "2026-10-07T07:42:13.125000+00:00",
+        "coin": "kNEIRO",
+        "dir": "Close Long",
+        "px": 0.086,
+        "sz": 116004.3,
+        "closed_pnl": 1242.41
+      },
+      {
+        "time_iso": "2026-10-07T07:42:13.392000+00:00",
+        "coin": "kNEIRO",
+        "dir": "Close Long",
+        "px": 0.086,
+        "sz": 815.9,
+        "closed_pnl": 8.74
+      },
+      {
+        "time_iso": "2026-10-07T07:42:13.464000+00:00",
+        "coin": "kNEIRO",
+        "dir": "Close Long",
+        "px": 0.086,
+        "sz": 1162.8,
+        "closed_pnl": 12.45
+      },
+      {
+        "time_iso": "2026-10-07T07:42:13.464000+00:00",
+        "coin": "kNEIRO",
+        "dir": "Close Long",
+        "px": 0.086,
+        "sz": 11595.7,
+        "closed_pnl": 124.19
+      },
+      {
+        "time_iso": "2026-10-07T07:42:13.795000+00:00",
+        "coin": "kNEIRO",
+        "dir": "Close Long",
+        "px": 0.086,
+        "sz": 1149.0,
+        "closed_pnl": 12.31
+      },
+      {
+        "time_iso": "2026-10-07T07:42:14.243000+00:00",
+        "coin": "kNEIRO",
+        "dir": "Close Long",
+        "px": 0.086,
+        "sz": 6009.0,
+        "closed_pnl": 64.36
+      },
+      {
+        "time_iso": "2026-10-07T07:42:14.721000+00:00",
+        "coin": "kNEIRO",
+        "dir": "Close Long",
+        "px": 0.086,
+        "sz": 7264.0,
+        "closed_pnl": 77.8
+      },
+      {
+        "time_iso": "2026-10-07T07:42:15.406000+00:00",
+        "coin": "kNEIRO",
+        "dir": "Close Long",
+        "px": 0.086,
+        "sz": 7265.7,
+        "closed_pnl": 77.82
+      },
+      {
+        "time_iso": "2026-10-07T07:42:15.805000+00:00",
+        "coin": "kNEIRO",
+        "dir": "Close Long",
+        "px": 0.086,
+        "sz": 765.1,
+        "closed_pnl": 8.19
+      },
+      {
+        "time_iso": "2026-10-07T07:42:16.002000+00:00",
+        "coin": "kNEIRO",
+        "dir": "Close Long",
+        "px": 0.086,
+        "sz": 7265.7,
+        "closed_pnl": 77.82
+      },
+      {
+        "time_iso": "2026-10-07T07:42:16.412000+00:00",
+        "coin": "kNEIRO",
+        "dir": "Close Long",
+        "px": 0.086,
+        "sz": 7265.7,
+        "closed_pnl": 77.82
+      },
+      {
+        "time_iso": "2026-10-07T07:42:16.544000+00:00",
+        "coin": "kNEIRO",
+        "dir": "Close Long",
+        "px": 0.086,
+        "sz": 7265.7,
+        "closed_pnl": 77.82
+      },
+      {
+        "time_iso": "2026-10-07T07:42:16.746000+00:00",
+        "coin": "kNEIRO",
+        "dir": "Close Long",
+        "px": 0.086,
+        "sz": 6009.0,
+        "closed_pnl": 64.36
+      },
+      {
+        "time_iso": "2026-10-07T07:42:16.952000+00:00",
+        "coin": "kNEIRO",
+        "dir": "Close Long",
+        "px": 0.086,
+        "sz": 7265.7,
+        "closed_pnl": 77.82
+      },
+      {
+        "time_iso": "2026-10-07T07:42:17.350000+00:00",
+        "coin": "kNEIRO",
+        "dir": "Close Long",
+        "px": 0.086,
+        "sz": 5633.2,
+        "closed_pnl": 60.33
+      },
+      {
+        "time_iso": "2026-10-07T07:42:17.350000+00:00",
+        "coin": "kNEIRO",
+        "dir": "Close Long",
+        "px": 0.086,
+        "sz": 7265.7,
+        "closed_pnl": 77.82
+      },
+      {
+        "time_iso": "2026-10-07T07:42:17.350000+00:00",
+        "coin": "kNEIRO",
+        "dir": "Close Long",
+        "px": 0.086,
+        "sz": 7265.7,
+        "closed_pnl": 77.82
+      }
+    ]
+  },
+  "funds": {
+    "native": {
+      "n_positions": 5,
+      "account_value": 658168.197622,
+      "position_value": 3343333.59
+    },
+    "builder_dex": {
+      "xyz": {
+        "n_positions": 3,
+        "account_value": 608357.430032,
+        "position_value": 5467710.68
+      },
+      "flx": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "vntl": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "hyna": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "km": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "abcd": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "cash": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "para": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "mkts": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "io": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      }
+    },
+    "spot": {
+      "n_nonzero": 3,
+      "balances": [
+        {
+          "coin": "USDC",
+          "total": 4997347.58181633,
+          "hold": 1263639.186118,
+          "entry_ntl": 0.0,
+          "usd": 4997347.58181633
+        },
+        {
+          "coin": "USDT0",
+          "total": 48215.25091058,
+          "hold": 0.0,
+          "entry_ntl": 48215.25091058,
+          "usd": 48215.25091058,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "USDH",
+          "total": 0.01250805,
+          "hold": 0.0,
+          "entry_ntl": 0.01250805,
+          "usd": 0.01250805
+        }
+      ],
+      "usd_stable": 4997347.59,
+      "usd_est_other": 48215.25,
+      "usd_total_est": 5045562.85,
+      "estimated": true
+    },
+    "native_usd": 658168.2,
+    "builder_usd": 608357.43,
+    "spot_usd": 5045562.85,
+    "total_usd": 6312088.48,
+    "non_native_usd": 5653920.28,
+    "non_native_share": 0.8957,
+    "positions": [
+      {
+        "coin": "BTC",
+        "szi": -10.74691,
+        "side": "short",
+        "entry_px": 83783.0,
+        "position_value": 880580.31158,
+        "unrealized_pnl": 19828.99091,
+        "leverage_value": 40.0,
+        "leverage_type": "cross",
+        "liquidation_px": 486328.2154946152,
+        "margin_used": 22014.507789,
+        "max_leverage": 40.0,
+        "cum_funding_all_time": -27489.703412,
+        "dex": ""
+      },
+      {
+        "coin": "DOGE",
+        "szi": 9756943.0,
+        "side": "long",
+        "entry_px": 0.092131,
+        "position_value": 823495.746143,
+        "unrealized_pnl": -75430.720665,
+        "leverage_value": 10.0,
+        "leverage_type": "cross",
+        "liquidation_px": null,
+        "margin_used": 82349.574614,
+        "max_leverage": 10.0,
+        "cum_funding_all_time": 7090.41951,
+        "dex": ""
+      },
+      {
+        "coin": "BSV",
+        "szi": 83801.24,
+        "side": "long",
+        "entry_px": 16.52,
+        "position_value": 1578312.55416,
+        "unrealized_pnl": 193916.06936,
+        "leverage_value": 3.0,
+        "leverage_type": "cross",
+        "liquidation_px": null,
+        "margin_used": 526104.18472,
+        "max_leverage": 3.0,
+        "cum_funding_all_time": 856.359085,
+        "dex": ""
+      },
+      {
+        "coin": "TNSR",
+        "szi": 862794.4,
+        "side": "long",
+        "entry_px": 0.03649,
+        "position_value": 31336.692608,
+        "unrealized_pnl": -146.675048,
+        "leverage_value": 3.0,
+        "leverage_type": "cross",
+        "liquidation_px": null,
+        "margin_used": 10445.564202,
+        "max_leverage": 3.0,
+        "cum_funding_all_time": -939.836863,
+        "dex": ""
+      },
+      {
+        "coin": "kNEIRO",
+        "szi": 365308.9,
+        "side": "long",
+        "entry_px": 0.07529,
+        "position_value": 29608.286345,
+        "unrealized_pnl": 2104.179264,
+        "leverage_value": 3.0,
+        "leverage_type": "cross",
+        "liquidation_px": null,
+        "margin_used": 9869.428781,
+        "max_leverage": 3.0,
+        "cum_funding_all_time": 15.948419,
+        "dex": ""
+      },
+      {
+        "coin": "xyz:GOOGL",
+        "szi": 219.928,
+        "side": "long",
+        "entry_px": 343.187,
+        "position_value": 76816.45184,
+        "unrealized_pnl": 1339.830828,
+        "leverage_value": 10.0,
+        "leverage_type": "cross",
+        "liquidation_px": null,
+        "margin_used": 7681.645184,
+        "max_leverage": 20.0,
+        "cum_funding_all_time": 3019.800268,
+        "dex": "xyz"
+      },
+      {
+        "coin": "xyz:SKHX",
+        "szi": 2107.974,
+        "side": "long",
+        "entry_px": 1431.724,
+        "position_value": 2594494.3992,
+        "unrealized_pnl": -423543.8464,
+        "leverage_value": 10.0,
+        "leverage_type": "cross",
+        "liquidation_px": null,
+        "margin_used": 259449.43992,
+        "max_leverage": 10.0,
+        "cum_funding_all_time": 30637.850602,
+        "dex": "xyz"
+      },
+      {
+        "coin": "xyz:SKHY",
+        "szi": -16202.56,
+        "side": "short",
+        "entry_px": 198.3187,
+        "position_value": 2796399.8304,
+        "unrealized_pnl": 416871.0777,
+        "leverage_value": 10.0,
+        "leverage_type": "cross",
+        "liquidation_px": 431.2363448008,
+        "margin_used": 279639.98304,
+        "max_leverage": 10.0,
+        "cum_funding_all_time": 20266.817212,
+        "dex": "xyz"
+      }
+    ],
+    "n_positions_total": 8,
+    "n_positions_native": 5,
+    "n_positions_builder": 3,
+    "known": true
+  },
+  "ledger": {
+    "n_total": 0,
+    "n_in_window": 0,
+    "n_kept": 0,
+    "by_type": {},
+    "external_out_usd": 0.0,
+    "external_in_usd": 0.0,
+    "internal_usd": 0.0,
+    "vault_out_usd": 0.0,
+    "bridge_out_usd": 0.0,
+    "unknown_usd": 0.0,
+    "external_out_rows": [],
+    "bridge_out_rows": [],
+    "unknown_rows": [],
+    "internal_rows": [],
+    "rows": [],
+    "n_bridge_out": 0,
+    "n_unknown": 0,
+    "counterparties": {},
+    "parse_failed": false
+  },
+  "verdict": "同地址換戰場（builder dex/現貨）",
+  "verdict_reasons": [
+    "非原生資金 $5,653,920.28 占總資產 $6,312,088.48 的90%（builder dex $608,357.43／現貨 $5,045,562.85）",
+    "成交戰場分布：非原生 1613/2000 筆（81%）",
+    "近 45 天無外轉紀錄（內部轉移 $0.00）"
+  ],
+  "endpoint_health": [
+    {
+      "name": "perpDexs",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "clearinghouseState[native]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "clearinghouseState[xyz]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "clearinghouseState[flx]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "clearinghouseState[vntl]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "clearinghouseState[hyna]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "clearinghouseState[km]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "clearinghouseState[abcd]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "clearinghouseState[cash]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "clearinghouseState[para]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.34
+    },
+    {
+      "name": "clearinghouseState[mkts]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "clearinghouseState[io]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "spotClearinghouseState",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "userNonFundingLedgerUpdates",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "portfolio",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.36
+    },
+    {
+      "name": "userFills",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.49
+    }
+  ],
+  "notes": [],
+  "requests_ok": 16,
+  "requests_failed": 0
+}

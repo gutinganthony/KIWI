@@ -23,10 +23,17 @@ last_updated: 2026-07-06
 
 ## 🔴 待辦（依急迫度）
 
+### 🆕 2026-10-08 新增（主對話 session 產生）
+
+- [ ] 🟡 **2026-10-19 部分解決（CLAUDE.md fileId 已換，Jake 同意）：找到新的權威 Sheet「KIWI 持倉表」**（fileId `1FPmLpXYVgm8Xrsv6Gs01bC-SlKytcEdmXF7NC2vUqJ4`），已同步進 `holdings.md`。**剩下一件**：~~①CLAUDE.md fileId~~ ✅；②Sheet 的「現金餘額」仍寫「請填」、「最後更新」停在 09-08、COHX 出場價待補。原紀錄：**Google Sheet「KIWI 持倉即時表」雲端讀不到**：`mcp__Google_Drive__read_file_content`
+  對 fileId `1tYg3PneDLrxXbtuoo1lsylFV8ehSpEblv9thEuAllns` 回 `Requested entity was not found`。
+  可能是檔案被移動或刪除、共用權限變了，或 fileId 換了。**請在 Drive 確認檔案還在、連結的 Google 帳號有權限**；
+  如果 fileId 換了，要更新 `CLAUDE.md` §0。在修好之前，每個 session 只能用 `skills/serenity/holdings.md`（最後同步 2026-08-28）。
+- [ ] **COHX 的實際持股**：出場規則 3 A 段（CRI≥50 → 槓桿全賣）的對象是 COHX。請確認你現在還持有、股數多少，
+  並把下單方式設定好（美股盤是台北晚上，**觸發當晚要能下單**）。
+
 ### 🆕 2026-09-30 新增（主對話 session 產生）
 
-- [ ] **Google Sheet「KIWI 持倉即時表」雲端讀取回傳 `Requested entity was not found`**（fileId `1tYg3PneDLrxXbtuoo1lsylFV8ehSpEblv9thEuAllns`）。
-  可能是檔案被移動、改權限或換了新檔。**請在 Mac 上確認該 Sheet 仍存在且 Drive 連接器有權限**；若換了新檔，把新 fileId 告訴 Claude 更新 CLAUDE.md §0。在那之前 session 只能用 `holdings.md`（最後同步 08-28）。
 - [ ] **台灣財經新聞站本次全部被雲端 egress 擋**：鉅亨（cnyes）、聯合／經濟日報（udn）、工商時報（ctee）、Yahoo 股市、蕃薯藤（yam）、富果（fugle），另有 Tom's Hardware、ServeTheHome。
   嘉澤報告（`topics/business/2026-09-30-3533-serenity-full-wt-oversold-margin.md`）的法說內容因此**全部只讀到搜尋摘要**。**若要補：在 Mac 開富果 2026-08-13 嘉澤法說備忘錄與鉅亨〈嘉澤估 Q3 毛利率持平上季〉**，核對「原料佔成本 65%」「庫藏股費用 2.79 億」「下半年費用 19–20 億」三個數字。
 
