@@ -36,6 +36,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-10-08 | [科斯托蘭尼的「失衡」與 1987 年股災：前因後果、今天的對照，以及現在最像哪一段](./topics/business/2026-10-08-kostolany-1987-crash-analog.md) | Business |
 | 2026-08-28 | [T1 條件⑤ 檢核 — NVDA Q2 FY27：供應商融資擴散觸發](./topics/business/2026-08-28-t1-condition5-nvda-q2-fy27-trigger.md) | Business |
 | 2026-08-25 | [「中國曝險」紅旗的第一性原理重寫](./topics/business/2026-08-25-china-red-flag-first-principles-rewrite.md) | Business |
+| 2026-10-22 | [SemiAnalysis〈Datacenters 2027 +50GW〉重點摘錄與說法驗證](./topics/business/2026-10-22-semianalysis-datacenters-2027-50gw-verification.md) | Business |
 | 2026-10-20 | [Serenity 完整 Step 1–9：Rigetti 與 D-Wave＋窄線寬雷射白話解說＋上游供應商上市計畫](./topics/business/2026-10-20-serenity-step1-9-rgti-qbts-and-narrow-linewidth-lasers.md) | Business |
 | 2026-10-20 | [Serenity 完整 Step 1–9：IonQ（IONQ）與 Quantinuum（QNT）](./topics/business/2026-10-20-serenity-step1-9-ionq-qnt.md) | Business |
 | 2026-10-20 | [量子計算產業現況與前景、個別公司優勢，以及 WaveTrend 超賣訊號的勝率（含 QNT）](./topics/business/2026-10-20-quantum-computing-landscape-and-wt-oversold-winrate.md) | Business |
@@ -163,6 +164,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-10-20 | [量子計算產業現況與前景、個別公司優勢，以及 WaveTrend 超賣訊號的勝率（含 QNT）](./topics/business/2026-10-20-quantum-computing-landscape-and-wt-oversold-winrate.md) | Business |
 | 2026-10-20 | [Serenity 完整 Step 1–9：IonQ（IONQ）與 Quantinuum（QNT）](./topics/business/2026-10-20-serenity-step1-9-ionq-qnt.md) | Business |
 | 2026-10-20 | [Serenity 完整 Step 1–9：Rigetti 與 D-Wave＋窄線寬雷射白話解說＋上游供應商上市計畫](./topics/business/2026-10-20-serenity-step1-9-rgti-qbts-and-narrow-linewidth-lasers.md) | Business |
+| 2026-10-22 | [SemiAnalysis〈Datacenters 2027 +50GW〉重點摘錄與說法驗證](./topics/business/2026-10-22-semianalysis-datacenters-2027-50gw-verification.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
