@@ -1,6 +1,6 @@
 # _SOURCE_PROBE — 有価証券報告書來源探測（JEM 否證 #3）
 
-> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-10-23T23:36:36+00:00
+> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-10-24T01:24:57+00:00
 > **為什麼有這支**：2026-08-20 Jake 多次嘗試註冊 EDINET API key 失敗（登入問題）。
 > 與其讓他繼續跟註冊表單纏鬥，不如讓 runner 直接回報**哪一條路是通的**。
 
@@ -10,14 +10,14 @@
 
 | 來源 | 狀態 | 備註 | body 前 180 字 |
 |---|---|---|---|
-| [EDINET v2 API（無 key）](https://api.edinet-fsa.go.jp/api/v2/documents.json?date=2026-08-18&type=2) | **200** | 已知：HTTP 200 但 body 為 401 invalid subscription key | `{"StatusCode": 401,"message": "Access denied due to invalid subscription key.Make sure to provide a valid key for an active subscription."}` |
-| [EDINET 網頁介面（不需 key？）](https://disclosure2.edinet-fsa.go.jp/WEEK0010.aspx) | **200** | 未驗證：網頁 UI 若可達，或可不透過 API 取文件 | `<!DOCTYPE html> <html lang="ja"> <head> <meta name="viewport" content="width=device-width,initial-scale=1"/> <meta name="description" content="EDINETの閲覧サイトです。有価証券報告書、有価証券届出書、大量保有報告` |
+| [EDINET v2 API（無 key）](https://api.edinet-fsa.go.jp/api/v2/documents.json?date=2026-08-18&type=2) | **200** | 已知：HTTP 200 但 body 為 401 invalid subscription key | `<!DOCTYPE html> <!-- saved from url=(0044)http://localhost/FSAEDINET_DEV/WZEK0020.aspx --> <html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">` |
+| [EDINET 網頁介面（不需 key？）](https://disclosure2.edinet-fsa.go.jp/WEEK0010.aspx) | **200** | 未驗證：網頁 UI 若可達，或可不透過 API 取文件 | `<!DOCTYPE html> <!-- saved from url=(0044)http://localhost/FSAEDINET_DEV/WZEK0020.aspx --> <html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">` |
 | [有報キャッチャー ufocatch 首頁](https://ufocatch.com/) | **200** | 未驗證：EDINET/TDnet XBRL 的第三方鏡像，宣稱免費且不需金鑰 | `<!DOCTYPE html> <html lang="ja"> <head>     <!-- Google Tag Manager -->     <script>(function(w,d,s,l,i){w[l]=w[l]//[];w[l].push({'gtm.start':     new Date().getTime(),event:'` |
 | [ufocatch Atom（候選路徑，純猜測）](https://resource.ufocatch.com/atom/edinetx/query/6855) | **403** | ⚠️ 路徑為猜測，回 404 不代表服務不存在，只代表這個路徑不對 | `<!DOCTYPE html>
 <!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
 <!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
 <!--[if IE 8]>` |
-| [JEM 公司 IR 站](https://www.jem-net.co.jp/) | **ERR URLError** | 未驗證：雲端 403；runner 未測 | `` |
+| [JEM 公司 IR 站](https://www.jem-net.co.jp/) | **200** | 未驗證：雲端 403；runner 未測 | `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja-jp` |
 | [TDnet 一覽（對照組）](https://www.release.tdnet.info/inbs/I_list_001_20260818.html) | **404** | 已知：runner 可達 HTTP 200 —— 若這條也失敗，代表是 runner 網路問題不是站點問題 | `<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html><head>
 <title>404 Not Found</title>
@@ -31,7 +31,7 @@
     <script>(function(w,d,s,l,i){w[l]=w[l]//[];w[l].push({'gtm.start':
     new Date().getTime(),event:'` |
 | [ufocatch 說明頁（已知存在）](https://ufocatch.com/about.aspx) | **200** | 對照：此頁確實存在。若它 200 而檢索頁 404 → 站可用、只是路徑要找 | `<!DOCTYPE html> <html lang="ja"> <head>     <!-- Google Tag Manager -->     <script>(function(w,d,s,l,i){w[l]=w[l]//[];w[l].push({'gtm.start':     new Date().getTime(),event:'` |
-| [EDINET 書類検索（猜測）](https://disclosure2.edinet-fsa.go.jp/week0020.aspx) | **200** | ⚠️ 猜測路徑（WEEK0010 是首頁，書類検索可能是別的 aspx） | `<!DOCTYPE html> <html lang="ja"> <head> <meta name="viewport" content="width=device-width,initial-scale=1"/> <meta name="description" content="開示情報利用者用トップ画面（英語）"/> <meta name="appl` |
+| [EDINET 書類検索（猜測）](https://disclosure2.edinet-fsa.go.jp/week0020.aspx) | **200** | ⚠️ 猜測路徑（WEEK0010 是首頁，書類検索可能是別的 aspx） | `<!DOCTYPE html> <!-- saved from url=(0044)http://localhost/FSAEDINET_DEV/WZEK0020.aspx --> <html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">` |
 
 ## 下一步（給未來 session）
 
@@ -47,14 +47,14 @@
 `https://api.edinet-fsa.go.jp/api/v2/documents.json?date=2026-08-18&type=2`
 
 ```html
-{"StatusCode": 401,"message": "Access denied due to invalid subscription key.Make sure to provide a valid key for an active subscription."}
+<!DOCTYPE html> <!-- saved from url=(0044)http://localhost/FSAEDINET_DEV/WZEK0020.aspx --> <html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta name="generator" content="GeneXus C# 16_0_8-139488"> <meta name="description" content="システムメンテナンス画面"> <meta name="viewport" content="width=1366, user-scalable=yes"> <meta name="apple-mobile-web-app-capable" content="yes"> <!--[if IE]><meta http-equiv="page-enter" content="blendTrans(Duration=0.1)"/><![endif]--> <meta name="fragment" content="!">  <title>EDINET</title> <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css"> <style id="gx-dom-fixes">.gx-center-align {text-align:center;}.gx-center-align > p,.gx-center-align > div.gx-content-placeholder > div.gx-ct-body > p, .gx-center-align > div.gxwebcomponent > div.gxwebcomponent-body > p,.gx-center-align > table,.gx-center-align > div.gx-content-placeholder > div.gx-ct-body > table, .gx-center-align > div.gxwebcomponent > div.gxwebcomponent-body > table,.gx-center-align > div,.gx-center-align > div.gx-content-placeholder > div.gx-ct-body > div, .gx-center-align > div.gxwebcomponent > div.gxwebcomponent-body > div,.gx-center-align > fieldset,.gx-center-align > div.gx-content-placeholder > div.gx-ct-body > fieldset, .gx-center-align > div.gxwebcomponent > div.gxwebcomponent-body > fieldset{margin-left:auto;margin-right:auto;}.gx-right-align {text-align:right;}.gx-right-align > p,.gx-right-align > div.gx-co
 ```
 
 ### EDINET 網頁介面（不需 key？）
 `https://disclosure2.edinet-fsa.go.jp/WEEK0010.aspx`
 
 ```html
-<!DOCTYPE html> <html lang="ja"> <head> <meta name="viewport" content="width=device-width,initial-scale=1"/> <meta name="description" content="EDINETの閲覧サイトです。有価証券報告書、有価証券届出書、大量保有報告書、公開買付届出書等の開示書類を閲覧できます。"/> <meta name="apple-mobile-web-app-capable" content="yes"/> <!--[if IE]><meta http-equiv="page-enter" content="blendTrans(Duration=0.1)"/><![endif]--> <meta name="fragment" content="!"/> <meta http-equiv="content-type" content="text/html; charset=UTF-8"/> <title>EDINET</title> <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css?202682016474931"/> <link id="gxtheme_css_reference" rel="stylesheet" type="text/css" href="Resources/Japanese/ThemeBlue.css?202682016474931" /> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/fontawesome_v5/css/fontawesome.min.css"/> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/fontawesome_v5/css/all.min.css"/> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/DVelopBootstrap.css"/> <script type="text/javascript" src="jquery.js?2136580" ></script><script type="text/javascript" src="bootstrap/js/bootstrap.min.js?202682016474931" ></script><script type="text/javascript" src="gxgral.js?2136580" ></script><script type="text/javascript" src="gxcfg.js?20268201645714" ></script><script type="text/javascript" src="js/CommonJS.js?20260828182232" ></script><script typ
+<!DOCTYPE html> <!-- saved from url=(0044)http://localhost/FSAEDINET_DEV/WZEK0020.aspx --> <html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta name="generator" content="GeneXus C# 16_0_8-139488"> <meta name="description" content="システムメンテナンス画面"> <meta name="viewport" content="width=1366, user-scalable=yes"> <meta name="apple-mobile-web-app-capable" content="yes"> <!--[if IE]><meta http-equiv="page-enter" content="blendTrans(Duration=0.1)"/><![endif]--> <meta name="fragment" content="!">  <title>EDINET</title> <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css"> <style id="gx-dom-fixes">.gx-center-align {text-align:center;}.gx-center-align > p,.gx-center-align > div.gx-content-placeholder > div.gx-ct-body > p, .gx-center-align > div.gxwebcomponent > div.gxwebcomponent-body > p,.gx-center-align > table,.gx-center-align > div.gx-content-placeholder > div.gx-ct-body > table, .gx-center-align > div.gxwebcomponent > div.gxwebcomponent-body > table,.gx-center-align > div,.gx-center-align > div.gx-content-placeholder > div.gx-ct-body > div, .gx-center-align > div.gxwebcomponent > div.gxwebcomponent-body > div,.gx-center-align > fieldset,.gx-center-align > div.gx-content-placeholder > div.gx-ct-body > fieldset, .gx-center-align > div.gxwebcomponent > div.gxwebcomponent-body > fieldset{margin-left:auto;margin-right:auto;}.gx-right-align {text-align:right;}.gx-right-align > p,.gx-right-align > div.gx-co
 ```
 
 ### 有報キャッチャー ufocatch 首頁
@@ -62,6 +62,13 @@
 
 ```html
 <!DOCTYPE html> <html lang="ja"> <head>     <!-- Google Tag Manager -->     <script>(function(w,d,s,l,i){w[l]=w[l]//[];w[l].push({'gtm.start':     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);     })(window,document,'script','dataLayer','GTM-KQ5J3GZM');</script>     <!-- End Google Tag Manager -->     <meta charset="utf-8" />     <meta name="viewport" content="width=device-width, initial-scale=1.0" />     <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />     <meta name="google-site-verification" content="Me5AYZ0nFZgkYjEfhSMHKiX-3RtBCC4Pu3oj79fryxo" />     <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />     <link rel="icon" type="image/png" sizes="192x192" href="/staticfiles/icons/icon-192.png" />     <link rel="apple-touch-icon" sizes="180x180" href="/staticfiles/icons/apple-touch-icon.png" />     <meta name="description" content="EDINET&#x30FB;TDnet&#x306E;&#x6709;&#x4FA1;&#x8A3C;&#x5238;&#x5831;&#x544A;&#x66F8;&#x3001;&#x6C7A;&#x7B97;&#x77ED;&#x4FE1;&#x3001;&#x5927;&#x91CF;&#x4FDD;&#x6709;&#x5831;&#x544A;&#x66F8;&#x3092;&#x6A2A;&#x65AD;&#x691C;&#x7D22;&#x3002;XBRL&#x306E;&#x8CA1;&#x52D9;&#x30C7;&#x30FC;&#x30BF;&#x3001;&#x30A6;&#x30A9;&#x30C3;&#x30C1;&#x30EA;&#x30B9;&#x30C8;&#x3001;&#x958B;&#x793A;&#x30A2;&#x30E9;&#x30FC;&#x30C8;&#x3
+```
+
+### JEM 公司 IR 站
+`https://www.jem-net.co.jp/`
+
+```html
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja-jp" lang="ja-jp" dir="ltr"> <head> <link rel="stylesheet" href="/templates/business/css/normalize.css" type="text/css" media="print,screen" /> <link rel="stylesheet" href="/templates/business/css/template.css" type="text/css" media="print,screen" /> <link rel="stylesheet" media="screen and (max-width: 640px)" href="/templates/business/css/responsive.css" type="text/css" /> <script type="text/javascript"> if ((navigator.userAgent.indexOf('iPhone') > 0) // navigator.userAgent.indexOf('iPod') > 0 // navigator.userAgent.indexOf('Android') > 0) { document.write('<meta name="viewport" content="width=device-width">'); }else{ document.write('<meta name="format-detection" content="telephone=no">');     } </script>  <base href="https://www.jem-net.co.jp/" /> 	<meta http-equiv="content-type" content="text/html; charset=utf-8" /> 	<meta name="keywords" content="半導体,プローブカード,研究,開発,検査用部品,製造" /> 	<meta name="robots" content="index, follow" /> 	<meta name="description" content="日本電子材料株式会社は、兵庫県尼崎市に本社を置くプローブカード（半導体検査用部品）のメーカーです。" /> 	<title>日本電子材料株式会社-半導体検査用部品プローブカードの研究開発製造</title> 	<link href="/templates/business/favic
 ```
 
 ### ufocatch 說明頁（已知存在）
@@ -75,15 +82,15 @@
 `https://disclosure2.edinet-fsa.go.jp/week0020.aspx`
 
 ```html
-<!DOCTYPE html> <html lang="ja"> <head> <meta name="viewport" content="width=device-width,initial-scale=1"/> <meta name="description" content="開示情報利用者用トップ画面（英語）"/> <meta name="apple-mobile-web-app-capable" content="yes"/> <!--[if IE]><meta http-equiv="page-enter" content="blendTrans(Duration=0.1)"/><![endif]--> <meta name="fragment" content="!"/> <meta http-equiv="content-type" content="text/html; charset=UTF-8"/> <title>EDINET</title> <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css?202682016474931"/> <link id="gxtheme_css_reference" rel="stylesheet" type="text/css" href="Resources/Japanese/ThemeBlue.css?202682016474931" /> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/fontawesome_v5/css/fontawesome.min.css"/> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/fontawesome_v5/css/all.min.css"/> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/DVelopBootstrap.css"/> <script type="text/javascript" src="jquery.js?2136580" ></script><script type="text/javascript" src="bootstrap/js/bootstrap.min.js?202682016474931" ></script><script type="text/javascript" src="gxgral.js?2136580" ></script><script type="text/javascript" src="gxcfg.js?202682016464954" ></script><script type="text/javascript" src="Window/InNewWindowRender.js" ></script><script type="text/javascript" src="js/CommonJS.js?20260828182232" ></script><script type="text/javascript" src="js/Scrolltop.js?
+<!DOCTYPE html> <!-- saved from url=(0044)http://localhost/FSAEDINET_DEV/WZEK0020.aspx --> <html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta name="generator" content="GeneXus C# 16_0_8-139488"> <meta name="description" content="システムメンテナンス画面"> <meta name="viewport" content="width=1366, user-scalable=yes"> <meta name="apple-mobile-web-app-capable" content="yes"> <!--[if IE]><meta http-equiv="page-enter" content="blendTrans(Duration=0.1)"/><![endif]--> <meta name="fragment" content="!">  <title>EDINET</title> <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css"> <style id="gx-dom-fixes">.gx-center-align {text-align:center;}.gx-center-align > p,.gx-center-align > div.gx-content-placeholder > div.gx-ct-body > p, .gx-center-align > div.gxwebcomponent > div.gxwebcomponent-body > p,.gx-center-align > table,.gx-center-align > div.gx-content-placeholder > div.gx-ct-body > table, .gx-center-align > div.gxwebcomponent > div.gxwebcomponent-body > table,.gx-center-align > div,.gx-center-align > div.gx-content-placeholder > div.gx-ct-body > div, .gx-center-align > div.gxwebcomponent > div.gxwebcomponent-body > div,.gx-center-align > fieldset,.gx-center-align > div.gx-content-placeholder > div.gx-ct-body > fieldset, .gx-center-align > div.gxwebcomponent > div.gxwebcomponent-body > fieldset{margin-left:auto;margin-right:auto;}.gx-right-align {text-align:right;}.gx-right-align > p,.gx-right-align > div.gx-co
 ```
 
 
 ## TDnet 解析診斷
 
-- 回溯嘗試：20261022(0列)
-- 測試頁：`https://www.release.tdnet.info/inbs/I_list_001_20261022.html`
-- HTML 長度：56,005 字元
+- 回溯嘗試：20261023(0列)
+- 測試頁：`https://www.release.tdnet.info/inbs/I_list_001_20261023.html`
+- HTML 長度：54,945 字元
 - `parse_list_page` 解析出的列數：**0**
 - 其中命中目標代碼：**0**
 
