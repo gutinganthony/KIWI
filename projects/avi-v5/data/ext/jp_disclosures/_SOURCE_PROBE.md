@@ -1,6 +1,6 @@
 # _SOURCE_PROBE — 有価証券報告書來源探測（JEM 否證 #3）
 
-> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-10-24T06:56:47+00:00
+> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-10-25T07:21:26+00:00
 > **為什麼有這支**：2026-08-20 Jake 多次嘗試註冊 EDINET API key 失敗（登入問題）。
 > 與其讓他繼續跟註冊表單纏鬥，不如讓 runner 直接回報**哪一條路是通的**。
 
@@ -88,20 +88,20 @@
 
 ## TDnet 解析診斷
 
-- 回溯嘗試：20261023(0列)
-- 測試頁：`https://www.release.tdnet.info/inbs/I_list_001_20261023.html`
-- HTML 長度：54,945 字元
+- 回溯嘗試：20261024(0列)
+- 測試頁：`https://www.release.tdnet.info/inbs/I_list_001_20261024.html`
+- HTML 長度：5,597 字元
 - `parse_list_page` 解析出的列數：**0**
 - 其中命中目標代碼：**0**
 
 實際出現的 class 值（前 40 個）：
 ```
-evennew-L kjTime, evennew-M kjCode, evennew-M kjName, evennew-M kjPlace, evennew-M kjTitle, evennew-M kjXbrl, evennew-R kjHistroy, header-L, header-M, header-R, kaijiSum, oddnew-L kjTime, oddnew-M kjCode, oddnew-M kjName, oddnew-M kjPlace, oddnew-M kjTitle, oddnew-M kjXbrl, oddnew-R kjHistroy, pager-L, pager-M, pager-O, pager-R, pagerTd, style002, xbrl-button, xbrl-mask
+evennew-L kjTime, evennew-M kjCode, evennew-M kjName, evennew-M kjPlace, evennew-M kjTitle, evennew-M kjXbrl, evennew-R kjHistroy, header-L, header-M, header-R, kaijiSum, oddnew-L kjTime, oddnew-M kjCode, oddnew-M kjName, oddnew-M kjPlace, oddnew-M kjTitle, oddnew-M kjXbrl, oddnew-R kjHistroy, pager-L, pager-O, pager-R, pagerTd
 ```
 
 其中以 `kj` 開頭者：**無 ← 這就是解析失敗的原因**
 
-`<tr>` 標籤數：**109**
+`<tr>` 標籤數：**11**
 
 ```html
 <!DOCTYPE html>
