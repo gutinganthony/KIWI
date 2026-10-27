@@ -367,6 +367,43 @@ def run_cycle(legs, data, store, broker, run_utc, quiet=False):
     store.save()
 
 
+def wilson_upper(wins, n, z=1.2816):
+    """勝率的單尾 90% 信賴上限（Wilson）。上限仍低於回測勝率＝統計上明顯變差。"""
+    p = wins / n
+    center = (p + z * z / (2 * n)) / (1 + z * z / n)
+    half = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / (1 + z * z / n)
+    return (center + half) * 100
+
+
+def leg_health(legs, store, min_n=10):
+    """用 ledger 裡已平倉的交易檢查每條腿是否失效。做多腿各自判斷，做空腿合併成一個籃子判斷。"""
+    if not store.ledger.exists():
+        return []
+    rows = [r for r in csv.DictReader(open(store.ledger)) if r["action"] == "EXIT" and r["ret"]]
+    groups = {}
+    for g in legs:
+        key = "做空籃子" if g["side"] == "short" else g["name"]
+        groups.setdefault(key, {"bt_wr": g.get("bt_wr"), "names": set()})["names"].add(g["name"])
+    out = []
+    for key, info in groups.items():
+        rets = [float(r["ret"]) for r in rows if r["leg"] in info["names"]]
+        n, wins = len(rets), sum(x > 0 for x in rets)
+        if n == 0:
+            out.append(f"  {key}：還沒有平倉的交易")
+            continue
+        wr = wins / n * 100
+        avg = float(np.mean(rets)) * 100
+        line = f"  {key}：{n} 筆，勝率 {wr:.0f}%（回測 {info['bt_wr']:.0f}%），平均每筆 {avg:+.2f}%"
+        if n < min_n:
+            line += f"　樣本不足（滿 {min_n} 筆才判斷）"
+        elif info["bt_wr"] and wilson_upper(wins, n) < info["bt_wr"]:
+            line += "　🩺 勝率明顯低於回測，建議停用這條腿"
+        else:
+            line += "　正常"
+        out.append(line)
+    return out
+
+
 def print_status(legs, store, data=None):
     total = 0.0
     print(f"\n狀態檔：{store.path}")
@@ -385,7 +422,12 @@ def print_status(legs, store, data=None):
         total += mark
         print(line)
     cap = store.state["capital"]
-    print(f"  合計（含未實現）{total:.2f}　起始 {cap:.2f}　{(total / cap - 1) * 100:+.2f}%\n")
+    print(f"  合計（含未實現）{total:.2f}　起始 {cap:.2f}　{(total / cap - 1) * 100:+.2f}%")
+    health = leg_health(legs, store)
+    if health:
+        print("失效檢查（模擬盤實際勝率 vs 回測；單尾 90% 信賴上限仍低於回測才判定失效）：")
+        print("\n".join(health))
+    print()
 
 
 def replay(legs, start, home, capital):
