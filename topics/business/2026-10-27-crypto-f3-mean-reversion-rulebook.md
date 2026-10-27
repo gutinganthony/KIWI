@@ -6,7 +6,7 @@ date_added: 2026-10-27
 last_updated: 2026-10-27
 topic: business
 tags: [backtest, crypto, mean-reversion, BNB, TRX, BCH, RSI, EMA200, portfolio, paper-trading, rulebook, short, perpetual, bear-market, tradingview, okx-demo]
-version: 2.0
+version: 2.1
 related: [./2026-06-06-dip-buying-best-indicator-combos-backtest.md]
 engine: projects/crypto-f3/f3_backtest.py
 ---
@@ -15,7 +15,7 @@ engine: projects/crypto-f3/f3_backtest.py
 >
 > **F3 2.0（§8）**：F3 縮成 70%，另外 30% 給「熊市做空籃子」（8 個幣、同一條規則，永續合約 1 倍）。4 年**年化 20.3%、最大回撤 −7.7%，最近 12 個月 +10.0%**（F3 是 +4.7%）。用部分多頭報酬換熊市保護。§8.3 的研究限制一定要看。
 >
-> **教學**：TradingView 見 §9，OKX 模擬盤見 §10。
+> **教學**：TradingView 見 §9，OKX 模擬盤（手動）見 §10，自動執行機器人（紙上交易／OKX 模擬盤）見 §11。
 >
 > **先講限制**（細節見 §6）：
 > - 全部是**本機回測**。只有 BNB 那條腿在 TextToQuant 上驗證過（Binance 資料，B- 級）。
@@ -308,6 +308,88 @@ F3 的三條做多腿完全不變，只是資金縮成 **70%**（BNB 21%、TRX 2
 
 ---
 
+## 11. 自動執行：`f3_okx_bot.py`（紙上交易／OKX 模擬盤）
+
+> 程式：`projects/crypto-f3/f3_okx_bot.py`。**只支援紙上交易和 OKX 模擬盤，沒有實盤模式。**
+> 要在你自己的電腦上跑。雲端 session 用完就回收，不能長期掛著，也不該保管你的金鑰。
+
+### 11.1 三種用法
+
+| 模式 | 指令 | 需要什麼 | 用途 |
+|---|---|---|---|
+| 紙上交易 | `python3 projects/crypto-f3/f3_okx_bot.py --mode paper --v2` | 什麼都不用 | 用 OKX 即時行情，完全照回測規則模擬成交，往前記錄。**建議先跑這個** |
+| OKX 模擬盤 | `python3 projects/crypto-f3/f3_okx_bot.py --mode okx-demo --v2` | OKX **模擬盤** API 金鑰 | 真的下單到模擬盤：市價進場，自動掛 OCO 停利停損，時間到自動平倉 |
+| 檢查 | `... --mode okx-demo --v2 --check` | 模擬盤金鑰 | 只讀帳戶模式、USDT 餘額、各商品下單規格，**不下單** |
+
+其他參數：
+- `--status`：只印持倉與資金。
+- `--capital 10000`：第一次執行時的總資金。
+- 不加 `--v2` 就是 F3（只做多）。
+- 狀態和明細存在 `~/.kiwi-f3/<模式>-<版本>/`，裡面有 `state.json` 和 `ledger.csv`。
+
+### 11.2 OKX 模擬盤金鑰（只在要用模擬盤模式時才需要）
+
+1. **建立模擬盤 API 金鑰：** 在 OKX 切到「模擬交易」，到個人中心 → API。權限只勾**讀取＋交易**，**不要勾提幣**，可以綁定你的 IP。
+2. **做空腿要改帳戶模式：** F3 2.0 的做空腿需要模擬盤的帳戶模式是「合約模式／單幣種保證金」以上。`--check` 會告訴你目前是哪一種。
+3. **金鑰放在你電腦上的檔案（不要放進 repo）：**
+
+   ```bash
+   mkdir -p ~/.kiwi-f3 && cat > ~/.kiwi-f3/okx.env <<'X'
+   export OKX_API_KEY=你的模擬盤 key
+   export OKX_API_SECRET=你的模擬盤 secret
+   export OKX_API_PASSPHRASE=你的 passphrase
+   X
+   chmod 600 ~/.kiwi-f3/okx.env
+   ```
+
+4. **先跑檢查：**
+
+   ```bash
+   . ~/.kiwi-f3/okx.env && python3 projects/crypto-f3/f3_okx_bot.py --mode okx-demo --v2 --check
+   ```
+
+### 11.3 排程（每 4 小時，K 線收盤後 5 分鐘）
+
+4 小時 K 線在 UTC 00/04/08/12/16/20 點收盤，換算台北時間剛好也是 00/04/08/12/16/20 點，所以排在每天這 6 個整點的第 5 分鐘。
+
+**cron（最簡單）：** 執行 `crontab -e`，加一行（路徑換成你的 KIWI 資料夾）：
+
+```
+5 0,4,8,12,16,20 * * * cd ~/KIWI && /usr/bin/python3 projects/crypto-f3/f3_okx_bot.py --mode paper --v2 >> ~/.kiwi-f3/bot.log 2>&1
+```
+
+改成模擬盤：在 `cd` 前面加 `. ~/.kiwi-f3/okx.env && `，並把 `--mode paper` 換成 `--mode okx-demo`。
+
+**注意 Mac 睡眠：**
+- cron 在睡眠時不會執行，錯過的 K 線訊號就錯過了。程式會在下次執行時提醒你漏了幾根。
+- 可以在「系統設定 → 電池／能源」設定不睡眠，或改用 launchd：睡眠中錯過的排程，會在醒來時補跑一次，但成交價會跟著延後。
+
+第一次在 Mac 上用之前，先執行 `python3 -m pip install --user pandas numpy`。
+
+### 11.4 驗證過什麼、沒驗證過什麼
+
+- ✅ **紙上引擎和回測一致：** `--replay 2025-06-01 --v2` 每 4 小時一步重播到今天，交易和 `f3_backtest.py --v2 --start 2025-06-01` 逐筆比對，結果見 PR 說明。
+- ✅ **請求格式：** 用假金鑰打 OKX 模擬盤 API，伺服器正確解析請求，只回「金鑰不存在」（50119）。商品規格（最小下單量、數量與價格級距、合約面額）讀取正常。
+- ❌ **還沒用真的模擬盤帳戶下過單：**
+  - 第一次用請先 `--check`，再用小資金跑，例如 `--capital 1000`。
+  - 每一筆都到 OKX 模擬盤畫面確認有掛上 OCO 停利停損。
+  - 出錯時 `ledger.csv` 會記一筆 ERROR，把訊息貼給我修。
+- **資金帳務是估算：** 各腿資金用成交價和固定成本 0.07% 估算，真正的盈虧以 OKX 帳戶為準。
+
+### 11.5 其他做法
+
+- **TradingView 警報 → OKX 訊號策略（Signal Bot）：**
+  - 不用寫程式，但需要 TradingView 付費方案才有 Webhook。
+  - 時間出場要靠 Pine 腳本送平倉訊號，目前的腳本只送進場訊號，還需要改寫。
+- **GitHub Actions 排程：**
+  - 不用開著 Mac。
+  - 但要改 `.github/workflows/`，依 CLAUDE.md 要先問你。
+  - 狀態要另外存（例如私有 gist），金鑰要放進 GitHub Secrets。
+  - 等模擬盤手動跑順了再考慮。
+
+---
+
 ## 更新紀錄
 - 2026-10-27 v1.0：初版。F3 組合規則、本機回測腳本、TradingView Pine 腳本、模擬交易路徑。
 - 2026-10-27 v2.0：新增 F3 2.0（熊市做空籃子）、做空研究結果與限制、TradingView 與 OKX 模擬盤教學；腳本加 `--v2`／`--overlay`，Pine 加做空籃子。BNB 2022-12 以前改用 Binance 日線補足 EMA200 暖機（F3 數字不變）。
+- 2026-10-27 v2.1：新增 §11 自動執行機器人 `f3_okx_bot.py`（紙上交易、OKX 模擬盤、歷史重播驗證），附排程方式。
