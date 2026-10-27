@@ -99,6 +99,7 @@ CONFIG = {
     "SELECT_MODE": "any_purple", # "any_purple"＝有紫點就進（紫點實測的做法）；"site_purple"＝網站 🟣 紫燈模式
     "SCAN_DAYS": 1,              # scan 指令列出幾個日曆日內的紫點；site_purple 回測也用它（網站預設「今天」=1，可選 7/14/30/60）
     "MIN_VOL_LOTS": None,        # 近 20 日均量門檻（張）；None = any_purple 不設、site_purple 用網站預設 3000
+    "KINDS": None,               # 只取這些場景的紫點，例 "F,I"（A～I）；None = 全部。5 年研究見 exit_study.py／README
     "FRESH_DAYS": 60,            # site_purple 的「最新訊號」搜尋窗口（網站固定 60，勿改）
 
     # ── 回測期間 ──
@@ -397,8 +398,19 @@ def min_vol(cfg):
     return 3000 if cfg["SELECT_MODE"] == "site_purple" else 0
 
 
+def kind_ok(kind, cfg):
+    if not cfg["KINDS"]:
+        return True
+    return KIND_LABEL[kind].split()[0] in {k.strip().upper() for k in cfg["KINDS"].split(",")}
+
+
 def purple_pick(rows, eye, asof_idx, cfg):
     """回測用：這一天收盤後要不要把這檔列為進場標的；要的話回傳紫點資訊。"""
+    p = _purple_pick(rows, eye, asof_idx, cfg)
+    return p if p and kind_ok(p["kind"], cfg) else None
+
+
+def _purple_pick(rows, eye, asof_idx, cfg):
     if cfg["SELECT_MODE"] == "any_purple":
         m = eye["launch_at"].get(asof_idx)          # 今天剛亮的紫點
         if not m:
@@ -727,6 +739,7 @@ def run_backtest(cfg, codes=None):
            + (f"_d{cfg['SCAN_DAYS']}" if cfg["SELECT_MODE"] == "site_purple" else "")
            + f"_v{min_vol(cfg)}_h{cfg['HOLD_DAYS']}_sl{cfg['STOP_LOSS']}_ts{cfg['TRAIL_STOP']}"
            + ("" if cfg["REENTRY_AFTER_STOP"] else "_noreentry")
+           + (f"_k{cfg['KINDS'].replace(',', '')}" if cfg["KINDS"] else "")
            + ("" if cfg["ENTRY"] == "next_open" else "_eclose"))
     _write_csv(os.path.join(cfg["OUT_DIR"], f"trades_{tag}.csv"), sorted(all_trades, key=lambda x: (x["entry_date"], x["code"])))
     _write_csv(os.path.join(cfg["OUT_DIR"], f"picks_{tag}.csv"), sorted(all_picks, key=lambda x: (x["date"], x["code"])))
@@ -791,6 +804,8 @@ def run_scan(cfg, codes=None):
         else:
             dots = [m for m in eye["launch"] if _days_between(m["time"], today) <= cfg["SCAN_DAYS"]][-1:]
         for m in dots:
+            if not kind_ok(m["kind"], cfg):
+                continue
             out.append({"code": code, "name": d["name"], "kind": KIND_LABEL[m["kind"]], "dot_date": m["time"],
                         "age": _days_between(m["time"], today), "vol20": vol, "close": d["rows"][-1]["close"],
                         "fast": round(m["fast"], 1), "slow": round(m["slow"], 1)})
@@ -827,10 +842,11 @@ def main():
     ap.add_argument("--trail", type=float, help="TRAIL_STOP，例 0.2")
     ap.add_argument("--no-reentry", action="store_true", help="停損後不再進場")
     ap.add_argument("--entry", choices=["next_open", "close"])
+    ap.add_argument("--kinds", help="只取這些場景的紫點，例 F,I（A～I）")
     a = ap.parse_args()
     cfg = dict(CONFIG)
     for k, v in [("START", a.start), ("END", a.end), ("RULE_VERSION", a.rule), ("SELECT_MODE", a.select_mode), ("SCAN_DAYS", a.days),
-                 ("MIN_VOL_LOTS", a.minvol), ("STOP_LOSS", a.stop), ("TRAIL_STOP", a.trail), ("ENTRY", a.entry)]:
+                 ("MIN_VOL_LOTS", a.minvol), ("STOP_LOSS", a.stop), ("TRAIL_STOP", a.trail), ("ENTRY", a.entry), ("KINDS", a.kinds)]:
         if v is not None:
             cfg[k] = v
     if a.hold is not None:
