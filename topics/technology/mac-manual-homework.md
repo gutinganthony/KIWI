@@ -23,6 +23,12 @@ last_updated: 2026-07-06
 
 ## 🔴 待辦（依急迫度）
 
+### 🆕 2026-10-27 新增（主對話 session 產生）
+
+- [ ] 🟢 **加密貨幣策略回測：雲端拿不到 Binance 原始 K 線**。`api.binance.com`、`data-api.binance.vision` 與 TextToQuant `export_candles` 的下載連結（supabase.co）在雲端都被 proxy 403 擋，只好改用 OKX 資料在本機篩選（OKX 可連）。
+  TextToQuant 回測本身用的是 Binance 資料，兩邊會有些微差異。**若要用 Binance 原始資料重跑篩選，需要在 Mac 上做。**
+  （另：TextToQuant 免費帳號的 5 次回測已用完，要再驗證需升級 Pro；組合回測需 Enterprise。）
+
 ### 🆕 2026-10-08 新增（主對話 session 產生）
 
 - [ ] 🟡 **2026-10-19 部分解決（CLAUDE.md fileId 已換，Jake 同意）：找到新的權威 Sheet「KIWI 持倉表」**（fileId `1FPmLpXYVgm8Xrsv6Gs01bC-SlKytcEdmXF7NC2vUqJ4`），已同步進 `holdings.md`。**剩下一件**：~~①CLAUDE.md fileId~~ ✅；②Sheet 的「現金餘額」仍寫「請填」、「最後更新」停在 09-08、COHX 出場價待補。原紀錄：**Google Sheet「KIWI 持倉即時表」雲端讀不到**：`mcp__Google_Drive__read_file_content`
