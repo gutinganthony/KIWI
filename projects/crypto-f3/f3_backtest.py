@@ -32,17 +32,18 @@ COST = 0.0007        # 每邊：手續費 0.05% + 滑價 0.02%
 FUND_DAY = 0.0003    # 做空腿每天付的資金費率（保守假設；多數時候做空其實是收錢）
 
 # side=long：只在「日線收盤 > 日線 EMA200」時開新倉；side=short：只在「日線收盤 < 日線 EMA200」時開新倉
-# weight＝F3 的資金比例；weight_v2＝F3 2.0 的資金比例
+# weight＝F3 的資金比例；weight_v2＝F3 2.0 的資金比例；bt_wr＝4 年回測勝率（%），給機器人的失效檢查用
+# （做空腿的 bt_wr 是 8 幣籃子合計的勝率，失效檢查也以整個籃子合計判斷）
 LEGS = [
-    dict(name="BNB 日線 多", symbol="BNB", tf="1d", side="long", weight=0.30, weight_v2=0.21,
+    dict(name="BNB 日線 多", symbol="BNB", tf="1d", side="long", weight=0.30, weight_v2=0.21, bt_wr=59.1,
          signal="close_cross_below_ema20", tp=0.15, sl=0.10, max_bars=7),
-    dict(name="TRX 4小時 多", symbol="TRX", tf="4h", side="long", weight=0.30, weight_v2=0.21,
+    dict(name="TRX 4小時 多", symbol="TRX", tf="4h", side="long", weight=0.30, weight_v2=0.21, bt_wr=75.6,
          signal=("rsi_cross_above", 2, 10), tp=0.03, sl=0.07, max_bars=90),
-    dict(name="BCH 4小時 多", symbol="BCH", tf="4h", side="long", weight=0.40, weight_v2=0.28,
+    dict(name="BCH 4小時 多", symbol="BCH", tf="4h", side="long", weight=0.40, weight_v2=0.28, bt_wr=64.3,
          signal=("rsi_cross_above", 14, 35), tp=0.07, sl=0.07, max_bars=18),
     # F3 2.0 熊市做空籃子：同一條規則套在 8 個事先依市值選定的幣（不是看回測績效挑的），各 3.75%
 ] + [
-    dict(name=f"{c} 日線 空", symbol=c, tf="1d", side="short", weight=0, weight_v2=0.30 / 8,
+    dict(name=f"{c} 日線 空", symbol=c, tf="1d", side="short", weight=0, weight_v2=0.30 / 8, bt_wr=64.0,
          signal=("rsi_cross_below", 2, 90), tp=0.07, sl=0.10, max_bars=30)
     for c in ("ETH", "SOL", "XRP", "DOGE", "ADA", "LINK", "AVAX", "DOT")
 ]
