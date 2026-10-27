@@ -40,6 +40,8 @@ jobs:
       MODE: ${{ github.event_name == 'push' && 'paper' || vars.F3_BOT_MODE || 'paper' }}
       PERSIST: ${{ github.event_name != 'push' && github.event.inputs.check_only != 'true' }}
       KIWI_F3_HOME: ${{ github.workspace }}/state
+      # 第一次建立狀態時的總資金（USDT）。之後以狀態檔為準；要改金額需先清掉 f3-bot-state 分支上該模式的資料夾
+      CAPITAL: ${{ vars.F3_BOT_CAPITAL || '83000' }}
       OKX_API_KEY: ${{ secrets.OKX_API_KEY }}
       OKX_API_SECRET: ${{ secrets.OKX_API_SECRET }}
       OKX_API_PASSPHRASE: ${{ secrets.OKX_API_PASSPHRASE }}
@@ -76,7 +78,7 @@ jobs:
         id: bot
         if: github.event.inputs.check_only != 'true'
         run: |
-          python3 projects/crypto-f3/f3_okx_bot.py --mode "$MODE" --v2 | tee "$RUNNER_TEMP/out.txt"
+          python3 projects/crypto-f3/f3_okx_bot.py --mode "$MODE" --v2 --capital "$CAPITAL" | tee "$RUNNER_TEMP/out.txt"
           # 有進場／出場／錯誤／漏 K 線才推播；每天台北 08 點那一輪另外推一次持倉摘要
           if grep -qE '【進場】|【出場】|❌|⚠️' "$RUNNER_TEMP/out.txt"; then
             echo "notify=event" >> "$GITHUB_OUTPUT"
@@ -97,7 +99,8 @@ jobs:
       - name: Notify Telegram
         if: steps.bot.outputs.notify != '' || github.event_name == 'push' || github.event.inputs.check_only == 'true'
         run: |
-          case "${{ steps.bot.outputs.notify }}" in
+          case "${{ github.event.inputs.check_only == 'true' && 'check' || steps.bot.outputs.notify }}" in
+            check) TITLE="🔎 F3 2.0 OKX 模擬盤帳戶檢查" ;;
             event) TITLE="🤖 F3 2.0（$MODE）有交易動作" ;;
             daily) TITLE="📋 F3 2.0（$MODE）每日持倉摘要" ;;
             *)     TITLE="🧪 F3 2.0 機器人測試執行（$MODE）" ;;
