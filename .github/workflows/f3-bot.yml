@@ -1,0 +1,114 @@
+name: F3 2.0 交易機器人（紙上交易／OKX 模擬盤）
+
+# 每 4 小時在 K 線收盤後 5 分鐘跑一次 projects/crypto-f3/f3_okx_bot.py。
+# 規則與說明：topics/business/2026-10-27-crypto-f3-mean-reversion-rulebook.md §11、§12
+#
+# 模式由 repo 變數 F3_BOT_MODE 決定（Settings → Secrets and variables → Actions → Variables）：
+#   沒設或 paper ＝ 紙上交易（預設，不需要金鑰）
+#   okx-demo     ＝ 下單到 OKX 模擬盤，需要 Secrets：OKX_API_KEY、OKX_API_SECRET、OKX_API_PASSPHRASE
+# 持倉狀態與交易明細 commit 到專用分支 f3-bot-state（不碰 main）。
+# 狀態不用 Actions cache：交易機器人遺失持倉紀錄會重複下單或漏掉時間出場。
+on:
+  schedule:
+    # UTC 00/04/08/12/16/20 點 05 分 ＝ 台北同樣這 6 個整點 05 分（只在 default branch 生效）
+    - cron: '5 0,4,8,12,16,20 * * *'
+  workflow_dispatch:
+    inputs:
+      check_only:
+        description: '只檢查 OKX 模擬盤金鑰與帳戶（不下單、不改狀態）'
+        type: boolean
+        default: false
+  push:
+    # 開發分支的測試執行：只跑紙上模式、不寫回狀態分支
+    branches: [claude/elegant-hawking-mgt9ga]
+    paths:
+      - '.github/workflows/f3-bot.yml'
+      - 'projects/crypto-f3/**'
+
+# 同一時間只能有一個機器人在跑，避免兩個 run 同時改狀態而重複下單
+concurrency:
+  group: f3-bot
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write   # 只用來 push f3-bot-state 分支
+    env:
+      MODE: ${{ github.event_name == 'push' && 'paper' || vars.F3_BOT_MODE || 'paper' }}
+      PERSIST: ${{ github.event_name != 'push' && github.event.inputs.check_only != 'true' }}
+      KIWI_F3_HOME: ${{ github.workspace }}/state
+      OKX_API_KEY: ${{ secrets.OKX_API_KEY }}
+      OKX_API_SECRET: ${{ secrets.OKX_API_SECRET }}
+      OKX_API_PASSPHRASE: ${{ secrets.OKX_API_PASSPHRASE }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: pip install --quiet numpy pandas
+
+      - name: Load state branch
+        run: |
+          git config user.name "kiwi-f3-bot"
+          git config user.email "kiwi-f3-bot@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin f3-bot-state >/dev/null; then
+            git fetch --quiet origin f3-bot-state:f3-bot-state
+            git worktree add state f3-bot-state
+          else
+            git worktree add --orphan -b f3-bot-state state
+          fi
+          ls -R state | head -20
+
+      - name: Check OKX demo account
+        if: github.event.inputs.check_only == 'true'
+        run: python3 projects/crypto-f3/f3_okx_bot.py --mode okx-demo --v2 --check | tee "$RUNNER_TEMP/out.txt"
+
+      - name: Run bot
+        id: bot
+        if: github.event.inputs.check_only != 'true'
+        run: |
+          python3 projects/crypto-f3/f3_okx_bot.py --mode "$MODE" --v2 | tee "$RUNNER_TEMP/out.txt"
+          # 有進場／出場／錯誤／漏 K 線才推播；每天台北 08 點那一輪另外推一次持倉摘要
+          if grep -qE '【進場】|【出場】|❌|⚠️' "$RUNNER_TEMP/out.txt"; then
+            echo "notify=event" >> "$GITHUB_OUTPUT"
+          elif [ "$(date -u +%H)" = "00" ]; then
+            echo "notify=daily" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Save state
+        if: env.PERSIST == 'true'
+        run: |
+          cd state
+          git add -A
+          if git diff --cached --quiet; then echo "no state change"; exit 0; fi
+          git commit --quiet -m "f3-bot: $MODE $(date -u +%Y-%m-%dT%H:%MZ)"
+          for i in 1 2 3; do git push --quiet origin f3-bot-state && exit 0; sleep $((i*5)); done
+          exit 1
+
+      - name: Notify Telegram
+        if: steps.bot.outputs.notify != '' || github.event_name == 'push' || github.event.inputs.check_only == 'true'
+        run: |
+          case "${{ steps.bot.outputs.notify }}" in
+            event) TITLE="🤖 F3 2.0（$MODE）有交易動作" ;;
+            daily) TITLE="📋 F3 2.0（$MODE）每日持倉摘要" ;;
+            *)     TITLE="🧪 F3 2.0 機器人測試執行（$MODE）" ;;
+          esac
+          python3 projects/avi-v5/scripts/notify_ops.py --title "$TITLE" --url "$RUN_URL" < "$RUNNER_TEMP/out.txt" || true
+
+      # 機器人靜默失效是最壞的情況（以為在跑，其實沒在跑），所以失敗要出聲
+      - name: Notify on failure
+        if: failure()
+        run: |
+          python3 projects/avi-v5/scripts/notify_ops.py \
+            --title "❌ F3 2.0 機器人執行失敗（$MODE）" \
+            --body "這一輪沒有跑完，可能漏掉進出場。請看 log。" \
+            --url "$RUN_URL" || true
