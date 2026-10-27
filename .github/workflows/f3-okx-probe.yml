@@ -1,0 +1,34 @@
+name: F3 OKX 連線測試（一次性）
+
+# 目的：確認 GitHub 機房 IP 能不能連 OKX（國際站可能擋雲端／美國 IP）。
+# 不需要任何金鑰、不下單。只在推到這個分支、且動到本檔時執行。
+on:
+  push:
+    branches: [claude/elegant-hawking-mgt9ga]
+    paths: ['.github/workflows/f3-okx-probe.yml']
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Runner 位置
+        run: curl -s -m 10 https://ipinfo.io/json | grep -E '"(country|region|org)"' || true
+      - name: 打 OKX
+        run: |
+          for host in www.okx.com aws.okx.com; do
+            for path in "/api/v5/public/time" \
+                        "/api/v5/market/history-candles?instId=TRX-USDT&bar=4H&limit=2" \
+                        "/api/v5/public/instruments?instType=SWAP&instId=ETH-USDT-SWAP"; do
+              code=$(curl -s -o /tmp/b -w '%{http_code}' -m 15 -A kiwi-f3-probe "https://$host$path")
+              echo "PROBE $host$path -> HTTP $code $(head -c 160 /tmp/b | tr '\n' ' ')"
+            done
+            # 私有端點用假金鑰：回 50119（金鑰不存在）＝連得到；回 403／1010＝被擋
+            code=$(curl -s -o /tmp/b -w '%{http_code}' -m 15 -A kiwi-f3-probe \
+              -H 'OK-ACCESS-KEY: 00000000-0000-0000-0000-000000000000' -H 'OK-ACCESS-SIGN: x' \
+              -H "OK-ACCESS-TIMESTAMP: $(date -u +%Y-%m-%dT%H:%M:%S.000Z)" -H 'OK-ACCESS-PASSPHRASE: x' \
+              -H 'x-simulated-trading: 1' "https://$host/api/v5/account/config")
+            echo "PROBE $host 私有端點 -> HTTP $code $(head -c 160 /tmp/b | tr '\n' ' ')"
+          done
