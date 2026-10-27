@@ -1,0 +1,67 @@
+//@version=5
+// KIWI F3 — 三腿加密貨幣均值回歸組合（每次載入一條腿）
+// 規則全文：topics/business/2026-10-27-crypto-f3-mean-reversion-rulebook.md
+//
+// 用法：
+//   BNB 腿 → 開 BNBUSDT 的「日線」圖（OKX:BNBUSDT 或 BINANCE:BNBUSDT），腿選「BNB 1d」
+//   TRX 腿 → 開 TRXUSDT 的「4 小時」圖，腿選「TRX 4h」
+//   BCH 腿 → 開 BCHUSDT 的「4 小時」圖，腿選「BCH 4h」
+// 注意：這支腳本沒有在 TradingView 上實測過（產生它的環境無法連 TradingView）。
+//       第一次用請先對照 f3_backtest.py 的交易明細，抽查幾筆進出場是否一致。
+strategy("KIWI F3 均值回歸（單腿）", overlay = true, initial_capital = 10000,
+     default_qty_type = strategy.percent_of_equity, default_qty_value = 100,
+     commission_type = strategy.commission.percent, commission_value = 0.07,
+     process_orders_on_close = true, pyramiding = 0)
+
+leg       = input.string("TRX 4h", "腿", options = ["BNB 1d", "TRX 4h", "BCH 4h"])
+startDate = input.time(timestamp("2022-10-27T00:00:00Z"), "回測起點")
+
+isBNB   = leg == "BNB 1d"
+isTRX   = leg == "TRX 4h"
+tpPct   = isBNB ? 15.0 : isTRX ? 3.0 : 7.0
+slPct   = isBNB ? 10.0 : 7.0
+maxBars = isBNB ? 7 : isTRX ? 90 : 18
+
+// ── 日線 EMA(200) 濾網 ──
+// 日線圖：當天收盤 > 當天 EMA200
+// 4 小時圖：前一個「已收盤」日線的收盤 > 它的 EMA200（[1] 搭配 lookahead_on 是不重繪的寫法）
+dGatePrev = request.security(syminfo.tickerid, "D", close[1] > ta.ema(close, 200)[1], lookahead = barmerge.lookahead_on)
+ema200    = ta.ema(close, 200)
+gate      = timeframe.isdaily ? close > ema200 : dGatePrev
+
+// ── 進場訊號（只看收盤）──
+ema20  = ta.ema(close, 20)
+r2     = ta.rsi(close, 2)
+r14    = ta.rsi(close, 14)
+sigBNB = close < ema20 and close[1] >= ema20[1]   // 收盤由上往下跌破 EMA20
+sigTRX = r2 > 10 and r2[1] <= 10                   // RSI(2) 向上穿越 10
+sigBCH = r14 > 35 and r14[1] <= 35                 // RSI(14) 向上穿越 35
+sig    = (isBNB ? sigBNB : isTRX ? sigTRX : sigBCH) and gate and time >= startDate
+
+// ── 部位管理 ──
+var int   eBar = na   // 進場那根 K 線
+var float ePx  = na   // 進場價（訊號 K 線收盤）
+inPos  = strategy.position_size > 0
+timeUp = inPos and not na(eBar) and bar_index - eBar >= maxBars
+
+// 時間到：第 maxBars 根收盤出場。若同一根又有訊號，等同「平倉後立刻重新進場」，
+// 這裡直接沿用部位、把進場價與計時重設（TradingView 會把它算成同一筆交易）。
+if timeUp and not sig
+    strategy.close("L", comment = "時間到")
+if sig and (not inPos or timeUp)
+    if not inPos
+        strategy.entry("L", strategy.long, comment = "進場")
+    eBar := bar_index
+    ePx  := close
+    alert("KIWI F3 " + leg + " 進場訊號：收盤 " + str.tostring(close) + "，停利 " + str.tostring(close * (1 + tpPct / 100)) + "，停損 " + str.tostring(close * (1 - slPct / 100)), alert.freq_once_per_bar_close)
+
+// 停利（限價）＋停損（停損單），以進場價為準
+if not na(ePx) and (inPos or sig)
+    strategy.exit("TPSL", "L", limit = ePx * (1 + tpPct / 100), stop = ePx * (1 - slPct / 100), comment_profit = "停利", comment_loss = "停損")
+
+// ── 圖上顯示 ──
+plot(isBNB ? ema20 : na, "EMA20", color = color.new(color.yellow, 0))
+plot(timeframe.isdaily ? ema200 : na, "EMA200", color = color.new(color.orange, 0))
+bgcolor(gate ? na : color.new(color.gray, 85), title = "日線濾網不成立（不開新倉）")
+plot(inPos ? ePx * (1 + tpPct / 100) : na, "停利", color = color.new(color.teal, 0), style = plot.style_linebr)
+plot(inPos ? ePx * (1 - slPct / 100) : na, "停損", color = color.new(color.red, 0), style = plot.style_linebr)

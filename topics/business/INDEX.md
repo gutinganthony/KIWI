@@ -98,3 +98,4 @@
 | 2026-09-07 | [全掃收尾：3013／3533／CEJN／GaN-SiC — 冷卻與 800VDC 兩線結案](./2026-09-07-scan-remaining-cooling-800vdc.md) | serenity, step5-9, cooling, 800VDC, UQD, CEJN, navitas, GaN, purity-filter, no-position |
 | 2026-09-07 | [SEMICON Taiwan 2026：從先進製程到 3D IC — 重點與對 KIWI 的意涵](./2026-09-07-semicon-taiwan-2026-3dic.md) | semicon-taiwan, 3DIC, advanced-packaging, hybrid-bonding, TCB, FOPLP, SoIC, system-integration, advantest |
 | 2026-10-08 | [科斯托蘭尼的「失衡」與 1987 年股災：前因後果、今天的對照，以及現在最像哪一段](./2026-10-08-kostolany-1987-crash-analog.md) | kostolany, 1987-crash, black-monday, fed-warsh, rate-hike, historical-analog, dotcom-2000, 1973, CRI, exit-rule, portfolio-insurance |
+| 2026-10-27 | [KIWI F3 — 加密貨幣三腿均值回歸組合：交易規則手冊](./2026-10-27-crypto-f3-mean-reversion-rulebook.md) | backtest, crypto, mean-reversion, BNB, TRX, BCH, RSI, EMA200, portfolio, paper-trading, rulebook |
