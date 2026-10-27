@@ -18,8 +18,8 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |-------|---------|
 | [Technology](./topics/technology/INDEX.md) | 5 |
 | [Science](./topics/science/INDEX.md) | 0 |
-| [Business](./topics/business/INDEX.md) | 96 |
-| [Business](./topics/business/INDEX.md) | 96 |
+| [Business](./topics/business/INDEX.md) | 97 |
+| [Business](./topics/business/INDEX.md) | 97 |
 | [Health](./topics/health/INDEX.md) | 1 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Other](./topics/other/INDEX.md) | 4 |
@@ -33,6 +33,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-10-27 | [KIWI F3／F3 2.0 — 加密貨幣均值回歸組合：交易規則手冊（含熊市做空、TradingView／OKX 教學）](./topics/business/2026-10-27-crypto-f3-mean-reversion-rulebook.md) | Business |
 | 2026-10-08 | [科斯托蘭尼的「失衡」與 1987 年股災：前因後果、今天的對照，以及現在最像哪一段](./topics/business/2026-10-08-kostolany-1987-crash-analog.md) | Business |
 | 2026-08-28 | [T1 條件⑤ 檢核 — NVDA Q2 FY27：供應商融資擴散觸發](./topics/business/2026-08-28-t1-condition5-nvda-q2-fy27-trigger.md) | Business |
 | 2026-08-25 | [「中國曝險」紅旗的第一性原理重寫](./topics/business/2026-08-25-china-red-flag-first-principles-rewrite.md) | Business |
@@ -127,6 +128,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-09-07 | [SEMICON Taiwan 2026：從先進製程到 3D IC — 重點與對 KIWI 的意涵](./topics/business/2026-09-07-semicon-taiwan-2026-3dic.md) | Business |
 | 2026-09-07 | [全掃收尾：3013／3533／CEJN／GaN-SiC — 冷卻與 800VDC 兩線結案](./topics/business/2026-09-07-scan-remaining-cooling-800vdc.md) | Business |
 | 2026-10-08 | [科斯托蘭尼的「失衡」與 1987 年股災：前因後果、今天的對照，以及現在最像哪一段](./topics/business/2026-10-08-kostolany-1987-crash-analog.md) | Business |
+| 2026-10-27 | [KIWI F3／F3 2.0 — 加密貨幣均值回歸組合：交易規則手冊（含熊市做空、TradingView／OKX 教學）](./topics/business/2026-10-27-crypto-f3-mean-reversion-rulebook.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
