@@ -390,9 +390,40 @@ F3 的三條做多腿完全不變，只是資金縮成 **70%**（BNB 21%、TRX 2
   - 狀態要另外存（例如私有 gist），金鑰要放進 GitHub Secrets。
   - 等模擬盤手動跑順了再考慮。
 
+## 12. 在 GitHub 上持續執行（不用開電腦）
+
+> 工作檔：`.github/workflows/f3-bot.yml`。每天台北 00／04／08／12／16／20 點 05 分自動跑一次 `f3_okx_bot.py --v2`。
+> 2026-10-27 測試：GitHub 的機器在美國，連 OKX 公開 API 正常，私有 API 用假金鑰回「金鑰不存在」，代表沒有被擋。
+
+- **狀態保存**：持倉與交易明細 commit 到專用分支 **`f3-bot-state`**，在 GitHub 上點這個分支就能看 `ledger.csv`。不碰 main。
+- **通知**：有進場、出場、錯誤或漏 K 線時推 Telegram；每天台北 08 點推一次持倉摘要；執行失敗也會推。沿用既有的 `TELEGRAM_BOT_TOKEN`／`TELEGRAM_CHAT_ID`。
+- **公開性**：這個 repo 是公開的，`f3-bot-state` 分支上的交易明細任何人都看得到（模擬盤，無妨）。金鑰放在 Secrets，是加密的，不會出現在任何紀錄。
+- **排程延遲**：GitHub 的排程常晚幾分鐘，尖峰時可能更久。成交價會比收盤價差一點，對日線、4 小時策略影響不大。
+
+### 12.1 切換到 OKX 模擬盤（你自己操作，金鑰不要給任何人，包括 Claude）
+
+1. **建立模擬盤 API 金鑰：** 在 OKX 模擬盤建立金鑰。
+   - 權限只勾「讀取＋交易」，不要勾「提幣」。
+   - **IP 白名單留空**：GitHub 的機器 IP 每次都不同，綁 IP 會被拒。
+   - 帳戶模式改成「合約模式／單幣種保證金」以上，F3 2.0 的做空腿才能下單。
+2. **新增三個 Secrets：** GitHub repo → Settings → Secrets and variables → Actions → **Secrets** →「New repository secret」：
+   - `OKX_API_KEY`
+   - `OKX_API_SECRET`
+   - `OKX_API_PASSPHRASE`
+3. **先做檢查：** Actions 分頁 → 左邊選「F3 2.0 交易機器人」→「Run workflow」→ 勾「只檢查」→ 執行。
+   - 結果會推到 Telegram：帳戶模式、USDT 餘額、各商品規格。
+   - **這一步也會確認 OKX 有沒有因為美國 IP 拒絕下單類請求。**
+4. **切換模式：** 檢查沒問題後，同一頁的 **Variables** 分頁 →「New repository variable」：名稱 `F3_BOT_MODE`，值 `okx-demo`。下一輪排程開始就用模擬盤下單。
+5. **切回紙上交易：** 把 `F3_BOT_MODE` 改成 `paper` 或刪掉。兩種模式的狀態分開存，在 `f3-bot-state` 分支的 `paper-F3-2.0/` 和 `okx-demo-F3-2.0/`。
+
+### 12.2 停止
+
+Actions 分頁 →「F3 2.0 交易機器人」→ 右上「⋯」→ Disable workflow。模擬盤上已經掛著的停利停損單仍會在 OKX 上生效。
+
 ---
 
 ## 更新紀錄
 - 2026-10-27 v1.0：初版。F3 組合規則、本機回測腳本、TradingView Pine 腳本、模擬交易路徑。
 - 2026-10-27 v2.0：新增 F3 2.0（熊市做空籃子）、做空研究結果與限制、TradingView 與 OKX 模擬盤教學；腳本加 `--v2`／`--overlay`，Pine 加做空籃子。BNB 2022-12 以前改用 Binance 日線補足 EMA200 暖機（F3 數字不變）。
 - 2026-10-27 v2.1：新增 §11 自動執行機器人 `f3_okx_bot.py`（紙上交易、OKX 模擬盤、歷史重播驗證），附排程方式。
+- 2026-10-27 v2.2：新增 §12 GitHub Actions 持續執行（f3-bot.yml）與切換 OKX 模擬盤步驟。
