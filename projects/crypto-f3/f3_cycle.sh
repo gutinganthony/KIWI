@@ -18,9 +18,17 @@ if ! python3 projects/crypto-f3/f3_okx_bot.py --mode "$MODE" --v2 --capital "$CA
   exit 1
 fi
 
+# 趨勢跟隨紙上交易（不下單，三個波動目標並行比較；研究報告 2026-10-28）。失敗不影響 F3，只推警示
+tp="$(mktemp)"
+if python3 projects/crypto-f3/trend_paper.py --home "$KIWI_F3_HOME/trend-paper" --capital "$CAPITAL" > "$tp" 2>&1; then
+  { echo; cat "$tp"; } | tee -a "$out"
+else
+  { echo; echo "⚠️ 趨勢跟隨紙上交易這一輪失敗：$(tail -3 "$tp")"; } | tee -a "$out"
+fi
+
 kind=""
-# 有進場／出場／錯誤／漏 K 線才推播；每天台北 08 點那一輪另外推一次持倉摘要
-if grep -qE '【進場】|【出場】|【風控】|❌|⚠️' "$out"; then
+# 有進場／出場／趨勢調整／錯誤／漏 K 線才推播；每天台北 08 點那一輪另外推一次持倉摘要
+if grep -qE '【進場】|【出場】|【風控】|【趨勢紙上】|❌|⚠️' "$out"; then
   kind="event"
 elif [ "$(date -u +%H)" = "00" ]; then
   kind="daily"
