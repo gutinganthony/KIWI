@@ -1,0 +1,549 @@
+<meta name="dash-one-writer">
+<style>
+  .f3 { font-family: var(--font-anthropic-sans); display: grid; gap: var(--cds-gap-xl); font-variant-numeric: tabular-nums; }
+  .f3 .head { display: grid; gap: var(--cds-gap-xs); }
+  .f3 .head h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; text-wrap: balance; }
+  .f3 .sub { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm); align-items: center; }
+  .f3 .chip { border: 1px solid var(--color-border-line); border-radius: 999px; padding: 0 var(--cds-pad-sm); }
+  .f3 .take { margin: 0; font-size: var(--cds-font-size-body); }
+  .f3 .take b { font-weight: 500; }
+  .f3 .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr)); gap: var(--cds-gap-md); }
+  .f3 .kpi { border-top: 1px solid var(--color-border-line); padding-top: var(--cds-pad-sm); display: grid; gap: 2px; min-width: 0; }
+  .f3 .kpi .lab { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .f3 .kpi .num { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); line-height: 1.15; }
+  .f3 .kpi .note { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .f3 section { display: grid; gap: var(--cds-gap-md); }
+  .f3 h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0; }
+  .f3 .lede { margin: 0; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); max-width: 70ch; }
+  .f3 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: var(--cds-gap-md); }
+  .f3 .card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: grid; gap: var(--cds-gap-sm); min-width: 0; align-content: start; }
+  .f3 .card h3 { margin: 0; font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); }
+  .f3 .card .cnote { margin: 0; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .f3 .chart { position: relative; min-height: 220px; }
+  .f3 .spark { position: relative; min-height: 64px; }
+  .f3 .ind-top { display: flex; justify-content: space-between; align-items: baseline; gap: var(--cds-gap-sm); flex-wrap: wrap; }
+  .f3 .ind-val { font-family: var(--font-anthropic-serif); font-size: var(--cds-font-size-title); font-weight: 400; }
+  .f3 .rule { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin: 0; }
+  .f3 .pill { display: inline-block; font-size: var(--cds-font-size-caption); border-radius: 999px; padding: 0 var(--cds-pad-sm); border: 1px solid var(--color-border-line); white-space: nowrap; }
+  .f3 .pill.ok { color: var(--color-ok); }
+  .f3 .pill.warn { color: var(--color-warn); border-color: currentColor; }
+  .f3 .pill.bad { color: var(--color-bad); border-color: currentColor; }
+  .f3 .pill.mute { color: var(--color-fg-muted); }
+  .f3 .tablebox { overflow-x: auto; max-height: 34rem; overflow-y: auto; }
+  .f3 table { border-collapse: collapse; width: 100%; font-size: var(--cds-font-size-caption); }
+  .f3 th { text-align: left; font-weight: var(--cds-font-weight-medium); color: var(--color-fg-muted); padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); position: sticky; top: 0; background: var(--color-panel); white-space: nowrap; }
+  .f3 td { padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+  .f3 td.num, .f3 th.num { text-align: right; }
+  .f3 td.wrap { white-space: normal; min-width: 14rem; }
+  .f3 tr.dim td { color: var(--color-fg-muted); }
+  .f3 .ctx { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: var(--cds-gap-md); }
+  .f3 .ctx div { display: grid; gap: 2px; }
+  .f3 .ctx .lab { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .f3 .ctx b { font-weight: 500; }
+  .f3 .tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); white-space: nowrap; }
+  .f3 .tip .t { color: var(--cds-text-secondary); }
+  .f3 .foot { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); margin: 0; max-width: 80ch; }
+  .f3 .legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm) var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .f3 .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .f3 .legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; background: var(--color-fg-muted); }
+  .f3 .legend i.dash { background: none; border-top: 2px dashed var(--color-fg-muted); height: 0; }
+  .f3 .note-box { border-left: 2px solid var(--color-border-line); padding-left: var(--cds-pad-sm); margin: 0; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); max-width: 80ch; }
+  .f3 [data-dash-source-state=empty] { color: transparent; }
+  .f3 [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+</style>
+
+<div class="f3">
+  <header class="head" id="top">
+    <h1>F3 2.0 模擬盤監控台</h1>
+    <div class="sub">
+      <span class="chip">OKX 模擬盤</span>
+      <span>資料時間（UTC）<span data-draw="kpi" data-source="summary" data-field="updated" data-row="0">—</span></span>
+      <span>開始日 <span data-draw="kpi" data-source="summary" data-field="started" data-row="0">—</span></span>
+    </div>
+    <p class="take">目前警示：<b data-draw="kpi" data-source="summary" data-field="alert_text" data-row="0">—</b></p>
+  </header>
+
+  <div class="kpis" id="kpis">
+    <div class="kpi"><span class="lab">總淨值（USDT，含未實現）</span><span class="num" data-draw="kpi" data-source="summary" data-field="equity" data-row="0">—</span><span class="note">起始 <span data-draw="kpi" data-source="summary" data-field="capital" data-row="0">—</span></span></div>
+    <div class="kpi"><span class="lab">累積報酬</span><span class="num" data-draw="kpi" data-source="summary" data-field="ret_pct" data-row="0">—</span><span class="note">回測合理預期：接近 0</span></div>
+    <div class="kpi"><span class="lab">目前回撤</span><span class="num" data-draw="kpi" data-source="summary" data-field="dd_pct" data-row="0">—</span><span class="note">停用線 −15%</span></div>
+    <div class="kpi"><span class="lab">持倉中的幣</span><span class="num" data-draw="kpi" data-source="summary" data-field="open_positions" data-row="0">—</span><span class="note">共 11 個</span></div>
+    <div class="kpi"><span class="lab">已平倉交易</span><span class="num" data-draw="kpi" data-source="summary" data-field="closed_trades" data-row="0">—</span><span class="note">滿 10 筆才判斷失效</span></div>
+    <div class="kpi"><span class="lab">警示</span><span class="num" data-draw="kpi" data-source="summary" data-field="alerts" data-row="0">—</span><span class="note">下單錯誤 <span data-draw="kpi" data-source="summary" data-field="errors" data-row="0">—</span> 次</span></div>
+  </div>
+
+  <section id="strategy">
+    <h2>策略現況</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>淨值走勢</h3>
+        <p class="cnote">每次機器人執行記一筆；虛線是起始資金 83,000。</p>
+        <div class="chart" id="equity-chart" data-draw="equity" data-source="equity"></div>
+      </div>
+      <div class="card">
+        <h3>各幣持倉</h3>
+        <p class="cnote">做多的 3 個幣用現貨，做空籃子 8 個幣用 1 倍永續合約。距停利／停損是離目前價格還有多遠。</p>
+        <div class="tablebox">
+          <table id="legs-table" data-source="legs" data-row-key="leg">
+            <thead><tr>
+              <th data-field="leg">幣</th><th data-field="weight" class="num">資金比例 %</th><th data-field="mark" class="num">目前價值</th>
+              <th data-field="status">狀態</th><th data-field="unreal_pct" class="num">未實現 %</th>
+              <th data-field="to_tp_pct" class="num">距停利 %</th><th data-field="to_sl_pct" class="num">距停損 %</th>
+              <th data-field="bars_held" class="num">已持有根數</th><th data-field="max_bars" class="num">最長根數</th>
+            </tr></thead>
+            <tbody data-draw="legs"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="trend">
+    <h2>趨勢跟隨（紙上交易，三個波動目標並行）</h2>
+    <p class="lede">BTC＋ETH 趨勢跟隨，不下單，只用 OKX 即時價格記帳。三個版本規則相同，只差「單幣波動目標」：每個幣的部位 ＝ 50% × 趨勢分數 × min(1, 目標 ÷ 該幣 60 日波動)。所以兩個幣的 60 日波動都低於 40% 時，三個版本持倉完全一樣；波動越高，目標高的版本留的部位越多。每天台北 08:00 日線收盤後調整一次，差超過 5 個百分點才動。跑一段時間後再決定用哪個目標（研究報告 2026-10-28）。</p>
+    <div class="grid">
+      <div class="card">
+        <h3>累積報酬：F3 2.0 和三個趨勢版本</h3>
+        <p class="cnote">各自從開始那天算起的累積報酬 %（F3 2.0 是 OKX 模擬盤，趨勢是紙上交易），每小時一筆。</p>
+        <div class="legend" id="trend-live-legend">
+          <span><i data-swatch="0"></i>F3 2.0</span><span><i data-swatch="1"></i>波動目標 40%</span><span><i data-swatch="2"></i>波動目標 45%</span><span><i data-swatch="3"></i>波動目標 50%</span>
+        </div>
+        <div class="chart" id="trend-live-chart" data-draw="trendlive" data-source="equity trend_equity"></div>
+      </div>
+      <div class="card">
+        <h3>三個版本目前的部位</h3>
+        <p class="cnote">實際部位會隨價格漂移；目標是今天收盤算出來的。</p>
+        <div class="tablebox">
+          <table id="trend-sum-table" data-source="trend_summary" data-row-key="variant">
+            <thead><tr>
+              <th data-field="variant">版本</th><th data-field="equity" class="num">淨值（USDT）</th><th data-field="ret_pct" class="num">累積報酬 %</th>
+              <th data-field="max_dd_pct" class="num">最大回撤 %</th><th data-field="btc_pct" class="num">BTC %</th><th data-field="eth_pct" class="num">ETH %</th>
+              <th data-field="cash_pct" class="num">現金 %</th><th data-field="btc_target_pct" class="num">BTC 目標 %</th><th data-field="eth_target_pct" class="num">ETH 目標 %</th>
+              <th data-field="rebalances" class="num">調整天數</th><th data-field="last_rebalance">最近調整</th>
+            </tr></thead>
+            <tbody data-draw="tsum"></tbody>
+          </table>
+        </div>
+        <p class="cnote">紙上交易開始日 <span data-draw="kpi" data-source="trend_summary" data-field="started" data-row="0">—</span>，資料時間（UTC）<span data-draw="kpi" data-source="trend_summary" data-field="updated" data-row="0">—</span>。</p>
+      </div>
+    </div>
+    <div class="card">
+      <h3>今天的趨勢訊號</h3>
+      <p class="cnote">7 個訊號各佔 1/7：收盤在 100／150／200 日均線之上、60／90／180 日漲跌為正、唐奇安通道（突破 20 日高點為多，跌破 10 日低點才轉空）。60 日波動低於波動目標時，該版本給滿部位。</p>
+      <div class="tablebox">
+        <table id="trend-sig-table" data-source="trend_signals" data-row-key="coin">
+          <thead><tr>
+            <th data-field="coin">幣</th><th data-field="close" class="num">日線收盤</th><th data-field="score" class="num">趨勢分數</th><th data-field="vol60_pct" class="num">60 日波動 %</th>
+            <th data-field="ma100">100 日線</th><th data-field="ma150">150 日線</th><th data-field="ma200">200 日線</th>
+            <th data-field="mom60">60 日</th><th data-field="mom90">90 日</th><th data-field="mom180">180 日</th><th data-field="donchian">唐奇安</th>
+            <th data-field="target40_pct" class="num">目標 40% 版</th><th data-field="target45_pct" class="num">目標 45% 版</th><th data-field="target50_pct" class="num">目標 50% 版</th>
+          </tr></thead>
+          <tbody data-draw="tsig"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>回測：三個版本的取捨</h3>
+        <p class="cnote">Yahoo 日線，樣本外 2021-01 → 2026-10（規則是看 2020 以前的資料定的）。合併欄是和 F3 2.0 各半、每月再平衡，2022-10 起；F3 那一半是樣本內數字，會偏樂觀。</p>
+        <div class="tablebox">
+          <table id="trend-bt-table" data-source="trend_bt" data-row-key="variant">
+            <thead><tr>
+              <th data-field="variant">版本</th><th data-field="oos_cagr" class="num">樣本外年化 %</th><th data-field="oos_dd" class="num">最大回撤 %</th>
+              <th data-field="oos_calmar" class="num">年化 ÷ 回撤</th><th data-field="since2022_cagr" class="num">2022 起年化 %</th><th data-field="since2022_dd" class="num">2022 起回撤 %</th>
+              <th data-field="worst_month" class="num">最差月 %</th><th data-field="longest_underwater_days" class="num">最長未創新高（天）</th>
+              <th data-field="avg_exposure" class="num">平均部位 %</th><th data-field="rebalances_per_year" class="num">一年調整次數</th>
+              <th data-field="blend_cagr" class="num">和 F3 合併年化 %</th><th data-field="blend_dd" class="num">合併回撤 %</th>
+            </tr></thead>
+            <tbody data-draw="tbt"></tbody>
+          </table>
+        </div>
+        <div class="tablebox">
+          <table id="trend-bt-years" data-source="trend_bt" data-row-key="variant">
+            <thead><tr>
+              <th data-field="variant">各年報酬 %</th><th data-field="y2021" class="num">2021</th><th data-field="y2022" class="num">2022</th><th data-field="y2023" class="num">2023</th>
+              <th data-field="y2024" class="num">2024</th><th data-field="y2025" class="num">2025</th><th data-field="y2026" class="num">2026（到 10 月）</th>
+            </tr></thead>
+            <tbody data-draw="tbty"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <h3>回測淨值：2022-10 → 2026-10（對數座標，起點＝1）</h3>
+        <p class="cnote">每週一點。F3 2.0 的選幣是用同一段資料挑的（樣本內）；趨勢的規則在 2020 以前就定了。</p>
+        <div class="legend" id="trend-bt-legend">
+          <span><i data-swatch="0"></i>F3 2.0</span><span><i data-swatch="1"></i>趨勢 40%</span><span><i data-swatch="2"></i>趨勢 45%</span><span><i data-swatch="3"></i>趨勢 50%</span><span><i class="dash"></i>BTC 持有</span>
+        </div>
+        <div class="chart" id="trend-bt-chart" data-draw="trendbt" data-source="trend_bt_curve"></div>
+      </div>
+    </div>
+    <p class="note-box">怎麼選：目標越高，多頭賺越多、回撤也越深（見上面的回測表）；2022 年以後三個版本的年化差距很小。紙上交易期間主要看兩件事：波動升高時三個版本差多少，以及實際成交價和收盤價差多少。</p>
+    <div class="card">
+      <h3>趨勢紙上交易明細</h3>
+      <p class="cnote">「和收盤價差」是成交價比日線收盤價差多少（不利方向為正），反映機器人延遲執行的成本。</p>
+      <div class="tablebox">
+        <table id="trend-trades-table" data-source="trend_trades" data-row-key="id">
+          <thead><tr>
+            <th data-field="time">時間（UTC）</th><th data-field="variant">版本</th><th data-field="coin">幣</th><th data-field="side">買賣</th>
+            <th data-field="price" class="num">價格</th><th data-field="usdt" class="num">金額（USDT）</th><th data-field="slip_pct" class="num">和收盤價差 %</th><th data-field="weight_after_pct" class="num">調整後部位 %</th>
+          </tr></thead>
+          <tbody data-draw="ttrades"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="health">
+    <h2>失效檢查</h2>
+    <p class="lede">用模擬盤實際平倉的交易判斷每個幣還有沒有效（規則手冊 §15.1）。勝率的 90% 信賴上限仍低於回測勝率才算失效；連虧或單一幣回撤超過門檻先暫停複查。做空籃子 8 個幣合併判斷。</p>
+    <div class="card">
+      <div class="tablebox">
+        <table id="health-table" data-source="health" data-row-key="group">
+          <thead><tr>
+            <th data-field="group">幣</th><th data-field="status">判定</th><th data-field="n" class="num">平倉筆數</th>
+            <th data-field="wr" class="num">實際勝率 %</th><th data-field="wilson_upper" class="num">勝率信賴上限 %</th><th data-field="bt_wr" class="num">回測勝率 %</th>
+            <th data-field="avg_pct" class="num">平均每筆 %</th><th data-field="streak" class="num">目前連虧</th><th data-field="streak_limit" class="num">連虧上限</th>
+            <th data-field="dd_pct" class="num">單幣回撤 %</th><th data-field="dd_limit" class="num">回撤上限 %</th><th data-field="slip_pct" class="num">平均滑價 %</th>
+          </tr></thead>
+          <tbody data-draw="health"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="market">
+    <h2>市場變量</h2>
+    <p class="lede">四個會讓策略變差的環境（規則手冊 §16）。門檻來自 2022-10 → 2026-10 的 561 筆回測交易，前後兩半樣本方向一致才列入。亮警示代表「歷史上這種環境會虧」，不會自動停單。</p>
+    <div class="grid">
+      <div class="card" id="ind-breadth">
+        <div class="ind-top"><h3>市場廣度</h3><span class="pill" data-draw="mstat" data-source="market" data-field="status" data-where="key=breadth">—</span></div>
+        <span class="ind-val"><span data-draw="mval" data-source="market" data-field="value" data-where="key=breadth">—</span>%</span>
+        <p class="rule">25 個幣裡收盤在自己 200 日均線之上的比例。&gt; 48% 時 TRX 新單平均每筆 −0.1%（其他時候 +1.4%）；&lt; 17% 時做多的幣多半空手。</p>
+        <div class="spark" data-draw="spark" data-key="breadth" data-source="market_hist"></div>
+      </div>
+      <div class="card" id="ind-btc">
+        <div class="ind-top"><h3>BTC 30 日漲跌</h3><span class="pill" data-draw="mstat" data-source="market" data-field="status" data-where="key=btc_ret30">—</span></div>
+        <span class="ind-val"><span data-draw="mval" data-source="market" data-field="value" data-where="key=btc_ret30">—</span>%</span>
+        <p class="rule">&gt; +7.7%（V 型反彈）時做空籃子新單平均每筆 −1.4%、勝率 52%；其他時候 +1.7%、勝率 71%。</p>
+        <div class="spark" data-draw="spark" data-key="btc_ret30" data-source="market_hist"></div>
+      </div>
+      <div class="card" id="ind-vol">
+        <div class="ind-top"><h3>做空籃子波動比</h3><span class="pill" data-draw="mstat" data-source="market" data-field="status" data-where="key=basket_vol_ratio">—</span></div>
+        <span class="ind-val"><span data-draw="mval" data-source="market" data-field="value" data-where="key=basket_vol_ratio">—</span> 倍</span>
+        <p class="rule">8 個做空幣「30 日波動 ÷ 365 日波動」的平均。&lt; 0.68（最近很安靜）時做空新單平均每筆 −1.2%；其他時候 +1.5%。</p>
+        <div class="spark" data-draw="spark" data-key="basket_vol_ratio" data-source="market_hist"></div>
+      </div>
+      <div class="card" id="ind-funding">
+        <div class="ind-top"><h3>做空資金費率</h3><span class="pill" data-draw="mstat" data-source="market" data-field="status" data-where="key=funding">—</span></div>
+        <span class="ind-val"><span data-draw="mval" data-source="market" data-field="value" data-where="key=funding">—</span>% / 8 小時</span>
+        <p class="rule">8 個做空幣永續合約的資金費率平均。正數是做空收錢。&lt; −0.01% 代表做空成本超過回測假設（每天 0.03%）。</p>
+      </div>
+    </div>
+    <div class="card">
+      <h3>背景（只看方向，不設警示）</h3>
+      <div class="ctx">
+        <div><span class="lab">BTC 距 200 日均線</span><b><span data-draw="mval" data-source="market" data-field="value" data-where="key=btc_trend">—</span>%</b></div>
+        <div><span class="lab">BTC 30 日年化波動</span><b><span data-draw="mval" data-source="market" data-field="value" data-where="key=btc_vol30">—</span>%</b></div>
+        <div><span class="lab">25 幣日報酬平均相關</span><b data-draw="mval" data-source="market" data-field="value" data-where="key=corr30">—</b></div>
+      </div>
+      <div class="spark" data-draw="spark" data-key="btc_trend" data-source="market_hist"></div>
+      <p class="cnote">上圖：BTC 距 200 日均線（%），最近 180 天。</p>
+    </div>
+  </section>
+
+  <section id="shorts">
+    <h2>做空籃子</h2>
+    <p class="lede">只有收盤在 200 日均線之下的幣才會開空。波動比低於 0.68、資金費率為負，都會讓做空變差。</p>
+    <div class="card">
+      <div class="tablebox">
+        <table id="shorts-table" data-source="shorts" data-row-key="coin">
+          <thead><tr>
+            <th data-field="coin">幣</th><th data-field="gate">濾網</th><th data-field="dist200_pct" class="num">距 200 日均線 %</th>
+            <th data-field="vol_ratio" class="num">波動比</th><th data-field="funding_8h_pct" class="num">資金費率 %／8h</th><th data-field="vol24h_musd" class="num">永續 24h 成交（百萬 USDT）</th>
+          </tr></thead>
+          <tbody data-draw="shorts"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="candidates">
+    <h2>候選幣（換幣五關）</h2>
+    <p class="lede">只有在某個幣被停用後才補位（規則手冊 §15）。第 1 關流動性與上市時間；第 2 關波動 ≤ 70%、近 2 年在 200 日均線之上 ≥ 50%、日線會反彈（變異比 &lt; 1）；第 3 關用現有三條規則原封不動回測 4 年；第 4 關影子紀錄（不下單、照規則記帳）實際跑滿 20 筆。現役的三個幣也列出來對照。每 7 天重算一次。</p>
+    <div class="card">
+      <div class="tablebox">
+        <table id="cand-table" data-source="candidates" data-row-key="coin">
+          <thead><tr>
+            <th data-field="coin">幣</th><th data-field="verdict">目前卡在哪</th>
+            <th data-field="vol24h_musd" class="num">現貨 24h 成交（百萬）</th><th data-field="vol2y" class="num">2 年波動 %</th>
+            <th data-field="above2y" class="num">均線上天數 %</th><th data-field="vr5" class="num">變異比</th>
+            <th data-field="rule">最適規則</th><th data-field="n" class="num">回測筆數</th><th data-field="wr" class="num">回測勝率 %</th>
+            <th data-field="h1" class="num">前 2 年 %</th><th data-field="h2" class="num">後 2 年 %</th>
+            <th data-field="shadow_n" class="num">影子紀錄筆數</th><th data-field="shadow_wr" class="num">影子紀錄勝率 %</th>
+          </tr></thead>
+          <tbody data-draw="cands"></tbody>
+        </table>
+      </div>
+      <p class="cnote">重算時間（UTC）：<span data-draw="kpi" data-source="candidates" data-field="updated" data-row="0">—</span></p>
+    </div>
+  </section>
+
+  <section id="trades">
+    <h2>最近交易</h2>
+    <p class="lede">機器人在 OKX 模擬盤的進出場紀錄。滑價是實際成交比訊號收盤價差多少（不利方向為正）。</p>
+    <div class="card">
+      <div class="tablebox">
+        <table id="trades-table" data-source="trades" data-row-key="id">
+          <thead><tr>
+            <th data-field="time">時間（UTC）</th><th data-field="leg">幣</th><th data-field="action">動作</th><th data-field="price" class="num">價格</th>
+            <th data-field="reason">原因</th><th data-field="ret_pct" class="num">報酬 %</th><th data-field="slip_pct" class="num">滑價 %</th>
+          </tr></thead>
+          <tbody data-draw="trades"></tbody>
+        </table>
+      </div>
+      <p class="cnote f3-empty" hidden>還沒有交易。機器人只在訊號出現時進場，空手是正常的。</p>
+    </div>
+  </section>
+
+  <p class="foot">資料來源：GitHub 上的 F3 機器人每小時執行後寫入 f3-bot-state 分支（okx-demo-F3-2.0/dash 和 trend-paper/dash），每天由排程任務搬進這個監控台；趨勢回測兩張表是固定資料。這是模擬盤，不是真錢。規則全文見 KIWI repo 的規則手冊 §15–§17。</p>
+</div>
+
+<script>
+  const F = {
+    num: d3.format(',.2f'),
+    int: d3.format(','),
+    pct: (v, d = 2) => (v > 0 ? '+' : '') + d3.format(`.${d}f`)(v) + '%',
+  };
+  const rowsOf = (id) => { const g = dash.data(id); return g.status === 'ok' && Array.isArray(g.data) ? g.data : null; };
+  const cell = (v, kind) => {
+    if (v === null || v === undefined || v === '') return '—';
+    if (kind === 'num') return d3.format(',.2f')(v);
+    if (kind === 'p1') return d3.format('.1f')(v);
+    if (kind === 'p2') return d3.format('.2f')(v);
+    if (kind === 'int') return d3.format(',')(v);
+    if (kind === 'px') return String(v);
+    return String(v);
+  };
+  const pillClass = (s) => ({ '正常': 'ok', '警示': 'warn', '建議停用': 'bad', '暫停複查': 'warn', '樣本不足': 'mute', '提示': 'mute', '參考': 'mute' }[s] || 'mute');
+  const whereKey = (el) => { const w = el.getAttribute('data-where') || ''; return decodeURIComponent(w.split('=')[1] || ''); };
+
+  // 表格：每列每格只寫文字；狀態用 span 上色
+  function fillTable(tbody, rows, cols) {
+    tbody.replaceChildren();
+    if (!rows) return;
+    for (const r of rows) {
+      const tr = document.createElement('tr');
+      if (r.gate === '不開空（在 EMA200 之上）') tr.className = 'dim';
+      for (const [field, kind] of cols) {
+        const td = document.createElement('td');
+        if (kind && kind !== 'txt' && kind !== 'pill' && kind !== 'wrap') td.className = 'num';
+        if (kind === 'wrap') td.className = 'wrap';
+        if (kind === 'pill') {
+          const s = document.createElement('span');
+          s.className = 'pill ' + pillClass(r[field]);
+          s.textContent = cell(r[field]);
+          td.appendChild(s);
+        } else {
+          td.textContent = cell(r[field], kind);
+        }
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+  }
+
+  dash.draw('kpi', (el) => {
+    const id = el.getAttribute('data-source');
+    const rows = rowsOf(id);
+    const f = el.getAttribute('data-field');
+    if (!rows || !rows.length) { el.textContent = '—'; return; }
+    const v = rows[0][f];
+    if (v === null || v === undefined) { el.textContent = '—'; return; }
+    if (f === 'equity' || f === 'capital') el.textContent = F.num(v);
+    else if (f === 'ret_pct' || f === 'dd_pct') el.textContent = F.pct(v);
+    else if (f === 'updated') el.textContent = String(v).replace('T', ' ').slice(0, 16);
+    else if (typeof v === 'number') el.textContent = F.int(v);
+    else el.textContent = String(v);
+    if (f === 'ret_pct') el.style.color = v > 0 ? 'var(--color-ok)' : v < 0 ? 'var(--color-bad)' : '';
+    if (f === 'dd_pct') el.style.color = v <= -15 ? 'var(--color-bad)' : v <= -7.5 ? 'var(--color-warn)' : '';
+    if (f === 'alerts') el.style.color = v > 0 ? 'var(--color-warn)' : '';
+  });
+
+  dash.draw('mval', (el) => {
+    const rows = rowsOf('market');
+    const r = rows && rows.find((x) => x.key === whereKey(el));
+    el.textContent = r && r.value !== null ? String(r.value) : '—';
+  });
+  dash.draw('mstat', (el) => {
+    const rows = rowsOf('market');
+    const r = rows && rows.find((x) => x.key === whereKey(el));
+    el.textContent = r ? r.status : '—';
+    el.className = 'pill ' + (r ? pillClass(r.status) : 'mute');
+  });
+
+  dash.draw('legs', (tb) => fillTable(tb, rowsOf('legs'), [['leg', 'txt'], ['weight', 'p2'], ['mark', 'num'], ['status', 'txt'], ['unreal_pct', 'p2'], ['to_tp_pct', 'p2'], ['to_sl_pct', 'p2'], ['bars_held', 'int'], ['max_bars', 'int']]));
+  dash.draw('health', (tb) => fillTable(tb, rowsOf('health'), [['group', 'txt'], ['status', 'pill'], ['n', 'int'], ['wr', 'p1'], ['wilson_upper', 'p1'], ['bt_wr', 'p1'], ['avg_pct', 'p2'], ['streak', 'int'], ['streak_limit', 'int'], ['dd_pct', 'p2'], ['dd_limit', 'p1'], ['slip_pct', 'p2']]));
+  dash.draw('shorts', (tb) => fillTable(tb, rowsOf('shorts'), [['coin', 'txt'], ['gate', 'txt'], ['dist200_pct', 'p1'], ['vol_ratio', 'p2'], ['funding_8h_pct', 'px'], ['vol24h_musd', 'p1']]));
+  dash.draw('cands', (tb) => fillTable(tb, rowsOf('candidates'), [['coin', 'txt'], ['verdict', 'wrap'], ['vol24h_musd', 'p1'], ['vol2y', 'p1'], ['above2y', 'p1'], ['vr5', 'p2'], ['rule', 'txt'], ['n', 'int'], ['wr', 'p1'], ['h1', 'p1'], ['h2', 'p1'], ['shadow_n', 'int'], ['shadow_wr', 'p1']]));
+  const realTrades = () => { const t = rowsOf('trades'); return t ? t.filter((r) => r.id !== -1) : null; };
+  dash.draw('trades', (tb) => fillTable(tb, realTrades(), [['time', 'txt'], ['leg', 'txt'], ['action', 'txt'], ['price', 'px'], ['reason', 'txt'], ['ret_pct', 'p2'], ['slip_pct', 'p2']]));
+  dash.onData(() => {
+    const t = realTrades();
+    document.querySelectorAll('.f3-empty').forEach((p) => { p.hidden = !(t && t.length === 0); });
+  });
+
+  // 共用：tooltip
+  function tipFor(box) {
+    let tip = box.querySelector('.tip');
+    if (!tip) { tip = document.createElement('div'); tip.className = 'tip'; tip.hidden = true; box.appendChild(tip); }
+    return tip;
+  }
+  function showTip(box, tip, x, y, title, line) {
+    tip.replaceChildren();
+    const a = document.createElement('div'); a.className = 't'; a.textContent = title;
+    const b = document.createElement('div'); b.textContent = line;
+    tip.append(a, b); tip.hidden = false;
+    const w = box.clientWidth, tw = tip.offsetWidth;
+    tip.style.left = Math.max(0, Math.min(w - tw, x + 10)) + 'px';
+    tip.style.top = Math.max(0, y - 40) + 'px';
+  }
+  function axisClean(g) { g.attr('font-size', null).attr('font-family', null); g.selectAll('text').style('fill', 'var(--color-fg-muted)').style('font-size', 'var(--cds-font-size-caption)'); g.selectAll('.domain').style('stroke', 'var(--cds-chart-axis)'); g.selectAll('.tick line').style('stroke', 'var(--cds-chart-grid)'); }
+
+  const CAPITAL = 83000;   // 起始資金（規則手冊 §12），畫成虛線
+  dash.draw('equity', (box) => {
+    box.replaceChildren();
+    const rows = rowsOf('equity');
+    if (!rows || !rows.length) return;
+    const data = rows.map((r) => ({ t: new Date(r.time + 'Z'), v: +r.equity }));
+    const W = Math.max(280, box.clientWidth), H = 220;
+    const lo = d3.min(data, (d) => d.v), hi = d3.max(data, (d) => d.v);
+    const pad = Math.max((hi - lo) * 0.15, CAPITAL * 0.01);
+    const y = d3.scaleLinear([Math.min(lo, CAPITAL) - pad, Math.max(hi, CAPITAL) + pad], [H - 24, 8]).nice();
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+    const yAxis = svg.append('g').call(d3.axisLeft(y).ticks(4).tickFormat(d3.format('~s')));
+    let ml = 0; yAxis.selectAll('text').each(function () { ml = Math.max(ml, this.getComputedTextLength()); });
+    ml += 14; yAxis.attr('transform', `translate(${ml},0)`).call((g) => g.selectAll('.tick line').attr('x2', W - ml - 8));
+    axisClean(yAxis); yAxis.select('.domain').remove();
+    const ext = d3.extent(data, (d) => d.t);
+    if (+ext[0] === +ext[1]) ext[1] = new Date(+ext[0] + 3600e3);
+    const x = d3.scaleUtc(ext, [ml, W - 8]);
+    const xAxis = svg.append('g').attr('transform', `translate(0,${H - 24})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor(W / 120))).tickFormat(d3.utcFormat('%m-%d %H:%M')));
+    axisClean(xAxis);
+    svg.append('line').attr('x1', ml).attr('x2', W - 8).attr('y1', y(CAPITAL)).attr('y2', y(CAPITAL)).style('stroke', 'var(--cds-chart-reference)').attr('stroke-dasharray', '4 4');
+    svg.append('path').datum(data).attr('fill', 'none').style('stroke', dash.colors[0]).attr('stroke-width', 2).attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round').attr('d', d3.line().x((d) => x(d.t)).y((d) => y(d.v)));
+    const last = data[data.length - 1];
+    svg.append('circle').attr('cx', x(last.t)).attr('cy', y(last.v)).attr('r', 3.5).style('fill', dash.colors[0]);
+    const dot = svg.append('circle').attr('r', 4).style('fill', dash.colors[0]).attr('visibility', 'hidden');
+    const tip = tipFor(box);
+    svg.on('pointermove', (ev) => {
+      const [mx] = d3.pointer(ev);
+      const i = d3.bisector((d) => d.t).center(data, x.invert(mx));
+      const d = data[i];
+      dot.attr('cx', x(d.t)).attr('cy', y(d.v)).attr('visibility', 'visible');
+      showTip(box, tip, x(d.t) * box.clientWidth / W, y(d.v) * box.clientWidth / W, d3.utcFormat('%Y-%m-%d %H:%M UTC')(d.t), F.num(d.v) + ' USDT');
+    }).on('pointerleave', () => { dot.attr('visibility', 'hidden'); tip.hidden = true; });
+  });
+
+  // ---------- 趨勢跟隨 ----------
+  const fmtBool = (v) => (v === true ? '✓' : v === false ? '✗' : '—');
+  dash.draw('tsum', (tb) => fillTable(tb, rowsOf('trend_summary'), [['variant', 'txt'], ['equity', 'num'], ['ret_pct', 'p2'], ['max_dd_pct', 'p2'], ['btc_pct', 'p1'], ['eth_pct', 'p1'], ['cash_pct', 'p1'], ['btc_target_pct', 'p1'], ['eth_target_pct', 'p1'], ['rebalances', 'int'], ['last_rebalance', 'txt']]));
+  dash.draw('tsig', (tb) => {
+    const rows = rowsOf('trend_signals');
+    fillTable(tb, rows && rows.map((r) => ({ ...r, ma100: fmtBool(r.ma100), ma150: fmtBool(r.ma150), ma200: fmtBool(r.ma200), mom60: fmtBool(r.mom60), mom90: fmtBool(r.mom90), mom180: fmtBool(r.mom180), donchian: fmtBool(r.donchian) })),
+      [['coin', 'txt'], ['close', 'num'], ['score', 'p2'], ['vol60_pct', 'p1'], ['ma100', 'txt'], ['ma150', 'txt'], ['ma200', 'txt'], ['mom60', 'txt'], ['mom90', 'txt'], ['mom180', 'txt'], ['donchian', 'txt'], ['target40_pct', 'p1'], ['target45_pct', 'p1'], ['target50_pct', 'p1']]);
+  });
+  dash.draw('tbt', (tb) => fillTable(tb, rowsOf('trend_bt'), [['variant', 'txt'], ['oos_cagr', 'p1'], ['oos_dd', 'p1'], ['oos_calmar', 'p2'], ['since2022_cagr', 'p1'], ['since2022_dd', 'p1'], ['worst_month', 'p1'], ['longest_underwater_days', 'int'], ['avg_exposure', 'int'], ['rebalances_per_year', 'int'], ['blend_cagr', 'p1'], ['blend_dd', 'p1']]));
+  dash.draw('tbty', (tb) => fillTable(tb, rowsOf('trend_bt'), [['variant', 'txt'], ['y2021', 'int'], ['y2022', 'int'], ['y2023', 'int'], ['y2024', 'int'], ['y2025', 'int'], ['y2026', 'int']]));
+  const realTT = () => { const t = rowsOf('trend_trades'); return t ? t.filter((r) => r.id !== -1) : null; };
+  dash.draw('ttrades', (tb) => fillTable(tb, realTT(), [['time', 'txt'], ['variant', 'txt'], ['coin', 'txt'], ['side', 'txt'], ['price', 'num'], ['usdt', 'num'], ['slip_pct', 'p2'], ['weight_after_pct', 'p1']]));
+  dash.onData(() => {
+    document.querySelectorAll('[data-swatch]').forEach((i) => { i.style.background = dash.colors[+i.getAttribute('data-swatch')]; });
+  });
+
+  // 多條線：series = [{name, color, dashed, pts:[{t, v}]}]
+  function lineChart(box, series, opt) {
+    box.replaceChildren();
+    const all = series.flatMap((s) => s.pts);
+    if (!all.length) return;
+    const W = Math.max(280, box.clientWidth), H = 240;
+    const ext = d3.extent(all, (d) => d.t);
+    if (+ext[0] === +ext[1]) ext[1] = new Date(+ext[0] + 3600e3);
+    let [lo, hi] = d3.extent(all, (d) => d.v);
+    if (opt.ref !== undefined) { lo = Math.min(lo, opt.ref); hi = Math.max(hi, opt.ref); }
+    const pad = opt.log ? 0 : Math.max((hi - lo) * 0.12, opt.minPad || 0.2);
+    const y = (opt.log ? d3.scaleLog([lo * 0.95, hi * 1.05], [H - 24, 8]) : d3.scaleLinear([lo - pad, hi + pad], [H - 24, 8]).nice());
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+    const yAxis = svg.append('g').call(d3.axisLeft(y).ticks(opt.log ? 5 : 4, opt.log ? '~g' : undefined).tickFormat(opt.yFmt));
+    let ml = 0; yAxis.selectAll('text').each(function () { ml = Math.max(ml, this.getComputedTextLength()); });
+    ml += 14; yAxis.attr('transform', `translate(${ml},0)`).call((g) => g.selectAll('.tick line').attr('x2', W - ml - 8));
+    axisClean(yAxis); yAxis.select('.domain').remove();
+    const x = d3.scaleUtc(ext, [ml, W - 8]);
+    const xAxis = svg.append('g').attr('transform', `translate(0,${H - 24})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor(W / 110))).tickFormat(d3.utcFormat(opt.xFmt)));
+    axisClean(xAxis);
+    if (opt.ref !== undefined) svg.append('line').attr('x1', ml).attr('x2', W - 8).attr('y1', y(opt.ref)).attr('y2', y(opt.ref)).style('stroke', 'var(--cds-chart-reference)').attr('stroke-dasharray', '4 4');
+    const line = d3.line().x((d) => x(d.t)).y((d) => y(d.v));
+    for (const s of series) {
+      if (!s.pts.length) continue;
+      const p = svg.append('path').datum(s.pts).attr('fill', 'none').style('stroke', s.color).attr('stroke-width', s.width || 1.8).attr('stroke-linejoin', 'round').attr('d', line);
+      if (s.dashed) p.attr('stroke-dasharray', '4 3');
+    }
+    const tip = tipFor(box);
+    const guide = svg.append('line').attr('y1', 8).attr('y2', H - 24).style('stroke', 'var(--cds-chart-grid)').attr('visibility', 'hidden');
+    svg.on('pointermove', (ev) => {
+      const [mx] = d3.pointer(ev);
+      const t = x.invert(mx);
+      guide.attr('x1', x(t)).attr('x2', x(t)).attr('visibility', 'visible');
+      const parts = series.filter((s) => s.pts.length).map((s) => { const d = s.pts[d3.bisector((q) => q.t).center(s.pts, t)]; return `${s.name} ${opt.vFmt(d.v)}`; });
+      showTip(box, tip, x(t) * box.clientWidth / W, 60, d3.utcFormat(opt.tipFmt)(t), parts.join('　'));
+    }).on('pointerleave', () => { guide.attr('visibility', 'hidden'); tip.hidden = true; });
+  }
+
+  const VARIANTS = ['波動目標 40%', '波動目標 45%', '波動目標 50%'];
+  dash.draw('trendlive', (box) => {
+    const f3 = rowsOf('equity'), tr = rowsOf('trend_equity');
+    if (!f3 || !tr) { box.replaceChildren(); return; }
+    const series = [{ name: 'F3 2.0', color: dash.colors[0], width: 2, pts: f3.map((r) => ({ t: new Date(r.time + 'Z'), v: +r.ret_pct })) }]
+      .concat(VARIANTS.map((v, i) => ({ name: v.replace('波動目標 ', '趨勢 '), color: dash.colors[i + 1], pts: tr.filter((r) => r.variant === v).map((r) => ({ t: new Date(r.time + 'Z'), v: +r.ret_pct })) })));
+    lineChart(box, series, { ref: 0, minPad: 0.3, yFmt: (v) => d3.format('+.1f')(v) + '%', vFmt: (v) => F.pct(v), xFmt: '%m-%d', tipFmt: '%Y-%m-%d %H:%M UTC' });
+  });
+
+  const BT_SERIES = ['F3 2.0', '趨勢 40%', '趨勢 45%', '趨勢 50%', 'BTC 持有'];
+  dash.draw('trendbt', (box) => {
+    const rows = rowsOf('trend_bt_curve');
+    if (!rows) { box.replaceChildren(); return; }
+    const series = BT_SERIES.map((n, i) => ({ name: n, color: i < 4 ? dash.colors[i] : 'var(--color-fg-muted)', dashed: i === 4, width: i === 4 ? 1.2 : 1.8,
+      pts: rows.filter((r) => r.series === n).map((r) => ({ t: new Date(r.date + 'T00:00:00Z'), v: +r.value })) }));
+    lineChart(box, series, { log: true, ref: 1, yFmt: d3.format('~g'), vFmt: d3.format('.2f'), xFmt: '%Y-%m', tipFmt: '%Y-%m-%d' });
+  });
+
+  // 市場變量 180 天走勢＋門檻線（門檻見規則手冊 §16）
+  const LIMITS = { breadth: [48, 16.7], btc_ret30: [7.7], basket_vol_ratio: [0.68], btc_trend: [0] };
+  const UNITS = { breadth: '%', btc_ret30: '%', basket_vol_ratio: ' 倍', btc_trend: '%' };
+  dash.draw('spark', (box) => {
+    box.replaceChildren();
+    const rows = rowsOf('market_hist');
+    if (!rows || !rows.length) return;
+    const key = box.getAttribute('data-key');
+    const data = rows.map((r) => ({ t: new Date(r.day + 'T00:00:00Z'), v: r[key] })).filter((d) => d.v !== null);
+    const W = Math.max(240, box.clientWidth), H = 64;
+    const lims = LIMITS[key] || [];
+    const vals = data.map((d) => d.v).concat(lims);
+    const y = d3.scaleLinear(d3.extent(vals), [H - 6, 6]).nice();
+    const x = d3.scaleUtc(d3.extent(data, (d) => d.t), [2, W - 2]);
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+    for (const l of lims) {
+      svg.append('line').attr('x1', 2).attr('x2', W - 2).attr('y1', y(l)).attr('y2', y(l)).style('stroke', 'var(--cds-chart-reference)').attr('stroke-dasharray', '3 3');
+    }
+    svg.append('path').datum(data).attr('fill', 'none').style('stroke', dash.colors[0]).attr('stroke-width', 1.5).attr('stroke-linejoin', 'round').attr('d', d3.line().x((d) => x(d.t)).y((d) => y(d.v)));
+    const last = data[data.length - 1];
+    svg.append('circle').attr('cx', x(last.t)).attr('cy', y(last.v)).attr('r', 3).style('fill', dash.colors[0]);
+    const dot = svg.append('circle').attr('r', 3.5).style('fill', dash.colors[0]).attr('visibility', 'hidden');
+    const tip = tipFor(box);
+    svg.on('pointermove', (ev) => {
+      const [mx] = d3.pointer(ev);
+      const d = data[d3.bisector((q) => q.t).center(data, x.invert(mx))];
+      dot.attr('cx', x(d.t)).attr('cy', y(d.v)).attr('visibility', 'visible');
+      showTip(box, tip, x(d.t) * box.clientWidth / W, y(d.v) * box.clientWidth / W + 30, d3.utcFormat('%Y-%m-%d')(d.t), d3.format('.2f')(d.v) + UNITS[key]);
+    }).on('pointerleave', () => { dot.attr('visibility', 'hidden'); tip.hidden = true; });
+  });
+</script>
