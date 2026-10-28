@@ -6,7 +6,7 @@ date_added: 2026-10-27
 last_updated: 2026-10-28
 topic: business
 tags: [backtest, crypto, mean-reversion, BNB, TRX, BCH, RSI, EMA200, portfolio, paper-trading, rulebook, short, perpetual, bear-market, tradingview, okx-demo]
-version: 2.6
+version: 2.7
 related: [./2026-06-06-dip-buying-best-indicator-combos-backtest.md]
 engine: projects/crypto-f3/f3_backtest.py
 ---
@@ -392,7 +392,8 @@ F3 的三條做多腿完全不變，只是資金縮成 **70%**（BNB 21%、TRX 2
 
 ## 12. 在 GitHub 上持續執行（不用開電腦）
 
-> 工作檔：`.github/workflows/f3-bot.yml`。每小時 05 分自動跑一次 `f3_okx_bot.py --v2`（2026-10-28 起；原本只排 6 個整點，但 GitHub 頭三輪漏跑 2 輪、延遲 1 輪）。同一根 K 線只處理一次，多跑不會重複下單。
+> 工作檔：`.github/workflows/f3-bot.yml`＋`projects/crypto-f3/f3_cycle.sh`。每小時 05 分跑一輪（機器人＋監控資料＋存狀態＋推播），同一根 K 線只處理一次，多跑不會重複下單。
+> **為什麼要「循環」：** GitHub 排程在這個 repo 很不可靠。2026-10-28 改成每小時排程後，16 小時只跑了 1 次，其他排程也常隔 4～5 小時。所以一次執行會待約 5 小時、每小時跑一輪，結束前自己觸發下一次執行；每 2 小時的排程只是斷掉時重新接上的備援。只檢查和下單測試另開一組，不用排在循環後面。
 > 2026-10-27 測試：GitHub 的機器在美國，連 OKX 公開 API 正常，私有 API 用假金鑰回「金鑰不存在」，代表沒有被擋。
 
 - **狀態保存**：持倉與交易明細 commit 到專用分支 **`f3-bot-state`**，在 GitHub 上點這個分支就能看 `ledger.csv`。不碰 main。
@@ -614,3 +615,4 @@ Actions 分頁 →「F3 2.0 交易機器人」→ 右上「⋯」→ Disable wor
 - 2026-10-28 v2.4：新增 §14 選幣歸因（三條規則各自只在自己的幣上最好）與 §15 換幣評估標準（失效停用、候選五關、影子腿）。
 - 2026-10-28 v2.5：GitHub 排程改每小時、開發分支測試不推播、新增 OKX 模擬盤下單測試（§12）。
 - 2026-10-28 v2.6：新增 §16 市場變量與調整指標、§17 模擬盤監控台；§15 成交額門檻改為依單筆大小推算（500 萬 USDT）。
+- 2026-10-28 v2.7：§12 改為每小時循環＋自動接手（GitHub 排程不可靠）；OKX 跨幣種保證金帳戶的現貨單改用 cross（下單測試抓到 cash 被拒）。

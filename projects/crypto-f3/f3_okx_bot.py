@@ -176,6 +176,17 @@ class OKXDemo:
     def long_short_mode(self):
         return self.config().get("posMode") == "long_short_mode"
 
+    def spot_td(self):
+        # 現貨模式／合約模式（acctLv 1、2）用 cash；跨幣種保證金／組合保證金（3、4）不接受 cash，要用 cross。
+        # cross 下只買得起 USDT 餘額內的量、賣出量不超過持有量，所以不會借幣（2026-10-28 下單測試踩到）
+        return "cross" if self.config().get("acctLv") in ("3", "4") else "cash"
+
+    def spot_sell(self, inst_id, qty, lot):
+        body = {"instId": inst_id, "tdMode": self.spot_td(), "side": "sell", "ordType": "market", "sz": self._fmt(qty, lot)}
+        if body["tdMode"] == "cash":
+            body["tgtCcy"] = "base_ccy"
+        return self.req("POST", "/api/v5/trade/order", body=body)[0]
+
     def inst(self, leg):
         iid = f"{leg['symbol']}-USDT" + ("-SWAP" if leg["side"] == "short" else "")
         if iid not in self._inst:
@@ -196,7 +207,8 @@ class OKXDemo:
 
     def check(self, legs):
         cfg = self.config()
-        print(f"帳戶模式 acctLv={cfg.get('acctLv')}（1＝現貨模式，2 以上才能交易永續合約）　持倉模式 posMode={cfg.get('posMode')}")
+        print(f"帳戶模式 acctLv={cfg.get('acctLv')}（1＝現貨模式，2 以上才能交易永續合約）　持倉模式 posMode={cfg.get('posMode')}"
+              f"　現貨下單模式 {self.spot_td()}　自動借幣 autoLoan={cfg.get('autoLoan')}")
         bal = self.req("GET", "/api/v5/account/balance", {"ccy": "USDT"})[0]
         usdt = next((d for d in bal.get("details", []) if d["ccy"] == "USDT"), {})
         print(f"模擬盤 USDT 可用餘額：{usdt.get('availBal', '0')}")
@@ -229,16 +241,18 @@ class OKXDemo:
         i = self.inst(leg)
         notional = st["equity"]
         if leg["side"] == "long":
-            o = self.req("POST", "/api/v5/trade/order", body={
-                "instId": i["instId"], "tdMode": "cash", "side": "buy", "ordType": "market",
-                "sz": self._fmt(notional, "0.01"), "tgtCcy": "quote_ccy"})[0]
+            body = {"instId": i["instId"], "tdMode": self.spot_td(), "side": "buy", "ordType": "market",
+                    "sz": self._fmt(notional, "0.01")}   # 市價買單的 sz 是 USDT 金額（cash 用 tgtCcy 指定；cross 預設就是）
+            if body["tdMode"] == "cash":
+                body["tgtCcy"] = "quote_ccy"
+            o = self.req("POST", "/api/v5/trade/order", body=body)[0]
             f = self._order(i["instId"], o["ordId"])
             px = float(f["avgPx"])
             qty = float(f["accFillSz"]) + (float(f["fee"]) if f.get("feeCcy") == leg["symbol"] else 0.0)
             qty = self._floor(qty, i["lotSz"])
             tp, sl = levels(leg, px)
             a = self.req("POST", "/api/v5/trade/order-algo", body={
-                "instId": i["instId"], "tdMode": "cash", "side": "sell", "ordType": "oco", "sz": self._fmt(qty, i["lotSz"]),
+                "instId": i["instId"], "tdMode": self.spot_td(), "side": "sell", "ordType": "oco", "sz": self._fmt(qty, i["lotSz"]),
                 "tpTriggerPx": self._fmt(tp, i["tickSz"]), "tpOrdPx": "-1",
                 "slTriggerPx": self._fmt(sl, i["tickSz"]), "slOrdPx": "-1"})[0]
         else:
@@ -290,9 +304,7 @@ class OKXDemo:
                 bal = self.req("GET", "/api/v5/account/balance", {"ccy": leg["symbol"]})[0]
                 avail = float(next((d["availBal"] for d in bal.get("details", []) if d["ccy"] == leg["symbol"]), 0))
                 qty = self._floor(min(pos["qty"], avail), i["lotSz"])
-                o = self.req("POST", "/api/v5/trade/order", body={
-                    "instId": pos["inst"], "tdMode": "cash", "side": "sell", "ordType": "market",
-                    "sz": self._fmt(qty, i["lotSz"]), "tgtCcy": "base_ccy"})[0]
+                o = self.spot_sell(pos["inst"], qty, i["lotSz"])
                 px = float(self._order(pos["inst"], o["ordId"])["avgPx"])
             else:
                 body = {"instId": pos["inst"], "mgnMode": "isolated"}
@@ -325,8 +337,7 @@ class OKXDemo:
             print("  ✅ OCO 停利停損單已在掛單列表")
             self.req("POST", "/api/v5/trade/cancel-algos", body=[{"algoId": pos["algoId"], "instId": pos["inst"]}])
             if g["side"] == "long":
-                body = {"instId": pos["inst"], "tdMode": "cash", "side": "sell", "ordType": "market",
-                        "sz": self._fmt(pos["qty"], i["lotSz"]), "tgtCcy": "base_ccy"}
+                o = self.spot_sell(pos["inst"], pos["qty"], i["lotSz"])
             else:   # 只平掉測試的數量，不動機器人可能持有的其他部位
                 body = {"instId": pos["inst"], "tdMode": "isolated", "side": "buy", "ordType": "market",
                         "sz": self._fmt(pos["qty"], i["lotSz"])}
@@ -334,7 +345,7 @@ class OKXDemo:
                     body["posSide"] = "short"
                 else:
                     body["reduceOnly"] = True
-            o = self.req("POST", "/api/v5/trade/order", body=body)[0]
+                o = self.req("POST", "/api/v5/trade/order", body=body)[0]
             out = float(self._order(pos["inst"], o["ordId"])["avgPx"])
             print(f"  ✅ 已撤銷 OCO 並平倉，成交 {out:.6g}")
         print("下單測試完成：現貨、永續、OCO、平倉都正常。可以到 OKX 模擬盤的「訂單歷史／成交明細」看到這幾筆。")

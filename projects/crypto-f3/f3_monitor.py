@@ -158,7 +158,8 @@ def trade_rows(led):
                         price=clean(float(r["price"]), 6) if r.get("price") else None, reason=r.get("reason") or "",
                         ret_pct=clean(float(r["ret"]) * 100, 2) if r.get("ret") else None,
                         slip_pct=slip_of(r) if r["action"] == "ENTER" else None, note=(r.get("note") or "")[:120]))
-    return out[::-1]
+    # 監控台讀不了空檔案：沒有交易時放一列佔位（id −1），頁面會改顯示「還沒有交易」
+    return out[::-1] or [dict(id=-1, time="", leg="", action="尚無交易", price=None, reason="", ret_pct=None, slip_pct=None, note="")]
 
 
 def health_rows(legs, led):
@@ -227,10 +228,10 @@ def market(dfs, tk):
     b, r30, bvr = breadth.iloc[-1], btc_ret30.iloc[-1], basket_vr.iloc[-1]
     m = [
         dict(key="breadth", name="市場廣度", value=clean(b, 1), unit="%",
-             rule=f"> {BREADTH_HOT:.0f}% 警示；< {BREADTH_COLD:.0f}% 做多腿多半空手",
+             rule=f"> {BREADTH_HOT:.0f}% 警示；< {BREADTH_COLD:.0f}% 做多的幣多半空手",
              status="警示" if b > BREADTH_HOT else "提示" if b < BREADTH_COLD else "正常",
              meaning="25 個幣裡收盤在自己 EMA200 之上的比例。",
-             effect="> 48%（山寨普漲）時 TRX 新單平均每筆 −0.1%、勝率 67%，其他時候 +1.4%、勝率 81%，兩半樣本一致；< 17% 時做多腿幾乎不開倉。"),
+             effect="> 48%（山寨普漲）時 TRX 新單平均每筆 −0.1%、勝率 67%，其他時候 +1.4%、勝率 81%，兩半樣本一致；< 17% 時做多的幣幾乎不開倉。"),
         dict(key="btc_ret30", name="BTC 30 日漲跌", value=clean(r30, 1), unit="%",
              rule=f"> +{BTC_RET30_HOT}% 警示（做空籃子）",
              status="警示" if r30 > BTC_RET30_HOT else "正常",
@@ -248,9 +249,9 @@ def market(dfs, tk):
              effect="回測假設做空每天付 0.03%（每 8 小時 0.01%），實際更負就會比回測差。"),
         dict(key="btc_trend", name="BTC 距 EMA200", value=clean(btc_trend.iloc[-1], 1), unit="%", rule="只看方向，不設警示",
              status="參考", meaning="BTC 收盤高於（正）或低於（負）200 日均線多少。",
-             effect="決定大盤多空；對各腿的影響在兩半樣本不一致，所以只當背景。"),
+             effect="決定大盤多空；對各幣的影響在兩半樣本不一致，所以只當背景。"),
         dict(key="btc_vol30", name="BTC 30 日波動", value=clean(btc_vol30.iloc[-1], 1), unit="%/年", rule="只看方向，不設警示",
-             status="參考", meaning="BTC 最近 30 天的年化波動。", effect="對做多腿影響不明顯；做空籃子在高波動時較好，但已由波動比涵蓋。"),
+             status="參考", meaning="BTC 最近 30 天的年化波動。", effect="對做多的幣影響不明顯；做空籃子在高波動時較好，但已由波動比涵蓋。"),
         dict(key="corr30", name="幣之間平均相關", value=clean(corr30.iloc[-1], 2), unit="", rule="只看方向，不設警示",
              status="參考", meaning="25 個幣最近 30 天日報酬的平均兩兩相關。", effect="越高代表越同漲同跌，分散效果越差；對勝率的影響不穩定。"),
     ]
@@ -352,7 +353,7 @@ def candidates(dfs, tk, meta, meta_p):
         elif not row["gate3"]:
             v = "第 3 關未過：固定規則回測"
         elif not row["gate4"] and c not in ACTIVE:
-            v = f"影子腿觀察中（{row['shadow_n'] or 0}／20 筆）"
+            v = f"影子紀錄觀察中（{row['shadow_n'] or 0}／20 筆）"
         else:
             v = "五關都過" if c not in ACTIVE else "第 1～3 關都過"
         row["verdict"] = ("現役，" if c in ACTIVE else "") + v
