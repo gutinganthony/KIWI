@@ -6,7 +6,7 @@ date_added: 2026-10-27
 last_updated: 2026-10-28
 topic: business
 tags: [backtest, crypto, mean-reversion, BNB, TRX, BCH, RSI, EMA200, portfolio, paper-trading, rulebook, short, perpetual, bear-market, tradingview, okx-demo]
-version: 2.4
+version: 2.5
 related: [./2026-06-06-dip-buying-best-indicator-combos-backtest.md]
 engine: projects/crypto-f3/f3_backtest.py
 ---
@@ -392,13 +392,15 @@ F3 的三條做多腿完全不變，只是資金縮成 **70%**（BNB 21%、TRX 2
 
 ## 12. 在 GitHub 上持續執行（不用開電腦）
 
-> 工作檔：`.github/workflows/f3-bot.yml`。每天台北 00／04／08／12／16／20 點 05 分自動跑一次 `f3_okx_bot.py --v2`。
+> 工作檔：`.github/workflows/f3-bot.yml`。每小時 05 分自動跑一次 `f3_okx_bot.py --v2`（2026-10-28 起；原本只排 6 個整點，但 GitHub 頭三輪漏跑 2 輪、延遲 1 輪）。同一根 K 線只處理一次，多跑不會重複下單。
 > 2026-10-27 測試：GitHub 的機器在美國，連 OKX 公開 API 正常，私有 API 用假金鑰回「金鑰不存在」，代表沒有被擋。
 
 - **狀態保存**：持倉與交易明細 commit 到專用分支 **`f3-bot-state`**，在 GitHub 上點這個分支就能看 `ledger.csv`。不碰 main。
 - **通知**：有進場、出場、錯誤或漏 K 線時推 Telegram；每天台北 08 點推一次持倉摘要；執行失敗也會推。沿用既有的 `TELEGRAM_BOT_TOKEN`／`TELEGRAM_CHAT_ID`。
 - **公開性**：這個 repo 是公開的，`f3-bot-state` 分支上的交易明細任何人都看得到（模擬盤，無妨）。金鑰放在 Secrets，是加密的，不會出現在任何紀錄。
-- **排程延遲**：GitHub 的排程常晚幾分鐘，尖峰時可能更久。成交價會比收盤價差一點，對日線、4 小時策略影響不大。
+- **排程延遲**：GitHub 的排程常晚幾分鐘到半小時，也會整輪漏跑。改成每小時跑之後，漏一輪最多晚 1 小時補上。成交價會比收盤價差一點，對日線、4 小時策略影響不大。
+- **開發分支的測試執行**：只跑紙上模式、不存檔、**不推 Telegram**（2026-10-27 曾經推出一則紙上的 TRX 進場，被誤認成 OKX 下單）。
+- **下單測試**：Run workflow 時勾「OKX 模擬盤下單測試」，會用約 50 USDT 開一筆現貨多單和一筆永續空單、掛停利停損、再撤單平倉，驗證整條下單流程。不影響策略資金與狀態，交易會留在 OKX 模擬盤的訂單歷史裡。
 
 ### 12.1 切換到 OKX 模擬盤（你自己操作，金鑰不要給任何人，包括 Claude）
 
@@ -547,3 +549,4 @@ Actions 分頁 →「F3 2.0 交易機器人」→ 右上「⋯」→ Disable wor
 - 2026-10-27 v2.2：新增 §12 GitHub Actions 持續執行（f3-bot.yml）與切換 OKX 模擬盤步驟。
 - 2026-10-27 v2.3：新增 §13 滾動樣本外檢驗（換幣無效、挑選方法本身未證明有效），機器人每日摘要加失效檢查。
 - 2026-10-28 v2.4：新增 §14 選幣歸因（三條規則各自只在自己的幣上最好）與 §15 換幣評估標準（失效停用、候選五關、影子腿）。
+- 2026-10-28 v2.5：GitHub 排程改每小時、開發分支測試不推播、新增 OKX 模擬盤下單測試（§12）。

@@ -11,6 +11,7 @@
   python3 f3_okx_bot.py --mode paper --v2                 # 紙上交易：不需要金鑰，按規則模擬成交
   python3 f3_okx_bot.py --mode okx-demo --check           # 只檢查模擬盤金鑰與帳戶設定，不下單
   python3 f3_okx_bot.py --mode okx-demo --v2              # 真的下單到 OKX 模擬盤
+  python3 f3_okx_bot.py --mode okx-demo --v2 --smoke      # 小額下單測試：開倉→掛 OCO→撤單平倉（不改狀態）
   python3 f3_okx_bot.py --replay 2025-06-01 --v2          # 用歷史資料把紙上引擎從某天重播到今天（驗證用）
   python3 f3_okx_bot.py --mode paper --v2 --status        # 只印目前持倉與各腿資金
 
@@ -304,6 +305,41 @@ class OKXDemo:
         return None
 
 
+    def smoke(self, legs, store, notional=50.0):
+        """端到端下單測試：用 50 USDT 開一筆現貨多單和一筆永續空單、掛 OCO、確認後全部撤銷平倉。
+        不碰狀態檔；交易會留在 OKX 模擬盤的訂單歷史和成交明細裡。"""
+        held = {n for n, st in store.state["legs"].items() if st["pos"]}
+        long_leg = next(g for g in legs if g["side"] == "long" and g["name"] not in held)
+        short_leg = next((g for g in legs if g["side"] == "short" and g["name"] not in held), None)
+        print(f"下單測試（每筆約 {notional:.0f} USDT，不影響策略資金與狀態）")
+        for g in [long_leg] + ([short_leg] if short_leg else []):
+            i = self.inst(g)
+            px = float(bt._get(f"{self.base}/api/v5/market/ticker?instId={i['instId']}")["data"][0]["last"])
+            if g["side"] == "short" and self._floor(notional / (px * float(i["ctVal"])), i["lotSz"]) < float(i["minSz"]):
+                print(f"  {g['name']}：{notional:.0f} USDT 不到最小下單單位，改用最小單位")
+            pos, note = self.enter(g, {"equity": notional if g["side"] == "long" else max(notional, px * float(i["ctVal"]) * float(i["minSz"]) * 1.01)},
+                                   pd.Timestamp.now("UTC").tz_localize(None), px)
+            print(f"  ✅ {g['name']} 進場成功：{note}　數量 {pos['qty']}　停利 {pos['tp']:.6g}　停損 {pos['sl']:.6g}")
+            live = self.req("GET", "/api/v5/trade/orders-algo-pending", {"ordType": "oco", "instId": pos["inst"]})
+            assert any(a["algoId"] == pos["algoId"] for a in live), "OCO 停利停損單沒有出現在掛單列表"
+            print("  ✅ OCO 停利停損單已在掛單列表")
+            self.req("POST", "/api/v5/trade/cancel-algos", body=[{"algoId": pos["algoId"], "instId": pos["inst"]}])
+            if g["side"] == "long":
+                body = {"instId": pos["inst"], "tdMode": "cash", "side": "sell", "ordType": "market",
+                        "sz": self._fmt(pos["qty"], i["lotSz"]), "tgtCcy": "base_ccy"}
+            else:   # 只平掉測試的數量，不動機器人可能持有的其他部位
+                body = {"instId": pos["inst"], "tdMode": "isolated", "side": "buy", "ordType": "market",
+                        "sz": self._fmt(pos["qty"], i["lotSz"])}
+                if self.long_short_mode():
+                    body["posSide"] = "short"
+                else:
+                    body["reduceOnly"] = True
+            o = self.req("POST", "/api/v5/trade/order", body=body)[0]
+            out = float(self._order(pos["inst"], o["ordId"])["avgPx"])
+            print(f"  ✅ 已撤銷 OCO 並平倉，成交 {out:.6g}")
+        print("下單測試完成：現貨、永續、OCO、平倉都正常。可以到 OKX 模擬盤的「訂單歷史／成交明細」看到這幾筆。")
+
+
 # ---------- 每次執行 ----------
 def fetch_all(legs, now=None):
     now = now or pd.Timestamp.now("UTC").tz_localize(None)
@@ -464,6 +500,7 @@ def main():
     ap.add_argument("--home", help="狀態與明細的資料夾（預設 ~/.kiwi-f3/<模式>-<版本>）")
     ap.add_argument("--check", action="store_true", help="只檢查 OKX 模擬盤金鑰與帳戶設定")
     ap.add_argument("--status", action="store_true", help="只印目前持倉與資金")
+    ap.add_argument("--smoke", action="store_true", help="OKX 模擬盤端到端下單測試（小額開倉→掛 OCO→撤單平倉，不改狀態）")
     ap.add_argument("--replay", metavar="YYYY-MM-DD", help="用歷史資料重播紙上引擎（驗證用）")
     a = ap.parse_args()
 
@@ -487,6 +524,11 @@ def main():
         broker = PaperBroker()
     store = Store(home, legs, a.capital, version)
     run_utc = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    if a.smoke:
+        if a.mode != "okx-demo":
+            raise SystemExit("--smoke 只能搭配 --mode okx-demo")
+        broker.smoke(legs, store)
+        return
     if a.status:
         print_status(legs, store, fetch_all(legs))
         return
