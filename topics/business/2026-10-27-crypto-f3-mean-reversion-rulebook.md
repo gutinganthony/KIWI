@@ -6,7 +6,7 @@ date_added: 2026-10-27
 last_updated: 2026-10-28
 topic: business
 tags: [backtest, crypto, mean-reversion, BNB, TRX, BCH, RSI, EMA200, portfolio, paper-trading, rulebook, short, perpetual, bear-market, tradingview, okx-demo, risk-control]
-version: 2.9
+version: 2.10
 related: [./2026-06-06-dip-buying-best-indicator-combos-backtest.md, ./2026-10-28-crypto-trend-following-research.md]
 engine: projects/crypto-f3/f3_backtest.py
 ---
@@ -665,7 +665,7 @@ Actions 分頁 →「F3 2.0 交易機器人」→ 右上「⋯」→ Disable wor
 完整報告：[加密貨幣趨勢跟隨研究](./2026-10-28-crypto-trend-following-research.md)。重點：
 - BTC＋ETH 集成趨勢（單幣波動目標 40%）樣本外 2021～2026 年化 21.9%、最大回撤 −30.2%；單靠趨勢，20% 和 −30% 綁在一起。
 - 和 F3 2.0 各半合併，2022-10～2026-10 回測 23.5%／−12.1%，但 F3 那一半是樣本內數字，實際預期約 15～20%／−15～−20%。
-- 下一步是讓趨勢腿也上模擬盤，和 F3 2.0 一起累積紀錄。
+- 2026-10-28 起趨勢跟隨以紙上交易並行三個波動目標（40／45／50%），掛在同一個每小時循環，狀態在 `f3-bot-state` 的 `trend-paper/`，監控台有「趨勢跟隨」一節（研究報告 §6～§7）。
 
 ---
 
@@ -681,3 +681,4 @@ Actions 分頁 →「F3 2.0 交易機器人」→ 右上「⋯」→ Disable wor
 - 2026-10-28 v2.7：§12 改為每小時循環＋自動接手（GitHub 排程不可靠）；OKX 跨幣種保證金帳戶的現貨單改用 cross（下單測試抓到 cash 被拒）。
 - 2026-10-28 v2.8：新增 §18 OKX 美股永續合約可行性與回測（F3 規則無效；Connors RSI(2) 有小優勢但輸給持有 QQQ）。
 - 2026-10-28 v2.9：§5／§15.1 風控改由機器人自動執行，新增 §12.3（黃燈半倉、紅燈清倉、單幣暫停／停用、流動性、「解除風控」按鈕）；新增 §19 趨勢跟隨研究摘要。
+- 2026-10-28 v2.10：§19 趨勢跟隨紙上交易上線（三個波動目標並行）。
