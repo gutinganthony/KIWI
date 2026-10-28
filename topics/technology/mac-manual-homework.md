@@ -25,7 +25,7 @@ last_updated: 2026-07-06
 
 ### 🆕 2026-10-27 新增（主對話 session 產生）
 
-- [ ] 🟡 **F3 機器人：按一次「OKX 模擬盤下單測試」**（2026-10-28）。GitHub → Actions →「F3 2.0 交易機器人」→ Run workflow → 勾「OKX 模擬盤下單測試」→ Run。用約 50 USDT 開一筆 TRX 現貨多單和一筆 ETH 永續空單、確認停利停損單有掛上，再撤單平倉；跑完到 OKX 模擬盤「訂單歷史」看得到這幾筆。雲端 session 沒有 `actions:write`，只能你按（見下方 2026-07-30 那條）。
+- [ ] 🟡 **F3 機器人：按一次「OKX 模擬盤下單測試」**（2026-10-28）。GitHub → Actions →「F3 2.0 交易機器人」→ Run workflow → 勾「OKX 模擬盤下單測試」→ Run。用約 50 USDT 開一筆 BNB 現貨多單和一筆 ETH 永續空單（各取第一條空手的腿）、確認停利停損單有掛上，再撤單平倉；跑完到 OKX 模擬盤「訂單歷史」看得到這幾筆。雲端 session 沒有 `actions:write`，只能你按（見下方 2026-07-30 那條）。
 - [ ] 🟢 **加密貨幣策略回測：雲端拿不到 Binance 原始 K 線**。`api.binance.com`、`data-api.binance.vision` 與 TextToQuant `export_candles` 的下載連結（supabase.co）在雲端都被 proxy 403 擋，只好改用 OKX 資料在本機篩選（OKX 可連）。
   TextToQuant 回測本身用的是 Binance 資料，兩邊會有些微差異。**若要用 Binance 原始資料重跑篩選，需要在 Mac 上做。**
   （另：TextToQuant 免費帳號的 5 次回測已用完，要再驗證需升級 Pro；組合回測需 Enterprise。）
