@@ -23,6 +23,10 @@ on:
         description: 'OKX 模擬盤下單測試：約 50 USDT 開一筆多單＋一筆空單、掛停利停損、再撤單平倉（不改策略狀態）'
         type: boolean
         default: false
+      resume:
+        description: '解除風控（停用／暫停的幣或紅燈）：填幣名（例如 BCH、做空籃子）或 all；其他兩個不要勾'
+        type: string
+        default: ''
   push:
     # 開發分支的測試執行：只跑紙上模式、不寫回狀態分支
     branches: [claude/elegant-hawking-mgt9ga]
@@ -33,7 +37,7 @@ on:
 # 同一時間只能有一個機器人在跑，避免兩個 run 同時改狀態而重複下單
 concurrency:
   # 只檢查／下單測試不碰狀態，另開一組，不用排在 5 小時的循環後面
-  group: ${{ (github.event.inputs.check_only == 'true' || github.event.inputs.smoke_test == 'true') && 'f3-bot-manual' || 'f3-bot' }}
+  group: ${{ (github.event.inputs.check_only == 'true' || github.event.inputs.smoke_test == 'true' || github.event.inputs.resume != '') && 'f3-bot-manual' || 'f3-bot' }}
   cancel-in-progress: false
 
 jobs:
@@ -48,7 +52,7 @@ jobs:
         shell: bash   # 等於 bash -eo pipefail：機器人出錯時 `| tee` 不會把失敗吃掉，失敗通知才會發
     env:
       MODE: ${{ github.event_name == 'push' && 'paper' || vars.F3_BOT_MODE || 'paper' }}
-      PERSIST: ${{ github.event_name != 'push' && github.event.inputs.check_only != 'true' && github.event.inputs.smoke_test != 'true' }}
+      PERSIST: ${{ github.event_name != 'push' && github.event.inputs.check_only != 'true' && github.event.inputs.smoke_test != 'true' && github.event.inputs.resume == '' }}
       KIWI_F3_HOME: ${{ github.workspace }}/state
       # 第一次建立狀態時的總資金（USDT）。之後以狀態檔為準；要改金額需先清掉 f3-bot-state 分支上該模式的資料夾
       CAPITAL: ${{ vars.F3_BOT_CAPITAL || '83000' }}
@@ -90,9 +94,22 @@ jobs:
 
       # GitHub 的排程在這個 repo 常常幾小時才跑一次（2026-10-28 實測：改每小時排程後 16 小時只跑了 1 次），
       # 所以一次執行就待著每小時跑一輪，約 5 小時後自己觸發下一次執行接手；排程只當「斷掉時重新接上」的備援。
+      # 解除風控：只改狀態檔並推回 f3-bot-state；正在跑的循環下一輪開始時會先拉這個變更
+      - name: Release risk controls
+        if: github.event.inputs.resume != ''
+        env:
+          RESUME: ${{ github.event.inputs.resume }}
+        run: |
+          python3 projects/crypto-f3/f3_okx_bot.py --mode "$MODE" --v2 --resume "$RESUME" | tee "$RUNNER_TEMP/out.txt"
+          cd state && git add -A
+          git diff --cached --quiet && exit 0
+          git commit --quiet -m "f3-bot: 解除風控 $RESUME"
+          for i in 1 2 3; do git pull --quiet --rebase origin f3-bot-state && git push --quiet origin f3-bot-state && exit 0; sleep $((i*5)); done
+          exit 1
+
       - name: Run bot (hourly loop)
         id: bot
-        if: github.event.inputs.check_only != 'true' && github.event.inputs.smoke_test != 'true'
+        if: github.event.inputs.check_only != 'true' && github.event.inputs.smoke_test != 'true' && github.event.inputs.resume == ''
         env:
           EVENT: ${{ github.event_name }}
           LOOP_SECONDS: ${{ github.event_name == 'push' && '0' || '18000' }}
@@ -110,15 +127,17 @@ jobs:
           echo "這次執行共 $fails 輪失敗"
 
       - name: Hand over to the next run
-        if: always() && env.PERSIST == 'true' && github.event.inputs.check_only != 'true' && github.event.inputs.smoke_test != 'true'
+        if: always() && env.PERSIST == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run f3-bot.yml --repo "$GITHUB_REPOSITORY" --ref "$GITHUB_REF_NAME"
 
       - name: Notify Telegram
-        if: github.event.inputs.check_only == 'true' || github.event.inputs.smoke_test == 'true'
+        if: github.event.inputs.check_only == 'true' || github.event.inputs.smoke_test == 'true' || github.event.inputs.resume != ''
         run: |
-          if [ "${{ github.event.inputs.check_only }}" = "true" ]; then TITLE="🔎 F3 2.0 OKX 模擬盤帳戶檢查"; else TITLE="🧪 F3 2.0 OKX 模擬盤下單測試（不影響策略）"; fi
+          if [ "${{ github.event.inputs.check_only }}" = "true" ]; then TITLE="🔎 F3 2.0 OKX 模擬盤帳戶檢查"
+          elif [ "${{ github.event.inputs.smoke_test }}" = "true" ]; then TITLE="🧪 F3 2.0 OKX 模擬盤下單測試（不影響策略）"
+          else TITLE="🔓 F3 2.0 解除風控"; fi
           python3 projects/avi-v5/scripts/notify_ops.py --title "$TITLE" --url "$RUN_URL" < "$RUNNER_TEMP/out.txt" || true
 
       # 機器人靜默失效是最壞的情況（以為在跑，其實沒在跑），所以失敗要出聲

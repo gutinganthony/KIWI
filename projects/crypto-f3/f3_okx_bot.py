@@ -131,6 +131,10 @@ class PaperBroker:
             pos["checked_until"] = t.isoformat()
         return None
 
+    def close_now(self, leg, pos, bars, why):
+        """風控清倉：用最新一根已收盤 K 線的收盤價出場。"""
+        return bars.index[-1], float(bars.close.iloc[-1]), why
+
 
 # ---------- OKX 模擬盤 ----------
 class OKXDemo:
@@ -297,24 +301,28 @@ class OKXDemo:
             raise RuntimeError(f"{leg['name']} 的停利停損單狀態是 {state}，請到 OKX 模擬盤手動檢查這筆部位")
         held = int(round((bars.index[-1] - pd.Timestamp(pos["entry_bar"])) / step_of(leg)))
         if held >= leg["max_bars"]:
-            self.req("POST", "/api/v5/trade/cancel-algos", body=[{"algoId": pos["algoId"], "instId": pos["inst"]}])
-            since = int(time.time() * 1000) - 5000
-            if pos["side"] == "long":
-                i = self.inst(leg)
-                bal = self.req("GET", "/api/v5/account/balance", {"ccy": leg["symbol"]})[0]
-                avail = float(next((d["availBal"] for d in bal.get("details", []) if d["ccy"] == leg["symbol"]), 0))
-                qty = self._floor(min(pos["qty"], avail), i["lotSz"])
-                o = self.spot_sell(pos["inst"], qty, i["lotSz"])
-                px = float(self._order(pos["inst"], o["ordId"])["avgPx"])
-            else:
-                body = {"instId": pos["inst"], "mgnMode": "isolated"}
-                if self.long_short_mode():
-                    body["posSide"] = "short"
-                self.req("POST", "/api/v5/trade/close-position", body=body)
-                time.sleep(2)
-                px = self._fills_vwap(pos["inst"], since, "buy") or float(bars.close.iloc[-1])
-            return bars.index[-1], px, "時間到"
+            return self.close_now(leg, pos, bars, "時間到")
         return None
+
+    def close_now(self, leg, pos, bars, why):
+        """撤掉停利停損單、市價平倉（時間到或風控清倉）。"""
+        self.req("POST", "/api/v5/trade/cancel-algos", body=[{"algoId": pos["algoId"], "instId": pos["inst"]}])
+        since = int(time.time() * 1000) - 5000
+        if pos["side"] == "long":
+            i = self.inst(leg)
+            bal = self.req("GET", "/api/v5/account/balance", {"ccy": leg["symbol"]})[0]
+            avail = float(next((d["availBal"] for d in bal.get("details", []) if d["ccy"] == leg["symbol"]), 0))
+            qty = self._floor(min(pos["qty"], avail), i["lotSz"])
+            o = self.spot_sell(pos["inst"], qty, i["lotSz"])
+            px = float(self._order(pos["inst"], o["ordId"])["avgPx"])
+        else:
+            body = {"instId": pos["inst"], "mgnMode": "isolated"}
+            if self.long_short_mode():
+                body["posSide"] = "short"
+            self.req("POST", "/api/v5/trade/close-position", body=body)
+            time.sleep(2)
+            px = self._fills_vwap(pos["inst"], since, "buy") or float(bars.close.iloc[-1])
+        return bars.index[-1], px, why
 
 
     def smoke(self, legs, store, notional=50.0):
@@ -365,7 +373,74 @@ def fetch_all(legs, now=None):
     return data
 
 
-def run_cycle(legs, data, store, broker, run_utc, quiet=False):
+# ---------- 自動風控（規則手冊 §15.1、策略介紹「風險規劃」） ----------
+# 單一個幣：連虧上限＝回測最長連虧＋2、回撤上限＝回測最大回撤×1.5（做空籃子 8 個幣合併判斷）
+STREAK_LIMIT = {"BNB 日線 多": 6, "TRX 4小時 多": 6, "BCH 4小時 多": 4, "做空籃子": 15}
+DD_LIMIT = {"BNB 日線 多": -26.0, "TRX 4小時 多": -38.0, "BCH 4小時 多": -21.0, "做空籃子": -31.0}
+YELLOW_DD, YELLOW_OFF_DD, RED_DD = -7.5, -5.0, -15.0   # 組合回撤（%）：黃燈半倉、黃燈解除、紅燈清倉
+LOW_VOL_M, LOW_VOL_DAYS = 2.0, 7                       # OKX 現貨 24h 成交額 < 200 萬 USDT 連續 7 天 → 停用
+
+
+def group_of(leg):
+    return "做空籃子" if leg["side"] == "short" else leg["name"]
+
+
+def leg_flags(legs, store, min_n=10):
+    """依已平倉交易判斷每組要不要停用（勝率明顯低於回測）或暫停（連虧、回撤超過上限）。回傳 {組: (動作, 說明)}。"""
+    rows = [r for r in csv.DictReader(open(store.ledger)) if r["action"] == "EXIT" and r["ret"]] if store.ledger.exists() else []
+    since = store.state.get("risk", {}).get("since_n", {})   # 解除風控後只看之後的交易
+    out = {}
+    for key in {group_of(g) for g in legs}:
+        names = {g["name"] for g in legs if group_of(g) == key}
+        bt_wr = next(g["bt_wr"] for g in legs if group_of(g) == key)
+        rets = [float(r["ret"]) for r in rows if r["leg"] in names][since.get(key, 0):]
+        n, wins = len(rets), sum(x > 0 for x in rets)
+        streak = 0
+        for x in rets:
+            streak = streak + 1 if x <= 0 else 0
+        eq = np.cumprod([1 + x for x in rets]) if rets else np.array([1.0])
+        dd = float((eq / np.maximum.accumulate(eq) - 1).min() * 100)
+        if n >= min_n and wilson_upper(wins, n) < bt_wr:
+            out[key] = ("disabled", f"勝率 {wins / n * 100:.0f}%（{n} 筆）明顯低於回測 {bt_wr:.0f}%")
+        elif streak > STREAK_LIMIT[key]:
+            out[key] = ("paused", f"連虧 {streak} 筆，超過上限 {STREAK_LIMIT[key]}")
+        elif dd < DD_LIMIT[key]:
+            out[key] = ("paused", f"回撤 {dd:.1f}%，超過上限 {DD_LIMIT[key]:.0f}%")
+    return out
+
+
+def liquidity_check(legs, store, now):
+    """每天一次：OKX 現貨 24h 成交額連續 7 天低於 200 萬 USDT 的幣停用。"""
+    risk = store.state.setdefault("risk", {})
+    today = f"{now:%Y-%m-%d}"
+    if risk.get("vol_day") == today:
+        return []
+    risk["vol_day"] = today
+    tk = {r["instId"]: r for r in bt._get("https://www.okx.com/api/v5/market/tickers?instType=SPOT")["data"]}
+    msgs = []
+    for g in legs:
+        st = store.state["legs"][g["name"]]
+        vol = float(tk.get(f"{g['symbol']}-USDT", {}).get("volCcy24h") or 0) / 1e6
+        st["low_vol_days"] = st.get("low_vol_days", 0) + 1 if vol < LOW_VOL_M else 0
+        if st["low_vol_days"] >= LOW_VOL_DAYS and not st.get("disabled"):
+            st["disabled"] = f"OKX 現貨成交額連續 {st['low_vol_days']} 天低於 {LOW_VOL_M:.0f} 百萬 USDT（今天 {vol:.1f}）"
+            msgs.append(f"【風控】{g['name']} 停用：{st['disabled']}")
+    return msgs
+
+
+def leg_mark(st, close):
+    """該腿目前價值（含未實現）。"""
+    pos = st["pos"]
+    if not pos or close is None:
+        return st["equity"]
+    move = close / pos["entry_px"] - 1
+    return st["equity"] * (1 + pos.get("frac", 1.0) * (-move if pos["side"] == "short" else move))
+
+
+def run_cycle(legs, data, store, broker, run_utc, quiet=False, risk=True):
+    say = (lambda m: None) if quiet else print
+    fresh = {}
+    # 1) 出場（每根 K 線只處理一次）
     for g in legs:
         st = store.state["legs"][g["name"]]
         bars, entry = data[g["name"]]
@@ -374,44 +449,100 @@ def run_cycle(legs, data, store, broker, run_utc, quiet=False):
         last_t = bars.index[-1]
         if st["last_bar"] and pd.Timestamp(st["last_bar"]) >= last_t:
             continue   # 這根 K 線處理過了
+        fresh[g["name"]] = last_t
         if st["last_bar"]:
             missed = int(round((last_t - pd.Timestamp(st["last_bar"])) / step_of(g))) - 1
-            if missed > 0 and not quiet:
-                print(f"⚠️ {g['name']}：上次執行後漏了 {missed} 根 K 線（電腦睡眠或沒排程？），那些 K 線上的進場訊號已錯過")
-        # 1) 出場
+            if missed > 0:
+                say(f"⚠️ {g['name']}：上次執行後漏了 {missed} 根 K 線（電腦睡眠或沒排程？），那些 K 線上的進場訊號已錯過")
         pos = st["pos"]
         if pos:
             ex = broker.check_exit(g, st, pos, bars)
             if ex:
-                t_exit, px, why = ex
-                held = int(round((t_exit - pd.Timestamp(pos["entry_bar"])) / step_of(g)))
-                ret = leg_return(g, pos["entry_px"], px, held)
-                st["equity"] *= (1 + ret)
-                st["pos"] = None
-                store.log(dict(run_utc=run_utc, leg=g["name"], action="EXIT", side=g["side"], bar_close_utc=t_exit + step_of(g),
-                               price=f"{px:.6g}", reason=why, ret=f"{ret:.5f}", sleeve_equity=f"{st['equity']:.2f}"))
-                if not quiet:
-                    print(f"【出場】{g['name']} {why} 價格 {px:.6g} 報酬 {ret*100:+.2f}% → 該腿資金 {st['equity']:.2f}")
-        # 2) 進場（只看最新一根已收盤 K 線）
-        if st["pos"] is None and bool(entry.iloc[-1]):
+                close_out(g, st, pos, ex, store, run_utc, say)
+
+    # 2) 風控
+    rk = store.state.setdefault("risk", {"mode": "normal"})
+    rk.setdefault("mode", "normal")
+    if risk:
+        closes = {g["name"]: (float(data[g["name"]][0].close.iloc[-1]) if not data[g["name"]][0].empty else None) for g in legs}
+        total = sum(leg_mark(store.state["legs"][g["name"]], closes[g["name"]]) for g in legs)
+        rk["peak"] = max(rk.get("peak", store.state["capital"]), total)
+        dd = (total / rk["peak"] - 1) * 100
+        rk["dd"] = round(dd, 3)
+        if rk["mode"] != "red" and dd <= RED_DD:
+            rk["mode"], rk["since"] = "red", run_utc
+            say(f"【風控】🛑 紅燈：組合從高點回撤 {dd:.1f}%（門檻 {RED_DD:.0f}%），全部平倉並停止新進場。要恢復請按 Run workflow 的「解除風控」")
+            for g in legs:
+                st = store.state["legs"][g["name"]]
+                if st["pos"] and not data[g["name"]][0].empty:
+                    try:
+                        ex = broker.close_now(g, st["pos"], data[g["name"]][0], "風控清倉")
+                        close_out(g, st, st["pos"], ex, store, run_utc, say)
+                    except Exception as e:
+                        store.log(dict(run_utc=run_utc, leg=g["name"], action="ERROR", side=g["side"], note=f"風控清倉失敗：{e}"[:300]))
+                        say(f"❌ {g['name']} 風控清倉失敗：{e}")
+        elif rk["mode"] == "normal" and dd <= YELLOW_DD:
+            rk["mode"], rk["since"] = "yellow", run_utc
+            say(f"【風控】⚠️ 黃燈：組合從高點回撤 {dd:.1f}%（門檻 {YELLOW_DD}%），之後新進場只用一半資金，回到 {YELLOW_OFF_DD:.0f}% 以內才恢復")
+        elif rk["mode"] == "yellow" and dd > YELLOW_OFF_DD:
+            rk["mode"], rk["since"] = "normal", run_utc
+            say(f"【風控】✅ 黃燈解除：組合回撤回到 {dd:.1f}%，新進場恢復全額")
+        for key, (act, why) in leg_flags(legs, store).items():
+            for g in legs:
+                st = store.state["legs"][g["name"]]
+                if group_of(g) == key and not st.get(act):
+                    st[act] = why
+                    if g["name"] == next(x["name"] for x in legs if group_of(x) == key):
+                        say(f"【風控】{key} {'停用' if act == 'disabled' else '暫停新進場'}：{why}。要恢復請按 Run workflow 的「解除風控」")
+        try:
+            for m in liquidity_check(legs, store, pd.Timestamp.now("UTC")):
+                say(m)
+        except Exception as e:   # 行情抓不到不影響交易
+            say(f"（流動性檢查這一輪失敗：{e}）")
+
+    # 3) 進場（只看最新一根已收盤 K 線）
+    for g in legs:
+        if g["name"] not in fresh:
+            continue
+        st = store.state["legs"][g["name"]]
+        bars, entry = data[g["name"]]
+        last_t = fresh[g["name"]]
+        blocked = risk and (rk["mode"] == "red" or st.get("disabled") or st.get("paused"))
+        if st["pos"] is None and bool(entry.iloc[-1]) and not blocked:
             close = float(bars.close.iloc[-1])
+            frac = 0.5 if risk and rk["mode"] == "yellow" else 1.0
             try:
-                pos, note = broker.enter(g, st, last_t, close)
+                pos, note = broker.enter(g, dict(st, equity=st["equity"] * frac), last_t, close)
             except Exception as e:  # 下單失敗：記錄後繼續處理其他腿
                 store.log(dict(run_utc=run_utc, leg=g["name"], action="ERROR", side=g["side"], bar_close_utc=last_t + step_of(g),
                                note=str(e)[:300]))
-                print(f"❌ {g['name']} 進場失敗：{e}")
+                say(f"❌ {g['name']} 進場失敗：{e}")
                 pos = None
             if pos:
+                pos["frac"] = frac
                 st["pos"] = pos
+                half = "（黃燈：半倉）" if frac < 1 else ""
                 store.log(dict(run_utc=run_utc, leg=g["name"], action="ENTER", side=g["side"], bar_close_utc=last_t + step_of(g),
-                               price=f"{pos['entry_px']:.6g}", reason="訊號", sleeve_equity=f"{st['equity']:.2f}",
+                               price=f"{pos['entry_px']:.6g}", reason="訊號" + half, sleeve_equity=f"{st['equity']:.2f}",
                                note=f"停利 {pos['tp']:.6g} 停損 {pos['sl']:.6g} {note}"))
-                if not quiet:
-                    print(f"【進場】{g['name']} {'做空' if g['side'] == 'short' else '做多'} 價格 {pos['entry_px']:.6g}"
-                          f"　停利 {pos['tp']:.6g}　停損 {pos['sl']:.6g}　最晚第 {g['max_bars']} 根收盤出場　{note}")
+                say(f"【進場】{g['name']} {'做空' if g['side'] == 'short' else '做多'}{half} 價格 {pos['entry_px']:.6g}"
+                    f"　停利 {pos['tp']:.6g}　停損 {pos['sl']:.6g}　最晚第 {g['max_bars']} 根收盤出場　{note}")
+        elif st["pos"] is None and bool(entry.iloc[-1]) and blocked:
+            why = "紅燈停止新進場" if rk["mode"] == "red" else st.get("disabled") or st.get("paused")
+            say(f"【風控】{g['name']} 有進場訊號但沒有下單：{why}")
         st["last_bar"] = last_t.isoformat()
     store.save()
+
+
+def close_out(g, st, pos, ex, store, run_utc, say):
+    t_exit, px, why = ex
+    held = int(round((t_exit - pd.Timestamp(pos["entry_bar"])) / step_of(g)))
+    ret = leg_return(g, pos["entry_px"], px, held)
+    st["equity"] *= (1 + ret * pos.get("frac", 1.0))
+    st["pos"] = None
+    store.log(dict(run_utc=run_utc, leg=g["name"], action="EXIT", side=g["side"], bar_close_utc=t_exit + step_of(g),
+                   price=f"{px:.6g}", reason=why, ret=f"{ret:.5f}", sleeve_equity=f"{st['equity']:.2f}"))
+    say(f"【出場】{g['name']} {why} 價格 {px:.6g} 報酬 {ret*100:+.2f}% → 該腿資金 {st['equity']:.2f}")
 
 
 def wilson_upper(wins, n, z=1.2816):
@@ -457,24 +588,58 @@ def print_status(legs, store, data=None):
     for g in legs:
         st = store.state["legs"][g["name"]]
         eq, pos = st["equity"], st["pos"]
-        mark = eq
+        close = float(data[g["name"]][0].close.iloc[-1]) if data and not data[g["name"]][0].empty else None
+        mark = leg_mark(st, close)
         line = f"  {g['name']:<10} 資金 {eq:>10.2f}"
         if pos:
-            if data:
-                c = float(data[g["name"]][0].close.iloc[-1])
-                mark = eq * ((2 - c / pos["entry_px"]) if pos["side"] == "short" else c / pos["entry_px"])
-            line += f"　持倉中（{pos['entry_bar'][:16]} 進場 {pos['entry_px']:.6g}，停利 {pos['tp']:.6g}／停損 {pos['sl']:.6g}）"
+            half = "（半倉）" if pos.get("frac", 1.0) < 1 else ""
+            line += f"　持倉中{half}（{pos['entry_bar'][:16]} 進場 {pos['entry_px']:.6g}，停利 {pos['tp']:.6g}／停損 {pos['sl']:.6g}）"
         else:
             line += "　空手"
+        if st.get("disabled"):
+            line += f"　⛔ 停用：{st['disabled']}"
+        elif st.get("paused"):
+            line += f"　⏸ 暫停：{st['paused']}"
         total += mark
         print(line)
     cap = store.state["capital"]
+    rk = store.state.get("risk", {})
+    mode = {"normal": "正常", "yellow": "⚠️ 黃燈（新進場半倉）", "red": "🛑 紅燈（已清倉、停止新進場）"}.get(rk.get("mode", "normal"))
     print(f"  合計（含未實現）{total:.2f}　起始 {cap:.2f}　{(total / cap - 1) * 100:+.2f}%")
+    if "peak" in rk:
+        print(f"  風控：{mode}　高點 {rk['peak']:.2f}　目前回撤 {rk.get('dd', 0):.2f}%（黃燈 {YELLOW_DD}%／紅燈 {RED_DD:.0f}%）")
     health = leg_health(legs, store)
     if health:
         print("失效檢查（模擬盤實際勝率 vs 回測；單尾 90% 信賴上限仍低於回測才判定失效）：")
         print("\n".join(health))
     print()
+
+
+def resume(legs, store, target):
+    """解除風控：target＝某個幣的名稱（例如「BCH 4小時 多」）、「做空籃子」，或 all（全部解除並把紅燈／黃燈歸零）。"""
+    done = []
+    rows = [r for r in csv.DictReader(open(store.ledger)) if r["action"] == "EXIT" and r["ret"]] if store.ledger.exists() else []
+    since = store.state.setdefault("risk", {}).setdefault("since_n", {})
+    for g in legs:
+        st = store.state["legs"][g["name"]]
+        if target in ("all", g["name"], group_of(g), g["symbol"]):
+            key = group_of(g)
+            since[key] = sum(1 for r in rows if r["leg"] in {x["name"] for x in legs if group_of(x) == key})
+            for k in ("disabled", "paused"):
+                if st.get(k):
+                    done.append(f"{g['name']}：解除「{st[k]}」")
+                    st[k] = None
+            st["low_vol_days"] = 0
+    if target == "all":
+        rk = store.state.setdefault("risk", {})
+        if rk.get("mode", "normal") != "normal":
+            done.append(f"組合風控：{rk['mode']} → 正常，高點重設為目前資金")
+        rk["mode"] = "normal"
+        rk["peak"] = sum(store.state["legs"][g["name"]]["equity"] for g in legs)
+        rk["dd"] = 0.0
+    store.save()
+    print("【風控】解除完成：" + ("；".join(done) if done else f"沒有符合「{target}」且需要解除的項目"))
+    print("注意：之後如果條件再次觸發，機器人會再自動停用／暫停。")
 
 
 def replay(legs, start, home, capital):
@@ -499,7 +664,7 @@ def replay(legs, start, home, capital):
             bars, entry = full[g["name"]]
             m = bars.index + step_of(g) <= now
             sl[g["name"]] = (bars[m], entry[m])
-        run_cycle(legs, sl, store, broker, now.isoformat(), quiet=True)
+        run_cycle(legs, sl, store, broker, now.isoformat(), quiet=True, risk=False)   # 驗證引擎和回測一致，不套風控
     return store
 
 
@@ -513,6 +678,7 @@ def main():
     ap.add_argument("--status", action="store_true", help="只印目前持倉與資金")
     ap.add_argument("--smoke", action="store_true", help="OKX 模擬盤端到端下單測試（小額開倉→掛 OCO→撤單平倉，不改狀態）")
     ap.add_argument("--replay", metavar="YYYY-MM-DD", help="用歷史資料重播紙上引擎（驗證用）")
+    ap.add_argument("--resume", metavar="目標", help="解除風控：某個幣的名稱、做空籃子，或 all（連組合紅燈／黃燈一起解除）")
     a = ap.parse_args()
 
     version = "F3-2.0" if a.v2 else "F3"
@@ -539,6 +705,9 @@ def main():
         if a.mode != "okx-demo":
             raise SystemExit("--smoke 只能搭配 --mode okx-demo")
         broker.smoke(legs, store)
+        return
+    if a.resume:
+        resume(legs, store, a.resume.strip())
         return
     if a.status:
         print_status(legs, store, fetch_all(legs))
