@@ -99,12 +99,17 @@ jobs:
         if: github.event.inputs.resume != ''
         env:
           RESUME: ${{ github.event.inputs.resume }}
+        # 每次重試都從最新狀態重做，不和循環的存檔合併，避免蓋掉持倉資料
         run: |
-          python3 projects/crypto-f3/f3_okx_bot.py --mode "$MODE" --v2 --resume "$RESUME" | tee "$RUNNER_TEMP/out.txt"
-          cd state && git add -A
-          git diff --cached --quiet && exit 0
-          git commit --quiet -m "f3-bot: 解除風控 $RESUME"
-          for i in 1 2 3; do git pull --quiet --rebase origin f3-bot-state && git push --quiet origin f3-bot-state && exit 0; sleep $((i*5)); done
+          for i in 1 2 3 4; do
+            git -C state fetch --quiet origin f3-bot-state && git -C state reset --quiet --hard FETCH_HEAD
+            python3 projects/crypto-f3/f3_okx_bot.py --mode "$MODE" --v2 --resume "$RESUME" | tee "$RUNNER_TEMP/out.txt"
+            git -C state add -A
+            git -C state diff --cached --quiet && exit 0
+            git -C state commit --quiet -m "f3-bot: 解除風控 $RESUME"
+            git -C state push --quiet origin f3-bot-state && exit 0
+            sleep $((i * 5))
+          done
           exit 1
 
       - name: Run bot (hourly loop)

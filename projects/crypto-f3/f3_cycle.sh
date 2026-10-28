@@ -7,8 +7,9 @@ set -uo pipefail
 cd "$(dirname "$0")/../.."
 out="$(mktemp)"
 # 先拉狀態分支：手動「解除風控」可能在循環進行中改過狀態
-if [ "$PERSIST" = "true" ] && ! git -C "$KIWI_F3_HOME" pull --quiet --rebase origin f3-bot-state 2>/dev/null; then
-  git -C "$KIWI_F3_HOME" rebase --abort 2>/dev/null || true   # 衝突時保留本機狀態，不要卡在 rebase 中
+# 衝突時（解除風控剛好在存檔那一兩分鐘按下）以本機為準：持倉資料不能丟，解除被蓋掉頂多再按一次
+if [ "$PERSIST" = "true" ] && ! git -C "$KIWI_F3_HOME" pull --quiet --rebase -X theirs origin f3-bot-state 2>/dev/null; then
+  git -C "$KIWI_F3_HOME" rebase --abort 2>/dev/null || true
 fi
 notify() { [ "${EVENT:-}" = "push" ] && return 0; python3 projects/avi-v5/scripts/notify_ops.py --title "$1" --url "$RUN_URL" "${@:2}" || true; }
 
@@ -37,7 +38,7 @@ if [ "$PERSIST" = "true" ]; then
     if ! git diff --cached --quiet; then
       git commit --quiet -m "f3-bot: $MODE $(date -u +%Y-%m-%dT%H:%MZ)"
       ok=0
-      for i in 1 2 3; do git push --quiet origin f3-bot-state && { ok=1; break; }; sleep $((i * 5)); git pull --quiet --rebase origin f3-bot-state || git rebase --abort 2>/dev/null || true; done
+      for i in 1 2 3; do git push --quiet origin f3-bot-state && { ok=1; break; }; sleep $((i * 5)); git pull --quiet --rebase -X theirs origin f3-bot-state || git rebase --abort 2>/dev/null || true; done
       [ "$ok" = 1 ] || echo "⚠️ 狀態沒有推上 f3-bot-state，下一輪會再推"
     fi )
 fi
