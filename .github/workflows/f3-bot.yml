@@ -38,7 +38,7 @@ concurrency:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     permissions:
       contents: write   # 只用來 push f3-bot-state 分支
     defaults:
@@ -96,6 +96,17 @@ jobs:
             echo "notify=event" >> "$GITHUB_OUTPUT"
           elif [ "$(date -u +%H)" = "00" ]; then
             echo "notify=daily" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 監控台的資料（規則手冊 §16）：持倉、淨值歷史、失效檢查、市場變量；候選幣每 7 天重算一次（約 5 分鐘）
+      # 失敗不影響交易本身，但每日摘要會附上錯誤
+      - name: Update dashboard data
+        if: env.PERSIST == 'true' && steps.bot.outcome == 'success'
+        continue-on-error: true
+        run: |
+          python3 projects/crypto-f3/f3_monitor.py --home "state/$MODE-F3-2.0" --mode "$MODE" 2>&1 | tee "$RUNNER_TEMP/monitor.txt"
+          if [ "${{ steps.bot.outputs.notify }}" = "daily" ]; then
+            { echo; echo "── 監控 ──"; cat "$RUNNER_TEMP/monitor.txt"; } >> "$RUNNER_TEMP/out.txt"
           fi
 
       - name: Save state
