@@ -1,7 +1,7 @@
 name: F3 2.0 交易機器人（紙上交易／OKX 模擬盤）
 
-# 每小時 05 分跑一次 projects/crypto-f3/f3_okx_bot.py（策略看 4 小時／日線 K 線；同一根 K 線只處理一次，
-# 多跑不會重複下單，只是讓 GitHub 漏掉或延遲排程時能在 1 小時內補上）。
+# 每小時 05 分跑一輪 projects/crypto-f3/f3_cycle.sh（機器人＋監控資料＋存狀態＋推播）。同一根 K 線只處理一次，多跑不會重複下單。
+# 一次執行待約 5 小時、每小時跑一輪，結束前自己觸發下一次執行；排程只是斷掉時的備援。
 # 規則與說明：topics/business/2026-10-27-crypto-f3-mean-reversion-rulebook.md §11、§12
 #
 # 模式由 repo 變數 F3_BOT_MODE 決定（Settings → Secrets and variables → Actions → Variables）：
@@ -11,8 +11,8 @@ name: F3 2.0 交易機器人（紙上交易／OKX 模擬盤）
 # 狀態不用 Actions cache：交易機器人遺失持倉紀錄會重複下單或漏掉時間出場。
 on:
   schedule:
-    # 每小時 05 分（只在 default branch 生效）。GitHub 排程常延遲或漏跑，所以不只排在 K 線收盤那 6 個整點
-    - cron: '5 * * * *'
+    # 備援：循環斷掉時重新接上（只在 default branch 生效）。循環還在跑時，這裡觸發的執行會排隊，之後被接手的執行取代
+    - cron: '35 */2 * * *'
   workflow_dispatch:
     inputs:
       check_only:
@@ -32,15 +32,17 @@ on:
 
 # 同一時間只能有一個機器人在跑，避免兩個 run 同時改狀態而重複下單
 concurrency:
-  group: f3-bot
+  # 只檢查／下單測試不碰狀態，另開一組，不用排在 5 小時的循環後面
+  group: ${{ (github.event.inputs.check_only == 'true' || github.event.inputs.smoke_test == 'true') && 'f3-bot-manual' || 'f3-bot' }}
   cancel-in-progress: false
 
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 340
     permissions:
       contents: write   # 只用來 push f3-bot-state 分支
+      actions: write    # 循環結束時觸發下一次執行
     defaults:
       run:
         shell: bash   # 等於 bash -eo pipefail：機器人出錯時 `| tee` 不會把失敗吃掉，失敗通知才會發
@@ -86,49 +88,37 @@ jobs:
         if: github.event.inputs.smoke_test == 'true'
         run: python3 projects/crypto-f3/f3_okx_bot.py --mode okx-demo --v2 --smoke | tee "$RUNNER_TEMP/out.txt"
 
-      - name: Run bot
+      # GitHub 的排程在這個 repo 常常幾小時才跑一次（2026-10-28 實測：改每小時排程後 16 小時只跑了 1 次），
+      # 所以一次執行就待著每小時跑一輪，約 5 小時後自己觸發下一次執行接手；排程只當「斷掉時重新接上」的備援。
+      - name: Run bot (hourly loop)
         id: bot
         if: github.event.inputs.check_only != 'true' && github.event.inputs.smoke_test != 'true'
+        env:
+          EVENT: ${{ github.event_name }}
+          LOOP_SECONDS: ${{ github.event_name == 'push' && '0' || '18000' }}
         run: |
-          python3 projects/crypto-f3/f3_okx_bot.py --mode "$MODE" --v2 --capital "$CAPITAL" | tee "$RUNNER_TEMP/out.txt"
-          # 有進場／出場／錯誤／漏 K 線才推播；每天台北 08 點那一輪另外推一次持倉摘要（開發分支的測試不推播）
-          if grep -qE '【進場】|【出場】|❌|⚠️' "$RUNNER_TEMP/out.txt"; then
-            echo "notify=event" >> "$GITHUB_OUTPUT"
-          elif [ "$(date -u +%H)" = "00" ]; then
-            echo "notify=daily" >> "$GITHUB_OUTPUT"
-          fi
+          end=$(( $(date +%s) + LOOP_SECONDS ))
+          fails=0
+          while :; do
+            bash projects/crypto-f3/f3_cycle.sh || fails=$((fails + 1))
+            now=$(date +%s)
+            next=$(( (now / 3600 + 1) * 3600 + 300 ))   # 下一個整點 05 分
+            [ "$next" -gt "$end" ] && break
+            echo "── 下一輪：$(date -u -d @$next +%H:%MZ) ──"
+            sleep $(( next - now ))
+          done
+          echo "這次執行共 $fails 輪失敗"
 
-      # 監控台的資料（規則手冊 §16）：持倉、淨值歷史、失效檢查、市場變量；候選幣每 7 天重算一次（約 5 分鐘）
-      # 失敗不影響交易本身，但每日摘要會附上錯誤
-      - name: Update dashboard data
-        if: env.PERSIST == 'true' && steps.bot.outcome == 'success'
-        continue-on-error: true
-        run: |
-          python3 projects/crypto-f3/f3_monitor.py --home "state/$MODE-F3-2.0" --mode "$MODE" 2>&1 | tee "$RUNNER_TEMP/monitor.txt"
-          if [ "${{ steps.bot.outputs.notify }}" = "daily" ]; then
-            { echo; echo "── 監控 ──"; cat "$RUNNER_TEMP/monitor.txt"; } >> "$RUNNER_TEMP/out.txt"
-          fi
-
-      - name: Save state
-        if: env.PERSIST == 'true'
-        run: |
-          cd state
-          git add -A
-          if git diff --cached --quiet; then echo "no state change"; exit 0; fi
-          git commit --quiet -m "f3-bot: $MODE $(date -u +%Y-%m-%dT%H:%MZ)"
-          for i in 1 2 3; do git push --quiet origin f3-bot-state && exit 0; sleep $((i*5)); done
-          exit 1
+      - name: Hand over to the next run
+        if: always() && env.PERSIST == 'true' && github.event.inputs.check_only != 'true' && github.event.inputs.smoke_test != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run f3-bot.yml --repo "$GITHUB_REPOSITORY" --ref "$GITHUB_REF_NAME"
 
       - name: Notify Telegram
-        if: github.event_name != 'push' && (steps.bot.outputs.notify != '' || github.event.inputs.check_only == 'true' || github.event.inputs.smoke_test == 'true')
+        if: github.event.inputs.check_only == 'true' || github.event.inputs.smoke_test == 'true'
         run: |
-          case "${{ github.event.inputs.check_only == 'true' && 'check' || github.event.inputs.smoke_test == 'true' && 'smoke' || steps.bot.outputs.notify }}" in
-            check) TITLE="🔎 F3 2.0 OKX 模擬盤帳戶檢查" ;;
-            smoke) TITLE="🧪 F3 2.0 OKX 模擬盤下單測試（不影響策略）" ;;
-            event) TITLE="🤖 F3 2.0（$MODE）有交易動作" ;;
-            daily) TITLE="📋 F3 2.0（$MODE）每日持倉摘要" ;;
-            *)     TITLE="🧪 F3 2.0 機器人測試執行（$MODE）" ;;
-          esac
+          if [ "${{ github.event.inputs.check_only }}" = "true" ]; then TITLE="🔎 F3 2.0 OKX 模擬盤帳戶檢查"; else TITLE="🧪 F3 2.0 OKX 模擬盤下單測試（不影響策略）"; fi
           python3 projects/avi-v5/scripts/notify_ops.py --title "$TITLE" --url "$RUN_URL" < "$RUNNER_TEMP/out.txt" || true
 
       # 機器人靜默失效是最壞的情況（以為在跑，其實沒在跑），所以失敗要出聲
