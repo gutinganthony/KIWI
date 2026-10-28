@@ -1,6 +1,6 @@
 # _SOURCE_PROBE — 有価証券報告書來源探測（JEM 否證 #3）
 
-> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-10-21T01:23:13+00:00
+> 由 `fetch_jp_disclosures.py` 在 runner 上執行。更新：2026-10-28T07:59:42+00:00
 > **為什麼有這支**：2026-08-20 Jake 多次嘗試註冊 EDINET API key 失敗（登入問題）。
 > 與其讓他繼續跟註冊表單纏鬥，不如讓 runner 直接回報**哪一條路是通的**。
 
@@ -54,7 +54,7 @@
 `https://disclosure2.edinet-fsa.go.jp/WEEK0010.aspx`
 
 ```html
-<!DOCTYPE html> <html lang="ja"> <head> <meta name="viewport" content="width=device-width,initial-scale=1"/> <meta name="description" content="EDINETの閲覧サイトです。有価証券報告書、有価証券届出書、大量保有報告書、公開買付届出書等の開示書類を閲覧できます。"/> <meta name="apple-mobile-web-app-capable" content="yes"/> <!--[if IE]><meta http-equiv="page-enter" content="blendTrans(Duration=0.1)"/><![endif]--> <meta name="fragment" content="!"/> <meta http-equiv="content-type" content="text/html; charset=UTF-8"/> <title>EDINET</title> <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css?202682016474931"/> <link id="gxtheme_css_reference" rel="stylesheet" type="text/css" href="Resources/Japanese/ThemeBlue.css?202682016474931" /> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/fontawesome_v5/css/fontawesome.min.css"/> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/fontawesome_v5/css/all.min.css"/> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/DVelopBootstrap.css"/> <script type="text/javascript" src="jquery.js?2136580" ></script><script type="text/javascript" src="bootstrap/js/bootstrap.min.js?202682016474931" ></script><script type="text/javascript" src="gxgral.js?2136580" ></script><script type="text/javascript" src="gxcfg.js?20268201645714" ></script><script type="text/javascript" src="js/CommonJS.js?20260828182232" ></script><script typ
+<!DOCTYPE html> <html lang="ja"> <head> <meta name="viewport" content="width=device-width,initial-scale=1"/> <meta name="description" content="EDINETの閲覧サイトです。有価証券報告書、有価証券届出書、大量保有報告書、公開買付届出書等の開示書類を閲覧できます。"/> <meta name="apple-mobile-web-app-capable" content="yes"/> <!--[if IE]><meta http-equiv="page-enter" content="blendTrans(Duration=0.1)"/><![endif]--> <meta name="fragment" content="!"/> <meta http-equiv="content-type" content="text/html; charset=UTF-8"/> <title>EDINET</title> <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css?202610617101019"/> <link id="gxtheme_css_reference" rel="stylesheet" type="text/css" href="Resources/Japanese/ThemeBlue.css?202610617101019" /> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/fontawesome_v5/css/fontawesome.min.css"/> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/fontawesome_v5/css/all.min.css"/> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/DVelopBootstrap.css"/> <script type="text/javascript" src="jquery.js?2136580" ></script><script type="text/javascript" src="bootstrap/js/bootstrap.min.js?202610617101019" ></script><script type="text/javascript" src="gxgral.js?2136580" ></script><script type="text/javascript" src="gxcfg.js?2026914155478" ></script><script type="text/javascript" src="js/CommonJS.js?20261024152014" ></script><script type
 ```
 
 ### 有報キャッチャー ufocatch 首頁
@@ -82,15 +82,15 @@
 `https://disclosure2.edinet-fsa.go.jp/week0020.aspx`
 
 ```html
-<!DOCTYPE html> <html lang="ja"> <head> <meta name="viewport" content="width=device-width,initial-scale=1"/> <meta name="description" content="開示情報利用者用トップ画面（英語）"/> <meta name="apple-mobile-web-app-capable" content="yes"/> <!--[if IE]><meta http-equiv="page-enter" content="blendTrans(Duration=0.1)"/><![endif]--> <meta name="fragment" content="!"/> <meta http-equiv="content-type" content="text/html; charset=UTF-8"/> <title>EDINET</title> <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css?202682016474931"/> <link id="gxtheme_css_reference" rel="stylesheet" type="text/css" href="Resources/Japanese/ThemeBlue.css?202682016474931" /> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/fontawesome_v5/css/fontawesome.min.css"/> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/fontawesome_v5/css/all.min.css"/> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/DVelopBootstrap.css"/> <script type="text/javascript" src="jquery.js?2136580" ></script><script type="text/javascript" src="bootstrap/js/bootstrap.min.js?202682016474931" ></script><script type="text/javascript" src="gxgral.js?2136580" ></script><script type="text/javascript" src="gxcfg.js?202682016464954" ></script><script type="text/javascript" src="Window/InNewWindowRender.js" ></script><script type="text/javascript" src="js/CommonJS.js?20260828182232" ></script><script type="text/javascript" src="js/Scrolltop.js?
+<!DOCTYPE html> <html lang="ja"> <head> <meta name="viewport" content="width=device-width,initial-scale=1"/> <meta name="description" content="開示情報利用者用トップ画面（英語）"/> <meta name="apple-mobile-web-app-capable" content="yes"/> <!--[if IE]><meta http-equiv="page-enter" content="blendTrans(Duration=0.1)"/><![endif]--> <meta name="fragment" content="!"/> <meta http-equiv="content-type" content="text/html; charset=UTF-8"/> <title>EDINET</title> <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css?202610617101019"/> <link id="gxtheme_css_reference" rel="stylesheet" type="text/css" href="Resources/Japanese/ThemeBlue.css?202610617101019" /> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/fontawesome_v5/css/fontawesome.min.css"/> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/fontawesome_v5/css/all.min.css"/> <link rel="stylesheet" type="text/css" href="DVelop/Bootstrap/Shared/DVelopBootstrap.css"/> <script type="text/javascript" src="jquery.js?2136580" ></script><script type="text/javascript" src="bootstrap/js/bootstrap.min.js?202610617101019" ></script><script type="text/javascript" src="gxgral.js?2136580" ></script><script type="text/javascript" src="gxcfg.js?2026914157169" ></script><script type="text/javascript" src="Window/InNewWindowRender.js" ></script><script type="text/javascript" src="js/CommonJS.js?20261024152014" ></script><script type="text/javascript" src="js/Scrolltop.js?20
 ```
 
 
 ## TDnet 解析診斷
 
-- 回溯嘗試：20261020(0列)
-- 測試頁：`https://www.release.tdnet.info/inbs/I_list_001_20261020.html`
-- HTML 長度：55,066 字元
+- 回溯嘗試：20261027(0列)
+- 測試頁：`https://www.release.tdnet.info/inbs/I_list_001_20261027.html`
+- HTML 長度：56,374 字元
 - `parse_list_page` 解析出的列數：**0**
 - 其中命中目標代碼：**0**
 

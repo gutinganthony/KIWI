@@ -1,0 +1,3342 @@
+{
+  "date": "2026-10-25",
+  "snapshot_dir": "/home/runner/work/KIWI/KIWI/projects/poly-observer/data/snapshots/2026-10-25",
+  "universe_size": 60,
+  "wallets_ok": 0,
+  "wallets_partial": 60,
+  "wallets_failed": 0,
+  "requests_ok": 296,
+  "requests_failed": 120,
+  "elapsed_sec": 720.6,
+  "endpoint_health": [
+    {
+      "name": "leaderboard[MONTH]",
+      "url": "https://data-api.polymarket.com/v1/leaderboard?timePeriod=MONTH&orderBy=PNL&limit=50&category=OVERALL&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.07
+    },
+    {
+      "name": "leaderboard[ALL]",
+      "url": "https://data-api.polymarket.com/v1/leaderboard?timePeriod=ALL&orderBy=PNL&limit=50&category=OVERALL&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "activity[0x25e28169…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x25e28169faea17421fcd4cc361f6436d1e449a09&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.3
+    },
+    {
+      "name": "activity[0x25e28169…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x25e28169faea17421fcd4cc361f6436d1e449a09&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.45
+    },
+    {
+      "name": "positions[0x25e28169…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x25e28169faea17421fcd4cc361f6436d1e449a09&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "value[0x25e28169…]",
+      "url": "https://data-api.polymarket.com/value?user=0x25e28169faea17421fcd4cc361f6436d1e449a09",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "pnl[0x25e28169…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x25e28169faea17421fcd4cc361f6436d1e449a09&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.17
+    },
+    {
+      "name": "pnl[0x25e28169…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x25e28169faea17421fcd4cc361f6436d1e449a09&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "activity[0x2005d16a…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x2005d16a84ceefa912d4e380cd32e7ff827875ea&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "activity[0x2005d16a…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x2005d16a84ceefa912d4e380cd32e7ff827875ea&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "activity[0x2005d16a…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x2005d16a84ceefa912d4e380cd32e7ff827875ea&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "positions[0x2005d16a…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x2005d16a84ceefa912d4e380cd32e7ff827875ea&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "value[0x2005d16a…]",
+      "url": "https://data-api.polymarket.com/value?user=0x2005d16a84ceefa912d4e380cd32e7ff827875ea",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "pnl[0x2005d16a…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x2005d16a84ceefa912d4e380cd32e7ff827875ea&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x2005d16a…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x2005d16a84ceefa912d4e380cd32e7ff827875ea&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0xf0318c32…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xf0318c32136c2db7fec88b84869aee6a1106c80c&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "activity[0xf0318c32…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xf0318c32136c2db7fec88b84869aee6a1106c80c&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "activity[0xf0318c32…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xf0318c32136c2db7fec88b84869aee6a1106c80c&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "positions[0xf0318c32…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xf0318c32136c2db7fec88b84869aee6a1106c80c&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "value[0xf0318c32…]",
+      "url": "https://data-api.polymarket.com/value?user=0xf0318c32136c2db7fec88b84869aee6a1106c80c",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "pnl[0xf0318c32…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xf0318c32136c2db7fec88b84869aee6a1106c80c&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0xf0318c32…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xf0318c32136c2db7fec88b84869aee6a1106c80c&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0xcdcccd0f…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xcdcccd0f2d86e450d973da415ad2430e5cc7935a&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "activity[0xcdcccd0f…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xcdcccd0f2d86e450d973da415ad2430e5cc7935a&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.3
+    },
+    {
+      "name": "positions[0xcdcccd0f…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xcdcccd0f2d86e450d973da415ad2430e5cc7935a&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "value[0xcdcccd0f…]",
+      "url": "https://data-api.polymarket.com/value?user=0xcdcccd0f2d86e450d973da415ad2430e5cc7935a",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "pnl[0xcdcccd0f…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xcdcccd0f2d86e450d973da415ad2430e5cc7935a&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.13
+    },
+    {
+      "name": "pnl[0xcdcccd0f…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xcdcccd0f2d86e450d973da415ad2430e5cc7935a&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x4f1d5ae2…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x4f1d5ae26fc31472966e951af3183308736d8de2&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.32
+    },
+    {
+      "name": "activity[0x4f1d5ae2…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x4f1d5ae26fc31472966e951af3183308736d8de2&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "activity[0x4f1d5ae2…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x4f1d5ae26fc31472966e951af3183308736d8de2&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "positions[0x4f1d5ae2…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x4f1d5ae26fc31472966e951af3183308736d8de2&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.07
+    },
+    {
+      "name": "value[0x4f1d5ae2…]",
+      "url": "https://data-api.polymarket.com/value?user=0x4f1d5ae26fc31472966e951af3183308736d8de2",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "pnl[0x4f1d5ae2…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x4f1d5ae26fc31472966e951af3183308736d8de2&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x4f1d5ae2…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x4f1d5ae26fc31472966e951af3183308736d8de2&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x7c37b52e…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x7c37b52eb226bcb9411375ec48b0169663fb6aeb&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "activity[0x7c37b52e…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x7c37b52eb226bcb9411375ec48b0169663fb6aeb&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.4
+    },
+    {
+      "name": "activity[0x7c37b52e…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x7c37b52eb226bcb9411375ec48b0169663fb6aeb&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.25
+    },
+    {
+      "name": "positions[0x7c37b52e…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x7c37b52eb226bcb9411375ec48b0169663fb6aeb&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "value[0x7c37b52e…]",
+      "url": "https://data-api.polymarket.com/value?user=0x7c37b52eb226bcb9411375ec48b0169663fb6aeb",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.27
+    },
+    {
+      "name": "pnl[0x7c37b52e…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x7c37b52eb226bcb9411375ec48b0169663fb6aeb&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x7c37b52e…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x7c37b52eb226bcb9411375ec48b0169663fb6aeb&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "activity[0x52685279…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x5268527977f700f9bf9b6d5cd843859e4e70135d&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "activity[0x52685279…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x5268527977f700f9bf9b6d5cd843859e4e70135d&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.41
+    },
+    {
+      "name": "activity[0x52685279…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x5268527977f700f9bf9b6d5cd843859e4e70135d&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "positions[0x52685279…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x5268527977f700f9bf9b6d5cd843859e4e70135d&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.27
+    },
+    {
+      "name": "value[0x52685279…]",
+      "url": "https://data-api.polymarket.com/value?user=0x5268527977f700f9bf9b6d5cd843859e4e70135d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "pnl[0x52685279…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x5268527977f700f9bf9b6d5cd843859e4e70135d&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x52685279…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x5268527977f700f9bf9b6d5cd843859e4e70135d&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x111f73e9…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x111f73e91f85b6fe4de1ddec3de2fe32122e355b&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.28
+    },
+    {
+      "name": "activity[0x111f73e9…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x111f73e91f85b6fe4de1ddec3de2fe32122e355b&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.28
+    },
+    {
+      "name": "activity[0x111f73e9…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x111f73e91f85b6fe4de1ddec3de2fe32122e355b&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.33
+    },
+    {
+      "name": "positions[0x111f73e9…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x111f73e91f85b6fe4de1ddec3de2fe32122e355b&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "value[0x111f73e9…]",
+      "url": "https://data-api.polymarket.com/value?user=0x111f73e91f85b6fe4de1ddec3de2fe32122e355b",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "pnl[0x111f73e9…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x111f73e91f85b6fe4de1ddec3de2fe32122e355b&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x111f73e9…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x111f73e91f85b6fe4de1ddec3de2fe32122e355b&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x1f3a646c…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1f3a646ce5cbe2c70270e7a46161d89b7c7b895d&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "activity[0x1f3a646c…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1f3a646ce5cbe2c70270e7a46161d89b7c7b895d&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.35
+    },
+    {
+      "name": "activity[0x1f3a646c…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1f3a646ce5cbe2c70270e7a46161d89b7c7b895d&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.29
+    },
+    {
+      "name": "positions[0x1f3a646c…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x1f3a646ce5cbe2c70270e7a46161d89b7c7b895d&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "value[0x1f3a646c…]",
+      "url": "https://data-api.polymarket.com/value?user=0x1f3a646ce5cbe2c70270e7a46161d89b7c7b895d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "pnl[0x1f3a646c…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x1f3a646ce5cbe2c70270e7a46161d89b7c7b895d&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "pnl[0x1f3a646c…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x1f3a646ce5cbe2c70270e7a46161d89b7c7b895d&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x2a696600…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x2a69660046d7acc4ab204d7cc5ba78b0776cd2f7&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "activity[0x2a696600…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x2a69660046d7acc4ab204d7cc5ba78b0776cd2f7&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.49
+    },
+    {
+      "name": "activity[0x2a696600…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x2a69660046d7acc4ab204d7cc5ba78b0776cd2f7&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.43
+    },
+    {
+      "name": "positions[0x2a696600…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x2a69660046d7acc4ab204d7cc5ba78b0776cd2f7&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.09
+    },
+    {
+      "name": "value[0x2a696600…]",
+      "url": "https://data-api.polymarket.com/value?user=0x2a69660046d7acc4ab204d7cc5ba78b0776cd2f7",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 1.23
+    },
+    {
+      "name": "pnl[0x2a696600…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x2a69660046d7acc4ab204d7cc5ba78b0776cd2f7&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x2a696600…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x2a69660046d7acc4ab204d7cc5ba78b0776cd2f7&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x511f9c77…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x511f9c771449162349795d17becf8b37031acbe1&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "activity[0x511f9c77…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x511f9c771449162349795d17becf8b37031acbe1&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.27
+    },
+    {
+      "name": "activity[0x511f9c77…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x511f9c771449162349795d17becf8b37031acbe1&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.38
+    },
+    {
+      "name": "positions[0x511f9c77…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x511f9c771449162349795d17becf8b37031acbe1&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.4
+    },
+    {
+      "name": "value[0x511f9c77…]",
+      "url": "https://data-api.polymarket.com/value?user=0x511f9c771449162349795d17becf8b37031acbe1",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.47
+    },
+    {
+      "name": "pnl[0x511f9c77…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x511f9c771449162349795d17becf8b37031acbe1&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "pnl[0x511f9c77…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x511f9c771449162349795d17becf8b37031acbe1&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0xb0e74df9…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xb0e74df9430a089aa102e2207af5fde1967439d2&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.45
+    },
+    {
+      "name": "activity[0xb0e74df9…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xb0e74df9430a089aa102e2207af5fde1967439d2&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "activity[0xb0e74df9…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xb0e74df9430a089aa102e2207af5fde1967439d2&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.27
+    },
+    {
+      "name": "positions[0xb0e74df9…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xb0e74df9430a089aa102e2207af5fde1967439d2&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.47
+    },
+    {
+      "name": "value[0xb0e74df9…]",
+      "url": "https://data-api.polymarket.com/value?user=0xb0e74df9430a089aa102e2207af5fde1967439d2",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.5
+    },
+    {
+      "name": "pnl[0xb0e74df9…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xb0e74df9430a089aa102e2207af5fde1967439d2&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0xb0e74df9…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xb0e74df9430a089aa102e2207af5fde1967439d2&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0xe6ca6ebb…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xe6ca6ebbec97e8a46ff3dbdb2a99d46254fbbff4&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.3
+    },
+    {
+      "name": "activity[0xe6ca6ebb…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xe6ca6ebbec97e8a46ff3dbdb2a99d46254fbbff4&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.36
+    },
+    {
+      "name": "positions[0xe6ca6ebb…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xe6ca6ebbec97e8a46ff3dbdb2a99d46254fbbff4&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.29
+    },
+    {
+      "name": "value[0xe6ca6ebb…]",
+      "url": "https://data-api.polymarket.com/value?user=0xe6ca6ebbec97e8a46ff3dbdb2a99d46254fbbff4",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.28
+    },
+    {
+      "name": "pnl[0xe6ca6ebb…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xe6ca6ebbec97e8a46ff3dbdb2a99d46254fbbff4&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0xe6ca6ebb…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xe6ca6ebbec97e8a46ff3dbdb2a99d46254fbbff4&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x5a218c7a…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x5a218c7ad04135830a45c41aaed7294df7809318&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "activity[0x5a218c7a…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x5a218c7ad04135830a45c41aaed7294df7809318&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "activity[0x5a218c7a…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x5a218c7ad04135830a45c41aaed7294df7809318&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.37
+    },
+    {
+      "name": "positions[0x5a218c7a…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x5a218c7ad04135830a45c41aaed7294df7809318&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "value[0x5a218c7a…]",
+      "url": "https://data-api.polymarket.com/value?user=0x5a218c7ad04135830a45c41aaed7294df7809318",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "pnl[0x5a218c7a…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x5a218c7ad04135830a45c41aaed7294df7809318&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "pnl[0x5a218c7a…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x5a218c7ad04135830a45c41aaed7294df7809318&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.16
+    },
+    {
+      "name": "activity[0xcbc66620…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xcbc666209b4c17ea84c03c0dda71b5dab9e4ec62&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "activity[0xcbc66620…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xcbc666209b4c17ea84c03c0dda71b5dab9e4ec62&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "activity[0xcbc66620…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xcbc666209b4c17ea84c03c0dda71b5dab9e4ec62&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.49
+    },
+    {
+      "name": "positions[0xcbc66620…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xcbc666209b4c17ea84c03c0dda71b5dab9e4ec62&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "value[0xcbc66620…]",
+      "url": "https://data-api.polymarket.com/value?user=0xcbc666209b4c17ea84c03c0dda71b5dab9e4ec62",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "pnl[0xcbc66620…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xcbc666209b4c17ea84c03c0dda71b5dab9e4ec62&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "pnl[0xcbc66620…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xcbc666209b4c17ea84c03c0dda71b5dab9e4ec62&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.13
+    },
+    {
+      "name": "activity[0x924379a7…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x924379a79c64b77ad5816ad362122a5f6228658e&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "activity[0x924379a7…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x924379a79c64b77ad5816ad362122a5f6228658e&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "activity[0x924379a7…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x924379a79c64b77ad5816ad362122a5f6228658e&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.42
+    },
+    {
+      "name": "positions[0x924379a7…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x924379a79c64b77ad5816ad362122a5f6228658e&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "value[0x924379a7…]",
+      "url": "https://data-api.polymarket.com/value?user=0x924379a79c64b77ad5816ad362122a5f6228658e",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.28
+    },
+    {
+      "name": "pnl[0x924379a7…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x924379a79c64b77ad5816ad362122a5f6228658e&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "pnl[0x924379a7…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x924379a79c64b77ad5816ad362122a5f6228658e&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "activity[0x1387d145…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1387d145aaf01f6e33b66525dda6e1f51f6955f8&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "activity[0x1387d145…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1387d145aaf01f6e33b66525dda6e1f51f6955f8&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "activity[0x1387d145…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1387d145aaf01f6e33b66525dda6e1f51f6955f8&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "positions[0x1387d145…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x1387d145aaf01f6e33b66525dda6e1f51f6955f8&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.35
+    },
+    {
+      "name": "value[0x1387d145…]",
+      "url": "https://data-api.polymarket.com/value?user=0x1387d145aaf01f6e33b66525dda6e1f51f6955f8",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.57
+    },
+    {
+      "name": "pnl[0x1387d145…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x1387d145aaf01f6e33b66525dda6e1f51f6955f8&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x1387d145…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x1387d145aaf01f6e33b66525dda6e1f51f6955f8&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.13
+    },
+    {
+      "name": "activity[0x361b16e3…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x361b16e3ddfe1d415d41008daac2631d94ab74fe&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "activity[0x361b16e3…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x361b16e3ddfe1d415d41008daac2631d94ab74fe&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.27
+    },
+    {
+      "name": "activity[0x361b16e3…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x361b16e3ddfe1d415d41008daac2631d94ab74fe&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "positions[0x361b16e3…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x361b16e3ddfe1d415d41008daac2631d94ab74fe&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "value[0x361b16e3…]",
+      "url": "https://data-api.polymarket.com/value?user=0x361b16e3ddfe1d415d41008daac2631d94ab74fe",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "pnl[0x361b16e3…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x361b16e3ddfe1d415d41008daac2631d94ab74fe&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x361b16e3…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x361b16e3ddfe1d415d41008daac2631d94ab74fe&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x2b592027…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x2b5920274740ca61745eeb077587bf5bb4ff9db6&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "activity[0x2b592027…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x2b5920274740ca61745eeb077587bf5bb4ff9db6&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "activity[0x2b592027…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x2b5920274740ca61745eeb077587bf5bb4ff9db6&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "positions[0x2b592027…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x2b5920274740ca61745eeb077587bf5bb4ff9db6&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.74
+    },
+    {
+      "name": "value[0x2b592027…]",
+      "url": "https://data-api.polymarket.com/value?user=0x2b5920274740ca61745eeb077587bf5bb4ff9db6",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "pnl[0x2b592027…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x2b5920274740ca61745eeb077587bf5bb4ff9db6&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "pnl[0x2b592027…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x2b5920274740ca61745eeb077587bf5bb4ff9db6&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "activity[0x5fdd66ff…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x5fdd66ffd0325d4e8d1d86fbec50caa31770a747&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "activity[0x5fdd66ff…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x5fdd66ffd0325d4e8d1d86fbec50caa31770a747&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "activity[0x5fdd66ff…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x5fdd66ffd0325d4e8d1d86fbec50caa31770a747&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.46
+    },
+    {
+      "name": "positions[0x5fdd66ff…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x5fdd66ffd0325d4e8d1d86fbec50caa31770a747&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "value[0x5fdd66ff…]",
+      "url": "https://data-api.polymarket.com/value?user=0x5fdd66ffd0325d4e8d1d86fbec50caa31770a747",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "pnl[0x5fdd66ff…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x5fdd66ffd0325d4e8d1d86fbec50caa31770a747&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x5fdd66ff…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x5fdd66ffd0325d4e8d1d86fbec50caa31770a747&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "activity[0x4868c31e…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x4868c31e81040e002b41984842b84bae8923a1c1&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "activity[0x4868c31e…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x4868c31e81040e002b41984842b84bae8923a1c1&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.32
+    },
+    {
+      "name": "activity[0x4868c31e…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x4868c31e81040e002b41984842b84bae8923a1c1&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.56
+    },
+    {
+      "name": "positions[0x4868c31e…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x4868c31e81040e002b41984842b84bae8923a1c1&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.35
+    },
+    {
+      "name": "value[0x4868c31e…]",
+      "url": "https://data-api.polymarket.com/value?user=0x4868c31e81040e002b41984842b84bae8923a1c1",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.33
+    },
+    {
+      "name": "pnl[0x4868c31e…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x4868c31e81040e002b41984842b84bae8923a1c1&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x4868c31e…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x4868c31e81040e002b41984842b84bae8923a1c1&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0xbc43c8bf…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xbc43c8bfbc4d77c2fc9011adad38ba43b88996d3&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "activity[0xbc43c8bf…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xbc43c8bfbc4d77c2fc9011adad38ba43b88996d3&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.28
+    },
+    {
+      "name": "activity[0xbc43c8bf…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xbc43c8bfbc4d77c2fc9011adad38ba43b88996d3&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.25
+    },
+    {
+      "name": "positions[0xbc43c8bf…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xbc43c8bfbc4d77c2fc9011adad38ba43b88996d3&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "value[0xbc43c8bf…]",
+      "url": "https://data-api.polymarket.com/value?user=0xbc43c8bfbc4d77c2fc9011adad38ba43b88996d3",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "pnl[0xbc43c8bf…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xbc43c8bfbc4d77c2fc9011adad38ba43b88996d3&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "pnl[0xbc43c8bf…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xbc43c8bfbc4d77c2fc9011adad38ba43b88996d3&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x03805a13…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x03805a13a0b3e058f55f6c6af95389d4f431073d&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "activity[0x03805a13…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x03805a13a0b3e058f55f6c6af95389d4f431073d&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.08
+    },
+    {
+      "name": "activity[0x03805a13…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x03805a13a0b3e058f55f6c6af95389d4f431073d&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.25
+    },
+    {
+      "name": "positions[0x03805a13…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x03805a13a0b3e058f55f6c6af95389d4f431073d&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.07
+    },
+    {
+      "name": "value[0x03805a13…]",
+      "url": "https://data-api.polymarket.com/value?user=0x03805a13a0b3e058f55f6c6af95389d4f431073d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.53
+    },
+    {
+      "name": "pnl[0x03805a13…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x03805a13a0b3e058f55f6c6af95389d4f431073d&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x03805a13…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x03805a13a0b3e058f55f6c6af95389d4f431073d&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "activity[0x83720820…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x83720820a8aa6c3f20ad71850e7a1a17d16c5223&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "activity[0x83720820…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x83720820a8aa6c3f20ad71850e7a1a17d16c5223&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.32
+    },
+    {
+      "name": "activity[0x83720820…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x83720820a8aa6c3f20ad71850e7a1a17d16c5223&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.28
+    },
+    {
+      "name": "positions[0x83720820…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x83720820a8aa6c3f20ad71850e7a1a17d16c5223&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "value[0x83720820…]",
+      "url": "https://data-api.polymarket.com/value?user=0x83720820a8aa6c3f20ad71850e7a1a17d16c5223",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "pnl[0x83720820…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x83720820a8aa6c3f20ad71850e7a1a17d16c5223&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "pnl[0x83720820…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x83720820a8aa6c3f20ad71850e7a1a17d16c5223&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.13
+    },
+    {
+      "name": "activity[0x8c0b024c…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x8c0b024c17831a0dde038547b7e791ae6a0d7aa5&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "activity[0x8c0b024c…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x8c0b024c17831a0dde038547b7e791ae6a0d7aa5&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.41
+    },
+    {
+      "name": "activity[0x8c0b024c…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x8c0b024c17831a0dde038547b7e791ae6a0d7aa5&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.31
+    },
+    {
+      "name": "positions[0x8c0b024c…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x8c0b024c17831a0dde038547b7e791ae6a0d7aa5&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.09
+    },
+    {
+      "name": "value[0x8c0b024c…]",
+      "url": "https://data-api.polymarket.com/value?user=0x8c0b024c17831a0dde038547b7e791ae6a0d7aa5",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "pnl[0x8c0b024c…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x8c0b024c17831a0dde038547b7e791ae6a0d7aa5&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "pnl[0x8c0b024c…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x8c0b024c17831a0dde038547b7e791ae6a0d7aa5&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x7ad71d79…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x7ad71d79a3bb90d0a87a06500fa0fe11663842aa&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "activity[0x7ad71d79…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x7ad71d79a3bb90d0a87a06500fa0fe11663842aa&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.29
+    },
+    {
+      "name": "activity[0x7ad71d79…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x7ad71d79a3bb90d0a87a06500fa0fe11663842aa&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.36
+    },
+    {
+      "name": "positions[0x7ad71d79…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x7ad71d79a3bb90d0a87a06500fa0fe11663842aa&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "value[0x7ad71d79…]",
+      "url": "https://data-api.polymarket.com/value?user=0x7ad71d79a3bb90d0a87a06500fa0fe11663842aa",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "pnl[0x7ad71d79…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x7ad71d79a3bb90d0a87a06500fa0fe11663842aa&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "pnl[0x7ad71d79…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x7ad71d79a3bb90d0a87a06500fa0fe11663842aa&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0xd38b71f3…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xd38b71f3e8ed1af71983e5c309eac3dfa9b35029&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "activity[0xd38b71f3…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xd38b71f3e8ed1af71983e5c309eac3dfa9b35029&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.28
+    },
+    {
+      "name": "activity[0xd38b71f3…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xd38b71f3e8ed1af71983e5c309eac3dfa9b35029&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.3
+    },
+    {
+      "name": "positions[0xd38b71f3…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xd38b71f3e8ed1af71983e5c309eac3dfa9b35029&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.31
+    },
+    {
+      "name": "value[0xd38b71f3…]",
+      "url": "https://data-api.polymarket.com/value?user=0xd38b71f3e8ed1af71983e5c309eac3dfa9b35029",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "pnl[0xd38b71f3…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xd38b71f3e8ed1af71983e5c309eac3dfa9b35029&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0xd38b71f3…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xd38b71f3e8ed1af71983e5c309eac3dfa9b35029&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.13
+    },
+    {
+      "name": "activity[0x96489abc…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x96489abcb9f583d6835c8ef95ffc923d05a86825&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "activity[0x96489abc…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x96489abcb9f583d6835c8ef95ffc923d05a86825&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "activity[0x96489abc…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x96489abcb9f583d6835c8ef95ffc923d05a86825&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "positions[0x96489abc…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x96489abcb9f583d6835c8ef95ffc923d05a86825&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.11
+    },
+    {
+      "name": "value[0x96489abc…]",
+      "url": "https://data-api.polymarket.com/value?user=0x96489abcb9f583d6835c8ef95ffc923d05a86825",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "pnl[0x96489abc…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x96489abcb9f583d6835c8ef95ffc923d05a86825&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x96489abc…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x96489abcb9f583d6835c8ef95ffc923d05a86825&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "activity[0x076daa87…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x076daa87c4fe1a85402a9b6b8e0a866224388d4c&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "activity[0x076daa87…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x076daa87c4fe1a85402a9b6b8e0a866224388d4c&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "activity[0x076daa87…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x076daa87c4fe1a85402a9b6b8e0a866224388d4c&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "positions[0x076daa87…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x076daa87c4fe1a85402a9b6b8e0a866224388d4c&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "value[0x076daa87…]",
+      "url": "https://data-api.polymarket.com/value?user=0x076daa87c4fe1a85402a9b6b8e0a866224388d4c",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.57
+    },
+    {
+      "name": "pnl[0x076daa87…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x076daa87c4fe1a85402a9b6b8e0a866224388d4c&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x076daa87…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x076daa87c4fe1a85402a9b6b8e0a866224388d4c&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0xb4f978be…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xb4f978be63cdf75554b0b46a4262a6db597cc9a7&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "activity[0xb4f978be…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xb4f978be63cdf75554b0b46a4262a6db597cc9a7&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.37
+    },
+    {
+      "name": "activity[0xb4f978be…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xb4f978be63cdf75554b0b46a4262a6db597cc9a7&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.36
+    },
+    {
+      "name": "positions[0xb4f978be…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xb4f978be63cdf75554b0b46a4262a6db597cc9a7&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.34
+    },
+    {
+      "name": "value[0xb4f978be…]",
+      "url": "https://data-api.polymarket.com/value?user=0xb4f978be63cdf75554b0b46a4262a6db597cc9a7",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "pnl[0xb4f978be…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xb4f978be63cdf75554b0b46a4262a6db597cc9a7&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0xb4f978be…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xb4f978be63cdf75554b0b46a4262a6db597cc9a7&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x285faa3e…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x285faa3e3d1465cf3ff1bff1e1d14891f5b8495f&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "activity[0x285faa3e…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x285faa3e3d1465cf3ff1bff1e1d14891f5b8495f&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.48
+    },
+    {
+      "name": "activity[0x285faa3e…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x285faa3e3d1465cf3ff1bff1e1d14891f5b8495f&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.55
+    },
+    {
+      "name": "positions[0x285faa3e…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x285faa3e3d1465cf3ff1bff1e1d14891f5b8495f&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "value[0x285faa3e…]",
+      "url": "https://data-api.polymarket.com/value?user=0x285faa3e3d1465cf3ff1bff1e1d14891f5b8495f",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "pnl[0x285faa3e…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x285faa3e3d1465cf3ff1bff1e1d14891f5b8495f&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x285faa3e…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x285faa3e3d1465cf3ff1bff1e1d14891f5b8495f&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "activity[0xc1b5f266…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xc1b5f266564e6d4907cf84bdf5a8f91621ef5d85&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.3
+    },
+    {
+      "name": "activity[0xc1b5f266…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xc1b5f266564e6d4907cf84bdf5a8f91621ef5d85&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.41
+    },
+    {
+      "name": "activity[0xc1b5f266…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xc1b5f266564e6d4907cf84bdf5a8f91621ef5d85&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.42
+    },
+    {
+      "name": "positions[0xc1b5f266…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xc1b5f266564e6d4907cf84bdf5a8f91621ef5d85&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.57
+    },
+    {
+      "name": "value[0xc1b5f266…]",
+      "url": "https://data-api.polymarket.com/value?user=0xc1b5f266564e6d4907cf84bdf5a8f91621ef5d85",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.31
+    },
+    {
+      "name": "pnl[0xc1b5f266…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xc1b5f266564e6d4907cf84bdf5a8f91621ef5d85&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0xc1b5f266…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xc1b5f266564e6d4907cf84bdf5a8f91621ef5d85&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x9b118664…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x9b11866433281ade9f2811dbde8acdefc45f5375&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.08
+    },
+    {
+      "name": "activity[0x9b118664…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x9b11866433281ade9f2811dbde8acdefc45f5375&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.09
+    },
+    {
+      "name": "activity[0x9b118664…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x9b11866433281ade9f2811dbde8acdefc45f5375&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "positions[0x9b118664…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x9b11866433281ade9f2811dbde8acdefc45f5375&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "value[0x9b118664…]",
+      "url": "https://data-api.polymarket.com/value?user=0x9b11866433281ade9f2811dbde8acdefc45f5375",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "pnl[0x9b118664…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x9b11866433281ade9f2811dbde8acdefc45f5375&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x9b118664…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x9b11866433281ade9f2811dbde8acdefc45f5375&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0xe221be3b…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xe221be3b45dfe5ed562ee9dc16f47205728e06f6&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.09
+    },
+    {
+      "name": "activity[0xe221be3b…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xe221be3b45dfe5ed562ee9dc16f47205728e06f6&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.06
+    },
+    {
+      "name": "activity[0xe221be3b…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xe221be3b45dfe5ed562ee9dc16f47205728e06f6&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.32
+    },
+    {
+      "name": "positions[0xe221be3b…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xe221be3b45dfe5ed562ee9dc16f47205728e06f6&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.37
+    },
+    {
+      "name": "value[0xe221be3b…]",
+      "url": "https://data-api.polymarket.com/value?user=0xe221be3b45dfe5ed562ee9dc16f47205728e06f6",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "pnl[0xe221be3b…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xe221be3b45dfe5ed562ee9dc16f47205728e06f6&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0xe221be3b…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xe221be3b45dfe5ed562ee9dc16f47205728e06f6&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x8bac34bb…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x8bac34bb7b51b4d63b128eb711d76706efdc35ca&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "activity[0x8bac34bb…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x8bac34bb7b51b4d63b128eb711d76706efdc35ca&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.37
+    },
+    {
+      "name": "activity[0x8bac34bb…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x8bac34bb7b51b4d63b128eb711d76706efdc35ca&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.39
+    },
+    {
+      "name": "positions[0x8bac34bb…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x8bac34bb7b51b4d63b128eb711d76706efdc35ca&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.3
+    },
+    {
+      "name": "value[0x8bac34bb…]",
+      "url": "https://data-api.polymarket.com/value?user=0x8bac34bb7b51b4d63b128eb711d76706efdc35ca",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "pnl[0x8bac34bb…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x8bac34bb7b51b4d63b128eb711d76706efdc35ca&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.13
+    },
+    {
+      "name": "pnl[0x8bac34bb…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x8bac34bb7b51b4d63b128eb711d76706efdc35ca&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "activity[0xe949065b…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xe949065b6c64308369c26dc590121623a5a4dea6&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "activity[0xe949065b…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xe949065b6c64308369c26dc590121623a5a4dea6&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.32
+    },
+    {
+      "name": "activity[0xe949065b…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xe949065b6c64308369c26dc590121623a5a4dea6&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.41
+    },
+    {
+      "name": "positions[0xe949065b…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xe949065b6c64308369c26dc590121623a5a4dea6&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "value[0xe949065b…]",
+      "url": "https://data-api.polymarket.com/value?user=0xe949065b6c64308369c26dc590121623a5a4dea6",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "pnl[0xe949065b…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xe949065b6c64308369c26dc590121623a5a4dea6&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0xe949065b…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xe949065b6c64308369c26dc590121623a5a4dea6&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "activity[0xa38a455b…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xa38a455bbdd4b68486548b7e19da99903f4f821d&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "activity[0xa38a455b…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xa38a455bbdd4b68486548b7e19da99903f4f821d&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.39
+    },
+    {
+      "name": "activity[0xa38a455b…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xa38a455bbdd4b68486548b7e19da99903f4f821d&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.38
+    },
+    {
+      "name": "positions[0xa38a455b…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xa38a455bbdd4b68486548b7e19da99903f4f821d&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "value[0xa38a455b…]",
+      "url": "https://data-api.polymarket.com/value?user=0xa38a455bbdd4b68486548b7e19da99903f4f821d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.3
+    },
+    {
+      "name": "pnl[0xa38a455b…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xa38a455bbdd4b68486548b7e19da99903f4f821d&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0xa38a455b…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xa38a455bbdd4b68486548b7e19da99903f4f821d&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x9ba9dec3…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x9ba9dec33838f4ec9f032f7247d7481987e63ce9&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.4
+    },
+    {
+      "name": "positions[0x9ba9dec3…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x9ba9dec33838f4ec9f032f7247d7481987e63ce9&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.45
+    },
+    {
+      "name": "value[0x9ba9dec3…]",
+      "url": "https://data-api.polymarket.com/value?user=0x9ba9dec33838f4ec9f032f7247d7481987e63ce9",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "pnl[0x9ba9dec3…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x9ba9dec33838f4ec9f032f7247d7481987e63ce9&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "pnl[0x9ba9dec3…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x9ba9dec33838f4ec9f032f7247d7481987e63ce9&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0xb0c85813…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xb0c85813a7a4428f1139ff91d3118a92c391fe7f&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "activity[0xb0c85813…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xb0c85813a7a4428f1139ff91d3118a92c391fe7f&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "activity[0xb0c85813…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xb0c85813a7a4428f1139ff91d3118a92c391fe7f&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "positions[0xb0c85813…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xb0c85813a7a4428f1139ff91d3118a92c391fe7f&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "value[0xb0c85813…]",
+      "url": "https://data-api.polymarket.com/value?user=0xb0c85813a7a4428f1139ff91d3118a92c391fe7f",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.6
+    },
+    {
+      "name": "pnl[0xb0c85813…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xb0c85813a7a4428f1139ff91d3118a92c391fe7f&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.13
+    },
+    {
+      "name": "pnl[0xb0c85813…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xb0c85813a7a4428f1139ff91d3118a92c391fe7f&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x676c1bb6…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x676c1bb692c76b57b06f1b93817515acfa5ce139&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "activity[0x676c1bb6…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x676c1bb692c76b57b06f1b93817515acfa5ce139&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.3
+    },
+    {
+      "name": "activity[0x676c1bb6…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x676c1bb692c76b57b06f1b93817515acfa5ce139&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "positions[0x676c1bb6…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x676c1bb692c76b57b06f1b93817515acfa5ce139&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.06
+    },
+    {
+      "name": "value[0x676c1bb6…]",
+      "url": "https://data-api.polymarket.com/value?user=0x676c1bb692c76b57b06f1b93817515acfa5ce139",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "pnl[0x676c1bb6…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x676c1bb692c76b57b06f1b93817515acfa5ce139&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "pnl[0x676c1bb6…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x676c1bb692c76b57b06f1b93817515acfa5ce139&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "activity[0x60a92c86…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x60a92c8620846d81f5ea17b0564e0d4b7c545a71&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "activity[0x60a92c86…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x60a92c8620846d81f5ea17b0564e0d4b7c545a71&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "activity[0x60a92c86…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x60a92c8620846d81f5ea17b0564e0d4b7c545a71&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "positions[0x60a92c86…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x60a92c8620846d81f5ea17b0564e0d4b7c545a71&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "value[0x60a92c86…]",
+      "url": "https://data-api.polymarket.com/value?user=0x60a92c8620846d81f5ea17b0564e0d4b7c545a71",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "pnl[0x60a92c86…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x60a92c8620846d81f5ea17b0564e0d4b7c545a71&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.13
+    },
+    {
+      "name": "pnl[0x60a92c86…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x60a92c8620846d81f5ea17b0564e0d4b7c545a71&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0xf68a2819…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xf68a281980f8c13828e84e147e3822381d6e5b1b&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "activity[0xf68a2819…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xf68a281980f8c13828e84e147e3822381d6e5b1b&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "activity[0xf68a2819…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xf68a281980f8c13828e84e147e3822381d6e5b1b&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "positions[0xf68a2819…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xf68a281980f8c13828e84e147e3822381d6e5b1b&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.08
+    },
+    {
+      "name": "value[0xf68a2819…]",
+      "url": "https://data-api.polymarket.com/value?user=0xf68a281980f8c13828e84e147e3822381d6e5b1b",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "pnl[0xf68a2819…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xf68a281980f8c13828e84e147e3822381d6e5b1b&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0xf68a2819…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xf68a281980f8c13828e84e147e3822381d6e5b1b&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0xa19cbaba…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xa19cbababc312f9df185e49d7004c249ed1ade6b&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "activity[0xa19cbaba…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xa19cbababc312f9df185e49d7004c249ed1ade6b&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.34
+    },
+    {
+      "name": "activity[0xa19cbaba…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xa19cbababc312f9df185e49d7004c249ed1ade6b&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.33
+    },
+    {
+      "name": "positions[0xa19cbaba…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xa19cbababc312f9df185e49d7004c249ed1ade6b&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "value[0xa19cbaba…]",
+      "url": "https://data-api.polymarket.com/value?user=0xa19cbababc312f9df185e49d7004c249ed1ade6b",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "pnl[0xa19cbaba…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xa19cbababc312f9df185e49d7004c249ed1ade6b&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0xa19cbaba…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xa19cbababc312f9df185e49d7004c249ed1ade6b&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.13
+    },
+    {
+      "name": "activity[0x0d6a1ada…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x0d6a1ada6d7ff785ab4b7263d9ce8e2baa85aa98&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "activity[0x0d6a1ada…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x0d6a1ada6d7ff785ab4b7263d9ce8e2baa85aa98&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "activity[0x0d6a1ada…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x0d6a1ada6d7ff785ab4b7263d9ce8e2baa85aa98&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "positions[0x0d6a1ada…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x0d6a1ada6d7ff785ab4b7263d9ce8e2baa85aa98&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "value[0x0d6a1ada…]",
+      "url": "https://data-api.polymarket.com/value?user=0x0d6a1ada6d7ff785ab4b7263d9ce8e2baa85aa98",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "pnl[0x0d6a1ada…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x0d6a1ada6d7ff785ab4b7263d9ce8e2baa85aa98&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.13
+    },
+    {
+      "name": "pnl[0x0d6a1ada…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x0d6a1ada6d7ff785ab4b7263d9ce8e2baa85aa98&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0xad5353af…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xad5353afe30c2da57709e2704ef3ccdcf67eef24&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "activity[0xad5353af…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xad5353afe30c2da57709e2704ef3ccdcf67eef24&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.37
+    },
+    {
+      "name": "activity[0xad5353af…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xad5353afe30c2da57709e2704ef3ccdcf67eef24&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.25
+    },
+    {
+      "name": "positions[0xad5353af…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xad5353afe30c2da57709e2704ef3ccdcf67eef24&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.09
+    },
+    {
+      "name": "value[0xad5353af…]",
+      "url": "https://data-api.polymarket.com/value?user=0xad5353afe30c2da57709e2704ef3ccdcf67eef24",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.89
+    },
+    {
+      "name": "pnl[0xad5353af…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xad5353afe30c2da57709e2704ef3ccdcf67eef24&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "pnl[0xad5353af…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xad5353afe30c2da57709e2704ef3ccdcf67eef24&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x3eb31daa…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x3eb31daa061a19855cbf0a4884c202fb86976a2a&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.4
+    },
+    {
+      "name": "activity[0x3eb31daa…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x3eb31daa061a19855cbf0a4884c202fb86976a2a&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.44
+    },
+    {
+      "name": "activity[0x3eb31daa…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x3eb31daa061a19855cbf0a4884c202fb86976a2a&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.52
+    },
+    {
+      "name": "positions[0x3eb31daa…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x3eb31daa061a19855cbf0a4884c202fb86976a2a&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.22
+    },
+    {
+      "name": "value[0x3eb31daa…]",
+      "url": "https://data-api.polymarket.com/value?user=0x3eb31daa061a19855cbf0a4884c202fb86976a2a",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.23
+    },
+    {
+      "name": "pnl[0x3eb31daa…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x3eb31daa061a19855cbf0a4884c202fb86976a2a&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x3eb31daa…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x3eb31daa061a19855cbf0a4884c202fb86976a2a&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x65757591…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x6575759174ad221bba9947bc3f18750ec769b198&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.48
+    },
+    {
+      "name": "activity[0x65757591…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x6575759174ad221bba9947bc3f18750ec769b198&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.36
+    },
+    {
+      "name": "activity[0x65757591…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x6575759174ad221bba9947bc3f18750ec769b198&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.33
+    },
+    {
+      "name": "positions[0x65757591…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x6575759174ad221bba9947bc3f18750ec769b198&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.41
+    },
+    {
+      "name": "value[0x65757591…]",
+      "url": "https://data-api.polymarket.com/value?user=0x6575759174ad221bba9947bc3f18750ec769b198",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "pnl[0x65757591…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x6575759174ad221bba9947bc3f18750ec769b198&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "pnl[0x65757591…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x6575759174ad221bba9947bc3f18750ec769b198&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x72487021…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x72487021e3339827c476592585c15ae7f0fa7e72&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.49
+    },
+    {
+      "name": "activity[0x72487021…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x72487021e3339827c476592585c15ae7f0fa7e72&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.51
+    },
+    {
+      "name": "activity[0x72487021…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x72487021e3339827c476592585c15ae7f0fa7e72&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.39
+    },
+    {
+      "name": "positions[0x72487021…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x72487021e3339827c476592585c15ae7f0fa7e72&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.33
+    },
+    {
+      "name": "value[0x72487021…]",
+      "url": "https://data-api.polymarket.com/value?user=0x72487021e3339827c476592585c15ae7f0fa7e72",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "pnl[0x72487021…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x72487021e3339827c476592585c15ae7f0fa7e72&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x72487021…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x72487021e3339827c476592585c15ae7f0fa7e72&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "activity[0x27f738fe…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x27f738fe203827445690339104aae35b20bc44b0&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.44
+    },
+    {
+      "name": "activity[0x27f738fe…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x27f738fe203827445690339104aae35b20bc44b0&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.3
+    },
+    {
+      "name": "activity[0x27f738fe…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x27f738fe203827445690339104aae35b20bc44b0&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.35
+    },
+    {
+      "name": "positions[0x27f738fe…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x27f738fe203827445690339104aae35b20bc44b0&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "value[0x27f738fe…]",
+      "url": "https://data-api.polymarket.com/value?user=0x27f738fe203827445690339104aae35b20bc44b0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "pnl[0x27f738fe…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x27f738fe203827445690339104aae35b20bc44b0&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.13
+    },
+    {
+      "name": "pnl[0x27f738fe…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x27f738fe203827445690339104aae35b20bc44b0&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0xe18ecc34…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xe18ecc345e00ee7c4f2d1f676f3dd2acb112f826&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.41
+    },
+    {
+      "name": "activity[0xe18ecc34…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xe18ecc345e00ee7c4f2d1f676f3dd2acb112f826&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "activity[0xe18ecc34…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xe18ecc345e00ee7c4f2d1f676f3dd2acb112f826&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "positions[0xe18ecc34…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xe18ecc345e00ee7c4f2d1f676f3dd2acb112f826&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "value[0xe18ecc34…]",
+      "url": "https://data-api.polymarket.com/value?user=0xe18ecc345e00ee7c4f2d1f676f3dd2acb112f826",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "pnl[0xe18ecc34…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xe18ecc345e00ee7c4f2d1f676f3dd2acb112f826&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0xe18ecc34…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xe18ecc345e00ee7c4f2d1f676f3dd2acb112f826&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x9d0dcd0c…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x9d0dcd0c8aa0526303fd9e17fff4666ef52d2e6d&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.07
+    },
+    {
+      "name": "activity[0x9d0dcd0c…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x9d0dcd0c8aa0526303fd9e17fff4666ef52d2e6d&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.08
+    },
+    {
+      "name": "activity[0x9d0dcd0c…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x9d0dcd0c8aa0526303fd9e17fff4666ef52d2e6d&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.37
+    },
+    {
+      "name": "positions[0x9d0dcd0c…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x9d0dcd0c8aa0526303fd9e17fff4666ef52d2e6d&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.39
+    },
+    {
+      "name": "value[0x9d0dcd0c…]",
+      "url": "https://data-api.polymarket.com/value?user=0x9d0dcd0c8aa0526303fd9e17fff4666ef52d2e6d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.31
+    },
+    {
+      "name": "pnl[0x9d0dcd0c…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x9d0dcd0c8aa0526303fd9e17fff4666ef52d2e6d&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "pnl[0x9d0dcd0c…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x9d0dcd0c8aa0526303fd9e17fff4666ef52d2e6d&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0xdaef2be2…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xdaef2be2a19ad331737d06545f85615b094554e9&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.44
+    },
+    {
+      "name": "activity[0xdaef2be2…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xdaef2be2a19ad331737d06545f85615b094554e9&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.27
+    },
+    {
+      "name": "activity[0xdaef2be2…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xdaef2be2a19ad331737d06545f85615b094554e9&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "positions[0xdaef2be2…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xdaef2be2a19ad331737d06545f85615b094554e9&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.27
+    },
+    {
+      "name": "value[0xdaef2be2…]",
+      "url": "https://data-api.polymarket.com/value?user=0xdaef2be2a19ad331737d06545f85615b094554e9",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "pnl[0xdaef2be2…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xdaef2be2a19ad331737d06545f85615b094554e9&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0xdaef2be2…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xdaef2be2a19ad331737d06545f85615b094554e9&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x56687bf4…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x56687bf447db6ffa42ffe2204a05edaa20f55839&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "activity[0x56687bf4…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x56687bf447db6ffa42ffe2204a05edaa20f55839&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "activity[0x56687bf4…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x56687bf447db6ffa42ffe2204a05edaa20f55839&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.72
+    },
+    {
+      "name": "positions[0x56687bf4…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x56687bf447db6ffa42ffe2204a05edaa20f55839&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "value[0x56687bf4…]",
+      "url": "https://data-api.polymarket.com/value?user=0x56687bf447db6ffa42ffe2204a05edaa20f55839",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "pnl[0x56687bf4…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x56687bf447db6ffa42ffe2204a05edaa20f55839&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "pnl[0x56687bf4…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x56687bf447db6ffa42ffe2204a05edaa20f55839&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "activity[0x204f72f3…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x204f72f35326db932158cba6adff0b9a1da95e14&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "activity[0x204f72f3…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x204f72f35326db932158cba6adff0b9a1da95e14&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "activity[0x204f72f3…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x204f72f35326db932158cba6adff0b9a1da95e14&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "positions[0x204f72f3…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x204f72f35326db932158cba6adff0b9a1da95e14&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.08
+    },
+    {
+      "name": "value[0x204f72f3…]",
+      "url": "https://data-api.polymarket.com/value?user=0x204f72f35326db932158cba6adff0b9a1da95e14",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "pnl[0x204f72f3…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x204f72f35326db932158cba6adff0b9a1da95e14&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x204f72f3…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x204f72f35326db932158cba6adff0b9a1da95e14&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x1f2dd6d4…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1f2dd6d473f3e824cd2f8a89d9c69fb96f6ad0cf&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "activity[0x1f2dd6d4…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1f2dd6d473f3e824cd2f8a89d9c69fb96f6ad0cf&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "activity[0x1f2dd6d4…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x1f2dd6d473f3e824cd2f8a89d9c69fb96f6ad0cf&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "positions[0x1f2dd6d4…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x1f2dd6d473f3e824cd2f8a89d9c69fb96f6ad0cf&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "value[0x1f2dd6d4…]",
+      "url": "https://data-api.polymarket.com/value?user=0x1f2dd6d473f3e824cd2f8a89d9c69fb96f6ad0cf",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "pnl[0x1f2dd6d4…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x1f2dd6d473f3e824cd2f8a89d9c69fb96f6ad0cf&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.16
+    },
+    {
+      "name": "pnl[0x1f2dd6d4…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x1f2dd6d473f3e824cd2f8a89d9c69fb96f6ad0cf&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    },
+    {
+      "name": "activity[0x6a72f618…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.05
+    },
+    {
+      "name": "activity[0x6a72f618…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "activity[0x6a72f618…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "positions[0x6a72f618…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.42
+    },
+    {
+      "name": "value[0x6a72f618…]",
+      "url": "https://data-api.polymarket.com/value?user=0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.36
+    },
+    {
+      "name": "pnl[0x6a72f618…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.17
+    },
+    {
+      "name": "pnl[0x6a72f618…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x96cfcb0c…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x96cfcb0c30942cfcd1cdf76c7d408794d66b1acb&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "activity[0x96cfcb0c…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x96cfcb0c30942cfcd1cdf76c7d408794d66b1acb&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "positions[0x96cfcb0c…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x96cfcb0c30942cfcd1cdf76c7d408794d66b1acb&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "value[0x96cfcb0c…]",
+      "url": "https://data-api.polymarket.com/value?user=0x96cfcb0c30942cfcd1cdf76c7d408794d66b1acb",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.36
+    },
+    {
+      "name": "pnl[0x96cfcb0c…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x96cfcb0c30942cfcd1cdf76c7d408794d66b1acb&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x96cfcb0c…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x96cfcb0c30942cfcd1cdf76c7d408794d66b1acb&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0xed64a7bf…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xed64a7bf029040aa331abc87902434d815ef217d&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "activity[0xed64a7bf…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xed64a7bf029040aa331abc87902434d815ef217d&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.17
+    },
+    {
+      "name": "activity[0xed64a7bf…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xed64a7bf029040aa331abc87902434d815ef217d&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.58
+    },
+    {
+      "name": "positions[0xed64a7bf…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xed64a7bf029040aa331abc87902434d815ef217d&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "value[0xed64a7bf…]",
+      "url": "https://data-api.polymarket.com/value?user=0xed64a7bf029040aa331abc87902434d815ef217d",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "pnl[0xed64a7bf…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xed64a7bf029040aa331abc87902434d815ef217d&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.13
+    },
+    {
+      "name": "pnl[0xed64a7bf…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xed64a7bf029040aa331abc87902434d815ef217d&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0xbc11a64a…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0xbc11a64ab34a03a043fbe80598fa065ee87eeec6&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "activity[0xbc11a64a…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0xbc11a64ab34a03a043fbe80598fa065ee87eeec6&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "activity[0xbc11a64a…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0xbc11a64ab34a03a043fbe80598fa065ee87eeec6&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "positions[0xbc11a64a…]",
+      "url": "https://data-api.polymarket.com/positions?user=0xbc11a64ab34a03a043fbe80598fa065ee87eeec6&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.28
+    },
+    {
+      "name": "value[0xbc11a64a…]",
+      "url": "https://data-api.polymarket.com/value?user=0xbc11a64ab34a03a043fbe80598fa065ee87eeec6",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "pnl[0xbc11a64a…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xbc11a64ab34a03a043fbe80598fa065ee87eeec6&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0xbc11a64a…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0xbc11a64ab34a03a043fbe80598fa065ee87eeec6&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "activity[0x78b9ac44…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x78b9ac44a6d7d7a076c14e0ad518b301b63c6b76&limit=500&offset=0",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.51
+    },
+    {
+      "name": "activity[0x78b9ac44…@500]",
+      "url": "https://data-api.polymarket.com/activity?user=0x78b9ac44a6d7d7a076c14e0ad518b301b63c6b76&limit=500&offset=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.33
+    },
+    {
+      "name": "activity[0x78b9ac44…@1000]",
+      "url": "https://data-api.polymarket.com/activity?user=0x78b9ac44a6d7d7a076c14e0ad518b301b63c6b76&limit=500&offset=1000",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.26
+    },
+    {
+      "name": "positions[0x78b9ac44…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x78b9ac44a6d7d7a076c14e0ad518b301b63c6b76&limit=500",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.27
+    },
+    {
+      "name": "value[0x78b9ac44…]",
+      "url": "https://data-api.polymarket.com/value?user=0x78b9ac44a6d7d7a076c14e0ad518b301b63c6b76",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.25
+    },
+    {
+      "name": "pnl[0x78b9ac44…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x78b9ac44a6d7d7a076c14e0ad518b301b63c6b76&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x78b9ac44…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x78b9ac44a6d7d7a076c14e0ad518b301b63c6b76&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.15
+    }
+  ],
+  "notes": []
+}

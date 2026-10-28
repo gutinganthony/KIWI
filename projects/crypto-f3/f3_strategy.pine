@@ -1,0 +1,87 @@
+//@version=5
+// KIWI F3 / F3 2.0 — 加密貨幣均值回歸組合（每張圖載入一條腿）
+// 規則全文：topics/business/2026-10-27-crypto-f3-mean-reversion-rulebook.md
+//
+// 用法（圖表代號用 OKX:xxxUSDT 或 BINANCE:xxxUSDT）：
+//   做多腿（F3 與 F3 2.0 都有）
+//     BNB 1d 多 → BNBUSDT 日線　　TRX 4h 多 → TRXUSDT 4 小時　　BCH 4h 多 → BCHUSDT 4 小時
+//   做空籃子（只有 F3 2.0）：同一條規則，分別開在下面 8 個幣的「日線」圖上
+//     ETH、SOL、XRP、DOGE、ADA、LINK、AVAX、DOT（例：OKX:ETHUSDT 日線，腿選「做空籃子 1d 空」）
+// 注意：已通過 TextToQuant 的 Pine 編譯檢查，但還沒在 TradingView 上實際跑過。
+//       第一次用請先對照 f3_backtest.py --trades 的明細，抽查幾筆進出場是否一致。
+//       做空腿的資金費率 TradingView 不會算，實際會比圖上的結果略差或略好。
+strategy("KIWI F3 均值回歸（單腿）", overlay = true, initial_capital = 10000,
+     default_qty_type = strategy.percent_of_equity, default_qty_value = 100,
+     commission_type = strategy.commission.percent, commission_value = 0.07,
+     process_orders_on_close = true, pyramiding = 0)
+
+leg       = input.string("TRX 4h 多", "腿", options = ["BNB 1d 多", "TRX 4h 多", "BCH 4h 多", "做空籃子 1d 空"])
+startDate = input.time(timestamp("27 Oct 2022 00:00 +0000"), "回測起點")
+
+isShort = str.contains(leg, "空")
+// 每條腿的參數：停利 %、停損 %、最長持有根數
+tpPct   = switch leg
+    "BNB 1d 多"  => 15.0
+    "TRX 4h 多"  => 3.0
+    => 7.0
+slPct   = switch leg
+    "BNB 1d 多"  => 10.0
+    "TRX 4h 多"  => 7.0
+    "BCH 4h 多"  => 7.0
+    => 10.0
+maxBars = switch leg
+    "BNB 1d 多"  => 7
+    "TRX 4h 多"  => 90
+    "BCH 4h 多"  => 18
+    => 30
+
+// ── 日線 EMA(200) 濾網 ──
+// 日線圖看當天收盤；4 小時圖看前一個「已收盤」日線（[1] 搭配 lookahead_on 是不重繪的寫法）
+// 做多腿：收盤 > EMA200 才開新倉；做空腿：收盤 < EMA200 才開新倉
+dAbovePrev = request.security(syminfo.tickerid, "D", close[1] > ta.ema(close, 200)[1], lookahead = barmerge.lookahead_on)
+ema200     = ta.ema(close, 200)
+above      = timeframe.isdaily ? close > ema200 : dAbovePrev
+gate       = isShort ? not above : above
+
+// ── 進場訊號（只看收盤）──
+ema20 = ta.ema(close, 20)
+r2    = ta.rsi(close, 2)
+r14   = ta.rsi(close, 14)
+sig0  = switch leg
+    "BNB 1d 多"  => close < ema20 and close[1] >= ema20[1]   // 收盤由上往下跌破 EMA20
+    "TRX 4h 多"  => r2 > 10 and r2[1] <= 10                   // RSI(2) 向上穿越 10
+    "BCH 4h 多"  => r14 > 35 and r14[1] <= 35                 // RSI(14) 向上穿越 35
+    => r2 < 90 and r2[1] >= 90                                // 做空籃子：RSI(2) 向下跌破 90
+sig = sig0 and gate and time >= startDate
+
+// ── 部位管理 ──
+var int   eBar = na   // 進場那根 K 線
+var float ePx  = na   // 進場價（訊號 K 線收盤）
+inPos  = strategy.position_size != 0
+timeUp = inPos and not na(eBar) and bar_index - eBar >= maxBars
+
+// 時間到：第 maxBars 根收盤出場。若同一根又有訊號，等同「平倉後立刻重新進場」，
+// 這裡直接沿用部位、把進場價與計時重設（TradingView 會把它算成同一筆交易）。
+if timeUp and not sig
+    strategy.close_all(comment = "時間到")
+if sig and (not inPos or timeUp)
+    if not inPos
+        strategy.entry("P", isShort ? strategy.short : strategy.long, comment = isShort ? "做空" : "做多")
+    eBar := bar_index
+    ePx  := close
+    tpPx = isShort ? close * (1 - tpPct / 100) : close * (1 + tpPct / 100)
+    slPx = isShort ? close * (1 + slPct / 100) : close * (1 - slPct / 100)
+    alert("KIWI F3 " + leg + (isShort ? " 做空" : " 做多") + "訊號：收盤 " + str.tostring(close) + "，停利 " + str.tostring(tpPx) + "，停損 " + str.tostring(slPx), alert.freq_once_per_bar_close)
+
+// 停利（限價）＋停損（停損單），以進場價為準
+tpLvl = isShort ? ePx * (1 - tpPct / 100) : ePx * (1 + tpPct / 100)
+slLvl = isShort ? ePx * (1 + slPct / 100) : ePx * (1 - slPct / 100)
+if not na(ePx) and (inPos or sig)
+    strategy.exit("TPSL", "P", limit = tpLvl, stop = slLvl, comment_profit = "停利", comment_loss = "停損")
+
+// ── 圖上顯示 ──
+plot(leg == "BNB 1d 多" ? ema20 : na, "EMA20", color = color.new(color.yellow, 0))
+plot(timeframe.isdaily ? ema200 : na, "EMA200", color = color.new(color.orange, 0))
+bgcolor(gate ? na : color.new(color.gray, 85), title = "濾網不成立（不開新倉）")
+plot(inPos ? tpLvl : na, "停利", color = color.new(color.teal, 0), style = plot.style_linebr)
+plot(inPos ? slLvl : na, "停損", color = color.new(color.red, 0), style = plot.style_linebr)

@@ -1,0 +1,155 @@
+name: F3 2.0 交易機器人（紙上交易／OKX 模擬盤）
+
+# 每小時 05 分跑一輪 projects/crypto-f3/f3_cycle.sh（機器人＋監控資料＋存狀態＋推播）。同一根 K 線只處理一次，多跑不會重複下單。
+# 一次執行待約 5 小時、每小時跑一輪，結束前自己觸發下一次執行；排程只是斷掉時的備援。
+# 規則與說明：topics/business/2026-10-27-crypto-f3-mean-reversion-rulebook.md §11、§12
+#
+# 模式由 repo 變數 F3_BOT_MODE 決定（Settings → Secrets and variables → Actions → Variables）：
+#   沒設或 paper ＝ 紙上交易（預設，不需要金鑰）
+#   okx-demo     ＝ 下單到 OKX 模擬盤，需要 Secrets：OKX_API_KEY、OKX_API_SECRET、OKX_API_PASSPHRASE
+# 持倉狀態與交易明細 commit 到專用分支 f3-bot-state（不碰 main）。
+# 狀態不用 Actions cache：交易機器人遺失持倉紀錄會重複下單或漏掉時間出場。
+on:
+  schedule:
+    # 備援：循環斷掉時重新接上（只在 default branch 生效）。循環還在跑時，這裡觸發的執行會排隊，之後被接手的執行取代
+    - cron: '35 */2 * * *'
+  workflow_dispatch:
+    inputs:
+      check_only:
+        description: '只檢查 OKX 模擬盤金鑰與帳戶（不下單、不改狀態）'
+        type: boolean
+        default: false
+      smoke_test:
+        description: 'OKX 模擬盤下單測試：約 50 USDT 開一筆多單＋一筆空單、掛停利停損、再撤單平倉（不改策略狀態）'
+        type: boolean
+        default: false
+      resume:
+        description: '解除風控（停用／暫停的幣或紅燈）：填幣名（例如 BCH、做空籃子）或 all；其他兩個不要勾'
+        type: string
+        default: ''
+  push:
+    # 開發分支的測試執行：只跑紙上模式、不寫回狀態分支
+    branches: [claude/elegant-hawking-mgt9ga]
+    paths:
+      - '.github/workflows/f3-bot.yml'
+      - 'projects/crypto-f3/**'
+
+# 同一時間只能有一個機器人在跑，避免兩個 run 同時改狀態而重複下單
+concurrency:
+  # 只檢查／下單測試不碰狀態，另開一組，不用排在 5 小時的循環後面
+  group: ${{ (github.event.inputs.check_only == 'true' || github.event.inputs.smoke_test == 'true' || github.event.inputs.resume != '') && 'f3-bot-manual' || 'f3-bot' }}
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    permissions:
+      contents: write   # 只用來 push f3-bot-state 分支
+      actions: write    # 循環結束時觸發下一次執行
+    defaults:
+      run:
+        shell: bash   # 等於 bash -eo pipefail：機器人出錯時 `| tee` 不會把失敗吃掉，失敗通知才會發
+    env:
+      MODE: ${{ github.event_name == 'push' && 'paper' || vars.F3_BOT_MODE || 'paper' }}
+      PERSIST: ${{ github.event_name != 'push' && github.event.inputs.check_only != 'true' && github.event.inputs.smoke_test != 'true' && github.event.inputs.resume == '' }}
+      KIWI_F3_HOME: ${{ github.workspace }}/state
+      # 第一次建立狀態時的總資金（USDT）。之後以狀態檔為準；要改金額需先清掉 f3-bot-state 分支上該模式的資料夾
+      CAPITAL: ${{ vars.F3_BOT_CAPITAL || '83000' }}
+      OKX_API_KEY: ${{ secrets.OKX_API_KEY }}
+      OKX_API_SECRET: ${{ secrets.OKX_API_SECRET }}
+      OKX_API_PASSPHRASE: ${{ secrets.OKX_API_PASSPHRASE }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: pip install --quiet numpy pandas
+
+      - name: Load state branch
+        run: |
+          git config user.name "kiwi-f3-bot"
+          git config user.email "kiwi-f3-bot@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin f3-bot-state >/dev/null; then
+            git fetch --quiet origin f3-bot-state:f3-bot-state
+            git worktree add state f3-bot-state
+          else
+            git worktree add --orphan -b f3-bot-state state
+          fi
+          ls -R state | head -20
+
+      - name: Check OKX demo account
+        if: github.event.inputs.check_only == 'true'
+        run: python3 projects/crypto-f3/f3_okx_bot.py --mode okx-demo --v2 --check | tee "$RUNNER_TEMP/out.txt"
+
+      - name: OKX demo order test
+        if: github.event.inputs.smoke_test == 'true'
+        run: python3 projects/crypto-f3/f3_okx_bot.py --mode okx-demo --v2 --smoke | tee "$RUNNER_TEMP/out.txt"
+
+      # GitHub 的排程在這個 repo 常常幾小時才跑一次（2026-10-28 實測：改每小時排程後 16 小時只跑了 1 次），
+      # 所以一次執行就待著每小時跑一輪，約 5 小時後自己觸發下一次執行接手；排程只當「斷掉時重新接上」的備援。
+      # 解除風控：只改狀態檔並推回 f3-bot-state；正在跑的循環下一輪開始時會先拉這個變更
+      - name: Release risk controls
+        if: github.event.inputs.resume != ''
+        env:
+          RESUME: ${{ github.event.inputs.resume }}
+        # 每次重試都從最新狀態重做，不和循環的存檔合併，避免蓋掉持倉資料
+        run: |
+          for i in 1 2 3 4; do
+            git -C state fetch --quiet origin f3-bot-state && git -C state reset --quiet --hard FETCH_HEAD
+            python3 projects/crypto-f3/f3_okx_bot.py --mode "$MODE" --v2 --resume "$RESUME" | tee "$RUNNER_TEMP/out.txt"
+            git -C state add -A
+            git -C state diff --cached --quiet && exit 0
+            git -C state commit --quiet -m "f3-bot: 解除風控 $RESUME"
+            git -C state push --quiet origin f3-bot-state && exit 0
+            sleep $((i * 5))
+          done
+          exit 1
+
+      - name: Run bot (hourly loop)
+        id: bot
+        if: github.event.inputs.check_only != 'true' && github.event.inputs.smoke_test != 'true' && github.event.inputs.resume == ''
+        env:
+          EVENT: ${{ github.event_name }}
+          LOOP_SECONDS: ${{ github.event_name == 'push' && '0' || '18000' }}
+        run: |
+          end=$(( $(date +%s) + LOOP_SECONDS ))
+          fails=0
+          while :; do
+            bash projects/crypto-f3/f3_cycle.sh || fails=$((fails + 1))
+            now=$(date +%s)
+            next=$(( (now / 3600 + 1) * 3600 + 300 ))   # 下一個整點 05 分
+            [ "$next" -gt "$end" ] && break
+            echo "── 下一輪：$(date -u -d @$next +%H:%MZ) ──"
+            sleep $(( next - now ))
+          done
+          echo "這次執行共 $fails 輪失敗"
+
+      - name: Hand over to the next run
+        if: always() && env.PERSIST == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run f3-bot.yml --repo "$GITHUB_REPOSITORY" --ref "$GITHUB_REF_NAME"
+
+      - name: Notify Telegram
+        if: github.event.inputs.check_only == 'true' || github.event.inputs.smoke_test == 'true' || github.event.inputs.resume != ''
+        run: |
+          if [ "${{ github.event.inputs.check_only }}" = "true" ]; then TITLE="🔎 F3 2.0 OKX 模擬盤帳戶檢查"
+          elif [ "${{ github.event.inputs.smoke_test }}" = "true" ]; then TITLE="🧪 F3 2.0 OKX 模擬盤下單測試（不影響策略）"
+          else TITLE="🔓 F3 2.0 解除風控"; fi
+          python3 projects/avi-v5/scripts/notify_ops.py --title "$TITLE" --url "$RUN_URL" < "$RUNNER_TEMP/out.txt" || true
+
+      # 機器人靜默失效是最壞的情況（以為在跑，其實沒在跑），所以失敗要出聲
+      - name: Notify on failure
+        if: failure()
+        run: |
+          python3 projects/avi-v5/scripts/notify_ops.py \
+            --title "❌ F3 2.0 機器人執行失敗（$MODE）" \
+            --body "這一輪沒有跑完，可能漏掉進出場。請看 log。" \
+            --url "$RUN_URL" || true

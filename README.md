@@ -18,8 +18,8 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 |-------|---------|
 | [Technology](./topics/technology/INDEX.md) | 5 |
 | [Science](./topics/science/INDEX.md) | 0 |
-| [Business](./topics/business/INDEX.md) | 96 |
-| [Business](./topics/business/INDEX.md) | 96 |
+| [Business](./topics/business/INDEX.md) | 97 |
+| [Business](./topics/business/INDEX.md) | 97 |
 | [Health](./topics/health/INDEX.md) | 1 |
 | [Society & Culture](./topics/society-culture/INDEX.md) | 0 |
 | [Other](./topics/other/INDEX.md) | 4 |
@@ -33,6 +33,8 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-10-28 | [加密貨幣趨勢跟隨研究：年化 20% 以上、回撤盡量低（BTC＋ETH 集成趨勢、和 F3 2.0 合併）](./topics/business/2026-10-28-crypto-trend-following-research.md) | Business |
+| 2026-10-27 | [KIWI F3／F3 2.0 — 加密貨幣均值回歸組合：交易規則手冊（含熊市做空、TradingView／OKX 教學）](./topics/business/2026-10-27-crypto-f3-mean-reversion-rulebook.md) | Business |
 | 2026-10-08 | [科斯托蘭尼的「失衡」與 1987 年股災：前因後果、今天的對照，以及現在最像哪一段](./topics/business/2026-10-08-kostolany-1987-crash-analog.md) | Business |
 | 2026-08-28 | [T1 條件⑤ 檢核 — NVDA Q2 FY27：供應商融資擴散觸發](./topics/business/2026-08-28-t1-condition5-nvda-q2-fy27-trigger.md) | Business |
 | 2026-08-25 | [「中國曝險」紅旗的第一性原理重寫](./topics/business/2026-08-25-china-red-flag-first-principles-rewrite.md) | Business |
@@ -165,6 +167,8 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-10-20 | [Serenity 完整 Step 1–9：IonQ（IONQ）與 Quantinuum（QNT）](./topics/business/2026-10-20-serenity-step1-9-ionq-qnt.md) | Business |
 | 2026-10-20 | [Serenity 完整 Step 1–9：Rigetti 與 D-Wave＋窄線寬雷射白話解說＋上游供應商上市計畫](./topics/business/2026-10-20-serenity-step1-9-rgti-qbts-and-narrow-linewidth-lasers.md) | Business |
 | 2026-10-22 | [SemiAnalysis〈Datacenters 2027 +50GW〉重點摘錄與說法驗證](./topics/business/2026-10-22-semianalysis-datacenters-2027-50gw-verification.md) | Business |
+| 2026-10-27 | [KIWI F3／F3 2.0 — 加密貨幣均值回歸組合：交易規則手冊（含熊市做空、TradingView／OKX 教學）](./topics/business/2026-10-27-crypto-f3-mean-reversion-rulebook.md) | Business |
+| 2026-10-28 | [加密貨幣趨勢跟隨研究：年化 20% 以上、回撤盡量低（BTC＋ETH 集成趨勢、和 F3 2.0 合併）](./topics/business/2026-10-28-crypto-trend-following-research.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
