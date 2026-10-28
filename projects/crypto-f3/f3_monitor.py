@@ -31,16 +31,15 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import f3_backtest as bt  # noqa: E402
-from f3_okx_bot import build_legs, wilson_upper  # noqa: E402
+from f3_okx_bot import (DD_LIMIT, RED_DD, STREAK_LIMIT, YELLOW_DD, build_legs, group_of,  # noqa: E402
+                        wilson_upper)
 
 OKX = "https://www.okx.com"
 # 監控和候選的範圍：研究時用的 25 個幣（規則手冊 §13）
 UNIVERSE = ["BTC", "ETH", "SOL", "XRP", "DOGE", "LINK", "AVAX", "ADA", "LTC", "DOT", "TRX", "BCH", "NEAR", "ATOM",
             "UNI", "AAVE", "BNB", "XLM", "ETC", "HBAR", "FIL", "ICP", "OP", "INJ", "APT"]
 ACTIVE = {"BNB", "TRX", "BCH"}
-# §15.1 門檻：回測最長連虧 + 2、回測最大回撤 × 1.5（做空籃子以 8 幣合計）
-STREAK_LIMIT = {"BNB 日線 多": 6, "TRX 4小時 多": 6, "BCH 4小時 多": 4, "做空籃子": 15}
-DD_LIMIT = {"BNB 日線 多": -26.0, "TRX 4小時 多": -38.0, "BCH 4小時 多": -21.0, "做空籃子": -31.0}
+# §15.1 門檻（連虧、單幣回撤、組合黃燈／紅燈）和機器人共用同一份定義，從 f3_okx_bot 匯入
 # §16 市場變量門檻（2022-10 → 2026-10 交易依進場時的變量分三等份；兩半樣本方向一致才列為警示）
 BREADTH_HOT, BREADTH_COLD = 48.0, 16.7
 BTC_RET30_HOT = 7.7
@@ -102,13 +101,14 @@ def leg_rows(legs, state, tk):
             short = pos["side"] == "short"
             move = last / pos["entry_px"] - 1
             unreal = -move if short else move
-            mark = eq * (1 + unreal)
+            mark = eq * (1 + pos.get("frac", 1.0) * unreal)
             step = pd.Timedelta(hours=4) if g["tf"] == "4h" else pd.Timedelta(days=1)
             held = int((pd.Timestamp.now("UTC").tz_localize(None) - pd.Timestamp(pos["entry_bar"])) / step)
             row.update(status="持倉中", entry=clean(pos["entry_px"], 6), tp=clean(pos["tp"], 6), sl=clean(pos["sl"], 6),
                        unreal_pct=clean(unreal * 100, 2), bars_held=held,
                        to_tp_pct=clean(abs(pos["tp"] / last - 1) * 100, 2), to_sl_pct=clean(abs(pos["sl"] / last - 1) * 100, 2))
         row["mark"] = clean(mark, 2)
+        row["flag"] = ("停用：" + st["disabled"]) if st.get("disabled") else ("暫停：" + st["paused"]) if st.get("paused") else ""
         total += mark
         rows.append(row)
     return rows, total
@@ -162,7 +162,7 @@ def trade_rows(led):
     return out[::-1] or [dict(id=-1, time="", leg="", action="尚無交易", price=None, reason="", ret_pct=None, slip_pct=None, note="")]
 
 
-def health_rows(legs, led):
+def health_rows(legs, led, state):
     groups = {}
     for g in legs:
         key = "做空籃子" if g["side"] == "short" else g["name"]
@@ -180,7 +180,12 @@ def health_rows(legs, led):
         dd = float((eq / np.maximum.accumulate(eq) - 1).min() * 100) if rets else 0.0
         slips = [s for s in (slip_of(r) for r in enters if r["leg"] in info["names"]) if s is not None]
         upper = wilson_upper(wins, n) if n else None
-        if n and upper < info["bt_wr"] and n >= 10:
+        flags = [state["legs"][g["name"]] for g in legs if group_of(g) == key]
+        if any(f.get("disabled") for f in flags):
+            status = "已停用"
+        elif any(f.get("paused") for f in flags):
+            status = "已暫停"
+        elif n and upper < info["bt_wr"] and n >= 10:
             status = "建議停用"
         elif streak > STREAK_LIMIT[key] or dd < DD_LIMIT[key]:
             status = "暫停複查"
@@ -382,19 +387,24 @@ def main():
 
     legs_r, total = leg_rows(legs, state, tk)
     eq = equity_history(home, state, legs_r, total)
-    health = health_rows(legs, led)
+    health = health_rows(legs, led, state)
     due, meta, meta_p = candidates_due(out, a.candidates)
     dfs = {c: daily(c, 1600 if due else 620) for c in UNIVERSE}   # 候選幣要 4 年；市場變量 620 天夠算 365 日波動和 EMA200
     mkt, mhist, shorts = market(dfs, tk)
     cands = candidates(dfs, tk, meta, meta_p) if due else None
 
     alerts = [f"{m['name']} {m['value']}{m['unit']}：{m['rule']}" for m in mkt if m["status"] == "警示"]
-    alerts += [f"{h['group']}：{h['status']}" for h in health if h["status"] in ("建議停用", "暫停複查")]
+    alerts += [f"{h['group']}：{h['status']}" for h in health if h["status"] in ("建議停用", "暫停複查", "已停用", "已暫停")]
+    rk = state.get("risk", {})
+    mode = {"yellow": "黃燈（新進場半倉）", "red": "紅燈（已清倉、停止新進場）"}.get(rk.get("mode"))
+    if mode:
+        alerts.insert(0, f"組合風控{mode}")
     alerts += [f"{h['group']} 平均滑價 {h['slip_pct']}% 超過 {SLIP_LIMIT}%" for h in health if h["slip_pct"] and h["slip_pct"] > SLIP_LIMIT]
     cap = state["capital"]
     summary = [dict(updated=now_utc().isoformat(timespec="minutes"), mode=a.mode, capital=cap, equity=clean(total, 2),
                     ret_pct=clean((total / cap - 1) * 100, 3), dd_pct=eq[-1]["dd_pct"] if eq else 0,
-                    max_dd_pct=clean(min(r["dd_pct"] for r in eq), 3) if eq else 0, dd_stop=-15.0,
+                    max_dd_pct=clean(min(r["dd_pct"] for r in eq), 3) if eq else 0, dd_stop=RED_DD, dd_yellow=YELLOW_DD,
+                    risk_mode={"yellow": "黃燈", "red": "紅燈"}.get(rk.get("mode"), "正常"),
                     open_positions=sum(r["status"] == "持倉中" for r in legs_r),
                     closed_trades=sum(1 for r in led if r["action"] == "EXIT"),
                     errors=sum(1 for r in led if r["action"] == "ERROR"),
