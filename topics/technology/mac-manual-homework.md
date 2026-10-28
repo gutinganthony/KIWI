@@ -23,6 +23,10 @@ last_updated: 2026-07-06
 
 ## 🔴 待辦（依急迫度）
 
+### 🆕 2026-10-28 新增（主對話 session 產生）
+
+- [ ] **investor.marvell.com、stocktitan.net 在雲端被擋（DNS 解析失敗）**；FinMind 美股當日額度用完（402）。Marvell 與 Credo 的財報數字因此只讀到搜尋摘要（`topics/business/2026-10-28-serenity-step1-9-avgo-mrvl-crdo-alab-and-scale-up-protocols.md`）。若要補：在 Mac 開 Marvell Q2 FY27 新聞稿核對稀釋股數、現金與負債；Credo Q1 FY27 核對現金下降原因。或在雲端環境的網路設定加入這兩個網域。
+
 ### 🆕 2026-10-27 新增（主對話 session 產生）
 
 - [ ] 🟡 **F3 機器人：按一次「OKX 模擬盤下單測試」**（2026-10-28）。GitHub → Actions →「F3 2.0 交易機器人」→ Run workflow → 勾「OKX 模擬盤下單測試」→ Run。用約 50 USDT 開一筆 BNB 現貨多單和一筆 ETH 永續空單（各取第一條空手的腿）、確認停利停損單有掛上，再撤單平倉；跑完到 OKX 模擬盤「訂單歷史」看得到這幾筆。雲端 session 沒有 `actions:write`，只能你按（見下方 2026-07-30 那條）。
