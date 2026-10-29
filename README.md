@@ -33,6 +33,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-10-29 | [MRVL 併購 Lumentum：算入整合效益後的情境與產業競爭影響](./topics/business/2026-10-29-mrvl-lumentum-synergy-scenarios-and-competitive-impact.md) | Business |
 | 2026-10-29 | [Serenity 完整 Step 1–9：COHR、Lumentum＋MRVL 併購 Lumentum 傳聞解析](./topics/business/2026-10-29-serenity-step1-9-cohr-lite-and-mrvl-lumentum-deal.md) | Business |
 | 2026-10-28 | [WaveTrend 分析 AVGO、MRVL、CRDO、ALAB＋Serenity「A／B」到底是什麼意思](./topics/business/2026-10-28-wavetrend-avgo-mrvl-crdo-alab-and-ab-explained.md) | Business |
 | 2026-10-28 | [Serenity 完整 Step 1–9：AVGO、MRVL、Credo、Astera Labs＋scale-up 協定白話解說](./topics/business/2026-10-28-serenity-step1-9-avgo-mrvl-crdo-alab-and-scale-up-protocols.md) | Business |
@@ -177,6 +178,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-10-28 | [Serenity 完整 Step 1–9：AVGO、MRVL、Credo、Astera Labs＋scale-up 協定白話解說](./topics/business/2026-10-28-serenity-step1-9-avgo-mrvl-crdo-alab-and-scale-up-protocols.md) | Business |
 | 2026-10-28 | [WaveTrend 分析 AVGO、MRVL、CRDO、ALAB＋Serenity「A／B」到底是什麼意思](./topics/business/2026-10-28-wavetrend-avgo-mrvl-crdo-alab-and-ab-explained.md) | Business |
 | 2026-10-29 | [Serenity 完整 Step 1–9：COHR、Lumentum＋MRVL 併購 Lumentum 傳聞解析](./topics/business/2026-10-29-serenity-step1-9-cohr-lite-and-mrvl-lumentum-deal.md) | Business |
+| 2026-10-29 | [MRVL 併購 Lumentum：算入整合效益後的情境與產業競爭影響](./topics/business/2026-10-29-mrvl-lumentum-synergy-scenarios-and-competitive-impact.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
