@@ -23,6 +23,10 @@ last_updated: 2026-07-06
 
 ## 🔴 待辦（依急迫度）
 
+### 🆕 2026-10-28 新增（主對話 session 產生）
+
+- [ ] 🟡 **TradingAgents 第一次實跑**：分支 `claude/zen-brahmagupta-0t885u` 合併進 main 後（workflow_dispatch 只認 main），GitHub → Actions →「TradingAgents (on-demand multi-agent analysis)」→ Run workflow → 代號填 `BE` → Run。雲端 session 沒有 `actions:write` 只能你按。跑完看 run 的 Summary 有沒有評級、`projects/tradingagents/reports/BE/` 有沒有報告；失敗把 log 丟給 Claude。可選：在 repo Secrets 加 `SEC_EDGAR_USER_AGENT`（`姓名 email`）。
+
 ### 🆕 2026-10-27 新增（主對話 session 產生）
 
 - [ ] 🟡 **F3 機器人：按一次「OKX 模擬盤下單測試」**（2026-10-28）。GitHub → Actions →「F3 2.0 交易機器人」→ Run workflow → 勾「OKX 模擬盤下單測試」→ Run。用約 50 USDT 開一筆 BNB 現貨多單和一筆 ETH 永續空單（各取第一條空手的腿）、確認停利停損單有掛上，再撤單平倉；跑完到 OKX 模擬盤「訂單歷史」看得到這幾筆。雲端 session 沒有 `actions:write`，只能你按（見下方 2026-07-30 那條）。
