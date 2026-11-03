@@ -1,0 +1,145 @@
+{
+  "date": "2026-11-03",
+  "snapshot_dir": "/home/runner/work/KIWI/KIWI/projects/poly-observer/data/snapshots/2026-11-03",
+  "universe_size": 2,
+  "wallets_ok": 0,
+  "wallets_partial": 0,
+  "wallets_failed": 2,
+  "requests_ok": 0,
+  "requests_failed": 16,
+  "elapsed_sec": 71.7,
+  "endpoint_health": [
+    {
+      "name": "leaderboard[MONTH]",
+      "url": "https://data-api.polymarket.com/v1/leaderboard?timePeriod=MONTH&orderBy=PNL&limit=50&category=OVERALL&offset=0",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"Data API v1 has been retired\",\"migration\":\"https://data-api.polymarket.com/v2/\",\"docs\":\"https://docs.polymarket.com/api-reference/data-api/overview\"}",
+      "elapsed_sec": 4.13
+    },
+    {
+      "name": "leaderboard[MONTH]",
+      "url": "https://lb-api.polymarket.com/leaderboard?window=MONTH&rankType=pnl&limit=50",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"lb-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/leaderboard instead.\"}",
+      "elapsed_sec": 4.13
+    },
+    {
+      "name": "leaderboard[WEEK]",
+      "url": "https://data-api.polymarket.com/v1/leaderboard?timePeriod=WEEK&orderBy=PNL&limit=50&category=OVERALL&offset=0",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"Data API v1 has been retired\",\"migration\":\"https://data-api.polymarket.com/v2/\",\"docs\":\"https://docs.polymarket.com/api-reference/data-api/overview\"}",
+      "elapsed_sec": 4.11
+    },
+    {
+      "name": "leaderboard[WEEK]",
+      "url": "https://lb-api.polymarket.com/leaderboard?window=WEEK&rankType=pnl&limit=50",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"lb-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/leaderboard instead.\"}",
+      "elapsed_sec": 4.12
+    },
+    {
+      "name": "leaderboard[ALL]",
+      "url": "https://data-api.polymarket.com/v1/leaderboard?timePeriod=ALL&orderBy=PNL&limit=50&category=OVERALL&offset=0",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"Data API v1 has been retired\",\"migration\":\"https://data-api.polymarket.com/v2/\",\"docs\":\"https://docs.polymarket.com/api-reference/data-api/overview\"}",
+      "elapsed_sec": 4.13
+    },
+    {
+      "name": "leaderboard[ALL]",
+      "url": "https://lb-api.polymarket.com/leaderboard?window=ALL&rankType=pnl&limit=50",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"lb-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/leaderboard instead.\"}",
+      "elapsed_sec": 4.13
+    },
+    {
+      "name": "activity[0x25e28169…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x25e28169faea17421fcd4cc361f6436d1e449a09&limit=500&offset=0",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"Data API v1 has been retired\",\"migration\":\"https://data-api.polymarket.com/v2/\",\"docs\":\"https://docs.polymarket.com/api-reference/data-api/overview\"}",
+      "elapsed_sec": 4.12
+    },
+    {
+      "name": "positions[0x25e28169…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x25e28169faea17421fcd4cc361f6436d1e449a09&limit=500",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"Data API v1 has been retired\",\"migration\":\"https://data-api.polymarket.com/v2/\",\"docs\":\"https://docs.polymarket.com/api-reference/data-api/overview\"}",
+      "elapsed_sec": 4.12
+    },
+    {
+      "name": "value[0x25e28169…]",
+      "url": "https://data-api.polymarket.com/value?user=0x25e28169faea17421fcd4cc361f6436d1e449a09",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"Data API v1 has been retired\",\"migration\":\"https://data-api.polymarket.com/v2/\",\"docs\":\"https://docs.polymarket.com/api-reference/data-api/overview\"}",
+      "elapsed_sec": 4.12
+    },
+    {
+      "name": "pnl[0x25e28169…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x25e28169faea17421fcd4cc361f6436d1e449a09&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.19
+    },
+    {
+      "name": "pnl[0x25e28169…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x25e28169faea17421fcd4cc361f6436d1e449a09&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.13
+    },
+    {
+      "name": "activity[0x2005d16a…@0]",
+      "url": "https://data-api.polymarket.com/activity?user=0x2005d16a84ceefa912d4e380cd32e7ff827875ea&limit=500&offset=0",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"Data API v1 has been retired\",\"migration\":\"https://data-api.polymarket.com/v2/\",\"docs\":\"https://docs.polymarket.com/api-reference/data-api/overview\"}",
+      "elapsed_sec": 4.12
+    },
+    {
+      "name": "positions[0x2005d16a…]",
+      "url": "https://data-api.polymarket.com/positions?user=0x2005d16a84ceefa912d4e380cd32e7ff827875ea&limit=500",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"Data API v1 has been retired\",\"migration\":\"https://data-api.polymarket.com/v2/\",\"docs\":\"https://docs.polymarket.com/api-reference/data-api/overview\"}",
+      "elapsed_sec": 4.13
+    },
+    {
+      "name": "value[0x2005d16a…]",
+      "url": "https://data-api.polymarket.com/value?user=0x2005d16a84ceefa912d4e380cd32e7ff827875ea",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"Data API v1 has been retired\",\"migration\":\"https://data-api.polymarket.com/v2/\",\"docs\":\"https://docs.polymarket.com/api-reference/data-api/overview\"}",
+      "elapsed_sec": 4.12
+    },
+    {
+      "name": "pnl[0x2005d16a…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x2005d16a84ceefa912d4e380cd32e7ff827875ea&interval=all&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    },
+    {
+      "name": "pnl[0x2005d16a…]",
+      "url": "https://user-pnl-api.polymarket.com/user-pnl?user_address=0x2005d16a84ceefa912d4e380cd32e7ff827875ea&interval=max&fidelity=1d",
+      "ok": false,
+      "status": 410,
+      "error": "HTTP 410; body={\"error\":\"user-pnl-api.polymarket.com has been retired. Use https://data-api.polymarket.com/v2/user-pnl?user=<address> instead.\"}",
+      "elapsed_sec": 4.14
+    }
+  ],
+  "notes": [
+    "leaderboard window=MONTH 全部端點失敗，該窗略過",
+    "leaderboard window=ALL 全部端點失敗，該窗略過"
+  ]
+}
