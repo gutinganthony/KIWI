@@ -1,22 +1,30 @@
 {
  "fetch": {
-  "ran_at": "2026-11-03T11:10:21.846555+00:00",
-  "days_scanned": 7,
+  "ran_at": "2026-11-04T11:20:13.094327+00:00",
+  "days_scanned": 8,
   "days_fetched": 0,
   "days_skipped_cached": 0,
   "raw_filings": 0,
   "parse_failed": 0,
   "requests_ok": 0,
-  "requests_failed": 7,
-  "elapsed_sec": 283.4,
+  "requests_failed": 8,
+  "elapsed_sec": 323.2,
   "endpoint_health": [
+   {
+    "name": "daily-index 2026-11-04",
+    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR4/form.20261104.idx",
+    "ok": false,
+    "status": 403,
+    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
+    "elapsed_sec": 40.24
+   },
    {
     "name": "daily-index 2026-11-03",
     "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR4/form.20261103.idx",
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.6
+    "elapsed_sec": 40.16
    },
    {
     "name": "daily-index 2026-11-02",
@@ -24,7 +32,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.26
+    "elapsed_sec": 40.19
    },
    {
     "name": "daily-index 2026-10-30",
@@ -32,7 +40,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.3
+    "elapsed_sec": 40.18
    },
    {
     "name": "daily-index 2026-10-29",
@@ -40,7 +48,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.3
+    "elapsed_sec": 40.2
    },
    {
     "name": "daily-index 2026-10-28",
@@ -48,7 +56,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.31
+    "elapsed_sec": 40.29
    },
    {
     "name": "daily-index 2026-10-27",
@@ -56,7 +64,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.26
+    "elapsed_sec": 40.4
    },
    {
     "name": "daily-index 2026-10-26",
@@ -64,10 +72,11 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.29
+    "elapsed_sec": 40.31
    }
   ],
   "errors": [
+   "2026-11-04 索引抓取失敗（status=403）",
    "2026-11-03 索引抓取失敗（status=403）",
    "2026-11-02 索引抓取失敗（status=403）",
    "2026-10-30 索引抓取失敗（status=403）",
@@ -77,9 +86,9 @@
    "2026-10-26 索引抓取失敗（status=403）"
   ]
  },
- "updated_at": "2026-11-03T12:04:38.161509+00:00",
+ "updated_at": "2026-11-04T11:26:04.813337+00:00",
  "funnel": {
-  "ran_at": "2026-11-03T11:15:05.400069+00:00",
+  "ran_at": "2026-11-04T11:25:36.421302+00:00",
   "days_loaded": 0,
   "funnel_stats": {
    "raw_filings": 0,
@@ -118,13 +127,13 @@
   "errors": []
  },
  "tracking": {
-  "ran_at": "2026-11-03T12:04:38.161361+00:00",
+  "ran_at": "2026-11-04T11:26:04.813130+00:00",
   "positions_total": 16,
   "positions_new": 0,
   "positions_updated": 15,
   "price_failed": 1,
-  "requests_ok": 16,
-  "requests_failed": 16,
+  "requests_ok": 32,
+  "requests_failed": 0,
   "price_source_stats": {
    "stooq": {
     "ok": 0,
@@ -153,139 +162,26 @@
    "SWZ": "yahoo",
    "BOLD": "yahoo"
   },
-  "elapsed_sec": 2972.6,
-  "endpoint_health": [
-   {
-    "name": "stooq EWSB",
-    "url": "https://stooq.com/q/d/l/?s=ewsb.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ConnectTimeout: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=ewsb.us&i=d (Caused by ConnectTimeoutError(<HTTPSConnection(host='stooq.com', port=443) at 0x7",
-    "elapsed_sec": 184.83
-   },
-   {
-    "name": "stooq TSM",
-    "url": "https://stooq.com/q/d/l/?s=tsm.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ConnectTimeout: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=tsm.us&i=d (Caused by ConnectTimeoutError(<HTTPSConnection(host='stooq.com', port=443) at 0x75",
-    "elapsed_sec": 184.66
-   },
-   {
-    "name": "stooq ENR",
-    "url": "https://stooq.com/q/d/l/?s=enr.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ConnectTimeout: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=enr.us&i=d (Caused by ConnectTimeoutError(<HTTPSConnection(host='stooq.com', port=443) at 0x75",
-    "elapsed_sec": 184.6
-   },
-   {
-    "name": "stooq VII",
-    "url": "https://stooq.com/q/d/l/?s=vii.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ConnectTimeout: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=vii.us&i=d (Caused by ConnectTimeoutError(<HTTPSConnection(host='stooq.com', port=443) at 0x75",
-    "elapsed_sec": 184.58
-   },
-   {
-    "name": "stooq UUUU",
-    "url": "https://stooq.com/q/d/l/?s=uuuu.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ConnectTimeout: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=uuuu.us&i=d (Caused by ConnectTimeoutError(<HTTPSConnection(host='stooq.com', port=443) at 0x7",
-    "elapsed_sec": 184.52
-   },
-   {
-    "name": "stooq YPF",
-    "url": "https://stooq.com/q/d/l/?s=ypf.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ConnectTimeout: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=ypf.us&i=d (Caused by ConnectTimeoutError(<HTTPSConnection(host='stooq.com', port=443) at 0x75",
-    "elapsed_sec": 184.54
-   },
-   {
-    "name": "stooq TURB",
-    "url": "https://stooq.com/q/d/l/?s=turb.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ConnectTimeout: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=turb.us&i=d (Caused by ConnectTimeoutError(<HTTPSConnection(host='stooq.com', port=443) at 0x7",
-    "elapsed_sec": 184.6
-   },
-   {
-    "name": "stooq VFLEX",
-    "url": "https://stooq.com/q/d/l/?s=vflex.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ConnectTimeout: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=vflex.us&i=d (Caused by ConnectTimeoutError(<HTTPSConnection(host='stooq.com', port=443) at 0x",
-    "elapsed_sec": 184.63
-   },
-   {
-    "name": "stooq BBASX",
-    "url": "https://stooq.com/q/d/l/?s=bbasx.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ConnectTimeout: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=bbasx.us&i=d (Caused by ConnectTimeoutError(<HTTPSConnection(host='stooq.com', port=443) at 0x",
-    "elapsed_sec": 184.53
-   },
-   {
-    "name": "stooq FTECX",
-    "url": "https://stooq.com/q/d/l/?s=ftecx.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ConnectTimeout: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=ftecx.us&i=d (Caused by ConnectTimeoutError(<HTTPSConnection(host='stooq.com', port=443) at 0x",
-    "elapsed_sec": 184.6
-   },
-   {
-    "name": "stooq HTO",
-    "url": "https://stooq.com/q/d/l/?s=hto.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ConnectTimeout: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=hto.us&i=d (Caused by ConnectTimeoutError(<HTTPSConnection(host='stooq.com', port=443) at 0x75",
-    "elapsed_sec": 184.5
-   },
-   {
-    "name": "stooq JCTC",
-    "url": "https://stooq.com/q/d/l/?s=jctc.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ConnectTimeout: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=jctc.us&i=d (Caused by ConnectTimeoutError(<HTTPSConnection(host='stooq.com', port=443) at 0x7",
-    "elapsed_sec": 184.53
-   },
-   {
-    "name": "stooq PFBX",
-    "url": "https://stooq.com/q/d/l/?s=pfbx.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ConnectTimeout: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=pfbx.us&i=d (Caused by ConnectTimeoutError(<HTTPSConnection(host='stooq.com', port=443) at 0x7",
-    "elapsed_sec": 184.55
-   },
-   {
-    "name": "stooq WRAP",
-    "url": "https://stooq.com/q/d/l/?s=wrap.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ConnectTimeout: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=wrap.us&i=d (Caused by ConnectTimeoutError(<HTTPSConnection(host='stooq.com', port=443) at 0x7",
-    "elapsed_sec": 184.57
-   },
-   {
-    "name": "stooq SWZ",
-    "url": "https://stooq.com/q/d/l/?s=swz.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ConnectTimeout: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=swz.us&i=d (Caused by ConnectTimeoutError(<HTTPSConnection(host='stooq.com', port=443) at 0x75",
-    "elapsed_sec": 184.54
-   },
-   {
-    "name": "stooq BOLD",
-    "url": "https://stooq.com/q/d/l/?s=bold.us&i=d",
-    "ok": false,
-    "status": null,
-    "error": "ConnectTimeout: HTTPSConnectionPool(host='stooq.com', port=443): Max retries exceeded with url: /q/d/l/?s=bold.us&i=d (Caused by ConnectTimeoutError(<HTTPSConnection(host='stooq.com', port=443) at 0x7",
-    "elapsed_sec": 184.51
-   }
-  ],
+  "elapsed_sec": 28.3,
+  "endpoint_health": [],
   "errors": [
-   "yahoo FTECX: 回應非有效 chart JSON"
+   "stooq EWSB: 回應非有效 CSV（No data？）",
+   "stooq TSM: 回應非有效 CSV（No data？）",
+   "stooq ENR: 回應非有效 CSV（No data？）",
+   "stooq VII: 回應非有效 CSV（No data？）",
+   "stooq UUUU: 回應非有效 CSV（No data？）",
+   "stooq YPF: 回應非有效 CSV（No data？）",
+   "stooq TURB: 回應非有效 CSV（No data？）",
+   "stooq VFLEX: 回應非有效 CSV（No data？）",
+   "stooq BBASX: 回應非有效 CSV（No data？）",
+   "stooq FTECX: 回應非有效 CSV（No data？）",
+   "yahoo FTECX: 回應非有效 chart JSON",
+   "stooq HTO: 回應非有效 CSV（No data？）",
+   "stooq JCTC: 回應非有效 CSV（No data？）",
+   "stooq PFBX: 回應非有效 CSV（No data？）",
+   "stooq WRAP: 回應非有效 CSV（No data？）",
+   "stooq SWZ: 回應非有效 CSV（No data？）",
+   "stooq BOLD: 回應非有效 CSV（No data？）"
   ]
  }
 }
