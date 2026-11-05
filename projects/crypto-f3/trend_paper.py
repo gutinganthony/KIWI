@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""BTC＋ETH 趨勢跟隨：紙上交易（不下單），同時跑三個波動目標 40%／45%／50%，跑一段時間再決定用哪個。
+"""BTC＋ETH 趨勢跟隨：紙上交易（不下單），同時跑四個版本，跑一段時間再決定用哪個：
+波動目標 40%／45%／50%，以及 40%＋BTC 空頭空手（2026-11-05 加入，見市場狀態研究）。
 
 規則和回測一模一樣（trend_backtest.py 的 targets()／step()）；差別只在成交價：
   - 每天 UTC 00:00 日線收盤後第一次執行時調整部位，用「執行當下的 OKX 現貨價」成交（記下和收盤價的差距＝延遲成本）。
@@ -29,12 +30,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import f3_backtest as bt  # noqa: E402
 import trend_backtest as tb  # noqa: E402
 
-VARIANTS = (0.40, 0.45, 0.50)
+# 版本代號：(單幣波動目標, BTC 空頭時空手)。40B 於 2026-11-05 加入（市場狀態研究），從加入那天起算
+VARIANTS = {"40": (0.40, False), "45": (0.45, False), "50": (0.50, False), "40B": (0.40, True)}
 OKX = "https://www.okx.com"
 
 
-def key(tg):
-    return f"{int(round(tg * 100))}"
+def label(v):
+    return f"波動目標 {int(round(v['target'] * 100))}%" + ("＋空頭空手" if v.get("bear") else "")
+
+
+def tgts(P, v):
+    return tb.targets(P, v["target"], bear_off=v.get("bear", False))
 
 
 def now_utc():
@@ -63,9 +69,13 @@ class Store:
         if self.path.exists():
             self.state = json.loads(self.path.read_text())
         else:
-            self.state = dict(version="trend-1", capital=capital, created_utc=now_utc().isoformat(),
-                              variants={key(tg): dict(target=tg, units={c: 0.0 for c in tb.COINS}, cash=capital)
-                                        for tg in VARIANTS}, last_day=None)
+            self.state = dict(version="trend-1", capital=capital, created_utc=now_utc().isoformat(), variants={}, last_day=None)
+        for k, (tg, bear) in VARIANTS.items():      # 新加的版本從今天起用起始資金開始
+            v = self.state["variants"].setdefault(k, dict(target=tg, units={c: 0.0 for c in tb.COINS}, cash=capital,
+                                                          started=now_utc().isoformat()[:10], last_day=None))
+            v.setdefault("bear", bear)
+            v.setdefault("started", self.state["created_utc"][:10])
+            v.setdefault("last_day", self.state.get("last_day"))
 
     def save(self):
         tmp = self.path.with_suffix(".tmp")
@@ -87,9 +97,11 @@ def value(v, px):
 
 
 def rebalance(store, P, day, fill, when, say):
-    """處理一根新日線：算目標部位，用 fill 價格調整。"""
+    """處理一根新日線：算目標部位，用 fill 價格調整（每個版本各自記錄處理到哪一天）。"""
     for k, v in store.state["variants"].items():
-        T, _, _ = tb.targets(P, v["target"])
+        if v.get("last_day") == f"{day:%Y-%m-%d}":
+            continue
+        T, _, _ = tgts(P, v)
         tgt = T.loc[day].to_dict()
         before = {c: v["units"][c] * fill[c] / value(v, fill) for c in tb.COINS}
         units, cash, turn = tb.step(v["units"], v["cash"], fill, tgt)
@@ -103,9 +115,9 @@ def rebalance(store, P, day, fill, when, say):
                                qty=f"{abs(d):.6f}", price=f"{fill[c]:.2f}", close=f"{P[c].loc[day]:.2f}",
                                usdt=f"{abs(d) * fill[c]:.2f}", weight_before=f"{before[c]:.4f}",
                                weight_after=f"{units[c] * fill[c] / eq:.4f}", target=f"{tgt[c]:.4f}"))
-            say(f"【趨勢紙上】波動目標 {k}%：" + "、".join(
+            say(f"【趨勢紙上】{label(v)}：" + "、".join(
                 f"{c} {before[c]:.0%}→{units[c] * fill[c] / eq:.0%}" for c in tb.COINS) + f"（淨值 {eq:,.0f}）")
-        v["units"], v["cash"] = units, cash
+        v["units"], v["cash"], v["last_day"] = units, cash, f"{day:%Y-%m-%d}"
     store.state["last_day"] = f"{day:%Y-%m-%d}"
 
 
@@ -116,40 +128,48 @@ def write_dash(store, P, px, when):
     cap = st["capital"]
     # 淨值歷史
     p = home / "equity.csv"
+    cols = ["time_utc"] + [f"eq{k}" for k in st["variants"]]
+    if p.exists() and list(pd.read_csv(p, nrows=0).columns) != cols:     # 新增版本：補欄位，舊列留空
+        pd.read_csv(p).reindex(columns=cols).to_csv(p, index=False)
     new = not p.exists()
     with open(p, "a", newline="") as f:
         w = csv.writer(f)
         if new:
-            w.writerow(["time_utc"] + [f"eq{k}" for k in st["variants"]])
+            w.writerow(cols)
         w.writerow([when] + [f"{value(v, px):.2f}" for v in st["variants"].values()])
     hist = pd.read_csv(p, parse_dates=["time_utc"])
     cut = hist.time_utc.max() - pd.Timedelta(days=30)        # 30 天內逐筆，更早每天一筆
     old = hist[hist.time_utc < cut]
     hist = pd.concat([old.groupby(old.time_utc.dt.floor("D")).tail(1), hist[hist.time_utc >= cut]])
     eq_rows = []
-    for k in st["variants"]:
+    for k, v in st["variants"].items():
         s = hist[f"eq{k}"]
+        ok = s.notna()
+        s, tt = s[ok], hist.time_utc[ok]
         dd = (s / s.cummax() - 1) * 100
-        for t, e, d in zip(hist.time_utc, s, dd):
-            eq_rows.append(dict(time=f"{t:%Y-%m-%dT%H:%M}", variant=f"波動目標 {k}%", equity=round(e, 2),
+        for t, e, d in zip(tt, s, dd):
+            eq_rows.append(dict(time=f"{t:%Y-%m-%dT%H:%M}", variant=label(v), equity=round(e, 2),
                                 ret_pct=round((e / cap - 1) * 100, 3), dd_pct=round(d, 3)))
     # 總覽
     led = list(csv.DictReader(open(home / "ledger.csv"))) if (home / "ledger.csv").exists() else []
-    T_all = {k: tb.targets(P, v["target"]) for k, v in st["variants"].items()}
+    T_all = {k: tgts(P, v) for k, v in st["variants"].items()}
+    bear_now = bool(tb.btc_bear(P).iloc[-1])
     summary = []
     for k, v in st["variants"].items():
         e = value(v, px)
-        s = pd.read_csv(p)[f"eq{k}"]
+        s = pd.read_csv(p)[f"eq{k}"].dropna()
         T, S, vol = T_all[k]
         mine = [r for r in led if r["variant"] == k]
-        summary.append(dict(variant=f"波動目標 {k}%", target_pct=int(k), equity=round(e, 2), ret_pct=round((e / cap - 1) * 100, 3),
+        summary.append(dict(variant=label(v), target_pct=int(round(v["target"] * 100)),
+                            bear_filter=("BTC 空頭：空手中" if bear_now else "BTC 非空頭") if v.get("bear") else "不適用",
+                            equity=round(e, 2), ret_pct=round((e / cap - 1) * 100, 3),
                             max_dd_pct=round(float((s / s.cummax() - 1).min() * 100), 3),
                             btc_pct=round(v["units"]["BTC"] * px["BTC"] / e * 100, 1),
                             eth_pct=round(v["units"]["ETH"] * px["ETH"] / e * 100, 1),
                             cash_pct=round(v["cash"] / e * 100, 1),
                             btc_target_pct=round(T["BTC"].iloc[-1] * 100, 1), eth_target_pct=round(T["ETH"].iloc[-1] * 100, 1),
                             rebalances=len({r["day"] for r in mine}), last_rebalance=mine[-1]["day"] if mine else "",
-                            last_day=st["last_day"], started=st["created_utc"][:10], updated=when))
+                            last_day=v["last_day"], started=v["started"], updated=when))
     # 訊號：每個幣 7 個訊號＋波動，三個版本的目標部位
     sig = []
     for c in tb.COINS:
@@ -166,7 +186,8 @@ def write_dash(store, P, px, when):
         for k in st["variants"]:
             row[f"target{k}_pct"] = round(float(T_all[k][0][c].iloc[-1] * 100), 1)
         sig.append(row)
-    trades = [dict(id=i, time=r["time"][:16], variant=f"波動目標 {r['variant']}%", coin=r["coin"], side=r["side"],
+    names = {k: label(v) for k, v in st["variants"].items()}
+    trades = [dict(id=i, time=r["time"][:16], variant=names.get(r["variant"], r["variant"]), coin=r["coin"], side=r["side"],
                    price=float(r["price"]), usdt=float(r["usdt"]),
                    slip_pct=round((float(r["price"]) / float(r["close"]) - 1) * 100 * (1 if r["side"] == "買" else -1), 3),
                    weight_after_pct=round(float(r["weight_after"]) * 100, 1))
@@ -184,12 +205,11 @@ def run(home, capital):
     day = P.index[-1]                       # 最新一根已收盤日線
     px = last_prices()
     msgs = []
-    if store.state["last_day"] != f"{day:%Y-%m-%d}":
-        rebalance(store, P, day, px, when, msgs.append)
+    rebalance(store, P, day, px, when, msgs.append)     # 已處理過這根日線的版本會自己略過
     store.save()
     write_dash(store, P, px, when)
     print(f"趨勢跟隨紙上交易（日線 {day:%Y-%m-%d}）：" + "；".join(
-        f"{k}% {value(v, px):,.0f}" for k, v in store.state["variants"].items()))
+        f"{label(v)} {value(v, px):,.0f}" for v in store.state["variants"].values()))
     for m in msgs:
         print(m)
 
@@ -202,9 +222,9 @@ def replay(home, capital, start):
         rebalance(store, P.loc[:day], day, P.loc[day].to_dict(), f"{day:%Y-%m-%d}T00:05", lambda m: None)
     px = P.iloc[-1].to_dict()
     for k, v in store.state["variants"].items():
-        T, _, _ = tb.targets(P, v["target"])
+        T, _, _ = tgts(P, v)
         e, _, _ = tb.simulate(P, T, start)
-        print(f"{k}%：重播 {value(v, px) / capital:.6f}　回測 {e.iloc[-1]:.6f}")
+        print(f"{label(v)}：重播 {value(v, px) / capital:.6f}　回測 {e.iloc[-1]:.6f}")
 
 
 def main():
