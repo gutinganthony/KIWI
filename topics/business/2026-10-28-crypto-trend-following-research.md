@@ -6,7 +6,7 @@ date_added: 2026-10-28
 last_updated: 2026-10-28
 topic: business
 tags: [backtest, crypto, trend-following, BTC, ETH, volatility-targeting, out-of-sample, portfolio, F3]
-version: 1.1
+version: 1.2
 related: [./2026-10-27-crypto-f3-mean-reversion-rulebook.md]
 engine: projects/crypto-f3/trend_backtest.py
 ---
@@ -132,6 +132,10 @@ engine: projects/crypto-f3/trend_backtest.py
 - 狀態和明細在 `f3-bot-state` 分支的 `trend-paper/`；監控台「趨勢跟隨」一節每天同步，和 F3 2.0 並排。
 - 有調整時 Telegram 推「【趨勢紙上】」。
 - 驗證：用 OKX 歷史收盤價從 2025-06-01 重播，三個版本的淨值和回測到小數點後 6 位相同。
+- **2026-11-05 加入第四個版本「40%＋空頭空手」**：規則同 40% 版，但 BTC 收盤 < 200 日均線且均線比 20 天前低時，兩個幣都空手（`trend_backtest.targets(bear_off=True)`，市場狀態研究 2026-11-05）。
+  - 從 2026-11-05 起用 83,000 USDT 開始；原本三個版本照舊。
+  - 回測（Yahoo）：樣本外 23.9%／−21.5%（40% 版 22.2%／−29.9%），樣本內 52.3%／−19.0%，和 F3 2.0 各半 23.6%／−11.9%。
+  - 重播驗證：從 2025-01-01 起四個版本都和回測到小數點後 6 位相同。
 
 **選目標的判斷方式（建議跑 3 個月以上，或等到出現一次波動 > 40% 的行情）：**
 1. 三個版本有沒有分開：如果期間波動一直低於 40%，紙上交易分不出高下，就照回測選 40%（年化 ÷ 回撤最好）。
@@ -146,3 +150,4 @@ engine: projects/crypto-f3/trend_backtest.py
 ## 更新紀錄
 - 2026-10-28 v1.0：初版。
 - 2026-10-28 v1.1：§6 波動目標 40／45／50% 比較（回測改成持倉漂移、與紙上交易同一段程式）；§7 紙上交易上線；§8 放真錢前條件。
+- 2026-11-05 v1.2：§7 加入第四個紙上版本「40%＋BTC 空頭空手」。

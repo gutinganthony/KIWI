@@ -60,11 +60,21 @@ def ensemble(c):
     return s
 
 
-def targets(P, target=0.40, cap=CAP, lb=LB):
-    """每天收盤後的目標部位（佔總資金比例）與訊號分數。"""
+def btc_bear(P, n=200, k=20):
+    """BTC 空頭：收盤 < 200 日均線，而且均線比 20 天前低（市場狀態研究 2026-11-05 唯一兩半樣本都成立的濾網）。"""
+    b = P["BTC"]
+    ma = b.rolling(n).mean()
+    return (b < ma) & (ma < ma.shift(k))
+
+
+def targets(P, target=0.40, cap=CAP, lb=LB, bear_off=False):
+    """每天收盤後的目標部位（佔總資金比例）與訊號分數。bear_off＝BTC 空頭時兩個幣都空手。"""
     S = pd.DataFrame({t: ensemble(P[t]) for t in P})
     vol = P.pct_change().rolling(lb).std() * np.sqrt(365)
-    return (cap * S * np.minimum(1, target / vol)).fillna(0), S, vol
+    T = (cap * S * np.minimum(1, target / vol)).fillna(0)
+    if bear_off:
+        T = T.where(~btc_bear(P), 0.0)
+    return T, S, vol
 
 
 def step(units, cash, px, tgt, band=BAND, cost=COST):
@@ -121,6 +131,7 @@ def main():
     ap.add_argument("--targets", default="0.40", help="單幣年化波動目標，逗號分隔（0.40＝40%%）")
     ap.add_argument("--source", default="yahoo", choices=("yahoo", "okx"))
     ap.add_argument("--start", default=None, help="回測起點（預設 Yahoo 2015-06-01、OKX 資料第 260 天）")
+    ap.add_argument("--bear", action="store_true", help="加上 BTC 空頭濾網（BTC 收盤 < 200 日均線且均線下彎時空手）")
     ap.add_argument("--chart", help="輸出淨值圖 PNG")
     ap.add_argument("--csv", help="改用本機 CSV（欄位 t,close；檔名 BTC.csv、ETH.csv）")
     a = ap.parse_args()
@@ -128,11 +139,11 @@ def main():
     start = a.start or ("2015-06-01" if a.source == "yahoo" and not a.csv else str(P.index[260].date()))
     curves = {}
     for tg in (float(x) for x in a.targets.split(",")):
-        T, S, _ = targets(P, tg)
+        T, S, _ = targets(P, tg, bear_off=a.bear)
         e, w, n = simulate(P, T, start)
         curves[tg] = e
         yrs = (e.index[-1] - e.index[0]).days / 365.25
-        print(f"\nBTC＋ETH 趨勢跟隨，單幣波動目標 {tg:.0%}（{a.source}，{start} 起；年化／最大回撤）")
+        print(f"\nBTC＋ETH 趨勢跟隨，單幣波動目標 {tg:.0%}{'＋BTC 空頭空手' if a.bear else ''}（{a.source}，{start} 起；年化／最大回撤）")
         for lab, s0, s1 in (("全期", start, None), ("樣本內 ～2020", start, "2020-12-31"),
                             ("樣本外 2021 起", "2021-01-01", None), ("2022 起", "2022-01-01", None)):
             if e.loc[s0:s1].size > 30:
