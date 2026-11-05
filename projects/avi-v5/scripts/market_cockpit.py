@@ -481,7 +481,7 @@ def bt_regime(reg):
             "n_switches": int(len(eps)), "period": [df.index[0].strftime("%Y-%m-%d"), df.index[-1].strftime("%Y-%m-%d")]}
 
 
-def bt_sectors(panel, bench_adj, reg):
+def bt_sectors(panel, bench_adj, reg, k=3):
     """板塊動能：月底依 strength 排名，次月持有 Top3 / Bottom3 / 等權；RRG 象限前瞻；regime × 板塊熱圖。"""
     idx = bench_adj.index
     adj = pd.concat({s: panel[s]["adj"] for s in panel}, axis=1)
@@ -499,20 +499,20 @@ def bt_sectors(panel, bench_adj, reg):
             rows_top.append(np.nan); rows_bot.append(np.nan); rows_all.append(np.nan)
             continue
         order = s.sort_values(ascending=False).index
-        rows_top.append(rr[order[:3]].mean())
-        rows_bot.append(rr[order[-3:]].mean())
+        rows_top.append(rr[order[:k]].mean())
+        rows_bot.append(rr[order[-k:]].mean())
         rows_all.append(rr[s.index].mean())
-        for k, sym in enumerate(order, 1):
+        for rk, sym in enumerate(order, 1):
             if not np.isnan(rr[sym]) and not np.isnan(b_ret[d]):
-                rank_exc.setdefault(k, []).append(rr[sym] - b_ret[d])
+                rank_exc.setdefault(rk, []).append(rr[sym] - b_ret[d])
     top, bot, allw = (pd.Series(v, index=m_str.index) for v in (rows_top, rows_bot, rows_all))
     valid = top.notna() & b_ret.notna()
     top, bot, allw, bch = top[valid], bot[valid], allw[valid], b_ret[valid]
     ls = top - bot
     eq = pd.DataFrame({"top3": (1 + top).cumprod(), "bottom3": (1 + bot).cumprod(),
                        "spy": (1 + bch).cumprod(), "ew": (1 + allw).cumprod()})
-    by_rank = [{"rank": k, "exc_next_month": r(np.mean(v) * 100), "win": r((np.array(v) > 0).mean() * 100, 1), "n": len(v)}
-               for k, v in sorted(rank_exc.items()) if len(v) >= 24]
+    by_rank = [{"rank": rk, "exc_next_month": r(np.mean(v) * 100), "win": r((np.array(v) > 0).mean() * 100, 1), "n": len(v)}
+               for rk, v in sorted(rank_exc.items()) if len(v) >= 24]
     # 年度 Top3 − SPY
     yr = pd.DataFrame({"top": top, "spy": bch})
     yearly = yr.groupby(yr.index.year).apply(lambda g: ((1 + g["top"]).prod() - (1 + g["spy"]).prod()) * 100)
@@ -526,18 +526,19 @@ def bt_sectors(panel, bench_adj, reg):
             if len(s) < 6 or rr.dropna().empty:
                 continue
             o = s.sort_values(ascending=False).index
-            lsx.append(rr[o[:3]].mean() - rr[o[-3:]].mean())
+            lsx.append(rr[o[:k]].mean() - rr[o[-k:]].mean())
         lsx = pd.Series(lsx).dropna()
         horizons[name] = {"ann_mean": r(lsx.mean() * 12 * 100), "t_stat": r(lsx.mean() / lsx.std() * math.sqrt(len(lsx)), 2),
                           "win": r((lsx > 0).mean() * 100, 1), "months": int(len(lsx))}
     sector_mom = {
+        "k": k,
         "horizons": horizons,
         "top3": perf_stats(top), "bottom3": perf_stats(bot), "spy": perf_stats(bch), "equal_weight": perf_stats(allw),
         "long_short": {"ann_mean": r(ls.mean() * 12 * 100), "t_stat": r(ls.mean() / ls.std() * math.sqrt(len(ls)), 2),
                        "win": r((ls > 0).mean() * 100, 1), "months": int(len(ls))},
         "top3_beats_spy": r((top > bch).mean() * 100, 1),
         "by_rank": by_rank,
-        "yearly_top3_minus_spy": {str(k): r(v, 1) for k, v in yearly.items()},
+        "yearly_top3_minus_spy": {str(y): r(v, 1) for y, v in yearly.items()},
         "equity": {"dates": [d.strftime("%Y-%m") for d in eq.index], **{c: [r(x, 3) for x in eq[c]] for c in eq.columns}},
     }
     # RRG 象限 → 前瞻 21 日超額（每 5 日取樣減少重疊）
@@ -650,6 +651,7 @@ def latest_snapshot(data, reg, panel, watch):
             aux[s] = {"ret_1m": r(a.pct_change(21).loc[d] * 100, 1), "ret_3m": r(a.pct_change(63).loc[d] * 100, 1),
                       "exc_3m": r((a.pct_change(63) - px.pct_change(63)).loc[d] * 100, 1)}
     return {
+        "market": "us", "bench": {"symbol": "SPY", "name": "S&P 500 ETF"},
         "generated": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
         "asof": d.strftime("%Y-%m-%d"),
         "regime": {
@@ -687,6 +689,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--cache", default=None, help="快取目錄（研究用；正式管線不快取）")
     ap.add_argument("--no-backtest", action="store_true")
+    ap.add_argument("--no-tw", action="store_true", help="略過台股模組")
     args = ap.parse_args()
     if args.cache:
         os.makedirs(args.cache, exist_ok=True)
@@ -702,6 +705,16 @@ def main():
     watch = build_watch(args.cache, reg.index, data[BENCH]["adj"])
     snap = latest_snapshot(data, reg, panel, watch)
     snap["missing"] = missing
+    # 台股模組（best-effort：資料檔不在就略過，不擋美股）
+    tw_snap = tw_bt = None
+    if not args.no_tw:
+        try:
+            import market_cockpit_tw
+            tw_snap, tw_bt = market_cockpit_tw.run()
+            snap["tw"] = tw_snap
+            print(f"tw: {tw_snap['asof']} regime={tw_snap['regime']['label']} score={tw_snap['regime']['score']} flow_days={tw_snap['flows']['history_days']}")
+        except Exception as e:  # noqa: BLE001
+            print(f"[warn] 台股模組失敗，略過：{e}", file=sys.stderr)
     json.dump(snap, open(OUT_DATA, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     print(f"wrote {OUT_DATA}: {snap['asof']} regime={snap['regime']['label']} score={snap['regime']['score']} "
           f"top={[s['symbol'] for s in snap['sectors'][:3]]} bottom={[s['symbol'] for s in snap['sectors'][-3:]]}")
@@ -709,6 +722,7 @@ def main():
         bt = {"generated": snap["generated"], "asof": snap["asof"],
               "regime": bt_regime(reg), "sectors": bt_sectors(panel, data[BENCH]["adj"], reg),
               "flows": bt_flows(panel, data[BENCH]["adj"]),
+              "tw": tw_bt,
               "caveats": [
                   "所有回測皆為樣本內、無交易成本、ETF 價格含股息（Adj Close）；XLRE 2015、XLC 2018 才上市，之前的橫斷面只有 9–10 檔。",
                   "Regime 門檻與支柱權重是設計值，不是最佳化值——目的是可解釋，而非最高報酬。",

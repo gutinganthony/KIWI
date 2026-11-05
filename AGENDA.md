@@ -35,14 +35,14 @@
 - [x] 2026-09-03 | COHX 出場規則裁決 | ✅ **Jake 裁決：只用 WT cross**。已寫進 `exit-playbook.md` §0 規則 2（COHR 週線 WT1 下穿 WT2 → 全出；看 COHR 不看 COHX；不設水位；**無停損**）。🔴 **記錄在案**：舊規則 2(b)「−30% 硬停損」在改版當下**已觸發未執行**（9/1 收盤 −35.38%）；配套認定 COHX 為「可歸零部位」。D7 連四週最高優先項結案
 - [x] 2026-09-05 | 信用利差監控接入管線 | ✅ **Jake 核准並已完成**。`projects/avi-v5/scripts/fetch_credit_spreads.py` 掛進 `update-dashboard.yml`（runner 已有 FRED_API_KEY，不需新 workflow）。抓 HY/BB/CCC 三條 ICE BofA OAS → `data/ext/credit/{hy_oas.csv, STATUS.md}`，**只在 🟡(≥100bp)/🔴(≥150bp) 推 Telegram，🟢 靜音**。這是 AI 追蹤系統裡**唯一通過歷史驗證**的訊號（2007 領先 S&P 見頂 4.4 個月）。⚠️ **首次 runner 執行後要驗收**：確認 STATUS.md 有產出且數字合理（現值應約 265bp）
 - [ ] 2026-09-08 | 🔴 **信用利差監控合併進 main（驗收未完成的唯一原因）** 【needs Jake】| **2026-09-07 驗收結果：這一格從來沒跑過，也不會跑。** 原因是機制性的——**GitHub Actions 的 schedule 只從 default branch 執行**，而 `update-dashboard.yml` 的 push trigger 也只認 `branches: [main]`。程式碼與 workflow 改動都在 `claude/kiwi-memory-supercycle-hgtt34` 上，**main 沒有 `fetch_credit_spreads.py`、workflow 也沒有那個步驟、`data/ext/credit/STATUS.md` 不存在**。管線本身是健康的（run #251 於 2026-09-07 07:04 UTC schedule 觸發、成功）。⚠️ **feature 落後 main 1170 個 commit**，且 main 剛併入 PR #39（三指數因子健檢＋殖利率曲線改版＋ECY）⇒ **合併需先 rebase／merge main 並處理衝突，不是一行指令**。**需要你一句話授權才動 main。**
-- [ ] 2026-11-12 | 全局觀測台接上每日自動更新 【needs Jake】| 2026-11-05 建好 `docs/cockpit/`（regime／板塊強弱／資金流向＋回測＋可增減持倉），但 `update-dashboard.yml` 沒接——改 workflow 要你點頭。patch 在 `projects/avi-v5/COCKPIT.md §6`，一句「接上」Claude 就做；不接的話頁面會停在 11/04 的資料。
+- [ ] 2026-11-12 | 全局觀測台接上每日自動更新 【needs Jake】| 2026-11-05 建好 `docs/cockpit/`（regime／板塊強弱／資金流向＋回測＋可增減持倉），但 `update-dashboard.yml` 沒接——改 workflow 要你點頭。patch 在 `projects/avi-v5/COCKPIT.md §6`（含台股法人流向每日累積那一步），一句「接上」Claude 就做；不接的話頁面會停在 11/05 的資料、台股法人流向的歷史也不會累積。
 - [ ] 2026-11-19 | NVDA Q3 FY27：T1 條件⑤ 複核 【Claude】| 財報預計 11/18 盤後（公司未確認）。看 DSO（≤50 否證／>65 升級）、應收 vs 營收增速、營業現金流÷淨利、股權投資與擔保有無再擴大。門檻表見 `topics/business/2026-08-28-t1-condition5-nvda-q2-fy27-trigger.md` §6.4
 - [ ] 2027-01-15 | 八因子季度重跑 【Claude】| 1Q27 合約價正式預估、Q3/Q4 hyperscaler 實際 capex（T1 v2 ④）、三星／海力士 Q4 財報、CXMT 良率與 HBM 驗證（⑥）
 - [ ] 2026-10-31 | 8271 規則 1 月收盤檢查 【Jake】| 10/16 收 181.5、年線約 170.1（線上 6.7%）；10/30 月收盤跌破年線＝全賣
 
 ## 🎯 目標（里程碑，無硬到期日）
 
-- **投資全局觀測台（/goal 2026-11-05）**：一個 dashboard 一眼看懂①市場多頭／盤整／空頭 ②強勢／弱勢板塊 ③資金流入／流出與歷史平均，三者皆數據化並附回測。**第一版 2026-11-05 上線**（`docs/cockpit/`，說明 `projects/avi-v5/COCKPIT.md`）。下一步：接每日更新（📌 11-12）、regime 切換推播、台股板塊版（三大法人流向是真實資金流，比美股的價量代理強）。
+- **投資全局觀測台（/goal 2026-11-05）**：一個 dashboard 一眼看懂①市場多頭／盤整／空頭 ②強勢／弱勢板塊 ③資金流入／流出與歷史平均，三者皆數據化並附回測。**第一版 2026-11-05 上線**（`docs/cockpit/`，說明 `projects/avi-v5/COCKPIT.md`）。**台股版同日上線**（20 類股 + 三大法人真實流向；動能 Top5−Bottom5 年化 +18%、t 2.3）。下一步：接每日更新（📌 11-12，法人流向歷史要靠它累積）、regime 切換推播。
 - Fund track record 鏈：~~架構定案~~ ✅ **2026-08-25 完成（BVI Incubator Fund + Approved Manager）** → **設立公司（下一步＝附錄 D 詢價 2–3 家，9/15）** → 開戶（基金 IBKR 抓 2–6 週）→ 首月對帳單歸檔。（2026-07-12 拍板：以公司架構帳戶跑才有意義。⚠️ 但 §9-4 的順序是：**個人 IBKR 自有資金先跑 record**，基金開張後才以基金 NAV 為正式 track record）
 - 組合去集中化：AI/半導體以外部位 ≥1 檔（90 天計畫第 7–10 週）。🔄 **2026-08-20 重新判定（前一版敘述已撤回，見 `skills/serenity/holdings.md`）**：實際持倉為 **8271 宇瞻・SK hynix ADR・2492 華新科・現金**。**華新科補回了村田留下的被動元件腿** → 本目標是否達成取決於「MLCC 算不算 AI/半導體以外」，**由你定義**。⚠️ 真正的集中風險換了形狀：**8271（模組／下游）與 SK hynix（原廠／上游）吃同一個記憶體週期的兩端**；且 **T1 是為原廠合約價設計的，不可直接套用到模組廠 8271**（漲價期模組廠是成本上升方）——8271 需要自己的出場條件
 - `docs/SERETINY_STOCK_PICKING.md` 從空模板變成自己的方法論（≥1,500 字，含「我什麼時候會錯」）
