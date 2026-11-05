@@ -33,6 +33,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-11-05 | [加密貨幣市場狀態切換策略回測：多頭／空頭／盤整／資金流向](./topics/business/2026-11-05-crypto-regime-switching-research.md) | Business |
 | 2026-10-28 | [加密貨幣趨勢跟隨研究：年化 20% 以上、回撤盡量低（BTC＋ETH 集成趨勢、和 F3 2.0 合併）](./topics/business/2026-10-28-crypto-trend-following-research.md) | Business |
 | 2026-10-27 | [KIWI F3／F3 2.0 — 加密貨幣均值回歸組合：交易規則手冊（含熊市做空、TradingView／OKX 教學）](./topics/business/2026-10-27-crypto-f3-mean-reversion-rulebook.md) | Business |
 | 2026-10-08 | [科斯托蘭尼的「失衡」與 1987 年股災：前因後果、今天的對照，以及現在最像哪一段](./topics/business/2026-10-08-kostolany-1987-crash-analog.md) | Business |
@@ -131,6 +132,7 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-10-08 | [科斯托蘭尼的「失衡」與 1987 年股災：前因後果、今天的對照，以及現在最像哪一段](./topics/business/2026-10-08-kostolany-1987-crash-analog.md) | Business |
 | 2026-10-27 | [KIWI F3／F3 2.0 — 加密貨幣均值回歸組合：交易規則手冊（含熊市做空、TradingView／OKX 教學）](./topics/business/2026-10-27-crypto-f3-mean-reversion-rulebook.md) | Business |
 | 2026-10-28 | [加密貨幣趨勢跟隨研究：年化 20% 以上、回撤盡量低（BTC＋ETH 集成趨勢、和 F3 2.0 合併）](./topics/business/2026-10-28-crypto-trend-following-research.md) | Business |
+| 2026-11-05 | [加密貨幣市場狀態切換策略回測：多頭／空頭／盤整／資金流向](./topics/business/2026-11-05-crypto-regime-switching-research.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
