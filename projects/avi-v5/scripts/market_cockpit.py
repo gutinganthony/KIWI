@@ -548,10 +548,10 @@ def bt_sectors(panel, bench_adj, reg, k=3):
         fwd = (d["adj"].shift(-21) / d["adj"] - 1) - (bench_adj.shift(-21) / bench_adj - 1)
         q = pd.Series([quadrant(a, b) for a, b in zip(d["rs_ratio"], d["rs_mom"])], index=d.index)
         sub = pd.DataFrame({"q": q, "f": fwd}).iloc[::5].dropna()
-        for k, g in sub.groupby("q"):
-            quad_stats.setdefault(k, []).extend(g["f"].tolist())
-    rrg = {k: {"label": QUAD_LABEL[k], "exc21_mean": r(np.mean(v) * 100), "win": r((np.array(v) > 0).mean() * 100, 1), "n": len(v)}
-           for k, v in quad_stats.items()}
+        for q, g in sub.groupby("q"):
+            quad_stats.setdefault(q, []).extend(g["f"].tolist())
+    rrg = {q: {"label": QUAD_LABEL[q], "exc21_mean": r(np.mean(v) * 100), "win": r((np.array(v) > 0).mean() * 100, 1), "n": len(v)}
+           for q, v in quad_stats.items()}
     # regime × 板塊：各 regime 下板塊月超額報酬均值
     st_m = reg["state"].reindex(me)
     heat = {}
