@@ -101,3 +101,4 @@
 | 2026-10-08 | [科斯托蘭尼的「失衡」與 1987 年股災：前因後果、今天的對照，以及現在最像哪一段](./2026-10-08-kostolany-1987-crash-analog.md) | kostolany, 1987-crash, black-monday, fed-warsh, rate-hike, historical-analog, dotcom-2000, 1973, CRI, exit-rule, portfolio-insurance |
 | 2026-10-27 | [KIWI F3／F3 2.0 — 加密貨幣均值回歸組合：交易規則手冊（含熊市做空、TradingView／OKX 教學）](./2026-10-27-crypto-f3-mean-reversion-rulebook.md) | backtest, crypto, mean-reversion, BNB, TRX, BCH, RSI, EMA200, portfolio, paper-trading, rulebook, short, bear-market |
 | 2026-10-28 | [加密貨幣趨勢跟隨研究：年化 20% 以上、回撤盡量低（BTC＋ETH 集成趨勢、和 F3 2.0 合併）](./2026-10-28-crypto-trend-following-research.md) | backtest, crypto, trend-following, BTC, ETH, volatility-targeting, out-of-sample, portfolio |
+| 2026-11-05 | [加密貨幣市場狀態切換策略回測：多頭／空頭／盤整／資金流向](./2026-11-05-crypto-regime-switching-research.md) | backtest, crypto, regime, regime-switching, trend-following, mean-reversion, out-of-sample |
