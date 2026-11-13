@@ -1,0 +1,130 @@
+{
+  "address": "0x2005d16a84ceefa912d4e380cd32e7ff827875ea",
+  "snapshot_date": "2026-11-13",
+  "bankroll": 10000.0,
+  "reliable": true,
+  "unreliable_reasons": [],
+  "coverage": {
+    "first_date": null,
+    "last_date": null,
+    "n_events": 0,
+    "n_trades": 0,
+    "n_redeems": 0,
+    "window_hours": 0.0,
+    "trades_per_hour": 0.0,
+    "n_markets_roundtrip": 0,
+    "n_markets_settle_only": 0,
+    "n_markets_open_only": 0,
+    "losing_redeem_count": 0,
+    "activity_truncated": false
+  },
+  "wallet_window": {
+    "cost": 0.0,
+    "recovered": 0.0,
+    "realized_pnl": 0.0,
+    "realized_is_upper_bound": true,
+    "roi": null,
+    "curve_delta": null,
+    "curve_divergence_warning": null,
+    "excluded_settle_only_proceeds": 0.0
+  },
+  "matrix": {
+    "optimistic": {
+      "fixed": {
+        "scenario": "optimistic",
+        "mode": "fixed",
+        "friction_per_side": 0.03,
+        "follower_net_pnl": 0.0,
+        "follower_invested": 0.0,
+        "follower_roi": null,
+        "avg_friction_per_trade": null,
+        "missed_buys": 0,
+        "copied_buys": 0,
+        "n_markets_copied": 0,
+        "win_rate": null,
+        "capture_rate": null,
+        "capture_biased": false
+      },
+      "proportional": {
+        "scenario": "optimistic",
+        "mode": "proportional",
+        "friction_per_side": 0.03,
+        "follower_net_pnl": 0.0,
+        "follower_invested": 0.0,
+        "follower_roi": null,
+        "avg_friction_per_trade": null,
+        "missed_buys": 0,
+        "copied_buys": 0,
+        "n_markets_copied": 0,
+        "win_rate": null,
+        "capture_rate": null,
+        "capture_biased": false
+      }
+    },
+    "realistic": {
+      "fixed": {
+        "scenario": "realistic",
+        "mode": "fixed",
+        "friction_per_side": 0.06,
+        "follower_net_pnl": 0.0,
+        "follower_invested": 0.0,
+        "follower_roi": null,
+        "avg_friction_per_trade": null,
+        "missed_buys": 0,
+        "copied_buys": 0,
+        "n_markets_copied": 0,
+        "win_rate": null,
+        "capture_rate": null,
+        "capture_biased": false
+      },
+      "proportional": {
+        "scenario": "realistic",
+        "mode": "proportional",
+        "friction_per_side": 0.06,
+        "follower_net_pnl": 0.0,
+        "follower_invested": 0.0,
+        "follower_roi": null,
+        "avg_friction_per_trade": null,
+        "missed_buys": 0,
+        "copied_buys": 0,
+        "n_markets_copied": 0,
+        "win_rate": null,
+        "capture_rate": null,
+        "capture_biased": false
+      }
+    },
+    "pessimistic": {
+      "fixed": {
+        "scenario": "pessimistic",
+        "mode": "fixed",
+        "friction_per_side": 0.09,
+        "follower_net_pnl": 0.0,
+        "follower_invested": 0.0,
+        "follower_roi": null,
+        "avg_friction_per_trade": null,
+        "missed_buys": 0,
+        "copied_buys": 0,
+        "n_markets_copied": 0,
+        "win_rate": null,
+        "capture_rate": null,
+        "capture_biased": false
+      },
+      "proportional": {
+        "scenario": "pessimistic",
+        "mode": "proportional",
+        "friction_per_side": 0.09,
+        "follower_net_pnl": 0.0,
+        "follower_invested": 0.0,
+        "follower_roi": null,
+        "avg_friction_per_trade": null,
+        "missed_buys": 0,
+        "copied_buys": 0,
+        "n_markets_copied": 0,
+        "win_rate": null,
+        "capture_rate": null,
+        "capture_biased": false
+      }
+    }
+  },
+  "raw_source": "snapshot"
+}
