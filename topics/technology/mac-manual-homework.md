@@ -26,6 +26,7 @@ last_updated: 2026-07-06
 ### 🆕 2026-10-28 新增（主對話 session 產生）
 
 - [ ] **investor.marvell.com、stocktitan.net 在雲端被擋（DNS 解析失敗）**；FinMind 美股當日額度用完（402）。Marvell 與 Credo 的財報數字因此只讀到搜尋摘要（`topics/business/2026-10-28-serenity-step1-9-avgo-mrvl-crdo-alab-and-scale-up-protocols.md`）。若要補：在 Mac 開 Marvell Q2 FY27 新聞稿核對稀釋股數、現金與負債；Credo Q1 FY27 核對現金下降原因。或在雲端環境的網路設定加入這兩個網域。
+- [ ] 🟡 **TradingAgents 第一次實跑**：分支 `claude/zen-brahmagupta-0t885u` 合併進 main 後（workflow_dispatch 只認 main），GitHub → Actions →「TradingAgents (on-demand multi-agent analysis)」→ Run workflow → 代號填 `BE` → Run。雲端 session 沒有 `actions:write` 只能你按。跑完看 run 的 Summary 有沒有評級、`projects/tradingagents/reports/BE/` 有沒有報告；失敗把 log 丟給 Claude。可選：在 repo Secrets 加 `SEC_EDGAR_USER_AGENT`（`姓名 email`）。
 
 ### 🆕 2026-10-27 新增（主對話 session 產生）
 

@@ -11,6 +11,7 @@
 |-------|------|------|
 | [Serenity 供應鏈選股](./serenity/SKILL.md) | `/serenity analyze $TICKER` | 從 AI 基礎建設 capex 反向追溯供應鏈瓶頸，找被低估的上游小市值股 |
 | [WaveTrend 技術分析](./wavetrend/SKILL.md) | `/wavetrend $TICKER` | 用 WaveTrend Oscillator 判斷超買/超賣、進出場時機 |
+| [多空辯論](./debate/SKILL.md) | `/debate $TICKER` | 建倉／加碼／判斷型出場前，讓多方、空方、組合風控隔離攻防，產出裁決表交給你決定 |
 
 ---
 

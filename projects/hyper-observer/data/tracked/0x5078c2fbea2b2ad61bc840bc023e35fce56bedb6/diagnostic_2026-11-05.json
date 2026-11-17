@@ -1,0 +1,858 @@
+{
+  "address": "0x5078c2fbea2b2ad61bc840bc023e35fce56bedb6",
+  "label": "james-wynn-blowup-groundtruth",
+  "date": "2026-11-05",
+  "probed_at": "2026-11-05T02:53:55.844680+00:00",
+  "ledger_window_days": 45,
+  "queries_ok": {
+    "perpDexs": true,
+    "clearinghouseState_native": true,
+    "clearinghouseState_dex": true,
+    "spotClearinghouseState": true,
+    "userNonFundingLedgerUpdates": true,
+    "portfolio": true,
+    "userFills": true
+  },
+  "dexs_detected": [
+    "xyz",
+    "flx",
+    "vntl",
+    "hyna",
+    "km",
+    "abcd",
+    "cash",
+    "para",
+    "mkts",
+    "io"
+  ],
+  "aborted": false,
+  "dexs_queried": [
+    "abcd",
+    "cash",
+    "flx",
+    "hyna",
+    "io",
+    "km",
+    "mkts",
+    "para",
+    "vntl",
+    "xyz"
+  ],
+  "portfolio_windows": {
+    "day": {
+      "account_value_last": 433.0,
+      "account_value_ts_iso": "2026-11-05T02:54:06.677000+00:00",
+      "pnl_last": -3120.08,
+      "vlm": 282767.09,
+      "n_points": 36
+    },
+    "week": {
+      "account_value_last": 433.0,
+      "account_value_ts_iso": "2026-11-05T02:54:06.677000+00:00",
+      "pnl_last": -2740.01,
+      "vlm": 473227.54,
+      "n_points": 71
+    },
+    "month": {
+      "account_value_last": 433.0,
+      "account_value_ts_iso": "2026-11-05T02:54:06.677000+00:00",
+      "pnl_last": -2599.52,
+      "vlm": 660899.79,
+      "n_points": 57
+    },
+    "allTime": {
+      "account_value_last": 433.0,
+      "account_value_ts_iso": "2026-11-05T02:54:06.677000+00:00",
+      "pnl_last": -22080595.81,
+      "vlm": 18941259565.47,
+      "n_points": 113
+    },
+    "perpDay": {
+      "account_value_last": 361.16,
+      "account_value_ts_iso": "2026-11-05T02:54:06.677000+00:00",
+      "pnl_last": -3120.14,
+      "vlm": 282767.09,
+      "n_points": 35
+    },
+    "perpWeek": {
+      "account_value_last": 361.16,
+      "account_value_ts_iso": "2026-11-05T02:54:06.677000+00:00",
+      "pnl_last": -2740.07,
+      "vlm": 473227.54,
+      "n_points": 71
+    },
+    "perpMonth": {
+      "account_value_last": 361.16,
+      "account_value_ts_iso": "2026-11-05T02:54:06.677000+00:00",
+      "pnl_last": -2599.38,
+      "vlm": 660899.79,
+      "n_points": 59
+    },
+    "perpAllTime": {
+      "account_value_last": 361.16,
+      "account_value_ts_iso": "2026-11-05T02:54:06.677000+00:00",
+      "pnl_last": -23397366.61,
+      "vlm": 18933251978.1,
+      "n_points": 111
+    }
+  },
+  "trading": {
+    "n_fills": 2000,
+    "truncated": true,
+    "last_fill_ts": 1793807102.234,
+    "last_fill_iso": "2026-11-04T15:45:02.234000+00:00",
+    "days_since_last_fill": 0.46,
+    "n_fills_7d": 44,
+    "n_fills_30d": 79,
+    "first_fill_iso": "2026-05-22T04:02:04.329000+00:00",
+    "top_coins": [
+      [
+        "xyz:SP500",
+        1056
+      ],
+      [
+        "BTC",
+        811
+      ],
+      [
+        "xyz:GOLD",
+        66
+      ],
+      [
+        "xyz:SPCX",
+        27
+      ],
+      [
+        "CASHCAT",
+        22
+      ],
+      [
+        "SOL",
+        9
+      ],
+      [
+        "ETH",
+        5
+      ],
+      [
+        "@166",
+        2
+      ]
+    ],
+    "by_venue": {
+      "builder:xyz": 1149,
+      "native": 847,
+      "spot": 4
+    },
+    "recent_fills": [
+      {
+        "time_iso": "2026-11-04T10:17:50.665000+00:00",
+        "coin": "BTC",
+        "dir": "Open Short",
+        "px": 78467.0,
+        "sz": 0.00039,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-11-04T10:17:50.665000+00:00",
+        "coin": "BTC",
+        "dir": "Open Short",
+        "px": 78467.0,
+        "sz": 0.00368,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-11-04T10:18:07.807000+00:00",
+        "coin": "BTC",
+        "dir": "Open Short",
+        "px": 78466.0,
+        "sz": 0.00049,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-11-04T10:18:11.782000+00:00",
+        "coin": "BTC",
+        "dir": "Open Short",
+        "px": 78459.0,
+        "sz": 0.00107,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-11-04T14:15:15.533000+00:00",
+        "coin": "BTC",
+        "dir": "Open Short",
+        "px": 78341.0,
+        "sz": 0.062,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-11-04T14:27:44.438000+00:00",
+        "coin": "BTC",
+        "dir": "Open Short",
+        "px": 78350.0,
+        "sz": 0.00497,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-11-04T14:42:54.655000+00:00",
+        "coin": "BTC",
+        "dir": "Close Short",
+        "px": 79361.0,
+        "sz": 0.72635,
+        "closed_pnl": -651.9
+      },
+      {
+        "time_iso": "2026-11-04T15:04:10.370000+00:00",
+        "coin": "BTC",
+        "dir": "Open Short",
+        "px": 79598.0,
+        "sz": 0.11931,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-11-04T15:04:10.370000+00:00",
+        "coin": "BTC",
+        "dir": "Open Short",
+        "px": 79598.0,
+        "sz": 0.2,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-11-04T15:04:10.370000+00:00",
+        "coin": "BTC",
+        "dir": "Open Short",
+        "px": 79598.0,
+        "sz": 0.01,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-11-04T15:08:49.686000+00:00",
+        "coin": "BTC",
+        "dir": "Close Short",
+        "px": 80677.0,
+        "sz": 0.32931,
+        "closed_pnl": -355.33
+      },
+      {
+        "time_iso": "2026-11-04T15:28:23.648000+00:00",
+        "coin": "BTC",
+        "dir": "Open Short",
+        "px": 80449.0,
+        "sz": 0.13617,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-11-04T15:28:23.648000+00:00",
+        "coin": "BTC",
+        "dir": "Open Short",
+        "px": 80449.0,
+        "sz": 0.05452,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-11-04T15:28:31.975000+00:00",
+        "coin": "BTC",
+        "dir": "Open Short",
+        "px": 80465.0,
+        "sz": 0.00089,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-11-04T15:28:58.577000+00:00",
+        "coin": "BTC",
+        "dir": "Open Short",
+        "px": 80430.0,
+        "sz": 0.00047,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-11-04T15:28:58.577000+00:00",
+        "coin": "BTC",
+        "dir": "Open Short",
+        "px": 80430.0,
+        "sz": 0.0006,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-11-04T15:43:43.651000+00:00",
+        "coin": "BTC",
+        "dir": "Open Short",
+        "px": 80343.0,
+        "sz": 0.0057,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-11-04T15:44:26.701000+00:00",
+        "coin": "BTC",
+        "dir": "Open Short",
+        "px": 80236.0,
+        "sz": 0.00947,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-11-04T15:44:40.957000+00:00",
+        "coin": "BTC",
+        "dir": "Open Short",
+        "px": 80270.0,
+        "sz": 0.00196,
+        "closed_pnl": 0.0
+      },
+      {
+        "time_iso": "2026-11-04T15:45:02.234000+00:00",
+        "coin": "BTC",
+        "dir": "Open Short",
+        "px": 80229.0,
+        "sz": 0.00222,
+        "closed_pnl": 0.0
+      }
+    ]
+  },
+  "funds": {
+    "native": {
+      "n_positions": 1,
+      "account_value": 361.161866,
+      "position_value": 17074.48
+    },
+    "builder_dex": {
+      "xyz": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "flx": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "vntl": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "hyna": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "km": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "abcd": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "cash": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "para": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "mkts": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "io": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      }
+    },
+    "spot": {
+      "n_nonzero": 5,
+      "balances": [
+        {
+          "coin": "USDC",
+          "total": 431.74871041,
+          "hold": 431.74871041,
+          "entry_ntl": 0.0,
+          "usd": 431.74871041
+        },
+        {
+          "coin": "FARM",
+          "total": 0.8,
+          "hold": 0.0,
+          "entry_ntl": 4.68664,
+          "usd": 4.68664,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "VAPOR",
+          "total": 816.0,
+          "hold": 0.0,
+          "entry_ntl": 3.5849328,
+          "usd": 3.5849328,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "HYPE",
+          "total": 0.01433447,
+          "hold": 0.0,
+          "entry_ntl": 0.53707415,
+          "usd": 0.53707415,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "MAX",
+          "total": 2908.3048,
+          "hold": 0.0,
+          "entry_ntl": 0.0,
+          "usd": 0.0,
+          "usd_is_estimate": true
+        }
+      ],
+      "usd_stable": 431.75,
+      "usd_est_other": 8.81,
+      "usd_total_est": 440.56,
+      "estimated": true
+    },
+    "native_usd": 361.16,
+    "builder_usd": 0.0,
+    "spot_usd": 440.56,
+    "total_usd": 801.72,
+    "non_native_usd": 440.56,
+    "non_native_share": 0.5495,
+    "positions": [
+      {
+        "coin": "BTC",
+        "szi": -0.212,
+        "side": "short",
+        "entry_px": 80432.6,
+        "position_value": 17074.48,
+        "unrealized_pnl": -22.75864,
+        "leverage_value": 40.0,
+        "leverage_type": "cross",
+        "liquidation_px": 81557.0869322152,
+        "margin_used": 426.862,
+        "max_leverage": 40.0,
+        "cum_funding_all_time": 5821694.697414,
+        "dex": ""
+      }
+    ],
+    "n_positions_total": 1,
+    "n_positions_native": 1,
+    "n_positions_builder": 0,
+    "known": true
+  },
+  "ledger": {
+    "n_total": 22,
+    "n_in_window": 22,
+    "n_kept": 22,
+    "by_type": {
+      "rewardsClaim": {
+        "n": 20,
+        "usd": 8455.73,
+        "direction": "in"
+      },
+      "send": {
+        "n": 2,
+        "usd": 5424.59,
+        "direction": "bridge_out"
+      }
+    },
+    "external_out_usd": 0.0,
+    "external_in_usd": 8455.74,
+    "internal_usd": 0.0,
+    "vault_out_usd": 0.0,
+    "bridge_out_usd": 5424.59,
+    "unknown_usd": 0.0,
+    "external_out_rows": [],
+    "bridge_out_rows": [
+      {
+        "time": 1791977502.905,
+        "time_iso": "2026-10-14T11:31:42.905000+00:00",
+        "type": "send",
+        "usd": 390.81,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xb59713b45cef60f9b71004468a08a60205180099f7e27fcb595fbf071be33ae4"
+      },
+      {
+        "time": 1791697303.325,
+        "time_iso": "2026-10-11T05:41:43.325000+00:00",
+        "type": "send",
+        "usd": 5033.78,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xb11cf72b81bb15a5b29604464e3a3101f6000f111cbe347754e5a27e40beef90"
+      }
+    ],
+    "unknown_rows": [],
+    "internal_rows": [],
+    "rows": [
+      {
+        "time": 1793846557.654,
+        "time_iso": "2026-11-05T02:42:37.654000+00:00",
+        "type": "rewardsClaim",
+        "usd": 70.59,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x1c32e8aa604394c01dac0448180c020202f2008ffb46b392bffb93fd1f476eaa"
+      },
+      {
+        "time": 1793806084.121,
+        "time_iso": "2026-11-04T15:28:04.121000+00:00",
+        "type": "rewardsClaim",
+        "usd": 108.9,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x35eb3b9d1b6710f6376404480f2fad0209dd0082b66a2fc8d9b3e6efda6aeae0"
+      },
+      {
+        "time": 1793801748.133,
+        "time_iso": "2026-11-04T14:15:48.133000+00:00",
+        "type": "rewardsClaim",
+        "usd": 23.37,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0xbc0f584999117b0bbd8904480e3f3f020216002f341499dd5fd8039c581554f6"
+      },
+      {
+        "time": 1793793079.994,
+        "time_iso": "2026-11-04T11:51:19.994000+00:00",
+        "type": "rewardsClaim",
+        "usd": 30.2,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x9f7e10cd676049f0a0f704480c7cf602027000b3026368c24346bc20266423db"
+      },
+      {
+        "time": 1793781486.859,
+        "time_iso": "2026-11-04T08:38:06.859000+00:00",
+        "type": "rewardsClaim",
+        "usd": 138.15,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x36c2db00324ec091383c04480a18950204f300e5cd41df63da8b8652f1429a7b"
+      },
+      {
+        "time": 1793732505.058,
+        "time_iso": "2026-11-03T19:01:45.058000+00:00",
+        "type": "rewardsClaim",
+        "usd": 321.48,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0xf338623e48ec2a45f4b20447ff8cf10201210023e3ef491897010d9107e00430"
+      },
+      {
+        "time": 1793609445.71,
+        "time_iso": "2026-11-02T08:50:45.710000+00:00",
+        "type": "rewardsClaim",
+        "usd": 891.9,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x60fe6cdf3e94de6762780447e53df30201aa00c4d997fd3904c71831fd98b852"
+      },
+      {
+        "time": 1793195730.876,
+        "time_iso": "2026-10-28T13:55:30.876000+00:00",
+        "type": "rewardsClaim",
+        "usd": 74.58,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x040db7ff39212280058704478cba6f0202cf00e4d4244152a7d66351f824fc6a"
+      },
+      {
+        "time": 1793105721.993,
+        "time_iso": "2026-10-27T12:55:21.993000+00:00",
+        "type": "rewardsClaim",
+        "usd": 4.26,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x72d59a0bee130e7e744f0447799e7402031d00f189162d50169e455ead16e869"
+      },
+      {
+        "time": 1793104258.967,
+        "time_iso": "2026-10-27T12:30:58.967000+00:00",
+        "type": "rewardsClaim",
+        "usd": 9.15,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0xce92e0d691663475d00c0447794e7802030600bc2c695347725b8c29506a0e60"
+      },
+      {
+        "time": 1793097065.708,
+        "time_iso": "2026-10-27T10:31:05.708000+00:00",
+        "type": "rewardsClaim",
+        "usd": 190.89,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0xc30d4d9f15335677c487044777c588020dfb0084b036754966d5f8f1d4373062"
+      },
+      {
+        "time": 1792925833.321,
+        "time_iso": "2026-10-25T10:57:13.321000+00:00",
+        "type": "rewardsClaim",
+        "usd": 138.63,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x56aee60381d91258582804475354fc02051100e91cdc312afa77915640dcec42"
+      },
+      {
+        "time": 1792766997.98,
+        "time_iso": "2026-10-23T14:49:57.980000+00:00",
+        "type": "rewardsClaim",
+        "usd": 3.5,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0xdfe865e2d8c8cf83e162044731c85a02040200c873cbee5583b1113597cca96e"
+      },
+      {
+        "time": 1792765325.806,
+        "time_iso": "2026-10-23T14:22:05.806000+00:00",
+        "type": "rewardsClaim",
+        "usd": 5.13,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x2072f0389ff42b5821ec0447316df7020b1c001e3af74a2ac43b9b8b5ef80542"
+      },
+      {
+        "time": 1792756763.686,
+        "time_iso": "2026-10-23T11:59:23.686000+00:00",
+        "type": "rewardsClaim",
+        "usd": 1020.41,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x1e4b27638029963e1fc404472f9e2302033b00491b2cb510c213d2b63f2d7028"
+      },
+      {
+        "time": 1791977502.905,
+        "time_iso": "2026-10-14T11:31:42.905000+00:00",
+        "type": "send",
+        "usd": 390.81,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xb59713b45cef60f9b71004468a08a60205180099f7e27fcb595fbf071be33ae4"
+      },
+      {
+        "time": 1791977385.712,
+        "time_iso": "2026-10-14T11:29:45.712000+00:00",
+        "type": "rewardsClaim",
+        "usd": 292.24,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x7bd76dde2a82a9dc7d5104468a02750201b700c3c585c8ae1fa01930e98683c7"
+      },
+      {
+        "time": 1791806323.032,
+        "time_iso": "2026-10-12T11:58:43.032000+00:00",
+        "type": "rewardsClaim",
+        "usd": 98.57,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x80fcfa6e545b6c2d82760446657b1a0201630053ef5e8aff24c5a5c1135f4618"
+      },
+      {
+        "time": 1791697303.325,
+        "time_iso": "2026-10-11T05:41:43.325000+00:00",
+        "type": "send",
+        "usd": 5033.78,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xb11cf72b81bb15a5b29604464e3a3101f6000f111cbe347754e5a27e40beef90"
+      },
+      {
+        "time": 1791697184.532,
+        "time_iso": "2026-10-11T05:39:44.532000+00:00",
+        "type": "rewardsClaim",
+        "usd": 812.02,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0x6c55608f26ceb9d56dcf04464e33a90201170074c1c1d8a7101e0be1e5c293c0"
+      },
+      {
+        "time": 1791020367.131,
+        "time_iso": "2026-10-03T09:39:27.131000+00:00",
+        "type": "rewardsClaim",
+        "usd": 133.42,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0xa517ce30ba1a5611a6910445bdc7220201f70016551d74e348e07983791e2ffc"
+      },
+      {
+        "time": 1790956254.406,
+        "time_iso": "2026-10-02T15:50:54.406000+00:00",
+        "type": "rewardsClaim",
+        "usd": 4088.34,
+        "direction": "in",
+        "destination": null,
+        "token": "USDC",
+        "hash": "0xcc1583d624732209cd8f0445b02d7402027300bbbf7640db6fde2f28e376fbf4"
+      }
+    ],
+    "n_bridge_out": 2,
+    "n_unknown": 0,
+    "counterparties": {},
+    "parse_failed": false
+  },
+  "verdict": "同地址換戰場（builder dex/現貨）｜⚠️ 資本外移中",
+  "verdict_reasons": [
+    "非原生資金 $440.56 占總資產 $801.72 的55%（builder dex $0.00／現貨 $440.56）",
+    "成交戰場分布：非原生 1153/2000 筆（58%）",
+    "近 45 天帳變動離場訊號：跨層轉移（HyperCore→HyperEVM，同一擁有者） $5,424.59",
+    "跨層轉移（HyperCore→HyperEVM，同一地址擁有者，非第三方）$5,424.59，占「現餘＋跨層轉移」87%（≥ 20% 門檻）→ 資本正離開交易場（跨層/減倉）"
+  ],
+  "endpoint_health": [
+    {
+      "name": "perpDexs",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "clearinghouseState[native]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "clearinghouseState[xyz]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "clearinghouseState[flx]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "clearinghouseState[vntl]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 1.36
+    },
+    {
+      "name": "clearinghouseState[hyna]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "clearinghouseState[km]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "clearinghouseState[abcd]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "clearinghouseState[cash]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "clearinghouseState[para]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.2
+    },
+    {
+      "name": "clearinghouseState[mkts]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "clearinghouseState[io]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "spotClearinghouseState",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "userNonFundingLedgerUpdates",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.18
+    },
+    {
+      "name": "portfolio",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.21
+    },
+    {
+      "name": "userFills",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.99
+    }
+  ],
+  "notes": [],
+  "requests_ok": 16,
+  "requests_failed": 0
+}

@@ -151,7 +151,22 @@ class OKXDemo:
         self._inst = {}
         self._cfg = None
 
+    TRANSIENT = ("50001", "50004", "50013", "50026")   # OKX 系統忙／暫時無法服務
+
     def req(self, method, path, params=None, body=None):
+        """查詢（GET）遇到 OKX 暫時性錯誤或網路錯誤會重試 3 次；下單（POST）不重試，避免重複下單。"""
+        for i in range(3 if method == "GET" else 1):
+            try:
+                return self._req(method, path, params, body)
+            except RuntimeError as e:
+                if i == 2 or method != "GET" or not any(f"code={c}" in str(e) for c in self.TRANSIENT):
+                    raise
+            except (urllib.error.URLError, TimeoutError, OSError):
+                if i == 2 or method != "GET":
+                    raise
+            time.sleep(2 * (i + 1))
+
+    def _req(self, method, path, params=None, body=None):
         qs = ("?" + urllib.parse.urlencode(params)) if params else ""
         body_s = json.dumps(body) if body is not None else ""
         now = datetime.now(timezone.utc)
@@ -287,9 +302,32 @@ class OKXDemo:
                "inst": i["instId"], "qty": qty, "algoId": a["algoId"], "entry_ms": int(time.time() * 1000)}
         return pos, f"ordId={o['ordId']} algoId={a['algoId']} 訊號收盤 {close:.6g} 實際成交 {px:.6g}"
 
+    def _algo_query(self, path, algo_id):
+        """用 algoId 查單；OKX 對「不在這個清單裡」的單回 51603，當作空清單。"""
+        try:
+            return self.req("GET", path, {"ordType": "oco", "algoId": algo_id})
+        except RuntimeError as e:
+            if "code=51603" in str(e):
+                return []
+            raise
+
+    def algo_order(self, pos):
+        """停利停損單目前的狀態。已觸發／已撤銷的單在歷史清單，還在等的單在掛單清單；
+        只查歷史會讓還在等的單回「不存在」（2026-10-31～11-02 機器人因此每輪當掉）。"""
+        h = self._algo_query("/api/v5/trade/orders-algo-history", pos["algoId"])
+        if h:
+            return h[0]
+        p = self._algo_query("/api/v5/trade/orders-algo-pending", pos["algoId"])
+        return p[0] if p else None
+
     def check_exit(self, leg, st, pos, bars):
-        h = self.req("GET", "/api/v5/trade/orders-algo-history", {"ordType": "oco", "algoId": pos["algoId"]})
-        state = h[0]["state"] if h else "live"
+        h = self.algo_order(pos)
+        if h is None:
+            print(f"⚠️ {leg['name']}：OKX 上找不到停利停損單 {pos['algoId']}（歷史和掛單都沒有），先照原本規則續抱，請到 OKX 模擬盤看一下")
+            state = "missing"
+        else:
+            state = h.get("state", "live")
+        h = [h] if h else []
         if state == "effective":   # 停利或停損已觸發
             side = "buy" if pos["side"] == "short" else "sell"
             px = self._fills_vwap(pos["inst"], pos["entry_ms"], side) or float(h[0].get("actualPx") or 0) or None
@@ -456,7 +494,13 @@ def run_cycle(legs, data, store, broker, run_utc, quiet=False, risk=True):
                 say(f"⚠️ {g['name']}：上次執行後漏了 {missed} 根 K 線（電腦睡眠或沒排程？），那些 K 線上的進場訊號已錯過")
         pos = st["pos"]
         if pos:
-            ex = broker.check_exit(g, st, pos, bars)
+            try:
+                ex = broker.check_exit(g, st, pos, bars)
+            except Exception as e:   # 這個幣查不到／平不了：記錄、下一輪再試，其他幣照常處理
+                store.log(dict(run_utc=run_utc, leg=g["name"], action="ERROR", side=g["side"], note=f"出場檢查失敗：{e}"[:300]))
+                say(f"❌ {g['name']} 出場檢查失敗（下一輪再試，其他幣照常）：{e}")
+                del fresh[g["name"]]   # 不標記這根 K 線處理過
+                continue
             if ex:
                 close_out(g, st, pos, ex, store, run_utc, say)
 

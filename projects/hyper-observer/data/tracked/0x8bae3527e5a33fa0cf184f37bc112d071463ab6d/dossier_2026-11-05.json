@@ -1,0 +1,398 @@
+{
+  "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+  "label": "scan-best-candidate-9M-lowdd",
+  "snapshot_date": "2026-11-05",
+  "classification": "consistent_winner",
+  "classification_reasons": [
+    "活動跨度 476.2 天 >= 60",
+    "總 PnL 12810718.66 > 10,000",
+    "回撤 0.0554 < 40% peak",
+    "目前槓桿 10.0 <= 20x",
+    "正月比率 0.765 >= 0.5",
+    "（fills 截斷 n>=2000，profit factor 3.931 樣本偏誤大，僅供低信心參考，不硬否決）"
+  ],
+  "followable": {
+    "ok": true,
+    "reasons": []
+  },
+  "metrics": {
+    "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+    "snapshot_date": "2026-11-05",
+    "pnl_source": "portfolio_curve",
+    "portfolio_window": "perpAllTime",
+    "low_confidence": false,
+    "total_pnl": 12810718.66,
+    "peak_pnl": 12815143.73,
+    "monthly_pnl": {
+      "2025-07": -73180.55,
+      "2025-08": -34288.37,
+      "2025-09": -8212.34,
+      "2025-10": 1435708.48,
+      "2025-11": 2045437.87,
+      "2025-12": 930544.52,
+      "2026-01": 638177.85,
+      "2026-02": 519822.91,
+      "2026-03": 1413004.59,
+      "2026-04": 1924051.99,
+      "2026-05": 106203.52,
+      "2026-06": -253202.61,
+      "2026-07": 1066691.25,
+      "2026-08": 1556583.85,
+      "2026-09": 255010.91,
+      "2026-10": 660797.69,
+      "2026-11": 627567.1
+    },
+    "active_months": 17,
+    "positive_month_ratio": 0.765,
+    "best_month_pnl": 2045437.87,
+    "max_drawdown_pct": 0.0554,
+    "current_drawdown_pct": 0.0003,
+    "max_single_day_crash_pct": 0.0331,
+    "span_days": 476.2,
+    "days_idle": 0.9,
+    "n_fills": 2000,
+    "profit_factor": 3.931,
+    "avg_win": 2480.36,
+    "avg_loss": 1508.08,
+    "realized_win_rate": 0.705,
+    "avg_hold_hours": 748.273,
+    "net_direction_ratio": 0.0046,
+    "n_fills_truncated": true,
+    "n_fills_last_30d": 1208,
+    "n_events": 42,
+    "n_events_last_30d": 28,
+    "n_events_last_30d_est": 28,
+    "events_30d_coverage_days": 30.0,
+    "median_fills_per_event": 26.0,
+    "median_event_notional": 720581.41,
+    "median_gap_between_events_hours": 0.06,
+    "p90_gap_between_events_hours": 119.0,
+    "had_liquidation": false,
+    "n_liquidations": 0,
+    "top_coin": "xyz:NVDA",
+    "vlm": 378414611.99,
+    "vlm_to_pnl_ratio": 29.54,
+    "funding_total": -122252.07,
+    "n_open_positions": 2,
+    "n_open_positions_native": 1,
+    "dexs_with_positions": [
+      "xyz"
+    ],
+    "account_value_native": 3331.93,
+    "account_value_by_dex": {
+      "": 3331.93,
+      "abcd": 0.0,
+      "cash": 0.0,
+      "flx": 0.0,
+      "hyna": 0.0,
+      "io": 0.0,
+      "km": 0.0,
+      "mkts": 0.0,
+      "para": 0.0,
+      "vntl": 0.0,
+      "xyz": 40830.9
+    },
+    "spot_value_usd": 3224363.2,
+    "spot_tokens": [
+      {
+        "coin": "USDC",
+        "qty": 3176147.93752233,
+        "usd": 3176147.94,
+        "estimated": false
+      },
+      {
+        "coin": "USDT0",
+        "qty": 48215.25091058,
+        "usd": 48215.25,
+        "estimated": true
+      },
+      {
+        "coin": "USDH",
+        "qty": 0.01250805,
+        "usd": 0.01,
+        "estimated": false
+      }
+    ],
+    "total_value_all_venues": 3268526.03,
+    "non_native_share": 0.999,
+    "current_max_leverage": 10.0,
+    "has_extreme_leverage": false,
+    "margin_types": [
+      "cross",
+      "isolated"
+    ],
+    "account_value": 44162.83,
+    "fetch_errors": []
+  },
+  "position_value": 500431.87,
+  "unrealized_pnl": -7948.17,
+  "n_open_positions": 2,
+  "open_positions": [
+    {
+      "coin": "APEX",
+      "szi": 46734.0,
+      "side": "long",
+      "entry_px": 0.18022,
+      "position_value": 9953.87466,
+      "unrealized_pnl": 1531.47318,
+      "leverage_value": 3.0,
+      "leverage_type": "cross",
+      "liquidation_px": null,
+      "margin_used": 3317.95822,
+      "max_leverage": 3.0,
+      "cum_funding_all_time": 21.490756,
+      "dex": ""
+    },
+    {
+      "coin": "xyz:ORCL",
+      "szi": 3984.063,
+      "side": "long",
+      "entry_px": 125.489,
+      "position_value": 490477.99593,
+      "unrealized_pnl": -9479.64106,
+      "leverage_value": 10.0,
+      "leverage_type": "isolated",
+      "liquidation_px": 118.8015186446,
+      "margin_used": 40830.897893,
+      "max_leverage": 10.0,
+      "cum_funding_all_time": 17.748247,
+      "dex": "xyz"
+    }
+  ],
+  "recent_fills": [
+    {
+      "time": "2026-11-04T18:24:58.756000+00:00",
+      "coin": "xyz:ORCL",
+      "dir": "Open Long",
+      "px": 125.43,
+      "sz": 4.232,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-04T18:24:58.756000+00:00",
+      "coin": "xyz:ORCL",
+      "dir": "Open Long",
+      "px": 125.42,
+      "sz": 103.719,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-04T18:24:58.756000+00:00",
+      "coin": "xyz:ORCL",
+      "dir": "Open Long",
+      "px": 125.42,
+      "sz": 2.368,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-04T18:24:58.756000+00:00",
+      "coin": "xyz:ORCL",
+      "dir": "Open Long",
+      "px": 125.42,
+      "sz": 6.348,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-04T18:24:58.756000+00:00",
+      "coin": "xyz:ORCL",
+      "dir": "Open Long",
+      "px": 125.41,
+      "sz": 38.496,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-04T18:24:58.756000+00:00",
+      "coin": "xyz:ORCL",
+      "dir": "Open Long",
+      "px": 125.4,
+      "sz": 2.389,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-04T18:24:58.756000+00:00",
+      "coin": "xyz:ORCL",
+      "dir": "Open Long",
+      "px": 125.39,
+      "sz": 2.366,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-04T18:24:58.756000+00:00",
+      "coin": "xyz:ORCL",
+      "dir": "Open Long",
+      "px": 125.39,
+      "sz": 34.167,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-04T18:24:59.156000+00:00",
+      "coin": "xyz:ORCL",
+      "dir": "Open Long",
+      "px": 125.5,
+      "sz": 1149.118,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-04T18:24:59.354000+00:00",
+      "coin": "xyz:ORCL",
+      "dir": "Open Long",
+      "px": 125.5,
+      "sz": 186.939,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-04T18:24:59.354000+00:00",
+      "coin": "xyz:ORCL",
+      "dir": "Open Long",
+      "px": 125.5,
+      "sz": 734.596,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-04T18:24:59.354000+00:00",
+      "coin": "xyz:ORCL",
+      "dir": "Open Long",
+      "px": 125.5,
+      "sz": 4.492,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-04T18:24:59.618000+00:00",
+      "coin": "xyz:ORCL",
+      "dir": "Open Long",
+      "px": 125.5,
+      "sz": 40.0,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-04T18:24:59.618000+00:00",
+      "coin": "xyz:ORCL",
+      "dir": "Open Long",
+      "px": 125.5,
+      "sz": 18.0,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-04T18:24:59.761000+00:00",
+      "coin": "xyz:ORCL",
+      "dir": "Open Long",
+      "px": 125.5,
+      "sz": 23.456,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-04T18:24:59.963000+00:00",
+      "coin": "xyz:ORCL",
+      "dir": "Open Long",
+      "px": 125.5,
+      "sz": 37.086,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-04T18:25:00.023000+00:00",
+      "coin": "xyz:ORCL",
+      "dir": "Open Long",
+      "px": 125.5,
+      "sz": 14.952,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-04T18:25:00.163000+00:00",
+      "coin": "xyz:ORCL",
+      "dir": "Open Long",
+      "px": 125.5,
+      "sz": 40.0,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-04T18:25:00.291000+00:00",
+      "coin": "xyz:ORCL",
+      "dir": "Open Long",
+      "px": 125.5,
+      "sz": 17.421,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-04T18:25:00.426000+00:00",
+      "coin": "xyz:ORCL",
+      "dir": "Open Long",
+      "px": 125.5,
+      "sz": 30.527,
+      "closed_pnl": 0.0,
+      "is_liquidation": false
+    }
+  ],
+  "new_positions": [
+    {
+      "key": "APEX:long",
+      "coin": "APEX"
+    },
+    {
+      "key": "xyz:ORCL:long",
+      "coin": "xyz:ORCL"
+    }
+  ],
+  "disappeared_positions": [
+    {
+      "key": "BSV:long",
+      "coin": "BSV"
+    },
+    {
+      "key": "ORDI:long",
+      "coin": "ORDI"
+    },
+    {
+      "key": "TNSR:long",
+      "coin": "TNSR"
+    },
+    {
+      "key": "xyz:GOOGL:long",
+      "coin": "xyz:GOOGL"
+    },
+    {
+      "key": "xyz:SKHX:long",
+      "coin": "xyz:SKHX"
+    },
+    {
+      "key": "xyz:SKHY:short",
+      "coin": "xyz:SKHY"
+    }
+  ],
+  "initialized": false,
+  "raw_source": "snapshot",
+  "funds_trend": {
+    "status": "收手中（現金化＋資本外移）",
+    "n_points": 7,
+    "days": 7,
+    "threshold": 0.05,
+    "first_date": "2026-10-30",
+    "last_date": "2026-11-05",
+    "spot_share_first": 0.8024,
+    "spot_share_last": 0.9865,
+    "spot_share_change": 0.1841,
+    "total_first": 5477147.34,
+    "total_last": 3268526.03,
+    "total_change_pct": -0.4032,
+    "perp_change_pct": -0.9592,
+    "position_value_change_pct": -0.8938
+  }
+}

@@ -2,7 +2,7 @@
 # F3 機器人「一輪」：跑機器人 → 更新監控資料 → 存狀態 → 需要時推 Telegram。
 # 由 .github/workflows/f3-bot.yml 每小時呼叫一次。需要的環境變數：MODE、CAPITAL、PERSIST、RUN_URL、
 # KIWI_F3_HOME（狀態資料夾的上一層，裡面是 f3-bot-state 分支的 worktree）、OKX_*／TELEGRAM_*（各自可選）。
-# 回傳值：機器人本身失敗時回傳 1（已自己推過失敗通知）。
+# 回傳值：F3 機器人失敗時回傳 1（已自己推過失敗通知；趨勢紙上交易照跑照存）。
 set -uo pipefail
 cd "$(dirname "$0")/../.."
 out="$(mktemp)"
@@ -12,18 +12,34 @@ if [ "$PERSIST" = "true" ] && ! git -C "$KIWI_F3_HOME" pull --quiet --rebase -X 
   git -C "$KIWI_F3_HOME" rebase --abort 2>/dev/null || true
 fi
 notify() { [ "${EVENT:-}" = "push" ] && return 0; python3 projects/avi-v5/scripts/notify_ops.py --title "$1" --url "$RUN_URL" "${@:2}" || true; }
+# 把 KIWI_F3_HOME 底下指定的路徑 commit 並推上 f3-bot-state
+save() {
+  [ "$PERSIST" = "true" ] || return 0
+  ( cd "$KIWI_F3_HOME"
+    git add -A -- "$@"
+    if ! git diff --cached --quiet; then
+      git commit --quiet -m "f3-bot: $MODE $(date -u +%Y-%m-%dT%H:%MZ)"
+      ok=0
+      for i in 1 2 3; do git push --quiet origin f3-bot-state && { ok=1; break; }; sleep $((i * 5)); git pull --quiet --rebase -X theirs origin f3-bot-state || git rebase --abort 2>/dev/null || true; done
+      [ "$ok" = 1 ] || echo "⚠️ 狀態沒有推上 f3-bot-state，下一輪會再推"
+    fi )
+}
 
-if ! python3 projects/crypto-f3/f3_okx_bot.py --mode "$MODE" --v2 --capital "$CAPITAL" 2>&1 | tee "$out"; then
-  notify "❌ F3 2.0 機器人執行失敗（$MODE）" --body "這一輪沒有跑完，可能漏掉進出場。下一小時會再試一次。錯誤：$(tail -3 "$out")"
-  exit 1
-fi
+bot_ok=1
+python3 projects/crypto-f3/f3_okx_bot.py --mode "$MODE" --v2 --capital "$CAPITAL" 2>&1 | tee "$out" || bot_ok=0
 
-# 趨勢跟隨紙上交易（不下單，三個波動目標並行比較；研究報告 2026-10-28）。失敗不影響 F3，只推警示
+# 趨勢跟隨紙上交易（不下單，三個波動目標並行比較；研究報告 2026-10-28）。和 F3 互不影響：任一邊失敗，另一邊照跑
 tp="$(mktemp)"
 if python3 projects/crypto-f3/trend_paper.py --home "$KIWI_F3_HOME/trend-paper" --capital "$CAPITAL" > "$tp" 2>&1; then
   { echo; cat "$tp"; } | tee -a "$out"
 else
   { echo; echo "⚠️ 趨勢跟隨紙上交易這一輪失敗：$(tail -3 "$tp")"; } | tee -a "$out"
+fi
+
+if [ "$bot_ok" = 0 ]; then
+  save trend-paper     # F3 這一輪沒跑完，它的狀態不存（下一輪重來），趨勢紙上的照存
+  notify "❌ F3 2.0 機器人執行失敗（$MODE）" --body "這一輪沒有跑完，可能漏掉進出場。下一小時會再試一次。錯誤：$(grep -v '^$' "$out" | grep -v '趨勢' | tail -3)"
+  exit 1
 fi
 
 kind=""
@@ -40,15 +56,7 @@ if [ "$PERSIST" = "true" ]; then
   python3 projects/crypto-f3/f3_monitor.py --home "$KIWI_F3_HOME/$MODE-F3-2.0" --mode "$MODE" > "$mon" 2>&1 || echo "（監控資料這一輪更新失敗）" >> "$mon"
   cat "$mon"
   [ "$kind" = "daily" ] && { echo; echo "── 監控 ──"; cat "$mon"; } >> "$out"
-
-  ( cd "$KIWI_F3_HOME"
-    git add -A
-    if ! git diff --cached --quiet; then
-      git commit --quiet -m "f3-bot: $MODE $(date -u +%Y-%m-%dT%H:%MZ)"
-      ok=0
-      for i in 1 2 3; do git push --quiet origin f3-bot-state && { ok=1; break; }; sleep $((i * 5)); git pull --quiet --rebase -X theirs origin f3-bot-state || git rebase --abort 2>/dev/null || true; done
-      [ "$ok" = 1 ] || echo "⚠️ 狀態沒有推上 f3-bot-state，下一輪會再推"
-    fi )
+  save .
 fi
 
 case "$kind" in
