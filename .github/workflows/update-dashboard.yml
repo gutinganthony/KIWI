@@ -73,12 +73,32 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: python scripts/risk_dashboards_data.py || true
 
+      # 全局觀測台（docs/cockpit/）台股資料：證交所類股指數追加 + 三大法人流向（T86 × 收盤價，依產業別彙總）。
+      # 2026-11-17 Jake 核准接入。證交所 WAF 約 15 個請求就封 10 分鐘，所以腳本自己限速，
+      # 每次只補「最新 + 往回 3 個缺日」，歷史慢慢累積；跑不完下次續。best-effort，永不擋 dashboard。
+      - name: Fetch TW sector data for cockpit (best-effort)
+        working-directory: projects/avi-v5
+        timeout-minutes: 12
+        continue-on-error: true
+        run: python scripts/fetch_tw_sectors.py --update --history-budget 3 --sleep 8 --cooldown 120 --max-block 2 || true
+
+      # 全局觀測台（docs/cockpit/）：市場 regime／板塊強弱／資金流向 + 回測，美股 + 台股。
+      # 2026-11-17 Jake 核准接入。Yahoo 擋 runner 時腳本會失敗退出、沿用上次的 JSON。best-effort，永不擋 dashboard。
+      - name: Update market cockpit data (best-effort)
+        working-directory: projects/avi-v5
+        timeout-minutes: 8
+        continue-on-error: true
+        run: python scripts/market_cockpit.py || true
+
       - name: Commit and push if changed
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/index.html docs/taiwan_data.json docs/history.json
           git add docs/risk/data.json 2>/dev/null || true
+          # 全局觀測台（2026-11-17）：頁面讀的兩個 JSON + 台股累積資料（CSV 與休市日清單都要入版控，否則歷史不會累積）
+          git add docs/cockpit/data.json docs/cockpit/backtest.json 2>/dev/null || true
+          git add projects/avi-v5/data/tw/*.csv projects/avi-v5/data/tw/holidays.txt projects/avi-v5/data/tw/industry_map.json 2>/dev/null || true
           git add projects/avi-v5/data/ext/*.csv 2>/dev/null || true
           # 日本開示資料橋（fetch_jp_disclosures.py）的產出是 .md，不被上面的 *.csv glob 涵蓋。
           # 2026-07-27 前這行不存在 → 橋有跑但產出從未入版控、隨 runner 回收消失。

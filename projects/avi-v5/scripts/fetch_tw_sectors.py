@@ -14,6 +14,7 @@ fetch_tw_sectors.py — 台股板塊資料層（給全局觀測台 docs/cockpit 
 
 用法：
   python scripts/fetch_tw_sectors.py --update                  # 補到今天（index + flow，各自從最後一筆接著補）
+  python scripts/fetch_tw_sectors.py --update --history-budget 3   # 每日排程用：補到今天後，再往回補 3 個缺日的法人流向
   python scripts/fetch_tw_sectors.py --backfill-index 2019-01-01   # 只回填指數（1 請求/日）
   python scripts/fetch_tw_sectors.py --backfill-flow 2025-11-01    # 回填法人流向（2 請求/日）
   （可同時給；順序：先 flow 再 index，日期由新到舊，讓最近一年先完整）
@@ -134,6 +135,9 @@ def fetch_index(fx, d):
         v = num(row[1])
         if v is not None:
             out[name] = v
+    # 盤中／尚未出表時，證交所會回一張只有名稱、數值是 "--" 的表：不能當成一天存進去
+    if "發行量加權股價指數" not in out:
+        return None
     return out
 
 
@@ -258,11 +262,14 @@ def trading_days(start, end):
         d -= timedelta(days=1)
 
 
-def run(kind, start, fx, imap=None):
+def run(kind, start, fx, imap=None, limit=None):
+    """補 start → 今天之間缺的交易日（由新到舊）。limit：本次最多補幾日（給每日排程慢慢往回補歷史用）。"""
     hol = load_holidays()
     have = flow_dates() if kind == "flow" else idx_dates()[0]
     end = date.today()
     todo = [d for d in trading_days(start, end) if d.isoformat() not in have and d.isoformat() not in hol]
+    if limit is not None:
+        todo = todo[:limit]
     print(f"[{kind}] 待補 {len(todo)} 日（{start} → {end}）", file=sys.stderr)
     done = 0
     for d in todo:
@@ -290,6 +297,9 @@ def run(kind, start, fx, imap=None):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--update", action="store_true", help="index 與 flow 各從最後一筆補到今天")
+    ap.add_argument("--history-budget", type=int, default=0,
+                    help="搭配 --update：補完最新之後，再往回補最多 N 個缺的交易日的法人流向（到 --history-floor 為止）")
+    ap.add_argument("--history-floor", default="2025-11-01", metavar="YYYY-MM-DD")
     ap.add_argument("--backfill-index", metavar="YYYY-MM-DD")
     ap.add_argument("--backfill-flow", metavar="YYYY-MM-DD")
     ap.add_argument("--sleep", type=float, default=5.0)
@@ -305,15 +315,18 @@ def main():
             start = date.fromisoformat(a.backfill_flow)
         else:
             have = flow_dates()
-            start = date.fromisoformat(max(have)) + timedelta(days=1) if have else date.today() - timedelta(days=400)
+            start = date.fromisoformat(max(have)) + timedelta(days=1) if have else date.today() - timedelta(days=10)
         ok &= run("flow", start, fx, imap)
     if a.update or a.backfill_index:
         if a.backfill_index:
             start = date.fromisoformat(a.backfill_index)
         else:
             have = idx_dates()[0]
-            start = date.fromisoformat(max(have)) + timedelta(days=1) if have else date.today() - timedelta(days=400)
+            start = date.fromisoformat(max(have)) + timedelta(days=1) if have else date.today() - timedelta(days=14)
         ok &= run("index", start, fx)
+    # 最新的都補完之後，才用剩下的額度往回補法人流向歷史（一次幾天，避免撞 WAF）
+    if ok and a.update and a.history_budget > 0:
+        ok &= run("flow", date.fromisoformat(a.history_floor), fx, imap, limit=a.history_budget)
     sys.exit(0 if ok else 2)
 
 

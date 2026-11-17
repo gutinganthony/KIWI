@@ -95,6 +95,15 @@ def yahoo_ohlcv(tk, cache=None):
     r = json.loads(raw)["chart"]["result"][0]
     qd = r["indicators"]["quote"][0]
     adj = r["indicators"].get("adjclose", [{}])[0].get("adjclose", qd["close"])
+    # Yahoo 偶爾把「最新一個已收盤交易日」的 close 回成 null（2026-11-17 實測：high/low/volume 都有、close 是 null），
+    # 當日收盤其實在 meta.regularMarketPrice。只在最後一根、且 meta 時間落在同一天時補。
+    meta = r.get("meta", {})
+    if qd["close"] and qd["close"][-1] is None and meta.get("regularMarketPrice") and meta.get("regularMarketTime"):
+        if abs(meta["regularMarketTime"] - r["timestamp"][-1]) < 86400:
+            px = float(meta["regularMarketPrice"])
+            qd["close"] = qd["close"][:-1] + [px]
+            prev = next(((c, a_) for c, a_ in zip(reversed(qd["close"][:-1]), reversed(adj[:-1])) if c and a_), None)
+            adj = list(adj[:-1]) + [px * (prev[1] / prev[0]) if prev else px]
     df = pd.DataFrame({"open": qd["open"], "high": qd["high"], "low": qd["low"], "close": qd["close"],
                        "adj": adj, "volume": qd["volume"]},
                       index=pd.to_datetime(r["timestamp"], unit="s", utc=True).tz_convert("America/New_York").normalize().tz_localize(None))

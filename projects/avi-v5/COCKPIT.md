@@ -66,26 +66,9 @@ jq -r '.sectors[]|[.rank,.symbol,.strength,.quadrant,.flow.pct,.flow.label]|@tsv
 ## 6. 維運
 
 - 本機／雲端 session 重算：`cd projects/avi-v5 && python3 scripts/market_cockpit.py --cache <scratch>/cache`（約 30 秒；快取只給研究用）。
-- **每日自動更新尚未接上**：需要在 `.github/workflows/update-dashboard.yml` 的「Update crash-risk board data」之後加兩步，並把產出加進 `git add`。改 workflow 要 Jake 核准（CLAUDE.md §0），所以本輪只把 patch 寫在這裡：
-
-```yaml
-      # 全局觀測台（docs/cockpit/）台股資料：證交所類股指數追加 + 三大法人流向（每日 3 個請求 + 往回補歷史）。
-      # 證交所 WAF 很兇，腳本自己限速；跑不完就下次續。best-effort。
-      - name: Fetch TW sector data for cockpit (best-effort)
-        working-directory: projects/avi-v5
-        timeout-minutes: 25
-        continue-on-error: true
-        run: python scripts/fetch_tw_sectors.py --update --sleep 8 --cooldown 120 --max-block 3 || true
-
-      # 全局觀測台（docs/cockpit/）：regime / 板塊強弱 / 資金流向 + 回測，美股 + 台股。2026-11-05 建立。best-effort，永不擋 dashboard。
-      - name: Update market cockpit data (best-effort)
-        working-directory: projects/avi-v5
-        timeout-minutes: 8
-        continue-on-error: true
-        run: python scripts/market_cockpit.py || true
-```
-```yaml
-          git add docs/cockpit/*.json projects/avi-v5/data/tw/*.csv projects/avi-v5/data/tw/holidays.txt 2>/dev/null || true
-```
+- **每日自動更新已接上**（2026-11-17 Jake 核准）：`.github/workflows/update-dashboard.yml` 在「Update crash-risk board data」之後有兩步——
+  `Fetch TW sector data for cockpit`（`fetch_tw_sectors.py --update --history-budget 3`：補最新的類股指數與法人流向，再往回補 3 個缺日）與
+  `Update market cockpit data`（`market_cockpit.py`）。產出 `docs/cockpit/*.json`、`data/tw/*.csv`、`holidays.txt`、`industry_map.json` 都在 commit 步驟的 git add 裡。兩步都是 best-effort，不擋主 dashboard。
+- 兩個資料陷阱（已在程式處理，改動時別拿掉）：(1) Yahoo 偶爾把最新一個已收盤交易日的 close 回成 null，當日收盤在 `meta.regularMarketPrice`（`yahoo_ohlcv` 會補）；(2) 證交所盤中／未出表時 MI_INDEX 回一張數值為 `--` 的表（`fetch_index` 看不到加權指數就當沒資料）。
 - 圖表用 cdn.jsdelivr 的 Chart.js 4.4.0（與主頁相同）。雲端容器打不到任何 CDN；要本機截圖測試就 `npm pack chart.js@4.4.0` 後用 Playwright `page.route` 餵本機檔。頁面在 Chart.js 載不到時會退化成「表格仍可讀、圖表位置顯示提示」。
 - 本頁沒有 Telegram 推播；若要「regime 切換時推播」，在 daily-alert 讀 `data.json.regime.state` 與前一日比較即可（未做）。
