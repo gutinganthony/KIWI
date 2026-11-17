@@ -1,0 +1,655 @@
+{
+  "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+  "label": "scan-best-candidate-9M-lowdd",
+  "date": "2026-11-13",
+  "probed_at": "2026-11-13T03:00:18.787578+00:00",
+  "ledger_window_days": 45,
+  "queries_ok": {
+    "perpDexs": true,
+    "clearinghouseState_native": true,
+    "clearinghouseState_dex": true,
+    "spotClearinghouseState": true,
+    "userNonFundingLedgerUpdates": true,
+    "portfolio": true,
+    "userFills": true
+  },
+  "dexs_detected": [
+    "xyz",
+    "flx",
+    "vntl",
+    "hyna",
+    "km",
+    "abcd",
+    "cash",
+    "para",
+    "mkts",
+    "io"
+  ],
+  "aborted": false,
+  "dexs_queried": [
+    "abcd",
+    "cash",
+    "flx",
+    "hyna",
+    "io",
+    "km",
+    "mkts",
+    "para",
+    "vntl",
+    "xyz"
+  ],
+  "portfolio_windows": {
+    "day": {
+      "account_value_last": 3204211.64,
+      "account_value_ts_iso": "2026-11-13T03:00:27.779000+00:00",
+      "pnl_last": 82.23,
+      "vlm": 0.0,
+      "n_points": 13
+    },
+    "week": {
+      "account_value_last": 3204211.64,
+      "account_value_ts_iso": "2026-11-13T03:00:27.779000+00:00",
+      "pnl_last": -731.35,
+      "vlm": 0.0,
+      "n_points": 64
+    },
+    "month": {
+      "account_value_last": 3204211.64,
+      "account_value_ts_iso": "2026-11-13T03:00:27.779000+00:00",
+      "pnl_last": 813471.53,
+      "vlm": 17748630.47,
+      "n_points": 46
+    },
+    "allTime": {
+      "account_value_last": 3204211.64,
+      "account_value_ts_iso": "2026-11-13T03:00:27.779000+00:00",
+      "pnl_last": 12785212.72,
+      "vlm": 386941008.32,
+      "n_points": 74
+    },
+    "perpDay": {
+      "account_value_last": 1751.02,
+      "account_value_ts_iso": "2026-11-13T03:00:27.779000+00:00",
+      "pnl_last": 79.34,
+      "vlm": 0.0,
+      "n_points": 13
+    },
+    "perpWeek": {
+      "account_value_last": 1751.02,
+      "account_value_ts_iso": "2026-11-13T03:00:27.779000+00:00",
+      "pnl_last": -746.3,
+      "vlm": 0.0,
+      "n_points": 64
+    },
+    "perpMonth": {
+      "account_value_last": 1751.02,
+      "account_value_ts_iso": "2026-11-13T03:00:27.779000+00:00",
+      "pnl_last": 813473.57,
+      "vlm": 17748630.47,
+      "n_points": 46
+    },
+    "perpAllTime": {
+      "account_value_last": 1751.02,
+      "account_value_ts_iso": "2026-11-13T03:00:27.779000+00:00",
+      "pnl_last": 12790613.37,
+      "vlm": 378886651.26,
+      "n_points": 79
+    }
+  },
+  "trading": {
+    "n_fills": 2000,
+    "truncated": true,
+    "last_fill_ts": 1793889624.848,
+    "last_fill_iso": "2026-11-05T14:40:24.848000+00:00",
+    "days_since_last_fill": 7.51,
+    "n_fills_7d": 0,
+    "n_fills_30d": 888,
+    "first_fill_iso": "2026-08-25T02:05:07.051000+00:00",
+    "top_coins": [
+      [
+        "xyz:NVDA",
+        490
+      ],
+      [
+        "DOGE",
+        302
+      ],
+      [
+        "xyz:SKHY",
+        291
+      ],
+      [
+        "xyz:SKHX",
+        173
+      ],
+      [
+        "xyz:INTC",
+        165
+      ],
+      [
+        "xyz:ORCL",
+        123
+      ],
+      [
+        "BSV",
+        87
+      ],
+      [
+        "kNEIRO",
+        81
+      ]
+    ],
+    "by_venue": {
+      "builder:xyz": 1284,
+      "native": 716
+    },
+    "recent_fills": [
+      {
+        "time_iso": "2026-11-05T14:40:24.848000+00:00",
+        "coin": "xyz:ORCL",
+        "dir": "Close Long",
+        "px": 118.45,
+        "sz": 50.654,
+        "closed_pnl": -356.55
+      },
+      {
+        "time_iso": "2026-11-05T14:40:24.848000+00:00",
+        "coin": "xyz:ORCL",
+        "dir": "Close Long",
+        "px": 118.46,
+        "sz": 159.362,
+        "closed_pnl": -1120.16
+      },
+      {
+        "time_iso": "2026-11-05T14:40:24.848000+00:00",
+        "coin": "xyz:ORCL",
+        "dir": "Close Long",
+        "px": 118.46,
+        "sz": 43.768,
+        "closed_pnl": -307.65
+      },
+      {
+        "time_iso": "2026-11-05T14:40:24.848000+00:00",
+        "coin": "xyz:ORCL",
+        "dir": "Close Long",
+        "px": 118.47,
+        "sz": 16.904,
+        "closed_pnl": -118.65
+      },
+      {
+        "time_iso": "2026-11-05T14:40:24.848000+00:00",
+        "coin": "xyz:ORCL",
+        "dir": "Close Long",
+        "px": 118.49,
+        "sz": 148.288,
+        "closed_pnl": -1037.87
+      },
+      {
+        "time_iso": "2026-11-05T14:40:24.848000+00:00",
+        "coin": "xyz:ORCL",
+        "dir": "Close Long",
+        "px": 118.5,
+        "sz": 159.362,
+        "closed_pnl": -1113.78
+      },
+      {
+        "time_iso": "2026-11-05T14:40:24.848000+00:00",
+        "coin": "xyz:ORCL",
+        "dir": "Close Long",
+        "px": 118.5,
+        "sz": 6.751,
+        "closed_pnl": -47.18
+      },
+      {
+        "time_iso": "2026-11-05T14:40:24.848000+00:00",
+        "coin": "xyz:ORCL",
+        "dir": "Close Long",
+        "px": 118.5,
+        "sz": 37.34,
+        "closed_pnl": -260.97
+      },
+      {
+        "time_iso": "2026-11-05T14:40:24.848000+00:00",
+        "coin": "xyz:ORCL",
+        "dir": "Close Long",
+        "px": 118.51,
+        "sz": 16.905,
+        "closed_pnl": -117.98
+      },
+      {
+        "time_iso": "2026-11-05T14:40:24.848000+00:00",
+        "coin": "xyz:ORCL",
+        "dir": "Close Long",
+        "px": 118.52,
+        "sz": 37.34,
+        "closed_pnl": -260.22
+      },
+      {
+        "time_iso": "2026-11-05T14:40:24.848000+00:00",
+        "coin": "xyz:ORCL",
+        "dir": "Close Long",
+        "px": 118.53,
+        "sz": 159.362,
+        "closed_pnl": -1109.0
+      },
+      {
+        "time_iso": "2026-11-05T14:40:24.848000+00:00",
+        "coin": "xyz:ORCL",
+        "dir": "Close Long",
+        "px": 118.53,
+        "sz": 37.705,
+        "closed_pnl": -262.39
+      },
+      {
+        "time_iso": "2026-11-05T14:40:24.848000+00:00",
+        "coin": "xyz:ORCL",
+        "dir": "Close Long",
+        "px": 118.54,
+        "sz": 10.123,
+        "closed_pnl": -70.34
+      },
+      {
+        "time_iso": "2026-11-05T14:40:24.848000+00:00",
+        "coin": "xyz:ORCL",
+        "dir": "Close Long",
+        "px": 118.55,
+        "sz": 159.362,
+        "closed_pnl": -1105.81
+      },
+      {
+        "time_iso": "2026-11-05T14:40:24.848000+00:00",
+        "coin": "xyz:ORCL",
+        "dir": "Close Long",
+        "px": 118.56,
+        "sz": 159.362,
+        "closed_pnl": -1104.22
+      },
+      {
+        "time_iso": "2026-11-05T14:40:24.848000+00:00",
+        "coin": "xyz:ORCL",
+        "dir": "Close Long",
+        "px": 118.56,
+        "sz": 37.343,
+        "closed_pnl": -258.75
+      },
+      {
+        "time_iso": "2026-11-05T14:40:24.848000+00:00",
+        "coin": "xyz:ORCL",
+        "dir": "Close Long",
+        "px": 118.58,
+        "sz": 159.362,
+        "closed_pnl": -1101.03
+      },
+      {
+        "time_iso": "2026-11-05T14:40:24.848000+00:00",
+        "coin": "xyz:ORCL",
+        "dir": "Close Long",
+        "px": 118.61,
+        "sz": 20.304,
+        "closed_pnl": -139.67
+      },
+      {
+        "time_iso": "2026-11-05T14:40:24.848000+00:00",
+        "coin": "xyz:ORCL",
+        "dir": "Close Long",
+        "px": 118.63,
+        "sz": 45.018,
+        "closed_pnl": -308.78
+      },
+      {
+        "time_iso": "2026-11-05T14:40:24.848000+00:00",
+        "coin": "xyz:ORCL",
+        "dir": "Close Long",
+        "px": 118.64,
+        "sz": 6.671,
+        "closed_pnl": -45.69
+      }
+    ]
+  },
+  "funds": {
+    "native": {
+      "n_positions": 1,
+      "account_value": 1751.015989,
+      "position_value": 8395.3
+    },
+    "builder_dex": {
+      "xyz": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "flx": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "vntl": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "hyna": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "km": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "abcd": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "cash": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "para": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "mkts": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      },
+      "io": {
+        "n_positions": 0,
+        "account_value": 0.0,
+        "position_value": 0
+      }
+    },
+    "spot": {
+      "n_nonzero": 3,
+      "balances": [
+        {
+          "coin": "USDC",
+          "total": 3156042.66218133,
+          "hold": 2798.43192,
+          "entry_ntl": 0.0,
+          "usd": 3156042.66218133
+        },
+        {
+          "coin": "USDT0",
+          "total": 48215.25091058,
+          "hold": 0.0,
+          "entry_ntl": 48215.25091058,
+          "usd": 48215.25091058,
+          "usd_is_estimate": true
+        },
+        {
+          "coin": "USDH",
+          "total": 0.01250805,
+          "hold": 0.0,
+          "entry_ntl": 0.01250805,
+          "usd": 0.01250805
+        }
+      ],
+      "usd_stable": 3156042.67,
+      "usd_est_other": 48215.25,
+      "usd_total_est": 3204257.93,
+      "estimated": true
+    },
+    "native_usd": 1751.02,
+    "builder_usd": 0.0,
+    "spot_usd": 3204257.93,
+    "total_usd": 3206008.95,
+    "non_native_usd": 3204257.93,
+    "non_native_share": 0.9995,
+    "positions": [
+      {
+        "coin": "APEX",
+        "szi": 46734.0,
+        "side": "long",
+        "entry_px": 0.18022,
+        "position_value": 8395.29576,
+        "unrealized_pnl": -27.10572,
+        "leverage_value": 3.0,
+        "leverage_type": "cross",
+        "liquidation_px": null,
+        "margin_used": 2798.43192,
+        "max_leverage": 3.0,
+        "cum_funding_all_time": 43.827177,
+        "dex": ""
+      }
+    ],
+    "n_positions_total": 1,
+    "n_positions_native": 1,
+    "n_positions_builder": 0,
+    "known": true
+  },
+  "ledger": {
+    "n_total": 3,
+    "n_in_window": 3,
+    "n_kept": 3,
+    "by_type": {
+      "send": {
+        "n": 3,
+        "usd": 2700000.0,
+        "direction": "bridge_out"
+      }
+    },
+    "external_out_usd": 0.0,
+    "external_in_usd": 0.0,
+    "internal_usd": 0.0,
+    "vault_out_usd": 0.0,
+    "bridge_out_usd": 2700000.0,
+    "unknown_usd": 0.0,
+    "external_out_rows": [],
+    "bridge_out_rows": [
+      {
+        "time": 1793815453.74,
+        "time_iso": "2026-11-04T18:04:13.740000+00:00",
+        "type": "send",
+        "usd": 900000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x509a8fbb865acac752140448113e9802038d00a1215de999f4633b0e455ea4b1"
+      },
+      {
+        "time": 1793682760.095,
+        "time_iso": "2026-11-03T05:12:40.095000+00:00",
+        "type": "send",
+        "usd": 900000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xed4f2941944a73ceeec80447f4e6f002010c00272f4d92a09117d494534e4db9"
+      },
+      {
+        "time": 1791610143.127,
+        "time_iso": "2026-10-10T05:29:03.127000+00:00",
+        "type": "send",
+        "usd": 900000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xe035ac52aaeeb226e1af04463ba0090202c9003845e1d0f883fe57a569e28c11"
+      }
+    ],
+    "unknown_rows": [],
+    "internal_rows": [],
+    "rows": [
+      {
+        "time": 1793815453.74,
+        "time_iso": "2026-11-04T18:04:13.740000+00:00",
+        "type": "send",
+        "usd": 900000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0x509a8fbb865acac752140448113e9802038d00a1215de999f4633b0e455ea4b1"
+      },
+      {
+        "time": 1793682760.095,
+        "time_iso": "2026-11-03T05:12:40.095000+00:00",
+        "type": "send",
+        "usd": 900000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xed4f2941944a73ceeec80447f4e6f002010c00272f4d92a09117d494534e4db9"
+      },
+      {
+        "time": 1791610143.127,
+        "time_iso": "2026-10-10T05:29:03.127000+00:00",
+        "type": "send",
+        "usd": 900000.0,
+        "direction": "bridge_out",
+        "destination": "0x2000000000000000000000000000000000000000",
+        "token": "USDC",
+        "hash": "0xe035ac52aaeeb226e1af04463ba0090202c9003845e1d0f883fe57a569e28c11"
+      }
+    ],
+    "n_bridge_out": 3,
+    "n_unknown": 0,
+    "counterparties": {},
+    "parse_failed": false
+  },
+  "verdict": "同地址換戰場（builder dex/現貨）｜⚠️ 資本外移中",
+  "verdict_reasons": [
+    "非原生資金 $3,204,257.93 占總資產 $3,206,008.95 的100%（builder dex $0.00／現貨 $3,204,257.93）",
+    "成交戰場分布：非原生 1284/2000 筆（64%）",
+    "近 45 天帳變動離場訊號：跨層轉移（HyperCore→HyperEVM，同一擁有者） $2,700,000.00",
+    "跨層轉移（HyperCore→HyperEVM，同一地址擁有者，非第三方）$2,700,000.00，占「現餘＋跨層轉移」46%（≥ 20% 門檻）→ 資本正離開交易場（跨層/減倉）"
+  ],
+  "endpoint_health": [
+    {
+      "name": "perpDexs",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.24
+    },
+    {
+      "name": "clearinghouseState[native]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "clearinghouseState[xyz]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "clearinghouseState[flx]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "clearinghouseState[vntl]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "clearinghouseState[hyna]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "clearinghouseState[km]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.13
+    },
+    {
+      "name": "clearinghouseState[abcd]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.16
+    },
+    {
+      "name": "clearinghouseState[cash]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "clearinghouseState[para]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "clearinghouseState[mkts]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.19
+    },
+    {
+      "name": "clearinghouseState[io]",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "spotClearinghouseState",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "userNonFundingLedgerUpdates",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.15
+    },
+    {
+      "name": "portfolio",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.14
+    },
+    {
+      "name": "userFills",
+      "url": "https://api.hyperliquid.xyz/info",
+      "ok": true,
+      "status": 200,
+      "error": null,
+      "elapsed_sec": 0.48
+    }
+  ],
+  "notes": [],
+  "requests_ok": 16,
+  "requests_failed": 0
+}

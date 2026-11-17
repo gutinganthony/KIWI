@@ -99,32 +99,32 @@
   </section>
 
   <section id="trend">
-    <h2>趨勢跟隨（紙上交易，三個波動目標並行）</h2>
-    <p class="lede">BTC＋ETH 趨勢跟隨，不下單，只用 OKX 即時價格記帳。三個版本規則相同，只差「單幣波動目標」：每個幣的部位 ＝ 50% × 趨勢分數 × min(1, 目標 ÷ 該幣 60 日波動)。所以兩個幣的 60 日波動都低於 40% 時，三個版本持倉完全一樣；波動越高，目標高的版本留的部位越多。每天台北 08:00 日線收盤後調整一次，差超過 5 個百分點才動。跑一段時間後再決定用哪個目標（研究報告 2026-10-28）。</p>
+    <h2>趨勢跟隨（紙上交易，四個版本並行）</h2>
+    <p class="lede">BTC＋ETH 趨勢跟隨，不下單，只用 OKX 即時價格記帳。三個版本規則相同，只差「單幣波動目標」：每個幣的部位 ＝ 50% × 趨勢分數 × min(1, 目標 ÷ 該幣 60 日波動)。所以兩個幣的 60 日波動都低於 40% 時，三個版本持倉完全一樣；波動越高，目標高的版本留的部位越多。每天台北 08:00 日線收盤後調整一次，差超過 5 個百分點才動。跑一段時間後再決定用哪個目標（研究報告 2026-10-28）。第四個版本「40%＋空頭空手」從 2026-11-05 起跑：規則和 40% 版相同，但 BTC 收盤在 200 日均線之下、而且均線下彎時兩個幣都空手（市場狀態研究 2026-11-05）。</p>
     <div class="grid">
       <div class="card">
-        <h3>累積報酬：F3 2.0 和三個趨勢版本</h3>
+        <h3>累積報酬：F3 2.0 和四個趨勢版本</h3>
         <p class="cnote">各自從開始那天算起的累積報酬 %（F3 2.0 是 OKX 模擬盤，趨勢是紙上交易），每小時一筆。</p>
         <div class="legend" id="trend-live-legend">
-          <span><i data-swatch="0"></i>F3 2.0</span><span><i data-swatch="1"></i>波動目標 40%</span><span><i data-swatch="2"></i>波動目標 45%</span><span><i data-swatch="3"></i>波動目標 50%</span>
+          <span><i data-swatch="0"></i>F3 2.0</span><span><i data-swatch="1"></i>波動目標 40%</span><span><i data-swatch="2"></i>波動目標 45%</span><span><i data-swatch="3"></i>波動目標 50%</span><span><i data-swatch="4"></i>40%＋空頭空手</span>
         </div>
         <div class="chart" id="trend-live-chart" data-draw="trendlive" data-source="equity trend_equity"></div>
       </div>
       <div class="card">
-        <h3>三個版本目前的部位</h3>
+        <h3>四個版本目前的部位</h3>
         <p class="cnote">實際部位會隨價格漂移；目標是今天收盤算出來的。</p>
         <div class="tablebox">
           <table id="trend-sum-table" data-source="trend_summary" data-row-key="variant">
             <thead><tr>
-              <th data-field="variant">版本</th><th data-field="equity" class="num">淨值（USDT）</th><th data-field="ret_pct" class="num">累積報酬 %</th>
+              <th data-field="variant">版本</th><th data-field="bear_filter">空頭濾網</th><th data-field="equity" class="num">淨值（USDT）</th><th data-field="ret_pct" class="num">累積報酬 %</th>
               <th data-field="max_dd_pct" class="num">最大回撤 %</th><th data-field="btc_pct" class="num">BTC %</th><th data-field="eth_pct" class="num">ETH %</th>
               <th data-field="cash_pct" class="num">現金 %</th><th data-field="btc_target_pct" class="num">BTC 目標 %</th><th data-field="eth_target_pct" class="num">ETH 目標 %</th>
-              <th data-field="rebalances" class="num">調整天數</th><th data-field="last_rebalance">最近調整</th>
+              <th data-field="rebalances" class="num">調整天數</th><th data-field="last_rebalance">最近調整</th><th data-field="started">開始日</th>
             </tr></thead>
             <tbody data-draw="tsum"></tbody>
           </table>
         </div>
-        <p class="cnote">紙上交易開始日 <span data-draw="kpi" data-source="trend_summary" data-field="started" data-row="0">—</span>，資料時間（UTC）<span data-draw="kpi" data-source="trend_summary" data-field="updated" data-row="0">—</span>。</p>
+        <p class="cnote">資料時間（UTC）<span data-draw="kpi" data-source="trend_summary" data-field="updated" data-row="0">—</span>。</p>
       </div>
     </div>
     <div class="card">
@@ -136,7 +136,7 @@
             <th data-field="coin">幣</th><th data-field="close" class="num">日線收盤</th><th data-field="score" class="num">趨勢分數</th><th data-field="vol60_pct" class="num">60 日波動 %</th>
             <th data-field="ma100">100 日線</th><th data-field="ma150">150 日線</th><th data-field="ma200">200 日線</th>
             <th data-field="mom60">60 日</th><th data-field="mom90">90 日</th><th data-field="mom180">180 日</th><th data-field="donchian">唐奇安</th>
-            <th data-field="target40_pct" class="num">目標 40% 版</th><th data-field="target45_pct" class="num">目標 45% 版</th><th data-field="target50_pct" class="num">目標 50% 版</th>
+            <th data-field="target40_pct" class="num">目標 40% 版</th><th data-field="target45_pct" class="num">目標 45% 版</th><th data-field="target50_pct" class="num">目標 50% 版</th><th data-field="target40B_pct" class="num">40%＋空頭空手版</th>
           </tr></thead>
           <tbody data-draw="tsig"></tbody>
         </table>
@@ -144,7 +144,7 @@
     </div>
     <div class="grid">
       <div class="card">
-        <h3>回測：三個版本的取捨</h3>
+        <h3>回測：四個版本的取捨</h3>
         <p class="cnote">Yahoo 日線，樣本外 2021-01 → 2026-10（規則是看 2020 以前的資料定的）。合併欄是和 F3 2.0 各半、每月再平衡，2022-10 起；F3 那一半是樣本內數字，會偏樂觀。</p>
         <div class="tablebox">
           <table id="trend-bt-table" data-source="trend_bt" data-row-key="variant">
@@ -172,12 +172,12 @@
         <h3>回測淨值：2022-10 → 2026-10（對數座標，起點＝1）</h3>
         <p class="cnote">每週一點。F3 2.0 的選幣是用同一段資料挑的（樣本內）；趨勢的規則在 2020 以前就定了。</p>
         <div class="legend" id="trend-bt-legend">
-          <span><i data-swatch="0"></i>F3 2.0</span><span><i data-swatch="1"></i>趨勢 40%</span><span><i data-swatch="2"></i>趨勢 45%</span><span><i data-swatch="3"></i>趨勢 50%</span><span><i class="dash"></i>BTC 持有</span>
+          <span><i data-swatch="0"></i>F3 2.0</span><span><i data-swatch="1"></i>趨勢 40%</span><span><i data-swatch="2"></i>趨勢 45%</span><span><i data-swatch="3"></i>趨勢 50%</span><span><i data-swatch="4"></i>趨勢 40%＋空頭</span><span><i class="dash"></i>BTC 持有</span>
         </div>
         <div class="chart" id="trend-bt-chart" data-draw="trendbt" data-source="trend_bt_curve"></div>
       </div>
     </div>
-    <p class="note-box">怎麼選：目標越高，多頭賺越多、回撤也越深（見上面的回測表）；2022 年以後三個版本的年化差距很小。紙上交易期間主要看兩件事：波動升高時三個版本差多少，以及實際成交價和收盤價差多少。</p>
+    <p class="note-box">怎麼選：目標越高，多頭賺越多、回撤也越深（見上面的回測表）；2022 年以後三個波動目標的年化差距很小。空頭濾網版本的回測回撤最小，代價是多頭裡偶爾被洗出場。紙上交易期間主要看三件事：波動升高時版本之間差多少、BTC 轉空頭時濾網版本有沒有及時空手，以及實際成交價和收盤價差多少。</p>
     <div class="card">
       <h3>趨勢紙上交易明細</h3>
       <p class="cnote">「和收盤價差」是成交價比日線收盤價差多少（不利方向為正），反映機器人延遲執行的成本。</p>
@@ -446,11 +446,11 @@
 
   // ---------- 趨勢跟隨 ----------
   const fmtBool = (v) => (v === true ? '✓' : v === false ? '✗' : '—');
-  dash.draw('tsum', (tb) => fillTable(tb, rowsOf('trend_summary'), [['variant', 'txt'], ['equity', 'num'], ['ret_pct', 'p2'], ['max_dd_pct', 'p2'], ['btc_pct', 'p1'], ['eth_pct', 'p1'], ['cash_pct', 'p1'], ['btc_target_pct', 'p1'], ['eth_target_pct', 'p1'], ['rebalances', 'int'], ['last_rebalance', 'txt']]));
+  dash.draw('tsum', (tb) => fillTable(tb, rowsOf('trend_summary'), [['variant', 'txt'], ['bear_filter', 'txt'], ['equity', 'num'], ['ret_pct', 'p2'], ['max_dd_pct', 'p2'], ['btc_pct', 'p1'], ['eth_pct', 'p1'], ['cash_pct', 'p1'], ['btc_target_pct', 'p1'], ['eth_target_pct', 'p1'], ['rebalances', 'int'], ['last_rebalance', 'txt'], ['started', 'txt']]));
   dash.draw('tsig', (tb) => {
     const rows = rowsOf('trend_signals');
     fillTable(tb, rows && rows.map((r) => ({ ...r, ma100: fmtBool(r.ma100), ma150: fmtBool(r.ma150), ma200: fmtBool(r.ma200), mom60: fmtBool(r.mom60), mom90: fmtBool(r.mom90), mom180: fmtBool(r.mom180), donchian: fmtBool(r.donchian) })),
-      [['coin', 'txt'], ['close', 'num'], ['score', 'p2'], ['vol60_pct', 'p1'], ['ma100', 'txt'], ['ma150', 'txt'], ['ma200', 'txt'], ['mom60', 'txt'], ['mom90', 'txt'], ['mom180', 'txt'], ['donchian', 'txt'], ['target40_pct', 'p1'], ['target45_pct', 'p1'], ['target50_pct', 'p1']]);
+      [['coin', 'txt'], ['close', 'num'], ['score', 'p2'], ['vol60_pct', 'p1'], ['ma100', 'txt'], ['ma150', 'txt'], ['ma200', 'txt'], ['mom60', 'txt'], ['mom90', 'txt'], ['mom180', 'txt'], ['donchian', 'txt'], ['target40_pct', 'p1'], ['target45_pct', 'p1'], ['target50_pct', 'p1'], ['target40B_pct', 'p1']]);
   });
   dash.draw('tbt', (tb) => fillTable(tb, rowsOf('trend_bt'), [['variant', 'txt'], ['oos_cagr', 'p1'], ['oos_dd', 'p1'], ['oos_calmar', 'p2'], ['since2022_cagr', 'p1'], ['since2022_dd', 'p1'], ['worst_month', 'p1'], ['longest_underwater_days', 'int'], ['avg_exposure', 'int'], ['rebalances_per_year', 'int'], ['blend_cagr', 'p1'], ['blend_dd', 'p1']]));
   dash.draw('tbty', (tb) => fillTable(tb, rowsOf('trend_bt'), [['variant', 'txt'], ['y2021', 'int'], ['y2022', 'int'], ['y2023', 'int'], ['y2024', 'int'], ['y2025', 'int'], ['y2026', 'int']]));
@@ -498,20 +498,20 @@
     }).on('pointerleave', () => { guide.attr('visibility', 'hidden'); tip.hidden = true; });
   }
 
-  const VARIANTS = ['波動目標 40%', '波動目標 45%', '波動目標 50%'];
+  const VARIANTS = ['波動目標 40%', '波動目標 45%', '波動目標 50%', '波動目標 40%＋空頭空手'];
   dash.draw('trendlive', (box) => {
     const f3 = rowsOf('equity'), tr = rowsOf('trend_equity');
     if (!f3 || !tr) { box.replaceChildren(); return; }
     const series = [{ name: 'F3 2.0', color: dash.colors[0], width: 2, pts: f3.map((r) => ({ t: new Date(r.time + 'Z'), v: +r.ret_pct })) }]
-      .concat(VARIANTS.map((v, i) => ({ name: v.replace('波動目標 ', '趨勢 '), color: dash.colors[i + 1], pts: tr.filter((r) => r.variant === v).map((r) => ({ t: new Date(r.time + 'Z'), v: +r.ret_pct })) })));
+      .concat(VARIANTS.map((v, i) => ({ name: v.replace('波動目標 ', '趨勢 ').replace('＋空頭空手', '＋空頭'), color: dash.colors[i + 1], pts: tr.filter((r) => r.variant === v).map((r) => ({ t: new Date(r.time + 'Z'), v: +r.ret_pct })) })));
     lineChart(box, series, { ref: 0, minPad: 0.3, yFmt: (v) => d3.format('+.1f')(v) + '%', vFmt: (v) => F.pct(v), xFmt: '%m-%d', tipFmt: '%Y-%m-%d %H:%M UTC' });
   });
 
-  const BT_SERIES = ['F3 2.0', '趨勢 40%', '趨勢 45%', '趨勢 50%', 'BTC 持有'];
+  const BT_SERIES = ['F3 2.0', '趨勢 40%', '趨勢 45%', '趨勢 50%', '趨勢 40%＋空頭', 'BTC 持有'];
   dash.draw('trendbt', (box) => {
     const rows = rowsOf('trend_bt_curve');
     if (!rows) { box.replaceChildren(); return; }
-    const series = BT_SERIES.map((n, i) => ({ name: n, color: i < 4 ? dash.colors[i] : 'var(--color-fg-muted)', dashed: i === 4, width: i === 4 ? 1.2 : 1.8,
+    const series = BT_SERIES.map((n, i) => ({ name: n, color: i < 5 ? dash.colors[i] : 'var(--color-fg-muted)', dashed: i === 5, width: i === 5 ? 1.2 : 1.8,
       pts: rows.filter((r) => r.series === n).map((r) => ({ t: new Date(r.date + 'T00:00:00Z'), v: +r.value })) }));
     lineChart(box, series, { log: true, ref: 1, yFmt: d3.format('~g'), vFmt: d3.format('.2f'), xFmt: '%Y-%m', tipFmt: '%Y-%m-%d' });
   });
