@@ -33,6 +33,8 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 <!-- RECENT_ENTRIES_START -->
 | Date | Title | Topic |
 |------|-------|-------|
+| 2026-11-17 | [配置回測：債券固定 50%，美股科技／標普 500／台股怎麼分最有效（目標年化 11%）](./topics/business/2026-11-17-allocation-backtest-50-bond-us-tw.md) | Business |
+| 2026-11-17 | [客戶版市場觀點：2026 年 11 月科技股修正（可直接轉發）](./topics/business/2026-11-17-client-market-view-tech.md) | Business |
 | 2026-10-29 | [MRVL 併購 Lumentum：算入整合效益後的情境與產業競爭影響](./topics/business/2026-10-29-mrvl-lumentum-synergy-scenarios-and-competitive-impact.md) | Business |
 | 2026-10-29 | [Serenity 完整 Step 1–9：COHR、Lumentum＋MRVL 併購 Lumentum 傳聞解析](./topics/business/2026-10-29-serenity-step1-9-cohr-lite-and-mrvl-lumentum-deal.md) | Business |
 | 2026-10-28 | [WaveTrend 分析 AVGO、MRVL、CRDO、ALAB＋Serenity「A／B」到底是什麼意思](./topics/business/2026-10-28-wavetrend-avgo-mrvl-crdo-alab-and-ab-explained.md) | Business |
@@ -181,6 +183,8 @@ A personal knowledge database of articles, links, and summaries, curated with Cl
 | 2026-10-29 | [Serenity 完整 Step 1–9：COHR、Lumentum＋MRVL 併購 Lumentum 傳聞解析](./topics/business/2026-10-29-serenity-step1-9-cohr-lite-and-mrvl-lumentum-deal.md) | Business |
 | 2026-10-29 | [MRVL 併購 Lumentum：算入整合效益後的情境與產業競爭影響](./topics/business/2026-10-29-mrvl-lumentum-synergy-scenarios-and-competitive-impact.md) | Business |
 | 2026-11-05 | [加密貨幣市場狀態切換策略回測：多頭／空頭／盤整／資金流向](./topics/business/2026-11-05-crypto-regime-switching-research.md) | Business |
+| 2026-11-17 | [客戶版市場觀點：2026 年 11 月科技股修正（可直接轉發）](./topics/business/2026-11-17-client-market-view-tech.md) | Business |
+| 2026-11-17 | [配置回測：債券固定 50%，美股科技／標普 500／台股怎麼分最有效（目標年化 11%）](./topics/business/2026-11-17-allocation-backtest-50-bond-us-tw.md) | Business |
 <!-- ALL_ENTRIES_END -->
 
 ---
