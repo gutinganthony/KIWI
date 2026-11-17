@@ -23,6 +23,10 @@ last_updated: 2026-07-06
 
 ## 🔴 待辦（依急迫度）
 
+### 🆕 2026-11-17 新增（主對話 session 產生）
+
+- [ ] 🟡 **客戶債券基金淨值**：配置回測 v1.1（`topics/business/2026-11-17-allocation-backtest-50-bond-us-tw.md` §7）只能用 FRED ICE BofA 指數最近 3 年（FRED 授權限制；ALFRED 在雲端被擋），而且不能用 HYG 頂替。請提供客戶那檔高收益債基金與企業債基金的名稱或 ISIN；如果鉅亨或 MoneyDJ 在雲端抓不到，請在 Mac 上下載含配息的歷史淨值 CSV，丟進 repo 或對話。
+
 ### 🆕 2026-10-28 新增（主對話 session 產生）
 
 - [ ] **investor.marvell.com、stocktitan.net 在雲端被擋（DNS 解析失敗）**；FinMind 美股當日額度用完（402）。Marvell 與 Credo 的財報數字因此只讀到搜尋摘要（`topics/business/2026-10-28-serenity-step1-9-avgo-mrvl-crdo-alab-and-scale-up-protocols.md`）。若要補：在 Mac 開 Marvell Q2 FY27 新聞稿核對稀釋股數、現金與負債；Credo Q1 FY27 核對現金下降原因。或在雲端環境的網路設定加入這兩個網域。

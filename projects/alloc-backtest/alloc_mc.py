@@ -28,10 +28,11 @@ def sim(w,ybond,eq_haircut=0.0,yrs=5,N=20000,blk=12):
         out[i]=sum(h.values())**(1/yrs)-1
     return out
 # H.QQQ/H.SPY in R are TWD returns already (L built as usd*fx). ok.
-rows=[]
-for ybond in [0.0285,0.050]:
-  for hc in [0.0,0.03]:
-    for k,w in MIX.items():
-        o=sim(w,ybond,hc,N=4000)
-        rows.append((f'債{ybond*100:.1f}%',f'股折減{hc*100:.0f}pp',k,round(np.median(o)*100,1),round((o>=0.11).mean()*100,0),round((o<0).mean()*100,0),round(np.percentile(o,10)*100,1)))
-print(pd.DataFrame(rows,columns=['債券假設','股票假設','組合','5年CAGR中位','P(≥11%)','P(<0)','P10']).to_string())
+if __name__=='__main__':
+    rows=[]
+    for ybond in [0.0285,0.050]:
+      for hc in [0.0,0.03]:
+        for k,w in MIX.items():
+            o=sim(w,ybond,hc,N=4000)
+            rows.append((f'債{ybond*100:.1f}%',f'股折減{hc*100:.0f}pp',k,round(np.median(o)*100,1),round((o>=0.11).mean()*100,0),round((o<0).mean()*100,0),round(np.percentile(o,10)*100,1)))
+    print(pd.DataFrame(rows,columns=['債券假設','股票假設','組合','5年CAGR中位','P(≥11%)','P(<0)','P10']).to_string())
