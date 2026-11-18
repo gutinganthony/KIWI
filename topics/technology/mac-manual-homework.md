@@ -23,6 +23,10 @@ last_updated: 2026-07-06
 
 ## 🔴 待辦（依急迫度）
 
+### 🆕 2026-11-18 新增（Serenity 週報排程 session 產生）
+
+- [ ] 🔴 **讀兩份 TDnet PDF 內文**（runner 能下載，但沒有 pdftotext／pypdf，WebFetch 又被 403 擋，所以讀不出文字）：①Seikoh 11/13 決算短信 `https://www.release.tdnet.info/inbs/140120261110570582.pdf`：上修公告後兩天 −27%，要找 H2 隱含減速、受注或中國合資等原因，重驗否證 #1／#2；②JEM 11/17「主要株主の異動」`https://www.release.tdnet.info/inbs/140120261117582272.pdf`：確認是誰增持或減持。結論寫回 `skills/serenity/watchlist.md`。
+
 ### 🆕 2026-10-28 新增（主對話 session 產生）
 
 - [ ] 🟡 **TradingAgents 第一次實跑**：分支 `claude/zen-brahmagupta-0t885u` 合併進 main 後（workflow_dispatch 只認 main），GitHub → Actions →「TradingAgents (on-demand multi-agent analysis)」→ Run workflow → 代號填 `BE` → Run。雲端 session 沒有 `actions:write` 只能你按。跑完看 run 的 Summary 有沒有評級、`projects/tradingagents/reports/BE/` 有沒有報告；失敗把 log 丟給 Claude。可選：在 repo Secrets 加 `SEC_EDGAR_USER_AGENT`（`姓名 email`）。
