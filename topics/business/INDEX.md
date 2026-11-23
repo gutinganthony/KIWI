@@ -130,3 +130,4 @@
 | 2026-11-05 | [加密貨幣市場狀態切換策略回測：多頭／空頭／盤整／資金流向](./2026-11-05-crypto-regime-switching-research.md) | backtest, crypto, regime, regime-switching, trend-following, mean-reversion, out-of-sample |
 | 2026-11-17 | [客戶版市場觀點：2026 年 11 月科技股修正（可直接轉發）](./2026-11-17-client-market-view-tech.md) | client-letter, macro, Fed, rates, TWD, tech-selloff, NVDA, compliance |
 | 2026-11-17 | [配置回測：債券固定 50%，美股科技／標普 500／台股怎麼分最有效（目標年化 11%）](./2026-11-17-allocation-backtest-50-bond-us-tw.md) | asset-allocation, backtest, QQQ, SPY, 0050, AGG, TWD, bootstrap, rates-regime |
+| 2026-11-23 | [觀點檢驗：11/20 美股急跌是「期中選舉後的痛苦政策」嗎？](./2026-11-23-view-check-post-midterm-chip-policy-selloff.md) | view-check, midterm, export-control, BIS, TSMC, NVDA, political-cycle, CRI |
