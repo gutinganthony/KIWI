@@ -1,6 +1,6 @@
 # 「把降低生鮮蔬果損耗做成一門生意」的商業先例與成敗
 
-> 讀取方式說明（適用全篇）：本環境只有 udn.com 與 cna.com.tw 可整頁讀取；agfundernews.com、money.udn.com、www.maff.go.jp 實測皆被網路限制擋下。下列每筆標「（整頁讀取）」者是用抓取工具讀全文後由模型摘錄，共 5 篇；標「（僅搜尋摘要）」者只看到搜尋引擎回傳的摘要，未能核對原文上下文，數字可能被斷章或日期標錯。搜尋結果頁面上顯示的日期有數筆明顯不可靠（把瀏覽當日當成發文日），已逐筆註明。查詢日：2026-11-23。
+> 讀取方式說明（適用全篇）：本環境只有 udn.com 與 cna.com.tw 可整頁讀取；agfundernews.com、money.udn.com、www.maff.go.jp 實測皆被網路限制擋下。下列每筆標「（整頁讀取）」者是用抓取工具讀全文後由模型摘錄，共 5 篇；標「（僅搜尋摘要）」者只看到搜尋引擎回傳的摘要，未能核對原文上下文，數字可能被斷章或日期標錯。搜尋結果頁面上顯示的日期有數筆明顯不可靠（把瀏覽當日當成發文日），已逐筆註明。另外，搜尋工具回傳的是「一段綜合摘要＋一串連結」，並非每句話都明確對應到單一網址；標「僅搜尋摘要」的條目所附連結，是從該次搜尋結果中依標題與內容比對出的最可能來源，引用前應開原文核對。查詢日：2026-11-23。
 
 ## 1. 採後保鮮新創的結局（Apeel、Hazel、Mori、Sufresca、StixFresh、Strella、AgroFresh、OneThird、Clarifruit、AgShift、Afresh）
 
@@ -185,7 +185,7 @@
 大品牌不買外部的降損服務，而是用自有品種、自有規範、自有檢驗人員與自有冷鏈資產把品質風險留在體系內，損失直接反映在種植者的每盤回報或公司損益上。Zespri 的公開數字顯示，品質成本可以大到一年 5 億多紐元。
 
 ### Cited Findings
-- Zespri：2023 會計年度果實品質損失為 5.34 億（紐元），品質成本為綠果每盤 2.56、SunGold 每盤 3.44（僅搜尋摘要；資料為 FY23）— [NZ Herald](https://www.nzherald.co.nz/the-country/news/zespri-struggled-too-made-mistakes-in-a-tough-year-for-the-kiwifruit-industry/NU3QKFWBVNDOPIZYD4TFICIXQI)
+- Zespri：2023 會計年度果實品質損失為 5.34 億（紐元），品質成本為綠果每盤 2.56、SunGold 每盤 3.44（僅搜尋摘要；資料為 FY23；摘要未指明出自哪一篇 NZ Herald 報導，所附為最可能的一篇）— [NZ Herald](https://www.nzherald.co.nz/the-country/news/zespri-struggled-too-made-mistakes-in-a-tough-year-for-the-kiwifruit-industry/NU3QKFWBVNDOPIZYD4TFICIXQI)
 - Zespri 2024 年 11 月預測稱每盤回報上升，原因之一是當季果實品質強、果損處於歷史低點（僅搜尋摘要；資料日期 2024-11／12）— [Zespri Kiwiflier](https://www.zespri.com/content/dam/zespri/nz/publications/Kiwiflier/kiwiflier-2024/KF-465-Dec-24.pdf)
 - Zespri 計畫在 2025/26 產季增加在岸稽核，把品質較差的果實擋在市場外，並推動全產業品質系統（僅搜尋摘要；資料日期 2026-02，摘要不完整）— [Zespri Kiwiflier](https://www.zespri.com/content/dam/zespri/nz/publications/Kiwiflier/kiwiflier-2026/KF-480.pdf)
 - Zespri 因包船鼠患事件獲保險理賠，使 SunGold 種植者在 2024/25 產季每盤多約 18 分；金額在來源間不一致：報導標題為 2,410 萬紐元，搜尋摘要寫 2,710 萬（僅搜尋摘要；資料日期 2025-01-29）— [RNZ](https://www.rnz.co.nz/news/country/540248/kiwifruit-growers-welcome-24-point-1m-payout-to-zespri-for-mice-infestation)
@@ -230,7 +230,6 @@
 - 2021 年政府投入新台幣 10 億元因應方案，其中 4.5 億元用於外銷獎勵（運費與數量獎勵）；獎勵須向指定外銷供果園採購；產地最低收購價每公斤 22 元、日本最低零售價 300 日圓（整頁讀取；資料日期 2022-04-01）— [中央社](https://www.cna.com.tw/news/ahel/202204015004.aspx)
 - 新進外銷業者以高價向農民收購、卻以低價報給日本進口商，主要靠補助獲利；新供應商品質不穩傷害既有品牌；分級仍靠農民人工，主觀且費工（整頁讀取；資料日期 2022-04-01）— [中央社](https://www.cna.com.tw/news/ahel/202204015004.aspx)
 - 農委會 2021 年發現輸日惡性削價，揚言不發運銷日本每公斤 12 元的外銷獎勵金（僅搜尋摘要；資料日期 2021-03-05）— [中央社](https://www.cna.com.tw/news/firstnews/202103050109.aspx)
-- 一位中部貿易商稱出了數百公噸鳳梨到日本與香港，「走日本線大賠」（僅搜尋摘要；資料日期約 2022，來源為 udn／cna 搜尋結果之一，未能定位到單篇）— [聯合新聞網](https://udn.com/news/story/7270/6440155)
 - 2021 年 3 月有新進貿易商未做好冷鏈就出貨新加坡，釀成黑心鳳梨事件；台灣品種最佳貯運溫度約 13 度，MD2 為 7–8 度，照 MD2 條件運送造成寒害；農委會停止當年銷星並由主委道歉，違規業者不發補助（整頁讀取；資料日期 2022-04-01）— [中央社](https://www.cna.com.tw/news/ahel/202204015004.aspx)
 - 屏東鳳梨外銷日本約 1 萬公噸；日本買方前一年簽約並提出每月需求量，採計畫性生產（僅搜尋摘要；日期未標）— [聯合新聞網](https://udn.com/news/story/124802/9436785)
 
@@ -251,7 +250,7 @@
 - 「日本買方前一年簽約、按月排量」顯示主流通路是計畫性採購，品質要求由買方規範；有機會的缺口在分級仍靠人工、主觀這一點。
 
 ### Gaps
-- 日本進口商對台灣鳳梨的實際索賠（扣款、拒收）金額、比例與合約條款：查不到。「走日本線大賠」的金額與原因也查不到。
+- 日本進口商對台灣鳳梨的實際索賠（扣款、拒收）金額、比例與合約條款：查不到。一次 udn／cna 站內搜尋的摘要提到「一位中部貿易商出了數百公噸鳳梨到日本與香港，走日本線大賠」（約 2021–2022 年），但無法定位到是哪一篇報導，金額與原因也查不到，未列入已查證事實。
 - 黑心、霉腐造成的到貨損耗率（不含燻蒸）：除「有些箱內近半數長霉」與「上架霉腐率 35%」外，查不到整體比例。
 - 台灣民間針對農產外銷的品質保證服務或貨損保險產品：查不到。
 - 台灣冷鏈或農業科技新創走服務收費模式的具體公司、收費方式與營收：查不到（搜尋只回傳政府計畫報導）。
