@@ -10,7 +10,7 @@ MG=[5366.0,5245.0,5087.2,5080.3,4843.7,4352.3]   # 上市融資餘額（億元�
 FD=["11/16","11/17","11/18","11/19","11/20","11/23"]; FI=[-701.9,-380.9,-765.6,-243.1,-95.1,-289.5]  # 外資及陸資買賣超（億元）
 IX=[41040.08,40092.11,40194.91,38426.89,36033.29,36811.89]
 fig=plt.figure(figsize=(15.6,8.4),facecolor=BG)
-fig.text(0.05,0.94,"■",color=GOLD,fontsize=17); fig.text(0.077,0.932,"台股最慘的那兩天，外資反而賣得最少",color=INK,fontsize=27,fontproperties=sb)
+fig.text(0.05,0.94,"■",color=GOLD,fontsize=17); fig.text(0.077,0.932,"台股連跌一成的那兩天，外資反而賣得最少",color=INK,fontsize=27,fontproperties=sb)
 fig.lines.append(plt.Line2D([0.05,0.96],[0.902,0.902],transform=fig.transFigure,color=INK,lw=1.0))
 fig.text(0.077,0.887,"左：上市融資餘額，一週少了一千億元以上，其中 11/19、11/20 兩天就減少 728 億元。右：外資每日買賣超與加權指數收盤",color=GREY,fontsize=12.5,va='top')
 ax=fig.add_axes([0.07,0.12,0.40,0.66]); ax.set_facecolor(BG); fig.text(0.07,0.80,"上市融資餘額（億元）",color=INK,fontsize=15,fontproperties=sb)
