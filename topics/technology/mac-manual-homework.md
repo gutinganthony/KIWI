@@ -25,6 +25,7 @@ last_updated: 2026-07-06
 
 ### 🆕 2026-09-07 新增（主對話 session 產生）
 
+- [ ] **逐字核對 SemiAnalysis 11/25「SpaceX Blackwell 現貨租金降到 $10–12／GPU 小時」**（2026-11-26 加）。雲端 session 讀不到 SemiAnalysis 機構客戶報告，cryptobriefing、BigGo、Futu 也被網路設定擋下，目前只有搜尋摘要。要確認：原文措辭與日期、GPU 型號（B200／B300／GB300）、「Anthropic 不續約 5 萬顆 H200」是不續約還是猶豫中。查證稿：`claude/evaluate-business-opportunities-mJXMo` 分支的 `personal/research/2026-11-26-gpu-rental-pricing-factcheck.md`。
 - [ ] **開 `insights.redef.tech` 那篇〈SEMICON Taiwan 最新發展分析之一：從先進製程到 3D IC〉**
   （Jake 2026-09-07 提供的連結）。**雲端讀不到**：該網域被 egress proxy 擋（`EGRESS_BLOCKED`），
   且文章未被搜尋引擎索引（完整標題／URL slug／關鍵字組合皆搜不到內容）。
