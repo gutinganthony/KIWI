@@ -1,6 +1,6 @@
 {
  "fetch": {
-  "ran_at": "2026-11-26T12:57:51.292742+00:00",
+  "ran_at": "2026-11-27T12:54:08.699541+00:00",
   "days_scanned": 8,
   "days_fetched": 0,
   "days_skipped_cached": 0,
@@ -8,15 +8,23 @@
   "parse_failed": 0,
   "requests_ok": 0,
   "requests_failed": 8,
-  "elapsed_sec": 324.4,
+  "elapsed_sec": 323.2,
   "endpoint_health": [
+   {
+    "name": "daily-index 2026-11-27",
+    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR4/form.20261127.idx",
+    "ok": false,
+    "status": 403,
+    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
+    "elapsed_sec": 40.3
+   },
    {
     "name": "daily-index 2026-11-26",
     "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR4/form.20261126.idx",
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.46
+    "elapsed_sec": 40.2
    },
    {
     "name": "daily-index 2026-11-25",
@@ -24,7 +32,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.38
+    "elapsed_sec": 40.26
    },
    {
     "name": "daily-index 2026-11-24",
@@ -32,7 +40,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.46
+    "elapsed_sec": 40.25
    },
    {
     "name": "daily-index 2026-11-23",
@@ -40,7 +48,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.35
+    "elapsed_sec": 40.14
    },
    {
     "name": "daily-index 2026-11-20",
@@ -48,7 +56,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.36
+    "elapsed_sec": 40.33
    },
    {
     "name": "daily-index 2026-11-19",
@@ -56,7 +64,7 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.42
+    "elapsed_sec": 40.28
    },
    {
     "name": "daily-index 2026-11-18",
@@ -64,31 +72,23 @@
     "ok": false,
     "status": 403,
     "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.37
-   },
-   {
-    "name": "daily-index 2026-11-17",
-    "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR4/form.20261117.idx",
-    "ok": false,
-    "status": 403,
-    "error": "HTTP 403; body=<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-e",
-    "elapsed_sec": 40.34
+    "elapsed_sec": 40.24
    }
   ],
   "errors": [
+   "2026-11-27 索引抓取失敗（status=403）",
    "2026-11-26 索引抓取失敗（status=403）",
    "2026-11-25 索引抓取失敗（status=403）",
    "2026-11-24 索引抓取失敗（status=403）",
    "2026-11-23 索引抓取失敗（status=403）",
    "2026-11-20 索引抓取失敗（status=403）",
    "2026-11-19 索引抓取失敗（status=403）",
-   "2026-11-18 索引抓取失敗（status=403）",
-   "2026-11-17 索引抓取失敗（status=403）"
+   "2026-11-18 索引抓取失敗（status=403）"
   ]
  },
- "updated_at": "2026-11-26T13:03:44.018220+00:00",
+ "updated_at": "2026-11-27T12:59:57.337367+00:00",
  "funnel": {
-  "ran_at": "2026-11-26T13:03:15.799040+00:00",
+  "ran_at": "2026-11-27T12:59:32.058209+00:00",
   "days_loaded": 0,
   "funnel_stats": {
    "raw_filings": 0,
@@ -127,7 +127,7 @@
   "errors": []
  },
  "tracking": {
-  "ran_at": "2026-11-26T13:03:44.018008+00:00",
+  "ran_at": "2026-11-27T12:59:57.337210+00:00",
   "positions_total": 16,
   "positions_new": 0,
   "positions_updated": 15,
@@ -162,7 +162,7 @@
    "SWZ": "yahoo",
    "BOLD": "yahoo"
   },
-  "elapsed_sec": 28.1,
+  "elapsed_sec": 25.1,
   "endpoint_health": [],
   "errors": [
    "stooq EWSB: 回應非有效 CSV（No data？）",
