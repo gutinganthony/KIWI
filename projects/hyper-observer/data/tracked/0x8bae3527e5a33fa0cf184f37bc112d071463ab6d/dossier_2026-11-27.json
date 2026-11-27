@@ -1,0 +1,341 @@
+{
+  "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+  "label": "scan-best-candidate-9M-lowdd",
+  "snapshot_date": "2026-11-27",
+  "classification": "blowup_risk",
+  "classification_reasons": [
+    "userFills 出現 83 次強平 >= 3（反覆爆倉，真高風險）"
+  ],
+  "followable": {
+    "ok": true,
+    "reasons": []
+  },
+  "metrics": {
+    "address": "0x8bae3527e5a33fa0cf184f37bc112d071463ab6d",
+    "snapshot_date": "2026-11-27",
+    "pnl_source": "portfolio_curve",
+    "portfolio_window": "perpAllTime",
+    "low_confidence": false,
+    "total_pnl": 12785476.79,
+    "peak_pnl": 12817399.6,
+    "monthly_pnl": {
+      "2025-07": -73180.55,
+      "2025-08": -34288.37,
+      "2025-09": -8212.34,
+      "2025-10": 1435708.48,
+      "2025-11": 2045437.87,
+      "2025-12": 930544.52,
+      "2026-01": 638177.85,
+      "2026-02": 519822.91,
+      "2026-03": 1413004.59,
+      "2026-04": 1924051.99,
+      "2026-05": 106203.52,
+      "2026-06": -253202.61,
+      "2026-07": 1066691.25,
+      "2026-08": 1556583.85,
+      "2026-09": 255010.91,
+      "2026-10": 660797.69,
+      "2026-11": 602325.22
+    },
+    "active_months": 17,
+    "positive_month_ratio": 0.765,
+    "best_month_pnl": 2045437.87,
+    "max_drawdown_pct": 0.0554,
+    "current_drawdown_pct": 0.0025,
+    "max_single_day_crash_pct": 0.0331,
+    "span_days": 498.2,
+    "days_idle": 0.8,
+    "n_fills": 2000,
+    "profit_factor": 3.117,
+    "avg_win": 2486.75,
+    "avg_loss": 866.3,
+    "realized_win_rate": 0.521,
+    "avg_hold_hours": 460.276,
+    "net_direction_ratio": 0.0473,
+    "n_fills_truncated": true,
+    "n_fills_last_30d": 1366,
+    "n_events": 37,
+    "n_events_last_30d": 24,
+    "n_events_last_30d_est": 24,
+    "events_30d_coverage_days": 30.0,
+    "median_fills_per_event": 27,
+    "median_event_notional": 898926.47,
+    "median_gap_between_events_hours": 0.07,
+    "p90_gap_between_events_hours": 263.57,
+    "had_liquidation": true,
+    "n_liquidations": 83,
+    "top_coin": "xyz:NVDA",
+    "vlm": 381883797.39,
+    "vlm_to_pnl_ratio": 29.87,
+    "funding_total": -261170.74,
+    "n_open_positions": 1,
+    "n_open_positions_native": 1,
+    "dexs_with_positions": [],
+    "account_value_native": 2037.22,
+    "account_value_by_dex": {
+      "": 2037.22,
+      "abcd": 0.0,
+      "cash": 0.0,
+      "flx": 0.0,
+      "hyna": 0.0,
+      "io": 0.0,
+      "km": 0.0,
+      "mkts": 0.0,
+      "para": 0.0,
+      "vntl": 0.0,
+      "xyz": 0.0
+    },
+    "spot_value_usd": 3199121.55,
+    "spot_tokens": [
+      {
+        "coin": "USDC",
+        "qty": 3150906.2863963298,
+        "usd": 3150906.29,
+        "estimated": false
+      },
+      {
+        "coin": "USDT0",
+        "qty": 48215.25091058,
+        "usd": 48215.25,
+        "estimated": true
+      },
+      {
+        "coin": "USDH",
+        "qty": 0.01250805,
+        "usd": 0.01,
+        "estimated": false
+      }
+    ],
+    "total_value_all_venues": 3201158.77,
+    "non_native_share": 0.9994,
+    "current_max_leverage": 3.0,
+    "has_extreme_leverage": false,
+    "margin_types": [
+      "cross"
+    ],
+    "account_value": 2037.22,
+    "fetch_errors": []
+  },
+  "position_value": 6017.0,
+  "unrealized_pnl": -2405.4,
+  "n_open_positions": 1,
+  "open_positions": [
+    {
+      "coin": "APEX",
+      "szi": 46734.0,
+      "side": "long",
+      "entry_px": 0.18022,
+      "position_value": 6017.0025,
+      "unrealized_pnl": -2405.39898,
+      "leverage_value": 3.0,
+      "leverage_type": "cross",
+      "liquidation_px": null,
+      "margin_used": 2005.6675,
+      "max_leverage": 3.0,
+      "cum_funding_all_time": 48.311396,
+      "dex": ""
+    }
+  ],
+  "recent_fills": [
+    {
+      "time": "2026-11-21T05:09:53.433000+00:00",
+      "coin": "xyz:NVDA",
+      "dir": "Close Long",
+      "px": 127.8,
+      "sz": 3.91,
+      "closed_pnl": -1.49,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-21T05:09:53.433000+00:00",
+      "coin": "xyz:NVDA",
+      "dir": "Close Long",
+      "px": 127.8,
+      "sz": 11.737,
+      "closed_pnl": -4.46,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-21T05:09:53.522000+00:00",
+      "coin": "xyz:NVDA",
+      "dir": "Close Long",
+      "px": 127.8,
+      "sz": 2.452,
+      "closed_pnl": -0.93,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-21T05:09:53.614000+00:00",
+      "coin": "xyz:NVDA",
+      "dir": "Close Long",
+      "px": 127.8,
+      "sz": 1.988,
+      "closed_pnl": -0.76,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-21T05:09:53.725000+00:00",
+      "coin": "xyz:NVDA",
+      "dir": "Close Long",
+      "px": 127.8,
+      "sz": 2.186,
+      "closed_pnl": -0.83,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-21T05:09:53.725000+00:00",
+      "coin": "xyz:NVDA",
+      "dir": "Close Long",
+      "px": 127.8,
+      "sz": 7.73,
+      "closed_pnl": -2.94,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-21T05:09:53.725000+00:00",
+      "coin": "xyz:NVDA",
+      "dir": "Close Long",
+      "px": 127.8,
+      "sz": 7.825,
+      "closed_pnl": -2.97,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-21T05:09:53.725000+00:00",
+      "coin": "xyz:NVDA",
+      "dir": "Close Long",
+      "px": 127.8,
+      "sz": 13.184,
+      "closed_pnl": -5.01,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-21T05:09:53.792000+00:00",
+      "coin": "xyz:NVDA",
+      "dir": "Close Long",
+      "px": 127.8,
+      "sz": 2.467,
+      "closed_pnl": -0.94,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-21T05:09:53.915000+00:00",
+      "coin": "xyz:NVDA",
+      "dir": "Close Long",
+      "px": 127.8,
+      "sz": 0.109,
+      "closed_pnl": -0.04,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-21T05:09:53.915000+00:00",
+      "coin": "xyz:NVDA",
+      "dir": "Close Long",
+      "px": 127.8,
+      "sz": 7.73,
+      "closed_pnl": -2.94,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-21T05:09:53.915000+00:00",
+      "coin": "xyz:NVDA",
+      "dir": "Close Long",
+      "px": 127.8,
+      "sz": 30.404,
+      "closed_pnl": -11.55,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-21T05:09:53.915000+00:00",
+      "coin": "xyz:NVDA",
+      "dir": "Close Long",
+      "px": 127.8,
+      "sz": 7.73,
+      "closed_pnl": -2.94,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-21T05:09:54.055000+00:00",
+      "coin": "xyz:NVDA",
+      "dir": "Close Long",
+      "px": 127.8,
+      "sz": 3.315,
+      "closed_pnl": -1.26,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-21T05:09:54.055000+00:00",
+      "coin": "xyz:NVDA",
+      "dir": "Close Long",
+      "px": 127.8,
+      "sz": 0.713,
+      "closed_pnl": -0.27,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-21T05:09:54.184000+00:00",
+      "coin": "xyz:NVDA",
+      "dir": "Close Long",
+      "px": 127.8,
+      "sz": 39.093,
+      "closed_pnl": -14.86,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-21T05:09:54.477000+00:00",
+      "coin": "xyz:NVDA",
+      "dir": "Close Long",
+      "px": 127.8,
+      "sz": 20.0,
+      "closed_pnl": -7.6,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-21T05:09:54.605000+00:00",
+      "coin": "xyz:NVDA",
+      "dir": "Close Long",
+      "px": 127.8,
+      "sz": 145.607,
+      "closed_pnl": -55.33,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-21T05:09:54.605000+00:00",
+      "coin": "xyz:NVDA",
+      "dir": "Close Long",
+      "px": 127.8,
+      "sz": 782.288,
+      "closed_pnl": -297.27,
+      "is_liquidation": false
+    },
+    {
+      "time": "2026-11-21T05:09:54.605000+00:00",
+      "coin": "xyz:NVDA",
+      "dir": "Close Long",
+      "px": 127.8,
+      "sz": 281.328,
+      "closed_pnl": -106.9,
+      "is_liquidation": false
+    }
+  ],
+  "new_positions": [],
+  "disappeared_positions": [],
+  "initialized": false,
+  "raw_source": "snapshot",
+  "funds_trend": {
+    "status": "收手中（現金化＋資本外移）",
+    "n_points": 7,
+    "days": 7,
+    "threshold": 0.05,
+    "first_date": "2026-11-21",
+    "last_date": "2026-11-27",
+    "spot_share_first": 0.9075,
+    "spot_share_last": 0.9994,
+    "spot_share_change": 0.0918,
+    "total_first": 3549742.46,
+    "total_last": 3201158.77,
+    "total_change_pct": -0.0982,
+    "perp_change_pct": -0.9938,
+    "position_value_change_pct": -0.9961
+  }
+}
